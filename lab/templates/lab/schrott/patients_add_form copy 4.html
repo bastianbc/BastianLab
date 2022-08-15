@@ -1,0 +1,24 @@
+{% extends "__base.html" %}
+{% block content %}
+<h3>Patient</h3>
+{% csrf_token %}
+<form action="" method="post">
+
+{{form.as_p}}
+    
+
+</div>
+</form>
+
+<p>
+        <input type="submit" value="Add Patient">
+        <a href="{% url 'patients-list' %}">Cancel</a>
+</p>
+{% endblock %}
+{% if messages %}
+     {% for message in messages %}
+         <div class="text-center alert alert-{{ message.tags }}">
+             {{ message|safe }}
+         </div>
+     {% endfor %}
+ {% endif %}

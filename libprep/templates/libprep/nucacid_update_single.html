@@ -1,0 +1,8 @@
+{% extends "__base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block content %}
+{% crispy form %}
+<a href="{% url 'nucacid-delete' nucacids.nu_id %}" class="btn btn-danger" role="button"> Delete Nucleic Acid </a>
+{% endblock content %}

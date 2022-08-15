@@ -1,0 +1,35 @@
+{% extends "__base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block body_title %}
+<h2>Project {{projects.abbreviation}}</h2> 
+{% endblock body_title %}
+{% block content %}
+
+<form method="post" >
+{% csrf_token %}
+
+    <div class="container">
+        
+        
+            <div class="row justify-content-start">
+                <div class="col-6">{{ form.abbreviation|as_crispy_field }}</div>
+                <div class="w-100"></div>
+                <div class="col">{{ form.name|as_crispy_field }}</div>
+                <div class="col">{{ form.pi|as_crispy_field }}</div>
+                <div class="w-100"></div>
+                <div class="col">{{ form.description|as_crispy_field }}</div>
+                <div class="col">{{ form.speedtype|as_crispy_field }}</div>
+                <div class="w-100"></div>
+                <div class= "col-6"> {{form.date_start|as_crispy_field}}</div>
+            </div>
+            <br>
+    
+        <button type="submit" class="btn btn-success">Update Project</button>
+        <a href="{% url 'project-delete' projects.pr_id %}" class="btn btn-danger" role="button"> Delete Project</a>
+        <a href="{% url 'part-list' pk=projects.pr_id %}" class="btn btn-primary" role="button"> Add from Intellipath</a>
+    </div>
+        
+</form>
+    {% endblock %}

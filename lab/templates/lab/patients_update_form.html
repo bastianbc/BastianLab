@@ -1,0 +1,35 @@
+{% extends "__base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block body_title %}
+<h2>Patient {{patients.pat_id}}</h2> 
+{% endblock body_title %}
+{% block content %}
+
+<form method="post" >
+{% csrf_token %}
+
+    <div class="container">
+        
+        
+            <div class="row justify-content-start">
+                <div class="col-6">{{ form.pat_id|as_crispy_field }}</div>
+                <div class="col-6">Block count for this patient: {{ blockcount}}</div>
+                <div class="w-100"></div>
+                <div class="col-3">{{ form.dob|as_crispy_field }}</div>
+                <div class="col-3">{{ form.race|as_crispy_field }}</div>
+                <div class="w-100"></div>
+                <div class="col-6">{{ form.source|as_crispy_field }}</div>
+                <div class="w-100"></div>
+                <div class= "col-6"> {{form.notes|as_crispy_field}}</div>
+            </div>
+            <br>
+    
+        <button type="submit" class="btn btn-success">Update patient</button>
+        <a href="{% url 'patient-delete' patients.pa_id %}" class="btn btn-danger" role="button"> Delete Patient</a>
+        <!-- <button type="delete" class="btn btn-danger">Delete patient</button> -->
+    </div>
+        
+</form>
+    {% endblock %}

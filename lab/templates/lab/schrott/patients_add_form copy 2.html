@@ -1,0 +1,33 @@
+{% extends "__base.html" %}
+
+{% block container %}
+<h1>Patient</h1>
+<form method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Save">
+</form>
+<table class="table">
+        <tr>
+            <thead class="thead-light">
+                <tr>
+                    <th>Histo#</th><th>Site</th>
+                    <th>Ulceration</th><th>Fixation</th>
+                    <th>Project</th><th>Diagnosis</th>
+                    <th>Received</th><th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for a in blocklist %}
+                <tr>
+                <td>{{ block.block_id }}</td>
+                <td>{{ blocks.body_site}}</td>
+                <td>{{ blocks.ulceration }}</td>
+                <td>{{ blocks.fixation }}</td>
+                <td>{{ blocks.project }}</td>
+                <td>{{ blocks.receive}}</td>
+                <td>{{ blocks.notes}}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+    </table>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "__base.html" %}
+
+{% if all_patients %}
+
+
+{% block content %}
+
+<table class="table">
+    <tr>
+        <thead class="thead-light">
+            <tr>
+                <th>pat_id</th>
+                <th>Source</th><th>Sex</th>
+                <th>Race</th><th>Project</th>
+                <th>Blocks</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for patients in all_patients %}
+            <tr>
+            <td><a href="{% url 'patient-update' patients.pa_id %}">{{ patients.pat_id }}</a></td>
+            <td>{{ patients.source }}</td>
+            <td>{{ patients.sex }}</td>
+            <td>{{ patients.race }}</td>
+            <td>{{ patients.project }}</td>
+            <td><a href="{% url 'block-list' %}?patientid={{patients.pa_id}}">{{patients.blocks_set.count}}</a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+</table>
+<form class="form-inline my-2 my-lg-0" action="{% url 'patients-list' %}" method="get">
+        <input name='q' class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+</form>
+{% if is_paginated %}
+    {% include "_pagination.html" %}
+{% endif %}
+
+{% endblock %}
+{% else %}
+  <p>There are no patients to display.</p>
+{% endif %}
+
+
+

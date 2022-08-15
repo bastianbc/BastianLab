@@ -1,0 +1,110 @@
+
+{% extends "__base.html" %}
+{% load crispy_forms_tags %}
+
+{% block page_title %}
+<h1 Adding Tissues></h1>
+{% endblock %}
+
+{% block body_title %}
+<p></p>
+<h4>Editing blocks for Patient <a href="{{ patients.get_absolute_url }}">{{ patients.pat_id }}</a></h4>
+{% endblock body_title %}
+
+{% block content %}
+<form action="" method="post" enctype="multipart/form-data">
+<p>
+    <input type="submit" class="btn btn-primary" value="Update Blocks">
+    <a class= "btn btn-secondary" href="{{ request.scheme }}://{{ request.get_host }}{% url 'patients-list' %}" role="button">Cancel</a>
+</p>
+  
+
+    {% for hidden_field in form.hidden_fields %}
+      {{ hidden_field.errors }}
+      {{ hidden_field }}
+    {% endfor %}
+
+    {% csrf_token %}
+
+    {{ form.management_form }}
+    {{ form.non_form_errors }}
+
+    {% for block_form in form.forms %}
+    
+        
+      
+      
+      <div class="card"></div>
+      <div class="card-title"></div>
+        {% if block_form.instance.bl_id %}
+          <h4> Block #: {{ block_form.instance.old_block_id }}</h4>
+          {% else %}
+            {% if form.forms|length > 1 %}
+              Add another block
+            {% else %}
+              Add a block
+            {% endif %}
+          {% endif %}
+        </div>
+        {% for hidden_field in block_form.hidden_fields %}
+          {{ hidden_field.errors }}
+        {% endfor %}
+      <div class="card-body"></div>
+      <div class="row justify-content-start">
+          <label for="block_form.old_block_id">Path #</label>
+          <div class="col-4"> {{ block_form.old_block_id }}</div>
+          <div class="col-8">{{ block_form.project|as_crispy_field }}</div>
+      </div>
+        
+    </div> 
+  </div>
+      {% if block_form.nested %}
+        <div class="indent">
+
+          <h3>Areas</h3>
+
+          {{ block_form.nested.management_form }}
+          {{ block_form.nested.non_form_errors }}
+
+          <table>
+            {% for area_form in block_form.nested.forms %}
+
+              <tr>
+                <td>
+                  <em>
+                    {% if area_form.instance.area_id %}
+                      Area: {{ area_form.instance.area_type }}
+                    {% else %}
+                      Add an area
+                    {% endif %}
+                  </em>
+                </td>
+                <td>
+                  {% for hidden_field in area_form.hidden_fields %}
+                    {{ hidden_field.errors }}
+                  {% endfor %}
+
+                  <table>
+                    {{ area_form.as_table }}
+                  </table>
+                </td>
+                <td>
+                  {% if area_form.instance.image %}
+                    <img src="{{ area_form.instance.image.url }}" height="100" alt="{{ nested.form.instance.area_id }}">
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </table>
+        </div>
+      {% endif %}
+
+    {% endfor %}
+
+    <hr>
+
+    
+  </form>
+
+{% endblock content %}
+</body>

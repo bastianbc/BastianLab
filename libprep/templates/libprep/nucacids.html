@@ -1,0 +1,46 @@
+{% extends "__base.html" %}
+{% load crispy_forms_tags %}
+{% block body_title %}
+<h3>Editing Nucleic Acids for <a href="{{ blocks.areas.get_absolute_url }}">Block: {{ areas.old_block_id }}/ Area: {{ areas.area_type }}</a>
+</h3>
+{% endblock %}
+{% block content %}
+<form method="post">{% csrf_token %}
+    <h2>NucAcids</h2>
+    {% for form in nucacs %}
+        {% for hidden_field in form.hidden_fields %}
+            {{ hidden_field.errors }}
+            {{ hidden_field }}
+        {% endfor %}
+    <div class="container">
+            <div class="row justify-content-start">
+                <!-- <div class="col">{{ form.nu_id|as_crispy_field }}</div> -->
+                <!-- <div class="w-100"></div> -->
+                <div class="col">{{ form.na_type|as_crispy_field }}</div>
+                <div class="col">{{ form.date_extr|as_crispy_field }}</div>
+                
+                <div class="col">{{ form.method|as_crispy_field }}</div>
+                <div class="w-100"></div>
+                <div class="col">{{ form.qubit|as_crispy_field }}</div>
+                <!-- <div class="w-100"></div> -->
+                <div class= "col"> {{form.amount|as_crispy_field}}</div>
+                <div class="col">{{ form.re_ext|as_crispy_field }}</div>
+           
+                <div class= "col"> {{form.total_ext|as_crispy_field}}</div>
+                <div class="w-100"></div>
+                <div class="col">{{ form.na_sheared|as_crispy_field }}</div>
+ 
+                <div class= "col"> {{form.shearing_vol|as_crispy_field}}</div>
+                <div class="col">{{ form.te_vol|as_crispy_field }}</div>
+            </div>
+            <br>
+        </div>
+        {% endfor %}    
+
+
+
+    </div>
+    {{ nucacids.as_table }}
+    <input type="submit" value="Save">
+</form>
+{% endblock %}

@@ -1,0 +1,27 @@
+
+{% extends "__base.html" %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title">Delete Area #{{areas.old_area_id}}</h5>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="alert alert-warning" role="alert">
+                Are you sure you want to delete area <strong>{{ areas.old_area_id }}</strong>?
+            </div>
+            <form action="{% url 'area-delete' pk %}" method="POST">
+                    {% csrf_token %}
+                    
+                <input class="btn btn-default btn-danger" type="submit" value="Delete"/>
+                <a href="{% url 'areas-list' %}?projectid={{projectid}}" class="btn btn-secondary" role="button"> Cancel</a>
+                
+                
+                
+             </form>
+        </form>
+    </div>
+</div>
+{% endblock %}

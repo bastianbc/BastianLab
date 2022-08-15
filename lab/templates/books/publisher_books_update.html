@@ -1,0 +1,97 @@
+{% extends 'books/base.html' %}
+
+{% block page_title %}Editing books for {{ publisher.name }}{% endblock %}
+
+{% block body_title %}Editing books for <a href="{{ publisher.get_absolute_url }}">{{ publisher.name }}</a>{% endblock %}
+
+
+{% block content %}
+  <form action="" method="post" enctype="multipart/form-data">
+
+    {% for hidden_field in form.hidden_fields %}
+      {{ hidden_field.errors }}
+      {{ hidden_field }}
+    {% endfor %}
+
+    {% csrf_token %}
+
+    {{ form.management_form }}
+    {{ form.non_form_errors }}
+
+    {% for book_form in form.forms %}
+
+      <hr>
+
+      <h2>
+        {% if book_form.instance.id %}
+          Book #{{ book_form.instance.id }}</h2>
+        {% else %}
+          {% if form.forms|length > 1 %}
+            Add another book
+          {% else %}
+            Add a book
+          {% endif %}
+        {% endif %}
+      </h2>
+
+      {% for hidden_field in book_form.hidden_fields %}
+        {{ hidden_field.errors }}
+      {% endfor %}
+
+      <table>
+        {{ book_form.as_table }}
+      </table>
+
+      {% if book_form.nested %}
+        <div class="indent">
+
+          <h3>Images</h3>
+
+          {{ book_form.nested.management_form }}
+          {{ book_form.nested.non_form_errors }}
+
+          <table>
+            {% for bookimage_form in book_form.nested.forms %}
+
+              <tr>
+                <td>
+                  <em>
+                    {% if bookimage_form.instance.id %}
+                      BookImage #{{ bookimage_form.instance.id }}
+                    {% else %}
+                      Add an image
+                    {% endif %}
+                  </em>
+                </td>
+                <td>
+                  {% for hidden_field in bookimage_form.hidden_fields %}
+                    {{ hidden_field.errors }}
+                  {% endfor %}
+
+                  <table>
+                    {{ bookimage_form.as_table }}
+                  </table>
+                </td>
+                <td>
+                  {% if bookimage_form.instance.image %}
+                    <img src="{{ bookimage_form.instance.image.url }}" height="100" alt="{{ nested.form.instance.alt_text }}">
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </table>
+        </div>
+      {% endif %}
+
+    {% endfor %}
+
+    <hr>
+
+    <p>
+      <input type="submit" value="Update books">
+      &nbsp; &nbsp;
+      <a href="{{ publisher.get_absolute_url  }}">Cancel</a>
+    </p>
+  </form>
+
+{% endblock content %}

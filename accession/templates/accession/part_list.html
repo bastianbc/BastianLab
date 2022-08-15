@@ -1,0 +1,46 @@
+{% extends "__base.html" %}
+
+{% if all_patients %}
+
+
+{% block content %}
+<form >
+        {% csrf_token %}
+    <table class="table" method='get'>
+        <tr>
+            <thead class="thead-light">
+                <tr>
+                    <th>Selection</th>
+                    <th>Accession#</th>
+                    <th>Diagnosis</th>
+                    <th>Body Site</th><th>Gross</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for block in all_parts %}
+                <tr>
+                <td><input type="checkbox" name="blocks_selected" value="{{ block.block_id }}" class="form-check-input"></td>
+                <td><a href="{{ block.block_id }}">{{ block.block_id }}</a></td>
+                <td>{{ block.dx_text }}</td>
+                <td>{{ block.site_text }}</td>
+                <td>{{ block.gross }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+    </table>
+
+        <input name='q' class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        <button class="btn btn-primary" action="/accession/addparts" role="button" >Add to project: {{proj_name}}</button>
+</form>
+{% if is_paginated %}
+    {% include "_pagination.html" %}
+{% endif %}
+
+{% endblock %}
+{% else %}
+  <p>There are no blocks to display.</p>
+{% endif %}
+
+
+
