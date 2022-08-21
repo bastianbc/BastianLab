@@ -18,7 +18,7 @@ urlpatterns = [
     # path('', views.get_name),
     #path('addpatient/', views.get_patient, name='addpatient'),
     # path('patientlist/show/<pk>', PatientView.as_view(), name='patient-detail'),
-    path('patientlist/', PatientList.as_view(), name='patients-list'),
+    path('', PatientList.as_view(), name='patients-list'),
     path('patient/add/', PatientCreate.as_view(), name='patient-add'),
     # path('patient/search/', PatientSearch.as_view(), name='patient-search'),
     path('patient/<pk>/', PatientUpdate.as_view(), name='patient-update'),

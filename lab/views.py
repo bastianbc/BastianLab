@@ -8,7 +8,7 @@ from django.http import HttpResponseRedirect
 
 from django.core.paginator import Paginator, EmptyPage,\
                                   PageNotAnInteger
-from django.db.models import Q 
+from django.db.models import Q
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView, CreateView, DeleteView, UpdateView
@@ -31,7 +31,7 @@ class PatientCreate(SuccessMessageMixin, CreateView):
     # class Meta:
     success_message = "Patient %(pat_id)s was created successfully"
     success_url = reverse_lazy('patients-list')
-    
+
     # def your_view(request):
     #     form = YourForm(request.POST or None)
     # success = False
@@ -41,7 +41,7 @@ class PatientCreate(SuccessMessageMixin, CreateView):
     #         form = YourForm()
     #         success = True
     # return render(request, 'your_template.html', {'form': form})
-    
+
     # def form_valid(self, form):
     #     messages.add_message(
     #         self.request,
@@ -61,11 +61,11 @@ class PatientUpdate(SuccessMessageMixin, UpdateView):
         pk=self.kwargs.get('pk','')
         patient_object=Patients.objects.get(pa_id=pk)
         blockcount=patient_object.blocks_set.count()
-        context['blockcount']=blockcount  
+        context['blockcount']=blockcount
         # This is done to display the project abbreviation as a header of the list of blocks
         return context
-    
-    
+
+
 
 class PatientDelete(DeleteView):
     model = Patients
@@ -74,16 +74,16 @@ class PatientDelete(DeleteView):
     success_message = 'Patient deleted sucessfully'
     # fields = ['pat_id','sex','race','source','project','notes']
     success_url = reverse_lazy('patients-list')
-    
+
     # def delete(self, request, *args, **kwargs):
     #     messages.success(self.request, self.success_message)
     # #     return super(PatientDelete, self).delete(request, *args, **kwargs)
 
     # def get_context_data(self, **kwargs):
     #     context = super(PatientDelete, self).get_context_data(**kwargs)
-    #     print(context) 
-    
-   
+    #     print(context)
+
+
     # def get_object(self, queryset=None):
     #     """ Hook to ensure object is owned by request.user. """
     #     obj = super(PatientDelete, self).get_object()
@@ -91,13 +91,13 @@ class PatientDelete(DeleteView):
     #         raise Http404
     #     assert False
     #     return obj
-         
+
 class PatientList(ListView):
     model = Patients
     template_name = 'lab/patients_list2.html'
     context_object_name = 'all_patients'
-    paginate_by = 10    
-    
+    paginate_by = 10
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # print(context)
@@ -129,7 +129,7 @@ class PatientList(ListView):
 #     #     context['page_list'] = Page.objects.all()
 #     #     return context
 
-        
+
 class PatientsBlocksUpdateView(SingleObjectMixin, FormView):
     # For adding blocks to a patient, or editing them.
 
@@ -164,8 +164,8 @@ class PatientsBlocksUpdateView(SingleObjectMixin, FormView):
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
-        return reverse('block-update', kwargs={'pk': self.object.pk}) 
-    
+        return reverse('block-update', kwargs={'pk': self.object.pk})
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['query'] = self.request.GET.get('q')
@@ -244,7 +244,7 @@ BlockFormset = inlineformset_factory(
 
 
 
-    
+
 
 # from django.contrib import messages
 # from django.http import HttpResponseRedirect
@@ -271,8 +271,3 @@ BlockFormset = inlineformset_factory(
 # class PublisherDetailView(DetailView):
 #     model = Publisher
 #     template_name = 'books/publisher_detail.html'
-
-
-
-
-

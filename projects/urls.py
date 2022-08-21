@@ -8,7 +8,7 @@ from .forms import ProjectForm
 
 # app_name = 'projects'
 urlpatterns = [
-    path('projectlist/', ProjectList.as_view(), name='projects-list'),
+    path('', ProjectList.as_view(), name='projects-list'),
     path('project/add/', ProjectCreate.as_view(), name='project-add'),
     path('project/update/<pk>', ProjectUpdate.as_view(), name='project-update'),
     path('projectlist/<pk>/', ProjectUpdate.as_view(), name='project-update'),

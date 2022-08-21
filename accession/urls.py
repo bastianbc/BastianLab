@@ -4,7 +4,7 @@ from accession.views import PartList, BlockList, addparts, BlockUpdate, BlockDel
 # from .forms import PatientForm
 
 urlpatterns = [
-    path('partlist/', PartList.as_view(), name='part-list'),
+    path('', PartList.as_view(), name='part-list'),
     path('partlist/<int:pk>/',PartList.as_view(), name='part-list'),
     # path(r'^partlist/(?P<pk>\d+)/$',PartList.as_view(), name='part-list'),
     path('addparts/', addparts, name='add-parts'),
@@ -19,4 +19,4 @@ urlpatterns = [
 
 
 
-] 
+]

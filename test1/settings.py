@@ -61,17 +61,18 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'django_tables2',
-    'debug_toolbar',
+    # 'debug_toolbar',
     'widget_tweaks',
     'rest_framework',
-    'crispy_forms'
+    'crispy_forms',
+    'home.apps.HomeConfig',
 ]
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 CRISPY_FAIL_SILENTLY = not DEBUG
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -108,10 +109,11 @@ WSGI_APPLICATION = 'test1.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'USER': 'borisbastian',
-        'NAME': 'labdb3',
-        'HOST': '',
-        'PORT': ''
+        'USER': 'postgres',
+        'PASSWORD': '12345678',
+        'NAME': 'labdb',
+        'HOST': 'development.c7oasmx9kbh5.us-east-1.rds.amazonaws.com',
+        'PORT': '5432'
     }
 # }
 # DATABASES = {
@@ -172,4 +174,3 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ]
 }
-

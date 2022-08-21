@@ -1,4 +1,4 @@
-{% extends "__base.html" %}
+{% extends "master.html" %}
 
 {% if all_projects %}
 
@@ -24,7 +24,7 @@
             <td>{{ projects.date_start }}</td>
             <td>{{ projects.speedtype }}</td>
             <td><a href="{% url 'block-list' %}?projectid={{projects.pr_id}}">{{projects.blocks_set.count}}</a></td>
-            
+
             </tr>
         {% endfor %}
         </tbody>
@@ -41,6 +41,3 @@
 {% else %}
   <p>There are no projects to display.</p>
 {% endif %}
-
-
-

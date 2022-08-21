@@ -38,15 +38,16 @@ urlpatterns = [
     path('accession/', include('accession.urls')),
     path('api-auth/', include('rest_framework.urls')),
     url(r'^favicon\.ico$',RedirectView.as_view(url='/static/bastianlab.png')),
+    path('', include('home.urls')),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-if settings.DEBUG:
-    import debug_toolbar
-    urlpatterns = [
-        path('__debug__/', include(debug_toolbar.urls)),
-        # url(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT,}),
-        # For django versions before 2.0:
-        # url(r'^__debug__/', include(debug_toolbar.urls)),
-
-    ] + urlpatterns
+# if settings.DEBUG:
+#     import debug_toolbar
+#     urlpatterns = [
+#         path('__debug__/', include(debug_toolbar.urls)),
+#         # url(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT,}),
+#         # For django versions before 2.0:
+#         # url(r'^__debug__/', include(debug_toolbar.urls)),
+#
+#     ] + urlpatterns
