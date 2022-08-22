@@ -42,7 +42,7 @@ SECRET_KEY = 'e6l2xn#ojz2g=tlgloq*oo*kxm)3z*8pcl*6e^)$n@-u8=n*s&'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1']
+ALLOWED_HOSTS = ['*']
 INTERNAL_IPS = ('127.0.0.1',)
 
 
