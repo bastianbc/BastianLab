@@ -13,8 +13,7 @@ from datetime import date
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 # from projects.models import Projects
-
-
+from django.db.models import Q
 
 class Patients(models.Model):
     pat_id = models.CharField(max_length=12, blank=False, null=False, unique=True)
@@ -29,14 +28,57 @@ class Patients(models.Model):
     pa_id = models.AutoField(primary_key=True)
     date_added = models.DateTimeField(auto_now=True)
 
-    def get_absolute_url(self):
-        return reverse('patient-update', kwargs={'pk': self.pk})
-
     class Meta:
         managed = True
         db_table = 'patients'
         verbose_name = 'Patient'
         verbose_name_plural = 'Patients'
+
+    def get_absolute_url(self):
+        return reverse('patient-update', kwargs={'pk': self.pk})
+
+    def query_by_args(self, **kwargs):
+        try:
+            ORDER_COLUMN_CHOICES = {
+                '1': 'pat_id',
+                '2': 'sex',
+                '3': 'race',
+                '4': 'source',
+                '5': 'project',
+            }
+            draw = int(kwargs.get('draw', None)[0])
+            length = int(kwargs.get('length', None)[0])
+            start = int(kwargs.get('start', None)[0])
+            search_value = kwargs.get('search[value]', None)[0]
+            order_column = kwargs.get('order[0][column]', None)[0]
+            order = kwargs.get('order[0][dir]', None)[0]
+            print("search_value: ", search_value)
+            order_column = ORDER_COLUMN_CHOICES[order_column]
+            # django orm '-' -> desc
+            if order == 'desc':
+                order_column = '-' + order_column
+
+            queryset = Patients.objects.all()
+            total = queryset.count()
+
+            if search_value:
+                queryset = queryset.filter(Q(pat_id__icontains=search_value) |
+                                           Q(race__icontains=search_value) |
+                                           Q(source__icontains=search_value) |
+                                           Q(project__icontains=search_value))
+
+            count = queryset.count()
+            queryset = queryset.order_by(order_column)[start:start + length]
+            # queryset = queryset[start:start + length]
+            return {
+                'items': queryset,
+                'count': count,
+                'total': total,
+                'draw': draw
+            }
+        except Exception as e:
+            print(str(e))
+            raise
 
 class Blocks(models.Model):
     old_block_id = models.CharField(max_length=50, blank=True, null=False, unique=True)
@@ -120,10 +162,9 @@ class Areas(models.Model):
     class Meta:
         managed = True
         db_table = 'areas'
-        
+
     # def save(self, *args, **kwargs):
     #     if not self.pk:
     #         Areas.old_block_id = Blocks.old_block_id
     #         print('Hello:', Areas.old_block_id)
     #     super().save(*args, **kwargs)
-

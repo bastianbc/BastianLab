@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'crispy_forms',
     'home.apps.HomeConfig',
+    'authentication.apps.AuthenticationConfig',
 ]
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 CRISPY_FAIL_SILENTLY = not DEBUG
@@ -174,3 +175,8 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ]
 }
+
+# Authentication settings
+LOGIN_URL = '/auth/login'
+LOGOUT_URL = '/auth/logout'
+LOGIN_REDIRECT_URL = '/dashboard'

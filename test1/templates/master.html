@@ -29,7 +29,8 @@ License: For each use you must have a valid license purchased only from above li
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700" />
 		<!--end::Fonts-->
 		<!--begin::Vendor Stylesheets(used by this page)-->
-		<link href="/static/assets/plugins/custom/fullcalendar/fullcalendar.bundle.css" rel="stylesheet" type="text/css" />
+		<!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css"> -->
+		<link href="/static/assets/plugins/custom/prismjs/prismjs.bundle.css" rel="stylesheet" type="text/css" />
 		<link href="/static/assets/plugins/custom/datatables/datatables.bundle.css" rel="stylesheet" type="text/css" />
 		<!--end::Vendor Stylesheets-->
 		<!--begin::Global Stylesheets Bundle(used by all pages)-->
@@ -1106,7 +1107,7 @@ License: For each use you must have a valid license purchased only from above li
 												<!--end::Menu item-->
 												<!--begin::Menu item-->
 												<div class="menu-item px-5">
-													<a href="../../demo21/dist/authentication/layouts/corporate/sign-in.html" class="menu-link px-5">Sign Out</a>
+													<a href="/auth/logout" class="menu-link px-5">Sign Out</a>
 												</div>
 												<!--end::Menu item-->
 											</div>
@@ -3717,7 +3718,6 @@ License: For each use you must have a valid license purchased only from above li
 		<script src="/static/assets/js/scripts.bundle.js"></script>
 		<!--end::Global Javascript Bundle-->
 		<!--begin::Vendors Javascript(used by this page)-->
-		<script src="/static/assets/plugins/custom/fullcalendar/fullcalendar.bundle.js"></script>
 		<!-- <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
 		<script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
 		<script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
@@ -3729,6 +3729,9 @@ License: For each use you must have a valid license purchased only from above li
 		<script src="https://cdn.amcharts.com/lib/5/geodata/usaLow.js"></script>
 		<script src="https://cdn.amcharts.com/lib/5/geodata/worldTimeZonesLow.js"></script>
 		<script src="https://cdn.amcharts.com/lib/5/geodata/worldTimeZoneAreasLow.js"></script> -->
+		<!-- <script src="https://code.jquery.com/jquery-3.5.1.js" charset="utf-8"></script> -->
+		<!-- <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js" charset="utf-8"></script> -->
+		<script src="/static/assets/plugins/custom/prismjs/prismjs.bundle.js"></script>
 		<script src="/static/assets/plugins/custom/datatables/datatables.bundle.js"></script>
 		<!--end::Vendors Javascript-->
 		<!--begin::Custom Javascript(used by this page)-->
@@ -3738,6 +3741,8 @@ License: For each use you must have a valid license purchased only from above li
 		<script src="/static/assets/js/custom/utilities/modals/users-search.js"></script>
 		<!--end::Custom Javascript-->
 		<!--end::Javascript-->
+		{% block scripts %}
+		{% endblock %}
 	</body>
 	<!--end::Body-->
 </html>

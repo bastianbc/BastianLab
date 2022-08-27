@@ -1,5 +1,5 @@
 from typing import Any
-from django.shortcuts import render
+from django.shortcuts import render, redirect, HttpResponse
 from django.urls import reverse_lazy, reverse
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import messages
@@ -22,7 +22,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView, CreateView, DeleteView, UpdateView
 from .models import Patients, Blocks, Areas
 from .forms import PatientForm, PatientsBlocksWithAreasFormset
-
+import json
 
 class PatientCreate(SuccessMessageMixin, CreateView):
     model = Patients
@@ -92,33 +92,65 @@ class PatientDelete(DeleteView):
     #     assert False
     #     return obj
 
-class PatientList(ListView):
-    model = Patients
-    template_name = 'lab/patients_list2.html'
-    context_object_name = 'all_patients'
-    paginate_by = 10
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # print(context)
-        context['query'] = self.request.GET.get('q')
-        #print(context)
-        # magical = context.get('object_list')
-        # print(magical)
-        return context
+def filter_patients(request):
+    from .serializers import PatientsSerializer
+    from django.http import JsonResponse
 
-    def get_queryset(self):
-        query = self.request.GET.get('q')
-        object_list = Patients.objects.all().order_by('-date_added')
-        # print('Hello')
-        if query:
-            object_list = Patients.objects.filter(
-            Q(source__icontains=query) | Q(project__icontains=query
-            ) |Q(pat_id__icontains=query)
-            ).order_by('pa_id')
-        # print(object_list)
-        return object_list
+    patients = Patients().query_by_args(**request.GET)
+    serializer = PatientsSerializer(patients['items'], many=True)
+    result = dict()
+    result['data'] = serializer.data
+    result['draw'] = patients['draw']
+    result['recordsTotal'] = patients['total']
+    result['recordsFiltered'] = patients['count']
 
+    return JsonResponse(result)
+
+def patients(request):
+    return render(request,"patient_list.html")
+
+def new_patient(request):
+    if request.method=="POST":
+        form = PatientForm(request.POST)
+        if form.is_valid():
+            patient = form.save()
+            messages.success(request,"Patient %s was created successfully." % patient.pat_id)
+            return redirect("patients")
+        else:
+            messages.error(request,"Patient wasn't created.")
+    else:
+        form = PatientForm()
+
+    return render(request,"patient.html",locals())
+
+def edit_patient(request,id):
+    patient = Patients.objects.get(pat_id=id)
+
+    if request.method=="POST":
+        form = PatientForm(request.POST,instance=patient)
+        if form.is_valid():
+            patient = form.save()
+            messages.success(request,"Patient %s was updated successfully." % patient.pat_id)
+            return redirect("patients")
+        else:
+            messages.error(request,"Patient wasn't updated!")
+    else:
+        form = PatientForm(instance=patient)
+
+    return render(request,"patient.html",locals())
+
+def delete_patient(request,id):
+    try:
+        patient = Patients.objects.get(pat_id=id)
+        patient.delete()
+        messages.success(request,"Patient %s was deleted successfully." % patient.pat_id)
+        deleted = True
+    except Exception as e:
+        messages.error(request, "Patient %s wasn't deleted!" % patient.pat_id)
+        deleted = False
+
+    return JsonResponse({ "deleted":True })
 
 # class PatientView(DetailView):
 #     model = Patients

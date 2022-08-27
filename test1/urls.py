@@ -36,8 +36,8 @@ urlpatterns = [
     path('projects/', include('projects.urls')),
     path('libprep/', include('libprep.urls')),
     path('accession/', include('accession.urls')),
-    path('api-auth/', include('rest_framework.urls')),
-    url(r'^favicon\.ico$',RedirectView.as_view(url='/static/bastianlab.png')),
+    path('auth/', include('authentication.urls')),
+    # url(r'^favicon\.ico$',RedirectView.as_view(url='/static/bastianlab.png')),
     path('', include('home.urls')),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
