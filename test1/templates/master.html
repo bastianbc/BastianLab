@@ -1159,14 +1159,26 @@ License: For each use you must have a valid license purchased only from above li
 											</a>
 										</li>
 										<li class="nav-item flex-equal">
+											<a class="nav-link d-flex flex-column text-nowrap flex-center w-100 {% if 'projects' in request.path %} active {% endif %}" href="/projects">
+												<span class="text-uppercase text-dark fw-bold fs-6 fs-lg-5">Projects</span>
+												<span class="text-gray-500 fs-8 fs-lg-7">Activities & Logs</span>
+											</a>
+										</li>
+										<li class="nav-item flex-equal">
 											<a class="nav-link d-flex flex-column text-nowrap flex-center w-100 {% if 'lab' in request.path %} active {% endif %}" href="/lab">
 												<span class="text-uppercase text-dark fw-bold fs-6 fs-lg-5">Patients</span>
 												<span class="text-gray-500 fs-8 fs-lg-7">Finance & Reporting</span>
 											</a>
 										</li>
 										<li class="nav-item flex-equal">
-											<a class="nav-link d-flex flex-column text-nowrap flex-center w-100 {% if 'accession' in request.path %} active {% endif %}" href="/accession">
-												<span class="text-uppercase text-dark fw-bold fs-6 fs-lg-5">Accessions</span>
+											<a class="nav-link d-flex flex-column text-nowrap flex-center w-100 {% if 'accession' in request.path %} active {% endif %}" href="#">
+												<span class="text-uppercase text-dark fw-bold fs-6 fs-lg-5">Blocks</span>
+												<span class="text-gray-500 fs-8 fs-lg-7">Orders & Delivery</span>
+											</a>
+										</li>
+										<li class="nav-item flex-equal">
+											<a class="nav-link d-flex flex-column text-nowrap flex-center w-100 {% if 'accession' in request.path %} active {% endif %}" href="#">
+												<span class="text-uppercase text-dark fw-bold fs-6 fs-lg-5">Areas</span>
 												<span class="text-gray-500 fs-8 fs-lg-7">Orders & Delivery</span>
 											</a>
 										</li>
@@ -1176,12 +1188,7 @@ License: For each use you must have a valid license purchased only from above li
 												<span class="text-gray-500 fs-8 fs-lg-7">Customers Directory</span>
 											</a>
 										</li>
-										<li class="nav-item flex-equal">
-											<a class="nav-link d-flex flex-column text-nowrap flex-center w-100 {% if 'projects' in request.path %} active {% endif %}" href="/projects">
-												<span class="text-uppercase text-dark fw-bold fs-6 fs-lg-5">Projects</span>
-												<span class="text-gray-500 fs-8 fs-lg-7">Activities & Logs</span>
-											</a>
-										</li>
+
 									</ul>
 								</div>
 								<!--end::Header tabs-->

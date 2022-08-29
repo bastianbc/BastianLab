@@ -52,7 +52,7 @@ class Patients(models.Model):
             search_value = kwargs.get('search[value]', None)[0]
             order_column = kwargs.get('order[0][column]', None)[0]
             order = kwargs.get('order[0][dir]', None)[0]
-            print("search_value: ", search_value)
+            
             order_column = ORDER_COLUMN_CHOICES[order_column]
             # django orm '-' -> desc
             if order == 'desc':

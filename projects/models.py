@@ -1,5 +1,6 @@
 from django.db import models
 from datetime import date
+from django.db.models import Q
 
 class Projects(models.Model):
 
@@ -23,9 +24,52 @@ class Projects(models.Model):
         db_table = 'projects'
         verbose_name = 'Project'
         verbose_name_plural = 'Projects'
-    
+
     # def get_absolute_url(self):
     #         return reverse('patient-update', kwargs={'pk': self.pk})
 
     def __str__(self):
        return self.name
+
+    def query_by_args(self, **kwargs):
+        try:
+            ORDER_COLUMN_CHOICES = {
+                '1': 'abbreviation',
+                '2': 'name',
+                '3': 'pi',
+                '4': 'date_start',
+                '5': 'speedtype',
+            }
+            draw = int(kwargs.get('draw', None)[0])
+            length = int(kwargs.get('length', None)[0])
+            start = int(kwargs.get('start', None)[0])
+            search_value = kwargs.get('search[value]', None)[0]
+            order_column = kwargs.get('order[0][column]', None)[0]
+            order = kwargs.get('order[0][dir]', None)[0]
+
+            order_column = ORDER_COLUMN_CHOICES[order_column]
+            # django orm '-' -> desc
+            if order == 'desc':
+                order_column = '-' + order_column
+
+            queryset = Projects.objects.all()
+            total = queryset.count()
+
+            if search_value:
+                queryset = queryset.filter(Q(pr_id__icontains=search_value) |
+                                           Q(name__icontains=search_value) |
+                                           Q(pi__icontains=search_value) |
+                                           Q(speedtype__icontains=search_value))
+
+            count = queryset.count()
+            queryset = queryset.order_by(order_column)[start:start + length]
+            # queryset = queryset[start:start + length]
+            return {
+                'items': queryset,
+                'count': count,
+                'total': total,
+                'draw': draw
+            }
+        except Exception as e:
+            print(str(e))
+            raise

@@ -21,14 +21,14 @@ var KTDatatablesServerSide = function () {
                 selector: 'td:first-child input[type="checkbox"]',
                 className: 'row-selected'
             },
-            ajax: '/lab/filter_patients',
+            ajax: '/projects/filter_projects',
             columns: [
                 { data: null },
-                { data: 'pat_id' },
-                { data: 'source' },
-                { data: 'sex' },
-                { data: 'race' },
-                { data: 'project' },
+                { data: 'abbreviation' },
+                { data: 'name' },
+                { data: 'pi' },
+                { data: 'date_start' },
+                { data: 'speedtype' },
                 // { data: 'blocks' },
             ],
             columnDefs: [
@@ -70,7 +70,7 @@ var KTDatatablesServerSide = function () {
                             <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4" data-kt-menu="true">
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/lab/edit/`+ row["pat_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
+                                    <a href="/projects/edit/`+ row["pr_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
                                         Edit
                                     </a>
                                 </div>
@@ -78,7 +78,7 @@ var KTDatatablesServerSide = function () {
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/lab/delete/` + row["pat_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
+                                    <a href="/projects/delete/` + row["pr_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
                                         Delete
                                     </a>
                                 </div>
