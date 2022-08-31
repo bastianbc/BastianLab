@@ -1,8 +1,8 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group
 from django.db.models import Q
 
-class User(User):
+class Group(Group):
 
     class Meta:
         proxy = True
@@ -10,10 +10,7 @@ class User(User):
     def query_by_args(self, **kwargs):
         try:
             ORDER_COLUMN_CHOICES = {
-                '1': 'username',
-                '2': 'first_name',
-                '3': 'last_name',
-                '4': 'last_login',
+                '1': 'name',
             }
             draw = int(kwargs.get('draw', None)[0])
             length = int(kwargs.get('length', None)[0])
@@ -27,15 +24,11 @@ class User(User):
             if order == 'desc':
                 order_column = '-' + order_column
 
-            queryset = User.objects.filter(is_superuser=False)
+            queryset = Group.objects.all()
             total = queryset.count()
 
             if search_value:
-                queryset = queryset.filter(
-                    Q(username__icontains=search_value) |
-                    Q(first_name__icontains=search_value) |
-                    Q(last_name__icontains=search_value)
-                )
+                queryset = queryset.filter(Q(name__icontains=search_value))
 
             count = queryset.count()
             queryset = queryset.order_by(order_column)[start:start + length]
@@ -49,7 +42,3 @@ class User(User):
         except Exception as e:
             print(str(e))
             raise
-
-    def reset_password(self):
-        self.last_login = None
-        self.save()

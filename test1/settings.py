@@ -67,6 +67,8 @@ INSTALLED_APPS = [
     'crispy_forms',
     'home.apps.HomeConfig',
     'authentication.apps.AuthenticationConfig',
+    'group.apps.GroupConfig',
+    'account.apps.AccountConfig',
 ]
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 CRISPY_FAIL_SILENTLY = not DEBUG

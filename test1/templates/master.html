@@ -827,22 +827,86 @@ License: For each use you must have a valid license purchased only from above li
 										</div>
 										<!--end::Search-->
 										<!--begin::Activities-->
-										<div class="d-flex align-items-center ms-2">
-											<!--begin::Drawer toggle-->
-											<div class="btn btn-icon btn-custom" id="kt_activities_toggle">
-												<!--begin::Svg Icon | path: icons/duotune/general/gen032.svg-->
-												<span class="svg-icon svg-icon-1">
+
+
+										<div class="d-flex align-items-center ms-2" id="kt_header_user_menu_toggle">
+											<!--begin::Menu- wrapper-->
+											{% if request.user.is_superuser %}
+											<!--begin::User icon(remove this button to use user avatar as menu toggle)-->
+											<div class="btn btn-icon btn-custom" data-kt-menu-trigger="click" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end">
+												<!--begin::Svg Icon | path: C:/wamp64/www/keenthemes/core/html/src/media/icons/duotune/coding/cod009.svg-->
+												<span class="svg-icon svg-icon-muted svg-icon-2hx">
 													<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-														<rect x="8" y="9" width="3" height="10" rx="1.5" fill="currentColor" />
-														<rect opacity="0.5" x="13" y="5" width="3" height="14" rx="1.5" fill="currentColor" />
-														<rect x="18" y="11" width="3" height="8" rx="1.5" fill="currentColor" />
-														<rect x="3" y="13" width="3" height="6" rx="1.5" fill="currentColor" />
+														<path opacity="0.3" d="M22.0318 8.59998C22.0318 10.4 21.4318 12.2 20.0318 13.5C18.4318 15.1 16.3318 15.7 14.2318 15.4C13.3318 15.3 12.3318 15.6 11.7318 16.3L6.93177 21.1C5.73177 22.3 3.83179 22.2 2.73179 21C1.63179 19.8 1.83177 18 2.93177 16.9L7.53178 12.3C8.23178 11.6 8.53177 10.7 8.43177 9.80005C8.13177 7.80005 8.73176 5.6 10.3318 4C11.7318 2.6 13.5318 2 15.2318 2C16.1318 2 16.6318 3.20005 15.9318 3.80005L13.0318 6.70007C12.5318 7.20007 12.4318 7.9 12.7318 8.5C13.3318 9.7 14.2318 10.6001 15.4318 11.2001C16.0318 11.5001 16.7318 11.3 17.2318 10.9L20.1318 8C20.8318 7.2 22.0318 7.59998 22.0318 8.59998Z" fill="currentColor"/>
+														<path d="M4.23179 19.7C3.83179 19.3 3.83179 18.7 4.23179 18.3L9.73179 12.8C10.1318 12.4 10.7318 12.4 11.1318 12.8C11.5318 13.2 11.5318 13.8 11.1318 14.2L5.63179 19.7C5.23179 20.1 4.53179 20.1 4.23179 19.7Z" fill="currentColor"/>
 													</svg>
 												</span>
 												<!--end::Svg Icon-->
 											</div>
-											<!--end::Drawer toggle-->
+											<!--end::User icon-->
+											<!--begin::Admin area menu-->
+											<div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg menu-state-color fw-semibold py-4 fs-6 w-275px" data-kt-menu="true">
+												<!--begin::Menu item-->
+												<div class="menu-item px-3">
+													<div class="menu-content d-flex align-items-center px-3">
+														<!--begin::Avatar-->
+														<div class="symbol symbol-50px me-5">
+															<img alt="Logo" src="/static/assets/media/illustrations/unitedpalms-1/9.png" />
+														</div>
+														<!--end::Avatar-->
+														<!--begin::Username-->
+														<div class="d-flex flex-column">
+															<div class="fw-bold d-flex align-items-center fs-5">Admin Area</div>
+														</div>
+														<!--end::Username-->
+													</div>
+												</div>
+												<!--end::Menu item-->
+												<!--begin::Menu separator-->
+												<div class="separator my-2"></div>
+												<!--end::Menu separator-->
+												<!--begin::Menu item-->
+												<div class="menu-item px-5">
+													<a href="/group" class="menu-link px-3 py-2" data-kt-element="mode" data-kt-value="light">
+														<span class="menu-icon" data-kt-element="icon">
+															<!--begin::Svg Icon | path: C:/wamp64/www/keenthemes/core/html/src/media/icons/duotune/communication/com014.svg-->
+															<span class="svg-icon svg-icon-muted svg-icon-2hx">
+																<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+																	<path d="M16.0173 9H15.3945C14.2833 9 13.263 9.61425 12.7431 10.5963L12.154 11.7091C12.0645 11.8781 12.1072 12.0868 12.2559 12.2071L12.6402 12.5183C13.2631 13.0225 13.7556 13.6691 14.0764 14.4035L14.2321 14.7601C14.2957 14.9058 14.4396 15 14.5987 15H18.6747C19.7297 15 20.4057 13.8774 19.912 12.945L18.6686 10.5963C18.1487 9.61425 17.1285 9 16.0173 9Z" fill="currentColor"/>
+																	<rect opacity="0.3" x="14" y="4" width="4" height="4" rx="2" fill="currentColor"/>
+																	<path d="M4.65486 14.8559C5.40389 13.1224 7.11161 12 9 12C10.8884 12 12.5961 13.1224 13.3451 14.8559L14.793 18.2067C15.3636 19.5271 14.3955 21 12.9571 21H5.04292C3.60453 21 2.63644 19.5271 3.20698 18.2067L4.65486 14.8559Z" fill="currentColor"/>
+																	<rect opacity="0.3" x="6" y="5" width="6" height="6" rx="3" fill="currentColor"/>
+																</svg>
+															</span>
+															<!--end::Svg Icon-->
+														</span>
+														<span class="menu-title">Groups</span>
+													</a>
+												</div>
+												<!--end::Menu item-->
+												<!--begin::Menu item-->
+												<div class="menu-item px-5">
+													<a href="/account" class="menu-link px-3 py-2" data-kt-element="mode" data-kt-value="light">
+														<span class="menu-icon" data-kt-element="icon">
+															<!--begin::Svg Icon | path: C:/wamp64/www/keenthemes/core/html/src/media/icons/duotune/communication/com013.svg-->
+															<span class="svg-icon svg-icon-muted svg-icon-2hx">
+																<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+																	<path d="M6.28548 15.0861C7.34369 13.1814 9.35142 12 11.5304 12H12.4696C14.6486 12 16.6563 13.1814 17.7145 15.0861L19.3493 18.0287C20.0899 19.3618 19.1259 21 17.601 21H6.39903C4.87406 21 3.91012 19.3618 4.65071 18.0287L6.28548 15.0861Z" fill="currentColor"/>
+																	<rect opacity="0.3" x="8" y="3" width="8" height="8" rx="4" fill="currentColor"/>
+																</svg>
+															</span>
+															<!--end::Svg Icon-->
+														</span>
+														<span class="menu-title">Accounts</span>
+													</a>
+												</div>
+												<!--end::Menu item-->
+											</div>
+											<!--end::Admin area menu-->
+											{% endif %}
+											<!--end::Menu wrapper-->
 										</div>
+
 										<!--end::Activities-->
 										<!--begin::Theme mode-->
 										<div class="d-flex align-items-center ms-2">
@@ -967,9 +1031,8 @@ License: For each use you must have a valid license purchased only from above li
 														<!--end::Avatar-->
 														<!--begin::Username-->
 														<div class="d-flex flex-column">
-															<div class="fw-bold d-flex align-items-center fs-5">Max Smith
-															<span class="badge badge-light-success fw-bold fs-8 px-2 py-1 ms-2">Pro</span></div>
-															<a href="#" class="fw-semibold text-muted text-hover-primary fs-7">max@kt.com</a>
+															<div class="fw-bold d-flex align-items-center fs-5"> {% if request.user.is_superuser %} {{ request.user.username }} {% else %} {{ request.user.first_name }} {{ request.user.last_name }} {% endif %} </div>
+															<a href="#" class="fw-semibold text-muted text-hover-primary fs-7">{{ request.user.email }}</a>
 														</div>
 														<!--end::Username-->
 													</div>
@@ -980,12 +1043,12 @@ License: For each use you must have a valid license purchased only from above li
 												<!--end::Menu separator-->
 												<!--begin::Menu item-->
 												<div class="menu-item px-5">
-													<a href="../../demo21/dist/account/overview.html" class="menu-link px-5">My Profile</a>
+													<a href="#" class="menu-link px-5">My Profile</a>
 												</div>
 												<!--end::Menu item-->
 												<!--begin::Menu item-->
 												<div class="menu-item px-5">
-													<a href="../../demo21/dist/apps/projects/list.html" class="menu-link px-5">
+													<a href="#" class="menu-link px-5">
 														<span class="menu-text">My Projects</span>
 														<span class="menu-badge">
 															<span class="badge badge-light-danger badge-circle fw-bold fs-7">3</span>
@@ -993,116 +1056,12 @@ License: For each use you must have a valid license purchased only from above li
 													</a>
 												</div>
 												<!--end::Menu item-->
-												<!--begin::Menu item-->
-												<div class="menu-item px-5" data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-placement="left-start">
-													<a href="#" class="menu-link px-5">
-														<span class="menu-title">My Subscription</span>
-														<span class="menu-arrow"></span>
-													</a>
-													<!--begin::Menu sub-->
-													<div class="menu-sub menu-sub-dropdown w-175px py-4">
-														<!--begin::Menu item-->
-														<div class="menu-item px-3">
-															<a href="../../demo21/dist/account/referrals.html" class="menu-link px-5">Referrals</a>
-														</div>
-														<!--end::Menu item-->
-														<!--begin::Menu item-->
-														<div class="menu-item px-3">
-															<a href="../../demo21/dist/account/billing.html" class="menu-link px-5">Billing</a>
-														</div>
-														<!--end::Menu item-->
-														<!--begin::Menu item-->
-														<div class="menu-item px-3">
-															<a href="../../demo21/dist/account/statements.html" class="menu-link px-5">Payments</a>
-														</div>
-														<!--end::Menu item-->
-														<!--begin::Menu item-->
-														<div class="menu-item px-3">
-															<a href="../../demo21/dist/account/statements.html" class="menu-link d-flex flex-stack px-5">Statements
-															<i class="fas fa-exclamation-circle ms-2 fs-7" data-bs-toggle="tooltip" title="View your statements"></i></a>
-														</div>
-														<!--end::Menu item-->
-														<!--begin::Menu separator-->
-														<div class="separator my-2"></div>
-														<!--end::Menu separator-->
-														<!--begin::Menu item-->
-														<div class="menu-item px-3">
-															<div class="menu-content px-3">
-																<label class="form-check form-switch form-check-custom form-check-solid">
-																	<input class="form-check-input w-30px h-20px" type="checkbox" value="1" checked="checked" name="notifications" />
-																	<span class="form-check-label text-muted fs-7">Notifications</span>
-																</label>
-															</div>
-														</div>
-														<!--end::Menu item-->
-													</div>
-													<!--end::Menu sub-->
-												</div>
-												<!--end::Menu item-->
-												<!--begin::Menu item-->
-												<div class="menu-item px-5">
-													<a href="../../demo21/dist/account/statements.html" class="menu-link px-5">My Statements</a>
-												</div>
-												<!--end::Menu item-->
 												<!--begin::Menu separator-->
 												<div class="separator my-2"></div>
 												<!--end::Menu separator-->
 												<!--begin::Menu item-->
-												<div class="menu-item px-5" data-kt-menu-trigger="{default: 'click', lg: 'hover'}" data-kt-menu-placement="left-start">
-													<a href="#" class="menu-link px-5">
-														<span class="menu-title position-relative">Language
-														<span class="fs-8 rounded bg-light px-3 py-2 position-absolute translate-middle-y top-50 end-0">English
-														<img class="w-15px h-15px rounded-1 ms-2" src="/static/assets/media/flags/united-states.svg" alt="" /></span></span>
-													</a>
-													<!--begin::Menu sub-->
-													<div class="menu-sub menu-sub-dropdown w-175px py-4">
-														<!--begin::Menu item-->
-														<div class="menu-item px-3">
-															<a href="../../demo21/dist/account/settings.html" class="menu-link d-flex px-5 active">
-															<span class="symbol symbol-20px me-4">
-																<img class="rounded-1" src="/static/assets/media/flags/united-states.svg" alt="" />
-															</span>English</a>
-														</div>
-														<!--end::Menu item-->
-														<!--begin::Menu item-->
-														<div class="menu-item px-3">
-															<a href="../../demo21/dist/account/settings.html" class="menu-link d-flex px-5">
-															<span class="symbol symbol-20px me-4">
-																<img class="rounded-1" src="/static/assets/media/flags/spain.svg" alt="" />
-															</span>Spanish</a>
-														</div>
-														<!--end::Menu item-->
-														<!--begin::Menu item-->
-														<div class="menu-item px-3">
-															<a href="../../demo21/dist/account/settings.html" class="menu-link d-flex px-5">
-															<span class="symbol symbol-20px me-4">
-																<img class="rounded-1" src="/static/assets/media/flags/germany.svg" alt="" />
-															</span>German</a>
-														</div>
-														<!--end::Menu item-->
-														<!--begin::Menu item-->
-														<div class="menu-item px-3">
-															<a href="../../demo21/dist/account/settings.html" class="menu-link d-flex px-5">
-															<span class="symbol symbol-20px me-4">
-																<img class="rounded-1" src="/static/assets/media/flags/japan.svg" alt="" />
-															</span>Japanese</a>
-														</div>
-														<!--end::Menu item-->
-														<!--begin::Menu item-->
-														<div class="menu-item px-3">
-															<a href="../../demo21/dist/account/settings.html" class="menu-link d-flex px-5">
-															<span class="symbol symbol-20px me-4">
-																<img class="rounded-1" src="/static/assets/media/flags/france.svg" alt="" />
-															</span>French</a>
-														</div>
-														<!--end::Menu item-->
-													</div>
-													<!--end::Menu sub-->
-												</div>
-												<!--end::Menu item-->
-												<!--begin::Menu item-->
 												<div class="menu-item px-5 my-1">
-													<a href="../../demo21/dist/account/settings.html" class="menu-link px-5">Account Settings</a>
+													<a href="/auth/change_password" class="menu-link px-5">Password Change</a>
 												</div>
 												<!--end::Menu item-->
 												<!--begin::Menu item-->
@@ -1146,6 +1105,8 @@ License: For each use you must have a valid license purchased only from above li
 						</div>
 						<!--end::Header top-->
 						<!--begin::Header bottom-->
+						{{ is_admin_area }}
+						{% if not "group" in request.path and not "account" in request.path  %}
 						<div class="header-bottom d-lg-flex flex-column align-items-stretch w-100" id="kt_header_navs" data-kt-drawer="true" data-kt-drawer-name="header-menu" data-kt-drawer-activate="{default: true, lg: false}" data-kt-drawer-overlay="true" data-kt-drawer-width="{default:'200px', '300px': '250px'}" data-kt-drawer-direction="start" data-kt-drawer-toggle="#kt_header_navs_toggle" data-kt-swapper="true" data-kt-swapper-mode="append" data-kt-swapper-parent="{default: '#kt_body', lg: '#kt_header'}">
 							<!--begin::Tabs container-->
 							<div class="container-custom container-xxl d-lg-flex flex-column w-100">
@@ -1291,6 +1252,7 @@ License: For each use you must have a valid license purchased only from above li
 							</div>
 							<!--end::Header panel-->
 						</div>
+						{% endif %}
 						<!--end::Header bottom-->
 					</div>
 					<!--end::Header-->
@@ -2018,7 +1980,7 @@ License: For each use you must have a valid license purchased only from above li
 								<div class="menu-item px-3" data-kt-menu-trigger="hover" data-kt-menu-placement="right-start">
 									<a href="#" class="menu-link px-3">
 										<span class="menu-title">Groups</span>
-										<span class="menu-arrow"></span>
+
 									</a>
 									<!--begin::Menu sub-->
 									<div class="menu-sub menu-sub-dropdown w-175px py-4">
