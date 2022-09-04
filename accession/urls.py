@@ -1,6 +1,5 @@
 from django.urls import path
-from accession.views import PartList, BlockList, addparts, BlockUpdate, BlockDelete, \
-     AreaCreate, AreaUpdate, AreaDelete
+from accession.views import PartList, BlockList, addparts, BlockDelete, AreaCreate, AreaUpdate, AreaDelete
 # from .forms import PatientForm
 
 urlpatterns = [
@@ -11,7 +10,7 @@ urlpatterns = [
     # path('partlookup/<int:associated_project>', partlookup, name='part-lookup'),
     path('blocklist/', BlockList.as_view(), name='block-list'),
     # path('blocklist/<int:projectid>', BlockList.as_view(), name='block_list2'),
-    path('block/update/<int:pk>/', BlockUpdate.as_view(), name='block-update'),
+    # path('block/update/<int:pk>/', BlockUpdate.as_view(), name='block-update'),
     path('block/delete/<int:pk>/', BlockDelete.as_view(), name='block-delete'),
     path('area/add/<int:pk>/', AreaCreate.as_view(), name='add-areas'),
     path('arealist/<int:pk>/',AreaUpdate.as_view(), name='area-update'),

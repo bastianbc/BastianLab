@@ -27,11 +27,63 @@ class NucAcids(models.Model):
         managed = True
         db_table = 'nuc_acids'
 
+    def query_by_args(self, **kwargs):
+        try:
+            ORDER_COLUMN_CHOICES = {
+                "1": "nu_id",
+                "2": "area",
+                "3": "block",
+                "4": "na_type",
+                "5": "date_extr",
+                "6": "method",
+                "7": "qubit",
+                "8": "volume",
+                "9": "amount",
+                "10": "re_ext",
+                "11": "total_ext",
+                "12": "na_sheared",
+                "13": "shearing_vol",
+                "14": "te_vol",
+            }
+            draw = int(kwargs.get('draw', None)[0])
+            length = int(kwargs.get('length', None)[0])
+            start = int(kwargs.get('start', None)[0])
+            search_value = kwargs.get('search[value]', None)[0]
+            order_column = kwargs.get('order[0][column]', None)[0]
+            order = kwargs.get('order[0][dir]', None)[0]
+
+            order_column = ORDER_COLUMN_CHOICES[order_column]
+            # django orm '-' -> desc
+            if order == 'desc':
+                order_column = '-' + order_column
+
+            queryset = NucAcids.objects.all()
+            total = queryset.count()
+
+            if search_value:
+                queryset = queryset.filter(Q(nu_id__icontains=search_value) |
+                                           Q(na_type__icontains=search_value) |
+                                           Q(method__icontains=search_value) |
+                                           Q(date_extr__icontains=search_value))
+
+            count = queryset.count()
+            queryset = queryset.order_by(order_column)[start:start + length]
+            # queryset = queryset[start:start + length]
+            return {
+                'items': queryset,
+                'count': count,
+                'total': total,
+                'draw': draw
+            }
+        except Exception as e:
+            print(str(e))
+            raise
+
     # @property
     # def calc_amount(self):
     #     # calculates the amount
     #     return self.qubit * self.volume
-    # def save(self, *args, **kwargs): 
+    # def save(self, *args, **kwargs):
     #     #Following lines set qubit and volume to 0 if they are None.
     #     kwargs.get('qubit',0)
     #     kwargs.get('volume',0)
@@ -62,4 +114,3 @@ class SampleLib(models.Model):
     class Meta:
         managed = True
         db_table = 'sample_lib'
-

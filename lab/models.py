@@ -11,9 +11,8 @@ from decimal import Decimal
 from django.urls import reverse
 from datetime import date
 from django.contrib.auth.models import User
-from django.core.validators import MinValueValidator, MaxValueValidator
 # from projects.models import Projects
-from django.db.models import Q
+from django.db.models import Q, Count
 
 class Patients(models.Model):
     pat_id = models.CharField(max_length=12, blank=False, null=False, unique=True)
@@ -52,20 +51,21 @@ class Patients(models.Model):
             search_value = kwargs.get('search[value]', None)[0]
             order_column = kwargs.get('order[0][column]', None)[0]
             order = kwargs.get('order[0][dir]', None)[0]
-            
+
             order_column = ORDER_COLUMN_CHOICES[order_column]
             # django orm '-' -> desc
             if order == 'desc':
                 order_column = '-' + order_column
 
-            queryset = Patients.objects.all()
+            queryset = Patients.objects.all().annotate(num_blocks=Count('patient_blocks'))
             total = queryset.count()
 
             if search_value:
-                queryset = queryset.filter(Q(pat_id__icontains=search_value) |
-                                           Q(race__icontains=search_value) |
-                                           Q(source__icontains=search_value) |
-                                           Q(project__icontains=search_value))
+                queryset = queryset.filter(
+                    Q(pat_id__icontains=search_value) |
+                    Q(race__icontains=search_value) |
+                    Q(source__icontains=search_value) |
+                    Q(project__icontains=search_value))
 
             count = queryset.count()
             queryset = queryset.order_by(order_column)[start:start + length]
@@ -79,43 +79,6 @@ class Patients(models.Model):
         except Exception as e:
             print(str(e))
             raise
-
-class Blocks(models.Model):
-    old_block_id = models.CharField(max_length=50, blank=True, null=False, unique=True)
-    pat_id = models.CharField(max_length=12, blank=True, null=True)
-    age = models.DecimalField(blank=True, null=True, decimal_places=1, max_digits=4, validators=[
-        MinValueValidator((0.1), message='Minimum age is 0.1 years'),
-        MaxValueValidator((120), message='Maximum age is 120 years'),
-        ])
-    body_site = models.TextField(blank=True, null=True)
-    ulceration = models.BooleanField(blank=True, null=True)
-    thickness = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
-    mitoses = models.IntegerField(blank=True, null=True)
-    p_stage = models.TextField(blank=True, null=True)
-    prim = models.TextField(blank=True, null=True)
-    subtype = models.TextField(blank=True, null=True)
-    slides = models.IntegerField(blank=True, null=True)
-    slides_left = models.IntegerField(blank=True, null=True)
-    fixation = models.CharField(max_length=10, blank=True, null=True)
-    area_id = models.CharField(max_length=100, blank=True, null=True)
-    old_project = models.CharField(max_length=50, blank=True, null=True)
-    project = models.ForeignKey('projects.Projects', on_delete=models.DO_NOTHING, blank=True, null=True)
-    diagnosis = models.TextField(blank=True, null=True)
-    storage = models.CharField(max_length=50, blank=True, null=True)
-    notes = models.TextField(blank=True, null=True)
-    micro = models.TextField(blank=True, null=True)
-    gross = models.TextField(blank=True, null=True)
-    clinical = models.TextField(blank=True, null=True)
-    site_code = models.TextField(blank=True, null=True)
-    icd9 = models.TextField(blank=True, null=True)
-    patient = models.ForeignKey('Patients', on_delete=models.CASCADE, db_column='patient', blank=True, null=True)
-    bl_id = models.AutoField(primary_key=True)
-    date_added = models.DateTimeField(blank=True, null=True, auto_now=True)
-
-    class Meta:
-        managed = True
-        db_table = 'blocks'
-
 
 class Areas(models.Model):
     PUNCH = 'PU'
@@ -156,7 +119,7 @@ class Areas(models.Model):
     image = models.ImageField(null=True, blank=True, upload_to="images/%y/%m/%d")
     notes = models.CharField(max_length=255, blank=True, null=True)
     project = models.CharField(max_length=100, blank=True, null=True)
-    block = models.ForeignKey('Blocks', on_delete=models.CASCADE, db_column='block', blank=True, null=True)
+    block = models.ForeignKey('blocks.Blocks', on_delete=models.CASCADE, db_column='block', blank=True, null=True, related_name="block_areas")
     ar_id = models.AutoField(primary_key=True)
 
     class Meta:

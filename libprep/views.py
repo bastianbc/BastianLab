@@ -7,7 +7,7 @@ from django.http import HttpResponseRedirect
 
 from django.core.paginator import Paginator, EmptyPage,\
                                   PageNotAnInteger
-from django.db.models import Q 
+from django.db.models import Q
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView, CreateView, DeleteView, UpdateView
@@ -16,19 +16,38 @@ from django.forms.models import inlineformset_factory, modelformset_factory
 from django.forms import Textarea, formset_factory, TextInput, DateInput
 from .models import NucAcids, SampleLib
 from .forms import  BaseNucAcids, NucAcidsFormSetHelper, NucAcidsForm, ExtractNucleicAcids
-from lab.models import Areas, Blocks
+from lab.models import Areas
+from blocks import *
 from django.utils.http import urlencode
 from utils.utils import sorted_nicely
 import re
+
+def nucacids(request):
+    return render(request, "nucacids.html", locals())
+
+def filter_nucacids(request):
+    from .serializers import NucacidsSerializer
+    from django.http import JsonResponse
+
+    nucacids = NucAcids().query_by_args(**request.GET)
+    serializer = NucacidsSerializer(nucacids['items'], many=True)
+    result = dict()
+    result['data'] = serializer.data
+    result['draw'] = nucacids['draw']
+    result['recordsTotal'] = nucacids['total']
+    result['recordsFiltered'] = nucacids['count']
+
+    return JsonResponse(result)
+
 
 class AreaList(ListView):
     # table_class = SimpleTable
     queryset = Areas.objects.all().order_by('-completion_date')
     template_name = 'libprep/areas_list.html'
     context_object_name = 'all_areas'
-    
-    paginate_by = 15   
-    
+
+    paginate_by = 15
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['query'] = self.request.GET.get('q')
@@ -44,20 +63,20 @@ class AreaList(ListView):
             block_object=Blocks.objects.get(bl_id=current_block)
             object_list = block_object.areas_set.all().order_by('-ar_id')
         else:
-            object_list = Areas.objects.all().order_by('-ar_id')       
+            object_list = Areas.objects.all().order_by('-ar_id')
         query = self.request.GET.get('q')
         if query:
             object_list = Areas.objects.filter(
             Q(area_type__icontains=query
             ) |Q(block__project__abbreviation__icontains=query) |Q(block__old_block_id__icontains=query)
-            ).order_by('-ar_id')   
+            ).order_by('-ar_id')
         return object_list
-    
 
-    
+
+
     def dispatch(self, request, *args, **kwargs):
         # the dispatch method injects the selected_areas
-        # into request.session so that it remains accessible after the redirect. It gets removed after 
+        # into request.session so that it remains accessible after the redirect. It gets removed after
         # add_nucs_to_area has run
 
         selected_areas = self.request.GET.getlist('areas_selected')
@@ -78,57 +97,57 @@ def add_nucs_to_area(request, areas_to_add_to, cd):
         digits=re.findall(r'\d+', last_nucacid)
         # Gets a list of the numbers out of the last_area
         last_nucacid_id = int(digits[-1])
-        # Takes the last number from that list 
+        # Takes the last number from that list
     else:
         last_nucacid_id = 0
     if areas_to_add_to:
-            selected_areas = Areas.objects.filter(ar_id__in=areas_to_add_to) 
+            selected_areas = Areas.objects.filter(ar_id__in=areas_to_add_to)
             for area in selected_areas:
                 last_nucacid_id += 1
                 if na_type == 'DNA' or na_type == 'RNA':
-                    new_nuc = NucAcids(nu_id=None, 
-                                    old_area_id=area.old_area_id, 
-                                    area=area, 
+                    new_nuc = NucAcids(nu_id=None,
+                                    old_area_id=area.old_area_id,
+                                    area=area,
                                     method=method,
                                     na_type=na_type,
-                                    old_na_id=old_na_id+'-'+na_type[0:]+'-'+str(last_nucacid_id)              
+                                    old_na_id=old_na_id+'-'+na_type[0:]+'-'+str(last_nucacid_id)
                                     )
-                    new_nuc.save()                 
-                    messages.success(request, 'NucAcid '+str(new_nuc.old_na_id)+' added to Area ' 
+                    new_nuc.save()
+                    messages.success(request, 'NucAcid '+str(new_nuc.old_na_id)+' added to Area '
                                 + area.old_area_id )
-                else: 
+                else:
                     # na_type was DNA+RNA, so have to make two NAs
                     # First make DNA
-                    new_nuc = NucAcids(nu_id=None, 
-                                    old_area_id=area.old_area_id, 
-                                    area=area, 
+                    new_nuc = NucAcids(nu_id=None,
+                                    old_area_id=area.old_area_id,
+                                    area=area,
                                     na_type='DNA',
                                     method=method,
-                                    old_na_id=old_na_id+'-D-'+str(last_nucacid_id)              
+                                    old_na_id=old_na_id+'-D-'+str(last_nucacid_id)
                                     )
-                    new_nuc.save()  
-                    messages.success(request, 'NucAcid '+str(new_nuc.old_na_id)+' added to Area ' 
+                    new_nuc.save()
+                    messages.success(request, 'NucAcid '+str(new_nuc.old_na_id)+' added to Area '
                                 + area.old_area_id )
                      #   Now make RNA
-                    new_nuc = NucAcids(nu_id=None, 
-                                    old_area_id=area.old_area_id, 
-                                    area=area, 
+                    new_nuc = NucAcids(nu_id=None,
+                                    old_area_id=area.old_area_id,
+                                    area=area,
                                     na_type='RNA',
                                     method=method,
-                                    old_na_id=old_na_id+'-R-'+str(last_nucacid_id)              
+                                    old_na_id=old_na_id+'-R-'+str(last_nucacid_id)
                                     )
-                    new_nuc.save()                 
-                    messages.success(request, 'NucAcid '+str(new_nuc.old_na_id)+' added, extracted from Area ' 
+                    new_nuc.save()
+                    messages.success(request, 'NucAcid '+str(new_nuc.old_na_id)+' added, extracted from Area '
                                 + area.old_area_id )
 
-    request.session.pop('selected_areas')    
-    return    
-    
+    request.session.pop('selected_areas')
+    return
+
 class NucAcidsList(ListView):
     queryset = NucAcids.objects.all().order_by('-nu_id')
     template_name = 'libprep/nucacids_datatables.html'
     context_object_name = 'all_nucacids'
-    # paginate_by = 24  
+    # paginate_by = 24
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -145,7 +164,7 @@ class NucAcidsList(ListView):
             area_object=Areas.objects.get(ar_id=current_area)
             object_list = area_object.nucacids_set.all().order_by('-nu_id')
         else:
-            object_list = NucAcids.objects.all().order_by('-nu_id')[:100]       
+            object_list = NucAcids.objects.all().order_by('-nu_id')[:100]
 
         query = self.request.GET.get('q')
         # object_list = NucAcids.objects.all().order_by('-nu_id')
@@ -156,14 +175,14 @@ class NucAcidsList(ListView):
             ).order_by('-nu_id')
         # print(object_list)
         return object_list
-    
+
 class NucAcidUpdate(UpdateView):
     model=NucAcids
     template_name = 'libprep/nucacid_update_single.html'
     form_class = NucAcidsForm
     success_message = 'Nucleic Acid updated sucessfully'
     success_url = reverse_lazy('nucacids-list')
-    
+
     # def save(self, commit=True):
     #     instance = super(NucAcidsForm, self).save(commit=False)
     #     instance.amount = self.cleaned_data['qubit'] * self.cleaned_data['volume']
@@ -178,7 +197,7 @@ class NucAcidDelete(DeleteView):
     success_message = 'Nucleic Acid deleted sucessfully'
     # fields = ['pat_id','sex','race','source','project','notes']
     success_url = reverse_lazy('nucacids-list')
-    
+
 def extract_nucacids(request):
     form = ExtractNucleicAcids
     selected_areas=request.session['selected_areas']
@@ -201,7 +220,7 @@ def extract_nucacids(request):
         return render(request, 'libprep/extract_nucacids.html', context={'selected_areas':selected_areas, 'form': form, 'area_list': area_list})#to your redirect
 
 def edit_nucacids(request):
-    NucAcidsFormset = modelformset_factory(NucAcids, 
+    NucAcidsFormset = modelformset_factory(NucAcids,
         formset = BaseNucAcids,
         fields = ('nu_id', 'na_type', 'date_extr', 'method', 'qubit', 'volume', 'amount',
                     're_ext', 'total_ext', 'na_sheared', 'shearing_vol', 'te_vol',),
@@ -211,14 +230,14 @@ def edit_nucacids(request):
                     'nu_id': TextInput(attrs={'readonly': 'readonly', 'size': '5'}),
                     'date_extr':DateInput(attrs={'size': '12'}),
                     'method':DateInput(attrs={'size': '6'}),
-                    'qubit': TextInput(attrs={'size': '5'}), 
+                    'qubit': TextInput(attrs={'size': '5'}),
                     'volume': TextInput(attrs={'size': '5'}),
                     'amount': TextInput(attrs={'size': '6'}),
                     're_ext': TextInput(attrs={'size': '5'}),
                     'total_ext': TextInput(attrs={'size': '7'}),
                     'na_sheared': TextInput(attrs={'size': '5'}),
                     'shearing_vol': TextInput(attrs={'size': '5'}),
-                    'te_vol': TextInput(attrs={'size': '6'}),   
+                    'te_vol': TextInput(attrs={'size': '6'}),
             },
         # formset = BaseNucAcidsFormSet,
         can_delete=True,
@@ -279,7 +298,7 @@ def edit_nucacids(request):
 #         return HttpResponseRedirect(self.get_success_url())
 
 #     def get_success_url(self):
-#         return reverse('nucacids-update', kwargs={'pk': self.object.pk}) 
+#         return reverse('nucacids-update', kwargs={'pk': self.object.pk})
 
 #     def get_context_data(self, **kwargs):
 #         context = super().get_context_data(**kwargs)
@@ -287,8 +306,8 @@ def edit_nucacids(request):
 #         return context
 #         #return render(request, "patients-list", context)
 
-# NucAcidsFormset=modelformset_factory(Nucacids, 
-#     form= NucacidsForm,  
+# NucAcidsFormset=modelformset_factory(Nucacids,
+#     form= NucacidsForm,
 #     fields = ('nu_id', 'na_type', 'date_extr', 'method', 'qubit', 'volume', 'amount',
 #                're_ext', 'total_ext', 'na_sheared', 'shearing_vol', 'te_vol', ),
 #     labels = {'nu_id': _('NA-ID'),

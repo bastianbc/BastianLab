@@ -69,6 +69,7 @@ INSTALLED_APPS = [
     'authentication.apps.AuthenticationConfig',
     'group.apps.GroupConfig',
     'account.apps.AccountConfig',
+    'blocks.apps.BlocksConfig',
 ]
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 CRISPY_FAIL_SILENTLY = not DEBUG

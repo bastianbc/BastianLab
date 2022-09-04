@@ -29,7 +29,7 @@ var KTDatatablesServerSide = function () {
                 { data: 'sex' },
                 { data: 'race' },
                 { data: 'project' },
-                // { data: 'blocks' },
+                { data: 'num_blocks' },
             ],
             columnDefs: [
                 {
@@ -50,6 +50,17 @@ var KTDatatablesServerSide = function () {
                 // },
                 {
                     targets: 6,
+                    orderable: false,
+                    render: function (data) {
+                        if (data > 0) {
+                          return `
+                              <a href="#">${data}</a>`;
+                        }
+                        return data;
+                    }
+                },
+                {
+                    targets: 7,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -243,11 +254,8 @@ var KTDatatablesServerSide = function () {
     var initToggleToolbar = function () {
         // Toggle selected action toolbar
         // Select all checkboxes
-        const container = document.querySelector('#patient_datatable');
+        const container = document.querySelector('.table');
         const checkboxes = container.querySelectorAll('[type="checkbox"]');
-
-        // Select elements
-        const deleteSelected = document.querySelector('[data-kt-docs-table-select="delete_selected"]');
 
         // Toggle delete selected toolbar
         checkboxes.forEach(c => {
@@ -258,68 +266,71 @@ var KTDatatablesServerSide = function () {
                 }, 50);
             });
         });
+    }
 
-        // Deleted selected rows
-        deleteSelected.addEventListener('click', function () {
-            // SweetAlert2 pop up --- official docs reference: https://sweetalert2.github.io/
-            // Swal.fire({
-            //     text: "Are you sure you want to delete selected customers?",
-            //     icon: "warning",
-            //     showCancelButton: true,
-            //     buttonsStyling: false,
-            //     showLoaderOnConfirm: true,
-            //     confirmButtonText: "Yes, delete!",
-            //     cancelButtonText: "No, cancel",
-            //     customClass: {
-            //         confirmButton: "btn fw-bold btn-danger",
-            //         cancelButton: "btn fw-bold btn-active-light-primary"
-            //     },
-            // }).then(function (result) {
-            //     if (result.value) {
-            //         // Simulate delete request -- for demo purpose only
-            //         Swal.fire({
-            //             text: "Deleting selected customers",
-            //             icon: "info",
-            //             buttonsStyling: false,
-            //             showConfirmButton: false,
-            //             timer: 2000
-            //         }).then(function () {
-            //             Swal.fire({
-            //                 text: "You have deleted all selected customers!.",
-            //                 icon: "success",
-            //                 buttonsStyling: false,
-            //                 confirmButtonText: "Ok, got it!",
-            //                 customClass: {
-            //                     confirmButton: "btn fw-bold btn-primary",
-            //                 }
-            //             }).then(function () {
-            //                 // delete row data from server and re-draw datatable
-            //                 dt.draw();
-            //             });
-            //
-            //             // Remove header checked box
-            //             const headerCheckbox = container.querySelectorAll('[type="checkbox"]')[0];
-            //             headerCheckbox.checked = false;
-            //         });
-            //     } else if (result.dismiss === 'cancel') {
-            //         Swal.fire({
-            //             text: "Selected customers was not deleted.",
-            //             icon: "error",
-            //             buttonsStyling: false,
-            //             confirmButtonText: "Ok, got it!",
-            //             customClass: {
-            //                 confirmButton: "btn fw-bold btn-primary",
-            //             }
-            //         });
-            //     }
-            // });
+    var handleSelectedRows = function (e) {
+      // Select element
+      const btnCreateBlock = document.querySelector('[data-kt-docs-table-select="event_selected"]');
+
+      // Created blocks for selected rows
+      btnCreateBlock.addEventListener('click', function () {
+
+        const container = document.querySelector('.table');
+
+        const selectedRows = container.querySelectorAll('[type="checkbox"]:checked');
+
+        const selectedIds = [];
+
+        selectedRows.forEach((p) => {
+          // Select parent row
+          const parent = p.closest('tr');
+          // Get customer name
+          const id = parent.querySelectorAll('td')[1].innerText;
+
+          selectedIds.push(id)
+
         });
+
+        $.ajax({
+          type: "GET",
+          url: "/blocks/new_async",
+          data: {
+            "selected_ids":JSON.stringify(selectedIds),
+          },
+        }).done(function(result) {
+          console.log("result.success:"+result.success);
+          if (result.success) {
+            Swal.fire({
+                text: "Block(s) was created succesfully.",
+                icon: "info",
+                buttonsStyling: false,
+                confirmButtonText: "Ok, got it!",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-success",
+                }
+            }).then(function(){
+              dt.draw();
+            });
+          }
+          else {
+            Swal.fire({
+                text: "Block(s) was not created.",
+                icon: "error",
+                buttonsStyling: false,
+                confirmButtonText: "Ok, got it!",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-danger",
+                }
+            });
+          }
+        });
+      });
     }
 
     // Toggle toolbars
     var toggleToolbars = function () {
         // Define variables
-        const container = document.querySelector('#patient_datatable');
+        const container = document.querySelector('.table');
         const toolbarBase = document.querySelector('[data-kt-docs-table-toolbar="base"]');
         const toolbarSelected = document.querySelector('[data-kt-docs-table-toolbar="selected"]');
         const selectedCount = document.querySelector('[data-kt-docs-table-select="selected_count"]');
@@ -359,6 +370,7 @@ var KTDatatablesServerSide = function () {
             handleFilterDatatable();
             handleDeleteRows();
             handleResetForm();
+            handleSelectedRows();
         }
     }
 }();

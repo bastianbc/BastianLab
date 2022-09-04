@@ -2,7 +2,7 @@ from django import forms
 from django.forms import ModelForm, Textarea
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
 from django.utils.translation import ugettext_lazy as _
-from .models import Patients, Blocks, Areas
+from .models import Patients, Areas
 from crispy_forms.helper import FormHelper
 
 
@@ -56,15 +56,15 @@ class PatientForm(ModelForm):
         }
 
 # The formset for editing the Areas that belong to a Block.
-BlockAreaFormset = inlineformset_factory(
-                            Blocks,
-                            Areas,
-                            exclude=('old_project','old_area_id','area', 'na_id','old_block_id',),
-                            extra=1,
-                            
-                            widgets={'notes': Textarea(attrs={'cols': 18, 'rows': 4, 'placeholder': 'Put any comments here...'}),
-                                    'completion_date': forms.SelectDateWidget,
-                                    'image': forms.ClearableFileInput})
+# BlockAreaFormset = inlineformset_factory(
+#                             Blocks,
+#                             Areas,
+#                             exclude=('old_project','old_area_id','area', 'na_id','old_block_id',),
+#                             extra=1,
+#
+#                             widgets={'notes': Textarea(attrs={'cols': 18, 'rows': 4, 'placeholder': 'Put any comments here...'}),
+#                                     'completion_date': forms.SelectDateWidget,
+#                                     'image': forms.ClearableFileInput})
 
 
 class BaseBlocksWithAreasFormset(BaseInlineFormSet):
@@ -73,7 +73,7 @@ class BaseBlocksWithAreasFormset(BaseInlineFormSet):
     # def __init__(self, *args, **kwargs):
     #     super(BaseBlocksWithAreasFormset, self).__init__(*args, **kwargs)
     #     self.helper = FormHelper()
-    #     self.helper.form_show_labels = False 
+    #     self.helper.form_show_labels = False
 
     def add_fields(self, form, index):
         super().add_fields(form, index)
@@ -161,17 +161,17 @@ class BaseBlocksWithAreasFormset(BaseInlineFormSet):
 #
 # You'd use this by passing in a Patient:
 #     PatientsBlocksWithImagesFormset(**form_kwargs, instance=self.object)
-PatientsBlocksWithAreasFormset = inlineformset_factory(
-                                Patients,
-                                Blocks,
-                                formset=BaseBlocksWithAreasFormset,
-                                # We need to specify at least one Block field:
-                                fields=('old_block_id','old_project',),
-                                labels = {'old_block_id': _('Path#'),
-                                    },
-                                extra=1,
-                                can_delete=True
-                                # If you don't want to be able to delete Patients:
-                                #can_delete=False
-                            )
-
+# PatientsBlocksWithAreasFormset = inlineformset_factory(
+#                                 Patients,
+#                                 Blocks,
+#                                 formset=BaseBlocksWithAreasFormset,
+#                                 # We need to specify at least one Block field:
+#                                 fields=('old_block_id','old_project',),
+#                                 labels = {'old_block_id': _('Path#'),
+#                                     },
+#                                 extra=1,
+#                                 can_delete=True
+#                                 # If you don't want to be able to delete Patients:
+#                                 #can_delete=False
+#                             )
+PatientsBlocksWithAreasFormset = {}

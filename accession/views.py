@@ -5,13 +5,14 @@ from django.urls import reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.base import ContextMixin
 from .models import Parts, Accessions
-from .forms import BlockForm, AreaForm, AreaUpdateForm
-from lab.models import Areas, Patients, Blocks
+from .forms import AreaForm, AreaUpdateForm
+from lab.models import Areas, Patients
+from blocks.models import *
 from projects.models import Projects
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
-from django.db.models import Q 
+from django.db.models import Q
 from django.shortcuts import render
 from django.contrib import messages
 
@@ -31,7 +32,7 @@ from django import template
 
 def build_url(*args, **kwargs):
     """##This function builds a url for redirect, incorporating search parameters. """
-    # This solved a difficult problem of returning 
+    # This solved a difficult problem of returning
     # to the BlockList of the same project after e.g. deleting or updating a block
     get = kwargs.pop('get', {})
     url = reverse(*args, **kwargs)
@@ -39,10 +40,10 @@ def build_url(*args, **kwargs):
         url += '?' + urlencode(get)
     return url
 
-def sorted_nicely(l): 
-    """ Sort the given iterable in the way that humans expect. Jeff Atwood""" 
-    convert = lambda text: int(text) if text.isdigit() else text 
-    alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ] 
+def sorted_nicely(l):
+    """ Sort the given iterable in the way that humans expect. Jeff Atwood"""
+    convert = lambda text: int(text) if text.isdigit() else text
+    alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
     return sorted(l, key = alphanum_key)
 
 class BlockDelete(DeleteView):
@@ -67,27 +68,27 @@ class BlockDelete(DeleteView):
         else: return reverse('block-list')
 
 
-    
-class BlockUpdate(SuccessMessageMixin, UpdateView):
-    model = Blocks
-    form_class = BlockForm
-    template_name = 'accession/blocks_update_form.html'
-    success_message = 'Block updated sucessfully'
 
-
-    def get_success_url(self):
-        projectid=self.request.GET.get('projectid')
-        return build_url('block-list', get={'projectid': projectid})
-
+# class BlockUpdate(SuccessMessageMixin, UpdateView):
+#     model = Blocks
+#     form_class = BlockForm
+#     template_name = 'accession/blocks_update_form.html'
+#     success_message = 'Block updated sucessfully'
+#
+#
+#     def get_success_url(self):
+#         projectid=self.request.GET.get('projectid')
+#         return build_url('block-list', get={'projectid': projectid})
+#
 
 class PartList(ListView):
     model = Parts
     template_name = 'accession/part_list.html'
     context_object_name = 'all_parts'
-    paginate_by = 4  
+    paginate_by = 4
 
 
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['query'] = self.request.GET.get('q')
@@ -107,7 +108,7 @@ class PartList(ListView):
         if block_list:
             addparts(self.request, block_list,proj_name)
         return object_list
-       
+
 def is_valid_query(param):
     return param != '' and param is not None
     #     return(True)
@@ -130,7 +131,7 @@ def get_mm_data(block_in):
         thick=block_in.block_id.thickness
         mits=block_in.block_id.mitoses
         subtype=block_in.block_id.subtype
-        
+
     else:
         ulc=stage=thick=mits=subtype=''
     return({'ulc': ulc,'stage': stage,'thick':thick,'mits':mits,'subtype':subtype})
@@ -139,16 +140,16 @@ def addparts(request, block_list, proj_name):
     blocks_to_add = block_list
     # associated_project=Projects.objects.get(name=request.POST.get('project'))
     if blocks_to_add:
-            selected_blocks = Parts.objects.filter(block_id__in=blocks_to_add) 
-            # selected_blocks = Parts.objects.filter(block_id=blocks_to_add) 
+            selected_blocks = Parts.objects.filter(block_id__in=blocks_to_add)
+            # selected_blocks = Parts.objects.filter(block_id=blocks_to_add)
             for block in selected_blocks:
                 block_out=make_block_id(block)
                 mm_data=get_mm_data(block)
                 does_exist = Blocks.objects.filter(old_block_id = block_out).exists()
                 if does_exist:
-                    messages.warning(request, 'Block '+block_out+' already exists in project  ' 
+                    messages.warning(request, 'Block '+block_out+' already exists in project  '
                                     + proj_name.name +'. No changes were made to database')
-                else:   
+                else:
                     # new_patient=Patients(
                     #     pa_id=block.dept_number.pat_id.pat_id,
                     #     sex=block.dept_number.pat_id.gender,
@@ -168,7 +169,7 @@ def addparts(request, block_list, proj_name):
                             },
                         pa_id=block.accession.patient.pat_id
                         )
-                    
+
                     new_block, block_created = Blocks.objects.update_or_create(
                         defaults={
                             'body_site':block.site_text,
@@ -183,14 +184,14 @@ def addparts(request, block_list, proj_name):
                             'micro':block.micro,
                             'site_code':block.site_code,
                             'icd9':block.icd9
-                            
+
                         },
                         project=proj_name,
                         # This passes the object itself rather than the key (which didn't work)
                         patient=new_patient,
                         old_block_id=block_out
                         )
-                    messages.success(request, 'Block '+block_out+' added to project ' 
+                    messages.success(request, 'Block '+block_out+' added to project '
                                     + proj_name.name +' successfully')
             # context={'selected_areas':selected_areas}
         # return redirect('nucacids-update')
@@ -240,7 +241,7 @@ class BlockList(ListView):
             patient_object=Patients.objects.get(pa_id=patientid)
             # object_list = patient_object.blocks_set.all()
             context['patientname']=patient_object.pat_id
-        
+
         # This is done to display the project abbreviation as a header of the list of blocks
         return context
 
@@ -251,11 +252,11 @@ class AreaCreate(CreateView, SuccessMessageMixin):
     success_message = success_message = "Area %(old_area_id)s was created successfully"
     def get_form_kwargs(self):
         """" This is required to get the initial values for old_area_id into the unbound form
-        the project abbreviation gets added to the kwargs and then gets popped out again in the __init__ method 
+        the project abbreviation gets added to the kwargs and then gets popped out again in the __init__ method
         of the form and provided as an initial value to the field old_area_id """
         kwargs = super(AreaCreate, self).get_form_kwargs()
         blockobject = Blocks.objects.get(bl_id=self.kwargs.get('pk'))
-        # The following code is to determine the latest/highest old_area_id entry for the initial value for 
+        # The following code is to determine the latest/highest old_area_id entry for the initial value for
         # the AreaForm
         projectabb = blockobject.project.abbreviation
         # project_areas = Areas.objects.filter(old_area_id__startswith=projectabb)
@@ -340,7 +341,7 @@ class AreaUpdate(SuccessMessageMixin, UpdateView):
             projectid=self.request.GET.get('projectid')
             return build_url('areas-list', get={'projectid': projectid})
         else:
-            return build_url('areas-list')  
+            return build_url('areas-list')
     def form_valid(self, form):
         pk = self.kwargs.get('pk')
         block = Areas.objects.get(ar_id=pk).block.bl_id
@@ -363,5 +364,3 @@ class AreaDelete(DeleteView):
     def get_success_url(self):
         projectid=self.request.GET.get('projectid')
         return build_url('areas-list', get={'projectid': projectid})
-
-

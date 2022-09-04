@@ -20,7 +20,7 @@ from .forms import PatientsBlocksWithAreasFormset
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView, CreateView, DeleteView, UpdateView
-from .models import Patients, Blocks, Areas
+from .models import Patients, Areas
 from .forms import PatientForm, PatientsBlocksWithAreasFormset
 import json
 
@@ -64,9 +64,6 @@ class PatientUpdate(SuccessMessageMixin, UpdateView):
         context['blockcount']=blockcount
         # This is done to display the project abbreviation as a header of the list of blocks
         return context
-
-
-
 class PatientDelete(DeleteView):
     model = Patients
     # form_class = PatientForm
@@ -91,7 +88,6 @@ class PatientDelete(DeleteView):
     #         raise Http404
     #     assert False
     #     return obj
-
 
 def filter_patients(request):
     from .serializers import PatientsSerializer
@@ -207,9 +203,10 @@ class PatientsBlocksUpdateView(SingleObjectMixin, FormView):
 
 
 
-BlockFormset = inlineformset_factory(
-    Patients, Blocks, fields=('old_block_id', 'body_site')
-)
+# BlockFormset = inlineformset_factory(
+#     Patients, Blocks, fields=('old_block_id', 'body_site')
+# )
+
 # class PatientBlockCreate(CreateView):
 #     template_name = 'lab/patients_add_form.html'
 #     model = Patients
