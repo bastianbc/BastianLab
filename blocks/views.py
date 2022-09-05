@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.forms.models import inlineformset_factory
 from .models import Blocks
@@ -7,6 +7,7 @@ from .forms import BlockForm
 from django.urls import reverse_lazy, reverse
 from django.http import JsonResponse
 import json
+from django.contrib import messages
 # BlockFormset = inlineformset_factory(
 #     Blocks, Blocks, fields=('block_id', 'body_site')
 # )
@@ -47,7 +48,7 @@ def filter_blocks(request):
     result['draw'] = blocks['draw']
     result['recordsTotal'] = blocks['total']
     result['recordsFiltered'] = blocks['count']
-    print(serializer.data)
+
     return JsonResponse(result)
 
 def blocks(request):
