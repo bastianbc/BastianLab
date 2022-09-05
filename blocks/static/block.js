@@ -8,7 +8,7 @@ var KTDatatablesServerSide = function () {
     var filterPayment;
 
     // Private functions
-    var initDatatable = function () {
+    var initDatatable = function ( initialValue ) {
         dt = $(".table").DataTable({
             // searchDelay: 500,
             processing: true,
@@ -102,7 +102,8 @@ var KTDatatablesServerSide = function () {
             // Add data-filter attribute
             createdRow: function (row, data, dataIndex) {
                 $(row).find('td:eq(4)').attr('data-filter', data.CreditCardType);
-            }
+            },
+            oSearch: {sSearch: initialValue}
         });
 
         table = dt.$;
@@ -360,10 +361,27 @@ var KTDatatablesServerSide = function () {
         }
     }
 
+    // Redirects from other pages
+    var handleInitialValue = () => {
+
+      // Remove parameters in URL
+      function cleanUrl() {
+        window.history.replaceState(null, null, window.location.pathname);
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const x = params.get('initial');
+
+      cleanUrl();
+
+      return x;
+
+    }
+
     // Public methods
     return {
         init: function () {
-            initDatatable();
+            initDatatable( handleInitialValue() );
             handleSearchDatatable();
             initToggleToolbar();
             handleFilterDatatable();

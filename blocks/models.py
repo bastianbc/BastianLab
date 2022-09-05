@@ -63,7 +63,7 @@ class Blocks(models.Model):
 
             if search_value:
                 queryset = queryset.filter(
-                    Q(patient__icontains=search_value) |
+                    Q(patient__pat_id__icontains=search_value) |
                     Q(diagnosis__icontains=search_value) |
                     Q(body_site__icontains=search_value) |
                     Q(gross__icontains=search_value))

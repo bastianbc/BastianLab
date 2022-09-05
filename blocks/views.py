@@ -47,7 +47,7 @@ def filter_blocks(request):
     result['draw'] = blocks['draw']
     result['recordsTotal'] = blocks['total']
     result['recordsFiltered'] = blocks['count']
-
+    print(serializer.data)
     return JsonResponse(result)
 
 def blocks(request):
@@ -80,7 +80,7 @@ def new_block_async(request):
     return JsonResponse({"success":False})
 
 def edit_block(request,id):
-    block = Blocks.objects.get(pat_id=id)
+    block = Blocks.objects.get(bl_id=id)
 
     if request.method=="POST":
         form = BlockForm(request.POST,instance=block)
@@ -97,7 +97,7 @@ def edit_block(request,id):
 
 def delete_block(request,id):
     try:
-        block = Blocks.objects.get(pat_id=id)
+        block = Blocks.objects.get(bl_id=id)
         block.delete()
         messages.success(request,"Block %s was deleted successfully." % block.pat_id)
         deleted = True

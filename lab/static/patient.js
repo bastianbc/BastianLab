@@ -51,10 +51,11 @@ var KTDatatablesServerSide = function () {
                 {
                     targets: 6,
                     orderable: false,
-                    render: function (data) {
+                    render: function (data, type, row) {
                         if (data > 0) {
+                          let pat_id = row["pat_id"];
                           return `
-                              <a href="#">${data}</a>`;
+                              <a href="/blocks?initial=${pat_id}">${data}</a>`;
                         }
                         return data;
                     }

@@ -1,0 +1,41 @@
+{% extends "master.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<form method="post" action="{% if id %} {% url 'edit-block' id %} {% else %} {% url 'new-block' %} {% endif %}">
+{% csrf_token %}
+<div class="container">
+
+    <h4>New Block</h4>
+        <div class="row justify-content-start">
+            <div class="col-6">{{ form.age|as_crispy_field }}</div>
+            <div class="col-6">{{ form.body_site|as_crispy_field }}</div>
+            <div class="col-6">{{ form.ulceration|as_crispy_field }}</div>
+            <div class="col-6">{{ form.thickness|as_crispy_field }}</div>
+            <div class="col-6">{{ form.mitoses|as_crispy_field }}</div>
+            <div class= "col-6"> {{form.p_stage|as_crispy_field}}</div>
+            <div class="col-6">{{ form.prim|as_crispy_field }}</div>
+            <div class="col-6">{{ form.subtype|as_crispy_field }}</div>
+            <div class="col-6">{{ form.slides|as_crispy_field }}</div>
+            <div class="col-6">{{ form.slides_left|as_crispy_field }}</div>
+            <div class="col-6">{{ form.fixation|as_crispy_field }}</div>
+            <div class= "col-6"> {{form.area_id|as_crispy_field}}</div>
+            <div class="col-6">{{ form.old_project|as_crispy_field }}</div>
+            <div class="col-6">{{ form.project|as_crispy_field }}</div>
+            <div class="col-6">{{ form.diagnosis|as_crispy_field }}</div>
+            <div class="col-6">{{ form.storage|as_crispy_field }}</div>
+            <div class="col-6">{{ form.notes|as_crispy_field }}</div>
+            <div class= "col-6"> {{form.micro|as_crispy_field}}</div>
+            <div class="col-6">{{ form.gross|as_crispy_field }}</div>
+            <div class="col-6">{{ form.clinical|as_crispy_field }}</div>
+            <div class="col-6">{{ form.site_code|as_crispy_field }}</div>
+            <div class="col-6">{{ form.icd9|as_crispy_field }}</div>
+            <div class= "col-6"> {{form.patient|as_crispy_field}}</div>
+        </div>
+        <br>
+    <button type="submit" class="btn btn-success">Save Block</button>
+</div>
+</form>
+{% endblock %}

@@ -36,6 +36,9 @@ class Patients(models.Model):
     def get_absolute_url(self):
         return reverse('patient-update', kwargs={'pk': self.pk})
 
+    def __str__(self):
+        return self.pat_id
+
     def query_by_args(self, **kwargs):
         try:
             ORDER_COLUMN_CHOICES = {
