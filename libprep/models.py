@@ -1,7 +1,5 @@
 from django.db import models
-from lab.models import Areas
 from datetime import date
-
 
 class NucAcids(models.Model):
     old_na_id = models.CharField(max_length=50, blank=True, null=True)
@@ -20,7 +18,7 @@ class NucAcids(models.Model):
     sl_id = models.CharField(max_length=50, blank=True, null=True)
     notes = models.CharField(max_length=255, blank=True, null=True)
     projects = models.CharField(max_length=100, blank=True, null=True)
-    area = models.ForeignKey(Areas, on_delete=models.SET_NULL, db_column='area', blank=True, null=True)
+    area = models.ForeignKey("areas.Areas", on_delete=models.SET_NULL, db_column='area', blank=True, null=True)
     nu_id = models.AutoField(primary_key=True)
 
     class Meta:

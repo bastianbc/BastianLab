@@ -20,7 +20,7 @@ from .forms import PatientsBlocksWithAreasFormset
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView, CreateView, DeleteView, UpdateView
-from .models import Patients, Areas
+from .models import Patients
 from .forms import PatientForm, PatientsBlocksWithAreasFormset
 import json
 

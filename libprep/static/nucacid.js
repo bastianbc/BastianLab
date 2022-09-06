@@ -26,7 +26,7 @@ var KTDatatablesServerSide = function () {
                 { data: null },
                 { data: 'nu_id' },
                 { data: 'area' },
-                { data: 'block' },
+                // { data: 'block' },
                 { data: 'na_type' },
                 { data: 'date_extr' },
                 { data: 'method' },
@@ -58,7 +58,7 @@ var KTDatatablesServerSide = function () {
                 //     }
                 // },
                 {
-                    targets: -1,
+                    targets: 14,
                     data: null,
                     orderable: false,
                     className: 'text-end',

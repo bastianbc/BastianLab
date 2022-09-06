@@ -35,13 +35,14 @@ urlpatterns = [
     path('lab/', include('lab.urls')),
     path('projects/', include('projects.urls')),
     path('libprep/', include('libprep.urls')),
-    path('accession/', include('accession.urls')),
+    # path('accession/', include('accession.urls')),
     path('auth/', include('authentication.urls')),
     # url(r'^favicon\.ico$',RedirectView.as_view(url='/static/bastianlab.png')),
     path('', include('home.urls')),
     path('group/', include('group.urls')),
     path('account/', include('account.urls')),
     path('blocks/', include('blocks.urls')),
+    path('areas/', include('areas.urls')),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

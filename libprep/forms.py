@@ -3,7 +3,7 @@ from django.forms import BaseModelFormSet, Textarea, ModelForm
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
 from django.forms.widgets import DateInput, TextInput
 from django.utils.translation import ugettext_lazy as _
-from .models import Areas, NucAcids
+from .models import NucAcids
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit, HTML, Div
 # from django.forms import TextInput
@@ -37,7 +37,7 @@ class NucAcidsForm(ModelForm):
     required_css_class = 'required'
     class Meta:
         model = NucAcids
-       
+
         fields = ['nu_id', 'na_type', 'date_extr', 'method', 'qubit', 'volume', 'amount',
                     're_ext', 'total_ext', 'na_sheared', 'shearing_vol', 'te_vol', 'area']
         labels = {'nu_id': _('NA-ID'),
@@ -53,7 +53,7 @@ class NucAcidsForm(ModelForm):
                 'shearing_vol': _('Shearing Vol [µl]'),
                 'te_vol': _('TE Vol [µl]')
                 }
-        widgets = {'area': TextInput(attrs={'readonly': 'readonly'}),           
+        widgets = {'area': TextInput(attrs={'readonly': 'readonly'}),
                 }
         Submit('search', 'Update')
 
@@ -62,7 +62,7 @@ class BaseNucAcids(BaseModelFormSet):
         # print('Args: ', args, 'Kwargs', kwargs)
         super().__init__(*args, **kwargs)
         self.queryset = NucAcids.objects.filter(na_type__isnull=True).order_by('-nu_id')
-        # 
+        #
 
 class NucAcidsFormSetHelper(FormHelper):
         def __init__(self, *args, **kwargs):
@@ -95,6 +95,6 @@ class ExtractNucleicAcids(forms.Form):
             <ul>{% for area in area_list%} <li class='list-group-item'>{{area}}</lir> {% endfor %}</ul>"),),
             'na_type',
             'method',
-            'prefix', 
+            'prefix',
             Submit('submit', 'Create NucAcids')
         )

@@ -49,7 +49,7 @@ INTERNAL_IPS = ('127.0.0.1',)
 # Application definition
 
 INSTALLED_APPS = [
-    'accession.apps.AccessionConfig',
+    # 'accession.apps.AccessionConfig',
     'libprep.apps.LibprepConfig',
     'lab.apps.LabConfig',
     'projects.apps.ProjectsConfig',
@@ -70,6 +70,7 @@ INSTALLED_APPS = [
     'group.apps.GroupConfig',
     'account.apps.AccountConfig',
     'blocks.apps.BlocksConfig',
+    'areas.apps.AreasConfig',
 ]
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 CRISPY_FAIL_SILENTLY = not DEBUG

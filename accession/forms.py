@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import ModelForm, Textarea, ClearableFileInput, ModelChoiceField, TextInput
 from django.utils.translation import ugettext_lazy as _
-from lab.models import Areas
+# from lab.models import Areas
 from blocks.models import *
 from django.contrib.auth.models import User
 from projects.models import Projects

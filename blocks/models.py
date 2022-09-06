@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.models import Q, Count
+import uuid
 
 class Blocks(models.Model):
     old_block_id = models.CharField(max_length=50, blank=True, null=False, unique=True)
@@ -37,6 +38,15 @@ class Blocks(models.Model):
     class Meta:
         db_table = 'blocks'
         managed = True
+
+    def _generate_unique_id(self):
+        return str(uuid.uuid4())
+
+    def save(self,*args,**kwargs):
+        if not self.old_block_id:
+            self.old_block_id = self._generate_unique_id()
+
+        super().save(*args, **kwargs)
 
     def query_by_args(self, **kwargs):
         try:

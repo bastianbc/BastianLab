@@ -3,11 +3,11 @@ from django.conf import settings
 from django.conf.urls import url
 from django.views.static import serve
 from . import views
-from .views import AreaList, edit_nucacids, NucAcidsList, NucAcidUpdate, NucAcidDelete, extract_nucacids
+from .views import edit_nucacids, NucAcidsList, NucAcidUpdate, NucAcidDelete, extract_nucacids
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 urlpatterns = [
-    path('arealist/', AreaList.as_view(), name='areas-list'),
+    # path('arealist/', AreaList.as_view(), name='areas-list'),
     # path('patient/add/', PatientCreate.as_view(), name='patient-add'),
     # # path('patient/search/', PatientSearch.as_view(), name='patient-search'),
     # path('patient/<pk>/', PatientUpdate.as_view(), name='patient-update'),

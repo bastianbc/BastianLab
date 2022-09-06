@@ -16,7 +16,7 @@ from django.forms.models import inlineformset_factory, modelformset_factory
 from django.forms import Textarea, formset_factory, TextInput, DateInput
 from .models import NucAcids, SampleLib
 from .forms import  BaseNucAcids, NucAcidsFormSetHelper, NucAcidsForm, ExtractNucleicAcids
-from lab.models import Areas
+from areas.models import Areas
 from blocks import *
 from django.utils.http import urlencode
 from utils.utils import sorted_nicely
@@ -40,52 +40,7 @@ def filter_nucacids(request):
     return JsonResponse(result)
 
 
-class AreaList(ListView):
-    # table_class = SimpleTable
-    queryset = Areas.objects.all().order_by('-completion_date')
-    template_name = 'libprep/areas_list.html'
-    context_object_name = 'all_areas'
 
-    paginate_by = 15
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['query'] = self.request.GET.get('q')
-        current_block = self.request.GET.get('blockid','')
-        if current_block:
-            block_object=Blocks.objects.get(bl_id=current_block)
-            context['blockname'] =block_object.old_block_id
-        return context
-
-    def get_queryset(self):
-        current_block = self.request.GET.get('blockid','')
-        if current_block:
-            block_object=Blocks.objects.get(bl_id=current_block)
-            object_list = block_object.areas_set.all().order_by('-ar_id')
-        else:
-            object_list = Areas.objects.all().order_by('-ar_id')
-        query = self.request.GET.get('q')
-        if query:
-            object_list = Areas.objects.filter(
-            Q(area_type__icontains=query
-            ) |Q(block__project__abbreviation__icontains=query) |Q(block__old_block_id__icontains=query)
-            ).order_by('-ar_id')
-        return object_list
-
-
-
-    def dispatch(self, request, *args, **kwargs):
-        # the dispatch method injects the selected_areas
-        # into request.session so that it remains accessible after the redirect. It gets removed after
-        # add_nucs_to_area has run
-
-        selected_areas = self.request.GET.getlist('areas_selected')
-        if selected_areas:
-            prior_selection = self.request.session.getlist('selected_areas','')
-            request.session['selected_areas'] = prior_selection+selected_areas
-            return HttpResponseRedirect(reverse('extract_nucacids'))
-        else:
-            return super().dispatch(request, *args, **kwargs)
 
 def add_nucs_to_area(request, areas_to_add_to, cd):
     old_na_id=cd.get('prefix')
