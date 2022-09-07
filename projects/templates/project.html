@@ -11,14 +11,11 @@
     <h4>New Project</h4>
         <div class="row justify-content-start">
                 <div class="col-6">{{ form.abbreviation|as_crispy_field }}</div>
-                <div class="w-100"></div>
-                <div class="col">{{ form.name|as_crispy_field }}</div>
-                <div class="col">{{ form.pi|as_crispy_field }}</div>
-                <div class="w-100"></div>
-                <div class="col">{{ form.description|as_crispy_field }}</div>
-                <div class="col">{{ form.speedtype|as_crispy_field }}</div>
-                <div class="w-100"></div>
+                <div class="col-6">{{ form.name|as_crispy_field }}</div>
+                <div class="col-6">{{ form.pi|as_crispy_field }}</div>
+                <div class="col-6">{{ form.speedtype|as_crispy_field }}</div>
                 <div class= "col-6"> {{form.date_start|as_crispy_field}}</div>
+                <div class="col-12">{{ form.description|as_crispy_field }}</div>
             </div>
             <br>
 
@@ -26,4 +23,9 @@
     <button type="submit" class="btn btn-success">Save Project</button>
 </div>
 </form>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/assets/js/custom/documentation/forms/flatpickr.js"></script>
+<script src="static/init.dateinput.js" charset="utf-8"></script>
 {% endblock %}

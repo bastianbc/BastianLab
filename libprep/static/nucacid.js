@@ -6,6 +6,7 @@ var KTDatatablesServerSide = function () {
     var table;
     var dt;
     var filterPayment;
+    var editor;
 
     // Private functions
     var initDatatable = function () {
@@ -359,6 +360,57 @@ var KTDatatablesServerSide = function () {
         }
     }
 
+    var initEditor = function () {
+
+      editor = new $.fn.dataTable.Editor({
+        ajax: "",
+        table: ".table",
+        fields: [ {
+               label: "First name:",
+               name: "nu_id"
+           }, {
+               label: "Last name:",
+               name: "area"
+           }, {
+               label: "Position:",
+               name: "na_type"
+           }, {
+               label: "Office:",
+               name: "date_extr",
+               type: "datetime"
+           }, {
+               label: "Extension:",
+               name: "method"
+           }, {
+               label: "Start date:",
+               name: "qubit",
+           }, {
+               label: "Salary:",
+               name: "volume"
+           }, {
+               label: "Extension:",
+               name: "amount"
+           }, {
+               label: "Start date:",
+               name: "re_ext",
+           }, {
+               label: "Salary:",
+               name: "total_ext"
+           }, {
+               label: "Extension:",
+               name: "na_sheared"
+           }, {
+               label: "Start date:",
+               name: "shearing_vol",
+           }, {
+               label: "Salary:",
+               name: "te_vol"
+           }
+       ]
+     });
+
+    }
+
     // Public methods
     return {
         init: function () {
@@ -368,6 +420,7 @@ var KTDatatablesServerSide = function () {
             handleFilterDatatable();
             handleDeleteRows();
             handleResetForm();
+            initEditor();
         }
     }
 }();
