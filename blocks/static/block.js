@@ -293,7 +293,7 @@ var KTDatatablesServerSide = function () {
 
         $.ajax({
           type: "GET",
-          url: "/blocks/new_async",
+          url: "/areas/new_async1",
           data: {
             "selected_ids":JSON.stringify(selectedIds),
           },
