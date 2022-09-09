@@ -52,9 +52,11 @@ def edit_nucacid_async(request):
             r = re.match(r"data\[(\d+)\]\[(\w+)\]", k)
             if r:
                 parameters["pk"] = r.groups()[0]
+                if v == '':
+                    v = None
                 parameters[r.groups()[1]] = v
 
-    print(parameters)            
+    print(parameters)
     custom_update(pk=parameters["pk"],parameters=parameters)
 
     return JsonResponse({"result":True})

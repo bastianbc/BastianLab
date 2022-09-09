@@ -5,7 +5,6 @@ def custom_update(pk,parameters):
         obj = NucAcids.objects.get(pk=pk)
         for key in parameters:
             setattr(obj, key, parameters[key])
-        print("1111111111111111111111111111111")
         print(obj.__dict__)
         obj.save()
         return obj
