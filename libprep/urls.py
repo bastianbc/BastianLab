@@ -21,7 +21,7 @@ urlpatterns = [
     #path('show', QuoteList.as_view(), name='showquotes'),
     path("", views.nucacids, name="nucacids"),
     path("filter_nucacids", views.filter_nucacids, name="filter-nucacids"),
-
+    path("edit_nucacid_async", views.edit_nucacid_async, name="edit-nucacid-async"),
 ] + staticfiles_urlpatterns()
 
 if settings.DEBUG:

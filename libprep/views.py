@@ -39,8 +39,25 @@ def filter_nucacids(request):
 
     return JsonResponse(result)
 
+def edit_nucacid_async(request):
+    from django.http import JsonResponse
+    import json
+    import re
+    from .utils import custom_update
 
+    parameters = {}
 
+    for k,v in request.POST.items():
+        if k.startswith('data'):
+            r = re.match(r"data\[(\d+)\]\[(\w+)\]", k)
+            if r:
+                parameters["pk"] = r.groups()[0]
+                parameters[r.groups()[1]] = v
+
+    print(parameters)            
+    custom_update(pk=parameters["pk"],parameters=parameters)
+
+    return JsonResponse({"result":True})
 
 def add_nucs_to_area(request, areas_to_add_to, cd):
     old_na_id=cd.get('prefix')

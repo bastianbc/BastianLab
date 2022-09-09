@@ -22,6 +22,12 @@ var KTDatatablesServerSide = function () {
                 selector: 'td:first-child input[type="checkbox"]',
                 className: 'row-selected'
             },
+            keys: {
+              columns: ':not(:first-child)',
+              keys: [ 9 ],
+              editor: editor,
+              editOnFocus: true
+            },
             ajax: '/libprep/filter_nucacids',
             columns: [
                 { data: null },
@@ -363,7 +369,17 @@ var KTDatatablesServerSide = function () {
     var initEditor = function () {
 
       editor = new $.fn.dataTable.Editor({
-        ajax: "",
+        ajax: {
+          url: "/libprep/edit_nucacid_async",
+          type: "POST",
+          headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
+          success: function () {
+              dt.draw();
+          },
+          error: function (xhr, ajaxOptions, thrownError) {
+              swal("Error updating!", "Please try again!", "error");
+          }
+        },
         table: ".table",
         fields: [ {
                label: "First name:",
@@ -406,7 +422,21 @@ var KTDatatablesServerSide = function () {
                label: "Salary:",
                name: "te_vol"
            }
-       ]
+       ],
+       formOptions: {
+          inline: {
+            onBlur: 'submit'
+          }
+       }
+     });
+
+
+     $('.table').on( 'click', 'tbody td:not(:first-child)', function (e) {
+          editor.inline( this );
+     });
+
+     $('.table').on( 'key-focus', function ( e, datatable, cell ) {
+          editor.inline( cell.index() );
      });
 
     }
