@@ -1,5 +1,6 @@
 from django.db import models
 from datetime import date
+from django.db.models import Q, Count
 
 class NucAcids(models.Model):
     old_na_id = models.CharField(max_length=50, blank=True, null=True)

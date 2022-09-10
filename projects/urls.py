@@ -6,6 +6,7 @@ from . import views
 from .views import ProjectList, ProjectCreate, ProjectUpdate, ProjectDelete
 from .forms import ProjectForm
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.conf.urls.static import static
 
 # app_name = 'projects'
 urlpatterns = [

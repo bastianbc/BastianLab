@@ -40,7 +40,7 @@ def new_project(request):
         form = ProjectForm(request.POST)
         if form.is_valid():
             project = form.save()
-            messages.success(request,"Project %s was created successfully." % project.pat_id)
+            messages.success(request,"Project %s was created successfully." % project.pr_id)
             return redirect("projects")
         else:
             messages.error(request,"Project wasn't created.")
@@ -50,13 +50,13 @@ def new_project(request):
     return render(request,"project.html",locals())
 
 def edit_project(request,id):
-    project = projects.objects.get(pat_id=id)
+    project = Projects.objects.get(pr_id=id)
 
     if request.method=="POST":
         form = ProjectForm(request.POST,instance=project)
         if form.is_valid():
             project = form.save()
-            messages.success(request,"Project %s was updated successfully." % project.pat_id)
+            messages.success(request,"Project %s was updated successfully." % project.pr_id)
             return redirect("projects")
         else:
             messages.error(request,"Project wasn't updated!")
@@ -67,12 +67,12 @@ def edit_project(request,id):
 
 def delete_project(request,id):
     try:
-        project = projects.objects.get(pat_id=id)
+        project = projects.objects.get(pr_id=id)
         project.delete()
-        messages.success(request,"Project %s was deleted successfully." % project.pat_id)
+        messages.success(request,"Project %s was deleted successfully." % project.pr_id)
         deleted = True
     except Exception as e:
-        messages.error(request, "Project %s wasn't deleted!" % project.pat_id)
+        messages.error(request, "Project %s wasn't deleted!" % project.pr_id)
         deleted = False
 
     return JsonResponse({ "deleted":True })
