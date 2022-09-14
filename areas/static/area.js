@@ -21,14 +21,23 @@ var KTDatatablesServerSide = function () {
                 selector: 'td:first-child input[type="checkbox"]',
                 className: 'row-selected'
             },
-            ajax: '/blocks/filter_blocks',
+            ajax: '/areas/filter_areas',
             columns: [
               { data: null },
-              { data: 'patient' },
-              { data: 'diagnosis' },
-              { data: 'body_site' },
-              { data: 'gross' },
-              { data: 'num_areas' },
+              { data: 'ar_id' },
+              { data: 'area' },
+              { data: 'old_area_id' },
+              { data: 'old_block_id' },
+              { data: 'collection' },
+              { data: 'area_type' },
+              { data: 'he_image' },
+              { data: 'na_id' },
+              { data: 'completion_date' },
+              { data: 'investigator' },
+              { data: 'image' },
+              { data: 'project' },
+              { data: 'block' },
+              { data: 'num_nucacids' },
             ],
             columnDefs: [
                 {
@@ -37,7 +46,7 @@ var KTDatatablesServerSide = function () {
                     render: function (data) {
                         return `
                             <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                <input class="form-check-input" type="checkbox" value="${data['bl_id']}" />
+                                <input class="form-check-input" type="checkbox" value="${data['ar_id']}" />
                             </div>`;
                     }
                 },
@@ -48,19 +57,30 @@ var KTDatatablesServerSide = function () {
                 //     }
                 // },
                 {
-                    targets: 5,
+                    targets: 11,
+                    orderable: false,
+                    // render: function (data) {
+                    //     if (data > 0) {
+                    //       return `
+                    //           <a href="#">${data}</a>`;
+                    //     }
+                    //     return data;
+                    // }
+                },
+                {
+                    targets: 14,
                     orderable: false,
                     render: function (data, type, row) {
                         if (data > 0) {
-                          let bl_id = row["bl_id"];
+                          let ar_id = row["ar_id"];
                           return `
-                              <a href="/areas?initial=${bl_id}">${data}</a>`;
+                              <a href="/libprep?initial=${ar_id}">${data}</a>`;
                         }
                         return data;
                     }
                 },
                 {
-                    targets: 6,
+                    targets: 15,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -81,7 +101,7 @@ var KTDatatablesServerSide = function () {
                             <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4" data-kt-menu="true">
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/blocks/edit/`+ row["bl_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
+                                    <a href="/areas/edit/`+ row["ar_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
                                         Edit
                                     </a>
                                 </div>
@@ -89,7 +109,7 @@ var KTDatatablesServerSide = function () {
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/blocks/delete/` + row["bl_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
+                                    <a href="/areas/delete/` + row["ar_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
                                         Delete
                                     </a>
                                 </div>
@@ -286,17 +306,15 @@ var KTDatatablesServerSide = function () {
           // Select parent row
           const parent = p.closest('tr');
           // Get customer name
-          const id = parent.querySelector('input[type=checkbox]').value;
+          const id = parent.querySelectorAll('td')[1].innerText;
 
           selectedIds.push(id)
-
-          console.log("selectedIds:"+selectedIds);
 
         });
 
         $.ajax({
           type: "GET",
-          url: "/areas/new_async",
+          url: "/libprep/new_async",
           data: {
             "selected_ids":JSON.stringify(selectedIds),
           },

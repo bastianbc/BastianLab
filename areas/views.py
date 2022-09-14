@@ -1,9 +1,13 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.generic.list import ListView
 from .models import *
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.contrib.messages.views import SuccessMessageMixin
 from .forms import *
+from django.http import JsonResponse
+import json
+from django.contrib import messages
+from blocks.models import *
 
 def filter_areas(request):
     from .serializers import AreasSerializer
@@ -26,7 +30,7 @@ def new_area(request):
         form = AreaForm(request.POST)
         if form.is_valid():
             area = form.save()
-            messages.success(request,"Area %s was created successfully." % area.bl_id)
+            messages.success(request,"Area %s was created successfully." % area.ar_id)
             return redirect("areas")
         else:
             messages.error(request,"Area wasn't created.")
@@ -39,22 +43,22 @@ def new_area_async(request):
     selected_ids = json.loads(request.GET.get("selected_ids"))
 
     for id in selected_ids:
-        patient = Patients.objects.get(pat_id=id)
+        block = Blocks.objects.get(bl_id=id)
 
-        Areas.objects.create(patient=patient)
+        Areas.objects.create(block=block)
 
         return JsonResponse({"success":True})
 
     return JsonResponse({"success":False})
 
 def edit_area(request,id):
-    area = Areas.objects.get(bl_id=id)
+    area = Areas.objects.get(ar_id=id)
 
     if request.method=="POST":
         form = AreaForm(request.POST,instance=area)
         if form.is_valid():
             area = form.save()
-            messages.success(request,"Area %s was updated successfully." % area.pat_id)
+            messages.success(request,"Area %s was updated successfully." % area.ar_id)
             return redirect("areas")
         else:
             messages.error(request,"Area wasn't updated!")
@@ -65,12 +69,12 @@ def edit_area(request,id):
 
 def delete_area(request,id):
     try:
-        area = Areas.objects.get(bl_id=id)
+        area = Areas.objects.get(ar_id=id)
         area.delete()
-        messages.success(request,"Area %s was deleted successfully." % area.pat_id)
+        messages.success(request,"Area %s was deleted successfully." % area.ar_id)
         deleted = True
     except Exception as e:
-        messages.error(request, "Area %s wasn't deleted!" % area.pat_id)
+        messages.error(request, "Area %s wasn't deleted!" % area.ar_id)
         deleted = False
 
     return JsonResponse({ "deleted":True })

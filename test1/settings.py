@@ -118,7 +118,8 @@ DATABASES = {
         'PASSWORD': '12345678',
         'NAME': 'labdb',
         'HOST': 'development.c7oasmx9kbh5.us-east-1.rds.amazonaws.com',
-        'PORT': '5432'
+        'PORT': '5432',
+        'DISABLE_SERVER_SIDE_CURSORS': True
     }
 # }
 # DATABASES = {

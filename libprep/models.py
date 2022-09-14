@@ -19,11 +19,10 @@ class NucAcids(models.Model):
     sl_id = models.CharField(max_length=50, blank=True, null=True)
     notes = models.CharField(max_length=255, blank=True, null=True)
     projects = models.CharField(max_length=100, blank=True, null=True)
-    area = models.ForeignKey("areas.Areas", on_delete=models.SET_NULL, db_column='area', blank=True, null=True)
+    area = models.ForeignKey("areas.Areas", on_delete=models.SET_NULL, db_column='area', blank=True, null=True, related_name="area_nucacids")
     nu_id = models.AutoField(primary_key=True)
 
     class Meta:
-        managed = True
         db_table = 'nuc_acids'
 
     def query_by_args(self, **kwargs):
@@ -60,10 +59,14 @@ class NucAcids(models.Model):
             total = queryset.count()
 
             if search_value:
-                queryset = queryset.filter(Q(nu_id__icontains=search_value) |
-                                           Q(na_type__icontains=search_value) |
-                                           Q(method__icontains=search_value) |
-                                           Q(date_extr__icontains=search_value))
+                queryset = queryset.filter(
+                    Q(nu_id__icontains=search_value) |
+                    Q(area__ar_id__icontains=search_value) |
+                    Q(na_type__icontains=search_value) |
+                    Q(na_type__icontains=search_value) |
+                    Q(method__icontains=search_value) |
+                    Q(date_extr__icontains=search_value)
+                )
 
             count = queryset.count()
             queryset = queryset.order_by(order_column)[start:start + length]

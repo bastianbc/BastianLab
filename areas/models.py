@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models import Q, Count
 from datetime import date
+import uuid
 
 class Areas(models.Model):
     PUNCH = 'PU'
@@ -47,8 +48,69 @@ class Areas(models.Model):
     class Meta:
         db_table = 'areas'
 
-    # def save(self, *args, **kwargs):
-    #     if not self.pk:
-    #         Areas.old_block_id = Blocks.old_block_id
-    #         print('Hello:', Areas.old_block_id)
-    #     super().save(*args, **kwargs)
+    def __str__(self):
+        return "%d" % self.ar_id    
+
+    def _generate_unique_id(self):
+        return str(uuid.uuid4())
+
+    def save(self,*args,**kwargs):
+        if not self.old_area_id:
+            self.old_area_id = self._generate_unique_id()
+
+        super().save(*args, **kwargs)
+
+    def query_by_args(self, **kwargs):
+        try:
+            ORDER_COLUMN_CHOICES = {
+                "1":"ar_id",
+                "2":"area",
+                "3":"old_area_id",
+                "4":"old_block_id",
+                "5":"collection",
+                "6":"area_type",
+                "7":"he_image",
+                "8":"na_id",
+                "9":"completion_date",
+                "10":"investigator",
+                "11":"project",
+                "12":"block",
+                "13":"notes",
+            }
+            draw = int(kwargs.get('draw', None)[0])
+            length = int(kwargs.get('length', None)[0])
+            start = int(kwargs.get('start', None)[0])
+            search_value = kwargs.get('search[value]', None)[0]
+            order_column = kwargs.get('order[0][column]', None)[0]
+            order = kwargs.get('order[0][dir]', None)[0]
+
+            order_column = ORDER_COLUMN_CHOICES[order_column]
+            # django orm '-' -> desc
+            if order == 'desc':
+                order_column = '-' + order_column
+
+            queryset = Areas.objects.all().annotate(num_nucacids=Count('area_nucacids'))
+            total = queryset.count()
+
+            if search_value:
+                queryset = queryset.filter(
+                    Q(ar_id__icontains=search_value) |
+                    Q(na_id__icontains=search_value) |
+                    Q(area__icontains=search_value) |
+                    Q(block__bl_id__icontains=search_value) |
+                    Q(investigator__icontains=search_value) |
+                    Q(notes__icontains=search_value) |
+                    Q(project__icontains=search_value))
+
+            count = queryset.count()
+            queryset = queryset.order_by(order_column)[start:start + length]
+            # queryset = queryset[start:start + length]
+            return {
+                'items': queryset,
+                'count': count,
+                'total': total,
+                'draw': draw
+            }
+        except Exception as e:
+            print(str(e))
+            raise

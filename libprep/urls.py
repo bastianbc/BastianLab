@@ -24,6 +24,7 @@ urlpatterns = [
     path("filter_nucacids", views.filter_nucacids, name="filter-nucacids"),
     path("edit_nucacid_async", views.edit_nucacid_async, name="edit-nucacid-async"),
     path('new', views.new_nucacid, name='new-nucacid'),
+    path('new_async', views.new_nucacid_async, name='new-nucacid-async'),
     path('edit/<str:id>', views.edit_nucacid, name='edit-nucacid'),
     path('delete/<str:id>', views.delete_nucacid, name='delete-nucacid'),
 ] + staticfiles_urlpatterns()

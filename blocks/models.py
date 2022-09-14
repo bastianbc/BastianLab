@@ -39,6 +39,9 @@ class Blocks(models.Model):
         db_table = 'blocks'
         managed = True
 
+    def __str__(self):
+        return "%d" % self.bl_id
+
     def _generate_unique_id(self):
         return str(uuid.uuid4())
 
