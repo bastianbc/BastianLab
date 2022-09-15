@@ -6,6 +6,7 @@ var KTDatatablesServerSide = function () {
     var table;
     var dt;
     var filterPayment;
+    var editor;
 
     // Private functions
     var initDatatable = function () {
@@ -20,6 +21,12 @@ var KTDatatablesServerSide = function () {
                 style: 'multi',
                 selector: 'td:first-child input[type="checkbox"]',
                 className: 'row-selected'
+            },
+            keys: {
+              columns: ':not(:first-child)',
+              keys: [ 9 ],
+              editor: editor,
+              editOnFocus: true
             },
             ajax: '/lab/filter_patients',
             columns: [
@@ -362,6 +369,53 @@ var KTDatatablesServerSide = function () {
         }
     }
 
+    var initEditor = function () {
+
+      editor = new $.fn.dataTable.Editor({
+        ajax: {
+          url: "/lab/edit_patient_async",
+          type: "POST",
+          headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
+          success: function () {
+              dt.draw();
+          },
+          error: function (xhr, ajaxOptions, thrownError) {
+              swal("Error updating!", "Please try again!", "error");
+          }
+        },
+        table: ".table",
+        fields: [ {
+               label: "Source:",
+               name: "source"
+           }, {
+               label: "Sex:",
+               name: "sex"
+           }, {
+               label: "Race:",
+               name: "race"
+           }, {
+               label: "Project:",
+               name: "project"
+           },
+       ],
+       formOptions: {
+          inline: {
+            onBlur: 'submit'
+          }
+       }
+     });
+
+
+     $('.table').on( 'click', 'tbody td:not(:first-child):not(:last-child)', function (e) {
+          editor.inline( this );
+     });
+
+     $('.table').on( 'key-focus', function ( e, datatable, cell ) {
+          editor.inline( cell.index() );
+     });
+
+    }
+
     // Public methods
     return {
         init: function () {
@@ -372,6 +426,7 @@ var KTDatatablesServerSide = function () {
             handleDeleteRows();
             handleResetForm();
             handleSelectedRows();
+            initEditor();
         }
     }
 }();

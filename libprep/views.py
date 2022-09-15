@@ -41,10 +41,8 @@ def filter_nucacids(request):
     return JsonResponse(result)
 
 def edit_nucacid_async(request):
-    from django.http import JsonResponse
-    import json
     import re
-    from .utils import custom_update
+    from core.utils import custom_update
 
     parameters = {}
 
@@ -57,7 +55,7 @@ def edit_nucacid_async(request):
                     v = None
                 parameters[r.groups()[1]] = v
 
-    custom_update(pk=parameters["pk"],parameters=parameters)
+    custom_update(NucAcids,pk=parameters["pk"],parameters=parameters)
 
     return JsonResponse({"result":True})
 

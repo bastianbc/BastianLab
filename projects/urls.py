@@ -19,5 +19,6 @@ urlpatterns = [
     path("filter_projects", views.filter_projects, name="filter-projects"),
     path('new', views.new_project, name='new-project'),
     path('edit/<str:id>', views.edit_project, name='edit-project'),
+    path("edit_project_async", views.edit_project_async, name="edit-project-async"),
     path('delete/<str:id>', views.delete_project, name='delete-project'),
 ] + staticfiles_urlpatterns()

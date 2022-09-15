@@ -21,5 +21,6 @@ urlpatterns = [
     path('new', views.new_block, name='new-block'),
     path('new_async', views.new_block_async, name='new-block-async'),
     path('edit/<str:id>', views.edit_block, name='edit-block'),
+    path("edit_block_async", views.edit_block_async, name="edit-block-async"),
     path('delete/<str:id>', views.delete_block, name='delete-block'),
 ] + staticfiles_urlpatterns()

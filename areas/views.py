@@ -67,6 +67,25 @@ def edit_area(request,id):
 
     return render(request,"area.html",locals())
 
+def edit_area_async(request):
+    import re
+    from core.utils import custom_update
+
+    parameters = {}
+
+    for k,v in request.POST.items():
+        if k.startswith('data'):
+            r = re.match(r"data\[(\d+)\]\[(\w+)\]", k)
+            if r:
+                parameters["pk"] = r.groups()[0]
+                if v == '':
+                    v = None
+                parameters[r.groups()[1]] = v
+
+    custom_update(Areas,pk=parameters["pk"],parameters=parameters)
+
+    return JsonResponse({"result":True})
+
 def delete_area(request,id):
     try:
         area = Areas.objects.get(ar_id=id)

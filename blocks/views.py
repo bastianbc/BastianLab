@@ -96,6 +96,25 @@ def edit_block(request,id):
 
     return render(request,"block.html",locals())
 
+def edit_block_async(request):
+    import re
+    from core.utils import custom_update
+
+    parameters = {}
+
+    for k,v in request.POST.items():
+        if k.startswith('data'):
+            r = re.match(r"data\[(\d+)\]\[(\w+)\]", k)
+            if r:
+                parameters["pk"] = r.groups()[0]
+                if v == '':
+                    v = None
+                parameters[r.groups()[1]] = v
+
+    custom_update(Blocks,pk=parameters["pk"],parameters=parameters)
+
+    return JsonResponse({"result":True})
+
 def delete_block(request,id):
     try:
         block = Blocks.objects.get(bl_id=id)

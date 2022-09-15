@@ -10,7 +10,7 @@ var KTDatatablesServerSide = function () {
 
     // Private functions
     var initDatatable = function ( initialValue ) {
-      
+
         dt = $(".table").DataTable({
             // searchDelay: 500,
             processing: true,
@@ -384,44 +384,44 @@ var KTDatatablesServerSide = function () {
         },
         table: ".table",
         fields: [ {
-               label: "First name:",
+               label: "Nucleic Acid Id:",
                name: "nu_id"
            }, {
-               label: "Last name:",
+               label: "Area:",
                name: "area"
            }, {
-               label: "Position:",
+               label: "Nucleic Acid Type:",
                name: "na_type"
            }, {
-               label: "Office:",
+               label: "Expired Date:",
                name: "date_extr",
                type: "datetime"
            }, {
-               label: "Extension:",
+               label: "Method:",
                name: "method"
            }, {
-               label: "Start date:",
+               label: "Qubit:",
                name: "qubit",
            }, {
-               label: "Salary:",
+               label: "Volume:",
                name: "volume"
            }, {
-               label: "Extension:",
+               label: "Amount:",
                name: "amount"
            }, {
-               label: "Start date:",
+               label: "Re-Extraction:",
                name: "re_ext",
            }, {
-               label: "Salary:",
+               label: "Total Extracted:",
                name: "total_ext"
            }, {
-               label: "Extension:",
+               label: "NA Sheared:",
                name: "na_sheared"
            }, {
-               label: "Start date:",
+               label: "Shearing Vol:",
                name: "shearing_vol",
            }, {
-               label: "Salary:",
+               label: "TE Vol:",
                name: "te_vol"
            }
        ],

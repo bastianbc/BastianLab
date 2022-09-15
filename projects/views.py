@@ -17,10 +17,11 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from .models import Projects
 from .forms import ProjectForm
+from django.http import JsonResponse
+import json
 
 def filter_projects(request):
     from .serializers import ProjectsSerializer
-    from django.http import JsonResponse
 
     projects = Projects().query_by_args(**request.GET)
     serializer = ProjectsSerializer(projects['items'], many=True)
@@ -64,6 +65,25 @@ def edit_project(request,id):
         form = ProjectForm(instance=project)
 
     return render(request,"project.html",locals())
+
+def edit_project_async(request):
+    import re
+    from core.utils import custom_update
+
+    parameters = {}
+
+    for k,v in request.POST.items():
+        if k.startswith('data'):
+            r = re.match(r"data\[(\d+)\]\[(\w+)\]", k)
+            if r:
+                parameters["pk"] = r.groups()[0]
+                if v == '':
+                    v = None
+                parameters[r.groups()[1]] = v
+
+    custom_update(Projects,pk=parameters["pk"],parameters=parameters)
+
+    return JsonResponse({"result":True})
 
 def delete_project(request,id):
     try:

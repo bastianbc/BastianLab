@@ -23,6 +23,7 @@ from django.views.generic.edit import FormView, CreateView, DeleteView, UpdateVi
 from .models import Patients
 from .forms import PatientForm, PatientsBlocksWithAreasFormset
 import json
+from django.http import JsonResponse
 
 class PatientCreate(SuccessMessageMixin, CreateView):
     model = Patients
@@ -135,6 +136,25 @@ def edit_patient(request,id):
         form = PatientForm(instance=patient)
 
     return render(request,"patient.html",locals())
+
+def edit_patient_async(request):
+    import re
+    from core.utils import custom_update
+
+    parameters = {}
+
+    for k,v in request.POST.items():
+        if k.startswith('data'):
+            r = re.match(r"data\[(\d+)\]\[(\w+)\]", k)
+            if r:
+                parameters["pk"] = r.groups()[0]
+                if v == '':
+                    v = None
+                parameters[r.groups()[1]] = v
+
+    custom_update(Patients,pk=parameters["pk"],parameters=parameters)
+
+    return JsonResponse({"result":True})
 
 def delete_patient(request,id):
     try:
