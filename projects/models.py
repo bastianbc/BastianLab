@@ -1,6 +1,6 @@
 from django.db import models
 from datetime import date
-from django.db.models import Q
+from django.db.models import Q, Count
 
 class Projects(models.Model):
 
@@ -10,13 +10,13 @@ class Projects(models.Model):
         (BORIS, 'Boris Bastian'),
         (IWEI, 'Iwei Yeh'),
     ]
-    name = models.CharField(max_length=100, blank=False, null=False)
-    abbreviation = models.CharField(max_length=6, blank=False, null=False, unique=True, default='XY')
-    pi = models.CharField(max_length=2, choices=PI_CHOICES, default=BORIS, blank=True, null=True)
-    speedtype = models.CharField(max_length=50, blank=True, null=True)
-    description = models.CharField(max_length=255, blank=True, null=True)
-    date_start = models.DateField(blank=True, null=True, default=date.today)
-    pr_id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100, blank=False, null=False,verbose_name="Name")
+    abbreviation = models.CharField(max_length=6, blank=False, null=False, unique=True, default='XY', verbose_name="Abbreviation", help_text="Requires a unique identifier for each Project.")
+    pi = models.CharField(max_length=2, choices=PI_CHOICES, default=BORIS, blank=True, null=True, verbose_name="Principal Investigator")
+    speedtype = models.CharField(max_length=50, blank=True, null=True, verbose_name="Speed Type")
+    description = models.CharField(max_length=255, blank=True, null=True, verbose_name="Description")
+    date_start = models.DateField(blank=True, null=True, default=date.today, verbose_name="Start Date")
+    pr_id = models.AutoField(primary_key=True, verbose_name="Project ID")
 
 
     class Meta:
@@ -52,7 +52,7 @@ class Projects(models.Model):
             if order == 'desc':
                 order_column = '-' + order_column
 
-            queryset = Projects.objects.all()
+            queryset = Projects.objects.all().annotate(num_blocks=Count('project_blocks'))
             total = queryset.count()
 
             if search_value:

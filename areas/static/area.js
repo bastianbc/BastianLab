@@ -131,7 +131,7 @@ var KTDatatablesServerSide = function () {
             createdRow: function (row, data, dataIndex) {
                 $(row).find('td:eq(4)').attr('data-filter', data.CreditCardType);
             },
-            oSearch: {sSearch: initialValue}
+            oSearch: {sSearch: "_initial:" + initialValue}
         });
 
         table = dt.$;

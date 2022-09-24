@@ -14,10 +14,18 @@ from django.contrib.auth.models import User
 from django.db.models import Q, Count
 
 class Patients(models.Model):
+    RACE_TYPES = (
+        (1, "White"),
+        (2, "American Indian or Alaska Native"),
+        (3, "Black or African American"),
+        (4, "Native Hawaiian or Other Pacific Islander"),
+    )
+
     pat_id = models.CharField(max_length=12, blank=False, null=False, unique=True)
     sex = models.CharField(max_length=1, blank=True, null=True)
     # age = models.FloatField(blank=True, null=True)
     dob = models.IntegerField(blank=True, null=True)
+    # race = models.SmallIntegerField(choices=RACE_TYPES, default=1)
     race = models.TextField(blank=True, null=True)
     source = models.CharField(max_length=20, blank=True, null=True)
     blocks_temp = models.CharField(max_length=100, blank=True, null=True)

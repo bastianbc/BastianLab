@@ -8,6 +8,7 @@ from django.urls import reverse_lazy, reverse
 from django.http import JsonResponse
 import json
 from django.contrib import messages
+from projects.models import Projects
 # BlockFormset = inlineformset_factory(
 #     Blocks, Blocks, fields=('block_id', 'body_site')
 # )
@@ -52,7 +53,10 @@ def filter_blocks(request):
     return JsonResponse(result)
 
 def blocks(request):
-    return render(request,"block_list.html")
+    project_id = request.GET.get("project_id")
+    if project_id:
+        project = Projects.objects.get(pr_id=project_id)
+    return render(request,"block_list.html",locals())
 
 def new_block(request):
     if request.method=="POST":
@@ -71,14 +75,14 @@ def new_block(request):
 def new_block_async(request):
     selected_ids = json.loads(request.GET.get("selected_ids"))
 
-    for id in selected_ids:
-        patient = Patients.objects.get(pat_id=id)
+    try:
+        for id in selected_ids:
+            patient = Patients.objects.get(pat_id=id)
+            Blocks.objects.create(patient=patient)
+    except Exception as e:
+        return JsonResponse({"success":False})
 
-        Blocks.objects.create(patient=patient)
-
-        return JsonResponse({"success":True})
-
-    return JsonResponse({"success":False})
+    return JsonResponse({"success":True})
 
 def edit_block(request,id):
     block = Blocks.objects.get(bl_id=id)

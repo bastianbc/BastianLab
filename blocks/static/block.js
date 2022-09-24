@@ -111,7 +111,7 @@ var KTDatatablesServerSide = function () {
             createdRow: function (row, data, dataIndex) {
                 $(row).find('td:eq(4)').attr('data-filter', data.CreditCardType);
             },
-            oSearch: {sSearch: initialValue}
+            oSearch: {sSearch: "_initial:" + initialValue}
         });
 
         table = dt.$;
@@ -278,11 +278,11 @@ var KTDatatablesServerSide = function () {
 
     var handleSelectedRows = function (e) {
       // Select element
-      const btnCreateBlock = document.querySelector('[data-kt-docs-table-select="event_selected"]');
+      const btnCreateArea = document.querySelector('[data-kt-docs-table-select="event_create_area"]');
 
-      // Created blocks for selected rows
-      btnCreateBlock.addEventListener('click', function () {
+      const btnAddBlockToProject = document.querySelector('[data-kt-docs-table-select="event_add_block_to_project"]');
 
+      function getSelectedRows() {
         const container = document.querySelector('.table');
 
         const selectedRows = container.querySelectorAll('[type="checkbox"]:checked');
@@ -301,11 +301,16 @@ var KTDatatablesServerSide = function () {
 
         });
 
+        return JSON.stringify(selectedIds);
+      }
+
+      btnCreateArea.addEventListener('click', function () {
+
         $.ajax({
           type: "GET",
           url: "/areas/new_async",
           data: {
-            "selected_ids":JSON.stringify(selectedIds),
+            "selected_ids": getSelectedRows(),
           },
         }).done(function(result) {
           console.log("result.success:"+result.success);
@@ -335,6 +340,14 @@ var KTDatatablesServerSide = function () {
           }
         });
       });
+
+      if (btnAddBlockToProject) {
+
+        btnAddBlockToProject.addEventListener('click', function () {
+          alert("hoppaaa!");
+        });
+
+      }
     }
 
     // Toggle toolbars
@@ -424,11 +437,21 @@ var KTDatatablesServerSide = function () {
       }
 
       const params = new URLSearchParams(window.location.search);
-      const x = params.get('initial');
+      const model = params.get('model');
+      const id = params.get('id');
 
       cleanUrl();
 
-      return x;
+      if (model != null && id !=null) {
+
+        return JSON.stringify({
+          "model": model,
+          "id": id
+        });
+
+      }
+
+      return null;
 
     }
 

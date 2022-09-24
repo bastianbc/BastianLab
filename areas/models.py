@@ -49,7 +49,7 @@ class Areas(models.Model):
         db_table = 'areas'
 
     def __str__(self):
-        return "%d" % self.ar_id    
+        return "%d" % self.ar_id
 
     def _generate_unique_id(self):
         return str(uuid.uuid4())
@@ -61,6 +61,16 @@ class Areas(models.Model):
         super().save(*args, **kwargs)
 
     def query_by_args(self, **kwargs):
+
+        def _parse_value(search_value):
+            if "_initial:" in search_value:
+                v = search_value.split("_initial:")[1]
+                return None if v == "null" or not v.isnumeric() else v
+            return search_value
+
+        def _is_initial_value(search_value):
+            return "_initial:" in search_value and search_value.split("_initial:")[1] != "null"
+
         try:
             ORDER_COLUMN_CHOICES = {
                 "1":"ar_id",
@@ -91,16 +101,26 @@ class Areas(models.Model):
 
             queryset = Areas.objects.all().annotate(num_nucacids=Count('area_nucacids'))
             total = queryset.count()
+            import pdb; pdb.set_trace()
+            is_initial = _is_initial_value(search_value)
+            search_value = _parse_value(search_value)
 
-            if search_value:
+            print("is_initial:",is_initial)
+            print("search_value:",search_value)
+
+            if is_initial:
                 queryset = queryset.filter(
-                    Q(ar_id__icontains=search_value) |
-                    Q(na_id__icontains=search_value) |
-                    Q(area__icontains=search_value) |
-                    Q(block__bl_id__icontains=search_value) |
-                    Q(investigator__icontains=search_value) |
-                    Q(notes__icontains=search_value) |
-                    Q(project__icontains=search_value))
+                        Q(block__bl_id=search_value)
+                    )
+            elif search_value:
+                queryset = queryset.filter(
+                        Q(ar_id__icontains=search_value) |
+                        Q(na_id__icontains=search_value) |
+                        Q(area__icontains=search_value) |
+                        Q(investigator__icontains=search_value) |
+                        Q(notes__icontains=search_value) |
+                        Q(project__icontains=search_value)
+                    )
 
             count = queryset.count()
             queryset = queryset.order_by(order_column)[start:start + length]

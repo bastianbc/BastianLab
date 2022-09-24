@@ -42,14 +42,14 @@ def new_area(request):
 def new_area_async(request):
     selected_ids = json.loads(request.GET.get("selected_ids"))
 
-    for id in selected_ids:
-        block = Blocks.objects.get(bl_id=id)
+    try:
+        for id in selected_ids:
+            block = Blocks.objects.get(bl_id=id)
+            Areas.objects.create(block=block)
+    except Exception as e:
+        return JsonResponse({"success":False})
 
-        Areas.objects.create(block=block)
-
-        return JsonResponse({"success":True})
-
-    return JsonResponse({"success":False})
+    return JsonResponse({"success":True})
 
 def edit_area(request,id):
     area = Areas.objects.get(ar_id=id)

@@ -36,7 +36,7 @@ var KTDatatablesServerSide = function () {
                 { data: 'pi' },
                 { data: 'date_start' },
                 { data: 'speedtype' },
-                // { data: 'blocks' },
+                { data: 'num_blocks' },
             ],
             columnDefs: [
                 {
@@ -49,6 +49,18 @@ var KTDatatablesServerSide = function () {
                             </div>`;
                     }
                 },
+                {
+                    targets: 6,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        if (data > 0) {
+                          let pr_id = row["pr_id"];
+                          return `
+                              <a href="/blocks?model=project&id=${pr_id}">${data}</a>`;
+                        }
+                        return data;
+                    }
+                },
                 // {
                 //     targets: 4,
                 //     render: function (data, type, row) {
@@ -56,7 +68,7 @@ var KTDatatablesServerSide = function () {
                 //     }
                 // },
                 {
-                    targets: 6,
+                    targets: 7,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -79,6 +91,14 @@ var KTDatatablesServerSide = function () {
                                 <div class="menu-item px-3">
                                     <a href="/projects/edit/`+ row["pr_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
                                         Edit
+                                    </a>
+                                </div>
+                                <!--end::Menu item-->
+
+                                <!--begin::Menu item-->
+                                <div class="menu-item px-3">
+                                    <a href="/blocks?project_id=`+ row["pr_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
+                                        Add Block
                                     </a>
                                 </div>
                                 <!--end::Menu item-->

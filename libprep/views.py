@@ -76,14 +76,14 @@ def new_nucacid(request):
 def new_nucacid_async(request):
     selected_ids = json.loads(request.GET.get("selected_ids"))
 
-    for id in selected_ids:
-        area = Areas.objects.get(ar_id=id)
+    try:
+        for id in selected_ids:
+            area = Areas.objects.get(ar_id=id)
+            NucAcids.objects.create(area=area)
+    except Exception as e:
+        return JsonResponse({"success":False})
 
-        NucAcids.objects.create(area=area)
-
-        return JsonResponse({"success":True})
-
-    return JsonResponse({"success":False})
+    return JsonResponse({"success":True})
 
 def edit_nucacid(request,id):
     nucacid = NucAcids.objects.get(nu_id=id)
