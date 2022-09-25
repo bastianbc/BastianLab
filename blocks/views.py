@@ -72,13 +72,26 @@ def new_block(request):
 
     return render(request,"block.html",locals())
 
-def new_block_async(request):
+def add_block_to_patient_async(request):
     selected_ids = json.loads(request.GET.get("selected_ids"))
 
     try:
         for id in selected_ids:
             patient = Patients.objects.get(pat_id=id)
             Blocks.objects.create(patient=patient)
+    except Exception as e:
+        return JsonResponse({"success":False})
+
+    return JsonResponse({"success":True})
+
+def add_block_to_project_async(request):
+    selected_ids = json.loads(request.GET.get("selected_ids"))
+    project_id = request.GET.get("project_id")
+
+    try:
+        for id in selected_ids:
+            project = Projects.objects.get(pr_id=project_id)
+            Blocks.objects.create(project=project)
     except Exception as e:
         return JsonResponse({"success":False})
 

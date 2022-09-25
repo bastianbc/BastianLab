@@ -1,6 +1,13 @@
+
 /*! Bootstrap integration for DataTables' Editor
  * ©2015 SpryMedia Ltd - datatables.net/license
  */
+
+import $ from 'jquery';
+import DataTable from 'datatables.net-bs4';
+import DataTable from 'datatables.net-editor';
+
+
 
 (function( factory ){
 	if ( typeof define === 'function' && define.amd ) {
@@ -125,7 +132,7 @@ const dom = {
 DataTable.Editor.display.bootstrap = $.extend( true, {}, DataTable.Editor.models.displayController, {
 	init: function ( dte ) {
 		// Add `form-control` to required elements
-		dte.on( 'displayOrder.dtebs', function ( e, display, action, form ) {
+		dte.on( 'displayOrder.dtebs open.dtebs', function ( e, display, action, form ) {
 			$.each( dte.s.fields, function ( key, field ) {
 				$('input:not([type=checkbox]):not([type=radio]), select, textarea', field.node() )
 					.addClass( 'form-control' );
@@ -249,3 +256,6 @@ DataTable.Editor.display.bootstrap = $.extend( true, {}, DataTable.Editor.models
 
 return DataTable.Editor;
 }));
+
+
+export default Editor;

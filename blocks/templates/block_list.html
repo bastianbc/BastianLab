@@ -139,7 +139,7 @@
             {% if project %}
             <!--begin::Menu item-->
             <div class="menu-item px-3">
-                <a href="javascript:;" class="menu-link px-3" data-kt-docs-table-select="event_add_block_to_project">
+                <a href="javascript:;" class="menu-link px-3" data-kt-docs-table-select="event_add_block_to_project" data-project_id="{{ project.pr_id }}">
                     Add Blocks to Project '{{ project.name }}'
                 </a>
             </div>
@@ -179,6 +179,7 @@
                 <input class="form-check-input" type="checkbox" data-kt-check="true" data-kt-check-target="#block_datatable .form-check-input" value="1"/>
             </div>
         </th>
+        <th>Project Name</th>
         <th>Patient Name</th>
         <th>Diagnosis</th>
         <th>Body Site</th>

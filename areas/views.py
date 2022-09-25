@@ -39,7 +39,7 @@ def new_area(request):
 
     return render(request,"area.html",locals())
 
-def new_area_async(request):
+def add_area_to_block_async(request):
     selected_ids = json.loads(request.GET.get("selected_ids"))
 
     try:

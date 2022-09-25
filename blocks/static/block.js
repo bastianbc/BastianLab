@@ -31,6 +31,7 @@ var KTDatatablesServerSide = function () {
             ajax: '/blocks/filter_blocks',
             columns: [
               { data: null },
+              { data: 'project' },
               { data: 'patient' },
               { data: 'diagnosis' },
               { data: 'body_site' },
@@ -55,7 +56,7 @@ var KTDatatablesServerSide = function () {
                 //     }
                 // },
                 {
-                    targets: 5,
+                    targets: 6,
                     orderable: false,
                     render: function (data, type, row) {
                         if (data > 0) {
@@ -67,7 +68,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 6,
+                    targets: 7,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -308,12 +309,11 @@ var KTDatatablesServerSide = function () {
 
         $.ajax({
           type: "GET",
-          url: "/areas/new_async",
+          url: "/areas/add_area_to_block_async",
           data: {
             "selected_ids": getSelectedRows(),
           },
         }).done(function(result) {
-          console.log("result.success:"+result.success);
           if (result.success) {
             Swal.fire({
                 text: "Block(s) was created succesfully.",
@@ -344,7 +344,41 @@ var KTDatatablesServerSide = function () {
       if (btnAddBlockToProject) {
 
         btnAddBlockToProject.addEventListener('click', function () {
-          alert("hoppaaa!");
+
+          $.ajax({
+            type: "GET",
+            url: "/blocks/add_block_to_project_async",
+            data: {
+              "selected_ids": getSelectedRows(),
+              "project_id": this.getAttribute('data-project_id')
+            },
+          }).done(function(result) {
+            if (result.success) {
+              Swal.fire({
+                  text: "Block(s) was created succesfully.",
+                  icon: "info",
+                  buttonsStyling: false,
+                  confirmButtonText: "Ok, got it!",
+                  customClass: {
+                      confirmButton: "btn fw-bold btn-success",
+                  }
+              }).then(function(){
+                dt.draw();
+              });
+            }
+            else {
+              Swal.fire({
+                  text: "Block(s) was not created.",
+                  icon: "error",
+                  buttonsStyling: false,
+                  confirmButtonText: "Ok, got it!",
+                  customClass: {
+                      confirmButton: "btn fw-bold btn-danger",
+                  }
+              });
+            }
+          });
+
         });
 
       }

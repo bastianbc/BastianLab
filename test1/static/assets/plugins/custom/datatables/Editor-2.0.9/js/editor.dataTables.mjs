@@ -1,6 +1,13 @@
+
 /*! DataTables styling integration for DataTables' Editor
  * ©SpryMedia Ltd - datatables.net/license
  */
+
+import $ from 'jquery';
+import DataTable from 'datatables.net-dt';
+import DataTable from 'datatables.net-editor';
+
+
 
 (function( factory ){
 	if ( typeof define === 'function' && define.amd ) {
@@ -37,3 +44,6 @@
 return $.fn.dataTable.Editor;
 
 }));
+
+
+export default Editor;

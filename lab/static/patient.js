@@ -301,7 +301,7 @@ var KTDatatablesServerSide = function () {
 
         $.ajax({
           type: "GET",
-          url: "/blocks/new_async",
+          url: "/blocks/add_block_to_patient_async",
           data: {
             "selected_ids":JSON.stringify(selectedIds),
           },

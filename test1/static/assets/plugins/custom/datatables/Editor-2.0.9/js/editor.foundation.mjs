@@ -1,6 +1,13 @@
+
 /*! Foundation integration for DataTables' Editor
  * ©2015 SpryMedia Ltd - datatables.net/license
  */
+
+import $ from 'jquery';
+import DataTable from 'datatables.net-zf';
+import DataTable from 'datatables.net-editor';
+
+
 
 (function( factory ){
 	if ( typeof define === 'function' && define.amd ) {
@@ -151,3 +158,6 @@ DataTable.Editor.display.foundation = $.extend( true, {}, DataTable.Editor.model
 
 return DataTable.Editor;
 }));
+
+
+export default Editor;

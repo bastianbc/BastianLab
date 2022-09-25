@@ -101,12 +101,9 @@ class Areas(models.Model):
 
             queryset = Areas.objects.all().annotate(num_nucacids=Count('area_nucacids'))
             total = queryset.count()
-            import pdb; pdb.set_trace()
+
             is_initial = _is_initial_value(search_value)
             search_value = _parse_value(search_value)
-
-            print("is_initial:",is_initial)
-            print("search_value:",search_value)
 
             if is_initial:
                 queryset = queryset.filter(

@@ -1,6 +1,51 @@
+
 /*! Bulma integration for DataTables' Editor
  * ©2015 SpryMedia Ltd - datatables.net/license
  */
+
+(function( factory ){
+	if ( typeof define === 'function' && define.amd ) {
+		// AMD
+		define( ['jquery', 'datatables.net-bm', 'datatables.net-editor'], function ( $ ) {
+			return factory( $, window, document );
+		} );
+	}
+	else if ( typeof exports === 'object' ) {
+		// CommonJS
+		module.exports = function (root, $) {
+			if ( ! root ) {
+				// CommonJS environments without a window global must pass a
+				// root. This will give an error otherwise
+				root = window;
+			}
+
+			if ( ! $ ) {
+				$ = typeof window !== 'undefined' ? // jQuery's factory checks for a global window
+					require('jquery') :
+					require('jquery')( root );
+			}
+
+			if ( ! $.fn.dataTable ) {
+				require('datatables.net-bm')(root, $);
+			}
+
+			if ( ! $.fn.dataTable ) {
+				require('datatables.net-editor')(root, $);
+			}
+
+
+			return factory( $, root, root.document );
+		};
+	}
+	else {
+		// Browser
+		factory( jQuery, window, document );
+	}
+}(function( $, window, document, undefined ) {
+'use strict';
+var DataTable = $.fn.dataTable;
+
+
 
 (function( factory ){
 	if ( typeof define === 'function' && define.amd ) {
@@ -123,7 +168,7 @@ DataTable.Editor.display.bulma = $.extend( true, {}, DataTable.Editor.models.dis
 	 */
 	init: function ( dte ) {
 		// Add `form-control` to required elements
-		dte.on( 'displayOrder.dtebs', function ( e, display, action, form ) {
+		dte.on( 'displayOrder.dtebm open.dtebm', function ( e, display, action, form ) {
 			$.each( dte.s.fields, function ( key, field ) {
 				$('input:not([type=checkbox]):not([type=radio]), select, textarea', field.node() )
 					.addClass( 'input' );
@@ -200,4 +245,8 @@ DataTable.Editor.display.bulma = $.extend( true, {}, DataTable.Editor.models.dis
 
 
 return DataTable.Editor;
+}));
+
+
+return Editor;
 }));
