@@ -2,12 +2,13 @@ from django.shortcuts import render,redirect
 from .models import User
 from django.contrib.auth.decorators import login_required,permission_required
 from .forms import AccountForm
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from django.conf import settings
 
 @permission_required("view_user",raise_exception=True)
 def accounts(request):
-    return render(request,"accounts.html",locals())
+    return render(request,"account_list.html",locals())
 
 @permission_required("add_user",raise_exception=True)
 def new_account(request):
