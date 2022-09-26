@@ -4,16 +4,22 @@
 
 {% block content %}
 {{form.media}}
-<form method="post" action="{% if id %} {% url 'edit-group' id %} {% else %} {% url 'new-group' %} {% endif %}">
-{% csrf_token %}
-<div class="container">
 
-    <h4>New Group</h4>
-        <div class="row justify-content-start">
-            {{form|crispy}}
-        </div>
-        <br>
-    <button type="submit" class="btn btn-success">Save</button>
-</div>
+<form method="post" action="{% if id %} {% url 'edit-group' id %} {% else %} {% url 'new-group' %} {% endif %}">
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">New Group</h3>
+    </div>
+    <div class="card-body">
+      {% csrf_token %}
+      <div class="row">
+        {{form|crispy}}
+      </div>
+    </div>
+    <div class="card-footer">
+      <a href="/group" class="btn btn-secondary">Cancel</a>
+      <button type="submit" class="btn btn-success">Save</button>
+    </div>
+  </div>
 </form>
 {% endblock %}
