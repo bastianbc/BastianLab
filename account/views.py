@@ -7,7 +7,7 @@ from django.conf import settings
 
 @permission_required("account.view_user",raise_exception=True)
 def accounts(request):
-    return render(request,"accounts.html",locals())
+    return render(request,"account_list.html",locals())
 
 @permission_required("account.add_user",raise_exception=True)
 def new_account(request):
