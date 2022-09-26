@@ -25,7 +25,14 @@ class NucAcids(models.Model):
     class Meta:
         db_table = 'nuc_acids'
 
-    def query_by_args(self, **kwargs):
+    def query_by_args(self, user, **kwargs):
+
+        def _get_authorizated_queryset():
+            queryset = NucAcids.objects.all()
+            if not user.is_superuser:
+                return queryset.filter(Q(area__block__project__technician=user) | Q(area__block__project__researcher=user))
+            return queryset
+
         try:
             ORDER_COLUMN_CHOICES = {
                 "1": "nu_id",
@@ -55,7 +62,7 @@ class NucAcids(models.Model):
             if order == 'desc':
                 order_column = '-' + order_column
 
-            queryset = NucAcids.objects.all()
+            queryset = _get_authorizated_queryset()
             total = queryset.count()
 
             if search_value:

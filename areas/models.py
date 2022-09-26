@@ -60,7 +60,13 @@ class Areas(models.Model):
 
         super().save(*args, **kwargs)
 
-    def query_by_args(self, **kwargs):
+    def query_by_args(self, user, **kwargs):
+
+        def _get_authorizated_queryset():
+            queryset = Areas.objects.all().annotate(num_nucacids=Count('area_nucacids'))
+            if not user.is_superuser:
+                return queryset.filter(Q(block__project__technician=user) | Q(block__project__researcher=user))
+            return queryset
 
         def _parse_value(search_value):
             if "_initial:" in search_value:
@@ -99,7 +105,8 @@ class Areas(models.Model):
             if order == 'desc':
                 order_column = '-' + order_column
 
-            queryset = Areas.objects.all().annotate(num_nucacids=Count('area_nucacids'))
+            queryset = _get_authorizated_queryset()
+
             total = queryset.count()
 
             is_initial = _is_initial_value(search_value)

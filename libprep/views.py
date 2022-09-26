@@ -30,7 +30,7 @@ def nucacids(request):
 def filter_nucacids(request):
     from .serializers import NucacidsSerializer
 
-    nucacids = NucAcids().query_by_args(**request.GET)
+    nucacids = NucAcids().query_by_args(request.user,**request.GET)
     serializer = NucacidsSerializer(nucacids['items'], many=True)
     result = dict()
     result['data'] = serializer.data

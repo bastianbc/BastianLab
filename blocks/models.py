@@ -52,7 +52,13 @@ class Blocks(models.Model):
 
         super().save(*args, **kwargs)
 
-    def query_by_args(self, **kwargs):
+    def query_by_args(self, user, **kwargs):
+
+        def _get_authorizated_queryset():
+            queryset = Blocks.objects.all().annotate(num_areas=Count('block_areas'))
+            if not user.is_superuser:
+                return queryset.filter(Q(project__technician=user) | Q(project__researcher=user))
+            return queryset
 
         def _parse_value(search_value):
             if "_initial:" in search_value:
@@ -81,7 +87,8 @@ class Blocks(models.Model):
             if order == 'desc':
                 order_column = '-' + order_column
 
-            queryset = Blocks.objects.all().annotate(num_areas=Count('block_areas'))
+            queryset = _get_authorizated_queryset()
+
             total = queryset.count()
 
             is_initial = _is_initial_value(search_value)

@@ -9,40 +9,11 @@ from django.http import JsonResponse
 import json
 from django.contrib import messages
 from projects.models import Projects
-# BlockFormset = inlineformset_factory(
-#     Blocks, Blocks, fields=('block_id', 'body_site')
-# )
-
-class BlockCreate(CreateView):
-    model = Blocks
-    fields = ["pat_id", 'sex', 'race', 'source', 'project']
-
-    def get_context_data(self, **kwargs):
-        # we need to overwrite get_context_data
-        # to make sure that our formset is rendered
-        data = super().get_context_data(**kwargs)
-        if self.request.POST:
-            data["blocks"] = BlockFormset(self.request.POST)
-        else:
-            data["blocks"] = BlockFormset()
-        return data
-
-    def form_valid(self, form):
-        context = self.get_context_data()
-        blocks = context["blocks"]
-        self.object = form.save()
-        if blocks.is_valid():
-            blocks.instance = self.object
-            blocks.save()
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        return reverse("blocks-list")
 
 def filter_blocks(request):
     from .serializers import BlocksSerializer
 
-    blocks = Blocks().query_by_args(**request.GET)
+    blocks = Blocks().query_by_args(request.user,**request.GET)
     serializer = BlocksSerializer(blocks['items'], many=True)
     result = dict()
     result['data'] = serializer.data

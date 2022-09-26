@@ -1,6 +1,9 @@
 from django.db import models
 from datetime import date
 from django.db.models import Q, Count
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class Projects(models.Model):
 
@@ -17,7 +20,8 @@ class Projects(models.Model):
     description = models.CharField(max_length=255, blank=True, null=True, verbose_name="Description")
     date_start = models.DateField(blank=True, null=True, default=date.today, verbose_name="Start Date")
     pr_id = models.AutoField(primary_key=True, verbose_name="Project ID")
-
+    technician = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="technician_projects", verbose_name="Technician")
+    researcher = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="researcher_projects", verbose_name="Researcher")
 
     class Meta:
         managed = True
@@ -31,7 +35,14 @@ class Projects(models.Model):
     def __str__(self):
        return self.name
 
-    def query_by_args(self, **kwargs):
+    def query_by_args(self, user, **kwargs):
+
+        def _get_authorizated_queryset():
+            queryset = Projects.objects.all().annotate(num_blocks=Count('project_blocks'))
+            if not user.is_superuser:
+                return queryset.filter(Q(technician=user) | Q(researcher=user))
+            return queryset
+
         try:
             ORDER_COLUMN_CHOICES = {
                 '1': 'abbreviation',
@@ -52,14 +63,17 @@ class Projects(models.Model):
             if order == 'desc':
                 order_column = '-' + order_column
 
-            queryset = Projects.objects.all().annotate(num_blocks=Count('project_blocks'))
+            queryset = _get_authorizated_queryset()
+
             total = queryset.count()
 
             if search_value:
-                queryset = queryset.filter(Q(pr_id__icontains=search_value) |
-                                           Q(name__icontains=search_value) |
-                                           Q(pi__icontains=search_value) |
-                                           Q(speedtype__icontains=search_value))
+                queryset = queryset.filter(
+                    Q(pr_id__icontains=search_value) |
+                    Q(name__icontains=search_value) |
+                    Q(pi__icontains=search_value) |
+                    Q(speedtype__icontains=search_value)
+                )
 
             count = queryset.count()
             queryset = queryset.order_by(order_column)[start:start + length]
