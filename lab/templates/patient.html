@@ -5,22 +5,24 @@
 {% block content %}
 
 <form method="post" action="{% if id %} {% url 'edit-patient' id %} {% else %} {% url 'new-patient' %} {% endif %}">
-{% csrf_token %}
-<div class="container">
-
-    <h4>New Patient</h4>
-        <div class="row justify-content-start">
-            <div class="col-6">{{ form.pat_id|as_crispy_field }}</div>
-            <div class="w-100"></div>
-            <div class="col">{{ form.dob|as_crispy_field }}</div>
-            <div class="col">{{ form.race|as_crispy_field }}</div>
-            <div class="w-100"></div>
-            <div class="col">{{ form.source|as_crispy_field }}</div>
-            <div class="w-100"></div>
-            <div class= "col-6"> {{form.notes|as_crispy_field}}</div>
-        </div>
-        <br>
-    <button type="submit" class="btn btn-success">Save patient</button>
-</div>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">New Patient</h3>
+    </div>
+    <div class="card-body">
+      {% csrf_token %}
+      <div class="row">
+        <div class="col-6">{{ form.pat_id|as_crispy_field }}</div>
+        <div class="col-6">{{ form.dob|as_crispy_field }}</div>
+        <div class="col-6">{{ form.race|as_crispy_field }}</div>
+        <div class="col-6">{{ form.source|as_crispy_field }}</div>
+        <div class= "col-12"> {{form.notes|as_crispy_field}}</div>
+      </div>
+    </div>
+    <div class="card-footer">
+      <a href="/lab" class="btn btn-secondary">Cancel</a>
+      <button type="submit" class="btn btn-success">Save</button>
+    </div>
+  </div>
 </form>
 {% endblock %}

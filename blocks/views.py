@@ -1,15 +1,15 @@
 from django.shortcuts import render, redirect
-from django.views.generic.edit import CreateView, DeleteView, UpdateView
-from django.forms.models import inlineformset_factory
 from .models import Blocks
 from lab.models import Patients
 from .forms import BlockForm
-from django.urls import reverse_lazy, reverse
 from django.http import JsonResponse
 import json
 from django.contrib import messages
 from projects.models import Projects
+from .serializers import BlocksSerializer
+from django.contrib.auth.decorators import login_required,permission_required
 
+@login_required
 def filter_blocks(request):
     from .serializers import BlocksSerializer
 
@@ -23,12 +23,14 @@ def filter_blocks(request):
 
     return JsonResponse(result)
 
+@permission_required("blocks.view_blocks",raise_exception=True)
 def blocks(request):
     project_id = request.GET.get("project_id")
     if project_id:
         project = Projects.objects.get(pr_id=project_id)
     return render(request,"block_list.html",locals())
 
+@permission_required("blocks.add_blocks",raise_exception=True)
 def new_block(request):
     if request.method=="POST":
         form = BlockForm(request.POST)
@@ -43,6 +45,7 @@ def new_block(request):
 
     return render(request,"block.html",locals())
 
+@permission_required("blocks.add_blocks",raise_exception=True)
 def add_block_to_patient_async(request):
     selected_ids = json.loads(request.GET.get("selected_ids"))
 
@@ -55,6 +58,7 @@ def add_block_to_patient_async(request):
 
     return JsonResponse({"success":True})
 
+@permission_required("blocks.add_blocks",raise_exception=True)
 def add_block_to_project_async(request):
     selected_ids = json.loads(request.GET.get("selected_ids"))
     project_id = request.GET.get("project_id")
@@ -68,6 +72,7 @@ def add_block_to_project_async(request):
 
     return JsonResponse({"success":True})
 
+@permission_required("blocks.change_blocks",raise_exception=True)
 def edit_block(request,id):
     block = Blocks.objects.get(bl_id=id)
 
@@ -84,6 +89,7 @@ def edit_block(request,id):
 
     return render(request,"block.html",locals())
 
+@permission_required("blocks.change_blocks",raise_exception=True)
 def edit_block_async(request):
     import re
     from core.utils import custom_update
@@ -103,6 +109,7 @@ def edit_block_async(request):
 
     return JsonResponse({"result":True})
 
+@permission_required("blocks.delete_blocks",raise_exception=True)
 def delete_block(request,id):
     try:
         block = Blocks.objects.get(bl_id=id)

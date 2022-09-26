@@ -5,31 +5,37 @@
 {% block content %}
 
 <form method="post" action="{% if id %} {% url 'edit-nucacid' id %} {% else %} {% url 'new-nucacid' %} {% endif %}">
-{% csrf_token %}
-<div class="container">
-    <h4>New Nuclecic Acid</h4>
-        <div class="row justify-content-start">
-          <div class="col-6"> {{ form.old_na_id|as_crispy_field }}</div>
-          <div class="col-6">{{ form.old_area_id|as_crispy_field }}</div>
-          <div class="col-6">{{ form.na_type|as_crispy_field }}</div>
-          <div class="col-6">{{ form.date_extr|as_crispy_field }}</div>
-          <div class="col-6">{{ form.method|as_crispy_field }}</div>
-          <div class="col-6">{{ form.qubit|as_crispy_field }}</div>
-          <div class="col-6">{{ form.volume|as_crispy_field }}</div>
-          <div class="col-6">{{ form.amount|as_crispy_field }}</div>
-          <div class="col-6">{{ form.re_ext|as_crispy_field }}</div>
-          <div class="col-6">{{ form.total_ext|as_crispy_field }}</div>
-          <div class="col-6">{{ form.na_sheared|as_crispy_field }}</div>
-          <div class="col-6">{{ form.shearing_vol|as_crispy_field }}</div>
-          <div class="col-6">{{ form.te_vol|as_crispy_field }}</div>
-          <div class="col-6">{{ form.sl_id|as_crispy_field }}</div>
-          <div class="col-6">{{ form.projects|as_crispy_field }}</div>
-          <div class="col-6">{{ form.area|as_crispy_field }}</div>
-          <div class="col-12">{{ form.notes|as_crispy_field }}</div>
-        </div>
-        <br>
-    <button type="submit" class="btn btn-success">Save Nucleic Acid</button>
-</div>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">New Nuclecic Acid</h3>
+    </div>
+    <div class="card-body">
+      {% csrf_token %}
+      <div class="row">
+        <div class="col-6"> {{ form.old_na_id|as_crispy_field }}</div>
+        <div class="col-6">{{ form.old_area_id|as_crispy_field }}</div>
+        <div class="col-6">{{ form.na_type|as_crispy_field }}</div>
+        <div class="col-6">{{ form.date_extr|as_crispy_field }}</div>
+        <div class="col-6">{{ form.method|as_crispy_field }}</div>
+        <div class="col-6">{{ form.qubit|as_crispy_field }}</div>
+        <div class="col-6">{{ form.volume|as_crispy_field }}</div>
+        <div class="col-6">{{ form.amount|as_crispy_field }}</div>
+        <div class="col-6">{{ form.re_ext|as_crispy_field }}</div>
+        <div class="col-6">{{ form.total_ext|as_crispy_field }}</div>
+        <div class="col-6">{{ form.na_sheared|as_crispy_field }}</div>
+        <div class="col-6">{{ form.shearing_vol|as_crispy_field }}</div>
+        <div class="col-6">{{ form.te_vol|as_crispy_field }}</div>
+        <div class="col-6">{{ form.sl_id|as_crispy_field }}</div>
+        <div class="col-6">{{ form.projects|as_crispy_field }}</div>
+        <div class="col-6">{{ form.area|as_crispy_field }}</div>
+        <div class="col-12">{{ form.notes|as_crispy_field }}</div>
+      </div>
+    </div>
+    <div class="card-footer">
+      <a href="/libprep" class="btn btn-secondary">Cancel</a>
+      <button type="submit" class="btn btn-success">Save</button>
+    </div>
+  </div>
 </form>
 {% endblock %}
 

@@ -1,11 +1,13 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Projects
 from .forms import ProjectForm
 from django.http import JsonResponse
 import json
 from .serializers import ProjectsSerializer
+from django.contrib.auth.decorators import login_required,permission_required
 
+@login_required
 def filter_projects(request):
 
     projects = Projects().query_by_args(request.user,**request.GET)
@@ -18,9 +20,11 @@ def filter_projects(request):
 
     return JsonResponse(result)
 
+@permission_required("projects.view_projects",raise_exception=True)
 def projects(request):
     return render(request,"project_list.html")
 
+@permission_required("projects.add_projects",raise_exception=True)
 def new_project(request):
     if request.method=="POST":
         form = ProjectForm(request.POST)
@@ -35,6 +39,7 @@ def new_project(request):
 
     return render(request,"project.html",locals())
 
+@permission_required("projects.change_projects",raise_exception=True)
 def edit_project(request,id):
     project = Projects.objects.get(pr_id=id)
 
@@ -51,6 +56,7 @@ def edit_project(request,id):
 
     return render(request,"project.html",locals())
 
+@permission_required("projects.change_projects",raise_exception=True)
 def edit_project_async(request):
     import re
     from core.utils import custom_update
@@ -70,14 +76,14 @@ def edit_project_async(request):
 
     return JsonResponse({"result":True})
 
+@permission_required("projects.delete_projects",raise_exception=True)
 def delete_project(request,id):
     try:
-        project = projects.objects.get(pr_id=id)
+        project = Projects.objects.get(pr_id=id)
         project.delete()
         messages.success(request,"Project %s was deleted successfully." % project.pr_id)
-        deleted = True
     except Exception as e:
-        messages.error(request, "Project %s wasn't deleted!" % project.pr_id)
-        deleted = False
+        messages.error(request, "Project %s wasn't deleted!")
+        return JsonResponse({ "deleted":False })
 
     return JsonResponse({ "deleted":True })
