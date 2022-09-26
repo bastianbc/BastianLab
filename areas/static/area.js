@@ -222,7 +222,7 @@ var KTDatatablesServerSide = function () {
                         }).then(function () {
                             // Calling delete request with ajax
                             $.ajax({
-                                url: document.querySelector('[data-kt-docs-table-filter="delete_row"]').href,
+                                url: parent.querySelector('[data-kt-docs-table-filter="delete_row"]').href,
                                 type: "DELETE",
                                 headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
                                 success: function () {

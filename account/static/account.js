@@ -42,7 +42,7 @@ var KTDatatablesServerSide = function () {
                 //     }
                 // },
                 {
-                    targets: -1,
+                    targets: 4,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -156,7 +156,7 @@ var KTDatatablesServerSide = function () {
                 const parent = e.target.closest('tr');
 
                 // Get customer name
-                const customerName = parent.querySelectorAll('td')[1].innerText;
+                const customerName = parent.querySelectorAll('td')[0].innerText;
 
                 // SweetAlert2 pop up --- official docs reference: https://sweetalert2.github.io/
                 Swal.fire({
@@ -182,7 +182,7 @@ var KTDatatablesServerSide = function () {
                         }).then(function () {
                             // Calling delete request with ajax
                             $.ajax({
-                                url: document.querySelector('[data-kt-docs-table-filter="delete_row"]').href,
+                                url: parent.querySelector('[data-kt-docs-table-filter="delete_row"]').href,
                                 type: "DELETE",
                                 headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
                                 success: function () {

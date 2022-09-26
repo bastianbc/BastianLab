@@ -56,8 +56,8 @@ class Blocks(models.Model):
 
         def _get_authorizated_queryset():
             queryset = Blocks.objects.all().annotate(num_areas=Count('block_areas'))
-            if not user.is_superuser:
-                return queryset.filter(Q(project__technician=user) | Q(project__researcher=user))
+            # if not user.is_superuser:
+            #     return queryset.filter(Q(project__technician=user) | Q(project__researcher=user))
             return queryset
 
         def _parse_value(search_value):
