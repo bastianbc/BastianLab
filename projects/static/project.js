@@ -105,6 +105,14 @@ var KTDatatablesServerSide = function () {
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
+                                    <a href="/blocks?project_id=`+ row["pr_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
+                                        Remove Block
+                                    </a>
+                                </div>
+                                <!--end::Menu item-->
+
+                                <!--begin::Menu item-->
+                                <div class="menu-item px-3">
                                     <a href="/projects/delete/` + row["pr_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
                                         Delete
                                     </a>

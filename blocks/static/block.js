@@ -283,6 +283,8 @@ var KTDatatablesServerSide = function () {
 
       const btnAddBlockToProject = document.querySelector('[data-kt-docs-table-select="event_add_block_to_project"]');
 
+      const btnRemoveBlockFromProject = document.querySelector('[data-kt-docs-table-select="event_remove_block_from_project"]');
+
       function getSelectedRows() {
         const container = document.querySelector('.table');
 
@@ -355,7 +357,7 @@ var KTDatatablesServerSide = function () {
           }).done(function(result) {
             if (result.success) {
               Swal.fire({
-                  text: "Block(s) was created succesfully.",
+                  text: "Block(s) was added succesfully.",
                   icon: "info",
                   buttonsStyling: false,
                   confirmButtonText: "Ok, got it!",
@@ -363,12 +365,54 @@ var KTDatatablesServerSide = function () {
                       confirmButton: "btn fw-bold btn-success",
                   }
               }).then(function(){
-                dt.draw();
+                window.location.href = "/projects";
               });
             }
             else {
               Swal.fire({
-                  text: "Block(s) was not created.",
+                  text: "Block(s) was not added.",
+                  icon: "error",
+                  buttonsStyling: false,
+                  confirmButtonText: "Ok, got it!",
+                  customClass: {
+                      confirmButton: "btn fw-bold btn-danger",
+                  }
+              });
+            }
+          });
+
+        });
+
+      }
+
+      if (btnRemoveBlockFromProject) {
+
+        btnRemoveBlockFromProject.addEventListener('click', function () {
+
+          $.ajax({
+            type: "GET",
+            url: "/blocks/remove_block_from_project_async",
+            data: {
+              "selected_ids": getSelectedRows(),
+              "project_id": this.getAttribute('data-project_id')
+            },
+          }).done(function(result) {
+            if (result.success) {
+              Swal.fire({
+                  text: "Block(s) was removed succesfully.",
+                  icon: "info",
+                  buttonsStyling: false,
+                  confirmButtonText: "Ok, got it!",
+                  customClass: {
+                      confirmButton: "btn fw-bold btn-success",
+                  }
+              }).then(function(){
+                window.location.href = "/projects";
+              });
+            }
+            else {
+              Swal.fire({
+                  text: "Block(s) was not removed.",
                   icon: "error",
                   buttonsStyling: false,
                   confirmButtonText: "Ok, got it!",

@@ -64,10 +64,30 @@ def add_block_to_project_async(request):
     project_id = request.GET.get("project_id")
 
     try:
+        project = Projects.objects.get(pr_id=project_id)
         for id in selected_ids:
-            project = Projects.objects.get(pr_id=project_id)
-            Blocks.objects.create(project=project)
+            block = Blocks.objects.get(bl_id=id)
+            block.project = project
+            block.save()
     except Exception as e:
+        print(str(e))
+        return JsonResponse({"success":False})
+
+    return JsonResponse({"success":True})
+
+@permission_required("blocks.change_blocks",raise_exception=True)
+def remove_block_from_project_async(request):
+    selected_ids = json.loads(request.GET.get("selected_ids"))
+    project_id = request.GET.get("project_id")
+
+    try:
+        project = Projects.objects.get(pr_id=project_id)
+        for id in selected_ids:
+            block = Blocks.objects.get(bl_id=id)
+            block.project = None
+            block.save()
+    except Exception as e:
+        print(str(e))
         return JsonResponse({"success":False})
 
     return JsonResponse({"success":True})
