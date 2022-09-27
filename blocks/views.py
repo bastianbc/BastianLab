@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect
 from .models import Blocks
-from lab.models import Patients
 from .forms import BlockForm
 from django.http import JsonResponse
 import json
 from django.contrib import messages
+from lab.models import Patients
 from projects.models import Projects
 from .serializers import BlocksSerializer
 from django.contrib.auth.decorators import login_required,permission_required
@@ -25,9 +25,14 @@ def filter_blocks(request):
 
 @permission_required("blocks.view_blocks",raise_exception=True)
 def blocks(request):
-    project_id = request.GET.get("project_id")
-    if project_id:
-        project = Projects.objects.get(pr_id=project_id)
+    id = request.GET.get("id")
+    model = request.GET.get("model")
+
+    if model=="project" and id:
+        project = Projects.objects.get(pr_id=id)
+    elif model=="patient" and id:
+        patient = Patients.objects.get(pr_id=id)
+
     return render(request,"block_list.html",locals())
 
 @permission_required("blocks.add_blocks",raise_exception=True)
