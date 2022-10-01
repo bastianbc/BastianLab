@@ -20,8 +20,8 @@ class Projects(models.Model):
     description = models.CharField(max_length=255, blank=True, null=True, verbose_name="Description")
     date_start = models.DateField(blank=True, null=True, default=date.today, verbose_name="Start Date")
     pr_id = models.AutoField(primary_key=True, verbose_name="Project ID")
-    technician = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="technician_projects", verbose_name="Technician")
-    researcher = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="researcher_projects", verbose_name="Researcher")
+    technician = models.ManyToManyField(User, null=True, related_name="technician_projects", verbose_name="Technician")
+    researcher = models.ManyToManyField(User, null=True, related_name="researcher_projects", verbose_name="Researcher")
 
     class Meta:
         managed = True

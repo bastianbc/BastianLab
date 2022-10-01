@@ -19,5 +19,5 @@ class GroupForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(GroupForm, self).__init__(*args, **kwargs)
-        self.fields["permissions"].queryset = Permission.objects.all().exclude(content_type__app_label__in=["admin", "auth", "sequences", "sessions", "contenttypes", "main", ])
+        self.fields["permissions"].queryset = Permission.objects.all().exclude(content_type__app_label__in=["admin", "auth", "sequences", "sessions", "contenttypes", "main", "account","group"])
         self.fields["permissions"].label_from_instance = lambda obj: "%s"% obj.name

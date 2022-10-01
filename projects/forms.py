@@ -12,7 +12,7 @@ class ProjectForm(BaseForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields["pi"].widget.attrs['class'] = 'form-control'
+        # self.fields["pi"].widget.attrs['class'] = 'form-control'
 
         self.fields["technician"].queryset = User.objects.filter(groups__name=settings.TECHNICIAN_GROUP_NAME)
         self.fields['technician'].label_from_instance = lambda obj: "%s" % obj.get_full_name()
