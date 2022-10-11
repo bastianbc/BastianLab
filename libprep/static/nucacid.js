@@ -40,6 +40,7 @@ var KTDatatablesServerSide = function () {
                 { data: 'qubit' },
                 { data: 'vol_init' },
                 { data: 'vol_remain' },
+                { data: 'amount' },
             ],
             columnDefs: [
                 {
@@ -59,7 +60,7 @@ var KTDatatablesServerSide = function () {
                 //     }
                 // },
                 {
-                    targets: 9,
+                    targets: 10,
                     data: null,
                     orderable: false,
                     className: 'text-end',

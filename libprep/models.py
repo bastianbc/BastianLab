@@ -97,20 +97,21 @@ class NucAcids(models.Model):
     def save(self,*args,**kwargs):
         if not self.name:
             self.name = self._generate_unique_name()
-            print("self.name:",self.name)
+
+        self.vol_remain = self.vol_init
 
         super().save(*args, **kwargs)
 
-    # @property
-    # def calc_amount(self):
-    #     # calculates the amount
-    #     return self.qubit * self.volume
-    # def save(self, *args, **kwargs):
-    #     #Following lines set qubit and volume to 0 if they are None.
-    #     kwargs.get('qubit',0)
-    #     kwargs.get('volume',0)
-    #     self.amount = self.qubit * self.volume
-    #     super(NucAcids, self).save(*args, **kwargs)
+    @property
+    def amount(self):
+        # calculates the amount: amount = vol_init * qubit
+        result = 0
+        try:
+            result = self.qubit * self.vol_init
+        except Exception as e:
+            pass
+
+        return result
 
 # class SampleLib(models.Model):
 #     sl_id = models.CharField(max_length=50, blank=True, null=True)
