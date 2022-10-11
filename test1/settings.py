@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     'blocks.apps.BlocksConfig',
     'areas.apps.AreasConfig',
     'core.apps.CoreConfig',
+    'method.apps.MethodConfig',
 ]
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 CRISPY_FAIL_SILENTLY = not DEBUG

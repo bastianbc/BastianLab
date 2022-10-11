@@ -1,7 +1,7 @@
 from django.db import models
 from django.db.models import Q, Count
 from datetime import date
-import uuid
+from django.utils.crypto import get_random_string
 
 class Areas(models.Model):
     PUNCH = 'PU'
@@ -30,20 +30,21 @@ class Areas(models.Model):
         (STROMA, 'Stroma'),
         (INTERMEDIATE, 'Intermediate Tumor')
     ]
-    old_area_id = models.CharField(max_length=50, blank=True, null=True, unique=True)
+
+    ar_id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=50, blank=True, null=True, unique=True)
     area = models.CharField(max_length=6, blank=True, null=True)
-    old_block_id = models.CharField(max_length=50, blank=True, null=True)
-    collection = models.CharField(max_length=2, choices=COLLECTION_CHOICES, default=SCRAPE, blank=True, null=True)
-    area_type = models.CharField(max_length=50, choices=TYPE_CHOICES, default=TUMOR, blank=False, null=False)
+    block = models.ForeignKey('blocks.Blocks', on_delete=models.CASCADE, db_column='block', blank=True, null=True, related_name="block_areas")
+    project = models.CharField(max_length=100, blank=True, null=True)
+    # old_block_id = models.CharField(max_length=50, blank=True, null=True)
+    collection = models.CharField(max_length=2, choices=COLLECTION_CHOICES, default=SCRAPE)
+    area_type = models.CharField(max_length=50, choices=TYPE_CHOICES, default=TUMOR)
     he_image = models.CharField(max_length=200, blank=True, null=True)
-    na_id = models.CharField(max_length=50, blank=True, null=True)
-    completion_date = models.DateField(blank=True, null=True, default=date.today)
+    # na_id = models.CharField(max_length=50, blank=True, null=True)
+    completion_date = models.DateField(default=date.today)
     investigator = models.CharField(max_length=50, blank=True, null=True)
     image = models.ImageField(null=True, blank=True, upload_to="images/%y/%m/%d")
     notes = models.CharField(max_length=255, blank=True, null=True)
-    project = models.CharField(max_length=100, blank=True, null=True)
-    block = models.ForeignKey('blocks.Blocks', on_delete=models.CASCADE, db_column='block', blank=True, null=True, related_name="block_areas")
-    ar_id = models.AutoField(primary_key=True)
 
     class Meta:
         db_table = 'areas'
@@ -52,18 +53,18 @@ class Areas(models.Model):
         return "%d" % self.ar_id
 
     def _generate_unique_id(self):
-        return str(uuid.uuid4())
+        return get_random_string(length=6)
 
     def save(self,*args,**kwargs):
-        if not self.old_area_id:
-            self.old_area_id = self._generate_unique_id()
+        if not self.name:
+            self.name = self._generate_unique_id()
 
         super().save(*args, **kwargs)
 
     def query_by_args(self, user, **kwargs):
 
         def _get_authorizated_queryset():
-            queryset = Areas.objects.all().annotate(num_nucacids=Count('area_nucacids'))
+            queryset = Areas.objects.all().annotate(num_nucacids=Count('nucacids'))
             if not user.is_superuser:
                 return queryset.filter(Q(block__project__technician=user) | Q(block__project__researcher=user))
             return queryset
@@ -79,19 +80,15 @@ class Areas(models.Model):
 
         try:
             ORDER_COLUMN_CHOICES = {
-                "1":"ar_id",
+                "1":"name",
                 "2":"area",
-                "3":"old_area_id",
-                "4":"old_block_id",
+                "3":"block",
+                "4":"project",
                 "5":"collection",
                 "6":"area_type",
                 "7":"he_image",
-                "8":"na_id",
-                "9":"completion_date",
-                "10":"investigator",
-                "11":"project",
-                "12":"block",
-                "13":"notes",
+                "8":"completion_date",
+                "9":"investigator",
             }
             draw = int(kwargs.get('draw', None)[0])
             length = int(kwargs.get('length', None)[0])
@@ -118,12 +115,13 @@ class Areas(models.Model):
                     )
             elif search_value:
                 queryset = queryset.filter(
-                        Q(ar_id__icontains=search_value) |
-                        Q(na_id__icontains=search_value) |
+                        Q(name__icontains=search_value) |
                         Q(area__icontains=search_value) |
+                        Q(collection__icontains=search_value) |
+                        Q(area_type__icontains=search_value) |
+                        Q(he_image__icontains=search_value) |
                         Q(investigator__icontains=search_value) |
-                        Q(notes__icontains=search_value) |
-                        Q(project__icontains=search_value)
+                        Q(notes__icontains=search_value)
                     )
 
             count = queryset.count()

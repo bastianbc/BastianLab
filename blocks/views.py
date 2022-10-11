@@ -105,10 +105,10 @@ def edit_block(request,id):
         form = BlockForm(request.POST,instance=block)
         if form.is_valid():
             block = form.save()
-            messages.success(request,"Block %s was updated successfully." % block.pat_id)
+            messages.success(request,"The block was updated successfully.")
             return redirect("blocks")
         else:
-            messages.error(request,"Block wasn't updated!")
+            messages.error(request,"The block wasn't updated!")
     else:
         form = BlockForm(instance=block)
 

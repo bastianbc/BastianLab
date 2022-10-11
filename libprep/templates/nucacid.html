@@ -12,22 +12,14 @@
     <div class="card-body">
       {% csrf_token %}
       <div class="row">
-        <div class="col-6"> {{ form.old_na_id|as_crispy_field }}</div>
-        <div class="col-6">{{ form.old_area_id|as_crispy_field }}</div>
-        <div class="col-6">{{ form.na_type|as_crispy_field }}</div>
-        <div class="col-6">{{ form.date_extr|as_crispy_field }}</div>
+        <div class="col-6"> {{ form.area|as_crispy_field }}</div>
+        <div class="col-6">{{ form.name|as_crispy_field }}</div>
+        <div class="col-6">{{ form.date|as_crispy_field }}</div>
         <div class="col-6">{{ form.method|as_crispy_field }}</div>
+        <div class="col-6">{{ form.na_type|as_crispy_field }}</div>
         <div class="col-6">{{ form.qubit|as_crispy_field }}</div>
-        <div class="col-6">{{ form.volume|as_crispy_field }}</div>
-        <div class="col-6">{{ form.amount|as_crispy_field }}</div>
-        <div class="col-6">{{ form.re_ext|as_crispy_field }}</div>
-        <div class="col-6">{{ form.total_ext|as_crispy_field }}</div>
-        <div class="col-6">{{ form.na_sheared|as_crispy_field }}</div>
-        <div class="col-6">{{ form.shearing_vol|as_crispy_field }}</div>
-        <div class="col-6">{{ form.te_vol|as_crispy_field }}</div>
-        <div class="col-6">{{ form.sl_id|as_crispy_field }}</div>
-        <div class="col-6">{{ form.projects|as_crispy_field }}</div>
-        <div class="col-6">{{ form.area|as_crispy_field }}</div>
+        <div class="col-6">{{ form.vol_init|as_crispy_field }}</div>
+        <div class="col-6">{{ form.vol_remain|as_crispy_field }}</div>
         <div class="col-12">{{ form.notes|as_crispy_field }}</div>
       </div>
     </div>

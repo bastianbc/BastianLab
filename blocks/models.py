@@ -1,12 +1,12 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.models import Q, Count
-import uuid
+from django.utils.crypto import get_random_string
 import json
 
 class Blocks(models.Model):
-    old_block_id = models.CharField(max_length=50, blank=True, null=False, unique=True)
-    pat_id = models.CharField(max_length=12, blank=True, null=True)
+    name = models.CharField(max_length=50, blank=True, null=False, unique=True)
+    # pat_id = models.CharField(max_length=12, blank=True, null=True)
     age = models.DecimalField(blank=True, null=True, decimal_places=1, max_digits=4, validators=[
         MinValueValidator((0.1), message='Minimum age is 0.1 years'),
         MaxValueValidator((120), message='Maximum age is 120 years'),
@@ -21,8 +21,8 @@ class Blocks(models.Model):
     slides = models.IntegerField(blank=True, null=True)
     slides_left = models.IntegerField(blank=True, null=True)
     fixation = models.CharField(max_length=10, blank=True, null=True)
-    area_id = models.CharField(max_length=100, blank=True, null=True)
-    old_project = models.CharField(max_length=50, blank=True, null=True)
+    # area_id = models.CharField(max_length=100, blank=True, null=True)
+    # old_project = models.CharField(max_length=50, blank=True, null=True)
     project = models.ForeignKey('projects.Projects', on_delete=models.DO_NOTHING, blank=True, null=True, related_name="project_blocks")
     diagnosis = models.TextField(blank=True, null=True)
     storage = models.CharField(max_length=50, blank=True, null=True)
@@ -44,11 +44,11 @@ class Blocks(models.Model):
         return "%d" % self.bl_id
 
     def _generate_unique_id(self):
-        return str(uuid.uuid4())
+        return get_random_string(length=6)
 
     def save(self,*args,**kwargs):
-        if not self.old_block_id:
-            self.old_block_id = self._generate_unique_id()
+        if not self.name:
+            self.name = self._generate_unique_id()
 
         super().save(*args, **kwargs)
 

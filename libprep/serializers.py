@@ -7,7 +7,7 @@ class NucacidsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = NucAcids
-        fields = ("nu_id", "area", "na_type", "date_extr", "method", "qubit", "volume", "amount", "re_ext", "total_ext", "na_sheared", "shearing_vol", "te_vol", "DT_RowId",)
+        fields = ("nu_id", "name", "area", "na_type", "date", "method", "qubit", "vol_init", "vol_remain", "DT_RowId",)
 
     def get_DT_RowId(self, obj):
        return getattr(obj, 'nu_id')

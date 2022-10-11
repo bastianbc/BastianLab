@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .models import NucAcids, SampleLib
+from .models import NucAcids
 from .forms import *
 from areas.models import Areas
-from blocks import *
+from method.models import Method
 import re
 import json
 from django.http import JsonResponse
@@ -65,12 +65,31 @@ def new_nucacid(request):
 @permission_required("librep.add_nucacids",raise_exception=True)
 def new_nucacid_async(request):
     selected_ids = json.loads(request.GET.get("selected_ids"))
+    options = json.loads(request.GET.get("options"))
 
     try:
         for id in selected_ids:
             area = Areas.objects.get(ar_id=id)
-            NucAcids.objects.create(area=area)
+            method = Method.objects.get(id=options["extraction_method"])
+
+            if options["na_type"] == NucAcids.BOTH:
+                for na_type in [NucAcids.DNA,NucAcids.RNA]:
+                    if not area.nucacids.filter(na_type=na_type).exists():
+                        NucAcids.objects.create(
+                            area=area,
+                            na_type=na_type,
+                            method=method
+                        )
+
+            if not area.nucacids.filter(na_type=options["na_type"]).exists():
+                NucAcids.objects.create(
+                    area=area,
+                    na_type=options["na_type"],
+                    method=method
+                )
+
     except Exception as e:
+        print(str(e))
         return JsonResponse({"success":False})
 
     return JsonResponse({"success":True})

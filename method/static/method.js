@@ -6,11 +6,9 @@ var KTDatatablesServerSide = function () {
     var table;
     var dt;
     var filterPayment;
-    var editor;
 
     // Private functions
-    var initDatatable = function ( initialValue ) {
-
+    var initDatatable = function () {
         dt = $(".table").DataTable({
             // searchDelay: 500,
             processing: true,
@@ -18,40 +16,22 @@ var KTDatatablesServerSide = function () {
             order: [[1, 'desc']],
             stateSave: false,
             destroy: true,
-            select: {
-                style: 'multi',
-                selector: 'td:first-child input[type="checkbox"]',
-                className: 'row-selected'
-            },
-            keys: {
-              columns: ':not(:first-child)',
-              keys: [ 9 ],
-              editor: editor,
-              editOnFocus: true
-            },
-            ajax: '/libprep/filter_nucacids',
+            ajax: '/method/filter_methods',
             columns: [
-                { data: null },
                 { data: 'name' },
-                { data: 'area' },
-                { data: 'na_type' },
-                { data: 'date' },
-                { data: 'method' },
-                { data: 'qubit' },
-                { data: 'vol_init' },
-                { data: 'vol_remain' },
+                { data: null }
             ],
             columnDefs: [
-                {
-                    targets: 0,
-                    orderable: false,
-                    render: function (data) {
-                        return `
-                            <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                <input class="form-check-input" type="checkbox" value="${data}" />
-                            </div>`;
-                    }
-                },
+                // {
+                //     targets: 0,
+                //     orderable: false,
+                //     render: function (data) {
+                //         return `
+                //             <div class="form-check form-check-sm form-check-custom form-check-solid">
+                //                 <input class="form-check-input" type="checkbox" value="${data}" />
+                //             </div>`;
+                //     }
+                // },
                 // {
                 //     targets: 4,
                 //     render: function (data, type, row) {
@@ -59,7 +39,7 @@ var KTDatatablesServerSide = function () {
                 //     }
                 // },
                 {
-                    targets: 9,
+                    targets: -1,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -80,7 +60,7 @@ var KTDatatablesServerSide = function () {
                             <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4" data-kt-menu="true">
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/libprep/edit/`+ row["nu_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
+                                    <a href="/method/edit/`+ row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
                                         Edit
                                     </a>
                                 </div>
@@ -88,7 +68,7 @@ var KTDatatablesServerSide = function () {
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/libprep/delete/` + row["nu_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
+                                    <a href="/method/delete/` + row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
                                         Delete
                                     </a>
                                 </div>
@@ -102,16 +82,13 @@ var KTDatatablesServerSide = function () {
             // Add data-filter attribute
             createdRow: function (row, data, dataIndex) {
                 $(row).find('td:eq(4)').attr('data-filter', data.CreditCardType);
-            },
-            oSearch: {sSearch: initialValue}
+            }
         });
 
         table = dt.$;
 
         // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
         dt.on('draw', function () {
-            initToggleToolbar();
-            toggleToolbars();
             handleDeleteRows();
             handleResetForm();
             KTMenu.createInstances();
@@ -250,204 +227,14 @@ var KTDatatablesServerSide = function () {
         });
     }
 
-    // Init toggle toolbar
-    var initToggleToolbar = function () {
-        // Toggle selected action toolbar
-        // Select all checkboxes
-        const container = document.querySelector('.table');
-        const checkboxes = container.querySelectorAll('[type="checkbox"]');
-
-        // Select elements
-        const deleteSelected = document.querySelector('[data-kt-docs-table-select="delete_selected"]');
-
-        // Toggle delete selected toolbar
-        checkboxes.forEach(c => {
-            // Checkbox on click event
-            c.addEventListener('click', function () {
-                setTimeout(function () {
-                    toggleToolbars();
-                }, 50);
-            });
-        });
-
-        // Deleted selected rows
-        deleteSelected.addEventListener('click', function () {
-            // SweetAlert2 pop up --- official docs reference: https://sweetalert2.github.io/
-            // Swal.fire({
-            //     text: "Are you sure you want to delete selected customers?",
-            //     icon: "warning",
-            //     showCancelButton: true,
-            //     buttonsStyling: false,
-            //     showLoaderOnConfirm: true,
-            //     confirmButtonText: "Yes, delete!",
-            //     cancelButtonText: "No, cancel",
-            //     customClass: {
-            //         confirmButton: "btn fw-bold btn-danger",
-            //         cancelButton: "btn fw-bold btn-active-light-primary"
-            //     },
-            // }).then(function (result) {
-            //     if (result.value) {
-            //         // Simulate delete request -- for demo purpose only
-            //         Swal.fire({
-            //             text: "Deleting selected customers",
-            //             icon: "info",
-            //             buttonsStyling: false,
-            //             showConfirmButton: false,
-            //             timer: 2000
-            //         }).then(function () {
-            //             Swal.fire({
-            //                 text: "You have deleted all selected customers!.",
-            //                 icon: "success",
-            //                 buttonsStyling: false,
-            //                 confirmButtonText: "Ok, got it!",
-            //                 customClass: {
-            //                     confirmButton: "btn fw-bold btn-primary",
-            //                 }
-            //             }).then(function () {
-            //                 // delete row data from server and re-draw datatable
-            //                 dt.draw();
-            //             });
-            //
-            //             // Remove header checked box
-            //             const headerCheckbox = container.querySelectorAll('[type="checkbox"]')[0];
-            //             headerCheckbox.checked = false;
-            //         });
-            //     } else if (result.dismiss === 'cancel') {
-            //         Swal.fire({
-            //             text: "Selected customers was not deleted.",
-            //             icon: "error",
-            //             buttonsStyling: false,
-            //             confirmButtonText: "Ok, got it!",
-            //             customClass: {
-            //                 confirmButton: "btn fw-bold btn-primary",
-            //             }
-            //         });
-            //     }
-            // });
-        });
-    }
-
-    // Toggle toolbars
-    var toggleToolbars = function () {
-        // Define variables
-        const container = document.querySelector('.table');
-        const toolbarBase = document.querySelector('[data-kt-docs-table-toolbar="base"]');
-        const toolbarSelected = document.querySelector('[data-kt-docs-table-toolbar="selected"]');
-        const selectedCount = document.querySelector('[data-kt-docs-table-select="selected_count"]');
-
-        // Select refreshed checkbox DOM elements
-        const allCheckboxes = container.querySelectorAll('tbody [type="checkbox"]');
-
-        // Detect checkboxes state & count
-        let checkedState = false;
-        let count = 0;
-
-        // Count checked boxes
-        allCheckboxes.forEach(c => {
-            if (c.checked) {
-                checkedState = true;
-                count++;
-            }
-        });
-
-        // Toggle toolbars
-        if (checkedState) {
-            selectedCount.innerHTML = count;
-            toolbarBase.classList.add('d-none');
-            toolbarSelected.classList.remove('d-none');
-        } else {
-            toolbarBase.classList.remove('d-none');
-            toolbarSelected.classList.add('d-none');
-        }
-    }
-
-    var initEditor = function () {
-
-      editor = new $.fn.dataTable.Editor({
-        ajax: {
-          url: "/libprep/edit_nucacid_async",
-          type: "POST",
-          headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
-          success: function () {
-              dt.draw();
-          },
-          error: function (xhr, ajaxOptions, thrownError) {
-              swal("Error updating!", "Please try again!", "error");
-          }
-        },
-        table: ".table",
-        fields: [ {
-               label: "Name:",
-               name: "name"
-           }, {
-               label: "Area:",
-               name: "area"
-           }, {
-               label: "Nucleic Acid Type:",
-               name: "na_type"
-           }, {
-               label: "Date:",
-               name: "date",
-               type: "datetime"
-           }, {
-               label: "Method:",
-               name: "method"
-           }, {
-               label: "Qubit:",
-               name: "qubit",
-           }, {
-               label: "Volume Init:",
-               name: "vol_init"
-           }, {
-               label: "Volume Remain:",
-               name: "vol_remain"
-           }
-       ],
-       formOptions: {
-          inline: {
-            onBlur: 'submit'
-          }
-       }
-     });
-
-
-     $('.table').on( 'click', 'tbody td:not(:first-child)', function (e) {
-          editor.inline( this );
-     });
-
-     $('.table').on( 'key-focus', function ( e, datatable, cell ) {
-          editor.inline( cell.index() );
-     });
-
-    }
-
-    // Redirects from other pages
-    var handleInitialValue = () => {
-
-      // Remove parameters in URL
-      function cleanUrl() {
-        window.history.replaceState(null, null, window.location.pathname);
-      }
-
-      const params = new URLSearchParams(window.location.search);
-      const x = params.get('initial');
-
-      cleanUrl();
-
-      return x;
-
-    }
-
     // Public methods
     return {
         init: function () {
-            initDatatable( handleInitialValue() );
+            initDatatable();
             handleSearchDatatable();
-            initToggleToolbar();
             handleFilterDatatable();
             handleDeleteRows();
             handleResetForm();
-            initEditor();
         }
     }
 }();

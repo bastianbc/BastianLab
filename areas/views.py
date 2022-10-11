@@ -23,7 +23,8 @@ def filter_areas(request):
 
 @permission_required("areas.view_areas",raise_exception=True)
 def areas(request):
-    return render(request,"area_list.html")
+    form = ExtractionOptionsForm
+    return render(request,"area_list.html",locals())
 
 @permission_required("areas.add_areas",raise_exception=True)
 def new_area(request):

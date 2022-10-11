@@ -31,20 +31,16 @@ var KTDatatablesServerSide = function () {
             ajax: '/areas/filter_areas',
             columns: [
               { data: null },
-              { data: 'ar_id' },
+              { data: 'name' },
               { data: 'area' },
-              { data: 'old_area_id' },
-              { data: 'old_block_id' },
+              { data: 'block' },
+              { data: 'project' },
               { data: 'collection' },
               { data: 'area_type' },
               { data: 'he_image' },
-              { data: 'na_id' },
               { data: 'completion_date' },
               { data: 'investigator' },
-              { data: 'image' },
-              { data: 'project' },
-              { data: 'block' },
-              { data: 'num_nucacids' },
+              { data: 'num_nucacids' }
             ],
             columnDefs: [
                 {
@@ -64,18 +60,7 @@ var KTDatatablesServerSide = function () {
                 //     }
                 // },
                 {
-                    targets: 11,
-                    orderable: false,
-                    // render: function (data) {
-                    //     if (data > 0) {
-                    //       return `
-                    //           <a href="#">${data}</a>`;
-                    //     }
-                    //     return data;
-                    // }
-                },
-                {
-                    targets: 14,
+                    targets: 10,
                     orderable: false,
                     render: function (data, type, row) {
                         if (data > 0) {
@@ -87,7 +72,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 15,
+                    targets: 11,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -297,11 +282,8 @@ var KTDatatablesServerSide = function () {
     }
 
     var handleSelectedRows = function (e) {
-      // Select element
-      const btnCreateBlock = document.querySelector('[data-kt-docs-table-select="event_selected"]');
 
-      // Created blocks for selected rows
-      btnCreateBlock.addEventListener('click', function () {
+      function getSelectedRows() {
 
         const container = document.querySelector('.table');
 
@@ -313,17 +295,46 @@ var KTDatatablesServerSide = function () {
           // Select parent row
           const parent = p.closest('tr');
           // Get customer name
-          const id = parent.querySelectorAll('td')[1].innerText;
+          const id = parent.querySelector('input[type=checkbox]').value;
 
           selectedIds.push(id)
 
         });
 
+        return JSON.stringify(selectedIds);
+      }
+
+      function getExtractionOptions() {
+
+        var data = new FormData(document.getElementById('frm_extraction_options'));
+        var options = Object.fromEntries(data.entries());
+
+        return JSON.stringify(options); 
+      }
+
+      // Select element
+      const btnExtractNucleicAcid = document.querySelector('[data-kt-docs-table-select="event_extract_nucleic_acid"]');
+
+      // Open modal for extraction options
+      btnExtractNucleicAcid.addEventListener('click', function () {
+
+        const el = document.getElementById("modal_extract_nucleic_acid");
+        const modal = new bootstrap.Modal(el);
+        modal.show();
+
+      });
+
+      const btnContinue = document.getElementById("btn_continue");
+
+      // create nucacids
+      btnContinue.addEventListener('click', function () {
+
         $.ajax({
           type: "GET",
           url: "/libprep/new_async",
           data: {
-            "selected_ids":JSON.stringify(selectedIds),
+            "selected_ids": getSelectedRows(),
+            "options": getExtractionOptions()
           },
         }).done(function(result) {
           console.log("result.success:"+result.success);
@@ -352,6 +363,7 @@ var KTDatatablesServerSide = function () {
             });
           }
         });
+
       });
     }
 

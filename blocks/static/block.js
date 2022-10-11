@@ -31,6 +31,7 @@ var KTDatatablesServerSide = function () {
             ajax: '/blocks/filter_blocks',
             columns: [
               { data: null },
+              { data: 'name' },
               { data: 'project' },
               { data: 'patient' },
               { data: 'diagnosis' },
@@ -56,7 +57,7 @@ var KTDatatablesServerSide = function () {
                 //     }
                 // },
                 {
-                    targets: 6,
+                    targets: 7,
                     orderable: false,
                     render: function (data, type, row) {
                         if (data > 0) {
@@ -68,7 +69,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 7,
+                    targets: 8,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -286,6 +287,7 @@ var KTDatatablesServerSide = function () {
       const btnRemoveBlockFromProject = document.querySelector('[data-kt-docs-table-select="event_remove_block_from_project"]');
 
       function getSelectedRows() {
+        
         const container = document.querySelector('.table');
 
         const selectedRows = container.querySelectorAll('[type="checkbox"]:checked');

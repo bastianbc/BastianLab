@@ -3,24 +3,25 @@ from datetime import date
 from django.db.models import Q, Count
 
 class NucAcids(models.Model):
-    old_na_id = models.CharField(max_length=50, blank=True, null=True, verbose_name="Old NA ID")
-    old_area_id = models.CharField(max_length=50, blank=True, null=True, verbose_name="Old Area ID")
-    na_type = models.CharField(max_length=20, blank=True, null=True, verbose_name="Type of NucAcid")
-    date_extr = models.DateField(blank=True, null=True, default=date.today, verbose_name="Extraction Date")
-    method = models.CharField(max_length=50, blank=True, null=True, verbose_name="Extraction Method")
-    qubit = models.FloatField(blank=True, null=True, verbose_name="Qubit")
-    volume = models.IntegerField(blank=True, null=True, verbose_name="Volume")
-    amount = models.FloatField(blank=True, null=True, verbose_name="Total Amount [ng]")
-    re_ext = models.FloatField(blank=True, null=True, verbose_name="Re-Extraction [ng]")
-    total_ext = models.FloatField(blank=True, null=True, verbose_name="Total Extracted [ng]")
-    na_sheared = models.FloatField(blank=True, null=True, verbose_name="NA Sheared [ng]")
-    shearing_vol = models.FloatField(blank=True, null=True, verbose_name="Shearing Vol [µl]")
-    te_vol = models.FloatField(blank=True, null=True, verbose_name="TE Vol [µl]")
-    sl_id = models.CharField(max_length=50, blank=True, null=True, verbose_name="SL ID")
-    notes = models.CharField(max_length=255, blank=True, null=True)
-    projects = models.CharField(max_length=100, blank=True, null=True)
-    area = models.ForeignKey("areas.Areas", on_delete=models.SET_NULL, db_column="area", blank=True, null=True, related_name="area_nucacids")
+    DNA = "dna"
+    RNA = "rna"
+    BOTH = "both"
+    NA_TYPES = (
+        (DNA, "DNA"),
+        (RNA, "RNA"),
+        (BOTH, "Both DNA and RNA"),
+    )
+
     nu_id = models.AutoField(primary_key=True, verbose_name="NA ID")
+    area = models.ForeignKey("areas.Areas", on_delete=models.SET_NULL, db_column="area", blank=True, null=True, related_name="nucacids", verbose_name="Area")
+    name = models.CharField(max_length=50, unique=True, verbose_name="Name")
+    date = models.DateField(blank=True, null=True, default=date.today, verbose_name="Extraction Date")
+    method = models.ForeignKey("method.Method",related_name="nuc_acids",on_delete=models.CASCADE, verbose_name="Method")
+    na_type = models.CharField(max_length=4, choices=NA_TYPES, verbose_name="NA Type")
+    qubit = models.FloatField(blank=True, null=True, verbose_name="Qubit")
+    vol_init = models.FloatField(blank=True, null=True, verbose_name="Volume Initialize")
+    vol_remain = models.FloatField(blank=True, null=True, verbose_name="Volume Remain")
+    notes = models.TextField(blank=True, null=True, verbose_name="Notes")
 
     class Meta:
         db_table = 'nuc_acids'
@@ -88,6 +89,18 @@ class NucAcids(models.Model):
             print(str(e))
             raise
 
+    def _generate_unique_name(self):
+        # blocks.name & Areas.name & first letter of NA_type
+        na_count = self.area.nucacids.count() # count of existing nucleic acid
+        return "%s_%s_%s_%d" % (self.area.block.name, self.area.name, self.na_type[0], na_count + 1)
+
+    def save(self,*args,**kwargs):
+        if not self.name:
+            self.name = self._generate_unique_name()
+            print("self.name:",self.name)
+
+        super().save(*args, **kwargs)
+
     # @property
     # def calc_amount(self):
     #     # calculates the amount
@@ -99,27 +112,27 @@ class NucAcids(models.Model):
     #     self.amount = self.qubit * self.volume
     #     super(NucAcids, self).save(*args, **kwargs)
 
-class SampleLib(models.Model):
-    sl_id = models.CharField(max_length=50, blank=True, null=True)
-    na_id = models.CharField(max_length=50, blank=True, null=True)
-    pre_pcr = models.IntegerField(blank=True, null=True)
-    post_lib_qubit = models.FloatField(blank=True, null=True)
-    post_lib_qpcr = models.FloatField(blank=True, null=True)
-    vol_lib = models.IntegerField(blank=True, null=True)
-    lp_dna = models.FloatField(blank=True, null=True)
-    re_lp_amount = models.FloatField(blank=True, null=True)
-    re_lp2_amount = models.FloatField(blank=True, null=True)
-    total_lp_dna = models.FloatField(blank=True, null=True)
-    chosen_for_capt = models.CharField(max_length=30, blank=True, null=True)
-    input_dna = models.FloatField(blank=True, null=True)
-    input_vol = models.FloatField(blank=True, null=True)
-    post_pcr = models.IntegerField(blank=True, null=True)
-    barcode_id = models.CharField(max_length=50, blank=True, null=True)
-    prep_date = models.DateField(blank=True, null=True)
-    notes = models.CharField(max_length=255, blank=True, null=True)
-    project = models.CharField(max_length=50, blank=True, null=True)
-    nuc_acid = models.ForeignKey(NucAcids, on_delete=models.CASCADE, db_column='nuc_acid', blank=True, null=True)
-
-    class Meta:
-        managed = True
-        db_table = 'sample_lib'
+# class SampleLib(models.Model):
+#     sl_id = models.CharField(max_length=50, blank=True, null=True)
+#     na_id = models.CharField(max_length=50, blank=True, null=True)
+#     pre_pcr = models.IntegerField(blank=True, null=True)
+#     post_lib_qubit = models.FloatField(blank=True, null=True)
+#     post_lib_qpcr = models.FloatField(blank=True, null=True)
+#     vol_lib = models.IntegerField(blank=True, null=True)
+#     lp_dna = models.FloatField(blank=True, null=True)
+#     re_lp_amount = models.FloatField(blank=True, null=True)
+#     re_lp2_amount = models.FloatField(blank=True, null=True)
+#     total_lp_dna = models.FloatField(blank=True, null=True)
+#     chosen_for_capt = models.CharField(max_length=30, blank=True, null=True)
+#     input_dna = models.FloatField(blank=True, null=True)
+#     input_vol = models.FloatField(blank=True, null=True)
+#     post_pcr = models.IntegerField(blank=True, null=True)
+#     barcode_id = models.CharField(max_length=50, blank=True, null=True)
+#     prep_date = models.DateField(blank=True, null=True)
+#     notes = models.CharField(max_length=255, blank=True, null=True)
+#     project = models.CharField(max_length=50, blank=True, null=True)
+#     nuc_acid = models.ForeignKey(NucAcids, on_delete=models.CASCADE, db_column='nuc_acid', blank=True, null=True)
+#
+#     class Meta:
+#         managed = True
+#         db_table = 'sample_lib'
