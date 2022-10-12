@@ -34,6 +34,15 @@ class NucAcids(models.Model):
                 return queryset.filter(Q(area__block__project__technician=user) | Q(area__block__project__researcher=user))
             return queryset
 
+        def _parse_value(search_value):
+            if "_initial:" in search_value:
+                v = search_value.split("_initial:")[1]
+                return None if v == "null" or not v.isnumeric() else v
+            return search_value
+
+        def _is_initial_value(search_value):
+            return "_initial:" in search_value and search_value.split("_initial:")[1] != "null"
+
         try:
             ORDER_COLUMN_CHOICES = {
                 "1": "nu_id",
@@ -64,16 +73,21 @@ class NucAcids(models.Model):
                 order_column = '-' + order_column
 
             queryset = _get_authorizated_queryset()
+
             total = queryset.count()
 
-            if search_value:
+            is_initial = _is_initial_value(search_value)
+            search_value = _parse_value(search_value)
+
+            if is_initial:
                 queryset = queryset.filter(
-                    Q(nu_id__icontains=search_value) |
-                    Q(area__ar_id__icontains=search_value) |
+                        Q(area__ar_id=search_value)
+                    )
+            elif search_value:
+                queryset = queryset.filter(
+                    Q(name__icontains=search_value) |
                     Q(na_type__icontains=search_value) |
-                    Q(na_type__icontains=search_value) |
-                    Q(method__icontains=search_value) |
-                    Q(date_extr__icontains=search_value)
+                    Q(date__icontains=search_value)
                 )
 
             count = queryset.count()

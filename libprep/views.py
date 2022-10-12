@@ -80,8 +80,7 @@ def new_nucacid_async(request):
                             na_type=na_type,
                             method=method
                         )
-
-            if not area.nucacids.filter(na_type=options["na_type"]).exists():
+            elif not area.nucacids.filter(na_type=options["na_type"]).exists():
                 NucAcids.objects.create(
                     area=area,
                     na_type=options["na_type"],
