@@ -74,13 +74,12 @@ def new_nucacid_async(request):
 
             if options["na_type"] == NucAcids.BOTH:
                 for na_type in [NucAcids.DNA,NucAcids.RNA]:
-                    if not area.nucacids.filter(na_type=na_type).exists():
-                        NucAcids.objects.create(
-                            area=area,
-                            na_type=na_type,
-                            method=method
-                        )
-            elif not area.nucacids.filter(na_type=options["na_type"]).exists():
+                    NucAcids.objects.create(
+                        area=area,
+                        na_type=na_type,
+                        method=method
+                    )
+            else:
                 NucAcids.objects.create(
                     area=area,
                     na_type=options["na_type"],

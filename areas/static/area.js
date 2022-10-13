@@ -283,6 +283,9 @@ var KTDatatablesServerSide = function () {
 
     var handleSelectedRows = function (e) {
 
+      const el = document.getElementById("modal_extract_nucleic_acid");
+      const modal = new bootstrap.Modal(el);
+
       function getSelectedRows() {
 
         const container = document.querySelector('.table');
@@ -309,7 +312,19 @@ var KTDatatablesServerSide = function () {
         var data = new FormData(document.getElementById('frm_extraction_options'));
         var options = Object.fromEntries(data.entries());
 
-        return JSON.stringify(options); 
+        return JSON.stringify(options);
+      }
+
+      function openModal() {
+
+        modal.show();
+        
+      }
+
+      function closeModal() {
+
+        modal.hide();
+
       }
 
       // Select element
@@ -318,9 +333,7 @@ var KTDatatablesServerSide = function () {
       // Open modal for extraction options
       btnExtractNucleicAcid.addEventListener('click', function () {
 
-        const el = document.getElementById("modal_extract_nucleic_acid");
-        const modal = new bootstrap.Modal(el);
-        modal.show();
+        openModal();
 
       });
 
@@ -337,7 +350,6 @@ var KTDatatablesServerSide = function () {
             "options": getExtractionOptions()
           },
         }).done(function(result) {
-          console.log("result.success:"+result.success);
           if (result.success) {
             Swal.fire({
                 text: "Block(s) was created succesfully.",
@@ -362,6 +374,9 @@ var KTDatatablesServerSide = function () {
                 }
             });
           }
+
+          closeModal();
+
         });
 
       });

@@ -45,20 +45,15 @@ class NucAcids(models.Model):
 
         try:
             ORDER_COLUMN_CHOICES = {
-                "1": "nu_id",
+                "1": "name",
                 "2": "area",
-                "3": "block",
-                "4": "na_type",
-                "5": "date_extr",
-                "6": "method",
-                "7": "qubit",
-                "8": "volume",
+                "3": "na_type",
+                "4": "date",
+                "5": "method",
+                "6": "qubit",
+                "7": "vol_init",
+                "8": "vol_remain",
                 "9": "amount",
-                "10": "re_ext",
-                "11": "total_ext",
-                "12": "na_sheared",
-                "13": "shearing_vol",
-                "14": "te_vol",
             }
             draw = int(kwargs.get('draw', None)[0])
             length = int(kwargs.get('length', None)[0])
@@ -105,7 +100,7 @@ class NucAcids(models.Model):
 
     def _generate_unique_name(self):
         # blocks.name & Areas.name & first letter of NA_type
-        na_count = self.area.nucacids.count() # count of existing nucleic acid
+        na_count = self.area.nucacids.filter(na_type=self.na_type).count() # count of existing nucleic acid
         return "%s_%s_%s_%d" % (self.area.block.name, self.area.name, self.na_type[0], na_count + 1)
 
     def save(self,*args,**kwargs):

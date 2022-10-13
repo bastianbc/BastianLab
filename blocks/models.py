@@ -41,7 +41,7 @@ class Blocks(models.Model):
         managed = True
 
     def __str__(self):
-        return "%d" % self.bl_id
+        return self.name
 
     def _generate_unique_id(self):
         return get_random_string(length=6)

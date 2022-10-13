@@ -50,7 +50,7 @@ class Areas(models.Model):
         db_table = 'areas'
 
     def __str__(self):
-        return "%d" % self.ar_id
+        return self.name
 
     def _generate_unique_id(self):
         return get_random_string(length=6)
