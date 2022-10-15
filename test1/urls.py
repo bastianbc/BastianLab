@@ -20,6 +20,7 @@ urlpatterns = [
     path('blocks/', include('blocks.urls')),
     path('areas/', include('areas.urls')),
     path('method/', include('method.urls')),
+    path('samplelib/', include('samplelib.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 handler404 = "core.views.error_404"

@@ -11,7 +11,8 @@ from django.contrib.auth.decorators import login_required,permission_required
 
 @permission_required("librep.view_nucacids",raise_exception=True)
 def nucacids(request):
-    return render(request, "nucacids.html", locals())
+    form = SampleLibCreationOptionsForm()
+    return render(request, "nucacid_list.html", locals())
 
 @login_required
 def filter_nucacids(request):
@@ -114,10 +115,20 @@ def delete_nucacid(request,id):
     try:
         nucacid = NucAcids.objects.get(nu_id=id)
         nucacid.delete()
-        messages.success(request,"Nucleci Acid %s was deleted successfully." % nucacid.nu_id)
+        messages.success(request,"Nucleci Acid %s was deleted successfully." % nucacid.name)
         deleted = True
     except Exception as e:
-        messages.error(request, "Nuclecic Acid %s wasn't deleted!" % nucacid.nu_id)
+        messages.error(request, "Nuclecic Acid %s wasn't deleted!" % nucacid.name)
         deleted = False
+
+    return JsonResponse({ "deleted":deleted })
+
+@permission_required("librep.delete_nucacids",raise_exception=True)
+def delete_batch_nucacids(request):
+    try:
+        selected_ids = json.loads(request.GET.get("selected_ids"))
+        NucAcids.objects.filter(nu_id__in=selected_ids).delete()
+    except Exception as e:
+        return JsonResponse({ "deleted":False })
 
     return JsonResponse({ "deleted":True })

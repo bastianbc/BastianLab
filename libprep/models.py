@@ -18,13 +18,16 @@ class NucAcids(models.Model):
     date = models.DateField(blank=True, null=True, default=date.today, verbose_name="Extraction Date")
     method = models.ForeignKey("method.Method",related_name="nuc_acids",on_delete=models.CASCADE, verbose_name="Method")
     na_type = models.CharField(max_length=4, choices=NA_TYPES, verbose_name="NA Type")
-    qubit = models.FloatField(blank=True, null=True, verbose_name="Qubit")
-    vol_init = models.FloatField(blank=True, null=True, verbose_name="Volume Initialize")
-    vol_remain = models.FloatField(blank=True, null=True, verbose_name="Volume Remain")
+    conc = models.FloatField(default=0, verbose_name="Qubit")
+    vol_init = models.FloatField(default=0, verbose_name="Volume Initialize")
+    vol_remain = models.FloatField(default=0, verbose_name="Volume Remain")
     notes = models.TextField(blank=True, null=True, verbose_name="Notes")
 
     class Meta:
         db_table = 'nuc_acids'
+
+    def __str__(self):
+        return self.name
 
     def query_by_args(self, user, **kwargs):
 
@@ -50,7 +53,7 @@ class NucAcids(models.Model):
                 "3": "na_type",
                 "4": "date",
                 "5": "method",
-                "6": "qubit",
+                "6": "conc",
                 "7": "vol_init",
                 "8": "vol_remain",
                 "9": "amount",
@@ -106,43 +109,25 @@ class NucAcids(models.Model):
     def save(self,*args,**kwargs):
         if not self.name:
             self.name = self._generate_unique_name()
-
-        self.vol_remain = self.vol_init
+            self.vol_remain = self.vol_init
 
         super().save(*args, **kwargs)
 
     @property
     def amount(self):
-        # calculates the amount: amount = vol_init * qubit
+        # calculates the amount: amount = vol_init * conc
         result = 0
         try:
-            result = self.qubit * self.vol_init
+            result = self.conc * self.vol_init
         except Exception as e:
             pass
 
         return result
 
-# class SampleLib(models.Model):
-#     sl_id = models.CharField(max_length=50, blank=True, null=True)
-#     na_id = models.CharField(max_length=50, blank=True, null=True)
-#     pre_pcr = models.IntegerField(blank=True, null=True)
-#     post_lib_qubit = models.FloatField(blank=True, null=True)
-#     post_lib_qpcr = models.FloatField(blank=True, null=True)
-#     vol_lib = models.IntegerField(blank=True, null=True)
-#     lp_dna = models.FloatField(blank=True, null=True)
-#     re_lp_amount = models.FloatField(blank=True, null=True)
-#     re_lp2_amount = models.FloatField(blank=True, null=True)
-#     total_lp_dna = models.FloatField(blank=True, null=True)
-#     chosen_for_capt = models.CharField(max_length=30, blank=True, null=True)
-#     input_dna = models.FloatField(blank=True, null=True)
-#     input_vol = models.FloatField(blank=True, null=True)
-#     post_pcr = models.IntegerField(blank=True, null=True)
-#     barcode_id = models.CharField(max_length=50, blank=True, null=True)
-#     prep_date = models.DateField(blank=True, null=True)
-#     notes = models.CharField(max_length=255, blank=True, null=True)
-#     project = models.CharField(max_length=50, blank=True, null=True)
-#     nuc_acid = models.ForeignKey(NucAcids, on_delete=models.CASCADE, db_column='nuc_acid', blank=True, null=True)
-#
-#     class Meta:
-#         managed = True
-#         db_table = 'sample_lib'
+    def set_zero_volume(self):
+        self.vol_remain = 0.0
+        self.save()
+
+    def update_volume(self,amount):
+        self.vol_remain = self.vol_remain - amount if self.vol_remain > amount else 0
+        self.save()

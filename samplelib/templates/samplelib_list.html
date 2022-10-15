@@ -91,7 +91,7 @@
     <!--end::Menu 1-->
     <!--end::Filter-->
     <!--begin::Add record-->
-    <button type="button" class="btn btn-primary" onclick="window.location.href = '/libprep/new';">
+    <button type="button" class="btn btn-primary" onclick="window.location.href = '/samplelib/new';">
       <!--begin::Svg Icon | path: icons/duotune/arrows/arr075.svg-->
       <span class="svg-icon svg-icon-2">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -100,7 +100,7 @@
         </svg>
       </span>
       <!--end::Svg Icon-->
-      Add Nucleic Acid
+      Add Sample Library
   </button>
     <!--end::Add record-->
   </div>
@@ -122,15 +122,13 @@
         <th class="w-10px pe-2">
         </th>
         <th>Name</th>
-        <th>Area</th>
-        <th>NA Type</th>
+        <th>Barcode</th>
         <th>Date</th>
         <th>Method</th>
-        <th>Qubit</th>
+        <th>Te Vol</th>
+        <th>Input Amount</th>
         <th>Vol Init</th>
         <th>Vol Remain</th>
-        <th>Amount</th>
-        <!-- <th>Libraries</th> -->
         <th class="text-end min-w-100px">Actions</th>
     </tr>
     {% csrf_token %}
@@ -142,5 +140,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="static/nucacid.js"></script>
+<script src="static/samplelib.js"></script>
 {% endblock %}

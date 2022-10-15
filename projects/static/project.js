@@ -278,7 +278,7 @@ var KTDatatablesServerSide = function () {
     var initToggleToolbar = function () {
         // Toggle selected action toolbar
         // Select all checkboxes
-        const container = document.querySelector('#patient_datatable');
+        const container = document.querySelector('.table');
         const checkboxes = container.querySelectorAll('[type="checkbox"]');
 
         // Select elements
@@ -354,7 +354,7 @@ var KTDatatablesServerSide = function () {
     // Toggle toolbars
     var toggleToolbars = function () {
         // Define variables
-        const container = document.querySelector('#patient_datatable');
+        const container = document.querySelector('.table');
         const toolbarBase = document.querySelector('[data-kt-docs-table-toolbar="base"]');
         const toolbarSelected = document.querySelector('[data-kt-docs-table-toolbar="selected"]');
         const selectedCount = document.querySelector('[data-kt-docs-table-select="selected_count"]');

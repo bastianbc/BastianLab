@@ -318,7 +318,7 @@ var KTDatatablesServerSide = function () {
       function openModal() {
 
         modal.show();
-        
+
       }
 
       function closeModal() {
@@ -352,7 +352,7 @@ var KTDatatablesServerSide = function () {
         }).done(function(result) {
           if (result.success) {
             Swal.fire({
-                text: "Block(s) was created succesfully.",
+                text: "Nucleic acid(s) was created succesfully.",
                 icon: "info",
                 buttonsStyling: false,
                 confirmButtonText: "Ok, got it!",

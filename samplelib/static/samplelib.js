@@ -29,18 +29,17 @@ var KTDatatablesServerSide = function () {
               editor: editor,
               editOnFocus: true
             },
-            ajax: '/libprep/filter_nucacids',
+            ajax: '/samplelib/filter_samplelibs',
             columns: [
                 { data: null },
                 { data: 'name' },
-                { data: 'area' },
-                { data: 'na_type' },
+                { data: 'barcode' },
                 { data: 'date' },
                 { data: 'method' },
-                { data: 'conc' },
+                { data: 'te_vol' },
+                { data: 'input_amount' },
                 { data: 'vol_init' },
                 { data: 'vol_remain' },
-                { data: 'amount' },
             ],
             columnDefs: [
                 {
@@ -49,7 +48,7 @@ var KTDatatablesServerSide = function () {
                     render: function (data) {
                         return `
                             <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                <input class="form-check-input" type="checkbox" value="${data['nu_id']}" />
+                                <input class="form-check-input" type="checkbox" value="${data['id']}" />
                             </div>`;
                     }
                 },
@@ -60,7 +59,7 @@ var KTDatatablesServerSide = function () {
                 //     }
                 // },
                 {
-                    targets: 10,
+                    targets: 9,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -81,7 +80,7 @@ var KTDatatablesServerSide = function () {
                             <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4" data-kt-menu="true">
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/libprep/edit/`+ row["nu_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
+                                    <a href="/samplelib/edit/`+ row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
                                         Edit
                                     </a>
                                 </div>
@@ -89,7 +88,7 @@ var KTDatatablesServerSide = function () {
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/libprep/delete/` + row["nu_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
+                                    <a href="/samplelib/delete/` + row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
                                         Delete
                                     </a>
                                 </div>
@@ -199,25 +198,29 @@ var KTDatatablesServerSide = function () {
                                 type: "DELETE",
                                 headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
                                 success: function () {
-                                    swal("Done!", "It was succesfully deleted!", "success");
-                                    dt.draw();
+                                  Swal.fire({
+                                        text: "Sample Library(s) was deleted succesfully.",
+                                        icon: "info",
+                                        buttonsStyling: false,
+                                        confirmButtonText: "Ok, got it!",
+                                        customClass: {
+                                            confirmButton: "btn fw-bold btn-success",
+                                        }
+                                    }).then(function(){
+                                      dt.draw();
+                                    });
                                 },
                                 error: function (xhr, ajaxOptions, thrownError) {
-                                    swal("Error deleting!", "Please try again", "error");
+                                  Swal.fire({
+                                      text: customerName + " was not deleted.",
+                                      icon: "error",
+                                      buttonsStyling: false,
+                                      confirmButtonText: "Ok, got it!",
+                                      customClass: {
+                                          confirmButton: "btn fw-bold btn-primary",
+                                      }
+                                  });
                                 }
-                            });
-
-                            Swal.fire({
-                                text: "You have deleted " + customerName + "!.",
-                                icon: "success",
-                                buttonsStyling: false,
-                                confirmButtonText: "Ok, got it!",
-                                customClass: {
-                                    confirmButton: "btn fw-bold btn-primary",
-                                }
-                            }).then(function () {
-                                // delete row data from server and re-draw datatable
-                                dt.draw();
                             });
                         });
                     } else if (result.dismiss === 'cancel') {
@@ -274,117 +277,57 @@ var KTDatatablesServerSide = function () {
         // Deleted selected rows
         deleteSelected.addEventListener('click', function () {
             // SweetAlert2 pop up --- official docs reference: https://sweetalert2.github.io/
-            Swal.fire({
-                text: "Are you sure you want to delete selected records?",
-                icon: "warning",
-                showCancelButton: true,
-                buttonsStyling: false,
-                showLoaderOnConfirm: true,
-                confirmButtonText: "Yes, delete!",
-                cancelButtonText: "No, cancel",
-                customClass: {
-                    confirmButton: "btn fw-bold btn-danger",
-                    cancelButton: "btn fw-bold btn-active-light-primary"
-                },
-            }).then(function (result) {
-                if (result.value) {
-                    // Simulate delete request -- for demo purpose only
-                    Swal.fire({
-                        text: "Deleting selected customers",
-                        icon: "info",
-                        buttonsStyling: false,
-                        showConfirmButton: false,
-                        timer: 2000
-                    }).then(function () {
-
-                      function getSelectedRows() {
-
-                        const container = document.querySelector('.table');
-
-                        const selectedRows = container.querySelectorAll('[type="checkbox"]:checked');
-
-                        const selectedIds = [];
-
-                        selectedRows.forEach((p) => {
-                          // Select parent row
-                          const parent = p.closest('tr');
-                          // Get customer name
-                          const id = parent.querySelector('input[type=checkbox]').value;
-
-                          selectedIds.push(id)
-
-                        });
-
-                        return JSON.stringify(selectedIds);
-                      }
-
-                        // Calling delete request with ajax
-                        $.ajax({
-                            type: "GET",
-                            url: "/libprep/batch_delete",
-                            data: {
-                              "selected_ids": getSelectedRows(),
-                            },
-                            done: function (result) {
-                                if (result.success) {
-                                  Swal.fire({
-                                      text: "Nucleic Acid(s) was deleted succesfully.",
-                                      icon: "info",
-                                      buttonsStyling: false,
-                                      confirmButtonText: "Ok, got it!",
-                                      customClass: {
-                                          confirmButton: "btn fw-bold btn-success",
-                                      }
-                                  }).then(function(){
-                                    dt.draw();
-                                  });
-                                }
-                                else {
-                                  Swal.fire({
-                                      text: "Nucleic Acid(s) wasn't deleted!",
-                                      icon: "error",
-                                      buttonsStyling: false,
-                                      confirmButtonText: "Ok, got it!",
-                                      customClass: {
-                                          confirmButton: "btn fw-bold btn-success",
-                                      }
-                                  });
-                                }
-                            },
-                            error: function (xhr, ajaxOptions, thrownError) {
-                                swal("Error deleting!", "Please try again", "error");
-                            }
-                        });
-
-                        Swal.fire({
-                            text: "You have deleted all selected customers!.",
-                            icon: "success",
-                            buttonsStyling: false,
-                            confirmButtonText: "Ok, got it!",
-                            customClass: {
-                                confirmButton: "btn fw-bold btn-primary",
-                            }
-                        }).then(function () {
-                            // delete row data from server and re-draw datatable
-                            dt.draw();
-                        });
-
-                        // Remove header checked box
-                        const headerCheckbox = container.querySelectorAll('[type="checkbox"]')[0];
-                        headerCheckbox.checked = false;
-                    });
-                } else if (result.dismiss === 'cancel') {
-                    Swal.fire({
-                        text: "Selected customers was not deleted.",
-                        icon: "error",
-                        buttonsStyling: false,
-                        confirmButtonText: "Ok, got it!",
-                        customClass: {
-                            confirmButton: "btn fw-bold btn-primary",
-                        }
-                    });
-                }
-            });
+            // Swal.fire({
+            //     text: "Are you sure you want to delete selected customers?",
+            //     icon: "warning",
+            //     showCancelButton: true,
+            //     buttonsStyling: false,
+            //     showLoaderOnConfirm: true,
+            //     confirmButtonText: "Yes, delete!",
+            //     cancelButtonText: "No, cancel",
+            //     customClass: {
+            //         confirmButton: "btn fw-bold btn-danger",
+            //         cancelButton: "btn fw-bold btn-active-light-primary"
+            //     },
+            // }).then(function (result) {
+            //     if (result.value) {
+            //         // Simulate delete request -- for demo purpose only
+            //         Swal.fire({
+            //             text: "Deleting selected customers",
+            //             icon: "info",
+            //             buttonsStyling: false,
+            //             showConfirmButton: false,
+            //             timer: 2000
+            //         }).then(function () {
+            //             Swal.fire({
+            //                 text: "You have deleted all selected customers!.",
+            //                 icon: "success",
+            //                 buttonsStyling: false,
+            //                 confirmButtonText: "Ok, got it!",
+            //                 customClass: {
+            //                     confirmButton: "btn fw-bold btn-primary",
+            //                 }
+            //             }).then(function () {
+            //                 // delete row data from server and re-draw datatable
+            //                 dt.draw();
+            //             });
+            //
+            //             // Remove header checked box
+            //             const headerCheckbox = container.querySelectorAll('[type="checkbox"]')[0];
+            //             headerCheckbox.checked = false;
+            //         });
+            //     } else if (result.dismiss === 'cancel') {
+            //         Swal.fire({
+            //             text: "Selected customers was not deleted.",
+            //             icon: "error",
+            //             buttonsStyling: false,
+            //             confirmButtonText: "Ok, got it!",
+            //             customClass: {
+            //                 confirmButton: "btn fw-bold btn-primary",
+            //             }
+            //         });
+            //     }
+            // });
         });
     }
 
@@ -422,120 +365,11 @@ var KTDatatablesServerSide = function () {
         }
     }
 
-    var handleSelectedRows = function (e) {
-
-      const el = document.getElementById("modal_create_sample_library");
-      const modal = new bootstrap.Modal(el);
-
-      function getSelectedRows() {
-
-        const container = document.querySelector('.table');
-
-        const selectedRows = container.querySelectorAll('[type="checkbox"]:checked');
-
-        const selectedIds = [];
-
-        selectedRows.forEach((p) => {
-          // Select parent row
-          const parent = p.closest('tr');
-          // Get customer name
-          const id = parent.querySelector('input[type=checkbox]').value;
-
-          selectedIds.push(id)
-
-        });
-
-        return JSON.stringify(selectedIds);
-      }
-
-      function getCreationOptions() {
-
-        var data = new FormData(document.getElementById('frm_creation_options'));
-        var options = Object.fromEntries(data.entries());
-
-        return JSON.stringify(options);
-      }
-
-      function openModal() {
-
-        modal.show();
-
-      }
-
-      function closeModal() {
-
-        modal.hide();
-
-      }
-
-      const txtPrefix = document.getElementById("id_prefix");
-
-      txtPrefix.addEventListener("keyup", function () {
-
-        this.value = this.value.toLocaleUpperCase();
-
-      });
-
-      // Select element
-      const btnCreateSampleLibrary = document.querySelector('[data-kt-docs-table-select="event_create_sample_library"]');
-
-      // Open modal for extraction options
-      btnCreateSampleLibrary.addEventListener('click', function () {
-
-        openModal();
-
-      });
-
-      const btnContinue = document.getElementById("btn_continue");
-
-      // create nucacids
-      btnContinue.addEventListener('click', function () {
-
-        $.ajax({
-          type: "GET",
-          url: "/samplelib/new_async",
-          data: {
-            "selected_ids": getSelectedRows(),
-            "options": getCreationOptions()
-          },
-        }).done(function(result) {
-          if (result.success) {
-            Swal.fire({
-                text: "Sample Library(s) was created succesfully.",
-                icon: "info",
-                buttonsStyling: false,
-                confirmButtonText: "Ok, got it!",
-                customClass: {
-                    confirmButton: "btn fw-bold btn-success",
-                }
-            }).then(function(){
-              dt.draw();
-            });
-          }
-          else {
-            Swal.fire({
-                text: "Sample Library(s) was not created.",
-                icon: "error",
-                buttonsStyling: false,
-                confirmButtonText: "Ok, got it!",
-                customClass: {
-                    confirmButton: "btn fw-bold btn-danger",
-                }
-            });
-          }
-
-          closeModal();
-
-        });
-
-      });
-    }
-
     var initEditor = function () {
 
       editor = new $.fn.dataTable.Editor({
         ajax: {
-          url: "/libprep/edit_nucacid_async",
+          url: "/samplelib/edit_samplelib_async",
           type: "POST",
           headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
           success: function () {
@@ -550,21 +384,21 @@ var KTDatatablesServerSide = function () {
                label: "Name:",
                name: "name"
            }, {
-               label: "Area:",
-               name: "area"
-           }, {
-               label: "Nucleic Acid Type:",
-               name: "na_type"
+               label: "Barcode:",
+               name: "barcode"
            }, {
                label: "Date:",
                name: "date",
                type: "datetime"
            }, {
                label: "Method:",
-               name: "method"
+               name: "method",
            }, {
-               label: "Concentration:",
-               name: "conc",
+               label: "Te Volume:",
+               name: "te_vol"
+           }, {
+               label: "Input Amount:",
+               name: "input_amount",
            }, {
                label: "Volume Init:",
                name: "vol_init"
@@ -617,7 +451,6 @@ var KTDatatablesServerSide = function () {
             handleFilterDatatable();
             handleDeleteRows();
             handleResetForm();
-            handleSelectedRows();
             initEditor();
         }
     }
