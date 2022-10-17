@@ -73,6 +73,7 @@ def new_samplelib_async(request):
 
     try:
         area = {}
+        sample_lib = {}
 
         barcode_id = int(options["barcode_start_with"])
 
@@ -85,7 +86,6 @@ def new_samplelib_async(request):
             autonumber = max_value + 1
 
         for nucacid in nucacids:
-            sample_lib = {}
 
             if not area == nucacid.area:
                 area = nucacid.area
@@ -97,6 +97,8 @@ def new_samplelib_async(request):
                     barcode=barcode,
                     method=Method.objects.all().first(),
                 )
+
+                autonumber += 1
 
             NA_SL_LINK.objects.create(
                 nucacid=nucacid,
