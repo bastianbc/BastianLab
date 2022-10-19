@@ -4,6 +4,7 @@ from .models import *
 class SampleLibSerializer(serializers.ModelSerializer):
     # block = serializers.IntegerField()
     DT_RowId = serializers.SerializerMethodField()
+    method = serializers.StringRelatedField()
 
     class Meta:
         model = SampleLib

@@ -534,9 +534,9 @@ var KTDatatablesServerSide = function () {
                       <span class="fs-6 fw-bold text-gray-800 text-hover-primary">${ data[i].input_amount }</span>
                     </div>`;
 
+          listEl.innerHTML += row;
         }
 
-        listEl.innerHTML += row;
 
         modal.show();
 
