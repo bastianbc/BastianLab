@@ -1,5 +1,6 @@
 from django.db import models
 from datetime import date
+from django.db.models import Q, Count
 
 class Barcode(models.Model):
     name = models.CharField(max_length=50, unique=True, verbose_name="Name")
@@ -26,12 +27,11 @@ class SampleLib(models.Model):
     class Meta:
         db_table = "sample_lib"
 
-    def get_unique_name(self,prefix):
-        # prefix - autonumber
-        return "%s-%d" % (prefix,1)
+    def __str__(self):
+        return self.name
 
-    def get_next_barcode(self, start_with):
-        return ""
+    def save(self,*args,**kwargs):
+        super().save(*args, **kwargs)
 
     def query_by_args(self, user, **kwargs):
 
@@ -81,9 +81,7 @@ class SampleLib(models.Model):
             search_value = _parse_value(search_value)
 
             if is_initial:
-                queryset = queryset.filter(
-                        Q(area__ar_id=search_value)
-                    )
+                pass
             elif search_value:
                 queryset = queryset.filter(
                     Q(name__icontains=search_value) |

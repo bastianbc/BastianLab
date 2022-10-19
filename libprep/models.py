@@ -109,7 +109,6 @@ class NucAcids(models.Model):
     def save(self,*args,**kwargs):
         if not self.name:
             self.name = self._generate_unique_name()
-            self.vol_remain = self.vol_init
 
         super().save(*args, **kwargs)
 
@@ -124,10 +123,14 @@ class NucAcids(models.Model):
 
         return result
 
+    def set_init_volume(self):
+        self.vol_remain = self.vol_init
+        self.save()
+
     def set_zero_volume(self):
         self.vol_remain = 0.0
         self.save()
 
     def update_volume(self,amount):
-        self.vol_remain = self.vol_remain - amount if self.vol_remain > amount else 0
+        self.vol_remain = 0 if amount > self.amount else (self.amount - amount) / self.conc
         self.save()

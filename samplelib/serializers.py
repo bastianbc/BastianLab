@@ -11,3 +11,11 @@ class SampleLibSerializer(serializers.ModelSerializer):
 
     def get_DT_RowId(self, obj):
        return getattr(obj, 'id')
+
+class UsedNuacidsSerializer(serializers.ModelSerializer):
+    sample_lib = serializers.StringRelatedField()
+    nucacid = serializers.StringRelatedField()
+
+    class Meta:
+        model = NA_SL_LINK
+        fields = ("sample_lib", "nucacid", "input_vol", "input_amount", )

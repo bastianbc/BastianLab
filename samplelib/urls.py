@@ -13,4 +13,6 @@ urlpatterns = [
     path('new_async', views.new_samplelib_async, name='new-samplelib-async'),
     path('edit/<str:id>', views.edit_samplelib, name='edit-samplelib'),
     path('delete/<str:id>', views.delete_samplelib, name='delete-samplelib'),
+    path('batch_delete', views.delete_batch_samplelibs, name='delete-batch-samplelibs'),
+    path('<int:id>/used_nucacids', views.get_used_nucacids, name='get-used-nucacids'),
 ] + staticfiles_urlpatterns()

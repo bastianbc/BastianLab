@@ -52,12 +52,18 @@ var KTDatatablesServerSide = function () {
                             </div>`;
                     }
                 },
-                // {
-                //     targets: 4,
-                //     render: function (data, type, row) {
-                //         return `<img src="${hostUrl}media/svg/card-logos/${row.CreditCardType}.svg" class="w-35px me-3" alt="${row.CreditCardType}">` + data;
-                //     }
-                // },
+                {
+                    targets: 6,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        if (data > 0) {
+                          let id = row["id"];
+                          return `
+                              <a href="javascript:;" class="detail-link">${data}</a>`;
+                        }
+                        return data;
+                    }
+                },
                 {
                     targets: 9,
                     data: null,
@@ -114,6 +120,7 @@ var KTDatatablesServerSide = function () {
             toggleToolbars();
             handleDeleteRows();
             handleResetForm();
+            initModal();
             KTMenu.createInstances();
         });
     }
@@ -277,57 +284,117 @@ var KTDatatablesServerSide = function () {
         // Deleted selected rows
         deleteSelected.addEventListener('click', function () {
             // SweetAlert2 pop up --- official docs reference: https://sweetalert2.github.io/
-            // Swal.fire({
-            //     text: "Are you sure you want to delete selected customers?",
-            //     icon: "warning",
-            //     showCancelButton: true,
-            //     buttonsStyling: false,
-            //     showLoaderOnConfirm: true,
-            //     confirmButtonText: "Yes, delete!",
-            //     cancelButtonText: "No, cancel",
-            //     customClass: {
-            //         confirmButton: "btn fw-bold btn-danger",
-            //         cancelButton: "btn fw-bold btn-active-light-primary"
-            //     },
-            // }).then(function (result) {
-            //     if (result.value) {
-            //         // Simulate delete request -- for demo purpose only
-            //         Swal.fire({
-            //             text: "Deleting selected customers",
-            //             icon: "info",
-            //             buttonsStyling: false,
-            //             showConfirmButton: false,
-            //             timer: 2000
-            //         }).then(function () {
-            //             Swal.fire({
-            //                 text: "You have deleted all selected customers!.",
-            //                 icon: "success",
-            //                 buttonsStyling: false,
-            //                 confirmButtonText: "Ok, got it!",
-            //                 customClass: {
-            //                     confirmButton: "btn fw-bold btn-primary",
-            //                 }
-            //             }).then(function () {
-            //                 // delete row data from server and re-draw datatable
-            //                 dt.draw();
-            //             });
-            //
-            //             // Remove header checked box
-            //             const headerCheckbox = container.querySelectorAll('[type="checkbox"]')[0];
-            //             headerCheckbox.checked = false;
-            //         });
-            //     } else if (result.dismiss === 'cancel') {
-            //         Swal.fire({
-            //             text: "Selected customers was not deleted.",
-            //             icon: "error",
-            //             buttonsStyling: false,
-            //             confirmButtonText: "Ok, got it!",
-            //             customClass: {
-            //                 confirmButton: "btn fw-bold btn-primary",
-            //             }
-            //         });
-            //     }
-            // });
+            Swal.fire({
+                text: "Are you sure you want to delete selected records?",
+                icon: "warning",
+                showCancelButton: true,
+                buttonsStyling: false,
+                showLoaderOnConfirm: true,
+                confirmButtonText: "Yes, delete!",
+                cancelButtonText: "No, cancel",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-danger",
+                    cancelButton: "btn fw-bold btn-active-light-primary"
+                },
+            }).then(function (result) {
+                if (result.value) {
+                    // Simulate delete request -- for demo purpose only
+                    Swal.fire({
+                        text: "Deleting selected customers",
+                        icon: "info",
+                        buttonsStyling: false,
+                        showConfirmButton: false,
+                        timer: 2000
+                    }).then(function () {
+
+                      function getSelectedRows() {
+
+                        const container = document.querySelector('.table');
+
+                        const selectedRows = container.querySelectorAll('[type="checkbox"]:checked');
+
+                        const selectedIds = [];
+
+                        selectedRows.forEach((p) => {
+                          // Select parent row
+                          const parent = p.closest('tr');
+                          // Get customer name
+                          const id = parent.querySelector('input[type=checkbox]').value;
+
+                          selectedIds.push(id)
+
+                        });
+
+                        return JSON.stringify(selectedIds);
+                      }
+
+                        // Calling delete request with ajax
+                        $.ajax({
+                            type: "GET",
+                            url: "/samplelib/batch_delete",
+                            data: {
+                              "selected_ids": getSelectedRows(),
+                            },
+                            done: function (result) {
+                                if (result.success) {
+                                  Swal.fire({
+                                      text: "Nucleic Acid(s) was deleted succesfully.",
+                                      icon: "info",
+                                      buttonsStyling: false,
+                                      confirmButtonText: "Ok, got it!",
+                                      customClass: {
+                                          confirmButton: "btn fw-bold btn-success",
+                                      }
+                                  }).then(function(){
+                                    dt.draw();
+                                  });
+                                }
+                                else {
+                                  Swal.fire({
+                                      text: "Nucleic Acid(s) wasn't deleted!",
+                                      icon: "error",
+                                      buttonsStyling: false,
+                                      confirmButtonText: "Ok, got it!",
+                                      customClass: {
+                                          confirmButton: "btn fw-bold btn-success",
+                                      }
+                                  });
+                                }
+                            },
+                            error: function (xhr, ajaxOptions, thrownError) {
+                                swal("Error deleting!", "Please try again", "error");
+                            }
+                        });
+
+                        Swal.fire({
+                            text: "You have deleted all selected customers!.",
+                            icon: "success",
+                            buttonsStyling: false,
+                            confirmButtonText: "Ok, got it!",
+                            customClass: {
+                                confirmButton: "btn fw-bold btn-primary",
+                            }
+                        }).then(function () {
+                            // delete row data from server and re-draw datatable
+                            dt.draw();
+                        });
+
+                        // Remove header checked box
+                        const headerCheckbox = container.querySelectorAll('[type="checkbox"]')[0];
+                        headerCheckbox.checked = false;
+                    });
+                } else if (result.dismiss === 'cancel') {
+                    Swal.fire({
+                        text: "Selected customers was not deleted.",
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn fw-bold btn-primary",
+                        }
+                    });
+                }
+            });
         });
     }
 
@@ -399,13 +466,14 @@ var KTDatatablesServerSide = function () {
            }, {
                label: "Input Amount:",
                name: "input_amount",
+               type: "readonly"
            }, {
                label: "Volume Init:",
                name: "vol_init"
            }, {
                label: "Volume Remain:",
                name: "vol_remain"
-           }
+           },
        ],
        formOptions: {
           inline: {
@@ -439,6 +507,75 @@ var KTDatatablesServerSide = function () {
       cleanUrl();
 
       return x;
+
+    }
+
+    var initModal = () => {
+
+      const el = document.getElementById("modal_used_nacacids");
+      const modal = new bootstrap.Modal(el);
+
+      el.addEventListener('hide.bs.modal', function(){
+
+        closeModal();
+
+      });
+
+      function openModal(data) {
+
+        var listEl = document.querySelector(".list-body");
+
+        for (var i = 0; i < data.length; i++) {
+
+          var row = `<div class="d-flex flex-stack">
+                      <span class="fs-6 fw-bold text-gray-800 text-hover-primary">${ data[i].sample_lib }</span>
+                      <span class="fs-6 fw-bold text-gray-800 text-hover-primary">${ data[i].nucacid }</span>
+                      <span class="fs-6 fw-bold text-gray-800 text-hover-primary">${ data[i].input_vol }</span>
+                      <span class="fs-6 fw-bold text-gray-800 text-hover-primary">${ data[i].input_amount }</span>
+                    </div>`;
+
+        }
+
+        listEl.innerHTML += row;
+
+        modal.show();
+
+      }
+
+      function closeModal() {
+
+        var listEl = document.querySelector(".list-body");
+
+        listEl.innerHTML = "";
+
+        // modal.hide();
+
+      }
+
+      const detailLink = document.querySelector(".detail-link");
+
+      detailLink.addEventListener("click", function (e) {
+        e.preventDefault();
+
+        // Select parent row
+        const parent = this.closest('tr');
+        // Get customer name
+        const id = parent.querySelector('input[type=checkbox]').value;
+
+        $.ajax({
+            url: "/samplelib/" + id + "/used_nucacids",
+            type: "GET",
+            success: function (data) {
+
+              openModal(data);
+
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+
+            }
+        });
+
+      });
 
     }
 

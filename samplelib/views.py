@@ -10,6 +10,7 @@ import re
 import json
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required,permission_required
+from .serializers import *
 
 @permission_required("samplelib.view_samplelib",raise_exception=True)
 def samplelibs(request):
@@ -17,8 +18,6 @@ def samplelibs(request):
 
 @login_required
 def filter_samplelibs(request):
-    from .serializers import SampleLibSerializer
-
     samplelibs = SampleLib().query_by_args(request.user,**request.GET)
     serializer = SampleLibSerializer(samplelibs['items'], many=True)
     result = dict()
@@ -77,7 +76,10 @@ def new_samplelib_async(request):
 
         barcode_id = int(options["barcode_start_with"])
 
-        nucacids = NucAcids.objects.filter(nu_id__in=selected_ids).order_by("vol_remain")
+        target_amount = float(options["target_amount"])
+
+        # nucacids = NucAcids.objects.filter(nu_id__in=selected_ids).order_by("vol_remain")
+        nucacids = sorted(NucAcids.objects.filter(nu_id__in=selected_ids),  key=lambda na: na.amount)
 
         prefixies = SampleLib.objects.filter(name__startswith=options["prefix"])
         autonumber = 1
@@ -95,6 +97,7 @@ def new_samplelib_async(request):
                 sample_lib = SampleLib.objects.create(
                     name="%s-%d" % (options["prefix"],autonumber),
                     barcode=barcode,
+                    input_amount=target_amount,
                     method=Method.objects.all().first(),
                 )
 
@@ -103,12 +106,14 @@ def new_samplelib_async(request):
             NA_SL_LINK.objects.create(
                 nucacid=nucacid,
                 sample_lib=sample_lib,
-                input_vol=nucacid.vol_remain,
-                input_amount=float(options["target_amount"]) - nucacid.vol_remain
+                input_vol= nucacid.vol_remain if nucacid.amount < target_amount else target_amount / nucacid.conc,
+                input_amount= target_amount
             )
 
-            nucacid.set_zero_volume()
-            # nucacid.update_volume(float(options["target_amount"]))
+            # nucacid.set_zero_volume()
+            nucacid.update_volume(target_amount)
+
+            target_amount -= nucacid.amount
 
             barcode_id = barcode_id + 1 if barcode_id < 192 else 1 #The barcode table contains numeric barcodes with barcode_id=1- 192
 
@@ -120,7 +125,7 @@ def new_samplelib_async(request):
 
 @permission_required("samplelib.change_samplelib",raise_exception=True)
 def edit_samplelib(request,id):
-    samplelib = SampleLib.objects.get(nu_id=id)
+    samplelib = SampleLib.objects.get(id=id)
 
     if request.method=="POST":
         form = SampleLibForm(request.POST,instance=samplelib)
@@ -147,3 +152,19 @@ def delete_samplelib(request,id):
         deleted = False
 
     return JsonResponse({"deleted":deleted })
+
+@permission_required("samplelib.delete_samplelib",raise_exception=True)
+def delete_batch_samplelibs(request):
+    try:
+        selected_ids = json.loads(request.GET.get("selected_ids"))
+        SampleLib.objects.filter(id__in=selected_ids).delete()
+    except Exception as e:
+        return JsonResponse({ "deleted":False })
+
+    return JsonResponse({ "deleted":True })
+
+@permission_required("samplelib.view_samplelib",raise_exception=True)
+def get_used_nucacids(request,id):
+    used_nucacids = NA_SL_LINK.objects.filter(sample_lib__id=id)
+    serializer = UsedNuacidsSerializer(used_nucacids, many=True)
+    return JsonResponse(serializer.data, safe=False)

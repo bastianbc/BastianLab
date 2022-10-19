@@ -44,7 +44,9 @@ def edit_nucacid_async(request):
                     v = None
                 parameters[r.groups()[1]] = v
 
-    custom_update(NucAcids,pk=parameters["pk"],parameters=parameters)
+    nucacid = custom_update(NucAcids,pk=parameters["pk"],parameters=parameters)
+
+    nucacid.set_init_volume()
 
     return JsonResponse({"result":True})
 
