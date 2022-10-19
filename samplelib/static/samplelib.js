@@ -552,13 +552,12 @@ var KTDatatablesServerSide = function () {
 
       }
 
-      const detailLink = document.querySelector(".detail-link");
+      const detailLinks = document.querySelectorAll(".detail-link");
 
-      if (detailLink) {
+      for (var detail of detailLinks) {
 
-        detailLink.addEventListener("click", function (e) {
+        detail.addEventListener("click", function (e) {
           e.preventDefault();
-
           // Select parent row
           const parent = this.closest('tr');
           // Get customer name
@@ -580,7 +579,6 @@ var KTDatatablesServerSide = function () {
         });
 
       }
-
     }
 
     // Public methods

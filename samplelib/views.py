@@ -107,7 +107,7 @@ def new_samplelib_async(request):
                 nucacid=nucacid,
                 sample_lib=sample_lib,
                 input_vol= nucacid.vol_remain if nucacid.amount < target_amount else target_amount / nucacid.conc,
-                input_amount= target_amount
+                input_amount= nucacid.amount if nucacid.amount < target_amount else target_amount
             )
 
             # nucacid.set_zero_volume()
