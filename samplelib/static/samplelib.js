@@ -554,28 +554,32 @@ var KTDatatablesServerSide = function () {
 
       const detailLink = document.querySelector(".detail-link");
 
-      detailLink.addEventListener("click", function (e) {
-        e.preventDefault();
+      if (detailLink) {
 
-        // Select parent row
-        const parent = this.closest('tr');
-        // Get customer name
-        const id = parent.querySelector('input[type=checkbox]').value;
+        detailLink.addEventListener("click", function (e) {
+          e.preventDefault();
 
-        $.ajax({
-            url: "/samplelib/" + id + "/used_nucacids",
-            type: "GET",
-            success: function (data) {
+          // Select parent row
+          const parent = this.closest('tr');
+          // Get customer name
+          const id = parent.querySelector('input[type=checkbox]').value;
 
-              openModal(data);
+          $.ajax({
+              url: "/samplelib/" + id + "/used_nucacids",
+              type: "GET",
+              success: function (data) {
 
-            },
-            error: function (xhr, ajaxOptions, thrownError) {
+                openModal(data);
 
-            }
+              },
+              error: function (xhr, ajaxOptions, thrownError) {
+
+              }
+          });
+
         });
 
-      });
+      }
 
     }
 
