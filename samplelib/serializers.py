@@ -8,7 +8,7 @@ class SampleLibSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SampleLib
-        fields = ("id", "name", "barcode", "date", "method", "te_vol", "input_amount", "vol_init", "vol_remain", "DT_RowId",)
+        fields = ("id", "name", "barcode", "date", "method", "conc", "input_amount", "vol_init", "vol_remain", "DT_RowId",)
 
     def get_DT_RowId(self, obj):
        return getattr(obj, 'id')

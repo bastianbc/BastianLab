@@ -18,7 +18,7 @@ class SampleLib(models.Model):
     barcode = models.ForeignKey(Barcode, on_delete=models.CASCADE, verbose_name="Barcode")
     date = models.DateField(default=date.today, verbose_name="Date")
     method = models.ForeignKey("method.Method",related_name="sample_libs",on_delete=models.CASCADE, verbose_name="Method")
-    te_vol = models.FloatField(default=0, verbose_name="Te Volume")
+    conc = models.FloatField(default=0, verbose_name="Concentration")
     input_amount = models.FloatField(default=0, verbose_name="Input Amount")
     vol_init = models.FloatField(default=0, verbose_name="Volume Initialize")
     vol_remain = models.FloatField(default=0, verbose_name="Volume Remain")
@@ -56,7 +56,7 @@ class SampleLib(models.Model):
                 "2": "barcode",
                 "4": "date",
                 "5": "method",
-                "6": "te_vol",
+                "6": "conc",
                 "6": "input_amount",
                 "7": "vol_init",
                 "8": "vol_remain",

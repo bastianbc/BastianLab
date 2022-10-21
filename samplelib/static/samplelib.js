@@ -36,7 +36,7 @@ var KTDatatablesServerSide = function () {
                 { data: 'barcode' },
                 { data: 'date' },
                 { data: 'method' },
-                { data: 'te_vol' },
+                { data: 'conc' },
                 { data: 'input_amount' },
                 { data: 'vol_init' },
                 { data: 'vol_remain' },
@@ -461,8 +461,8 @@ var KTDatatablesServerSide = function () {
                label: "Method:",
                name: "method",
            }, {
-               label: "Te Volume:",
-               name: "te_vol"
+               label: "Concentration:",
+               name: "conc"
            }, {
                label: "Input Amount:",
                name: "input_amount",
