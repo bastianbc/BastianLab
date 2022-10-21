@@ -456,9 +456,49 @@ var KTDatatablesServerSide = function () {
         return JSON.stringify(options);
       }
 
+      function checkSelectedRows() {
+        // selected row's na type must be DNA
+        const container = document.querySelector('.table');
+
+        const selectedRows = container.querySelectorAll('[type="checkbox"]:checked');
+
+        for (var i = 0; i < selectedRows.length; i++) {
+
+          const parent = selectedRows[i].closest('tr');
+          // Get customer name
+          const na_type = parent.querySelectorAll('td')[3].innerText;
+
+          if (na_type != "DNA") {
+
+            return false;
+
+          }
+        }
+
+        return true;
+
+      }
+
       function openModal() {
 
-        modal.show();
+        if (checkSelectedRows()) {
+
+          modal.show();
+
+        }
+        else {
+
+          Swal.fire({
+              text: "Sample library can only be created from a nucleic acid of type DNA",
+              icon: "error",
+              buttonsStyling: false,
+              confirmButtonText: "Ok, got it!",
+              customClass: {
+                  confirmButton: "btn fw-bold btn-primary",
+              }
+          });
+
+        }
 
       }
 
