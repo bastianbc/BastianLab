@@ -1,0 +1,38 @@
+from rest_framework import serializers
+from .models import *
+
+class CapturedLibSerializer(serializers.ModelSerializer):
+    # block = serializers.IntegerField()
+    DT_RowId = serializers.SerializerMethodField()
+    barcode = serializers.StringRelatedField()
+
+    class Meta:
+        model = CapturedLib
+        fields = ("id", "name", "barcode", "date", "bait", "frag_size", "conc", "amp_cycle", "buffer", "nm", "vol_init", "vol_remain", "amount", "DT_RowId",)
+
+    def get_DT_RowId(self, obj):
+       return getattr(obj, 'id')
+
+class UsedSampleLibSerializer(serializers.ModelSerializer):
+    captured_lib = serializers.StringRelatedField()
+    name = serializers.SerializerMethodField()
+    conc = serializers.SerializerMethodField()
+    vol_remain = serializers.SerializerMethodField()
+    barcode = serializers.SerializerMethodField()
+    volume = serializers.IntegerField()
+
+    class Meta:
+        model = SL_CL_LINK
+        fields = ("captured_lib", "name", "conc", "vol_remain", "barcode", "volume", )
+
+    def get_name(self, obj):
+        return obj.sample_lib.name
+
+    def get_conc(self, obj):
+        return obj.sample_lib.conc
+
+    def get_vol_remain(self, obj):
+        return obj.sample_lib.vol_remain
+
+    def get_barcode(self, obj):
+        return obj.sample_lib.barcode.name

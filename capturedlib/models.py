@@ -18,11 +18,11 @@ class CapturedLib(models.Model):
     name = models.CharField(max_length=50, unique=True, verbose_name="Name")
     barcode = models.ForeignKey("samplelib.Barcode", on_delete=models.CASCADE, verbose_name="Barcode")
     date = models.DateField(default=date.today, verbose_name="Date")
-    bait = models.CharField(choices=BAIT_TYPES, verbose_name="Bait")
+    bait = models.CharField(max_length=20, choices=BAIT_TYPES, verbose_name="Bait")
     frag_size = models.FloatField(default=0, verbose_name="Input Amount")
     conc = models.FloatField(default=0, verbose_name="Concentration")
     amp_cycle = models.IntegerField(default=0)
-    buffer = models.CharField(choices=BUFFER_TYPES, verbose_name="Buffer")
+    buffer = models.CharField(max_length=20, choices=BUFFER_TYPES, verbose_name="Buffer")
     nm = models.FloatField(default=0, verbose_name="nM")
     vol_init = models.FloatField(default=0, verbose_name="Volume Initialize")
     vol_remain = models.FloatField(default=0, verbose_name="Volume Remain")
@@ -34,6 +34,17 @@ class CapturedLib(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def amount(self):
+        # calculates the amount: amount = vol_init * conc
+        result = 0
+        try:
+            result = self.conc * self.vol_init
+        except Exception as e:
+            pass
+
+        return result
 
     def query_by_args(self, user, **kwargs):
 

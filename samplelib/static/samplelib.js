@@ -121,6 +121,7 @@ var KTDatatablesServerSide = function () {
             handleDeleteRows();
             handleResetForm();
             initModal();
+            handleSelectedRows();
             KTMenu.createInstances();
         });
     }
@@ -510,10 +511,134 @@ var KTDatatablesServerSide = function () {
 
     }
 
+    var handleSelectedRows = (e) => {
+
+      document.getElementById("modal_capturedlib_options").addEventListener('show.bs.modal', function(e){
+
+        if (!checkSelectedRows()) {
+
+          Swal.fire({
+              text: "Identical barcodes are used in selected rows.",
+              icon: "error",
+              buttonsStyling: false,
+              confirmButtonText: "Ok, got it!",
+              customClass: {
+                  confirmButton: "btn fw-bold btn-primary",
+              }
+          });
+
+          return e.preventDefault()
+        }
+
+      });
+
+      function getSelectedRows() {
+
+        const container = document.querySelector('.table');
+
+        const selectedRows = container.querySelectorAll('[type="checkbox"]:checked');
+
+        const selectedIds = [];
+
+        selectedRows.forEach((p) => {
+          // Select parent row
+          const parent = p.closest('tr');
+          // Get customer name
+          const id = parent.querySelector('input[type=checkbox]').value;
+
+          selectedIds.push(id)
+
+        });
+
+        return JSON.stringify(selectedIds);
+      }
+
+      function getCreationOptions() {
+
+        var data = new FormData(document.getElementById('frm_creation_options'));
+        var options = Object.fromEntries(data.entries());
+
+        return JSON.stringify(options);
+      }
+
+      function checkSelectedRows() {
+        // selected row's na type must be DNA
+        var container = document.querySelector('.table');
+
+        var selectedRows = container.querySelectorAll('[type="checkbox"]:checked');
+
+        var barcodeList = [];
+
+        for (var i = 0; i < selectedRows.length; i++) {
+
+          const parent = selectedRows[i].closest('tr');
+          // Get barcode
+          const barcode = parent.querySelectorAll('td')[2].innerText;
+
+          if (barcodeList.indexOf(barcode) > -1 ) {
+
+            return false;
+
+          }
+
+          barcodeList.push(barcode);
+        }
+
+        return true;
+
+      }
+
+      document.getElementById("btn_continue").addEventListener('click', function () {
+
+        $.ajax({
+          type: "GET",
+          url: "/capturedlib/new_async",
+          data: {
+            "selected_ids": getSelectedRows(),
+            "options": getCreationOptions()
+          },
+        }).done(function(result) {
+          if (result.success) {
+            Swal.fire({
+                text: "Sample Library(s) was created succesfully.",
+                icon: "info",
+                buttonsStyling: false,
+                confirmButtonText: "Ok, got it!",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-success",
+                }
+            }).then(function(){
+              dt.draw();
+            });
+          }
+          else {
+            Swal.fire({
+                text: "Sample Library(s) was not created.",
+                icon: "error",
+                buttonsStyling: false,
+                confirmButtonText: "Ok, got it!",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-danger",
+                }
+            });
+          }
+
+        });
+
+      });
+
+      document.getElementById("id_prefix").addEventListener("keyup", function () {
+
+        this.value = this.value.toLocaleUpperCase();
+
+      });
+
+    }
+
     var initModal = () => {
 
-      const el = document.getElementById("modal_used_nacacids");
-      const modal = new bootstrap.Modal(el);
+      var el = document.getElementById("modal_used_nacacids");
+      var modal = new bootstrap.Modal(el);
 
       el.addEventListener('hide.bs.modal', function(){
 
@@ -527,16 +652,22 @@ var KTDatatablesServerSide = function () {
 
         for (var i = 0; i < data.length; i++) {
 
-          var row = `<div class="d-flex flex-stack">
-                      <span class="fs-6 fw-bold text-gray-800 text-hover-primary">${ data[i].sample_lib }</span>
-                      <span class="fs-6 fw-bold text-gray-800 text-hover-primary">${ data[i].nucacid }</span>
-                      <span class="fs-6 fw-bold text-gray-800 text-hover-primary">${ data[i].input_vol }</span>
-                      <span class="fs-6 fw-bold text-gray-800 text-hover-primary">${ data[i].input_amount }</span>
-                    </div>`;
+          // var row = `<div class="d-flex flex-stack">
+          //             <span class="fs-6 fw-bold text-gray-800 text-hover-primary">${ data[i].sample_lib }</span>
+          //             <span class="fs-6 fw-bold text-gray-800 text-hover-primary">${ data[i].nucacid }</span>
+          //             <span class="fs-6 fw-bold text-gray-800 text-hover-primary">${ data[i].input_vol }</span>
+          //             <span class="fs-6 fw-bold text-gray-800 text-hover-primary">${ data[i].input_amount }</span>
+          //           </div>`;
+          var row = `<div class="row mb-1">
+            <div class="col-3">${ data[i].sample_lib }</div>
+            <div class="col-3">${ data[i].nucacid }</div>
+            <div class="col-3 text-center">${ data[i].input_vol }</div>
+            <div class="col-3 text-center">${ data[i].input_amount }</div>
+          </div>
+          `;
 
           listEl.innerHTML += row;
         }
-
 
         modal.show();
 

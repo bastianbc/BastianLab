@@ -29,17 +29,21 @@ var KTDatatablesServerSide = function () {
               editor: editor,
               editOnFocus: true
             },
-            ajax: '/samplelib/filter_samplelibs',
+            ajax: '/capturedlib/filter_capturedlibs',
             columns: [
                 { data: null },
                 { data: 'name' },
                 { data: 'barcode' },
                 { data: 'date' },
-                { data: 'method' },
+                { data: 'bait' },
+                { data: 'frag_size' },
                 { data: 'conc' },
-                { data: 'input_amount' },
+                { data: 'amp_cycle' },
+                { data: 'buffer' },
+                { data: 'nm' },
                 { data: 'vol_init' },
                 { data: 'vol_remain' },
+                { data: 'amount' },
             ],
             columnDefs: [
                 {
@@ -53,7 +57,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 6,
+                    targets: 12,
                     orderable: false,
                     render: function (data, type, row) {
                         if (data > 0) {
@@ -65,7 +69,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 9,
+                    targets: 13,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -88,6 +92,14 @@ var KTDatatablesServerSide = function () {
                                 <div class="menu-item px-3">
                                     <a href="/samplelib/edit/`+ row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
                                         Edit
+                                    </a>
+                                </div>
+                                <!--end::Menu item-->
+
+                                <!--begin::Menu item-->
+                                <div class="menu-item px-3">
+                                    <a href="javascript:;" class="menu-link px-3 detail-link" data-kt-docs-table-filter="detail_row">
+                                        Used Sample Libraries
                                     </a>
                                 </div>
                                 <!--end::Menu item-->
@@ -512,7 +524,7 @@ var KTDatatablesServerSide = function () {
 
     var initModal = () => {
 
-      const el = document.getElementById("modal_used_nacacids");
+      const el = document.getElementById("modal_used_samplelibs");
       const modal = new bootstrap.Modal(el);
 
       el.addEventListener('hide.bs.modal', function(){
@@ -527,13 +539,14 @@ var KTDatatablesServerSide = function () {
 
         for (var i = 0; i < data.length; i++) {
 
-          var row = `<div class="d-flex flex-stack">
-                      <span class="fs-6 fw-bold text-gray-800 text-hover-primary">${ data[i].sample_lib }</span>
-                      <span class="fs-6 fw-bold text-gray-800 text-hover-primary">${ data[i].nucacid }</span>
-                      <span class="fs-6 fw-bold text-gray-800 text-hover-primary">${ data[i].input_vol }</span>
-                      <span class="fs-6 fw-bold text-gray-800 text-hover-primary">${ data[i].input_amount }</span>
-                    </div>`;
-
+          var row = `<div class="row mb-1">
+              <div class="col-2">${ data[i].name }</div>
+              <div class="col-2">${ data[i].conc }</div>
+              <div class="col-2 text-center">${ data[i].vol_remain }</div>
+              <div class="col-2 text-center">${ data[i].barcode }</div>
+              <div class="col-2 text-center"><input type="text" name="name" class="textinput textInput form-control form-control-sm"></div>
+              <div class="col-2 text-center"><input type="text" name="name" class="textinput textInput form-control form-control-sm"></div>
+            </div>`;
           listEl.innerHTML += row;
         }
 
@@ -564,7 +577,7 @@ var KTDatatablesServerSide = function () {
           const id = parent.querySelector('input[type=checkbox]').value;
 
           $.ajax({
-              url: "/samplelib/" + id + "/used_nucacids",
+              url: "/capturedlib/" + id + "/used_samplelibs",
               type: "GET",
               success: function (data) {
 

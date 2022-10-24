@@ -74,6 +74,7 @@ INSTALLED_APPS = [
     'core.apps.CoreConfig',
     'method.apps.MethodConfig',
     'samplelib',
+    'capturedlib',
 ]
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 CRISPY_FAIL_SILENTLY = not DEBUG

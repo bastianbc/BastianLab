@@ -14,6 +14,7 @@ from .serializers import *
 
 @permission_required("samplelib.view_samplelib",raise_exception=True)
 def samplelibs(request):
+    form = CapturedLibCreationOptionsForm()
     return render(request, "samplelib_list.html", locals())
 
 @login_required
