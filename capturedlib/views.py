@@ -139,3 +139,18 @@ def get_used_samplelibs(request,id):
     used_samplelibs = SL_CL_LINK.objects.filter(captured_lib__id=id)
     serializer = UsedSampleLibSerializer(used_samplelibs, many=True)
     return JsonResponse(serializer.data, safe=False)
+
+@permission_required("capturedlib.change_capturedlib",raise_exception=True)
+def update_async(request,id):
+    try:
+        values = json.loads(request.GET.get("values"))
+
+        for value in values:
+            link = SL_CL_LINK.objects.get(captured_lib__id=id,sample_lib__id=value["id"])
+            link.volume = float(value["volume"])
+            link.save()
+    except Exception as e:
+        print(str(e))
+        return JsonResponse({"success":False})
+
+    return JsonResponse({"success":True})

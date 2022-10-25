@@ -652,12 +652,6 @@ var KTDatatablesServerSide = function () {
 
         for (var i = 0; i < data.length; i++) {
 
-          // var row = `<div class="d-flex flex-stack">
-          //             <span class="fs-6 fw-bold text-gray-800 text-hover-primary">${ data[i].sample_lib }</span>
-          //             <span class="fs-6 fw-bold text-gray-800 text-hover-primary">${ data[i].nucacid }</span>
-          //             <span class="fs-6 fw-bold text-gray-800 text-hover-primary">${ data[i].input_vol }</span>
-          //             <span class="fs-6 fw-bold text-gray-800 text-hover-primary">${ data[i].input_amount }</span>
-          //           </div>`;
           var row = `<div class="row mb-1">
             <div class="col-3">${ data[i].sample_lib }</div>
             <div class="col-3">${ data[i].nucacid }</div>

@@ -132,7 +132,7 @@ var KTDatatablesServerSide = function () {
             toggleToolbars();
             handleDeleteRows();
             handleResetForm();
-            initModal();
+            initRowActions();
             KTMenu.createInstances();
         });
     }
@@ -522,76 +522,164 @@ var KTDatatablesServerSide = function () {
 
     }
 
-    var initModal = () => {
+    var initRowActions = () => {
 
       const el = document.getElementById("modal_used_samplelibs");
       const modal = new bootstrap.Modal(el);
 
-      el.addEventListener('hide.bs.modal', function(){
+      initModal();
 
-        closeModal();
+      function initModal() {
 
-      });
+        el.addEventListener('hide.bs.modal', function(){
 
-      function openModal(data) {
+          var listEl = document.querySelector(".list-body");
+
+          listEl.innerHTML = "";
+
+        });
+
+        var detailLinks = document.querySelectorAll(".detail-link");
+
+        for (var detail of detailLinks) {
+
+          detail.addEventListener("click", function (e) {
+            e.preventDefault();
+            // Select parent row
+            const parent = this.closest('tr');
+            // Get customer name
+            const id = parent.querySelector('input[type=checkbox]').value;
+
+            $.ajax({
+                url: "/capturedlib/" + id + "/used_samplelibs",
+                type: "GET",
+                success: function (data) {
+
+                  fillElements(id,data);
+
+                  initEvents();
+
+                  modal.show();
+
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+
+                }
+            });
+
+          });
+
+        }
+
+      }
+
+      function fillElements(id,data) {
 
         var listEl = document.querySelector(".list-body");
+
+        listEl.setAttribute('data-captured_lib_id', id);
 
         for (var i = 0; i < data.length; i++) {
 
           var row = `<div class="row mb-1">
-              <div class="col-2">${ data[i].name }</div>
+              <div class="col-2" data-id="${ data[i].id }">${ data[i].name }</div>
               <div class="col-2">${ data[i].conc }</div>
               <div class="col-2 text-center">${ data[i].vol_remain }</div>
               <div class="col-2 text-center">${ data[i].barcode }</div>
-              <div class="col-2 text-center"><input type="text" name="name" class="textinput textInput form-control form-control-sm"></div>
-              <div class="col-2 text-center"><input type="text" name="name" class="textinput textInput form-control form-control-sm"></div>
+              <div class="col-2 text-center"><input type="text" class="textinput textInput form-control form-control-sm detail-amount" value="${ data[i].amount }"></div>
+              <div class="col-2 text-center"><input type="text" class="textinput textInput form-control form-control-sm detail-volume" value="${ data[i].volume }"></div>
+            </div>
+            <div class="mt-5">
+              <button type="button" class="btn btn-lg btn-success" id="btn_save">Save</button>
             </div>`;
           listEl.innerHTML += row;
         }
 
+      }
 
-        modal.show();
+      function getValues() {
+
+        var rows = document.querySelector(".list-body").querySelectorAll(".row");
+
+        var values = [];
+
+        for (var row of rows) {
+
+          var id = row.querySelectorAll('div')[0].getAttribute("data-id");
+          var volume = row.querySelector(".detail-volume").value;
+
+          values.push({
+            "id":id,
+            "volume":volume
+          });
+        }
+
+        return JSON.stringify(values);
 
       }
 
-      function closeModal() {
+      function initEvents() {
 
-        var listEl = document.querySelector(".list-body");
+        for (var amount of document.querySelectorAll(".detail-amount")) {
 
-        listEl.innerHTML = "";
+          amount.addEventListener("change", function () {
 
-        // modal.hide();
+            var parent = this.closest('.row');
 
-      }
+            var conc = parent.querySelectorAll('div')[1].innerText;
 
-      const detailLinks = document.querySelectorAll(".detail-link");
+            var volume = this.value / conc;
 
-      for (var detail of detailLinks) {
+            parent.querySelector(".detail-volume").value = volume;
 
-        detail.addEventListener("click", function (e) {
-          e.preventDefault();
-          // Select parent row
-          const parent = this.closest('tr');
-          // Get customer name
-          const id = parent.querySelector('input[type=checkbox]').value;
+          });
+
+        }
+
+        var id = document.querySelector(".list-body").getAttribute("data-captured_lib_id");
+
+        document.getElementById("btn_save").addEventListener('click', function () {
 
           $.ajax({
-              url: "/capturedlib/" + id + "/used_samplelibs",
-              type: "GET",
-              success: function (data) {
+            type: "GET",
+            url: "/capturedlib/"+ id +"/update_async",
+            data: {
+              "values": getValues(),
+            },
+          }).done(function(result) {
+            if (result.success) {
+              Swal.fire({
+                  text: "Captured Library(s) was updated succesfully.",
+                  icon: "info",
+                  buttonsStyling: false,
+                  confirmButtonText: "Ok, got it!",
+                  customClass: {
+                      confirmButton: "btn fw-bold btn-success",
+                  }
+              }).then(function(){
+                dt.draw();
+              });
+            }
+            else {
+              Swal.fire({
+                  text: "Captured Library(s) was not updated.",
+                  icon: "error",
+                  buttonsStyling: false,
+                  confirmButtonText: "Ok, got it!",
+                  customClass: {
+                      confirmButton: "btn fw-bold btn-danger",
+                  }
+              });
+            }
 
-                openModal(data);
+            modal.hide();
 
-              },
-              error: function (xhr, ajaxOptions, thrownError) {
-
-              }
           });
 
         });
 
       }
+
     }
 
     // Public methods

@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import *
 
-# Register your models here.
+admin.site.register(CapturedLib)
+admin.site.register(SL_CL_LINK)

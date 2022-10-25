@@ -14,16 +14,20 @@ class CapturedLibSerializer(serializers.ModelSerializer):
        return getattr(obj, 'id')
 
 class UsedSampleLibSerializer(serializers.ModelSerializer):
-    captured_lib = serializers.StringRelatedField()
+    # captured_lib = serializers.StringRelatedField()
+    id = serializers.SerializerMethodField()
     name = serializers.SerializerMethodField()
     conc = serializers.SerializerMethodField()
     vol_remain = serializers.SerializerMethodField()
     barcode = serializers.SerializerMethodField()
-    volume = serializers.IntegerField()
+    volume = serializers.FloatField()
 
     class Meta:
         model = SL_CL_LINK
-        fields = ("captured_lib", "name", "conc", "vol_remain", "barcode", "volume", )
+        fields = ("captured_lib", "id","name", "conc", "vol_remain", "barcode", "volume", "amount", )
+
+    def get_id(self, obj):
+        return obj.sample_lib.id
 
     def get_name(self, obj):
         return obj.sample_lib.name

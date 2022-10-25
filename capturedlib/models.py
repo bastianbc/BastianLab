@@ -122,3 +122,14 @@ class SL_CL_LINK(models.Model):
 
     class Meta:
         db_table = "sl_cl_link"
+
+    @property
+    def amount(self):
+        # calculates the amount: amount = volume * conc
+        result = 0
+        try:
+            result = self.sample_lib.conc * self.volume
+        except Exception as e:
+            pass
+
+        return result

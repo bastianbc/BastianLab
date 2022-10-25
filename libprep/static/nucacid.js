@@ -457,22 +457,26 @@ var KTDatatablesServerSide = function () {
       }
 
       function checkSelectedRows() {
-        // selected row's na type must be DNA
+        // selected row's na type can not be together rna and dna
         const container = document.querySelector('.table');
 
         const selectedRows = container.querySelectorAll('[type="checkbox"]:checked');
 
+        var arr = [];
+
         for (var i = 0; i < selectedRows.length; i++) {
 
-          const parent = selectedRows[i].closest('tr');
-          // Get customer name
-          const na_type = parent.querySelectorAll('td')[3].innerText;
+          var naType = selectedRows[i].closest('tr').querySelectorAll('td')[3].innerText;
 
-          if (na_type != "DNA") {
+          arr.push(naType)
+        }
 
-            return false;
+        var naTypeSet = new Set(arr);
 
-          }
+        if (naTypeSet.size > 1) {
+
+          return false;
+
         }
 
         return true;
@@ -489,7 +493,7 @@ var KTDatatablesServerSide = function () {
         else {
 
           Swal.fire({
-              text: "Sample library can only be created from a nucleic acid of type DNA",
+              text: "DNA and RNA type nucleic acids cannot be together in the selected rows.",
               icon: "error",
               buttonsStyling: false,
               confirmButtonText: "Ok, got it!",
