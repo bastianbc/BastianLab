@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<form method="post" action="{% if id %} {% url 'edit-samplelib' id %} {% else %} {% url 'new-samplelib' %} {% endif %}">
+<form method="post" action="{% if id %} {% url 'edit-capturedlib' id %} {% else %} {% url 'new-capturedlib' %} {% endif %}">
   <div class="card">
     <div class="card-header">
       <h3 class="card-title">New Sample Library</h3>
@@ -24,7 +24,7 @@
       </div>
     </div>
     <div class="card-footer">
-      <a href="/samplelib" class="btn btn-secondary">Cancel</a>
+      <a href="/capturedlib" class="btn btn-secondary">Cancel</a>
       <button type="submit" class="btn btn-success">Save</button>
     </div>
   </div>

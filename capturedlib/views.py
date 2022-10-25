@@ -45,15 +45,15 @@ def edit_capturedlib_async(request):
 @permission_required("capturedlib.add_capturedlib",raise_exception=True)
 def new_capturedlib(request):
     if request.method=="POST":
-        form = SampleLibForm(request.POST)
+        form = CapturedLibForm(request.POST)
         if form.is_valid():
             capturedlib = form.save()
-            messages.success(request,"Sample Library %s was created successfully." % capturedlib.name)
+            messages.success(request,"Captured Library %s was created successfully." % capturedlib.name)
             return redirect("capturedlibs")
         else:
-            messages.error(request,"Sample Library wasn't created.")
+            messages.error(request,"Captured Library wasn't created.")
     else:
-        form = SampleLibForm()
+        form = CapturedLibForm()
 
     return render(request,"capturedlib.html",locals())
 
@@ -102,10 +102,10 @@ def edit_capturedlib(request,id):
         form = SampleLibForm(request.POST,instance=capturedlib)
         if form.is_valid():
             capturedlib = form.save()
-            messages.success(request,"Sample Library %s was updated successfully." % capturedlib.name)
+            messages.success(request,"Captured Library %s was updated successfully." % capturedlib.name)
             return redirect("capturedlibs")
         else:
-            messages.error(request,"Sample Library wasn't updated!")
+            messages.error(request,"Captured Library wasn't updated!")
     else:
         form = SampleLibForm(instance=capturedlib)
 
@@ -116,10 +116,10 @@ def delete_capturedlib(request,id):
     try:
         capturedlib = SampleLib.objects.get(id=id)
         capturedlib.delete()
-        messages.success(request,"Sample Library %s was deleted successfully." % capturedlib.name)
+        messages.success(request,"Captured Library %s was deleted successfully." % capturedlib.name)
         deleted = True
     except Exception as e:
-        messages.error(request, "Sample Library wasn't deleted!")
+        messages.error(request, "Captured Library wasn't deleted!")
         deleted = False
 
     return JsonResponse({"deleted":deleted })

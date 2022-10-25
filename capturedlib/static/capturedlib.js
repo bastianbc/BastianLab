@@ -97,7 +97,7 @@ var KTDatatablesServerSide = function () {
                                 <!--end::Menu item-->
 
                                 <!--begin::Menu item-->
-                                <div class="menu-item px-3">
+                                <div class="menu-item px-2">
                                     <a href="javascript:;" class="menu-link px-3 detail-link" data-kt-docs-table-filter="detail_row">
                                         Used Library(s)
                                     </a>
@@ -588,12 +588,15 @@ var KTDatatablesServerSide = function () {
               <div class="col-2 text-center">${ data[i].barcode }</div>
               <div class="col-2 text-center"><input type="text" class="textinput textInput form-control form-control-sm detail-amount" value="${ data[i].amount }"></div>
               <div class="col-2 text-center"><input type="text" class="textinput textInput form-control form-control-sm detail-volume" value="${ data[i].volume }"></div>
-            </div>
-            <div class="mt-5">
-              <button type="button" class="btn btn-lg btn-success" id="btn_save">Save</button>
             </div>`;
           listEl.innerHTML += row;
         }
+
+        var footer = `<div class="mt-5">
+              <button type="button" class="btn btn-lg btn-success" id="btn_save">Save</button>
+            </div>`;
+
+        listEl.innerHTML += footer;
 
       }
 
