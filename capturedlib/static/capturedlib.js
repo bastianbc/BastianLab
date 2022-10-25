@@ -557,6 +557,9 @@ var KTDatatablesServerSide = function () {
 
                   fillElements(id,data);
 
+                  updateTotalAmount();
+                  updateTotalVolume();
+
                   initEvents();
 
                   modal.show();
@@ -579,17 +582,21 @@ var KTDatatablesServerSide = function () {
 
         listEl.setAttribute('data-captured_lib_id', id);
 
+        var total_amount = 0;
+        var total_volume = 0;
+
         for (var i = 0; i < data.length; i++) {
 
           var row = `<div class="row mb-1">
-              <div class="col-2" data-id="${ data[i].id }">${ data[i].name }</div>
-              <div class="col-2">${ data[i].conc }</div>
-              <div class="col-2 text-center">${ data[i].vol_remain }</div>
-              <div class="col-2 text-center">${ data[i].barcode }</div>
-              <div class="col-2 text-center"><input type="text" class="textinput textInput form-control form-control-sm detail-amount" value="${ data[i].amount }"></div>
-              <div class="col-2 text-center"><input type="text" class="textinput textInput form-control form-control-sm detail-volume" value="${ data[i].volume }"></div>
+              <div class="col-2 align-self-center">${ data[i].name }</div>
+              <div class="col-2 align-self-center">${ data[i].conc }</div>
+              <div class="col-2 align-self-center text-center">${ data[i].vol_remain }</div>
+              <div class="col-2 align-self-center text-center">${ data[i].barcode }</div>
+              <div class="col-2 text-center"><input type="text" class="textinput textInput form-control form-control-sm text-end detail-amount" value="${ data[i].amount }"></div>
+              <div class="col-2 text-center"><input type="text" class="textinput textInput form-control form-control-sm text-end detail-volume" value="${ data[i].volume }"></div>
             </div>`;
           listEl.innerHTML += row;
+
         }
 
         var footer = `<div class="mt-5">
@@ -621,6 +628,34 @@ var KTDatatablesServerSide = function () {
 
       }
 
+      function updateTotalAmount() {
+
+        var total = 0;
+
+        for (var detail of document.querySelectorAll(".detail-amount")) {
+
+          total += parseFloat(detail.value);
+
+        }
+
+        document.querySelector("#total_amount").value = total;
+
+      }
+
+      function updateTotalVolume() {
+
+        var total = 0;
+
+        for (var detail of document.querySelectorAll(".detail-volume")) {
+
+          total += parseFloat(detail.value);
+
+        }
+
+        document.querySelector("#total_volume").value = total;
+
+      }
+
       function initEvents() {
 
         for (var amount of document.querySelectorAll(".detail-amount")) {
@@ -634,6 +669,9 @@ var KTDatatablesServerSide = function () {
             var volume = this.value / conc;
 
             parent.querySelector(".detail-volume").value = volume;
+
+            updateTotalAmount();
+            updateTotalVolume();
 
           });
 
