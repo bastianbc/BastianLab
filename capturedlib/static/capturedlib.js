@@ -99,7 +99,7 @@ var KTDatatablesServerSide = function () {
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
                                     <a href="javascript:;" class="menu-link px-3 detail-link" data-kt-docs-table-filter="detail_row">
-                                        Used Sample Libraries
+                                        Used Library(s)
                                     </a>
                                 </div>
                                 <!--end::Menu item-->
