@@ -343,7 +343,7 @@ var KTDatatablesServerSide = function () {
                         // Calling delete request with ajax
                         $.ajax({
                             type: "GET",
-                            url: "/samplelib/batch_delete",
+                            url: "/capturedlib/batch_delete",
                             data: {
                               "selected_ids": getSelectedRows(),
                             },

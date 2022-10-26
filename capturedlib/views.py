@@ -118,7 +118,7 @@ def edit_capturedlib(request,id):
 @permission_required("capturedlib.delete_capturedlib",raise_exception=True)
 def delete_capturedlib(request,id):
     try:
-        capturedlib = SampleLib.objects.get(id=id)
+        capturedlib = CapturedLib.objects.get(id=id)
         capturedlib.delete()
         messages.success(request,"Captured Library %s was deleted successfully." % capturedlib.name)
         deleted = True
@@ -132,7 +132,7 @@ def delete_capturedlib(request,id):
 def delete_batch_capturedlibs(request):
     try:
         selected_ids = json.loads(request.GET.get("selected_ids"))
-        SampleLib.objects.filter(id__in=selected_ids).delete()
+        CapturedLib.objects.filter(id__in=selected_ids).delete()
     except Exception as e:
         return JsonResponse({ "deleted":False })
 
