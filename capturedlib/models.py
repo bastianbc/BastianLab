@@ -115,6 +115,11 @@ class CapturedLib(models.Model):
             print(str(e))
             raise
 
+    def set_nm(self):
+        # Calculate CL.nM as CL.conc/660 * CL.frag_size * 10^6 and store in CL.nM
+        self.nm = round(self.conc/660 * self.frag_size * 10**6,2)
+        self.save()
+
 class SL_CL_LINK(models.Model):
     captured_lib = models.ForeignKey(CapturedLib,on_delete=models.CASCADE, verbose_name="Captured Library")
     sample_lib = models.ForeignKey("samplelib.SampleLib", on_delete=models.CASCADE, verbose_name="Sample Library")

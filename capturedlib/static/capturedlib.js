@@ -90,7 +90,7 @@ var KTDatatablesServerSide = function () {
                             <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4" data-kt-menu="true">
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/samplelib/edit/`+ row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
+                                    <a href="/capturedlib/edit/`+ row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
                                         Edit
                                     </a>
                                 </div>
@@ -106,7 +106,7 @@ var KTDatatablesServerSide = function () {
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/samplelib/delete/` + row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
+                                    <a href="/capturedlib/delete/` + row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
                                         Delete
                                     </a>
                                 </div>
@@ -448,7 +448,7 @@ var KTDatatablesServerSide = function () {
 
       editor = new $.fn.dataTable.Editor({
         ajax: {
-          url: "/samplelib/edit_samplelib_async",
+          url: "/capturedlib/edit_capturedlib_async",
           type: "POST",
           headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
           success: function () {
@@ -470,21 +470,40 @@ var KTDatatablesServerSide = function () {
                name: "date",
                type: "datetime"
            }, {
-               label: "Method:",
-               name: "method",
+               label: "Bait:",
+               name: "bait",
+               type: "select",
+               options : [
+                 {"label": "Type 1", "value": "type1"},
+                 {"label": "Type 2", "value": "type2"},
+                 {"label": "Type 3", "value": "type3"}
+               ]
+           },{
+               label: "Fragment Size:",
+               name: "frag_size"
            }, {
                label: "Concentration:",
                name: "conc"
            }, {
-               label: "Input Amount:",
-               name: "input_amount",
-               type: "readonly"
+               label: "AMP Cycle:",
+               name: "amp_cycle"
+           },{
+               label: "Buffer:",
+               name: "buffer"
+           },{
+               label: "nM:",
+               name: "nm",
            }, {
                label: "Volume Init:",
                name: "vol_init"
            }, {
                label: "Volume Remain:",
                name: "vol_remain"
+           },
+           {
+               label: "Amount:",
+               name: "amount",
+               type: "readonly"
            },
        ],
        formOptions: {

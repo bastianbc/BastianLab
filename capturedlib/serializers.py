@@ -5,6 +5,7 @@ class CapturedLibSerializer(serializers.ModelSerializer):
     # block = serializers.IntegerField()
     DT_RowId = serializers.SerializerMethodField()
     barcode = serializers.StringRelatedField()
+    nm = serializers.SerializerMethodField()
 
     class Meta:
         model = CapturedLib
@@ -12,6 +13,9 @@ class CapturedLibSerializer(serializers.ModelSerializer):
 
     def get_DT_RowId(self, obj):
        return getattr(obj, 'id')
+
+    def get_nm(self,obj):
+        return round(obj.nm,2)
 
 class UsedSampleLibSerializer(serializers.ModelSerializer):
     # captured_lib = serializers.StringRelatedField()

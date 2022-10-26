@@ -33,6 +33,10 @@ class SampleLib(models.Model):
     def save(self,*args,**kwargs):
         super().save(*args, **kwargs)
 
+    def update_volume(self, volume):
+        self.vol_remain = 0 if volume > self.vol_remain else self.vol_remain - volume
+        self.save()
+
     def query_by_args(self, user, **kwargs):
 
         def _get_authorizated_queryset():

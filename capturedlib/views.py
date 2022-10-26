@@ -1,10 +1,12 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 import json
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required,permission_required
 from .serializers import *
 from .models import *
 from samplelib.models import SampleLib, Barcode
+from .forms import *
+from django.contrib import messages
 
 @permission_required("capturedlib.view_capturedlib",raise_exception=True)
 def capturedlibs(request):
@@ -38,14 +40,16 @@ def edit_capturedlib_async(request):
                     v = None
                 parameters[r.groups()[1]] = v
 
-    custom_update(SampleLib,pk=parameters["pk"],parameters=parameters)
+    captured_lib = custom_update(CapturedLib,pk=parameters["pk"],parameters=parameters)
+
+    captured_lib.set_nm()
 
     return JsonResponse({"result":True})
 
 @permission_required("capturedlib.add_capturedlib",raise_exception=True)
 def new_capturedlib(request):
     if request.method=="POST":
-        form = CapturedLibForm(request.POST)
+        form = CapturedLibForm(request.POST, request.FILES)
         if form.is_valid():
             capturedlib = form.save()
             messages.success(request,"Captured Library %s was created successfully." % capturedlib.name)
@@ -96,10 +100,10 @@ def new_capturedlib_async(request):
 
 @permission_required("capturedlib.change_capturedlib",raise_exception=True)
 def edit_capturedlib(request,id):
-    capturedlib = SampleLib.objects.get(id=id)
+    capturedlib = CapturedLib.objects.get(id=id)
 
     if request.method=="POST":
-        form = SampleLibForm(request.POST,instance=capturedlib)
+        form = CapturedLibForm(request.POST,request.FILES,instance=capturedlib)
         if form.is_valid():
             capturedlib = form.save()
             messages.success(request,"Captured Library %s was updated successfully." % capturedlib.name)
@@ -107,7 +111,7 @@ def edit_capturedlib(request,id):
         else:
             messages.error(request,"Captured Library wasn't updated!")
     else:
-        form = SampleLibForm(instance=capturedlib)
+        form = CapturedLibForm(instance=capturedlib)
 
     return render(request,"capturedlib.html",locals())
 
@@ -144,11 +148,16 @@ def get_used_samplelibs(request,id):
 def update_async(request,id):
     try:
         values = json.loads(request.GET.get("values"))
+        captured_lib = CapturedLib.objects.get(id=id)
 
         for value in values:
-            link = SL_CL_LINK.objects.get(captured_lib__id=id,sample_lib__id=value["id"])
+            sample_lib = SampleLib.objects.get(id=value["id"])
+
+            link = SL_CL_LINK.objects.get(captured_lib=captured_lib,sample_lib=sample_lib)
             link.volume = float(value["volume"])
             link.save()
+
+            sample_lib.update_volume(value["volume"])
     except Exception as e:
         print(str(e))
         return JsonResponse({"success":False})

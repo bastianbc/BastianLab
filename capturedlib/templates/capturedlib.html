@@ -4,10 +4,10 @@
 
 {% block content %}
 
-<form method="post" action="{% if id %} {% url 'edit-capturedlib' id %} {% else %} {% url 'new-capturedlib' %} {% endif %}">
+<form method="post" action="{% if id %} {% url 'edit-capturedlib' id %} {% else %} {% url 'new-capturedlib' %} {% endif %}" enctype="multipart/form-data" >
   <div class="card">
     <div class="card-header">
-      <h3 class="card-title">New Sample Library</h3>
+      <h3 class="card-title">New Captured Library</h3>
     </div>
     <div class="card-body">
       {% csrf_token %}
@@ -15,11 +15,15 @@
         <div class="col-6">{{ form.name|as_crispy_field }}</div>
         <div class="col-6">{{ form.barcode|as_crispy_field }}</div>
         <div class="col-6">{{ form.date|as_crispy_field }}</div>
-        <div class="col-6">{{ form.method|as_crispy_field }}</div>
+        <div class="col-6">{{ form.bait|as_crispy_field }}</div>
+        <div class="col-6">{{ form.frag_size|as_crispy_field }}</div>
         <div class="col-6">{{ form.conc|as_crispy_field }}</div>
-        <div class="col-6">{{ form.input_amount|as_crispy_field }}</div>
+        <div class="col-6">{{ form.amp_cycle|as_crispy_field }}</div>
+        <div class="col-6">{{ form.buffer|as_crispy_field }}</div>
+        <div class="col-6">{{ form.nm|as_crispy_field }}</div>
         <div class="col-6">{{ form.vol_init|as_crispy_field }}</div>
         <div class="col-6">{{ form.vol_remain|as_crispy_field }}</div>
+        <div class="col-12">{{ form.pdf|as_crispy_field }}</div>
         <div class="col-12">{{ form.notes|as_crispy_field }}</div>
       </div>
     </div>
