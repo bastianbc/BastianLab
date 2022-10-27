@@ -149,15 +149,16 @@ def update_async(request,id):
     try:
         values = json.loads(request.GET.get("values"))
         captured_lib = CapturedLib.objects.get(id=id)
-
         for value in values:
+            volume = float(value["volume"])
+
             sample_lib = SampleLib.objects.get(id=value["id"])
 
             link = SL_CL_LINK.objects.get(captured_lib=captured_lib,sample_lib=sample_lib)
-            link.volume = float(value["volume"])
+            link.volume = volume
             link.save()
 
-            sample_lib.update_volume(value["volume"])
+            sample_lib.update_volume(volume)
     except Exception as e:
         print(str(e))
         return JsonResponse({"success":False})
