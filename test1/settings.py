@@ -75,6 +75,7 @@ INSTALLED_APPS = [
     'method.apps.MethodConfig',
     'samplelib',
     'capturedlib',
+    'sequencinglib',
 ]
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 CRISPY_FAIL_SILENTLY = not DEBUG

@@ -2,6 +2,10 @@
 
 {% load crispy_forms_tags %}
 
+{% block head %}
+
+{% endblock %}
+
 {% block content %}
 
 <!--begin::Wrapper-->
@@ -89,7 +93,7 @@
     <!--end::Menu 1-->
     <!--end::Filter-->
     <!--begin::Add record-->
-    <button type="button" class="btn btn-primary" onclick="window.location.href = '/capturedlib/new';">
+    <button type="button" class="btn btn-primary" onclick="window.location.href = '/samplelib/new';">
       <!--begin::Svg Icon | path: icons/duotune/arrows/arr075.svg-->
       <span class="svg-icon svg-icon-2">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -98,7 +102,7 @@
         </svg>
       </span>
       <!--end::Svg Icon-->
-      Add Captured Library
+      Add Sequencing Library
   </button>
     <!--end::Add record-->
   </div>
@@ -130,8 +134,8 @@
 
             <!--begin::Menu item-->
             <div class="menu-item px-3">
-                <a href="javascript:;" class="menu-link px-3" data-bs-toggle="modal" data-bs-target="#modal_sequencinglib_options">
-                    Create Sequencing Library
+                <a href="javascript:;" class="menu-link px-3" data-bs-toggle="modal" data-bs-target="#modal_capturedlib_options">
+                    Create Captured Library
                 </a>
             </div>
             <!--end::Menu item-->
@@ -176,17 +180,9 @@
             </div>
         </th>
         <th>Name</th>
-        <th>Barcode</th>
         <th>Date</th>
-        <th>Bait</th>
-        <th>Fragment Size</th>
-        <th>Concentration</th>
-        <th>AMP Style</th>
+        <th>NMol</th>
         <th>Buffer</th>
-        <th>nM</th>
-        <th>Vol Init</th>
-        <th>Vol Remain</th>
-        <th>Amount</th>
         <th class="text-end min-w-100px">Actions</th>
     </tr>
     {% csrf_token %}
@@ -197,7 +193,7 @@
 <!--end::Datatable-->
 
 <!--begin::Modal -->
-<div class="modal fade" id="modal_used_samplelibs" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="modal_used_capturedlibs" tabindex="-1" aria-hidden="true">
   <!--begin::Modal dialog-->
   <div class="modal-dialog modal-dialog-centered mw-800px">
     <!--begin::Modal content-->
@@ -205,7 +201,7 @@
       <!--begin::Modal header-->
       <div class="modal-header">
         <!--begin::Modal title-->
-        <h2>Used Sample Libraries</h2>
+        <h2>Used Nucleic Acids</h2>
         <!--end::Modal title-->
         <!--begin::Close-->
         <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
@@ -229,28 +225,21 @@
             <!--begin::Contact groups-->
             <div class="d-flex flex-column gap-5">
               <div class="list-header">
-                <div class="row d-flex justify-content-end mb-2">
-                  <div class="col-2 d-flex">
-                    <span class="align-self-center"><strong>Total:</strong></span>
-                  </div>
-                  <div class="col-2 bg-secondary p-2">
-                    <input type="text" class="textinput textInput form-control form-control-sm text-end" id="total_amount" value="">
-                  </div>
-                  <div class="col-2 bg-secondary p-2">
-                    <input type="text" class="textinput textInput form-control form-control-sm text-end" id="total_volume" value="">
-                  </div>
-                </div>
+                <!-- <div class="d-flex flex-stack">
+                  <a href="javascript:;" class="fs-6 fw-bold text-gray-800 text-hover-primary text-active-primary active">Sample Library</a>
+                  <a href="javascript:;" class="fs-6 fw-bold text-gray-800 text-hover-primary text-active-primary active">Nucleic Acid</a>
+                  <a href="javascript:;" class="fs-6 fw-bold text-gray-800 text-hover-primary text-active-primary active">Input Volume</a>
+                  <a href="javascript:;" class="fs-6 fw-bold text-gray-800 text-hover-primary text-active-primary active">Input Amount</a>
+                </div> -->
                 <div class="row text-light-dark bg-primary">
-                  <div class="col-2">Name</div>
-                  <div class="col-2">Concentration</div>
-                  <div class="col-2 text-center">Volume Remain</div>
-                  <div class="col-2 text-center">Barcode</div>
-                  <div class="col-2 text-center">Amount</div>
-                  <div class="col-2 text-center">Input Volume</div>
+                  <div class="col-3">Sample Library</div>
+                  <div class="col-3">Nucleic Acid</div>
+                  <div class="col-3 text-center">Input Volume</div>
+                  <div class="col-3 text-center">Input Amount</div>
                 </div>
               </div>
               <div class="list-body">
-                <!-- list area -->
+
               </div>
             </div>
             <!--end::Contact groups-->
@@ -268,16 +257,16 @@
 </div>
 <!--end::Modal -->
 
-<!--begin::Modal - Create App-->
-<div class="modal fade" id="modal_sequencinglib_options" tabindex="-1" aria-hidden="true">
+<!--begin::Modal -->
+<div class="modal fade" id="modal_capturedlib_options" tabindex="-1" aria-hidden="true">
   <!--begin::Modal dialog-->
-  <div class="modal-dialog modal-dialog-centered mw-500px">
+  <div class="modal-dialog modal-dialog-centered mw-800px">
     <!--begin::Modal content-->
     <div class="modal-content">
       <!--begin::Modal header-->
       <div class="modal-header">
         <!--begin::Modal title-->
-        <h2>Create Sequencing Library</h2>
+        <h2>Used Nucleic Acids</h2>
         <!--end::Modal title-->
         <!--begin::Close-->
         <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
@@ -295,116 +284,36 @@
       <!--end::Modal header-->
       <!--begin::Modal body-->
       <div class="modal-body py-lg-10 px-lg-10">
-        <!--begin::Stepper-->
-        <div class="stepper stepper-pills" id="modal_stepper">
-        <!--begin::Nav-->
-        <div class="stepper-nav flex-center flex-wrap mb-10">
-            <!--begin::Step 1-->
-            <div class="stepper-item current" data-kt-stepper-element="nav">
+        <div class="card card-flush">
+          <!--begin::Card body-->
+          <div class="card-body pt-5">
+            <form id="frm_creation_options">
+              {% csrf_token %}
+              {{ form | crispy }}
+              <!--begin::Actions-->
+              <div class="d-flex flex-stack pt-10">
                 <!--begin::Wrapper-->
-                <div class="stepper-wrapper d-flex align-items-center">
+                <div>
+                  <button type="button" class="btn btn-lg btn-primary" id="btn_continue">Continue
+                    <!--begin::Svg Icon | path: icons/duotune/arrows/arr064.svg-->
+                    <span class="svg-icon svg-icon-3 ms-1 me-0">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect opacity="0.5" x="18" y="13" width="13" height="2" rx="1" transform="rotate(-180 18 13)" fill="currentColor" />
+                        <path d="M15.4343 12.5657L11.25 16.75C10.8358 17.1642 10.8358 17.8358 11.25 18.25C11.6642 18.6642 12.3358 18.6642 12.75 18.25L18.2929 12.7071C18.6834 12.3166 18.6834 11.6834 18.2929 11.2929L12.75 5.75C12.3358 5.33579 11.6642 5.33579 11.25 5.75C10.8358 6.16421 10.8358 6.83579 11.25 7.25L15.4343 11.4343C15.7467 11.7467 15.7467 12.2533 15.4343 12.5657Z" fill="currentColor" />
+                      </svg>
+                    </span>
+                    <!--end::Svg Icon-->
+                  </button>
                 </div>
                 <!--end::Wrapper-->
-            </div>
-            <!--end::Step 1-->
-
-            <!--begin::Step 2-->
-            <div class="stepper-item" data-kt-stepper-element="nav">
-                <!--begin::Wrapper-->
-                <div class="stepper-wrapper d-flex align-items-center">
-                </div>
-                <!--end::Wrapper-->
-            </div>
-            <!--end::Step 2-->
-        </div>
-        <!--end::Nav-->
-
-            <!--begin::Form-->
-            <form class="form mx-auto" novalidate="novalidate" id="frm_creation_options" action="/sequencinglib/new_async">
-                <!--begin::Group-->
-                <div class="mb-5">
-                    <!--begin::Step 1-->
-                    <div class="flex-column current" data-kt-stepper-element="content">
-                        {{ form.sequencing_lib | as_crispy_field }}
-                    </div>
-                    <!--begin::Step 1-->
-
-                    <!--begin::Step 1-->
-                    <div class="flex-column" data-kt-stepper-element="content">
-                        <!--begin::Input group-->
-                        <div class="fv-row mb-10">
-                            {{ form.prefix | as_crispy_field }}
-                        </div>
-                        <!--end::Input group-->
-
-                        <!--begin::Input group-->
-                        <div class="fv-row mb-10">
-                            {{ form.date | as_crispy_field }}
-                        </div>
-                        <!--end::Input group-->
-
-                        <!--begin::Input group-->
-                        <div class="fv-row mb-10">
-                            {{ form.buffer | as_crispy_field }}
-                        </div>
-                        <!--end::Input group-->
-
-                        <!--begin::Input group-->
-                        <div class="fv-row mb-10">
-                            {{ form.conc | as_crispy_field }}
-                        </div>
-                        <!--end::Input group-->
-
-                        <!--begin::Input group-->
-                        <div class="fv-row mb-10">
-                            {{ form.vol_init | as_crispy_field }}
-                        </div>
-                        <!--end::Input group-->
-                    </div>
-                    <!--begin::Step 1-->
-                </div>
-                <!--end::Group-->
-
-                <!--begin::Actions-->
-                <div class="d-flex flex-stack">
-                    <!--begin::Wrapper-->
-                    <div class="me-2">
-                        <button type="button" class="btn btn-light btn-active-light-primary" data-kt-stepper-action="previous">
-                            Back
-                        </button>
-                    </div>
-                    <!--end::Wrapper-->
-
-                    <!--begin::Wrapper-->
-                    <div>
-                        <button type="button" class="btn btn-success" data-kt-stepper-action="submit">
-                            <span class="indicator-label">
-                                Submit
-                            </span>
-                            <span class="indicator-progress">
-                                Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
-                            </span>
-                        </button>
-
-                        <button type="button" class="btn btn-primary" data-kt-stepper-action="next">
-                            <!--begin::Svg Icon | path: icons/duotune/arrows/arr064.svg-->
-                            <span class="svg-icon svg-icon-3 ms-1 me-0">
-                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <rect opacity="0.5" x="18" y="13" width="13" height="2" rx="1" transform="rotate(-180 18 13)" fill="currentColor" />
-                                <path d="M15.4343 12.5657L11.25 16.75C10.8358 17.1642 10.8358 17.8358 11.25 18.25C11.6642 18.6642 12.3358 18.6642 12.75 18.25L18.2929 12.7071C18.6834 12.3166 18.6834 11.6834 18.2929 11.2929L12.75 5.75C12.3358 5.33579 11.6642 5.33579 11.25 5.75C10.8358 6.16421 10.8358 6.83579 11.25 7.25L15.4343 11.4343C15.7467 11.7467 15.7467 12.2533 15.4343 12.5657Z" fill="currentColor" />
-                              </svg>
-                            </span>
-                            <!--end::Svg Icon-->
-                            Continue
-                        </button>
-                    </div>
-                    <!--end::Wrapper-->
-                </div>
-                <!--end::Actions-->
+              </div>
+              <!--end::Actions-->
             </form>
-            <!--end::Form-->
+          </div>
+          <!--end::Card body-->
         </div>
-        <!--end::Stepper-->
+
+
       </div>
       <!--end::Modal body-->
     </div>
@@ -412,10 +321,11 @@
   </div>
   <!--end::Modal dialog-->
 </div>
-<!--end::Modal - Create App-->
+<!--end::Modal -->
+
 {% endblock %}
 
 {% block scripts %}
-<script src="static/capturedlib.js"></script>
-<script src="static/init.dateinput.capturedlib.js"></script>
+<script src="static/sequencinglib.js"></script>
+<script src="static/init.dateinput.sequencinglib.js"></script>
 {% endblock %}

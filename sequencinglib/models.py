@@ -2,54 +2,30 @@ from django.db import models
 from datetime import date
 from django.db.models import Q, Count
 
-class CapturedLib(models.Model):
-    BAIT_TYPES = (
-        ("Type 1", "type1"),
-        ("Type 2", "type2"),
-        ("Type 3", "type3"),
-    )
-
+class SequencingLib(models.Model):
     BUFFER_TYPES = (
-        ("Type 1", "type1"),
-        ("Type 2", "type2"),
-        ("Type 3", "type3"),
+        ("type1", "Type 1"),
+        ("type2", "Type 2"),
+        ("type3", "Type 3"),
     )
 
     name = models.CharField(max_length=50, unique=True, verbose_name="Name")
-    barcode = models.ForeignKey("samplelib.Barcode", on_delete=models.CASCADE, verbose_name="Barcode")
     date = models.DateField(default=date.today, verbose_name="Date")
-    bait = models.CharField(max_length=20, choices=BAIT_TYPES, verbose_name="Bait")
-    frag_size = models.FloatField(default=0, verbose_name="Input Amount")
-    conc = models.FloatField(default=0, verbose_name="Concentration")
-    amp_cycle = models.IntegerField(default=0)
+    nmol = models.FloatField(default=0, verbose_name="N Mol")
     buffer = models.CharField(max_length=20, choices=BUFFER_TYPES, verbose_name="Buffer")
-    nm = models.FloatField(default=0, verbose_name="nM")
-    vol_init = models.FloatField(default=0, verbose_name="Volume Initialize")
-    vol_remain = models.FloatField(default=0, verbose_name="Volume Remain")
     pdf = models.FileField(upload_to="uploads/")
     notes = models.TextField(blank=True, null=True, verbose_name="Notes")
 
     class Meta:
-        db_table = "captured_lib"
+        db_table = "sequencing_lib"
 
     def __str__(self):
         return self.name
 
-    @property
-    def amount(self):
-        # calculates the amount: amount = vol_init * conc
-        result = 0
-        try:
-            result = self.conc * self.vol_init
-        except Exception as e:
-            pass
-
-        return result
-
     def query_by_args(self, user, **kwargs):
 
         def _get_authorizated_queryset():
-            queryset = CapturedLib.objects.all()
+            queryset = SequencingLib.objects.all()
             if not user.is_superuser:
                 return queryset.filter(Q(area__block__project__technician=user) | Q(area__block__project__researcher=user))
             return queryset
@@ -66,14 +42,9 @@ class CapturedLib(models.Model):
         try:
             ORDER_COLUMN_CHOICES = {
                 "1": "name",
-                "2": "barcode",
-                "3": "date",
-                "4": "bait",
-                "5": "frag_size",
-                "6": "conc",
-                "7": "amp_cycle",
-                "8": "vol_init",
-                "9": "vol_remain",
+                "2": "date",
+                "3": "nmol",
+                "4": "buffer",
             }
             draw = int(kwargs.get('draw', None)[0])
             length = int(kwargs.get('length', None)[0])
@@ -115,26 +86,10 @@ class CapturedLib(models.Model):
             print(str(e))
             raise
 
-    def set_nm(self):
-        # Calculate CL.nM as CL.conc/660 * CL.frag_size * 10^6 and store in CL.nM
-        self.nm = round(self.conc/660 * self.frag_size * 10**6,2)
-        self.save()
-
-class SL_CL_LINK(models.Model):
-    captured_lib = models.ForeignKey(CapturedLib,on_delete=models.CASCADE, verbose_name="Captured Library")
-    sample_lib = models.ForeignKey("samplelib.SampleLib", on_delete=models.CASCADE, verbose_name="Sample Library")
+class CL_SEQL_LINK(models.Model):
+    sequencing_lib = models.ForeignKey(SequencingLib,on_delete=models.CASCADE, verbose_name="Sequencing Library")
+    captured_lib = models.ForeignKey("capturedlib.CapturedLib", on_delete=models.CASCADE, verbose_name="Captured Library")
     volume = models.FloatField(default=0, verbose_name="Volume")
 
     class Meta:
-        db_table = "sl_cl_link"
-
-    @property
-    def amount(self):
-        # calculates the amount: amount = volume * conc
-        result = 0
-        try:
-            result = self.sample_lib.conc * self.volume
-        except Exception as e:
-            pass
-
-        return result
+        db_table = "cl_seql_link"

@@ -10,6 +10,7 @@ from django.contrib import messages
 
 @permission_required("capturedlib.view_capturedlib",raise_exception=True)
 def capturedlibs(request):
+    form = SequencingLibCreationForm()
     return render(request, "capturedlib_list.html", locals())
 
 @login_required
