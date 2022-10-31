@@ -93,3 +93,8 @@ class CL_SEQL_LINK(models.Model):
 
     class Meta:
         db_table = "cl_seql_link"
+
+    @property
+    def persentage(self):
+        # calculates the amount: amount = volume * conc
+        return 0

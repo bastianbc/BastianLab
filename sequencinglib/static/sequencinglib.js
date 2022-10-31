@@ -77,6 +77,14 @@ var KTDatatablesServerSide = function () {
                                 <!--end::Menu item-->
 
                                 <!--begin::Menu item-->
+                                <div class="menu-item px-2">
+                                    <a href="javascript:;" class="menu-link px-3 detail-link" data-kt-docs-table-filter="detail_row">
+                                        Used Library(s)
+                                    </a>
+                                </div>
+                                <!--end::Menu item-->
+
+                                <!--begin::Menu item-->
                                 <div class="menu-item px-3">
                                     <a href="/sequencinglib/delete/` + row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
                                         Delete
@@ -104,7 +112,7 @@ var KTDatatablesServerSide = function () {
             toggleToolbars();
             handleDeleteRows();
             handleResetForm();
-            // initModal();
+            initRowActions();
             handleSelectedRows();
             KTMenu.createInstances();
         });
@@ -574,75 +582,206 @@ var KTDatatablesServerSide = function () {
 
     }
 
-    var initModal = () => {
+    var initRowActions = () => {
 
-      var el = document.getElementById("modal_used_nacacids");
-      var modal = new bootstrap.Modal(el);
+      const el = document.getElementById("modal_used_capturedlibs");
+      const modal = new bootstrap.Modal(el);
 
-      el.addEventListener('hide.bs.modal', function(){
+      initModal();
 
-        closeModal();
+      function initModal() {
 
-      });
+        el.addEventListener('hide.bs.modal', function(){
 
-      function openModal(data) {
+          var listEl = document.querySelector(".list-body");
+
+          listEl.innerHTML = "";
+
+        });
+
+        var detailLinks = document.querySelectorAll(".detail-link");
+
+        for (var detail of detailLinks) {
+
+          detail.addEventListener("click", function (e) {
+            e.preventDefault();
+            // Select parent row
+            const parent = this.closest('tr');
+            // Get customer name
+            const id = parent.querySelector('input[type=checkbox]').value;
+
+            $.ajax({
+                url: "/sequencinglib/" + id + "/used_capturedlibs",
+                type: "GET",
+                success: function (data) {
+
+                  fillElements(id,data);
+
+                  updateTotalPersentage();
+                  updateTotalVolume();
+
+                  initEvents();
+
+                  modal.show();
+
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+
+                }
+            });
+
+          });
+
+        }
+
+      }
+
+      function fillElements(id,data) {
 
         var listEl = document.querySelector(".list-body");
+
+        listEl.setAttribute('data-sequencing_lib_id', id);
+
+        var total_persentage = 0;
+        var total_volume = 0;
 
         for (var i = 0; i < data.length; i++) {
 
           var row = `<div class="row mb-1">
-            <div class="col-3">${ data[i].sample_lib }</div>
-            <div class="col-3">${ data[i].nucacid }</div>
-            <div class="col-3 text-center">${ data[i].input_vol }</div>
-            <div class="col-3 text-center">${ data[i].input_amount }</div>
-          </div>
-          `;
-
+              <div class="col-2 align-self-center" data-id="${ data[i].id }">${ data[i].name }</div>
+              <div class="col-2 align-self-center">${ data[i].frag_size }</div>
+              <div class="col-2 align-self-center text-center">${ data[i].vol_remain }</div>
+              <div class="col-1 align-self-center text-center">${ data[i].conc }</div>
+              <div class="col-1 align-self-center text-center">${ data[i].nm }</div>
+              <div class="col-2 text-center"><input type="text" class="textinput textInput form-control form-control-sm text-end detail-persentage" value="${ data[i].persentage }"></div>
+              <div class="col-2 text-center"><input type="text" class="textinput textInput form-control form-control-sm text-end detail-volume" value="${ data[i].volume }"></div>
+            </div>`;
           listEl.innerHTML += row;
+
         }
 
-        modal.show();
+        var footer = `<div class="mt-5">
+              <button type="button" class="btn btn-lg btn-success" id="btn_save">Save</button>
+            </div>`;
+
+        listEl.innerHTML += footer;
 
       }
 
-      function closeModal() {
+      function getValues() {
 
-        var listEl = document.querySelector(".list-body");
+        var rows = document.querySelector(".list-body").querySelectorAll(".row");
 
-        listEl.innerHTML = "";
+        var values = [];
 
-        // modal.hide();
+        for (var row of rows) {
+
+          var id = row.querySelectorAll('div')[0].getAttribute("data-id");
+          var volume = row.querySelector(".detail-volume").value;
+
+          values.push({
+            "id":id,
+            "volume":volume
+          });
+        }
+
+        return JSON.stringify(values);
 
       }
 
-      const detailLinks = document.querySelectorAll(".detail-link");
+      function updateTotalPersentage() {
 
-      for (var detail of detailLinks) {
+        var total = 0;
 
-        detail.addEventListener("click", function (e) {
-          e.preventDefault();
-          // Select parent row
-          const parent = this.closest('tr');
-          // Get customer name
-          const id = parent.querySelector('input[type=checkbox]').value;
+        for (var detail of document.querySelectorAll(".detail-amount")) {
+
+          total += parseFloat(detail.value);
+
+        }
+
+        // document.querySelector("#total_amount").value = total;
+
+      }
+
+      function updateTotalVolume() {
+
+        var total = 0;
+
+        for (var detail of document.querySelectorAll(".detail-volume")) {
+
+          total += parseFloat(detail.value);
+
+        }
+
+        // document.querySelector("#total_volume").value = total;
+
+      }
+
+      function initEvents() {
+
+        for (var amount of document.querySelectorAll(".detail-persentage")) {
+
+          amount.addEventListener("change", function () {
+
+            var parent = this.closest('.row');
+
+            var conc = parent.querySelectorAll('div')[1].innerText;
+
+            var volume = this.value / conc;
+
+            parent.querySelector(".detail-volume").value = volume;
+
+            updateTotalPersentage();
+            updateTotalVolume();
+
+          });
+
+        }
+
+        var id = document.querySelector(".list-body").getAttribute("data-captured_lib_id");
+
+        document.getElementById("btn_save").addEventListener('click', function () {
 
           $.ajax({
-              url: "/samplelib/" + id + "/used_nucacids",
-              type: "GET",
-              success: function (data) {
+            type: "GET",
+            url: "/capturedlib/"+ id +"/update_async",
+            data: {
+              "values": getValues(),
+            },
+          }).done(function(result) {
+            if (result.success) {
+              Swal.fire({
+                  text: "Captured Library(s) was updated succesfully.",
+                  icon: "info",
+                  buttonsStyling: false,
+                  confirmButtonText: "Ok, got it!",
+                  customClass: {
+                      confirmButton: "btn fw-bold btn-success",
+                  }
+              }).then(function(){
+                dt.draw();
+              });
+            }
+            else {
+              Swal.fire({
+                  text: "Captured Library(s) was not updated.",
+                  icon: "error",
+                  buttonsStyling: false,
+                  confirmButtonText: "Ok, got it!",
+                  customClass: {
+                      confirmButton: "btn fw-bold btn-danger",
+                  }
+              });
+            }
 
-                openModal(data);
+            modal.hide();
 
-              },
-              error: function (xhr, ajaxOptions, thrownError) {
-
-              }
           });
 
         });
 
       }
+
     }
 
     // Public methods

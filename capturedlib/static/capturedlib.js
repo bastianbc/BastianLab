@@ -132,7 +132,7 @@ var KTDatatablesServerSide = function () {
             toggleToolbars();
             handleDeleteRows();
             handleResetForm();
-            // initRowActions();
+            initRowActions();
             handleSelectedRows.init();
             KTMenu.createInstances();
         });

@@ -23,24 +23,27 @@ class UsedCapturedLibSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
     conc = serializers.SerializerMethodField()
     vol_remain = serializers.SerializerMethodField()
-    barcode = serializers.SerializerMethodField()
-    volume = serializers.FloatField()
+    frag_size = serializers.SerializerMethodField()
+    nm = serializers.SerializerMethodField()
 
     class Meta:
         model = CL_SEQL_LINK
-        fields = ("captured_lib", "id","name", "conc", "vol_remain", "barcode", "volume", "amount", )
+        fields = ("captured_lib", "id", "name", "conc", "frag_size", "vol_remain", "nm", "persentage", "volume",)
 
     def get_id(self, obj):
-        return obj.sample_lib.id
+        return obj.captured_lib.id
 
     def get_name(self, obj):
-        return obj.sample_lib.name
+        return obj.captured_lib.name
 
     def get_conc(self, obj):
-        return obj.sample_lib.conc
+        return obj.captured_lib.conc
 
     def get_vol_remain(self, obj):
-        return obj.sample_lib.vol_remain
+        return obj.captured_lib.vol_remain
 
-    def get_barcode(self, obj):
-        return obj.sample_lib.barcode.name
+    def get_frag_size(self, obj):
+        return obj.captured_lib.frag_size
+
+    def get_nm(self, obj):
+        return round(obj.captured_lib.nm,2)

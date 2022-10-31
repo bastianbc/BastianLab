@@ -195,13 +195,13 @@
 <!--begin::Modal -->
 <div class="modal fade" id="modal_used_capturedlibs" tabindex="-1" aria-hidden="true">
   <!--begin::Modal dialog-->
-  <div class="modal-dialog modal-dialog-centered mw-800px">
+  <div class="modal-dialog modal-dialog-centered mw-900px">
     <!--begin::Modal content-->
     <div class="modal-content">
       <!--begin::Modal header-->
       <div class="modal-header">
         <!--begin::Modal title-->
-        <h2>Used Nucleic Acids</h2>
+        <h2>Used Captured Libraries</h2>
         <!--end::Modal title-->
         <!--begin::Close-->
         <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
@@ -225,17 +225,25 @@
             <!--begin::Contact groups-->
             <div class="d-flex flex-column gap-5">
               <div class="list-header">
-                <!-- <div class="d-flex flex-stack">
-                  <a href="javascript:;" class="fs-6 fw-bold text-gray-800 text-hover-primary text-active-primary active">Sample Library</a>
-                  <a href="javascript:;" class="fs-6 fw-bold text-gray-800 text-hover-primary text-active-primary active">Nucleic Acid</a>
-                  <a href="javascript:;" class="fs-6 fw-bold text-gray-800 text-hover-primary text-active-primary active">Input Volume</a>
-                  <a href="javascript:;" class="fs-6 fw-bold text-gray-800 text-hover-primary text-active-primary active">Input Amount</a>
-                </div> -->
+                <div class="row d-flex justify-content-end mb-2">
+                  <div class="col-2 d-flex">
+                    <span class="align-self-center"><strong>Total:</strong></span>
+                  </div>
+                  <div class="col-2 bg-secondary p-2">
+                    <input type="text" class="textinput textInput form-control form-control-sm text-end" id="total_percentage" value="">
+                  </div>
+                  <div class="col-2 bg-secondary p-2">
+                    <input type="text" class="textinput textInput form-control form-control-sm text-end" id="total_volume" value="">
+                  </div>
+                </div>
                 <div class="row text-light-dark bg-primary">
-                  <div class="col-3">Sample Library</div>
-                  <div class="col-3">Nucleic Acid</div>
-                  <div class="col-3 text-center">Input Volume</div>
-                  <div class="col-3 text-center">Input Amount</div>
+                  <div class="col-2">Name</div>
+                  <div class="col-2">Fragment Size</div>
+                  <div class="col-2">Volume Remain</div>
+                  <div class="col-1">Conc.</div>
+                  <div class="col-1">nM</div>
+                  <div class="col-2 text-center">Persentage</div>
+                  <div class="col-2 text-center">Volume</div>
                 </div>
               </div>
               <div class="list-body">

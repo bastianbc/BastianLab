@@ -172,7 +172,7 @@ def delete_batch_sequencinglibs(request):
 @permission_required("sequencinglib.view_sequencinglib",raise_exception=True)
 def get_used_capturedlibs(request,id):
     used_capturedlibs = CL_SEQL_LINK.objects.filter(sequencing_lib__id=id)
-    serializer = UsedSampleLibSerializer(used_samplelibs, many=True)
+    serializer = UsedCapturedLibSerializer(used_capturedlibs, many=True)
     return JsonResponse(serializer.data, safe=False)
 
 @permission_required("sequencinglib.change_sequencinglib",raise_exception=True)
