@@ -15,3 +15,8 @@ class SequencingLibCreationForm(forms.Form):
     buffer = forms.ChoiceField(choices=SequencingLib.BUFFER_TYPES)
     conc = forms.FloatField(initial=0, label="Concentration")
     vol_init = forms.FloatField(initial=0, label="Initialize Volume")
+
+class SequencingLibForm(forms.ModelForm):
+    class Meta:
+        model = SequencingLib
+        fields = "__all__"

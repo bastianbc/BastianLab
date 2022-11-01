@@ -99,15 +99,19 @@ def new_sequencinglib_async(request):
 
     return JsonResponse({"success":True})
 
+@permission_required("sequencinglib.view_sequencinglib",raise_exception=True)
+def get_sequencinglib_async(request,id):
+    sequencing_lib = SequencingLib.objects.get(id=id)
+    serializer = SequencingLibSerializer(sequencing_lib)
+    return JsonResponse(serializer.data, safe=False)
+
 @permission_required("sequencinglib.add_sequencinglib",raise_exception=True)
 def recreate_sequencinglib_async(request):
-
     selected_ids = json.loads(request.GET.get("selected_ids"))
     options = json.loads(request.GET.get("options"))
 
     try:
-        sequencing_lib = SequencingLib.objects.get(id=options["id"])
-
+        sequencing_lib = SequencingLib.objects.get(id=options["sequencing_lib"])
         capturedlibs = CapturedLib.objects.filter(id__in=selected_ids)
 
         CL_SEQL_LINK.objects.filter(sequencing_lib=sequencing_lib).delete()

@@ -4,15 +4,15 @@ from django.db.models import Q, Count
 
 class CapturedLib(models.Model):
     BAIT_TYPES = (
-        ("Type 1", "type1"),
-        ("Type 2", "type2"),
-        ("Type 3", "type3"),
+        ("type1", "Type 1"),
+        ("type2", "Type 2"),
+        ("type3", "Type 3"),
     )
 
     BUFFER_TYPES = (
-        ("Type 1", "type1"),
-        ("Type 2", "type2"),
-        ("Type 3", "type3"),
+        ("type1", "Type 1"),
+        ("type2", "Type 2"),
+        ("type3", "Type 3"),
     )
 
     name = models.CharField(max_length=50, unique=True, verbose_name="Name")

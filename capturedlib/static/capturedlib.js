@@ -745,8 +745,24 @@ var KTDatatablesServerSide = function () {
 
     var handleSelectedRows = ((e) => {
 
+      var stepper = new KTStepper(document.getElementById("modal_stepper"));
+
+      var modal = new bootstrap.Modal(document.getElementById("modal_sequencinglib_options"));
+
       function initModal() {
         var isInit = false;
+
+        function resetStepper() {
+
+          stepper.goFirst();
+
+        }
+
+        function resetForm() {
+
+          document.getElementById("frm_creation_options").reset();
+
+        }
 
         document.getElementById("modal_sequencinglib_options").addEventListener('show.bs.modal', function(e){
 
@@ -780,13 +796,64 @@ var KTDatatablesServerSide = function () {
 
         document.getElementById("modal_sequencinglib_options").addEventListener('hide.bs.modal', function(e){
 
-          document.getElementById("frm_creation_options").reset();
+          resetForm();
+
+          resetStepper();
 
         });
 
       }
 
       function initEvents() {
+
+        function handleSpinner(state) {
+
+          if (state) {
+
+            document.querySelector('[data-kt-stepper-action="next"]').setAttribute("data-kt-indicator", "on");
+
+          }
+          else {
+
+            document.querySelector('[data-kt-stepper-action="next"]').removeAttribute("data-kt-indicator");
+
+          }
+
+        }
+
+        function handleData(data) {
+
+          document.getElementById("id_prefix").value = data.name;
+          document.getElementById("id_date").value = data.date;
+          document.getElementById("id_buffer").value = data.buffer;
+
+        }
+
+        function handleFormAction(state) {
+
+          var frm = document.getElementById('frm_creation_options');
+          var url = "";
+
+          if (state) {
+
+            url = "/sequencinglib/recreate_sequencinglib_async";
+
+          }
+          else {
+
+            url = "/sequencinglib/new_async";
+
+          }
+
+          frm.setAttribute("action",url);
+
+        }
+
+        function getFormAction() {
+
+          return document.getElementById('frm_creation_options').getAttribute("action")
+
+        }
 
         document.getElementById("id_prefix").addEventListener("keyup", function () {
 
@@ -796,21 +863,37 @@ var KTDatatablesServerSide = function () {
 
         document.getElementById("id_sequencing_lib").addEventListener("change", function () {
 
-          var frm = document.getElementById('frm_creation_options');
-          var url = "";
+          $.ajax({
+            type: "GET",
+            url: "/sequencinglib/get_sequencinglib_async/" + this.value,
+            beforeSend: function () {
 
-          if (this.value == null || this.value == "") {
+              handleSpinner(true);
 
-            url = "/sequencinglib/new_async";
+            }
+          }).done(function(data) {
+            if (data) {
 
-          }
-          else {
+              handleSpinner(false);
 
-            url = "/sequencinglib/recreate_sequencinglib_async";
+              handleData(data);
 
-          }
+              handleFormAction(true);
 
-          frm.setAttribute("action",url);
+            }
+            else {
+              Swal.fire({
+                  text: "Sequencing Library(s) was not created.",
+                  icon: "error",
+                  buttonsStyling: false,
+                  confirmButtonText: "Ok, got it!",
+                  customClass: {
+                      confirmButton: "btn fw-bold btn-danger",
+                  }
+              });
+            }
+
+          });
 
         });
 
@@ -818,7 +901,7 @@ var KTDatatablesServerSide = function () {
 
           $.ajax({
             type: "GET",
-            url: "/sequencinglib/new_async",
+            url: getFormAction(),
             data: {
               "selected_ids": getSelectedRows(),
               "options": getCreationOptions()
@@ -834,6 +917,9 @@ var KTDatatablesServerSide = function () {
                       confirmButton: "btn fw-bold btn-success",
                   }
               }).then(function(){
+
+                modal.hide();
+
                 dt.draw();
               });
             }
@@ -856,10 +942,6 @@ var KTDatatablesServerSide = function () {
       }
 
       function initStepper() {
-
-        const element = document.querySelector("#modal_stepper");
-
-        const stepper = new KTStepper(element);
 
         if (Object.keys(stepper).length !== 0) { //isEmpty
 
