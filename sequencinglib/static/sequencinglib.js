@@ -70,7 +70,7 @@ var KTDatatablesServerSide = function () {
                             <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4" data-kt-menu="true">
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/samplelib/edit/`+ row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
+                                    <a href="/sequencinglib/edit/`+ row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
                                         Edit
                                     </a>
                                 </div>
@@ -719,13 +719,13 @@ var KTDatatablesServerSide = function () {
 
       function initEvents() {
 
-        for (var amount of document.querySelectorAll(".detail-persentage")) {
+        for (var persentage of document.querySelectorAll(".detail-persentage")) {
 
-          amount.addEventListener("change", function () {
+          persentage.addEventListener("change", function () {
 
             var parent = this.closest('.row');
 
-            var conc = parent.querySelectorAll('div')[1].innerText;
+            var conc = parent.querySelectorAll('div')[3].innerText;
 
             var volume = this.value / conc;
 

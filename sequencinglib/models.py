@@ -13,7 +13,7 @@ class SequencingLib(models.Model):
     date = models.DateField(default=date.today, verbose_name="Date")
     nmol = models.FloatField(default=0, verbose_name="N Mol")
     buffer = models.CharField(max_length=20, choices=BUFFER_TYPES, verbose_name="Buffer")
-    pdf = models.FileField(upload_to="uploads/")
+    pdf = models.FileField(upload_to="uploads/", null=True, blank=True)
     notes = models.TextField(blank=True, null=True, verbose_name="Notes")
 
     class Meta:

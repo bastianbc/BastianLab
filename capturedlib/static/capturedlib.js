@@ -452,7 +452,19 @@ var KTDatatablesServerSide = function () {
           url: "/capturedlib/edit_capturedlib_async",
           type: "POST",
           headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
-          success: function () {
+          success: function (result) {
+              if (!result.success) {
+                Swal.fire({
+                    text: "Error occurred during data update.",
+                    icon: "error",
+                    buttonsStyling: false,
+                    confirmButtonText: "Ok, got it!",
+                    customClass: {
+                        confirmButton: "btn fw-bold btn-primary",
+                    }
+                });
+              }
+
               dt.draw();
           },
           error: function (xhr, ajaxOptions, thrownError) {
@@ -463,9 +475,6 @@ var KTDatatablesServerSide = function () {
         fields: [ {
                label: "Name:",
                name: "name"
-           }, {
-               label: "Barcode:",
-               name: "barcode"
            }, {
                label: "Date:",
                name: "date",
@@ -482,7 +491,7 @@ var KTDatatablesServerSide = function () {
            },{
                label: "Fragment Size:",
                name: "frag_size"
-           }, {
+           },{
                label: "Concentration:",
                name: "conc"
            }, {
@@ -492,9 +501,6 @@ var KTDatatablesServerSide = function () {
                label: "Buffer:",
                name: "buffer"
            },{
-               label: "nM:",
-               name: "nm",
-           }, {
                label: "Volume Init:",
                name: "vol_init"
            }, {
@@ -776,6 +782,10 @@ var KTDatatablesServerSide = function () {
                 customClass: {
                     confirmButton: "btn fw-bold btn-primary",
                 }
+            }).then(function () {
+
+              modal.hide();
+
             });
 
           }

@@ -32,20 +32,24 @@ def edit_capturedlib_async(request):
 
     parameters = {}
 
-    for k,v in request.POST.items():
-        if k.startswith('data'):
-            r = re.match(r"data\[(\d+)\]\[(\w+)\]", k)
-            if r:
-                parameters["pk"] = r.groups()[0]
-                if v == '':
-                    v = None
-                parameters[r.groups()[1]] = v
+    try:
+        for k,v in request.POST.items():
+            if k.startswith('data'):
+                r = re.match(r"data\[(\d+)\]\[(\w+)\]", k)
+                if r:
+                    parameters["pk"] = r.groups()[0]
+                    if v == '':
+                        v = None
+                    parameters[r.groups()[1]] = v
 
-    captured_lib = custom_update(CapturedLib,pk=parameters["pk"],parameters=parameters)
+        captured_lib = custom_update(CapturedLib,pk=parameters["pk"],parameters=parameters)
 
-    captured_lib.set_nm()
+        captured_lib.set_nm()
+    except Exception as e:
+        print("%s in %s" % (str(e),__file__))
+        return JsonResponse({"success":False})
 
-    return JsonResponse({"result":True})
+    return JsonResponse({"success":True})
 
 @permission_required("capturedlib.add_capturedlib",raise_exception=True)
 def new_capturedlib(request):

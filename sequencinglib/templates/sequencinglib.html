@@ -13,13 +13,10 @@
       {% csrf_token %}
       <div class="row">
         <div class="col-6">{{ form.name|as_crispy_field }}</div>
-        <div class="col-6">{{ form.barcode|as_crispy_field }}</div>
         <div class="col-6">{{ form.date|as_crispy_field }}</div>
-        <div class="col-6">{{ form.method|as_crispy_field }}</div>
-        <div class="col-6">{{ form.conc|as_crispy_field }}</div>
-        <div class="col-6">{{ form.input_amount|as_crispy_field }}</div>
-        <div class="col-6">{{ form.vol_init|as_crispy_field }}</div>
-        <div class="col-6">{{ form.vol_remain|as_crispy_field }}</div>
+        <div class="col-6">{{ form.nmol|as_crispy_field }}</div>
+        <div class="col-6">{{ form.buffer|as_crispy_field }}</div>
+        <div class="col-6">{{ form.pdf|as_crispy_field }}</div>
         <div class="col-12">{{ form.notes|as_crispy_field }}</div>
       </div>
     </div>

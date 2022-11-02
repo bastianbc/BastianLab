@@ -4,7 +4,7 @@ from .models import *
 class SequencingLibSerializer(serializers.ModelSerializer):
     # block = serializers.IntegerField()
     DT_RowId = serializers.SerializerMethodField()
-    buffer = serializers.StringRelatedField()
+    buffer = serializers.SerializerMethodField()
     nmol = serializers.SerializerMethodField()
 
     class Meta:
@@ -16,6 +16,9 @@ class SequencingLibSerializer(serializers.ModelSerializer):
 
     def get_nmol(self,obj):
         return round(obj.nmol,2)
+
+    def get_buffer(self,obj):
+        return obj.get_buffer_display()
 
 class UsedCapturedLibSerializer(serializers.ModelSerializer):
     # captured_lib = serializers.StringRelatedField()

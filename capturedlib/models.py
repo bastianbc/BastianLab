@@ -18,15 +18,15 @@ class CapturedLib(models.Model):
     name = models.CharField(max_length=50, unique=True, verbose_name="Name")
     barcode = models.ForeignKey("samplelib.Barcode", on_delete=models.CASCADE, verbose_name="Barcode")
     date = models.DateField(default=date.today, verbose_name="Date")
-    bait = models.CharField(max_length=20, choices=BAIT_TYPES, verbose_name="Bait")
-    frag_size = models.FloatField(default=0, verbose_name="Input Amount")
+    bait = models.CharField(max_length=20, choices=BAIT_TYPES, verbose_name="Bait", null=True, blank=True)
+    frag_size = models.FloatField(default=0, verbose_name="Fragment Size")
     conc = models.FloatField(default=0, verbose_name="Concentration")
     amp_cycle = models.IntegerField(default=0)
-    buffer = models.CharField(max_length=20, choices=BUFFER_TYPES, verbose_name="Buffer")
+    buffer = models.CharField(max_length=20, choices=BUFFER_TYPES, verbose_name="Buffer", null=True, blank=True)
     nm = models.FloatField(default=0, verbose_name="nM")
     vol_init = models.FloatField(default=0, verbose_name="Volume Initialize")
     vol_remain = models.FloatField(default=0, verbose_name="Volume Remain")
-    pdf = models.FileField(upload_to="uploads/")
+    pdf = models.FileField(upload_to="uploads/", null=True, blank=True)
     notes = models.TextField(blank=True, null=True, verbose_name="Notes")
 
     class Meta:
@@ -117,8 +117,12 @@ class CapturedLib(models.Model):
 
     def set_nm(self):
         # Calculate CL.nM as CL.conc/660 * CL.frag_size * 10^6 and store in CL.nM
-        self.nm = round(self.conc/660 * self.frag_size * 10**6,2)
-        self.save()
+        try:
+            self.nm = round(self.conc/660 * float(self.frag_size) * 10**6,2)
+            self.save()
+        except Exception as e:
+            print("%s in %s" % (str(e),__file__))
+            raise
 
 class SL_CL_LINK(models.Model):
     captured_lib = models.ForeignKey(CapturedLib,on_delete=models.CASCADE, verbose_name="Captured Library")
