@@ -203,3 +203,6 @@ def make_sequencinglib_async(request,id):
         return JsonResponse({"success":False})
 
     return JsonResponse({"success":True})
+
+def create_ilab_sheet(request):    
+    return JsonResponse({"result":False})

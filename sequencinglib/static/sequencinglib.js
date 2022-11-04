@@ -623,7 +623,7 @@ var KTDatatablesServerSide = function () {
 
                   fillElements(id);
 
-                  updateTotalPersentage();
+                  updateTotalPercentage();
                   updateTotalVolume();
                   updateBufferAmount();
                   updateVolumeRemain();
@@ -725,7 +725,7 @@ var KTDatatablesServerSide = function () {
 
       }
 
-      function updateTotalPersentage() {
+      function updateTotalPercentage() {
 
         var total = 0;
 
@@ -795,7 +795,7 @@ var KTDatatablesServerSide = function () {
 
             row.querySelector(".detail-volume").value = volume.toFixed(2);
 
-            updateTotalPersentage();
+            updateTotalPercentage();
             updateTotalVolume();
             updateBufferAmount();
             updateVolumeRemain();
