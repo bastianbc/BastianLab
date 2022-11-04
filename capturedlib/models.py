@@ -124,6 +124,10 @@ class CapturedLib(models.Model):
             print("%s in %s" % (str(e),__file__))
             raise
 
+    def update_volume(self, volume):
+        self.vol_remain = 0 if volume > self.vol_remain else self.vol_remain - volume
+        self.save()
+
 class SL_CL_LINK(models.Model):
     captured_lib = models.ForeignKey(CapturedLib,on_delete=models.CASCADE, verbose_name="Captured Library")
     sample_lib = models.ForeignKey("samplelib.SampleLib", on_delete=models.CASCADE, verbose_name="Sample Library")

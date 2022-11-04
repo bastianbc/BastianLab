@@ -93,7 +93,7 @@
     <!--end::Menu 1-->
     <!--end::Filter-->
     <!--begin::Add record-->
-    <button type="button" class="btn btn-primary" onclick="window.location.href = '/samplelib/new';">
+    <button type="button" class="btn btn-primary" onclick="window.location.href = '/sequencinglib/new';">
       <!--begin::Svg Icon | path: icons/duotune/arrows/arr075.svg-->
       <span class="svg-icon svg-icon-2">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -225,6 +225,14 @@
             <!--begin::Contact groups-->
             <div class="d-flex flex-column gap-5">
               <div class="list-header">
+                <div class="row d-flex justify-content-end mb-2">
+                  <div class="col-4 d-flex">
+                    <span class="align-self-center"><strong>Amount of buffer to add:</strong></span>
+                  </div>
+                  <div class="col-2 bg-secondary p-2">
+                    <input type="text" class="textinput textInput form-control form-control-sm text-end" id="buffer_amount" value="">
+                  </div>
+                </div>
                 <div class="row d-flex justify-content-end mb-2">
                   <div class="col-2 d-flex">
                     <span class="align-self-center"><strong>Total:</strong></span>

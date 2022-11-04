@@ -519,7 +519,7 @@ var KTDatatablesServerSide = function () {
               }
           });
 
-          return e.preventDefault()
+          return e.preventDefault();
         }
 
       });
@@ -587,6 +587,8 @@ var KTDatatablesServerSide = function () {
       const el = document.getElementById("modal_used_capturedlibs");
       const modal = new bootstrap.Modal(el);
 
+      var data = {};
+
       initModal();
 
       function initModal() {
@@ -596,6 +598,8 @@ var KTDatatablesServerSide = function () {
           var listEl = document.querySelector(".list-body");
 
           listEl.innerHTML = "";
+
+          data = {};
 
         });
 
@@ -613,12 +617,16 @@ var KTDatatablesServerSide = function () {
             $.ajax({
                 url: "/sequencinglib/" + id + "/used_capturedlibs",
                 type: "GET",
-                success: function (data) {
+                success: function (retval) {
 
-                  fillElements(id,data);
+                  data = retval;
+
+                  fillElements(id);
 
                   updateTotalPersentage();
                   updateTotalVolume();
+                  updateBufferAmount();
+                  updateVolumeRemain();
 
                   initEvents();
 
@@ -636,32 +644,60 @@ var KTDatatablesServerSide = function () {
 
       }
 
-      function fillElements(id,data) {
+      function fillElements(id) {
 
         var listEl = document.querySelector(".list-body");
 
         listEl.setAttribute('data-sequencing_lib_id', id);
+        listEl.setAttribute('data-nmol', data[0].nmol);
 
-        var total_persentage = 0;
-        var total_volume = 0;
+        var total_persentage = 1;
+        var totalVolume = 0;
 
         for (var i = 0; i < data.length; i++) {
 
-          var row = `<div class="row mb-1">
-              <div class="col-2 align-self-center" data-id="${ data[i].id }">${ data[i].name }</div>
+          totalVolume += data[i].volume;
+
+        }
+
+        for (var i = 0; i < data.length; i++) {
+          var p = 0.00;
+          var v = 0.00;
+          //
+          // if (totalVolume > 0) {
+          //
+          //   p = data[i].volume / totalVolume;
+          //
+          // }
+          // else {
+          //
+          //   p = 1/data.length;
+          //
+          // }
+          //
+          // v = p * data[i].nmol  / data[i].nm;
+          v = data[i].volume;
+          p = data[i].volume / totalVolume;
+
+          var row = `<div class="row mb-1 detail-row">
+              <div class="col-2 align-self-center" data-id="${ data[i].captured_lib }">${ data[i].name }</div>
               <div class="col-2 align-self-center">${ data[i].frag_size }</div>
               <div class="col-2 align-self-center text-center">${ data[i].vol_remain }</div>
               <div class="col-1 align-self-center text-center">${ data[i].conc }</div>
               <div class="col-1 align-self-center text-center">${ data[i].nm }</div>
-              <div class="col-2 text-center"><input type="text" class="textinput textInput form-control form-control-sm text-end detail-persentage" value="${ data[i].persentage }"></div>
-              <div class="col-2 text-center"><input type="text" class="textinput textInput form-control form-control-sm text-end detail-volume" value="${ data[i].volume }"></div>
+              <div class="col-2 text-center"><input type="text" class="textinput textInput form-control form-control-sm text-end detail-percentage" value="${ p.toFixed(2) }"></div>
+              <div class="col-2 text-center"><input type="text" class="textinput textInput form-control form-control-sm text-end detail-volume" value="${ v.toFixed(2) }"></div>
             </div>`;
           listEl.innerHTML += row;
 
         }
 
+        // var note = '<div><textarea name="notes" cols="40" rows="2" class="textarea form-control" id="id_notes"></textarea></div>';
+        //
+        // listEl.innerHTML += note;
+
         var footer = `<div class="mt-5">
-              <button type="button" class="btn btn-lg btn-success" id="btn_save">Save</button>
+              <button type="button" class="btn btn-lg btn-success" id="btn_save">Make Sequencing Library</button>
             </div>`;
 
         listEl.innerHTML += footer;
@@ -693,13 +729,13 @@ var KTDatatablesServerSide = function () {
 
         var total = 0;
 
-        for (var detail of document.querySelectorAll(".detail-amount")) {
+        for (var detail of document.querySelectorAll(".detail-percentage")) {
 
           total += parseFloat(detail.value);
 
         }
 
-        // document.querySelector("#total_amount").value = total;
+        document.querySelector("#total_percentage").value = total.toFixed(2);
 
       }
 
@@ -713,38 +749,89 @@ var KTDatatablesServerSide = function () {
 
         }
 
-        // document.querySelector("#total_volume").value = total;
+        document.querySelector("#total_volume").value = total.toFixed(2);
+
+      }
+
+      function updateBufferAmount() {
+
+        var totalVolume = document.querySelector("#total_volume").value;
+
+        var targetMol = document.querySelector(".list-body").getAttribute("data-nmol");
+
+        var targetVol = 0;
+
+        var bufferAmount = (targetVol - totalVolume).toFixed(2);
+
+        document.querySelector("#buffer_amount").value = bufferAmount;
+
+      }
+
+      function updateVolumeRemain(){
+
+        document.querySelectorAll(".detail-row").forEach((row, i) => {
+
+          var volume = parseFloat(row.querySelector(".detail-volume").value);
+
+          row.querySelectorAll('div')[2].innerText = (data[i].vol_remain - volume).toFixed(2);
+
+        });
 
       }
 
       function initEvents() {
 
-        for (var persentage of document.querySelectorAll(".detail-persentage")) {
+        for (var persentage of document.querySelectorAll(".detail-percentage")) {
 
           persentage.addEventListener("change", function () {
 
-            var parent = this.closest('.row');
+            var row = this.closest('.row');
 
-            var conc = parent.querySelectorAll('div')[3].innerText;
+            var nm = row.querySelectorAll('div')[4].innerText;
 
-            var volume = this.value / conc;
+            var nmol = document.querySelector(".list-body").getAttribute("data-nmol");
 
-            parent.querySelector(".detail-volume").value = volume;
+            var volume = this.value * nmol  / nm;
+
+            row.querySelector(".detail-volume").value = volume.toFixed(2);
 
             updateTotalPersentage();
             updateTotalVolume();
+            updateBufferAmount();
+            updateVolumeRemain();
 
           });
 
         }
 
-        var id = document.querySelector(".list-body").getAttribute("data-captured_lib_id");
+        function checkTotalPercentage() {
+
+          return parseFloat(document.getElementById("total_percentage").value) == 1;
+
+        }
 
         document.getElementById("btn_save").addEventListener('click', function () {
 
+          if ( !checkTotalPercentage() ) {
+            Swal.fire({
+                text: "The total percent should be 100.",
+                icon: "error",
+                buttonsStyling: false,
+                confirmButtonText: "Ok, got it!",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-danger",
+                }
+            });
+
+            return e.preventDefault();
+
+          }
+
+          var id = document.querySelector(".list-body").getAttribute("data-sequencing_lib_id");
+
           $.ajax({
             type: "GET",
-            url: "/capturedlib/"+ id +"/update_async",
+            url: "/sequencinglib/"+ id +"/make_sequencinglib_async",
             data: {
               "values": getValues(),
             },

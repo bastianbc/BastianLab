@@ -79,7 +79,8 @@ def new_sequencinglib_async(request):
         sequencing_lib = SequencingLib.objects.create(
             name="%s-%d" % (options["prefix"],autonumber),
             date=options["date"],
-            buffer=options["buffer"]
+            buffer=options["buffer"],
+            nmol=float(options["conc"]) * float(options["vol_init"])
         )
 
         for captured_lib in capturedlibs:
@@ -115,6 +116,9 @@ def recreate_sequencinglib_async(request):
         capturedlibs = CapturedLib.objects.filter(id__in=selected_ids)
 
         CL_SEQL_LINK.objects.filter(sequencing_lib=sequencing_lib).delete()
+
+        sequencing_lib.nmol = float(options["conc"]) * float(options["vol_init"])
+        sequencing_lib.save()
 
         for captured_lib in capturedlibs:
             # target_mol = conc * vol
@@ -180,20 +184,20 @@ def get_used_capturedlibs(request,id):
     return JsonResponse(serializer.data, safe=False)
 
 @permission_required("sequencinglib.change_sequencinglib",raise_exception=True)
-def update_async(request,id):
+def make_sequencinglib_async(request,id):
     try:
         values = json.loads(request.GET.get("values"))
         sequencing_lib = SequencingLib.objects.get(id=id)
         for value in values:
             volume = float(value["volume"])
 
-            sample_lib = SampleLib.objects.get(id=value["id"])
+            captured_lib = CapturedLib.objects.get(id=value["id"])
 
-            link = SL_CL_LINK.objects.get(sequencing_lib=sequencing_lib,sample_lib=sample_lib)
+            link = CL_SEQL_LINK.objects.get(sequencing_lib=sequencing_lib,captured_lib=captured_lib)
             link.volume = volume
             link.save()
 
-            sample_lib.update_volume(volume)
+            captured_lib.update_volume(volume)
     except Exception as e:
         print(str(e))
         return JsonResponse({"success":False})
