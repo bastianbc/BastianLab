@@ -12,6 +12,7 @@ class SequencingLib(models.Model):
     name = models.CharField(max_length=50, unique=True, verbose_name="Name")
     date = models.DateField(default=date.today, verbose_name="Date")
     nmol = models.FloatField(default=0, verbose_name="N Mol")
+    target_vol = models.FloatField(default=0, verbose_name="Target Volume")
     buffer = models.CharField(max_length=20, choices=BUFFER_TYPES, verbose_name="Buffer")
     pdf = models.FileField(upload_to="uploads/", null=True, blank=True)
     notes = models.TextField(blank=True, null=True, verbose_name="Notes")
@@ -87,14 +88,9 @@ class SequencingLib(models.Model):
             raise
 
 class CL_SEQL_LINK(models.Model):
-    sequencing_lib = models.ForeignKey(SequencingLib,on_delete=models.CASCADE, verbose_name="Sequencing Library")
-    captured_lib = models.ForeignKey("capturedlib.CapturedLib", on_delete=models.CASCADE, verbose_name="Captured Library")
+    sequencing_lib = models.ForeignKey(SequencingLib,on_delete=models.CASCADE, verbose_name="Sequencing Library", related_name="cl_links")
+    captured_lib = models.ForeignKey("capturedlib.CapturedLib", on_delete=models.CASCADE, verbose_name="Captured Library", related_name="seql_links")
     volume = models.FloatField(default=0, verbose_name="Volume")
 
     class Meta:
         db_table = "cl_seql_link"
-
-    @property
-    def persentage(self):
-        # calculates the amount: amount = volume * conc
-        return 0

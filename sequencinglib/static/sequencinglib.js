@@ -650,6 +650,7 @@ var KTDatatablesServerSide = function () {
 
         listEl.setAttribute('data-sequencing_lib_id', id);
         listEl.setAttribute('data-nmol', data[0].nmol);
+        listEl.setAttribute('data-target_vol', data[0].target_vol);
 
         var total_persentage = 1;
         var totalVolume = 0;
@@ -683,7 +684,7 @@ var KTDatatablesServerSide = function () {
               <div class="col-2 align-self-center" data-id="${ data[i].captured_lib }">${ data[i].name }</div>
               <div class="col-2 align-self-center">${ data[i].frag_size }</div>
               <div class="col-2 align-self-center text-center">${ data[i].vol_remain }</div>
-              <div class="col-1 align-self-center text-center">${ data[i].conc }</div>
+              <div class="col-1 align-self-center text-center">${ data[i].nm }</div>
               <div class="col-1 align-self-center text-center">${ data[i].nm }</div>
               <div class="col-2 text-center"><input type="text" class="textinput textInput form-control form-control-sm text-end detail-percentage" value="${ p.toFixed(2) }"></div>
               <div class="col-2 text-center"><input type="text" class="textinput textInput form-control form-control-sm text-end detail-volume" value="${ v.toFixed(2) }"></div>
@@ -759,7 +760,7 @@ var KTDatatablesServerSide = function () {
 
         var targetMol = document.querySelector(".list-body").getAttribute("data-nmol");
 
-        var targetVol = 0;
+        var targetVol = document.querySelector(".list-body").getAttribute("data-target_vol");
 
         var bufferAmount = (targetVol - totalVolume).toFixed(2);
 

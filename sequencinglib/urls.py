@@ -18,4 +18,5 @@ urlpatterns = [
     path('<int:id>/make_sequencinglib_async', views.make_sequencinglib_async, name='make_sequencinglib_async'),
     path('get_sequencinglib_async/<int:id>', views.get_sequencinglib_async, name="get-sequencinglib-async"),
     path('recreate_sequencinglib_async', views.recreate_sequencinglib_async, name="recreate-sequencinglib-async"),
+    path('create_ilab_sheet', views.create_ilab_sheet, name="create-ilab-sheet"),
 ] + staticfiles_urlpatterns()

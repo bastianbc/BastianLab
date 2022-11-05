@@ -80,18 +80,19 @@ def new_sequencinglib_async(request):
             name="%s-%d" % (options["prefix"],autonumber),
             date=options["date"],
             buffer=options["buffer"],
-            nmol=float(options["conc"]) * float(options["vol_init"])
+            target_vol= float(options["vol_init"]),
+            nmol=float(options["nm"]) * float(options["vol_init"])
         )
 
         for captured_lib in capturedlibs:
-            # target_mol = conc * vol
+            # target_mol = nm * vol
             # CLcount = the number CLs selected
             # Calculate CL_Seq_L_link.volume for each CL using (target_mol/CLcount)/CL.nM
 
             CL_SEQL_LINK.objects.create(
                 sequencing_lib = sequencing_lib,
                 captured_lib = captured_lib,
-                volume = ((float(options["conc"]) * float(options["vol_init"])) / len(selected_ids))/captured_lib.nm
+                volume = ((float(options["nm"]) * float(options["vol_init"])) / len(selected_ids))/captured_lib.nm
             )
 
     except Exception as e:
@@ -117,18 +118,19 @@ def recreate_sequencinglib_async(request):
 
         CL_SEQL_LINK.objects.filter(sequencing_lib=sequencing_lib).delete()
 
-        sequencing_lib.nmol = float(options["conc"]) * float(options["vol_init"])
+        sequencing_lib.nmol = float(options["nm"]) * float(options["vol_init"])
+        sequencing_lib.nm = float(options["vol_init"])
         sequencing_lib.save()
 
         for captured_lib in capturedlibs:
-            # target_mol = conc * vol
+            # target_mol = nm * vol
             # CLcount = the number CLs selected
             # Calculate CL_Seq_L_link.volume for each CL using (target_mol/CLcount)/CL.nM
 
             CL_SEQL_LINK.objects.create(
                 sequencing_lib = sequencing_lib,
                 captured_lib = captured_lib,
-                volume = ((float(options["conc"]) * float(options["vol_init"])) / len(selected_ids))/captured_lib.nm
+                volume = ((float(options["nm"]) * float(options["vol_init"])) / len(selected_ids))/captured_lib.nm
             )
 
     except Exception as e:
@@ -204,5 +206,42 @@ def make_sequencinglib_async(request,id):
 
     return JsonResponse({"success":True})
 
-def create_ilab_sheet(request):    
-    return JsonResponse({"result":False})
+def create_ilab_sheet(request):
+    import csv
+    from django.http import HttpResponse
+
+    class Report(object):
+        name = ""
+        date = ""
+        nmol = 0.0
+        buffer = ""
+        sample_lib = 0
+        i5 = ""
+        i7 = ""
+
+    result = []
+
+    for seq_link in CL_SEQL_LINK.objects.all():
+        report = Report()
+        report.name = seq_link.sequencing_lib.name
+        report.date = seq_link.sequencing_lib.date
+        report.nmol = seq_link.sequencing_lib.nmol
+        report.buffer = seq_link.sequencing_lib.get_buffer_display()
+        for sl_link in seq_link.captured_lib.sl_links.all():
+                report.sample_lib = sl_link.sample_lib.id
+                report.i5 = sl_link.sample_lib.barcode.i5
+                report.i7 = sl_link.sample_lib.barcode.i7
+        result.append(report)
+
+    response = HttpResponse(
+        content_type='text/csv',
+        headers={'Content-Disposition': 'attachment; filename="sequencinglib.csv"'},
+    )
+
+    field_names = ["name","date","nmol","buffer","sample_lib","i5","i7"]
+    writer = csv.writer(response)
+    writer.writerow(field_names)
+    for item in result:
+        writer.writerow([getattr(item, field) for field in field_names])
+
+    return response
