@@ -7,9 +7,11 @@ from .models import *
 from .forms import *
 from django.contrib import messages
 from capturedlib.models import *
+from sequencingrun.forms import *
 
 @permission_required("sequencinglib.view_sequencinglib",raise_exception=True)
 def sequencinglibs(request):
+    form = SequencingRunCreationForm()
     return render(request, "sequencinglib_list.html", locals())
 
 @login_required
@@ -115,7 +117,7 @@ def recreate_sequencinglib_async(request):
     try:
         sequencing_lib = SequencingLib.objects.get(id=options["sequencing_lib"])
         capturedlibs = CapturedLib.objects.filter(id__in=selected_ids)
-        
+
         CL_SEQL_LINK.objects.filter(sequencing_lib=sequencing_lib).delete()
 
         sequencing_lib.nmol = float(options["nm"]) * float(options["vol_init"])

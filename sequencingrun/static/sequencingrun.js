@@ -29,13 +29,16 @@ var KTDatatablesServerSide = function () {
               editor: editor,
               editOnFocus: true
             },
-            ajax: '/sequencinglib/filter_sequencinglibs',
+            ajax: '/sequencingrun/filter_sequencingruns',
             columns: [
                 { data: null },
                 { data: 'name' },
                 { data: 'date' },
-                { data: 'nmol' },
-                { data: 'buffer' },
+                { data: 'facility' },
+                { data: 'sequencer' },
+                { data: 'pe' },
+                { data: 'amp_cycles' },
+                { data: 'date_run' },
             ],
             columnDefs: [
                 {
@@ -49,7 +52,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 5,
+                    targets: 6,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -70,7 +73,7 @@ var KTDatatablesServerSide = function () {
                             <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4" data-kt-menu="true">
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/sequencinglib/edit/`+ row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
+                                    <a href="/sequencingrun/edit/`+ row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
                                         Edit
                                     </a>
                                 </div>
@@ -86,7 +89,7 @@ var KTDatatablesServerSide = function () {
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/sequencinglib/delete/` + row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
+                                    <a href="/sequencingrun/delete/` + row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
                                         Delete
                                     </a>
                                 </div>
@@ -324,7 +327,7 @@ var KTDatatablesServerSide = function () {
                         // Calling delete request with ajax
                         $.ajax({
                             type: "GET",
-                            url: "/sequencinglib/batch_delete",
+                            url: "/sequencingrun/batch_delete",
                             data: {
                               "selected_ids": getSelectedRows(),
                             },
@@ -505,81 +508,6 @@ var KTDatatablesServerSide = function () {
 
     var handleSelectedRows = (e) => {
 
-      document.getElementById("modal_sequencingrun_options").addEventListener('show.bs.modal', function(e){
-
-        // if (!checkSelectedRows()) {
-        //
-        //   Swal.fire({
-        //       text: "Identical barcodes are used in selected rows.",
-        //       icon: "error",
-        //       buttonsStyling: false,
-        //       confirmButtonText: "Ok, got it!",
-        //       customClass: {
-        //           confirmButton: "btn fw-bold btn-primary",
-        //       }
-        //   });
-        //
-        //   return e.preventDefault();
-        // }
-
-      });
-
-      function getSelectedRows() {
-
-        const container = document.querySelector('.table');
-
-        const selectedRows = container.querySelectorAll('[type="checkbox"]:checked');
-
-        const selectedIds = [];
-
-        selectedRows.forEach((p) => {
-          // Select parent row
-          const parent = p.closest('tr');
-          // Get customer name
-          const id = parent.querySelector('input[type=checkbox]').value;
-
-          selectedIds.push(id)
-
-        });
-
-        return JSON.stringify(selectedIds);
-      }
-
-      function getCreationOptions() {
-
-        var data = new FormData(document.getElementById('frm_creation_options'));
-        var options = Object.fromEntries(data.entries());
-
-        return JSON.stringify(options);
-      }
-
-      function checkSelectedRows() {
-        // selected row's na type must be DNA
-        var container = document.querySelector('.table');
-
-        var selectedRows = container.querySelectorAll('[type="checkbox"]:checked');
-
-        var barcodeList = [];
-
-        for (var i = 0; i < selectedRows.length; i++) {
-
-          const parent = selectedRows[i].closest('tr');
-          // Get barcode
-          const barcode = parent.querySelectorAll('td')[2].innerText;
-
-          if (barcodeList.indexOf(barcode) > -1 ) {
-
-            return false;
-
-          }
-
-          barcodeList.push(barcode);
-        }
-
-        return true;
-
-      }
-
     }
 
     var initRowActions = () => {
@@ -615,7 +543,7 @@ var KTDatatablesServerSide = function () {
             const id = parent.querySelector('input[type=checkbox]').value;
 
             $.ajax({
-                url: "/sequencinglib/" + id + "/used_capturedlibs",
+                url: "/sequencingrun/" + id + "/used_capturedlibs",
                 type: "GET",
                 success: function (retval) {
 
@@ -833,7 +761,7 @@ var KTDatatablesServerSide = function () {
 
           $.ajax({
             type: "GET",
-            url: "/sequencinglib/"+ id +"/make_sequencinglib_async",
+            url: "/sequencingrun/"+ id +"/make_sequencingrun_async",
             data: {
               "values": getValues(),
             },
