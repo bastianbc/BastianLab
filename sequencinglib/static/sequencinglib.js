@@ -647,7 +647,8 @@ var KTDatatablesServerSide = function () {
       function fillElements(id) {
 
         var listEl = document.querySelector(".list-body");
-
+        console.log("data:");
+        console.log(data[0]);
         listEl.setAttribute('data-sequencing_lib_id', id);
         listEl.setAttribute('data-nmol', data[0].nmol);
         listEl.setAttribute('data-target_vol', data[0].target_vol);
@@ -756,11 +757,11 @@ var KTDatatablesServerSide = function () {
 
       function updateBufferAmount() {
 
-        var totalVolume = document.querySelector("#total_volume").value;
+        var totalVolume = parseFloat(document.querySelector("#total_volume").value);
 
-        var targetMol = document.querySelector(".list-body").getAttribute("data-nmol");
+        var targetVol = parseFloat(document.querySelector(".list-body").getAttribute("data-target_vol"));
 
-        var targetVol = document.querySelector(".list-body").getAttribute("data-target_vol");
+        console.log("totalVolume:"+totalVolume+"targetVol:"+targetVol);
 
         var bufferAmount = (targetVol - totalVolume).toFixed(2);
 

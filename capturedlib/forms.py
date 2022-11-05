@@ -13,7 +13,7 @@ class SequencingLibCreationForm(forms.Form):
     prefix = forms.CharField()
     date = forms.DateField(initial=date.today)
     buffer = forms.ChoiceField(choices=SequencingLib.BUFFER_TYPES)
-    conc = forms.FloatField(initial=0, label="Concentration")
+    nm = forms.FloatField(initial=0, label="nM")
     vol_init = forms.FloatField(initial=0, label="Initialize Volume")
 
 class SequencingLibForm(forms.ModelForm):

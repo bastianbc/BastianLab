@@ -28,10 +28,11 @@ class UsedCapturedLibSerializer(serializers.ModelSerializer):
     frag_size = serializers.SerializerMethodField()
     nm = serializers.SerializerMethodField()
     nmol = serializers.SerializerMethodField()
+    target_vol = serializers.SerializerMethodField()
 
     class Meta:
         model = CL_SEQL_LINK
-        fields = ("id", "captured_lib", "name", "conc", "frag_size", "vol_remain", "nm", "nmol", "persentage", "volume",)
+        fields = ("id", "captured_lib", "name", "conc", "frag_size", "vol_remain", "nm", "nmol", "target_vol", "volume",)
 
     def get_name(self, obj):
         return obj.captured_lib.name
@@ -50,3 +51,6 @@ class UsedCapturedLibSerializer(serializers.ModelSerializer):
 
     def get_nmol(self,obj):
         return obj.sequencing_lib.nmol
+
+    def get_target_vol(self,obj):
+        return obj.sequencing_lib.target_vol
