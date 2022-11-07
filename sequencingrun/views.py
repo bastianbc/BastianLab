@@ -4,6 +4,7 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required,permission_required
 from .serializers import *
 from .models import *
+from sequencinglib.models import *
 from .forms import *
 from django.contrib import messages
 from capturedlib.models import *
@@ -49,13 +50,13 @@ def edit_sequencingrun_async(request):
 @permission_required("sequencingrun.add_sequencingrun",raise_exception=True)
 def new_sequencingrun(request):
     if request.method=="POST":
-        form = SequencingRunForm(request.POST, request.FILES)
+        form = SequencingRunForm(request.POST)
         if form.is_valid():
             sequencingrun = form.save()
-            messages.success(request,"Sequencing Library %s was created successfully." % sequencingrun.name)
+            messages.success(request,"Sequencing Run %s was created successfully." % sequencingrun.name)
             return redirect("sequencingruns")
         else:
-            messages.error(request,"Sequencing Library wasn't created.")
+            messages.error(request,"Sequencing Run wasn't created.")
     else:
         form = SequencingRunForm()
 
@@ -77,7 +78,8 @@ def new_sequencingrun_async(request):
         sequencing_run = SequencingRun.objects.create(
             name="%s-%d" % (options["prefix"],autonumber),
             date=options["date"],
-            facility=options["buffer"],
+            date_run=options["date_run"],
+            facility=options["facility"],
             sequencer=options["sequencer"],
             pe=options["pe"],
             amp_cycles=options["amp_cycles"],
@@ -97,15 +99,15 @@ def new_sequencingrun_async(request):
 @permission_required("sequencingrun.change_sequencingrun",raise_exception=True)
 def edit_sequencingrun(request,id):
     sequencing_run = SequencingRun.objects.get(id=id)
-
+    import pdb; pdb.set_trace()
     if request.method=="POST":
-        form = SequencingRunForm(request.POST,request.FILES,instance=sequencing_run)
+        form = SequencingRunForm(request.POST,instance=sequencing_run)
         if form.is_valid():
             form.save()
-            messages.success(request,"Sequencing Library %s was updated successfully." % sequencing_run.name)
+            messages.success(request,"Sequencing Run %s was updated successfully." % sequencing_run.name)
             return redirect("sequencingruns")
         else:
-            messages.error(request,"Sequencing Library wasn't updated!")
+            messages.error(request,"Sequencing Run wasn't updated!")
     else:
         form = SequencingRunForm(instance=sequencing_run)
 
@@ -116,10 +118,10 @@ def delete_sequencingrun(request,id):
     try:
         sequencing_run = SequencingRun.objects.get(id=id)
         sequencing_run.delete()
-        messages.success(request,"Sequencing Library %s was deleted successfully." % sequencing_run.name)
+        messages.success(request,"Sequencing Run %s was deleted successfully." % sequencing_run.name)
         deleted = True
     except Exception as e:
-        messages.error(request, "Sequencing Library wasn't deleted!")
+        messages.error(request, "Sequencing Run wasn't deleted!")
         deleted = False
 
     return JsonResponse({"deleted":deleted })
@@ -135,7 +137,8 @@ def delete_batch_sequencingruns(request):
     return JsonResponse({ "deleted":True })
 
 @permission_required("sequencingrun.view_sequencingrun",raise_exception=True)
-def get_used_capturedlibs(request,id):
-    used_capturedlibs = CL_SEQL_LINK.objects.filter(sequencing_run__id=id)
-    serializer = UsedSequencingLibSerializer(used_capturedlibs, many=True)
+def get_used_sequencinglibs(request,id):
+    sequencing_run = SequencingRun.objects.get(id=id)
+    used_sequencinglibs = sequencing_run.sequencing_libs.all()
+    serializer = UsedSequencingLibSerializer(used_sequencinglibs, many=True)
     return JsonResponse(serializer.data, safe=False)

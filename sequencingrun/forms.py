@@ -8,7 +8,7 @@ class SequencingRunForm(forms.ModelForm):
         fields = "__all__"
 
 class SequencingRunCreationForm(forms.Form):
-    name = forms.CharField()
+    prefix = forms.CharField()
     date_run = forms.DateField(initial=date.today)
     date = forms.DateField(initial=date.today)
     facility = forms.ChoiceField(choices=SequencingRun.FACILITY_TYPES)

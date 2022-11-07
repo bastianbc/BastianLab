@@ -29,7 +29,7 @@ class SequencingRun(models.Model):
     pe = models.CharField(max_length=20, choices=SEQUENCER_TYPES, verbose_name="PE")
     amp_cycles = models.IntegerField(default=0, verbose_name="AMP Cycles")
     notes = models.TextField(blank=True, null=True, verbose_name="Notes")
-    sequencing_libs = models.ManyToManyField("sequencinglib.SequencingLib")
+    sequencing_libs = models.ManyToManyField("sequencinglib.SequencingLib", blank=True)
 
     class Meta:
         db_table = "sequencing_run"

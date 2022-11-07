@@ -4,24 +4,26 @@
 
 {% block content %}
 
-<form method="post" action="{% if id %} {% url 'edit-sequencinglib' id %} {% else %} {% url 'new-sequencinglib' %} {% endif %}">
+<form method="post" action="{% if id %} {% url 'edit-sequencingrun' id %} {% else %} {% url 'new-sequencingrun' %} {% endif %}">
   <div class="card">
     <div class="card-header">
-      <h3 class="card-title">New Sequencing Library</h3>
+      <h3 class="card-title">New Sequencing Run</h3>
     </div>
     <div class="card-body">
       {% csrf_token %}
       <div class="row">
         <div class="col-6">{{ form.name|as_crispy_field }}</div>
         <div class="col-6">{{ form.date|as_crispy_field }}</div>
-        <div class="col-6">{{ form.nmol|as_crispy_field }}</div>
-        <div class="col-6">{{ form.buffer|as_crispy_field }}</div>
-        <div class="col-6">{{ form.pdf|as_crispy_field }}</div>
+        <div class="col-6">{{ form.facility|as_crispy_field }}</div>
+        <div class="col-6">{{ form.sequencer|as_crispy_field }}</div>
+        <div class="col-6">{{ form.pe|as_crispy_field }}</div>
+        <div class="col-6">{{ form.amp_cycles|as_crispy_field }}</div>
+        <div class="col-6">{{ form.date_run|as_crispy_field }}</div>
         <div class="col-12">{{ form.notes|as_crispy_field }}</div>
       </div>
     </div>
     <div class="card-footer">
-      <a href="/sequencinglib" class="btn btn-secondary">Cancel</a>
+      <a href="/sequencingrun" class="btn btn-secondary">Cancel</a>
       <button type="submit" class="btn btn-success">Save</button>
     </div>
   </div>

@@ -14,5 +14,5 @@ urlpatterns = [
     path('edit/<str:id>', views.edit_sequencingrun, name='edit-sequencingrun'),
     path('delete/<str:id>', views.delete_sequencingrun, name='delete-sequencingrun'),
     path('batch_delete', views.delete_batch_sequencingruns, name='delete-batch-sequencingruns'),
-    path('<int:id>/used_capturedlibs', views.get_used_capturedlibs, name='get-used-capturedlibs'),
+    path('<int:id>/used_sequencinglibs', views.get_used_sequencinglibs, name='get-used-sequencinglibs'),
 ] + staticfiles_urlpatterns()

@@ -52,7 +52,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 6,
+                    targets: 8,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -334,7 +334,7 @@ var KTDatatablesServerSide = function () {
                             done: function (result) {
                                 if (result.success) {
                                   Swal.fire({
-                                      text: "Nucleic Acid(s) was deleted succesfully.",
+                                      text: "Sequencing Run(s) was deleted succesfully.",
                                       icon: "info",
                                       buttonsStyling: false,
                                       confirmButtonText: "Ok, got it!",
@@ -347,7 +347,7 @@ var KTDatatablesServerSide = function () {
                                 }
                                 else {
                                   Swal.fire({
-                                      text: "Nucleic Acid(s) wasn't deleted!",
+                                      text: "Sequencing Run(s) wasn't deleted!",
                                       icon: "error",
                                       buttonsStyling: false,
                                       confirmButtonText: "Ok, got it!",
@@ -360,19 +360,6 @@ var KTDatatablesServerSide = function () {
                             error: function (xhr, ajaxOptions, thrownError) {
                                 swal("Error deleting!", "Please try again", "error");
                             }
-                        });
-
-                        Swal.fire({
-                            text: "You have deleted all selected customers!.",
-                            icon: "success",
-                            buttonsStyling: false,
-                            confirmButtonText: "Ok, got it!",
-                            customClass: {
-                                confirmButton: "btn fw-bold btn-primary",
-                            }
-                        }).then(function () {
-                            // delete row data from server and re-draw datatable
-                            dt.draw();
                         });
 
                         // Remove header checked box
@@ -512,7 +499,7 @@ var KTDatatablesServerSide = function () {
 
     var initRowActions = () => {
 
-      const el = document.getElementById("modal_used_capturedlibs");
+      const el = document.getElementById("modal_used_sequencinglibs");
       const modal = new bootstrap.Modal(el);
 
       var data = {};
@@ -543,20 +530,13 @@ var KTDatatablesServerSide = function () {
             const id = parent.querySelector('input[type=checkbox]').value;
 
             $.ajax({
-                url: "/sequencingrun/" + id + "/used_capturedlibs",
+                url: "/sequencingrun/" + id + "/used_sequencinglibs",
                 type: "GET",
                 success: function (retval) {
 
                   data = retval;
 
                   fillElements(id);
-
-                  updateTotalPercentage();
-                  updateTotalVolume();
-                  updateBufferAmount();
-                  updateVolumeRemain();
-
-                  initEvents();
 
                   modal.show();
 
@@ -575,227 +555,18 @@ var KTDatatablesServerSide = function () {
       function fillElements(id) {
 
         var listEl = document.querySelector(".list-body");
-        console.log("data:");
-        console.log(data[0]);
-        listEl.setAttribute('data-sequencing_lib_id', id);
-        listEl.setAttribute('data-nmol', data[0].nmol);
-        listEl.setAttribute('data-target_vol', data[0].target_vol);
-
-        var total_persentage = 1;
-        var totalVolume = 0;
 
         for (var i = 0; i < data.length; i++) {
-
-          totalVolume += data[i].volume;
-
-        }
-
-        for (var i = 0; i < data.length; i++) {
-          var p = 0.00;
-          var v = 0.00;
-          //
-          // if (totalVolume > 0) {
-          //
-          //   p = data[i].volume / totalVolume;
-          //
-          // }
-          // else {
-          //
-          //   p = 1/data.length;
-          //
-          // }
-          //
-          // v = p * data[i].nmol  / data[i].nm;
-          v = data[i].volume;
-          p = data[i].volume / totalVolume;
 
           var row = `<div class="row mb-1 detail-row">
-              <div class="col-2 align-self-center" data-id="${ data[i].captured_lib }">${ data[i].name }</div>
-              <div class="col-2 align-self-center">${ data[i].frag_size }</div>
-              <div class="col-2 align-self-center text-center">${ data[i].vol_remain }</div>
-              <div class="col-1 align-self-center text-center">${ data[i].nm }</div>
-              <div class="col-1 align-self-center text-center">${ data[i].nm }</div>
-              <div class="col-2 text-center"><input type="text" class="textinput textInput form-control form-control-sm text-end detail-percentage" value="${ p.toFixed(2) }"></div>
-              <div class="col-2 text-center"><input type="text" class="textinput textInput form-control form-control-sm text-end detail-volume" value="${ v.toFixed(2) }"></div>
+              <div class="col-3 align-self-center" data-id="${ data[i].sequencing_lib }">${ data[i].name }</div>
+              <div class="col-3 align-self-center">${ data[i].date }</div>
+              <div class="col-3 align-self-center">${ data[i].buffer }</div>
+              <div class="col-3 align-self-center text-center">${ data[i].nmol }</div>
             </div>`;
           listEl.innerHTML += row;
 
         }
-
-        // var note = '<div><textarea name="notes" cols="40" rows="2" class="textarea form-control" id="id_notes"></textarea></div>';
-        //
-        // listEl.innerHTML += note;
-
-        var footer = `<div class="mt-5">
-              <button type="button" class="btn btn-lg btn-success" id="btn_save">Make Sequencing Library</button>
-            </div>`;
-
-        listEl.innerHTML += footer;
-
-      }
-
-      function getValues() {
-
-        var rows = document.querySelector(".list-body").querySelectorAll(".row");
-
-        var values = [];
-
-        for (var row of rows) {
-
-          var id = row.querySelectorAll('div')[0].getAttribute("data-id");
-          var volume = row.querySelector(".detail-volume").value;
-
-          values.push({
-            "id":id,
-            "volume":volume
-          });
-        }
-
-        return JSON.stringify(values);
-
-      }
-
-      function updateTotalPercentage() {
-
-        var total = 0;
-
-        for (var detail of document.querySelectorAll(".detail-percentage")) {
-
-          total += parseFloat(detail.value);
-
-        }
-
-        document.querySelector("#total_percentage").value = total.toFixed(2);
-
-      }
-
-      function updateTotalVolume() {
-
-        var total = 0;
-
-        for (var detail of document.querySelectorAll(".detail-volume")) {
-
-          total += parseFloat(detail.value);
-
-        }
-
-        document.querySelector("#total_volume").value = total.toFixed(2);
-
-      }
-
-      function updateBufferAmount() {
-
-        var totalVolume = parseFloat(document.querySelector("#total_volume").value);
-
-        var targetVol = parseFloat(document.querySelector(".list-body").getAttribute("data-target_vol"));
-
-        console.log("totalVolume:"+totalVolume+"targetVol:"+targetVol);
-
-        var bufferAmount = (targetVol - totalVolume).toFixed(2);
-
-        document.querySelector("#buffer_amount").value = bufferAmount;
-
-      }
-
-      function updateVolumeRemain(){
-
-        document.querySelectorAll(".detail-row").forEach((row, i) => {
-
-          var volume = parseFloat(row.querySelector(".detail-volume").value);
-
-          row.querySelectorAll('div')[2].innerText = (data[i].vol_remain - volume).toFixed(2);
-
-        });
-
-      }
-
-      function initEvents() {
-
-        for (var persentage of document.querySelectorAll(".detail-percentage")) {
-
-          persentage.addEventListener("change", function () {
-
-            var row = this.closest('.row');
-
-            var nm = row.querySelectorAll('div')[4].innerText;
-
-            var nmol = document.querySelector(".list-body").getAttribute("data-nmol");
-
-            var volume = this.value * nmol  / nm;
-
-            row.querySelector(".detail-volume").value = volume.toFixed(2);
-
-            updateTotalPercentage();
-            updateTotalVolume();
-            updateBufferAmount();
-            updateVolumeRemain();
-
-          });
-
-        }
-
-        function checkTotalPercentage() {
-
-          return parseFloat(document.getElementById("total_percentage").value) == 1;
-
-        }
-
-        document.getElementById("btn_save").addEventListener('click', function () {
-
-          if ( !checkTotalPercentage() ) {
-            Swal.fire({
-                text: "The total percent should be 100.",
-                icon: "error",
-                buttonsStyling: false,
-                confirmButtonText: "Ok, got it!",
-                customClass: {
-                    confirmButton: "btn fw-bold btn-danger",
-                }
-            });
-
-            return e.preventDefault();
-
-          }
-
-          var id = document.querySelector(".list-body").getAttribute("data-sequencing_lib_id");
-
-          $.ajax({
-            type: "GET",
-            url: "/sequencingrun/"+ id +"/make_sequencingrun_async",
-            data: {
-              "values": getValues(),
-            },
-          }).done(function(result) {
-            if (result.success) {
-              Swal.fire({
-                  text: "Captured Library(s) was updated succesfully.",
-                  icon: "info",
-                  buttonsStyling: false,
-                  confirmButtonText: "Ok, got it!",
-                  customClass: {
-                      confirmButton: "btn fw-bold btn-success",
-                  }
-              }).then(function(){
-                dt.draw();
-              });
-            }
-            else {
-              Swal.fire({
-                  text: "Captured Library(s) was not updated.",
-                  icon: "error",
-                  buttonsStyling: false,
-                  confirmButtonText: "Ok, got it!",
-                  customClass: {
-                      confirmButton: "btn fw-bold btn-danger",
-                  }
-              });
-            }
-
-            modal.hide();
-
-          });
-
-        });
 
       }
 

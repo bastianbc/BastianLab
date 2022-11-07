@@ -113,7 +113,7 @@ var KTDatatablesServerSide = function () {
             handleDeleteRows();
             handleResetForm();
             initRowActions();
-            handleSelectedRows();
+            handleSelectedRows.init();
             KTMenu.createInstances();
         });
     }
@@ -503,26 +503,84 @@ var KTDatatablesServerSide = function () {
 
     }
 
-    var handleSelectedRows = (e) => {
+    var handleSelectedRows = ((e) => {
 
-      document.getElementById("modal_sequencingrun_options").addEventListener('show.bs.modal', function(e){
+      var modal = new bootstrap.Modal(document.getElementById("modal_sequencingrun_options"));
 
-        // if (!checkSelectedRows()) {
-        //
-        //   Swal.fire({
-        //       text: "Identical barcodes are used in selected rows.",
-        //       icon: "error",
-        //       buttonsStyling: false,
-        //       confirmButtonText: "Ok, got it!",
-        //       customClass: {
-        //           confirmButton: "btn fw-bold btn-primary",
-        //       }
-        //   });
-        //
-        //   return e.preventDefault();
-        // }
+      function initModal() {
+        var isInit = false;
 
-      });
+        function resetForm() {
+
+          document.getElementById("frm_creation_options").reset();
+
+        }
+
+        document.getElementById("modal_sequencingrun_options").addEventListener('show.bs.modal', function(e){
+
+          initEvents();
+
+        });
+
+        document.getElementById("modal_sequencingrun_options").addEventListener('hide.bs.modal', function(e){
+
+          resetForm();
+
+        });
+
+      }
+
+      function initEvents() {
+
+        document.getElementById("id_prefix").addEventListener("keyup", function () {
+
+          this.value = this.value.toLocaleUpperCase();
+
+        });
+
+        document.getElementById("btn_continue").addEventListener('click', function () {
+
+          $.ajax({
+            type: "GET",
+            url: "/sequencingrun/new_async",
+            data: {
+              "selected_ids": getSelectedRows(),
+              "options": getCreationOptions()
+            },
+          }).done(function(result) {
+            if (result.success) {
+              Swal.fire({
+                  text: "Sequencing Library(s) was created succesfully.",
+                  icon: "info",
+                  buttonsStyling: false,
+                  confirmButtonText: "Ok, got it!",
+                  customClass: {
+                      confirmButton: "btn fw-bold btn-success",
+                  }
+              }).then(function(){
+
+                modal.hide();
+
+                dt.draw();
+              });
+            }
+            else {
+              Swal.fire({
+                  text: "Sequencing Library(s) was not created.",
+                  icon: "error",
+                  buttonsStyling: false,
+                  confirmButtonText: "Ok, got it!",
+                  customClass: {
+                      confirmButton: "btn fw-bold btn-danger",
+                  }
+              });
+            }
+
+          });
+
+        });
+
+      }
 
       function getSelectedRows() {
 
@@ -580,7 +638,13 @@ var KTDatatablesServerSide = function () {
 
       }
 
-    }
+      return {
+        init: function () {
+          initModal();
+        }
+      }
+
+    })();
 
     var initRowActions = () => {
 
@@ -647,8 +711,7 @@ var KTDatatablesServerSide = function () {
       function fillElements(id) {
 
         var listEl = document.querySelector(".list-body");
-        console.log("data:");
-        console.log(data[0]);
+        
         listEl.setAttribute('data-sequencing_lib_id', id);
         listEl.setAttribute('data-nmol', data[0].nmol);
         listEl.setAttribute('data-target_vol', data[0].target_vol);
