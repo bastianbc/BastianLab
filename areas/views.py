@@ -23,7 +23,7 @@ def filter_areas(request):
 
 @permission_required("areas.view_areas",raise_exception=True)
 def areas(request):
-    form = ExtractionOptionsForm
+    form = ExtractionOptionsForm()
     return render(request,"area_list.html",locals())
 
 @permission_required("areas.add_areas",raise_exception=True)
@@ -31,9 +31,12 @@ def new_area(request):
     if request.method=="POST":
         form = AreaForm(request.POST)
         if form.is_valid():
-            area = form.save()
-            messages.success(request,"Area %s was created successfully." % area.ar_id)
-            return redirect("areas")
+            try:
+                area = form.save()
+                messages.success(request,"Area %s was created successfully." % area.ar_id)
+                return redirect("areas")
+            except Exception as e:
+                messages.error(request,"Area wasn't created. %s" % str(e))
         else:
             messages.error(request,"Area wasn't created.")
     else:
@@ -44,12 +47,18 @@ def new_area(request):
 @permission_required("areas.add_areas",raise_exception=True)
 def add_area_to_block_async(request):
     selected_ids = json.loads(request.GET.get("selected_ids"))
+    options = json.loads(request.GET.get("options"))
 
     try:
         for id in selected_ids:
-            block = Blocks.objects.get(bl_id=id)
-            Areas.objects.create(block=block)
+            for _ in range(int(options["number"])):
+                block = Blocks.objects.get(bl_id=id)
+                Areas.objects.create(
+                    block=block,
+                    area_type=options["area_type"],
+                )
     except Exception as e:
+        print(str(e))
         return JsonResponse({"success":False})
 
     return JsonResponse({"success":True})

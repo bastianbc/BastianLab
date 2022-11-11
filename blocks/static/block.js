@@ -36,7 +36,7 @@ var KTDatatablesServerSide = function () {
               { data: 'patient' },
               { data: 'diagnosis' },
               { data: 'body_site' },
-              { data: 'gross' },
+              { data: 'thickness' },
               { data: 'num_areas' },
             ],
             columnDefs: [
@@ -278,16 +278,86 @@ var KTDatatablesServerSide = function () {
         });
     }
 
-    var handleSelectedRows = function (e) {
-      // Select element
-      const btnCreateArea = document.querySelector('[data-kt-docs-table-select="event_create_area"]');
+    var handleSelectedRows = (function (e) {
+
+      var modal = new bootstrap.Modal(document.getElementById("modal_area_options"));
+
+      function initModal() {
+        var isInit = false;
+
+        function resetForm() {
+
+          document.getElementById("frm_creation_options").reset();
+
+        }
+
+        document.getElementById("modal_area_options").addEventListener('show.bs.modal', function(e){
+
+          if (!isInit) {
+
+            isInit = true;
+
+            initEvents();
+          }
+
+        });
+
+        document.getElementById("modal_area_options").addEventListener('hide.bs.modal', function(e){
+
+          resetForm();
+
+        });
+
+      }
+
+      function initEvents() {
+
+        document.getElementById('btn_continue').addEventListener('click', function () {
+          console.log("Continue click");
+          $.ajax({
+            type: "GET",
+            url: "/areas/add_area_to_block_async",
+            data: {
+              "selected_ids": getSelectedRows(),
+              "options": getCreationOptions()
+            },
+          }).done(function(result) {
+            if (result.success) {
+              Swal.fire({
+                  text: "Block(s) was created succesfully.",
+                  icon: "info",
+                  buttonsStyling: false,
+                  confirmButtonText: "Ok, got it!",
+                  customClass: {
+                      confirmButton: "btn fw-bold btn-success",
+                  }
+              }).then(function(){
+                dt.draw();
+              });
+            }
+            else {
+              Swal.fire({
+                  text: "Block(s) was not created.",
+                  icon: "error",
+                  buttonsStyling: false,
+                  confirmButtonText: "Ok, got it!",
+                  customClass: {
+                      confirmButton: "btn fw-bold btn-danger",
+                  }
+              });
+            }
+          });
+
+        });
+
+      }
 
       const btnAddBlockToProject = document.querySelector('[data-kt-docs-table-select="event_add_block_to_project"]');
 
       const btnRemoveBlockFromProject = document.querySelector('[data-kt-docs-table-select="event_remove_block_from_project"]');
 
       function getSelectedRows() {
-        
+
         const container = document.querySelector('.table');
 
         const selectedRows = container.querySelectorAll('[type="checkbox"]:checked');
@@ -309,41 +379,13 @@ var KTDatatablesServerSide = function () {
         return JSON.stringify(selectedIds);
       }
 
-      btnCreateArea.addEventListener('click', function () {
+      function getCreationOptions() {
 
-        $.ajax({
-          type: "GET",
-          url: "/areas/add_area_to_block_async",
-          data: {
-            "selected_ids": getSelectedRows(),
-          },
-        }).done(function(result) {
-          if (result.success) {
-            Swal.fire({
-                text: "Block(s) was created succesfully.",
-                icon: "info",
-                buttonsStyling: false,
-                confirmButtonText: "Ok, got it!",
-                customClass: {
-                    confirmButton: "btn fw-bold btn-success",
-                }
-            }).then(function(){
-              dt.draw();
-            });
-          }
-          else {
-            Swal.fire({
-                text: "Block(s) was not created.",
-                icon: "error",
-                buttonsStyling: false,
-                confirmButtonText: "Ok, got it!",
-                customClass: {
-                    confirmButton: "btn fw-bold btn-danger",
-                }
-            });
-          }
-        });
-      });
+        var data = new FormData(document.getElementById('frm_creation_options'));
+        var options = Object.fromEntries(data.entries());
+
+        return JSON.stringify(options);
+      }
 
       if (btnAddBlockToProject) {
 
@@ -428,7 +470,14 @@ var KTDatatablesServerSide = function () {
         });
 
       }
-    }
+
+      return {
+        init: function () {
+          initModal();
+        }
+      }
+
+    })();
 
     // Toggle toolbars
     var toggleToolbars = function () {
@@ -486,8 +535,8 @@ var KTDatatablesServerSide = function () {
                label: "Body Site:",
                name: "body_site"
            }, {
-               label: "Gross:",
-               name: "gross"
+               label: "Thickness:",
+               name: "thickness"
            },
        ],
        formOptions: {
@@ -544,7 +593,7 @@ var KTDatatablesServerSide = function () {
             handleFilterDatatable();
             handleDeleteRows();
             handleResetForm();
-            handleSelectedRows();
+            handleSelectedRows.init();
             initEditor();
         }
     }

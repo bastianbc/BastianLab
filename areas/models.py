@@ -14,37 +14,33 @@ class Areas(models.Model):
         (PELLET, 'Cell Pellet'),
         (CURLS, 'Curls')
     ]
-    IN_SITU = 'IS'
-    INVASIVE = 'INV'
-    NORMAL = 'N'
-    BENIGN = 'B'
-    INTERMEDIATE = 'INT'
-    STROMA = 'ST'
-    TUMOR = 'T'
-    TYPE_CHOICES = [
-        (TUMOR, 'Malignant Tumor, NOS'),
-        (IN_SITU, 'Malignant Tumor, In Situ'),
-        (INVASIVE, 'Malignant Tumor, Invasive'),
-        (BENIGN, 'Benign Tumor (e.g. Nevus)'),
-        (NORMAL, 'Normal'),
-        (STROMA, 'Stroma'),
-        (INTERMEDIATE, 'Intermediate Tumor')
-    ]
+
+    AREA_TYPE_TYPES = (
+        ("mel1","Mel 1"),
+        ("mel2","Mel 2"),
+        ("mel3","Mel 3"),
+        ("mel4","Mel 4"),
+        ("in_situ","in situ"),
+        ("nevus1","Nevus 1"),
+        ("nevus2","Nevus 2"),
+        ("normal","Normal"),
+        ("intmediate","Intmediate")
+    )
 
     ar_id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=50, blank=True, null=True, unique=True)
-    area = models.CharField(max_length=6, blank=True, null=True)
     block = models.ForeignKey('blocks.Blocks', on_delete=models.CASCADE, db_column='block', blank=True, null=True, related_name="block_areas")
-    project = models.CharField(max_length=100, blank=True, null=True)
+    name = models.CharField(max_length=50, blank=True, null=True, unique=True)
+    # area = models.CharField(max_length=6, blank=True, null=True)
+    # project = models.CharField(max_length=100, blank=True, null=True)
     # old_block_id = models.CharField(max_length=50, blank=True, null=True)
     collection = models.CharField(max_length=2, choices=COLLECTION_CHOICES, default=SCRAPE)
-    area_type = models.CharField(max_length=50, choices=TYPE_CHOICES, default=TUMOR)
-    he_image = models.CharField(max_length=200, blank=True, null=True)
+    area_type = models.CharField(max_length=10, choices=AREA_TYPE_TYPES, blank=True, null=True)
+    # he_image = models.CharField(max_length=200, blank=True, null=True)
     # na_id = models.CharField(max_length=50, blank=True, null=True)
     completion_date = models.DateField(default=date.today)
-    investigator = models.CharField(max_length=50, blank=True, null=True)
+    # investigator = models.CharField(max_length=50, blank=True, null=True)
     image = models.ImageField(null=True, blank=True, upload_to="images/%y/%m/%d")
-    notes = models.CharField(max_length=255, blank=True, null=True)
+    notes = models.TextField(blank=True, null=True)
 
     class Meta:
         db_table = 'areas'
@@ -53,7 +49,8 @@ class Areas(models.Model):
         return self.name
 
     def _generate_unique_id(self):
-        return get_random_string(length=6)
+        count = Areas.objects.filter(block=self.block,area_type=self.area_type).count()
+        return "%s_%s_%d" % (self.block.name, self.area_type, count + 1)
 
     def save(self,*args,**kwargs):
         if not self.name:

@@ -10,7 +10,7 @@ class BlocksSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Blocks
-        fields = ("bl_id","name","project","patient","diagnosis","body_site","gross","num_areas","DT_RowId",)
+        fields = ("bl_id","name","project","patient","diagnosis","body_site","thickness","num_areas","DT_RowId",)
 
     def get_value(self,obj):
         return obj.patient.pat_id

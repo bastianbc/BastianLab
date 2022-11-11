@@ -32,12 +32,10 @@ var KTDatatablesServerSide = function () {
             columns: [
               { data: null },
               { data: 'name' },
-              { data: 'area' },
               { data: 'block' },
               { data: 'project' },
               { data: 'collection' },
               { data: 'area_type' },
-              { data: 'he_image' },
               { data: 'completion_date' },
               { data: 'investigator' },
               { data: 'num_nucacids' }
@@ -60,7 +58,7 @@ var KTDatatablesServerSide = function () {
                 //     }
                 // },
                 {
-                    targets: 10,
+                    targets: 8,
                     orderable: false,
                     render: function (data, type, row) {
                         if (data > 0) {
@@ -72,7 +70,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 11,
+                    targets: 9,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -167,7 +165,7 @@ var KTDatatablesServerSide = function () {
         });
     }
 
-    // Delete customer
+    // Delete area
     var handleDeleteRows = () => {
         // Select all delete buttons
         const deleteButtons = document.querySelectorAll('[data-kt-docs-table-filter="delete_row"]');
@@ -180,12 +178,12 @@ var KTDatatablesServerSide = function () {
                 // Select parent row
                 const parent = e.target.closest('tr');
 
-                // Get customer name
-                const customerName = parent.querySelectorAll('td')[1].innerText;
+                // Get area name
+                const areaName = parent.querySelectorAll('td')[1].innerText;
 
                 // SweetAlert2 pop up --- official docs reference: https://sweetalert2.github.io/
                 Swal.fire({
-                    text: "Are you sure you want to delete " + customerName + "?",
+                    text: "Are you sure you want to delete " + areaName + "?",
                     icon: "warning",
                     showCancelButton: true,
                     buttonsStyling: false,
@@ -199,7 +197,7 @@ var KTDatatablesServerSide = function () {
                     if (result.value) {
                         // Simulate delete request -- for demo purpose only
                         Swal.fire({
-                            text: "Deleting " + customerName,
+                            text: "Deleting " + areaName,
                             icon: "info",
                             buttonsStyling: false,
                             showConfirmButton: false,
@@ -220,7 +218,7 @@ var KTDatatablesServerSide = function () {
                             });
 
                             Swal.fire({
-                                text: "You have deleted " + customerName + "!.",
+                                text: "You have deleted " + areaName + "!.",
                                 icon: "success",
                                 buttonsStyling: false,
                                 confirmButtonText: "Ok, got it!",
@@ -231,16 +229,6 @@ var KTDatatablesServerSide = function () {
                                 // delete row data from server and re-draw datatable
                                 dt.draw();
                             });
-                        });
-                    } else if (result.dismiss === 'cancel') {
-                        Swal.fire({
-                            text: customerName + " was not deleted.",
-                            icon: "error",
-                            buttonsStyling: false,
-                            confirmButtonText: "Ok, got it!",
-                            customClass: {
-                                confirmButton: "btn fw-bold btn-primary",
-                            }
                         });
                     }
                 });
@@ -297,7 +285,7 @@ var KTDatatablesServerSide = function () {
         selectedRows.forEach((p) => {
           // Select parent row
           const parent = p.closest('tr');
-          // Get customer name
+          // Get area name
           const id = parent.querySelector('input[type=checkbox]').value;
 
           selectedIds.push(id)
@@ -365,7 +353,7 @@ var KTDatatablesServerSide = function () {
           }
           else {
             Swal.fire({
-                text: "Block(s) was not created.",
+                text: "Area(s) was not created.",
                 icon: "error",
                 buttonsStyling: false,
                 confirmButtonText: "Ok, got it!",
@@ -432,12 +420,19 @@ var KTDatatablesServerSide = function () {
         },
         table: ".table",
         fields: [ {
-             label: "Area:",
-             name: "area"
+               label: "Name:",
+               name: "name"
            }, {
-             label: "Old Area Id:",
-             name: "old_area_id"
+             label: "Block:",
+             name: "block",
+             type: "readonly",
+             attr: { disabled:true }
            }, {
+             label: "Project:",
+             name: "project",
+             type: "readonly",
+             attr: { disabled:true }
+           },{
               label: "Collection:",
               name: "collection",
               type: "select",
@@ -452,31 +447,26 @@ var KTDatatablesServerSide = function () {
               name: "area_type",
               type: "select",
               options: [
-                  { label: "Malignant Tumor, NOS", value: "T" },
-                  { label: "Malignant Tumor, In Situ", value: "IS" },
-                  { label: "Malignant Tumor, Invasive", value: "INV" },
-                  { label: "Benign Tumor (e.g. Nevus)", value: "B" },
-                  { label: "Normal", value: "N" },
-                  { label: "Stroma", value: "ST" },
-                  { label: "Intermediate Tumor", value: "INT" }
+                  { label: "Mel 1", value: "mel1" },
+                  { label: "Mel 2", value: "mel2" },
+                  { label: "Mel 3", value: "mel3" },
+                  { label: "Mel 4", value: "mel4" },
+                  { label: "in situ", value: "in_situ" },
+                  { label: "Nevus 1", value: "nevus1" },
+                  { label: "Nevus 2", value: "nevus2" },
+                  { label: "Normal", value: "normal" },
+                  { label: "Intmediate", value: "intmediate" }
               ]
-            }, {
-              label: "NA Id:",
-              name: "na_id"
             }, {
               label: "Completion Date:",
               name: "completion_date",
               type: "datetime"
             }, {
               label: "Investigator:",
-              name: "investigator"
-            }, {
-              label: "Project:",
-              name: "project"
-            }, {
-              label: "Block:",
-              name: "block"
-            },
+              name: "investigator",
+              type: "readonly",
+              attr: { disabled:true }
+            }
        ],
        formOptions: {
           inline: {

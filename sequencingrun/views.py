@@ -99,7 +99,7 @@ def new_sequencingrun_async(request):
 @permission_required("sequencingrun.change_sequencingrun",raise_exception=True)
 def edit_sequencingrun(request,id):
     sequencing_run = SequencingRun.objects.get(id=id)
-    import pdb; pdb.set_trace()
+
     if request.method=="POST":
         form = SequencingRunForm(request.POST,instance=sequencing_run)
         if form.is_valid():

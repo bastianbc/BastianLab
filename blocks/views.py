@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from .models import Blocks
-from .forms import BlockForm
+from .forms import *
 from django.http import JsonResponse
 import json
 from django.contrib import messages
@@ -27,6 +27,8 @@ def filter_blocks(request):
 def blocks(request):
     id = request.GET.get("id")
     model = request.GET.get("model")
+
+    form = AreaCreationForm()
 
     if model=="project" and id:
         project = Projects.objects.get(pr_id=id)

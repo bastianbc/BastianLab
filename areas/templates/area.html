@@ -7,28 +7,29 @@
 <form method="post" action="{% if id %} {% url 'edit-area' id %} {% else %} {% url 'new-area' %} {% endif %}">
   <div class="card">
     <div class="card-header">
-      <h3 class="card-title">New Area</h3>
+      <h3 class="card-title">Area</h3>
     </div>
     <div class="card-body">
       {% csrf_token %}
       <div class="row">
+        <div class="col-6"> {{form.block|as_crispy_field}}</div>
         <div class="col-6"> {{form.name|as_crispy_field}}</div>
-        <div class="col-6">{{ form.area|as_crispy_field }}</div>
         <div class="col-6">{{ form.collection|as_crispy_field }}</div>
         <div class="col-6">{{ form.area_type|as_crispy_field }}</div>
-        <div class="col-6">{{ form.he_image|as_crispy_field }}</div>
         <div class="col-6">{{ form.completion_date|as_crispy_field }}</div>
-        <div class="col-6">{{ form.investigator|as_crispy_field }}</div>
-        <div class="col-6">{{ form.project|as_crispy_field }}</div>
-        <div class="col-6">{{form.block|as_crispy_field}}</div>
         <div class="col-12">{{ form.image|as_crispy_field }}</div>
         <div class="col-12">{{ form.notes|as_crispy_field }}</div>
       </div>
     </div>
     <div class="card-footer">
-      <a href="/lab" class="btn btn-secondary">Cancel</a>
+      <a href="/areas" class="btn btn-secondary">Cancel</a>
       <button type="submit" class="btn btn-success">Save</button>
     </div>
   </div>
 </form>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/assets/js/custom/documentation/forms/flatpickr.js"></script>
+<script src="/libprep/static/init.dateinput.areas.js"></script>
 {% endblock %}

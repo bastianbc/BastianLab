@@ -7,7 +7,7 @@
 <form method="post" action="{% if id %} {% url 'edit-method' id %} {% else %} {% url 'new-method' %} {% endif %}">
   <div class="card">
     <div class="card-header">
-      <h3 class="card-title">New Method</h3>
+      <h3 class="card-title">Method</h3>
     </div>
     <div class="card-body">
       {% csrf_token %}

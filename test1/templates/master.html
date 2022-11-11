@@ -3724,6 +3724,26 @@ License: For each use you must have a valid license purchased only from above li
 		<script src="/static/assets/js/custom/utilities/modals/users-search.js"></script>
 		<!--end::Custom Javascript-->
 		<!--end::Javascript-->
+		<script type="text/javascript">
+			{% for message in messages %}
+
+				{% if message.tags == "alert-danger" %}
+
+				Swal.fire({
+						text: "{{ message|safe }}",
+						icon: "error",
+						buttonsStyling: false,
+						confirmButtonText: "Ok, got it!",
+						customClass: {
+								confirmButton: "btn fw-bold btn-primary",
+						}
+				});
+
+				{% endif %}
+
+			{% endfor %}
+		</script>
+
 		{% block scripts %}
 		{% endblock %}
 	</body>
