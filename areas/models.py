@@ -28,7 +28,7 @@ class Areas(models.Model):
     )
 
     ar_id = models.AutoField(primary_key=True)
-    block = models.ForeignKey('blocks.Blocks', on_delete=models.CASCADE, db_column='block', blank=True, null=True, related_name="block_areas")
+    block = models.ForeignKey('blocks.Blocks', on_delete=models.CASCADE, db_column='block', related_name="block_areas")
     name = models.CharField(max_length=50, blank=True, null=True, unique=True)
     # area = models.CharField(max_length=6, blank=True, null=True)
     # project = models.CharField(max_length=100, blank=True, null=True)
@@ -78,14 +78,12 @@ class Areas(models.Model):
         try:
             ORDER_COLUMN_CHOICES = {
                 "1":"name",
-                "2":"area",
-                "3":"block",
-                "4":"project",
-                "5":"collection",
-                "6":"area_type",
-                "7":"he_image",
-                "8":"completion_date",
-                "9":"investigator",
+                "2":"block",
+                "3":"project",
+                "4":"collection",
+                "5":"area_type",
+                "6":"completion_date",
+                "7":"investigator",
             }
             draw = int(kwargs.get('draw', None)[0])
             length = int(kwargs.get('length', None)[0])
@@ -113,11 +111,9 @@ class Areas(models.Model):
             elif search_value:
                 queryset = queryset.filter(
                         Q(name__icontains=search_value) |
-                        Q(area__icontains=search_value) |
+                        Q(block__name__icontains=search_value) |
                         Q(collection__icontains=search_value) |
                         Q(area_type__icontains=search_value) |
-                        Q(he_image__icontains=search_value) |
-                        Q(investigator__icontains=search_value) |
                         Q(notes__icontains=search_value)
                     )
 

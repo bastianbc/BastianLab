@@ -115,13 +115,14 @@ class NucAcids(models.Model):
     @property
     def amount(self):
         # calculates the amount: amount = vol_init * conc
-        result = 0
-        try:
-            result = self.conc * self.vol_init
-        except Exception as e:
-            pass
-
-        return result
+        # result = 0
+        # try:
+        #     result = self.conc * self.vol_init
+        # except Exception as e:
+        #     pass
+        #
+        # return result
+        return self.conc * self.vol_remain
 
     def set_init_volume(self):
         self.vol_remain = self.vol_init
@@ -132,5 +133,5 @@ class NucAcids(models.Model):
         self.save()
 
     def update_volume(self,amount):
-        self.vol_remain = 0 if amount > self.amount else (self.amount - amount) / self.conc
+        self.vol_remain -= (amount / self.conc)
         self.save()

@@ -58,9 +58,9 @@ class SampleLib(models.Model):
             ORDER_COLUMN_CHOICES = {
                 "1": "name",
                 "2": "barcode",
-                "4": "date",
-                "5": "method",
-                "6": "conc",
+                "3": "date",
+                "4": "method",
+                "5": "conc",
                 "6": "input_amount",
                 "7": "vol_init",
                 "8": "vol_remain",
