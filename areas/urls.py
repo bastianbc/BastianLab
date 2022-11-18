@@ -10,4 +10,5 @@ urlpatterns = [
     path('edit/<str:id>', views.edit_area, name='edit-area'),
     path("edit_area_async", views.edit_area_async, name="edit-area-async"),
     path('delete/<str:id>', views.delete_area, name='delete-area'),
+    path('batch_delete', views.delete_batch_areas, name='delete-batch-areas'),
 ] + staticfiles_urlpatterns()

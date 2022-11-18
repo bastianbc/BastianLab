@@ -293,7 +293,7 @@ var KTDatatablesServerSide = function () {
                 if (result.value) {
                     // Simulate delete request -- for demo purpose only
                     Swal.fire({
-                        text: "Deleting selected customers",
+                        text: "Deleting selected records",
                         icon: "info",
                         buttonsStyling: false,
                         showConfirmButton: false,
@@ -711,7 +711,7 @@ var KTDatatablesServerSide = function () {
       function fillElements(id) {
 
         var listEl = document.querySelector(".list-body");
-        
+
         listEl.setAttribute('data-sequencing_lib_id', id);
         listEl.setAttribute('data-nmol', data[0].nmol);
         listEl.setAttribute('data-target_vol', data[0].target_vol);

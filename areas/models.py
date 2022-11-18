@@ -49,8 +49,8 @@ class Areas(models.Model):
         return self.name
 
     def _generate_unique_id(self):
-        count = Areas.objects.filter(block=self.block,area_type=self.area_type).count()
-        return "%s_%s_%d" % (self.block.name, self.area_type, count + 1)
+        count = Areas.objects.filter(block=self.block).count()
+        return "%s_area%d" % (self.block.name, count + 1)
 
     def save(self,*args,**kwargs):
         if not self.name:

@@ -46,17 +46,16 @@ def new_area(request):
 
 @permission_required("areas.add_areas",raise_exception=True)
 def add_area_to_block_async(request):
-    selected_ids = json.loads(request.GET.get("selected_ids"))
+    block_id = json.loads(request.GET.get("block_id"))
     options = json.loads(request.GET.get("options"))
 
     try:
-        for id in selected_ids:
-            for _ in range(int(options["number"])):
-                block = Blocks.objects.get(bl_id=id)
-                Areas.objects.create(
-                    block=block,
-                    area_type=options["area_type"],
-                )
+        for _ in range(int(options["number"])):
+            block = Blocks.objects.get(bl_id=block_id)
+            Areas.objects.create(
+                block=block,
+            )
+
     except Exception as e:
         print(str(e))
         return JsonResponse({"success":False})
@@ -110,5 +109,15 @@ def delete_area(request,id):
     except Exception as e:
         messages.error(request, "Area %s wasn't deleted!" % area.ar_id)
         deleted = False
+
+    return JsonResponse({ "deleted":True })
+
+@permission_required("areas.delete_areas",raise_exception=True)
+def delete_batch_areas(request):
+    try:
+        selected_ids = json.loads(request.GET.get("selected_ids"))
+        Areas.objects.filter(ar_id__in=selected_ids).delete()
+    except Exception as e:
+        return JsonResponse({ "deleted":False })
 
     return JsonResponse({ "deleted":True })

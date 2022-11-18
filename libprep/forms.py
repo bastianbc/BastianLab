@@ -3,6 +3,7 @@ from .models import NucAcids
 from samplelib.models import Barcode
 
 class NucAcidForm(forms.ModelForm):
+    amount = forms.FloatField()
     class Meta:
         model = NucAcids
         fields = "__all__"

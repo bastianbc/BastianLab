@@ -155,7 +155,7 @@ var KTDatatablesServerSide = function () {
         });
     }
 
-    // Delete customer
+    // Delete nucacid
     var handleDeleteRows = () => {
         // Select all delete buttons
         const deleteButtons = document.querySelectorAll('[data-kt-docs-table-filter="delete_row"]');
@@ -168,12 +168,12 @@ var KTDatatablesServerSide = function () {
                 // Select parent row
                 const parent = e.target.closest('tr');
 
-                // Get customer name
-                const customerName = parent.querySelectorAll('td')[1].innerText;
+                // Get nucacid name
+                const nucacidName = parent.querySelectorAll('td')[1].innerText;
 
                 // SweetAlert2 pop up --- official docs reference: https://sweetalert2.github.io/
                 Swal.fire({
-                    text: "Are you sure you want to delete " + customerName + "?",
+                    text: "Are you sure you want to delete " + nucacidName + "?",
                     icon: "warning",
                     showCancelButton: true,
                     buttonsStyling: false,
@@ -187,7 +187,7 @@ var KTDatatablesServerSide = function () {
                     if (result.value) {
                         // Simulate delete request -- for demo purpose only
                         Swal.fire({
-                            text: "Deleting " + customerName,
+                            text: "Deleting " + nucacidName,
                             icon: "info",
                             buttonsStyling: false,
                             showConfirmButton: false,
@@ -208,7 +208,7 @@ var KTDatatablesServerSide = function () {
                             });
 
                             Swal.fire({
-                                text: "You have deleted " + customerName + "!.",
+                                text: "You have deleted " + nucacidName + "!.",
                                 icon: "success",
                                 buttonsStyling: false,
                                 confirmButtonText: "Ok, got it!",
@@ -222,7 +222,7 @@ var KTDatatablesServerSide = function () {
                         });
                     } else if (result.dismiss === 'cancel') {
                         Swal.fire({
-                            text: customerName + " was not deleted.",
+                            text: nucacidName + " was not deleted.",
                             icon: "error",
                             buttonsStyling: false,
                             confirmButtonText: "Ok, got it!",
@@ -290,7 +290,7 @@ var KTDatatablesServerSide = function () {
                 if (result.value) {
                     // Simulate delete request -- for demo purpose only
                     Swal.fire({
-                        text: "Deleting selected customers",
+                        text: "Deleting selected records",
                         icon: "info",
                         buttonsStyling: false,
                         showConfirmButton: false,
@@ -308,7 +308,7 @@ var KTDatatablesServerSide = function () {
                         selectedRows.forEach((p) => {
                           // Select parent row
                           const parent = p.closest('tr');
-                          // Get customer name
+                          // Get nucacid name
                           const id = parent.querySelector('input[type=checkbox]').value;
 
                           selectedIds.push(id)
@@ -357,7 +357,7 @@ var KTDatatablesServerSide = function () {
                         });
 
                         Swal.fire({
-                            text: "You have deleted all selected customers!.",
+                            text: "You have deleted all selected nucacids!.",
                             icon: "success",
                             buttonsStyling: false,
                             confirmButtonText: "Ok, got it!",
@@ -375,7 +375,7 @@ var KTDatatablesServerSide = function () {
                     });
                 } else if (result.dismiss === 'cancel') {
                     Swal.fire({
-                        text: "Selected customers was not deleted.",
+                        text: "Selected nucacids was not deleted.",
                         icon: "error",
                         buttonsStyling: false,
                         confirmButtonText: "Ok, got it!",
@@ -438,7 +438,7 @@ var KTDatatablesServerSide = function () {
         selectedRows.forEach((p) => {
           // Select parent row
           const parent = p.closest('tr');
-          // Get customer name
+          // Get nucacid name
           const id = parent.querySelector('input[type=checkbox]').value;
 
           selectedIds.push(id)

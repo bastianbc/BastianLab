@@ -296,7 +296,7 @@ var KTDatatablesServerSide = function () {
                 if (result.value) {
                     // Simulate delete request -- for demo purpose only
                     Swal.fire({
-                        text: "Deleting selected customers",
+                        text: "Deleting selected records",
                         icon: "info",
                         buttonsStyling: false,
                         showConfirmButton: false,

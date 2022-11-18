@@ -39,6 +39,7 @@ class Blocks(models.Model):
         ("type1","Type 1"),
         ("type2","Type 2"),
     )
+
     bl_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50, blank=True, null=False, unique=True)
     # pat_id = models.CharField(max_length=12, blank=True, null=True)
