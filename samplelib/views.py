@@ -66,21 +66,20 @@ def new_samplelib(request):
 
 @permission_required("samplelib.add_samplelib",raise_exception=True)
 def new_samplelib_async(request):
-    from .utils import get_smallest_amount_nucleic_acid
+    from itertools import groupby
 
     selected_ids = json.loads(request.GET.get("selected_ids"))
     options = json.loads(request.GET.get("options"))
 
     try:
-        area = {}
-        sample_lib = {}
 
         barcode_id = int(options["barcode_start_with"])
 
         target_amount = used_amount = float(options["target_amount"])
 
-        # nucacids = NucAcids.objects.filter(nu_id__in=selected_ids).order_by("vol_remain")
-        nucacids = sorted(NucAcids.objects.filter(nu_id__in=selected_ids),  key=lambda na: na.amount, reverse=True)
+        nucacids = NucAcids.objects.filter(nu_id__in=selected_ids)
+
+        grouped_nucacids = [list(result) for key, result in groupby(nucacids, key=lambda na: na.area)]
 
         prefixies = SampleLib.objects.filter(name__startswith=options["prefix"])
         autonumber = 1
@@ -88,70 +87,62 @@ def new_samplelib_async(request):
             max_value = max([int(p.name.split("-")[-1]) for p in prefixies])
             autonumber = max_value + 1
 
-        while target_amount > 0 and len(nucacids) > 0:
+        for group in grouped_nucacids:
 
-            nucacid = nucacids.pop()
-
-            if not nucacid.amount > 0:
-                continue
-
-            if not area == nucacid.area:
-                area = nucacid.area
-
-                barcode = Barcode.objects.get(id=barcode_id)
-
-                sample_lib = SampleLib.objects.create(
-                    name="%s-%d" % (options["prefix"],autonumber),
-                    barcode=barcode,
-                    input_amount=target_amount,
-                    method=Method.objects.all().first(),
-                )
-
-                autonumber += 1
-
-            used_amount = nucacid.amount if nucacid.amount < target_amount else target_amount
-
-            NA_SL_LINK.objects.create(
-                nucacid=nucacid,
-                sample_lib=sample_lib,
-                input_vol= used_amount / nucacid.conc,
-                input_amount= used_amount
+            sample_lib = SampleLib.objects.create(
+                name="%s-%d" % (options["prefix"],autonumber),
+                barcode=Barcode.objects.get(id=barcode_id),
+                method=Method.objects.all().first(),
             )
 
-            # nucacid.set_zero_volume()
-            nucacid.update_volume(used_amount)
+            if len(group) > 1:
 
-            target_amount -= nucacid.amount
+                total_amount = 0
 
-        # for nucacid in nucacids:
-        #
-        #     if not area == nucacid.area:
-        #         area = nucacid.area
-        #
-        #         barcode = Barcode.objects.get(id=barcode_id)
-        #
-        #         sample_lib = SampleLib.objects.create(
-        #             name="%s-%d" % (options["prefix"],autonumber),
-        #             barcode=barcode,
-        #             input_amount=target_amount,
-        #             method=Method.objects.all().first(),
-        #         )
-        #
-        #         autonumber += 1
-        #
-        #     NA_SL_LINK.objects.create(
-        #         nucacid=nucacid,
-        #         sample_lib=sample_lib,
-        #         input_vol= nucacid.vol_remain if nucacid.amount < target_amount else target_amount / nucacid.conc,
-        #         input_amount= nucacid.amount if nucacid.amount < target_amount else target_amount
-        #     )
-        #
-        #     # nucacid.set_zero_volume()
-        #     nucacid.update_volume(target_amount)
-        #
-        #     target_amount -= nucacid.amount
-        #
-        #     barcode_id = barcode_id + 1 if barcode_id < 192 else 1 #The barcode table contains numeric barcodes with barcode_id=1- 192
+                sorted_group = sorted(group, key=lambda na: na.amount, reverse=True)
+
+                while target_amount > 0 and len(sorted_group) > 0:
+
+                    nucacid = sorted_group.pop()
+
+                    if not nucacid.amount > 0:
+                        continue
+
+                    used_amount = nucacid.amount if nucacid.amount < target_amount else target_amount
+                    total_amount += used_amount
+
+                    NA_SL_LINK.objects.create(
+                        nucacid=nucacid,
+                        sample_lib=sample_lib,
+                        input_vol= used_amount / nucacid.conc,
+                        input_amount= used_amount
+                    )
+
+                    nucacid.update_volume(used_amount)
+
+                    target_amount -= used_amount
+
+                sample_lib.input_amount = total_amount
+                sample_lib.save()
+            else:
+                nucacid = group.pop()
+
+                used_amount = nucacid.amount if nucacid.amount < target_amount else target_amount
+
+                sample_lib.input_amount = used_amount
+                sample_lib.save()
+
+                NA_SL_LINK.objects.create(
+                    nucacid=nucacid,
+                    sample_lib=sample_lib,
+                    input_vol= used_amount / nucacid.conc,
+                    input_amount= used_amount
+                )
+
+                nucacid.update_volume(used_amount)
+
+            barcode_id = barcode_id + 1 if barcode_id < 192 else 1 #The barcode table contains numeric barcodes with barcode_id=1- 192
+            autonumber += 1
 
     except Exception as e:
         print(str(e))

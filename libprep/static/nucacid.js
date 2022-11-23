@@ -60,6 +60,10 @@ var KTDatatablesServerSide = function () {
                 //     }
                 // },
                 {
+                    targets: 9,
+                    orderable: false
+                },
+                {
                     targets: 10,
                     data: null,
                     orderable: false,
@@ -466,9 +470,17 @@ var KTDatatablesServerSide = function () {
 
         for (var i = 0; i < selectedRows.length; i++) {
 
-          var naType = selectedRows[i].closest('tr').querySelectorAll('td')[3].innerText;
+          try {
 
-          arr.push(naType)
+            var naType = selectedRows[i].closest('tr').querySelectorAll('td')[3].innerText;
+
+            arr.push(naType)
+
+          } catch (e) {
+
+            continue;
+
+          }
         }
 
         var naTypeSet = new Set(arr);

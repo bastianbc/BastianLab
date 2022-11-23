@@ -88,9 +88,7 @@ class SampleLib(models.Model):
                 pass
             elif search_value:
                 queryset = queryset.filter(
-                    Q(name__icontains=search_value) |
-                    Q(na_type__icontains=search_value) |
-                    Q(date__icontains=search_value)
+                    Q(name__icontains=search_value) 
                 )
 
             count = queryset.count()

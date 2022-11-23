@@ -56,7 +56,6 @@ class NucAcids(models.Model):
                 "6": "conc",
                 "7": "vol_init",
                 "8": "vol_remain",
-                "9": "amount",
             }
             draw = int(kwargs.get('draw', None)[0])
             length = int(kwargs.get('length', None)[0])
