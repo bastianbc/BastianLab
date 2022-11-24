@@ -33,7 +33,7 @@ def blocks(request):
     if model=="project" and id:
         project = Projects.objects.get(pr_id=id)
     elif model=="patient" and id:
-        patient = Patients.objects.get(pr_id=id)
+        patient = Patients.objects.get(pat_id=id)
 
     return render(request,"block_list.html",locals())
 

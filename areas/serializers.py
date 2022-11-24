@@ -21,10 +21,10 @@ class AreasSerializer(serializers.ModelSerializer):
         return obj.get_area_type_display()
 
     def get_investigator(self, obj):
-        return obj.block.project.pi if obj.block else None
+        return obj.block.project.pi if obj.block.project else None
 
     def get_block(self,obj):
         return obj.block.name if obj.block else None
 
     def get_project(self,obj):
-        return obj.block.project.name if obj.block else None
+        return obj.block.project.name if obj.block.project else None
