@@ -40,7 +40,8 @@ class SampleLib(models.Model):
     def query_by_args(self, user, **kwargs):
 
         def _get_authorizated_queryset():
-            queryset = SampleLib.objects.all()
+            # queryset = SampleLib.objects.all()
+            queryset = SampleLib.objects.all().annotate(num_nucacids=Count('nucacids'))
             if not user.is_superuser:
                 return queryset.filter(Q(area__block__project__technician=user) | Q(area__block__project__researcher=user))
             return queryset
@@ -88,7 +89,7 @@ class SampleLib(models.Model):
                 pass
             elif search_value:
                 queryset = queryset.filter(
-                    Q(name__icontains=search_value) 
+                    Q(name__icontains=search_value)
                 )
 
             count = queryset.count()
@@ -106,7 +107,7 @@ class SampleLib(models.Model):
 
 class NA_SL_LINK(models.Model):
     nucacid = models.ForeignKey("libprep.NucAcids",on_delete=models.CASCADE, verbose_name="Nucleic Acid")
-    sample_lib = models.ForeignKey(SampleLib, on_delete=models.CASCADE, verbose_name="Sample Library")
+    sample_lib = models.ForeignKey(SampleLib, on_delete=models.CASCADE, related_name="nucacids", verbose_name="Sample Library")
     input_vol = models.FloatField(default=0, verbose_name="Te Volume")
     input_amount = models.FloatField(default=0, verbose_name="Input Amount")
 

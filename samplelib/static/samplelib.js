@@ -40,6 +40,7 @@ var KTDatatablesServerSide = function () {
                 { data: 'input_amount' },
                 { data: 'vol_init' },
                 { data: 'vol_remain' },
+                { data: 'num_nucacids' }
             ],
             columnDefs: [
                 {
@@ -53,7 +54,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 6,
+                    targets: 9,
                     orderable: false,
                     render: function (data, type, row) {
                         if (data > 0) {
@@ -65,7 +66,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 9,
+                    targets: 10,
                     data: null,
                     orderable: false,
                     className: 'text-end',

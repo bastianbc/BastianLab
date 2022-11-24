@@ -2,14 +2,14 @@ from rest_framework import serializers
 from .models import *
 
 class SampleLibSerializer(serializers.ModelSerializer):
-    # block = serializers.IntegerField()
     DT_RowId = serializers.SerializerMethodField()
     method = serializers.StringRelatedField()
     input_amount = serializers.SerializerMethodField()
+    num_nucacids = serializers.IntegerField()
 
     class Meta:
         model = SampleLib
-        fields = ("id", "name", "barcode", "date", "method", "conc", "input_amount", "vol_init", "vol_remain", "DT_RowId",)
+        fields = ("id", "name", "barcode", "date", "method", "conc", "input_amount", "vol_init", "vol_remain", "num_nucacids", "DT_RowId",)
 
     def get_DT_RowId(self, obj):
        return getattr(obj, 'id')
