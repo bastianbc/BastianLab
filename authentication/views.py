@@ -26,7 +26,7 @@ def log_in(request):
                     request.session["username"] = username
                     return redirect("/auth/set_password")
                 else:
-                    messages.error(request, custom_messages.AUTHENTICATION_ERROR)
+                    messages.error(request, "Invalid username or password!")
 
                 messages.error(request, "Authentication Error!")
                 print("Authentication Error!")

@@ -337,48 +337,36 @@ var KTDatatablesServerSide = function () {
                             data: {
                               "selected_ids": getSelectedRows(),
                             },
-                            done: function (result) {
-                                if (result.success) {
-                                  Swal.fire({
-                                      text: "Nucleic Acid(s) was deleted succesfully.",
-                                      icon: "info",
-                                      buttonsStyling: false,
-                                      confirmButtonText: "Ok, got it!",
-                                      customClass: {
-                                          confirmButton: "btn fw-bold btn-success",
-                                      }
-                                  }).then(function(){
-                                    dt.draw();
-                                  });
-                                }
-                                else {
-                                  Swal.fire({
-                                      text: "Nucleic Acid(s) wasn't deleted!",
-                                      icon: "error",
-                                      buttonsStyling: false,
-                                      confirmButtonText: "Ok, got it!",
-                                      customClass: {
-                                          confirmButton: "btn fw-bold btn-success",
-                                      }
-                                  });
-                                }
-                            },
                             error: function (xhr, ajaxOptions, thrownError) {
                                 swal("Error deleting!", "Please try again", "error");
                             }
-                        });
-
-                        Swal.fire({
-                            text: "You have deleted all selected customers!.",
-                            icon: "success",
-                            buttonsStyling: false,
-                            confirmButtonText: "Ok, got it!",
-                            customClass: {
-                                confirmButton: "btn fw-bold btn-primary",
-                            }
-                        }).then(function () {
-                            // delete row data from server and re-draw datatable
-                            dt.draw();
+                        }).done(function () {
+                          function (result) {
+                              if (result.success) {
+                                Swal.fire({
+                                    text: "Nucleic Acid(s) was deleted succesfully.",
+                                    icon: "info",
+                                    buttonsStyling: false,
+                                    confirmButtonText: "Ok, got it!",
+                                    customClass: {
+                                        confirmButton: "btn fw-bold btn-success",
+                                    }
+                                }).then(function(){
+                                  dt.draw();
+                                });
+                              }
+                              else {
+                                Swal.fire({
+                                    text: "Nucleic Acid(s) wasn't deleted!",
+                                    icon: "error",
+                                    buttonsStyling: false,
+                                    confirmButtonText: "Ok, got it!",
+                                    customClass: {
+                                        confirmButton: "btn fw-bold btn-success",
+                                    }
+                                });
+                              }
+                          }
                         });
 
                         // Remove header checked box

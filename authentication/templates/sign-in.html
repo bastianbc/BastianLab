@@ -103,6 +103,13 @@ License: For each use you must have a valid license purchased only from above li
 									<!--end::Link-->
 								</div>
 								<!--end::Wrapper-->
+
+								<div class="fv-row mb-3 text-center">
+									{% for message in messages %}
+									     <span class="text-danger">{{message}}</span>
+									{% endfor %}
+								</div>
+
 								<!--begin::Submit button-->
 								<div class="d-grid mb-10">
 									<button type="submit" id="kt_sign_in_submit" class="btn btn-primary">

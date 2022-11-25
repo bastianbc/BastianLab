@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<form method="post" action="{% if id %} {% url 'edit-block' id %} {% else %} {% url 'new-block' %} {% endif %}">
+<form method="post" action="{% if id %} {% url 'edit-block' id %} {% else %} {% url 'new-block' %} {% endif %}" novalidate>
   <div class="card">
     <div class="card-header">
       <h3 class="card-title">Block</h3>

@@ -148,3 +148,14 @@ def delete_block(request,id):
         deleted = False
 
     return JsonResponse({ "deleted":True })
+
+@permission_required("blocks.delete_samplelib",raise_exception=True)
+def delete_batch_blocks(request):
+    try:
+        selected_ids = json.loads(request.GET.get("selected_ids"))
+        Blocks.objects.filter(bl_id__in=selected_ids).delete()
+    except Exception as e:
+        print(str(e))
+        return JsonResponse({ "deleted":False })
+
+    return JsonResponse({ "deleted":True })

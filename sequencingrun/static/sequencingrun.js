@@ -331,34 +331,33 @@ var KTDatatablesServerSide = function () {
                             data: {
                               "selected_ids": getSelectedRows(),
                             },
-                            done: function (result) {
-                                if (result.success) {
-                                  Swal.fire({
-                                      text: "Sequencing Run(s) was deleted succesfully.",
-                                      icon: "info",
-                                      buttonsStyling: false,
-                                      confirmButtonText: "Ok, got it!",
-                                      customClass: {
-                                          confirmButton: "btn fw-bold btn-success",
-                                      }
-                                  }).then(function(){
-                                    dt.draw();
-                                  });
-                                }
-                                else {
-                                  Swal.fire({
-                                      text: "Sequencing Run(s) wasn't deleted!",
-                                      icon: "error",
-                                      buttonsStyling: false,
-                                      confirmButtonText: "Ok, got it!",
-                                      customClass: {
-                                          confirmButton: "btn fw-bold btn-success",
-                                      }
-                                  });
-                                }
-                            },
                             error: function (xhr, ajaxOptions, thrownError) {
                                 swal("Error deleting!", "Please try again", "error");
+                            }
+                        }).done(function (result) {
+                            if (result.deleted) {
+                              Swal.fire({
+                                  text: "Sequencing Run(s) was deleted succesfully.",
+                                  icon: "info",
+                                  buttonsStyling: false,
+                                  confirmButtonText: "Ok, got it!",
+                                  customClass: {
+                                      confirmButton: "btn fw-bold btn-success",
+                                  }
+                              }).then(function(){
+                                dt.draw();
+                              });
+                            }
+                            else {
+                              Swal.fire({
+                                  text: "Sequencing Run(s) wasn't deleted!",
+                                  icon: "error",
+                                  buttonsStyling: false,
+                                  confirmButtonText: "Ok, got it!",
+                                  customClass: {
+                                      confirmButton: "btn fw-bold btn-success",
+                                  }
+                              });
                             }
                         });
 
