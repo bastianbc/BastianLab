@@ -618,6 +618,9 @@ var KTDatatablesServerSide = function () {
         },
         table: ".table",
         fields: [ {
+               label: "Name:",
+               name: "name"
+           },{
                label: "Diagnosis:",
                name: "diagnosis"
            }, {
