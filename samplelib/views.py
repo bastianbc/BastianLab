@@ -70,6 +70,7 @@ def new_samplelib_async(request):
 
     selected_ids = json.loads(request.GET.get("selected_ids"))
     options = json.loads(request.GET.get("options"))
+    created_links = []
 
     try:
 
@@ -111,7 +112,7 @@ def new_samplelib_async(request):
                     used_amount = nucacid.amount if nucacid.amount < target_amount else target_amount
                     total_amount += used_amount
 
-                    NA_SL_LINK.objects.create(
+                    link = NA_SL_LINK.objects.create(
                         nucacid=nucacid,
                         sample_lib=sample_lib,
                         input_vol= used_amount / nucacid.conc,
@@ -132,7 +133,7 @@ def new_samplelib_async(request):
                 sample_lib.input_amount = used_amount
                 sample_lib.save()
 
-                NA_SL_LINK.objects.create(
+                link = NA_SL_LINK.objects.create(
                     nucacid=nucacid,
                     sample_lib=sample_lib,
                     input_vol= used_amount / nucacid.conc,
@@ -143,12 +144,16 @@ def new_samplelib_async(request):
 
             barcode_id = barcode_id + 1 if barcode_id < 192 else 1 #The barcode table contains numeric barcodes with barcode_id=1- 192
             autonumber += 1
+            created_links.append(link.id)
+
+        saved_links = NA_SL_LINK.objects.filter(id__in=created_links)
+        serializer = SavedNuacidsSerializer(saved_links, many=True)
 
     except Exception as e:
         print(str(e))
-        return JsonResponse({"success":False})
+        return JsonResponse({"success":False, "data":None})
 
-    return JsonResponse({"success":True})
+    return JsonResponse({"success":True, "data":serializer.data})
 
 @permission_required("samplelib.change_samplelib",raise_exception=True)
 def edit_samplelib(request,id):
@@ -186,6 +191,7 @@ def delete_batch_samplelibs(request):
         selected_ids = json.loads(request.GET.get("selected_ids"))
         SampleLib.objects.filter(id__in=selected_ids).delete()
     except Exception as e:
+        print(str(e))
         return JsonResponse({ "deleted":False })
 
     return JsonResponse({ "deleted":True })
@@ -195,3 +201,24 @@ def get_used_nucacids(request,id):
     used_nucacids = NA_SL_LINK.objects.filter(sample_lib__id=id)
     serializer = UsedNuacidsSerializer(used_nucacids, many=True)
     return JsonResponse(serializer.data, safe=False)
+
+@permission_required("samplelib.change_samplelib",raise_exception=True)
+def update_sl_na_link_async(request):
+    try:
+        values = json.loads(request.GET.get("values"))
+
+        for value in values:
+            volume = float(value["volume"])
+            amount = float(value["amount"])
+
+            link = NA_SL_LINK.objects.get(id=value["id"])
+            link.input_vol = volume
+            link.input_amount = amount
+            link.save()
+
+            link.nucacid.update_volume(amount)
+    except Exception as e:
+        print(str(e))
+        return JsonResponse({ "success":False })
+
+    return JsonResponse({ "success":True })

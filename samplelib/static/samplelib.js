@@ -84,11 +84,19 @@ var KTDatatablesServerSide = function () {
                                 </span>
                             </a>
                             <!--begin::Menu-->
-                            <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4" data-kt-menu="true">
+                            <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-150px py-4" data-kt-menu="true">
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
                                     <a href="/samplelib/edit/`+ row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
                                         Edit
+                                    </a>
+                                </div>
+                                <!--end::Menu item-->
+
+                                <!--begin::Menu item-->
+                                <div class="menu-item px-2">
+                                    <a href="javascript:;" class="menu-link px-3 detail-link" data-kt-docs-table-filter="detail_row">
+                                        Used Nucacids(s)
                                     </a>
                                 </div>
                                 <!--end::Menu item-->
@@ -177,11 +185,11 @@ var KTDatatablesServerSide = function () {
                 const parent = e.target.closest('tr');
 
                 // Get customer name
-                const customerName = parent.querySelectorAll('td')[1].innerText;
+                const recordName = parent.querySelectorAll('td')[1].innerText;
 
                 // SweetAlert2 pop up --- official docs reference: https://sweetalert2.github.io/
                 Swal.fire({
-                    text: "Are you sure you want to delete " + customerName + "?",
+                    text: "Are you sure you want to delete " + recordName + "?",
                     icon: "warning",
                     showCancelButton: true,
                     buttonsStyling: false,
@@ -195,7 +203,7 @@ var KTDatatablesServerSide = function () {
                     if (result.value) {
                         // Simulate delete request -- for demo purpose only
                         Swal.fire({
-                            text: "Deleting " + customerName,
+                            text: "Deleting " + recordName,
                             icon: "info",
                             buttonsStyling: false,
                             showConfirmButton: false,
@@ -221,7 +229,7 @@ var KTDatatablesServerSide = function () {
                                 },
                                 error: function (xhr, ajaxOptions, thrownError) {
                                   Swal.fire({
-                                      text: customerName + " was not deleted.",
+                                      text: recordName + " was not deleted.",
                                       icon: "error",
                                       buttonsStyling: false,
                                       confirmButtonText: "Ok, got it!",
@@ -234,7 +242,7 @@ var KTDatatablesServerSide = function () {
                         });
                     } else if (result.dismiss === 'cancel') {
                         Swal.fire({
-                            text: customerName + " was not deleted.",
+                            text: recordName + " was not deleted.",
                             icon: "error",
                             buttonsStyling: false,
                             confirmButtonText: "Ok, got it!",
@@ -341,7 +349,7 @@ var KTDatatablesServerSide = function () {
                                 swal("Error deleting!", "Please try again", "error");
                             }
                         }).done(function (result) {
-                            if (result.success) {
+                            if (result.deleted) {
                               Swal.fire({
                                   text: "Nucleic Acid(s) was deleted succesfully.",
                                   icon: "info",

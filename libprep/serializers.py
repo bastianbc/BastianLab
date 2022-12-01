@@ -8,6 +8,7 @@ class NucacidsSerializer(serializers.ModelSerializer):
     method = serializers.StringRelatedField()
     na_type = serializers.SerializerMethodField()
     vol_remain = serializers.SerializerMethodField()
+    amount = serializers.SerializerMethodField()
 
     class Meta:
         model = NucAcids
@@ -27,3 +28,6 @@ class NucacidsSerializer(serializers.ModelSerializer):
 
     def get_vol_remain(self, obj):
         return round(obj.vol_remain,2)
+
+    def get_amount(self, obj):
+        return round(obj.amount,2)    

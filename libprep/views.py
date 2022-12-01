@@ -131,6 +131,7 @@ def delete_batch_nucacids(request):
         selected_ids = json.loads(request.GET.get("selected_ids"))
         NucAcids.objects.filter(nu_id__in=selected_ids).delete()
     except Exception as e:
+        print(str(e))
         return JsonResponse({ "deleted":False })
 
     return JsonResponse({ "deleted":True })

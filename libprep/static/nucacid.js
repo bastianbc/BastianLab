@@ -412,10 +412,305 @@ var KTDatatablesServerSide = function () {
         }
     }
 
-    var handleSelectedRows = function (e) {
+    var handleSelectedRows = ((e) => {
 
-      const el = document.getElementById("modal_create_sample_library");
-      const modal = new bootstrap.Modal(el);
+      var stepper = new KTStepper(document.getElementById("modal_stepper"));
+
+      var modal = new bootstrap.Modal(document.getElementById("modal_samplelib_options"));
+
+      function initModal() {
+        var isInit = false;
+
+        function resetStepper() {
+
+          stepper.goFirst();
+
+        }
+
+        function resetForm() {
+
+          document.getElementById("frm_creation_options").reset();
+
+        }
+
+        function resetTable() {
+
+          document.querySelector(".list-body").innerHTML = "";
+
+        }
+
+        document.getElementById("modal_samplelib_options").addEventListener('show.bs.modal', function(e){
+
+          if (!checkSelectedRows()) {
+
+            Swal.fire({
+                text: "Identical barcodes are used in selected rows.",
+                icon: "error",
+                buttonsStyling: false,
+                confirmButtonText: "Ok, got it!",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-primary",
+                }
+            }).then(function () {
+
+              modal.hide();
+
+            });
+
+          }
+          else {
+
+            if (!isInit) {
+
+              isInit = true;
+
+              initEvents();
+            }
+
+          }
+
+        });
+
+        document.getElementById("modal_samplelib_options").addEventListener('hide.bs.modal', function(e){
+
+          resetForm();
+
+          resetStepper();
+
+          resetTable();
+
+          dt.draw();
+
+        });
+
+      }
+
+      function initEvents() {
+
+        function handleSpinner(state) {
+
+          if (state) {
+
+            document.querySelector('[data-kt-stepper-action="next"]').setAttribute("data-kt-indicator", "on");
+
+          }
+          else {
+
+            document.querySelector('[data-kt-stepper-action="next"]').removeAttribute("data-kt-indicator");
+
+          }
+
+        }
+
+        function handleSize() {
+
+          var element = document.getElementById("modal_samplelib_options").getElementsByClassName("modal-dialog")[0];
+
+          element.classList.remove("mw-600px");
+
+          element.classList.add("mw-900px");
+
+        }
+
+        function getValues() {
+
+          var rows = document.querySelector(".list-body").querySelectorAll(".row");
+
+          var values = [];
+
+          for (var row of rows) {
+
+            var id = row.getAttribute("data-id");
+            var volume = row.querySelector(".detail-volume").value;
+            var amount = row.querySelector(".detail-amount").value;
+
+            values.push({
+              "id":id,
+              "volume":volume,
+              "amount": amount
+            });
+          }
+
+          return JSON.stringify(values);
+
+        }
+
+        document.getElementById("id_prefix").addEventListener("keyup", function () {
+
+          this.value = this.value.toLocaleUpperCase();
+
+        });
+
+        // document.getElementById("id_sequencing_lib").addEventListener("change", function () {
+        //
+        //   $.ajax({
+        //     type: "GET",
+        //     url: "/sequencinglib/get_sequencinglib_async/" + this.value,
+        //     beforeSend: function () {
+        //
+        //       handleSpinner(true);
+        //
+        //     }
+        //   }).done(function(data) {
+        //     if (data) {
+        //
+        //       handleSpinner(false);
+        //
+        //       handleData(data);
+        //
+        //       handleFormAction(true);
+        //
+        //     }
+        //     else {
+        //       Swal.fire({
+        //           text: "Sequencing Library(s) was not created.",
+        //           icon: "error",
+        //           buttonsStyling: false,
+        //           confirmButtonText: "Ok, got it!",
+        //           customClass: {
+        //               confirmButton: "btn fw-bold btn-danger",
+        //           }
+        //       });
+        //     }
+        //
+        //   });
+        //
+        // });
+
+        function fillElements(data) {
+
+          var listEl = document.querySelector(".list-body");
+
+          var total_amount = 0;
+          var total_volume = 0;
+
+          for (var i = 0; i < data.length; i++) {
+
+            var row = `<div class="row m-1" data-id="${ data[i].id }">
+                <div class="col-3 align-self-center">${ data[i].sample_lib }</div>
+                <div class="col-3 align-self-center">${ data[i].nucacid }</div>
+                <div class="col-3 align-self-center">${ data[i].area }</div>
+                <div class="col-1 align-self-center">${ data[i].conc }</div>
+                <div class="col-1 text-center"><input type="text" class="textinput textInput form-control form-control-sm text-end detail-volume" value="${ data[i].input_vol }"></div>
+                <div class="col-1 text-center"><input type="text" class="textinput textInput form-control form-control-sm text-end detail-amount" value="${ data[i].input_amount }"></div>
+              </div>`;
+            listEl.innerHTML += row;
+
+          }
+
+        }
+
+        document.querySelector('[data-kt-stepper-action="next"]').addEventListener('click', function () {
+
+          $.ajax({
+            type: "GET",
+            url: "/samplelib/new_async",
+            data: {
+              "selected_ids": getSelectedRows(),
+              "options": getCreationOptions()
+            },
+            beforeSend: function () {
+
+              handleSpinner(true);
+
+            }
+          }).done(function(result) {
+            if (result.success) {
+
+              handleSpinner(false);
+
+              handleSize();
+
+              fillElements(result.data);
+
+              handleVolumeChanged();
+
+              handleChangesSubmit();
+
+              stepper.goNext();
+
+            }
+            else {
+              Swal.fire({
+                  text: "Sequencing Library(s) was not created.",
+                  icon: "error",
+                  buttonsStyling: false,
+                  confirmButtonText: "Ok, got it!",
+                  customClass: {
+                      confirmButton: "btn fw-bold btn-danger",
+                  }
+              });
+            }
+
+          });
+
+        });
+
+        function handleVolumeChanged() {
+
+          for (var amount of document.querySelectorAll(".detail-volume")) {
+
+            amount.addEventListener("change", function () {
+
+              var parent = this.closest('.row');
+
+              var conc = parent.querySelectorAll('div')[3].innerText;
+
+              var amount = this.value * conc;
+
+              parent.querySelector(".detail-amount").value = amount;
+
+            });
+
+          }
+
+        }
+
+        function handleChangesSubmit() {
+
+          document.querySelector('[data-kt-stepper-action="submit"]').addEventListener('click', function () {
+
+            $.ajax({
+              type: "GET",
+              url: "/samplelib/update_async",
+              data: {
+                "values": getValues(),
+              },
+            }).done(function(result) {
+              if (result.success) {
+                Swal.fire({
+                    text: "Sample Library(s) was updated succesfully.",
+                    icon: "info",
+                    buttonsStyling: false,
+                    confirmButtonText: "Ok, got it!",
+                    customClass: {
+                        confirmButton: "btn fw-bold btn-success",
+                    }
+                }).then(function(){
+                  dt.draw();
+                });
+              }
+              else {
+                Swal.fire({
+                    text: "Sample Library(s) was not updated.",
+                    icon: "error",
+                    buttonsStyling: false,
+                    confirmButtonText: "Ok, got it!",
+                    customClass: {
+                        confirmButton: "btn fw-bold btn-danger",
+                    }
+                });
+              }
+
+              modal.hide();
+
+            });
+
+          });
+
+        }
+
+      }
 
       function getSelectedRows() {
 
@@ -428,7 +723,7 @@ var KTDatatablesServerSide = function () {
         selectedRows.forEach((p) => {
           // Select parent row
           const parent = p.closest('tr');
-          // Get nucacid name
+          // Get customer name
           const id = parent.querySelector('input[type=checkbox]').value;
 
           selectedIds.push(id)
@@ -481,97 +776,13 @@ var KTDatatablesServerSide = function () {
 
       }
 
-      function openModal() {
-
-        if (checkSelectedRows()) {
-
-          modal.show();
-
+      return {
+        init: function () {
+          initModal();
         }
-        else {
-
-          Swal.fire({
-              text: "DNA and RNA type nucleic acids cannot be together in the selected rows.",
-              icon: "error",
-              buttonsStyling: false,
-              confirmButtonText: "Ok, got it!",
-              customClass: {
-                  confirmButton: "btn fw-bold btn-primary",
-              }
-          });
-
-        }
-
       }
 
-      function closeModal() {
-
-        modal.hide();
-
-      }
-
-      const txtPrefix = document.getElementById("id_prefix");
-
-      txtPrefix.addEventListener("keyup", function () {
-
-        this.value = this.value.toLocaleUpperCase();
-
-      });
-
-      // Select element
-      const btnCreateSampleLibrary = document.querySelector('[data-kt-docs-table-select="event_create_sample_library"]');
-
-      // Open modal for extraction options
-      btnCreateSampleLibrary.addEventListener('click', function () {
-
-        openModal();
-
-      });
-
-      const btnContinue = document.getElementById("btn_continue");
-
-      // create nucacids
-      btnContinue.addEventListener('click', function () {
-
-        $.ajax({
-          type: "GET",
-          url: "/samplelib/new_async",
-          data: {
-            "selected_ids": getSelectedRows(),
-            "options": getCreationOptions()
-          },
-        }).done(function(result) {
-          if (result.success) {
-            Swal.fire({
-                text: "Sample Library(s) was created succesfully.",
-                icon: "info",
-                buttonsStyling: false,
-                confirmButtonText: "Ok, got it!",
-                customClass: {
-                    confirmButton: "btn fw-bold btn-success",
-                }
-            }).then(function(){
-              dt.draw();
-            });
-          }
-          else {
-            Swal.fire({
-                text: "Sample Library(s) was not created.",
-                icon: "error",
-                buttonsStyling: false,
-                confirmButtonText: "Ok, got it!",
-                customClass: {
-                    confirmButton: "btn fw-bold btn-danger",
-                }
-            });
-          }
-
-          closeModal();
-
-        });
-
-      });
-    }
+    })();
 
     var initEditor = function () {
 
@@ -659,7 +870,7 @@ var KTDatatablesServerSide = function () {
             handleFilterDatatable();
             handleDeleteRows();
             handleResetForm();
-            handleSelectedRows();
+            handleSelectedRows.init();
             initEditor();
         }
     }
