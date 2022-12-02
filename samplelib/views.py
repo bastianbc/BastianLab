@@ -128,6 +128,9 @@ def new_samplelib_async(request):
             else:
                 nucacid = group.pop()
 
+                if not nucacid.amount > 0:
+                    continue
+
                 used_amount = nucacid.amount if nucacid.amount < target_amount else target_amount
 
                 sample_lib.input_amount = used_amount
