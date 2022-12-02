@@ -130,7 +130,7 @@ var KTDatatablesServerSide = function () {
             handleDeleteRows();
             handleResetForm();
             initModal();
-            handleSelectedRows();
+            handleSelectedRows.init();
             KTMenu.createInstances();
         });
     }
@@ -278,9 +278,6 @@ var KTDatatablesServerSide = function () {
         const container = document.querySelector('.table');
         const checkboxes = container.querySelectorAll('[type="checkbox"]');
 
-        // Select elements
-        const deleteSelected = document.querySelector('[data-kt-docs-table-select="delete_selected"]');
-
         // Toggle delete selected toolbar
         checkboxes.forEach(c => {
             // Checkbox on click event
@@ -291,107 +288,6 @@ var KTDatatablesServerSide = function () {
             });
         });
 
-        // Deleted selected rows
-        deleteSelected.addEventListener('click', function () {
-            // SweetAlert2 pop up --- official docs reference: https://sweetalert2.github.io/
-            Swal.fire({
-                text: "Are you sure you want to delete selected records?",
-                icon: "warning",
-                showCancelButton: true,
-                buttonsStyling: false,
-                showLoaderOnConfirm: true,
-                confirmButtonText: "Yes, delete!",
-                cancelButtonText: "No, cancel",
-                customClass: {
-                    confirmButton: "btn fw-bold btn-danger",
-                    cancelButton: "btn fw-bold btn-active-light-primary"
-                },
-            }).then(function (result) {
-                if (result.value) {
-                    // Simulate delete request -- for demo purpose only
-                    Swal.fire({
-                        text: "Deleting selected records",
-                        icon: "info",
-                        buttonsStyling: false,
-                        showConfirmButton: false,
-                        timer: 2000
-                    }).then(function () {
-
-                      function getSelectedRows() {
-
-                        const container = document.querySelector('.table');
-
-                        const selectedRows = container.querySelectorAll('[type="checkbox"]:checked');
-
-                        const selectedIds = [];
-
-                        selectedRows.forEach((p) => {
-                          // Select parent row
-                          const parent = p.closest('tr');
-                          // Get customer name
-                          const id = parent.querySelector('input[type=checkbox]').value;
-
-                          selectedIds.push(id)
-
-                        });
-
-                        return JSON.stringify(selectedIds);
-                      }
-
-                        // Calling delete request with ajax
-                        $.ajax({
-                            type: "GET",
-                            url: "/samplelib/batch_delete",
-                            data: {
-                              "selected_ids": getSelectedRows(),
-                            },
-                            error: function (xhr, ajaxOptions, thrownError) {
-                                swal("Error deleting!", "Please try again", "error");
-                            }
-                        }).done(function (result) {
-                            if (result.deleted) {
-                              Swal.fire({
-                                  text: "Nucleic Acid(s) was deleted succesfully.",
-                                  icon: "info",
-                                  buttonsStyling: false,
-                                  confirmButtonText: "Ok, got it!",
-                                  customClass: {
-                                      confirmButton: "btn fw-bold btn-success",
-                                  }
-                              }).then(function(){
-                                dt.draw();
-                              });
-                            }
-                            else {
-                              Swal.fire({
-                                  text: "Nucleic Acid(s) wasn't deleted!",
-                                  icon: "error",
-                                  buttonsStyling: false,
-                                  confirmButtonText: "Ok, got it!",
-                                  customClass: {
-                                      confirmButton: "btn fw-bold btn-success",
-                                  }
-                              });
-                            }
-                        });
-
-                        // Remove header checked box
-                        const headerCheckbox = container.querySelectorAll('[type="checkbox"]')[0];
-                        headerCheckbox.checked = false;
-                    });
-                } else if (result.dismiss === 'cancel') {
-                    Swal.fire({
-                        text: "Selected customers was not deleted.",
-                        icon: "error",
-                        buttonsStyling: false,
-                        confirmButtonText: "Ok, got it!",
-                        customClass: {
-                            confirmButton: "btn fw-bold btn-primary",
-                        }
-                    });
-                }
-            });
-        });
     }
 
     // Toggle toolbars
@@ -506,7 +402,9 @@ var KTDatatablesServerSide = function () {
 
     }
 
-    var handleSelectedRows = (e) => {
+    var handleSelectedRows = ((e) => {
+
+      var container = document.querySelector('.table');
 
       document.getElementById("modal_capturedlib_options").addEventListener('show.bs.modal', function(e){
 
@@ -529,9 +427,7 @@ var KTDatatablesServerSide = function () {
 
       function getSelectedRows() {
 
-        const container = document.querySelector('.table');
-
-        const selectedRows = container.querySelectorAll('[type="checkbox"]:checked');
+        const selectedRows = container.querySelectorAll('tbody [type="checkbox"]:checked');
 
         const selectedIds = [];
 
@@ -557,8 +453,6 @@ var KTDatatablesServerSide = function () {
       }
 
       function checkSelectedRows() {
-        // selected row's na type must be DNA
-        var container = document.querySelector('.table');
 
         var selectedRows = container.querySelectorAll('[type="checkbox"]:checked');
 
@@ -628,7 +522,107 @@ var KTDatatablesServerSide = function () {
 
       });
 
-    }
+      function uncheckedFirstCheckBox() {
+
+        dt.on( 'draw', function () {
+
+          // Remove header checked box
+          const headerCheckbox = container.querySelectorAll('[type="checkbox"]')[0];
+          headerCheckbox.checked = false;
+
+        });
+
+      }
+
+      function handleBatchDelete() {
+        // Select elements
+        const deleteSelected = document.querySelector('[data-kt-docs-table-select="delete_selected"]');
+        // Deleted selected rows
+        deleteSelected.addEventListener('click', function () {
+            // SweetAlert2 pop up --- official docs reference: https://sweetalert2.github.io/
+            Swal.fire({
+                text: "Are you sure you want to delete selected records?",
+                icon: "warning",
+                showCancelButton: true,
+                buttonsStyling: false,
+                showLoaderOnConfirm: true,
+                confirmButtonText: "Yes, delete!",
+                cancelButtonText: "No, cancel",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-danger",
+                    cancelButton: "btn fw-bold btn-active-light-primary"
+                },
+            }).then(function (result) {
+                if (result.value) {
+
+                    Swal.fire({
+                        text: "Deleting selected records",
+                        icon: "info",
+                        buttonsStyling: false,
+                        showConfirmButton: false,
+                        timer: 2000
+                    }).then(function () {
+
+                        $.ajax({
+                            type: "GET",
+                            url: "/samplelib/batch_delete",
+                            data: {
+                              "selected_ids": getSelectedRows(),
+                            },
+                            error: function (xhr, ajaxOptions, thrownError) {
+                                swal("Error deleting!", "Please try again", "error");
+                            }
+                        }).done(function (result) {
+                            if (result.deleted) {
+                              Swal.fire({
+                                  text: "Nucleic Acid(s) was deleted succesfully.",
+                                  icon: "info",
+                                  buttonsStyling: false,
+                                  confirmButtonText: "Ok, got it!",
+                                  customClass: {
+                                      confirmButton: "btn fw-bold btn-success",
+                                  }
+                              }).then(function(){
+                                dt.draw();
+                              });
+                            }
+                            else {
+                              Swal.fire({
+                                  text: "Nucleic Acid(s) wasn't deleted!",
+                                  icon: "error",
+                                  buttonsStyling: false,
+                                  confirmButtonText: "Ok, got it!",
+                                  customClass: {
+                                      confirmButton: "btn fw-bold btn-success",
+                                  }
+                              });
+                            }
+                        });
+
+                    });
+                } else if (result.dismiss === 'cancel') {
+                    Swal.fire({
+                        text: "Selected customers was not deleted.",
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn fw-bold btn-primary",
+                        }
+                    });
+                }
+            });
+        });
+
+      }
+
+      return {
+        init: function () {
+          handleBatchDelete(), uncheckedFirstCheckBox();
+        }
+      }
+
+    })();
 
     var initModal = () => {
 

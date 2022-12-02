@@ -12,8 +12,8 @@
     <div class="card-body">
       {% csrf_token %}
       <div class="row">
+        <div class="col-6">{{ form.prefix|as_crispy_field }}</div>
         <div class="col-6"> {{ form.area|as_crispy_field }}</div>
-        <div class="col-6">{{ form.name|as_crispy_field }}</div>
         <div class="col-6">{{ form.date|as_crispy_field }}</div>
         <div class="col-6">{{ form.method|as_crispy_field }}</div>
         <div class="col-6">{{ form.na_type|as_crispy_field }}</div>
