@@ -376,7 +376,9 @@ var KTDatatablesServerSide = function () {
 
 
      $('.table').on( 'click', 'tbody td:not(:first-child)', function (e) {
-          editor.inline( this );
+       editor.inline( dt.cell( this ).index(), {
+           onBlur: 'submit'
+       });
      });
 
      $('.table').on( 'key-focus', function ( e, datatable, cell ) {
@@ -575,7 +577,7 @@ var KTDatatablesServerSide = function () {
                         }).done(function (result) {
                             if (result.deleted) {
                               Swal.fire({
-                                  text: "Nucleic Acid(s) was deleted succesfully.",
+                                  text: "Sample Library(s) was deleted succesfully.",
                                   icon: "info",
                                   buttonsStyling: false,
                                   confirmButtonText: "Ok, got it!",
@@ -588,7 +590,7 @@ var KTDatatablesServerSide = function () {
                             }
                             else {
                               Swal.fire({
-                                  text: "Nucleic Acid(s) wasn't deleted!",
+                                  text: "Sample Library(s) wasn't deleted!",
                                   icon: "error",
                                   buttonsStyling: false,
                                   confirmButtonText: "Ok, got it!",
@@ -641,11 +643,11 @@ var KTDatatablesServerSide = function () {
 
         for (var i = 0; i < data.length; i++) {
 
-          var row = `<div class="row mb-1">
+          var row = `<div class="row m-1">
             <div class="col-3">${ data[i].sample_lib }</div>
-            <div class="col-3">${ data[i].nucacid }</div>
-            <div class="col-3 text-center">${ data[i].input_vol }</div>
-            <div class="col-3 text-center">${ data[i].input_amount }</div>
+            <div class="col-5">${ data[i].nucacid }</div>
+            <div class="col-2 text-center">${ data[i].input_vol }</div>
+            <div class="col-2 text-center">${ data[i].input_amount }</div>
           </div>
           `;
 

@@ -53,6 +53,7 @@ def edit_nucacid_async(request):
 @permission_required("librep.add_nucacids",raise_exception=True)
 def new_nucacid(request):
     if request.method=="POST":
+        print("++++++++++++++++++++++++++++")
         form = NucAcidForm(request.POST)
         if form.is_valid():
             nucacid = form.save()
@@ -62,7 +63,6 @@ def new_nucacid(request):
             messages.error(request,"Nucleic Acid wasn't created.")
     else:
         form = NucAcidForm()
-        print(form)
 
     return render(request,"nucacid.html",locals())
 

@@ -576,8 +576,10 @@ var KTDatatablesServerSide = function () {
 
 
      $('.table').on( 'click', 'tbody td:not(:first-child)', function (e) {
-          editor.inline( this );
-     });
+        editor.inline( dt.cell( this ).index(), {
+            onBlur: 'submit'
+        } );
+    } );
 
      $('.table').on( 'key-focus', function ( e, datatable, cell ) {
           editor.inline( cell.index() );

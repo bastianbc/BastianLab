@@ -140,9 +140,7 @@ class Blocks(models.Model):
                           )
             elif search_value:
                 queryset = queryset.filter(
-                        Q(patient__pat_id__icontains=search_value) |
-                        Q(project__pr_id__icontains=search_value) |
-                        Q(project__name__icontains=search_value) |
+                        Q(name__icontains=search_value) |
                         Q(diagnosis__icontains=search_value) |
                         Q(body_site__icontains=search_value) |
                         Q(gross__icontains=search_value)

@@ -11,6 +11,7 @@ import json
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required,permission_required
 from .serializers import *
+from django.db.models import Q
 
 @permission_required("samplelib.view_samplelib",raise_exception=True)
 def samplelibs(request):
@@ -78,16 +79,16 @@ def new_samplelib_async(request):
 
         target_amount = used_amount = float(options["target_amount"])
 
-        nucacids = NucAcids.objects.filter(nu_id__in=selected_ids)
+        nucacids = NucAcids.objects.filter(Q(nu_id__in=selected_ids) & Q(vol_remain__gt=0))
 
-        grouped_nucacids = [list(result) for key, result in groupby(nucacids, key=lambda na: na.area)]
+        grouped_nucacids = [list(result) for key, result in groupby(sorted(nucacids,key=lambda na: na.area.ar_id), key=lambda na: na.area.ar_id)]
 
         prefixies = SampleLib.objects.filter(name__startswith=options["prefix"])
         autonumber = 1
         if prefixies.exists():
             max_value = max([int(p.name.split("-")[-1]) for p in prefixies])
             autonumber = max_value + 1
-
+        print(grouped_nucacids)
         for group in grouped_nucacids:
 
             sample_lib = SampleLib.objects.create(
@@ -106,9 +107,6 @@ def new_samplelib_async(request):
 
                     nucacid = sorted_group.pop()
 
-                    if not nucacid.amount > 0:
-                        continue
-
                     used_amount = nucacid.amount if nucacid.amount < target_amount else target_amount
                     total_amount += used_amount
 
@@ -119,6 +117,8 @@ def new_samplelib_async(request):
                         input_amount= used_amount
                     )
 
+                    created_links.append(link.id)
+
                     nucacid.update_volume(used_amount)
 
                     target_amount -= used_amount
@@ -127,9 +127,6 @@ def new_samplelib_async(request):
                 sample_lib.save()
             else:
                 nucacid = group.pop()
-
-                if not nucacid.amount > 0:
-                    continue
 
                 used_amount = nucacid.amount if nucacid.amount < target_amount else target_amount
 
@@ -143,13 +140,13 @@ def new_samplelib_async(request):
                     input_amount= used_amount
                 )
 
+                created_links.append(link.id)
                 nucacid.update_volume(used_amount)
 
             barcode_id = barcode_id + 1 if barcode_id < 192 else 1 #The barcode table contains numeric barcodes with barcode_id=1- 192
             autonumber += 1
-            created_links.append(link.id)
 
-        saved_links = NA_SL_LINK.objects.filter(id__in=created_links)
+        saved_links = NA_SL_LINK.objects.filter(id__in=created_links).order_by("nucacid__area")
         serializer = SavedNuacidsSerializer(saved_links, many=True)
 
     except Exception as e:

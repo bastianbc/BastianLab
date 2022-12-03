@@ -6,6 +6,7 @@ class SampleLibSerializer(serializers.ModelSerializer):
     method = serializers.StringRelatedField()
     input_amount = serializers.SerializerMethodField()
     num_nucacids = serializers.IntegerField()
+    barcode = serializers.StringRelatedField()
 
     class Meta:
         model = SampleLib
