@@ -208,15 +208,18 @@ def update_sl_na_link_async(request):
         values = json.loads(request.GET.get("values"))
 
         for value in values:
+            link = NA_SL_LINK.objects.get(id=value["id"])
+
             volume = float(value["volume"])
             amount = float(value["amount"])
 
-            link = NA_SL_LINK.objects.get(id=value["id"])
+            diff = amount - link.input_amount
+
             link.input_vol = volume
             link.input_amount = amount
             link.save()
 
-            link.nucacid.update_volume(amount)
+            link.nucacid.update_volume(diff)
     except Exception as e:
         print(str(e))
         return JsonResponse({ "success":False })

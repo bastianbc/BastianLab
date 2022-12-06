@@ -310,6 +310,8 @@ var KTDatatablesServerSide = function () {
 
     var handleSelectedRows = ((e) => {
 
+      var isInit = false;
+
       const container = document.querySelector('.table');
 
       var stepper = new KTStepper(document.getElementById("modal_stepper"));
@@ -317,7 +319,6 @@ var KTDatatablesServerSide = function () {
       var modal = new bootstrap.Modal(document.getElementById("modal_samplelib_options"));
 
       function initModal() {
-        var isInit = false;
 
         function resetStepper() {
 
@@ -362,7 +363,7 @@ var KTDatatablesServerSide = function () {
 
               isInit = true;
 
-              initEvents();
+              initModalEvents().init();
             }
 
           }
@@ -383,188 +384,67 @@ var KTDatatablesServerSide = function () {
 
       }
 
-      function initEvents() {
+      function initModalEvents() {
 
-        function handleSpinner(state) {
+        function initPrefixKeyUp() {
 
-          if (state) {
+          document.getElementById("id_prefix").addEventListener("keyup", function () {
 
-            document.querySelector('[data-kt-stepper-action="next"]').setAttribute("data-kt-indicator", "on");
-
-          }
-          else {
-
-            document.querySelector('[data-kt-stepper-action="next"]').removeAttribute("data-kt-indicator");
-
-          }
-
-        }
-
-        function handleSize() {
-
-          var element = document.getElementById("modal_samplelib_options").getElementsByClassName("modal-dialog")[0];
-
-          element.classList.remove("mw-600px");
-
-          element.classList.add("mw-900px");
-
-        }
-
-        function getValues() {
-
-          var rows = document.querySelector(".list-body").querySelectorAll(".row");
-
-          var values = [];
-
-          for (var row of rows) {
-
-            var id = row.getAttribute("data-id");
-            var volume = row.querySelector(".detail-volume").value;
-            var amount = row.querySelector(".detail-amount").value;
-
-            values.push({
-              "id":id,
-              "volume":volume,
-              "amount": amount
-            });
-          }
-
-          return JSON.stringify(values);
-
-        }
-
-        document.getElementById("id_prefix").addEventListener("keyup", function () {
-
-          this.value = this.value.toLocaleUpperCase();
-
-        });
-
-        // document.getElementById("id_sequencing_lib").addEventListener("change", function () {
-        //
-        //   $.ajax({
-        //     type: "GET",
-        //     url: "/sequencinglib/get_sequencinglib_async/" + this.value,
-        //     beforeSend: function () {
-        //
-        //       handleSpinner(true);
-        //
-        //     }
-        //   }).done(function(data) {
-        //     if (data) {
-        //
-        //       handleSpinner(false);
-        //
-        //       handleData(data);
-        //
-        //       handleFormAction(true);
-        //
-        //     }
-        //     else {
-        //       Swal.fire({
-        //           text: "Sequencing Library(s) was not created.",
-        //           icon: "error",
-        //           buttonsStyling: false,
-        //           confirmButtonText: "Ok, got it!",
-        //           customClass: {
-        //               confirmButton: "btn fw-bold btn-danger",
-        //           }
-        //       });
-        //     }
-        //
-        //   });
-        //
-        // });
-
-        function fillElements(data) {
-
-          var listEl = document.querySelector(".list-body");
-
-          var total_amount = 0;
-          var total_volume = 0;
-
-          for (var i = 0; i < data.length; i++) {
-
-            var row = `<div class="row m-1" data-id="${ data[i].id }">
-                <div class="col-3 align-self-center">${ data[i].sample_lib }</div>
-                <div class="col-3 align-self-center">${ data[i].nucacid }</div>
-                <div class="col-3 align-self-center">${ data[i].area }</div>
-                <div class="col-1 align-self-center">${ data[i].conc }</div>
-                <div class="col-1 text-center"><input type="text" class="textinput textInput form-control form-control-sm text-end detail-volume" value="${ data[i].input_vol }"></div>
-                <div class="col-1 text-center"><input type="text" class="textinput textInput form-control form-control-sm text-end detail-amount" value="${ data[i].input_amount }"></div>
-              </div>`;
-            listEl.innerHTML += row;
-
-          }
-
-        }
-
-        document.querySelector('[data-kt-stepper-action="next"]').addEventListener('click', function () {
-
-          $.ajax({
-            type: "GET",
-            url: "/samplelib/new_async",
-            data: {
-              "selected_ids": getSelectedRows(),
-              "options": getCreationOptions()
-            },
-            beforeSend: function () {
-
-              handleSpinner(true);
-
-            }
-          }).done(function(result) {
-            if (result.success) {
-
-              handleSpinner(false);
-
-              handleSize();
-
-              fillElements(result.data);
-
-              handleVolumeChanged();
-
-              handleChangesSubmit();
-
-              stepper.goNext();
-
-            }
-            else {
-              Swal.fire({
-                  text: "Sequencing Library(s) was not created.",
-                  icon: "error",
-                  buttonsStyling: false,
-                  confirmButtonText: "Ok, got it!",
-                  customClass: {
-                      confirmButton: "btn fw-bold btn-danger",
-                  }
-              });
-            }
+            this.value = this.value.toLocaleUpperCase();
 
           });
 
-        });
+        }
 
-        function handleVolumeChanged() {
+        function initContinueClick() {
 
-          for (var amount of document.querySelectorAll(".detail-volume")) {
+          document.querySelector('[data-kt-stepper-action="next"]').addEventListener('click', function () {
 
-            amount.addEventListener("change", function () {
+            $.ajax({
+              type: "GET",
+              url: "/samplelib/new_async",
+              data: {
+                "selected_ids": getSelectedRows(),
+                "options": getCreationOptions()
+              },
+              beforeSend: function () {
 
-              var parent = this.closest('.row');
+                handleSpinner(true);
 
-              var conc = parent.querySelectorAll('div')[3].innerText;
+              }
+            }).done(function(result) {
+              if (result.success) {
 
-              var amount = this.value * conc;
+                handleSpinner(false);
 
-              parent.querySelector(".detail-amount").value = amount;
+                handleSize();
+
+                fillElements(result.data);
+
+                initDynamicEvents().init();
+
+                stepper.goNext();
+
+              }
+              else {
+                Swal.fire({
+                    text: "Sequencing Library(s) was not created.",
+                    icon: "error",
+                    buttonsStyling: false,
+                    confirmButtonText: "Ok, got it!",
+                    customClass: {
+                        confirmButton: "btn fw-bold btn-danger",
+                    }
+                });
+              }
 
             });
 
-          }
+          });
 
         }
 
-        function handleChangesSubmit() {
+        function initSubmit() {
 
           document.querySelector('[data-kt-stepper-action="submit"]').addEventListener('click', function () {
 
@@ -606,6 +486,113 @@ var KTDatatablesServerSide = function () {
 
           });
 
+        }
+
+        function handleSpinner(state) {
+
+          if (state) {
+
+            document.querySelector('[data-kt-stepper-action="next"]').setAttribute("data-kt-indicator", "on");
+
+          }
+          else {
+
+            document.querySelector('[data-kt-stepper-action="next"]').removeAttribute("data-kt-indicator");
+
+          }
+
+        }
+
+        function handleSize() {
+
+          var element = document.getElementById("modal_samplelib_options").getElementsByClassName("modal-dialog")[0];
+
+          element.classList.remove("mw-600px");
+
+          element.classList.add("mw-900px");
+
+        }
+
+        function fillElements(data) {
+
+          var listEl = document.querySelector(".list-body");
+
+          var total_amount = 0;
+          var total_volume = 0;
+
+          for (var i = 0; i < data.length; i++) {
+
+            var row = `<div class="row m-1" data-id="${ data[i].id }">
+                <div class="col-3 align-self-center">${ data[i].sample_lib }</div>
+                <div class="col-3 align-self-center">${ data[i].nucacid }</div>
+                <div class="col-3 align-self-center">${ data[i].area }</div>
+                <div class="col-1 align-self-center">${ data[i].conc }</div>
+                <div class="col-1 text-center"><input type="text" class="textinput textInput form-control form-control-sm text-end detail-volume" value="${ data[i].input_vol }"></div>
+                <div class="col-1 text-center"><input type="text" class="textinput textInput form-control form-control-sm text-end detail-amount" value="${ data[i].input_amount }"></div>
+              </div>`;
+            listEl.innerHTML += row;
+
+          }
+
+        }
+
+        function getValues() {
+
+          var rows = document.querySelector(".list-body").querySelectorAll(".row");
+
+          var values = [];
+
+          for (var row of rows) {
+
+            var id = row.getAttribute("data-id");
+            var volume = row.querySelector(".detail-volume").value;
+            var amount = row.querySelector(".detail-amount").value;
+
+            values.push({
+              "id":id,
+              "volume":volume,
+              "amount": amount
+            });
+          }
+
+          return JSON.stringify(values);
+
+        }
+
+        return {
+          init: function () {
+            initPrefixKeyUp(),initContinueClick(), initSubmit();
+          }
+        }
+
+      }
+
+      function initDynamicEvents() {
+
+        function initVolumeChange() {
+
+          for (var amount of document.querySelectorAll(".detail-volume")) {
+
+            amount.addEventListener("change", function () {
+
+              var parent = this.closest('.row');
+
+              var conc = parent.querySelectorAll('div')[3].innerText;
+
+              var amount = this.value * conc;
+
+              parent.querySelector(".detail-amount").value = amount;
+
+            });
+
+          }
+
+        }
+
+        return {
+          init: function () {
+            initVolumeChange();
+          }
         }
 
       }
