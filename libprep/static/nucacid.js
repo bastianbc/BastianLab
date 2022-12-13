@@ -525,10 +525,11 @@ var KTDatatablesServerSide = function () {
             var row = `<div class="row m-1" data-id="${ data[i].id }">
                 <div class="col-3 align-self-center">${ data[i].sample_lib }</div>
                 <div class="col-3 align-self-center">${ data[i].nucacid }</div>
-                <div class="col-3 align-self-center">${ data[i].area }</div>
+                <div class="col-2 align-self-center">${ data[i].area }</div>
                 <div class="col-1 align-self-center">${ data[i].conc }</div>
                 <div class="col-1 text-center"><input type="text" class="textinput textInput form-control form-control-sm text-end detail-volume" value="${ data[i].input_vol }"></div>
                 <div class="col-1 text-center"><input type="text" class="textinput textInput form-control form-control-sm text-end detail-amount" value="${ data[i].input_amount }"></div>
+                <div class="col-1 text-center"><input type="text" class="textinput textInput form-control form-control-sm text-end detail-te" value="${ shareVolume - data[i].input_vol }"></div>
               </div>`;
             listEl.innerHTML += row;
 
@@ -569,6 +570,8 @@ var KTDatatablesServerSide = function () {
 
       function initDynamicEvents() {
 
+        var shareVolume = parseFloat(document.getElementById("id_share_volume").value);
+
         function initVolumeChange() {
 
           for (var amount of document.querySelectorAll(".detail-volume")) {
@@ -577,11 +580,35 @@ var KTDatatablesServerSide = function () {
 
               var parent = this.closest('.row');
 
-              var conc = parent.querySelectorAll('div')[3].innerText;
+              var conc = parseFloat(parent.querySelectorAll('div')[3].innerText);
 
               var amount = this.value * conc;
 
               parent.querySelector(".detail-amount").value = amount;
+
+              parent.querySelector(".detail-te").value = shareVolume - this.value;
+
+            });
+
+          }
+
+        }
+
+        function initAmountChange() {
+
+          for (var amount of document.querySelectorAll(".detail-amount")) {
+
+            amount.addEventListener("change", function () {
+
+              var parent = this.closest('.row');
+
+              var conc = parent.querySelectorAll('div')[3].innerText;
+
+              var volume = parseFloat(this.value / conc).toFixed(2);
+
+              parent.querySelector(".detail-volume").value = volume;
+
+              parent.querySelector(".detail-te").value = shareVolume - volume;
 
             });
 
@@ -591,7 +618,7 @@ var KTDatatablesServerSide = function () {
 
         return {
           init: function () {
-            initVolumeChange();
+            initVolumeChange(),initAmountChange();
           }
         }
 

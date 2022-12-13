@@ -377,7 +377,7 @@ var KTDatatablesServerSide = function () {
 
         const container = document.querySelector('.table');
 
-        const selectedRows = container.querySelectorAll('[type="checkbox"]:checked');
+        const selectedRows = container.querySelectorAll('tbody [type="checkbox"]:checked');
 
         const selectedIds = [];
 

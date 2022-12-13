@@ -18,8 +18,11 @@ class SampleLib(models.Model):
     barcode = models.ForeignKey(Barcode, on_delete=models.CASCADE, verbose_name="Barcode")
     date = models.DateField(default=date.today, verbose_name="Date")
     method = models.ForeignKey("method.Method",related_name="sample_libs",on_delete=models.CASCADE, verbose_name="Method")
-    conc = models.FloatField(default=0, verbose_name="Concentration")
-    input_amount = models.FloatField(default=0, verbose_name="Input Amount")
+    qubit = models.FloatField(default=0, verbose_name="Qubit")
+    qpcr_conc = models.FloatField(default=0, verbose_name="qPCR Concentration")
+    pcr_cycles = models.FloatField(default=0, verbose_name="PCR Cycles")
+    amount_in = models.FloatField(default=0, verbose_name="Input Amount")
+    amount_final = models.FloatField(default=0, verbose_name="Final Amount")
     vol_init = models.FloatField(default=0, verbose_name="Volume Initialize")
     vol_remain = models.FloatField(default=0, verbose_name="Volume Remain")
     notes = models.TextField(blank=True, null=True, verbose_name="Notes")
@@ -31,6 +34,7 @@ class SampleLib(models.Model):
         return self.name
 
     def save(self,*args,**kwargs):
+        self.amount_final = self.vol_remain * self.qpcr_conc
         super().save(*args, **kwargs)
 
     def update_volume(self, volume):

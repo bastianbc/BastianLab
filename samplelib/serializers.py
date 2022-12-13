@@ -4,19 +4,19 @@ from .models import *
 class SampleLibSerializer(serializers.ModelSerializer):
     DT_RowId = serializers.SerializerMethodField()
     method = serializers.StringRelatedField()
-    input_amount = serializers.SerializerMethodField()
+    amount_in = serializers.SerializerMethodField()
     num_nucacids = serializers.IntegerField()
     barcode = serializers.StringRelatedField()
 
     class Meta:
         model = SampleLib
-        fields = ("id", "name", "barcode", "date", "method", "conc", "input_amount", "vol_init", "vol_remain", "num_nucacids", "DT_RowId",)
+        fields = ("id", "name", "barcode", "date", "method", "amount_final", "qpcr_conc", "amount_in", "vol_init", "vol_remain", "pcr_cycles", "qubit", "num_nucacids", "DT_RowId",)
 
     def get_DT_RowId(self, obj):
        return getattr(obj, 'id')
 
-    def get_input_amount(self,obj):
-        return round(obj.input_amount,2)
+    def get_amount_in(self,obj):
+        return round(obj.amount_in,2)
 
 class UsedNuacidsSerializer(serializers.ModelSerializer):
     sample_lib = serializers.StringRelatedField()

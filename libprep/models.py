@@ -103,7 +103,7 @@ class NucAcids(models.Model):
     def _generate_unique_name(self):
         # blocks.name & Areas.name & first letter of NA_type
         na_count = self.area.nucacids.filter(area=self.area,na_type=self.na_type).count() # count of existing nucleic acid
-        return "%s_%s_%s_%d" % (self.area.block.name, self.area.name, self.na_type[0], na_count + 1)
+        return "%s-%s-%d" % (self.na_type[0].upper(),self.area.name, na_count + 1)
 
     def save(self,*args,**kwargs):
         if not self.name:

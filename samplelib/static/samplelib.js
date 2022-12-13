@@ -36,8 +36,10 @@ var KTDatatablesServerSide = function () {
                 { data: 'barcode' },
                 { data: 'date' },
                 { data: 'method' },
-                { data: 'conc' },
-                { data: 'input_amount' },
+                { data: 'qpcr_conc' },
+                { data: 'pcr_cycles' },
+                { data: 'amount_in' },
+                { data: 'amount_final' },
                 { data: 'vol_init' },
                 { data: 'vol_remain' },
                 { data: 'num_nucacids' }
@@ -54,7 +56,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 9,
+                    targets: 11,
                     orderable: false,
                     render: function (data, type, row) {
                         if (data > 0) {
@@ -66,7 +68,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 10,
+                    targets: 12,
                     data: null,
                     orderable: false,
                     className: 'text-end',

@@ -143,7 +143,7 @@ def new_samplelib_async(request):
                 created_links.append(link.id)
                 nucacid.update_volume(used_amount)
 
-            barcode_id = barcode_id + 1 if barcode_id < 192 else 1 #The barcode table contains numeric barcodes with barcode_id=1- 192
+            barcode_id = (barcode_id % 192) + 1 #The barcode table contains numeric barcodes with barcode_id=1- 192
             autonumber += 1
 
         saved_links = NA_SL_LINK.objects.filter(id__in=created_links).order_by("nucacid__area")
@@ -218,6 +218,10 @@ def update_sl_na_link_async(request):
             link.input_vol = volume
             link.input_amount = amount
             link.save()
+
+            sample_lib = link.sample_lib
+            sample_lib.input_amount = amount
+            sample_lib.save()
 
             link.nucacid.update_volume(diff)
     except Exception as e:
