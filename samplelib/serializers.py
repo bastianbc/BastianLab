@@ -5,18 +5,27 @@ class SampleLibSerializer(serializers.ModelSerializer):
     DT_RowId = serializers.SerializerMethodField()
     method = serializers.StringRelatedField()
     amount_in = serializers.SerializerMethodField()
+    amount_final = serializers.SerializerMethodField()
     num_nucacids = serializers.IntegerField()
     barcode = serializers.StringRelatedField()
+    area = serializers.SerializerMethodField()
 
     class Meta:
         model = SampleLib
-        fields = ("id", "name", "barcode", "date", "method", "amount_final", "qpcr_conc", "amount_in", "vol_init", "vol_remain", "pcr_cycles", "qubit", "num_nucacids", "DT_RowId",)
+        fields = ("id", "name", "barcode", "area","date", "method", "amount_final", "qpcr_conc", "amount_in", "vol_init", "vol_remain", "pcr_cycles", "qubit", "num_nucacids", "DT_RowId",)
 
     def get_DT_RowId(self, obj):
        return getattr(obj, 'id')
 
     def get_amount_in(self,obj):
         return round(obj.amount_in,2)
+
+    def get_amount_final(self,obj):
+        return round(obj.amount_final,2)
+
+    def get_area(self,obj):
+        # Nuclecic Acids have to be from the SAME Area (never many areas) to be combined into one SL.
+        return obj.nucacids.first().nucacid.area.name
 
 class UsedNuacidsSerializer(serializers.ModelSerializer):
     sample_lib = serializers.StringRelatedField()

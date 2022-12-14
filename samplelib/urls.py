@@ -15,5 +15,6 @@ urlpatterns = [
     path('delete/<str:id>', views.delete_samplelib, name='delete-samplelib'),
     path('batch_delete', views.delete_batch_samplelibs, name='delete-batch-samplelibs'),
     path('<int:id>/used_nucacids', views.get_used_nucacids, name='get-used-nucacids'),
-    path('update_async', views.update_sl_na_link_async, name="update-async")
+    path('update_async', views.update_sl_na_link_async, name="update-async"),
+    path('<int:id>/print_as_csv', views.print_as_csv, name="print_as_csv"),
 ] + staticfiles_urlpatterns()

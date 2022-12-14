@@ -34,6 +34,7 @@ var KTDatatablesServerSide = function () {
                 { data: null },
                 { data: 'name' },
                 { data: 'barcode' },
+                { data: 'area' },
                 { data: 'date' },
                 { data: 'method' },
                 { data: 'qpcr_conc' },
@@ -56,7 +57,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 11,
+                    targets: 12,
                     orderable: false,
                     render: function (data, type, row) {
                         if (data > 0) {
@@ -68,7 +69,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 12,
+                    targets: 13,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -639,7 +640,7 @@ var KTDatatablesServerSide = function () {
 
       });
 
-      function openModal(data) {
+      function openModal(id,data) {
 
         var listEl = document.querySelector(".list-body");
 
@@ -655,6 +656,8 @@ var KTDatatablesServerSide = function () {
 
           listEl.innerHTML += row;
         }
+        
+        el.querySelector(".modal-footer a").setAttribute("href","/samplelib/"+id+"/print_as_csv")
 
         modal.show();
 
@@ -686,7 +689,7 @@ var KTDatatablesServerSide = function () {
               type: "GET",
               success: function (data) {
 
-                openModal(data);
+                openModal(id,data);
 
               },
               error: function (xhr, ajaxOptions, thrownError) {

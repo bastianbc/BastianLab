@@ -520,6 +520,8 @@ var KTDatatablesServerSide = function () {
           var total_amount = 0;
           var total_volume = 0;
 
+          var shareVolume = parseFloat(document.getElementById("id_share_volume").value);
+
           for (var i = 0; i < data.length; i++) {
 
             var row = `<div class="row m-1" data-id="${ data[i].id }">

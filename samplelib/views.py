@@ -88,7 +88,7 @@ def new_samplelib_async(request):
         if prefixies.exists():
             max_value = max([int(p.name.split("-")[-1]) for p in prefixies])
             autonumber = max_value + 1
-        print(grouped_nucacids)
+
         for group in grouped_nucacids:
 
             sample_lib = SampleLib.objects.create(
@@ -220,7 +220,7 @@ def update_sl_na_link_async(request):
             link.save()
 
             sample_lib = link.sample_lib
-            sample_lib.input_amount = amount
+            sample_lib.amount_in = amount
             sample_lib.save()
 
             link.nucacid.update_volume(diff)
@@ -229,3 +229,36 @@ def update_sl_na_link_async(request):
         return JsonResponse({ "success":False })
 
     return JsonResponse({ "success":True })
+
+def print_as_csv(request,id):
+    import csv
+    from django.http import HttpResponse
+
+    class Report(object):
+        sample_lib = ""
+        nucacid = ""
+        input_vol = 0.0
+        input_amount = 0.0
+
+    result = []
+
+    for sl_link in NA_SL_LINK.objects.filter(sample_lib__id=id):
+        report = Report()
+        report.sample_lib = sl_link.sample_lib.name
+        report.nucacid = sl_link.nucacid.name
+        report.input_vol = sl_link.input_vol
+        report.input_amount = sl_link.input_amount
+        result.append(report)
+
+    response = HttpResponse(
+        content_type='text/csv',
+        headers={'Content-Disposition': 'attachment; filename="used_nucacids.csv"'},
+    )
+
+    field_names = ["sample_lib","nucacid","input_vol","input_amount"]
+    writer = csv.writer(response)
+    writer.writerow(field_names)
+    for item in result:
+        writer.writerow([getattr(item, field) for field in field_names])
+
+    return response
