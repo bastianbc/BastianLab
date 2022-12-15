@@ -54,6 +54,7 @@ class Patients(models.Model):
                 '3': 'race',
                 '4': 'source',
                 '5': 'project',
+                '6': 'project',
             }
             draw = int(kwargs.get('draw', None)[0])
             length = int(kwargs.get('length', None)[0])

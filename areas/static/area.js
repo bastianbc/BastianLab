@@ -14,7 +14,7 @@ var KTDatatablesServerSide = function () {
             // searchDelay: 500,
             processing: true,
             serverSide: true,
-            order: [[1, 'desc']],
+            order: [[6, 'desc']],
             stateSave: false,
             destroy: true,
             select: {
@@ -36,7 +36,11 @@ var KTDatatablesServerSide = function () {
               { data: 'project' },
               { data: 'collection' },
               { data: 'area_type' },
-              { data: 'completion_date' },
+              { data: 'completion_date',
+                render: function (data) {
+                  return moment(data).format('MM/DD/YYYY');
+                }
+              },
               { data: 'investigator' },
               { data: 'num_nucacids' }
             ],
@@ -559,7 +563,10 @@ var KTDatatablesServerSide = function () {
             }, {
               label: "Completion Date:",
               name: "completion_date",
-              type: "datetime"
+              type: "datetime",
+              def: function () { return new Date(); },
+              displayFormat: "M/D/YYYY",
+              wireFormat: 'YYYY-MM-DD'
             }, {
               label: "Investigator:",
               name: "investigator",

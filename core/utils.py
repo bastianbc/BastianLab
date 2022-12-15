@@ -1,9 +1,12 @@
+from django.db.models.fields import FloatField, IntegerField
+
 def custom_update(model,pk,parameters):
     try:
         obj = model.objects.get(pk=pk)
-        print(obj)
+
         for key in parameters:
-            print("%s:%s" % (key,parameters[key]))
+            if not key == "pk" and type(obj._meta.get_field(key)) == FloatField:
+                parameters[key] = float(parameters[key])
             setattr(obj, key, parameters[key])
 
         obj.save()

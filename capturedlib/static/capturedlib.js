@@ -15,7 +15,7 @@ var KTDatatablesServerSide = function () {
             // searchDelay: 500,
             processing: true,
             serverSide: true,
-            order: [[1, 'desc']],
+            order: [[3, 'desc']],
             stateSave: false,
             destroy: true,
             select: {
@@ -34,7 +34,11 @@ var KTDatatablesServerSide = function () {
                 { data: null },
                 { data: 'name' },
                 { data: 'barcode' },
-                { data: 'date' },
+                { data: 'date',
+                  render: function (data) {
+                    return moment(data).format('MM/DD/YYYY');
+                  }
+                },
                 { data: 'bait' },
                 { data: 'frag_size' },
                 { data: 'conc' },
@@ -360,7 +364,10 @@ var KTDatatablesServerSide = function () {
            }, {
                label: "Date:",
                name: "date",
-               type: "datetime"
+               type: "datetime",
+               def: function () { return new Date(); },
+               displayFormat: 'M/D/YYYY',
+               wireFormat: 'YYYY-MM-DD',
            }, {
                label: "Bait:",
                name: "bait",

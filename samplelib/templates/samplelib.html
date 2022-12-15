@@ -16,8 +16,11 @@
         <div class="col-6">{{ form.barcode|as_crispy_field }}</div>
         <div class="col-6">{{ form.date|as_crispy_field }}</div>
         <div class="col-6">{{ form.method|as_crispy_field }}</div>
-        <div class="col-6">{{ form.conc|as_crispy_field }}</div>
-        <div class="col-6">{{ form.input_amount|as_crispy_field }}</div>
+        <div class="col-6">{{ form.qubit|as_crispy_field }}</div>
+        <div class="col-6">{{ form.qpcr_conc|as_crispy_field }}</div>
+        <div class="col-6">{{ form.pcr_cycles|as_crispy_field }}</div>
+        <div class="col-6">{{ form.amount_in|as_crispy_field }}</div>
+        <div class="col-6">{{ form.amount_final|as_crispy_field }}</div>
         <div class="col-6">{{ form.vol_init|as_crispy_field }}</div>
         <div class="col-6">{{ form.vol_remain|as_crispy_field }}</div>
         <div class="col-12">{{ form.notes|as_crispy_field }}</div>

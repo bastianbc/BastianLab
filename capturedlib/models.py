@@ -141,7 +141,7 @@ class SL_CL_LINK(models.Model):
         # calculates the amount: amount = volume * conc
         result = 0
         try:
-            result = self.sample_lib.conc * self.volume
+            result = self.sample_lib.qpcr_conc * self.volume
         except Exception as e:
             pass
 

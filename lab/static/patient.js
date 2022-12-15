@@ -14,7 +14,7 @@ var KTDatatablesServerSide = function () {
             // searchDelay: 500,
             processing: true,
             serverSide: true,
-            order: [[1, 'desc']],
+            order: [[6, 'desc']],
             stateSave: false,
             destroy: true,
             select: {
@@ -36,6 +36,11 @@ var KTDatatablesServerSide = function () {
                 { data: 'sex' },
                 { data: 'race' },
                 { data: 'project' },
+                { data: 'date_added',
+                  render: function (data) {
+                    return moment(data).format('MM/DD/YYYY');
+                  }
+                },
                 { data: 'num_blocks' },
             ],
             columnDefs: [
@@ -56,7 +61,7 @@ var KTDatatablesServerSide = function () {
                 //     }
                 // },
                 {
-                    targets: 6,
+                    targets: 7,
                     orderable: false,
                     render: function (data, type, row) {
                         if (data > 0) {
@@ -68,7 +73,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 7,
+                    targets: 8,
                     data: null,
                     orderable: false,
                     className: 'text-end',

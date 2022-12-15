@@ -15,7 +15,7 @@ var KTDatatablesServerSide = function () {
             // searchDelay: 500,
             processing: true,
             serverSide: true,
-            order: [[1, 'desc']],
+            order: [[4, 'desc']],
             stateSave: false,
             destroy: true,
             select: {
@@ -35,7 +35,11 @@ var KTDatatablesServerSide = function () {
                 { data: 'name' },
                 { data: 'barcode' },
                 { data: 'area' },
-                { data: 'date' },
+                { data: 'date',
+                  render: function (data) {
+                    return moment(data).format('MM/DD/YYYY');
+                  }
+                },
                 { data: 'method' },
                 { data: 'qpcr_conc' },
                 { data: 'pcr_cycles' },
@@ -351,18 +355,25 @@ var KTDatatablesServerSide = function () {
            }, {
                label: "Date:",
                name: "date",
-               type: "datetime"
+               type: "datetime",
+               def: function () { return new Date(); },
+               displayFormat: "M/D/YYYY",
+               wireFormat: 'YYYY-MM-DD'
            }, {
                label: "Method:",
                name: "method",
            }, {
                label: "Concentration:",
-               name: "conc"
+               name: "qpcr_conc"
            }, {
                label: "Input Amount:",
-               name: "input_amount",
+               name: "amount_in",
                type: "readonly"
-           }, {
+           },  {
+               label: "Final Amount:",
+               name: "amount_final",
+               type: "readonly"
+           },{
                label: "Volume Init:",
                name: "vol_init"
            }, {
@@ -656,7 +667,7 @@ var KTDatatablesServerSide = function () {
 
           listEl.innerHTML += row;
         }
-        
+
         el.querySelector(".modal-footer a").setAttribute("href","/samplelib/"+id+"/print_as_csv")
 
         modal.show();

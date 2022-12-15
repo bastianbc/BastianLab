@@ -14,7 +14,7 @@ var KTDatatablesServerSide = function () {
             // searchDelay: 500,
             processing: true,
             serverSide: true,
-            order: [[1, 'desc']],
+            order: [[7, 'desc']],
             stateSave: false,
             destroy: true,
             select: {
@@ -37,6 +37,11 @@ var KTDatatablesServerSide = function () {
               { data: 'diagnosis' },
               { data: 'body_site' },
               { data: 'thickness' },
+              { data: 'date_added',
+                render: function (data) {
+                  return moment(data).format('MM/DD/YYYY');
+                }
+              },
               { data: 'num_areas' },
             ],
             columnDefs: [
@@ -57,7 +62,7 @@ var KTDatatablesServerSide = function () {
                 //     }
                 // },
                 {
-                    targets: 7,
+                    targets: 8,
                     orderable: false,
                     render: function (data, type, row) {
                         if (data > 0) {
@@ -69,7 +74,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 8,
+                    targets: 9,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -623,13 +628,13 @@ var KTDatatablesServerSide = function () {
            },{
                label: "Diagnosis:",
                name: "diagnosis"
-           }, {
+           },{
                label: "Body Site:",
                name: "body_site"
-           }, {
+           },{
                label: "Thickness:",
                name: "thickness"
-           },
+           }
        ],
        formOptions: {
           inline: {

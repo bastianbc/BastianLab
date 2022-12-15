@@ -106,10 +106,13 @@ class Blocks(models.Model):
 
         try:
             ORDER_COLUMN_CHOICES = {
-                "1":"patient",
-                "2":"diagnosis",
-                "3":"body_site",
-                "4":"gross",
+                "1":"name",
+                "2":"project",
+                "3":"patient",
+                "4":"diagnosis",
+                "5":"body_site",
+                "6":"thickness",
+                "7":"date_added"
             }
             draw = int(kwargs.get('draw', None)[0])
             length = int(kwargs.get('length', None)[0])

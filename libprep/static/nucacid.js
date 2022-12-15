@@ -15,7 +15,7 @@ var KTDatatablesServerSide = function () {
             // searchDelay: 500,
             processing: true,
             serverSide: true,
-            order: [[1, 'desc']],
+            order: [[4, 'desc']],
             stateSave: false,
             destroy: true,
             select: {
@@ -35,7 +35,11 @@ var KTDatatablesServerSide = function () {
                 { data: 'name' },
                 { data: 'area' },
                 { data: 'na_type' },
-                { data: 'date' },
+                { data: 'date',
+                  render: function (data) {
+                    return moment(data).format('MM/DD/YYYY');
+                  }
+                },
                 { data: 'method' },
                 { data: 'conc' },
                 { data: 'vol_init' },
@@ -817,7 +821,10 @@ var KTDatatablesServerSide = function () {
            }, {
                label: "Date:",
                name: "date",
-               type: "datetime"
+               type: "datetime",
+               def: function () { return new Date(); },
+               displayFormat: "M/D/YYYY",
+               wireFormat: 'YYYY-MM-DD'
            }, {
                label: "Method:",
                name: "method"

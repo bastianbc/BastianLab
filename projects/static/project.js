@@ -14,7 +14,7 @@ var KTDatatablesServerSide = function () {
             // searchDelay: 500,
             processing: true,
             serverSide: true,
-            order: [[1, 'desc']],
+            order: [[4, 'desc']],
             stateSave: false,
             destroy: true,
             select: {
@@ -34,7 +34,11 @@ var KTDatatablesServerSide = function () {
                 { data: 'abbreviation' },
                 { data: 'name' },
                 { data: 'pi' },
-                { data: 'date_start' },
+                { data: 'date_start',
+                  render: function (data) {
+                    return moment(data).format('MM/DD/YYYY');
+                  }
+                },
                 { data: 'speedtype' },
                 { data: 'num_blocks' },
             ],
@@ -417,7 +421,10 @@ var KTDatatablesServerSide = function () {
            }, {
                label: "Start Date:",
                name: "date_start",
-               type: "datetime"
+               type: "datetime",
+               def: function () { return new Date(); },
+               displayFormat: "M/D/YYYY",
+               wireFormat: 'YYYY-MM-DD'
            }, {
                label: "Speed Type:",
                name: "speedtype"

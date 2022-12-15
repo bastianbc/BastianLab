@@ -41,7 +41,7 @@ class UsedSampleLibSerializer(serializers.ModelSerializer):
         return obj.sample_lib.name
 
     def get_conc(self, obj):
-        return obj.sample_lib.conc
+        return obj.sample_lib.qpcr_conc
 
     def get_vol_remain(self, obj):
         return obj.sample_lib.vol_remain
