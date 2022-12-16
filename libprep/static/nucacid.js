@@ -9,7 +9,7 @@ var KTDatatablesServerSide = function () {
     var editor;
 
     // Private functions
-    var initDatatable = function ( initialValue ) {
+    var initDatatable = function ( initialValue, filterDateRange, filterNAType ) {
 
         dt = $(".table").DataTable({
             // searchDelay: 500,
@@ -29,7 +29,14 @@ var KTDatatablesServerSide = function () {
               editor: editor,
               editOnFocus: true
             },
-            ajax: '/libprep/filter_nucacids',
+            ajax: {
+              url: '/libprep/filter_nucacids',
+              type: "GET",
+              data:{
+                "date_range": filterDateRange,
+                "na_type": filterNAType,
+              }
+            },
             columns: [
                 { data: null },
                 { data: 'name' },
@@ -143,23 +150,12 @@ var KTDatatablesServerSide = function () {
 
         // Filter datatable on submit
         filterButton.addEventListener('click', function () {
-            // Get filter values
-            let paymentValue = '';
 
-            // Get payment value
-            filterPayment.forEach(r => {
-                if (r.checked) {
-                    paymentValue = r.value;
-                }
+          var dateRange = document.getElementById("id_date_range").value;
+          var naType = document.getElementById("id_na_type").value;
 
-                // Reset payment value if "All" is selected
-                if (paymentValue === 'all') {
-                    paymentValue = '';
-                }
-            });
+          initDatatable(null,dateRange,naType)
 
-            // Filter datatable --- official docs reference: https://datatables.net/reference/api/search()
-            dt.search(paymentValue).draw();
         });
     }
 
@@ -251,11 +247,13 @@ var KTDatatablesServerSide = function () {
 
         // Reset datatable
         resetButton.addEventListener('click', function () {
-            // Reset payment type
-            filterPayment[0].checked = true;
 
-            // Reset datatable --- official docs reference: https://datatables.net/reference/api/search()
-            dt.search('').draw();
+          document.getElementById("id_date_range").value = "";
+
+          document.getElementById("id_na_type").value = "";
+
+          initDatatable(null, null, null);
+
         });
     }
 
@@ -879,7 +877,7 @@ var KTDatatablesServerSide = function () {
     // Public methods
     return {
         init: function () {
-            initDatatable( handleInitialValue() );
+            initDatatable( handleInitialValue(),null,null );
             handleSearchDatatable();
             initToggleToolbar();
             handleFilterDatatable();

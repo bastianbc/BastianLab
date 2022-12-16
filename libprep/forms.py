@@ -19,3 +19,12 @@ class SampleLibCreationOptionsForm(forms.Form):
     target_amount = forms.FloatField()
     share_volume = forms.FloatField()
     prefix = forms.CharField()
+
+class FilterForm(forms.Form):
+    date_range = forms.DateField()
+    na_type = forms.ChoiceField(choices=[('','---------' )] + NucAcids.NA_TYPES[:-1], label="NA Type", required=False)
+
+    def __init__(self, *args, **kwargs):
+        super(FilterForm, self).__init__(*args, **kwargs)
+        self.fields["date_range"].widget.attrs.update({'class':'form-control-sm'})
+        self.fields["na_type"].widget.attrs.update({'class':'form-control-sm'})

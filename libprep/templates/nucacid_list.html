@@ -47,35 +47,12 @@
       <div class="px-7 py-5">
         <!--begin::Input group-->
         <div class="mb-10">
-          <!--begin::Label-->
-          <label class="form-label fs-5 fw-semibold mb-3">Filter Type:</label>
-          <!--end::Label-->
           <!--begin::Options-->
-          <div class="d-flex flex-column flex-wrap fw-semibold" data-kt-docs-table-filter="payment_type">
-            <!--begin::Option-->
-            <label class="form-check form-check-sm form-check-custom form-check-solid mb-3 me-5">
-              <input class="form-check-input" type="radio" name="payment_type" value="all" checked="checked" />
-              <span class="form-check-label text-gray-600">All</span>
-            </label>
-            <!--end::Option-->
-            <!--begin::Option-->
-            <label class="form-check form-check-sm form-check-custom form-check-solid mb-3 me-5">
-              <input class="form-check-input" type="radio" name="payment_type" value="visa" />
-              <span class="form-check-label text-gray-600">Filter 1</span>
-            </label>
-            <!--end::Option-->
-            <!--begin::Option-->
-            <label class="form-check form-check-sm form-check-custom form-check-solid mb-3">
-              <input class="form-check-input" type="radio" name="payment_type" value="mastercard" />
-              <span class="form-check-label text-gray-600">Filter 2</span>
-            </label>
-            <!--end::Option-->
-            <!--begin::Option-->
-            <label class="form-check form-check-sm form-check-custom form-check-solid">
-              <input class="form-check-input" type="radio" name="payment_type" value="americanexpress" />
-              <span class="form-check-label text-gray-600">Filter 3</span>
-            </label>
-            <!--end::Option-->
+          <div class="row mb-2">
+            <div class="col-sm-12">{{ filter.date_range|as_crispy_field }}</div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-sm-12">{{ filter.na_type|as_crispy_field }}</div>
           </div>
           <!--end::Options-->
         </div>
@@ -321,4 +298,5 @@
 
 {% block scripts %}
 <script src="static/nucacid.js"></script>
+<script src="/libprep/static/init.dateinput.libprep.js"></script>
 {% endblock %}

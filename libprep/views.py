@@ -12,6 +12,7 @@ from django.contrib.auth.decorators import login_required,permission_required
 @permission_required("librep.view_nucacids",raise_exception=True)
 def nucacids(request):
     form = SampleLibCreationOptionsForm()
+    filter = FilterForm()
     return render(request, "nucacid_list.html", locals())
 
 @login_required

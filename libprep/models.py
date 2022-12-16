@@ -1,16 +1,16 @@
 from django.db import models
-from datetime import date
+from datetime import date, datetime
 from django.db.models import Q, Count
 
 class NucAcids(models.Model):
     DNA = "dna"
     RNA = "rna"
     BOTH = "both"
-    NA_TYPES = (
+    NA_TYPES = [
         (DNA, "DNA"),
         (RNA, "RNA"),
         (BOTH, "Both DNA and RNA"),
-    )
+    ]
 
     nu_id = models.AutoField(primary_key=True, verbose_name="NA ID")
     area = models.ForeignKey("areas.Areas", on_delete=models.SET_NULL, db_column="area", blank=True, null=True, related_name="nucacids", verbose_name="Area")
@@ -57,12 +57,16 @@ class NucAcids(models.Model):
                 "7": "vol_init",
                 "8": "vol_remain",
             }
+            print(kwargs)
+
             draw = int(kwargs.get('draw', None)[0])
             length = int(kwargs.get('length', None)[0])
             start = int(kwargs.get('start', None)[0])
             search_value = kwargs.get('search[value]', None)[0]
             order_column = kwargs.get('order[0][column]', None)[0]
             order = kwargs.get('order[0][dir]', None)[0]
+            date_range = kwargs.get('date_range', None)[0]
+            na_type = kwargs.get('na_type', None)[0]
 
             order_column = ORDER_COLUMN_CHOICES[order_column]
             # django orm '-' -> desc
@@ -75,6 +79,19 @@ class NucAcids(models.Model):
 
             is_initial = _is_initial_value(search_value)
             search_value = _parse_value(search_value)
+
+            if date_range:
+                arr = date_range.split(" to ")
+                start_date = datetime.strptime(arr[0],'%m/%d/%Y').date()
+                end_date = datetime.strptime(arr[1],'%m/%d/%Y').date()
+                queryset = queryset.filter(
+                    Q(date__gte=start_date) & Q(date__lte=end_date)
+                )
+
+            if na_type:
+                queryset = queryset.filter(
+                    Q(na_type=na_type)
+                )
 
             if is_initial:
                 queryset = queryset.filter(
