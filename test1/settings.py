@@ -77,6 +77,8 @@ INSTALLED_APPS = [
     'capturedlib',
     'sequencinglib',
     'sequencingrun',
+    'buffer',
+    'bait',
 ]
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 CRISPY_FAIL_SILENTLY = not DEBUG

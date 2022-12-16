@@ -2,12 +2,12 @@ from django.db import models
 from django.utils.text import slugify
 from django.db.models import Q, Count
 
-class Method(models.Model):
+class Bait(models.Model):
     name = models.CharField(max_length=50, verbose_name="Name")
     slug = models.SlugField(max_length=50, unique=True)
 
     class Meta:
-        db_table = "method"
+        db_table = "bait"
 
     def __str__(self):
         return self.name
@@ -33,7 +33,7 @@ class Method(models.Model):
             if order == 'desc':
                 order_column = '-' + order_column
 
-            queryset = Method.objects.all()
+            queryset = Bait.objects.all()
             total = queryset.count()
 
             if search_value:

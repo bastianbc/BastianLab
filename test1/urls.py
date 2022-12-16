@@ -24,6 +24,8 @@ urlpatterns = [
     path('capturedlib/', include('capturedlib.urls')),
     path('sequencinglib/', include('sequencinglib.urls')),
     path('sequencingrun/', include('sequencingrun.urls')),
+    path('buffer/', include('buffer.urls')),
+    path('bait/', include('bait.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 handler404 = "core.views.error_404"
