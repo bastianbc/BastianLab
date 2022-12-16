@@ -3,6 +3,8 @@ from django.contrib.auth.decorators import login_required,permission_required
 from .forms import *
 from django.contrib import messages
 from django.conf import settings
+from django.http import JsonResponse
+from .serializers import BaitSerializer
 
 @permission_required("bait.view_bait",raise_exception=True)
 def baits(request):
@@ -50,9 +52,6 @@ def delete_bait(request,id):
 
 @permission_required("bait.view_bait",raise_exception=True)
 def filter_baits(request):
-    from .serializers import BaitSerializer
-    from django.http import JsonResponse
-
     baits = Bait().query_by_args(**request.GET)
     serializer = BaitSerializer(baits['items'], many=True)
     result = dict()
@@ -62,3 +61,8 @@ def filter_baits(request):
     result['recordsFiltered'] = baits['count']
 
     return JsonResponse(result)
+
+@permission_required("bait.view_bait",raise_exception=True)
+def get_bait_choices(request):
+    serializer = BaitSerializer(Bait.objects.all(), many=True)
+    return JsonResponse(serializer.data,safe=False)

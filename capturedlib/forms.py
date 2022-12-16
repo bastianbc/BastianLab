@@ -1,7 +1,8 @@
 from django import forms
-from .models import CapturedLib
 from datetime import date
+from .models import CapturedLib
 from sequencinglib.models import SequencingLib
+from buffer.models import Buffer
 
 class CapturedLibForm(forms.ModelForm):
     class Meta:
@@ -12,6 +13,6 @@ class SequencingLibCreationForm(forms.Form):
     sequencing_lib = forms.ModelChoiceField(queryset=SequencingLib.objects.all(), label="Sequencing Library")
     prefix = forms.CharField()
     date = forms.DateField(initial=date.today)
-    buffer = forms.ChoiceField(choices=SequencingLib.BUFFER_TYPES)
+    buffer = forms.ModelChoiceField(queryset=Buffer.objects.all())
     nm = forms.FloatField(initial=0, label="nM")
     vol_init = forms.FloatField(initial=0, label="Initialize Volume")

@@ -1,7 +1,7 @@
 from django import forms
 from .models import SampleLib
 from datetime import date
-from capturedlib.models import CapturedLib
+from buffer.models import Buffer
 
 class SampleLibForm(forms.ModelForm):
     class Meta:
@@ -12,4 +12,4 @@ class SampleLibForm(forms.ModelForm):
 class CapturedLibCreationOptionsForm(forms.Form):
     prefix = forms.CharField()
     date = forms.DateField(initial=date.today)
-    bait = forms.ChoiceField(choices=CapturedLib.BAIT_TYPES)
+    bait = forms.ModelChoiceField(queryset=Buffer.objects.all())

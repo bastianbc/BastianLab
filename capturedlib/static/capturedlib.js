@@ -39,11 +39,11 @@ var KTDatatablesServerSide = function () {
                     return moment(data).format('MM/DD/YYYY');
                   }
                 },
-                { data: 'bait' },
+                // { data: 'bait' },
                 { data: 'frag_size' },
                 { data: 'conc' },
                 { data: 'amp_cycle' },
-                { data: 'buffer' },
+                // { data: 'buffer' },
                 { data: 'nm' },
                 { data: 'vol_init' },
                 { data: 'vol_remain' },
@@ -62,7 +62,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 12,
+                    targets: 10,
                     orderable: false,
                     render: function (data, type, row) {
                         if (data > 0) {
@@ -73,7 +73,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 13,
+                    targets: 11,
                     orderable: false,
                     render: function (data, type, row) {
                         if (data) {
@@ -90,7 +90,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 14,
+                    targets: 12,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -350,6 +350,8 @@ var KTDatatablesServerSide = function () {
 
     var initEditor = function () {
 
+      // updateBaitOptions();
+
       editor = new $.fn.dataTable.Editor({
         ajax: {
           url: "/capturedlib/edit_capturedlib_async",
@@ -386,15 +388,6 @@ var KTDatatablesServerSide = function () {
                displayFormat: 'M/D/YYYY',
                wireFormat: 'YYYY-MM-DD',
            }, {
-               label: "Bait:",
-               name: "bait",
-               type: "select",
-               options : [
-                 {"label": "Type 1", "value": "type1"},
-                 {"label": "Type 2", "value": "type2"},
-                 {"label": "Type 3", "value": "type3"}
-               ]
-           },{
                label: "Fragment Size:",
                name: "frag_size"
            },{
@@ -403,9 +396,6 @@ var KTDatatablesServerSide = function () {
            }, {
                label: "AMP Cycle:",
                name: "amp_cycle"
-           },{
-               label: "Buffer:",
-               name: "buffer"
            },{
                label: "Volume Init:",
                name: "vol_init"
@@ -426,6 +416,29 @@ var KTDatatablesServerSide = function () {
        }
      });
 
+     function  updateBaitOptions() {
+
+       $.ajax({
+           url: "/bait/get_bait_choices",
+           type: "GET",
+           success: function (data) {
+
+            var options = [];
+            data.forEach((item, i) => {
+
+              options.push({
+                "label":item["name"],
+                "value":item["id"]
+              })
+
+            });
+
+            editor.field( 'bait' ).update( options );
+
+           }
+       });
+
+     }
 
      $('.table').on( 'click', 'tbody td:not(:first-child)', function (e) {
           editor.inline( this );

@@ -3,26 +3,14 @@ from datetime import date
 from django.db.models import Q, Count
 
 class CapturedLib(models.Model):
-    BAIT_TYPES = (
-        ("type1", "Type 1"),
-        ("type2", "Type 2"),
-        ("type3", "Type 3"),
-    )
-
-    BUFFER_TYPES = (
-        ("type1", "Type 1"),
-        ("type2", "Type 2"),
-        ("type3", "Type 3"),
-    )
-
     name = models.CharField(max_length=50, unique=True, verbose_name="Name")
     barcode = models.ForeignKey("samplelib.Barcode", on_delete=models.CASCADE, verbose_name="Barcode")
     date = models.DateField(default=date.today, verbose_name="Date")
-    bait = models.CharField(max_length=20, choices=BAIT_TYPES, verbose_name="Bait", null=True, blank=True)
+    bait = models.ForeignKey("bait.Bait", verbose_name="Bait", on_delete=models.SET_NULL, null=True, blank=True)
     frag_size = models.FloatField(default=0, verbose_name="Fragment Size")
     conc = models.FloatField(default=0, verbose_name="Concentration")
     amp_cycle = models.IntegerField(default=0)
-    buffer = models.CharField(max_length=20, choices=BUFFER_TYPES, verbose_name="Buffer", null=True, blank=True)
+    buffer = models.ForeignKey("buffer.Buffer", verbose_name="Buffer", on_delete=models.SET_NULL, null=True, blank=True)
     nm = models.FloatField(default=0, verbose_name="nM")
     vol_init = models.FloatField(default=0, verbose_name="Volume Initialize")
     vol_remain = models.FloatField(default=0, verbose_name="Volume Remain")

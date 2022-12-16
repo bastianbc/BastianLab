@@ -6,20 +6,16 @@ class CapturedLibSerializer(serializers.ModelSerializer):
     DT_RowId = serializers.SerializerMethodField()
     barcode = serializers.StringRelatedField()
     nm = serializers.SerializerMethodField()
-    bait = serializers.SerializerMethodField()
 
     class Meta:
         model = CapturedLib
-        fields = ("id", "name", "barcode", "date", "bait", "frag_size", "conc", "amp_cycle", "buffer", "nm", "vol_init", "vol_remain", "amount", "pdf", "DT_RowId",)
+        fields = ("id", "name", "barcode", "date", "bait", "frag_size", "conc", "amp_cycle", "nm", "vol_init", "vol_remain", "amount", "pdf", "DT_RowId",)
 
     def get_DT_RowId(self, obj):
        return getattr(obj, 'id')
 
     def get_nm(self,obj):
         return round(obj.nm,2)
-
-    def get_bait(self,obj):
-        return obj.get_bait_display()
 
 class UsedSampleLibSerializer(serializers.ModelSerializer):
     # captured_lib = serializers.StringRelatedField()
