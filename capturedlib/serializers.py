@@ -10,7 +10,7 @@ class CapturedLibSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CapturedLib
-        fields = ("id", "name", "barcode", "date", "bait", "frag_size", "conc", "amp_cycle", "buffer", "nm", "vol_init", "vol_remain", "amount", "DT_RowId",)
+        fields = ("id", "name", "barcode", "date", "bait", "frag_size", "conc", "amp_cycle", "buffer", "nm", "vol_init", "vol_remain", "amount", "pdf", "DT_RowId",)
 
     def get_DT_RowId(self, obj):
        return getattr(obj, 'id')
