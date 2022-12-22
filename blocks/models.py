@@ -127,7 +127,7 @@ class Blocks(models.Model):
                 order_column = '-' + order_column
 
             queryset = _get_authorizated_queryset()
-
+            
             total = queryset.count()
 
             is_initial = _is_initial_value(search_value)

@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required,permission_required
 from .serializers import *
 from .models import *
 from samplelib.models import SampleLib, Barcode
+from bait.models import Bait
 from .forms import *
 from django.contrib import messages
 
@@ -83,11 +84,13 @@ def new_capturedlib_async(request):
 
         barcode = Barcode.objects.first()
 
+        bait = Bait.objects.get(id=options["bait"])
+
         captured_lib = CapturedLib.objects.create(
             name="%s-%d" % (options["prefix"],autonumber),
             barcode=barcode,
             date=options["date"],
-            bait=options["bait"]
+            bait=bait
         )
 
         for sample_lib in samplelibs:

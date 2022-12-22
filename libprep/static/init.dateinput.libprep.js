@@ -1,11 +1,15 @@
 $( document ).ready(function() {
 
   $("#id_date").flatpickr({
-    dateFormat: "m/d/Y",
+    altInput: true,
+    altFormat: "m/d/Y",
+    dateFormat: "Y-m-d",
   });
 
   $("#id_date_range").flatpickr({
-    dateFormat: "m/d/Y",
+    altInput: true,
+    altFormat: "m/d/Y",
+    dateFormat: "Y-m-d",
     mode: "range"
   });
 

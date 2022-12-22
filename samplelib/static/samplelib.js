@@ -61,6 +61,10 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
+                  targets: 3,
+                  orderable: false,
+                },
+                {
                     targets: 12,
                     orderable: false,
                     render: function (data, type, row) {
@@ -366,14 +370,17 @@ var KTDatatablesServerSide = function () {
                label: "Concentration:",
                name: "qpcr_conc"
            }, {
+               label: "PCR Cycles:",
+               name: "pcr_cycles"
+           }, {
                label: "Input Amount:",
                name: "amount_in",
                type: "readonly"
-           },  {
+           }, {
                label: "Final Amount:",
                name: "amount_final",
                type: "readonly"
-           },{
+           }, {
                label: "Volume Init:",
                name: "vol_init"
            }, {
@@ -667,8 +674,6 @@ var KTDatatablesServerSide = function () {
 
           listEl.innerHTML += row;
         }
-
-        el.querySelector(".modal-footer a").setAttribute("href","/samplelib/"+id+"/print_as_csv")
 
         modal.show();
 

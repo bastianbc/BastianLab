@@ -1,7 +1,15 @@
 $( document ).ready(function() {
 
-  $("#id_date").flatpickr();
+  $("#id_date").flatpickr({
+    altInput: true,
+    altFormat: "m/d/Y",
+    dateFormat: "Y-m-d",
+  });
 
-  $("#id_date_run").flatpickr();
+  $("#id_date_run").flatpickr({
+    altInput: true,
+    altFormat: "m/d/Y",
+    dateFormat: "Y-m-d",
+  });
 
 });

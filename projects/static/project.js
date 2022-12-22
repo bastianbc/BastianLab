@@ -60,7 +60,7 @@ var KTDatatablesServerSide = function () {
                         if (data > 0) {
                           let pr_id = row["pr_id"];
                           return `
-                              <a href="/blocks?model=project&id=${pr_id}">${data}</a>`;
+                              <a href="/blocks?model=project&id=${pr_id}&initial=true">${data}</a>`;
                         }
                         return data;
                     }
@@ -90,7 +90,7 @@ var KTDatatablesServerSide = function () {
                                 </span>
                             </a>
                             <!--begin::Menu-->
-                            <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4" data-kt-menu="true">
+                            <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-150px py-4" data-kt-menu="true">
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
                                     <a href="/projects/edit/`+ row["pr_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
@@ -101,16 +101,16 @@ var KTDatatablesServerSide = function () {
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/blocks?model=project&id=`+ row["pr_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
-                                        Add Block
+                                    <a href="/blocks?model=project&id=`+ row["pr_id"] +`&initial=false" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
+                                        Add Block(s)
                                     </a>
                                 </div>
                                 <!--end::Menu item-->
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/blocks?model=project&id=`+ row["pr_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
-                                        Remove Block
+                                    <a href="/blocks?model=project&id=`+ row["pr_id"] +`&initial=true" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
+                                        Remove Block(s)
                                     </a>
                                 </div>
                                 <!--end::Menu item-->

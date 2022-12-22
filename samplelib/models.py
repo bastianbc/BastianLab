@@ -34,6 +34,7 @@ class SampleLib(models.Model):
         return self.name
 
     def save(self,*args,**kwargs):
+        self.vol_remain = self.vol_init
         self.amount_final = self.vol_remain * self.qpcr_conc
         super().save(*args, **kwargs)
 
@@ -63,12 +64,14 @@ class SampleLib(models.Model):
             ORDER_COLUMN_CHOICES = {
                 "1": "name",
                 "2": "barcode",
-                "3": "date",
-                "4": "method",
-                "5": "conc",
-                "6": "input_amount",
-                "7": "vol_init",
-                "8": "vol_remain",
+                "4": "date",
+                "5": "method",
+                "6": "conc",
+                "7": "pcr_cycles",
+                "8": "amount_in",
+                "9": "amount_final",
+                "10": "vol_init",
+                "11": "vol_remain",
             }
             draw = int(kwargs.get('draw', None)[0])
             length = int(kwargs.get('length', None)[0])

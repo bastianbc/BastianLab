@@ -57,7 +57,6 @@ class NucAcids(models.Model):
                 "7": "vol_init",
                 "8": "vol_remain",
             }
-            print(kwargs)
 
             draw = int(kwargs.get('draw', None)[0])
             length = int(kwargs.get('length', None)[0])
@@ -107,6 +106,7 @@ class NucAcids(models.Model):
             count = queryset.count()
             queryset = queryset.order_by(order_column)[start:start + length]
             # queryset = queryset[start:start + length]
+            
             return {
                 'items': queryset,
                 'count': count,

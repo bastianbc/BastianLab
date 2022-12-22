@@ -17,7 +17,7 @@ class NucAcidForm(forms.ModelForm):
 class SampleLibCreationOptionsForm(forms.Form):
     barcode_start_with = forms.ModelChoiceField(queryset = Barcode.objects.all())
     target_amount = forms.FloatField()
-    share_volume = forms.FloatField()
+    shear_volume = forms.FloatField()
     prefix = forms.CharField()
 
 class FilterForm(forms.Form):

@@ -11,6 +11,8 @@ var KTDatatablesServerSide = function () {
     // Private functions
     var initDatatable = function ( initialValue, filterDateRange, filterNAType ) {
 
+        $.fn.dataTable.moment( 'YYYY-MM-DD' );
+
         dt = $(".table").DataTable({
             // searchDelay: 500,
             processing: true,
@@ -42,11 +44,7 @@ var KTDatatablesServerSide = function () {
                 { data: 'name' },
                 { data: 'area' },
                 { data: 'na_type' },
-                { data: 'date',
-                  render: function (data) {
-                    return moment(data).format('MM/DD/YYYY');
-                  }
-                },
+                { data: 'date'},
                 { data: 'method' },
                 { data: 'conc' },
                 { data: 'vol_init' },
@@ -123,6 +121,23 @@ var KTDatatablesServerSide = function () {
         });
 
         table = dt.$;
+
+        $.fn.dataTable.moment = function ( format, locale ) {
+          console.log("ffffffffffffffffffffffff");
+            var types = $.fn.dataTable.ext.type;
+
+            // Add type detection
+            types.detect.unshift( function ( d ) {
+                return moment( d, format, locale, true ).isValid() ?
+                    'moment-'+format :
+                    null;
+            } );
+
+            // Add sorting method - use an integer for the sorting
+            types.order[ 'moment-'+format+'-pre' ] = function ( d ) {
+                return moment( d, format, locale, true ).unix();
+            };
+        };
 
         // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
         dt.on('draw', function () {
@@ -340,6 +355,12 @@ var KTDatatablesServerSide = function () {
 
         }
 
+        function hidePrintAsCSV() {
+
+          document.querySelector('[data-kt-stepper-action="print"]').classList.add("d-none");
+
+        }
+
         document.getElementById("modal_samplelib_options").addEventListener('show.bs.modal', function(e){
 
           if (!checkSelectedRows()) {
@@ -379,6 +400,8 @@ var KTDatatablesServerSide = function () {
           resetStepper();
 
           resetTable();
+
+          hidePrintAsCSV();
 
           dt.draw();
 
@@ -424,6 +447,8 @@ var KTDatatablesServerSide = function () {
                 fillElements(result.data);
 
                 initDynamicEvents().init();
+
+                initPrintAsCSV();
 
                 stepper.goNext();
 
@@ -522,7 +547,7 @@ var KTDatatablesServerSide = function () {
           var total_amount = 0;
           var total_volume = 0;
 
-          var shareVolume = parseFloat(document.getElementById("id_share_volume").value);
+          var shearVolume = parseFloat(document.getElementById("id_shear_volume").value);
 
           for (var i = 0; i < data.length; i++) {
 
@@ -533,7 +558,7 @@ var KTDatatablesServerSide = function () {
                 <div class="col-1 align-self-center">${ data[i].conc }</div>
                 <div class="col-1 text-center"><input type="text" class="textinput textInput form-control form-control-sm text-end detail-volume" value="${ data[i].input_vol }"></div>
                 <div class="col-1 text-center"><input type="text" class="textinput textInput form-control form-control-sm text-end detail-amount" value="${ data[i].input_amount }"></div>
-                <div class="col-1 text-center"><input type="text" class="textinput textInput form-control form-control-sm text-end detail-te" value="${ shareVolume - data[i].input_vol }"></div>
+                <div class="col-1 text-center"><input type="text" class="textinput textInput form-control form-control-sm text-end detail-te" value="${ shearVolume - data[i].input_vol }"></div>
               </div>`;
             listEl.innerHTML += row;
 
@@ -564,6 +589,27 @@ var KTDatatablesServerSide = function () {
 
         }
 
+        function getLinkIds() {
+
+          var result = [];
+
+          document.querySelectorAll(".list-body .row").forEach((item, i) => {
+
+            result.push(item.getAttribute("data-id"));
+
+          });
+
+          return JSON.stringify(result);
+        }
+
+        function initPrintAsCSV() {
+
+          document.querySelector('[data-kt-stepper-action="print"]').classList.remove("d-none");
+
+          document.querySelector('[data-kt-stepper-action="print"]').setAttribute("href", "/samplelib/print_as_csv?selected_ids=" + getLinkIds());
+
+        }
+
         return {
           init: function () {
             initPrefixKeyUp(),initContinueClick(), initSubmit();
@@ -574,7 +620,7 @@ var KTDatatablesServerSide = function () {
 
       function initDynamicEvents() {
 
-        var shareVolume = parseFloat(document.getElementById("id_share_volume").value);
+        var shearVolume = parseFloat(document.getElementById("id_shear_volume").value);
 
         function initVolumeChange() {
 
@@ -590,7 +636,7 @@ var KTDatatablesServerSide = function () {
 
               parent.querySelector(".detail-amount").value = amount;
 
-              parent.querySelector(".detail-te").value = shareVolume - this.value;
+              parent.querySelector(".detail-te").value = shearVolume - this.value;
 
             });
 
@@ -612,7 +658,7 @@ var KTDatatablesServerSide = function () {
 
               parent.querySelector(".detail-volume").value = volume;
 
-              parent.querySelector(".detail-te").value = shareVolume - volume;
+              parent.querySelector(".detail-te").value = shearVolume - volume;
 
             });
 

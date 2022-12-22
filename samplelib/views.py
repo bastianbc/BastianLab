@@ -230,7 +230,7 @@ def update_sl_na_link_async(request):
 
     return JsonResponse({ "success":True })
 
-def print_as_csv(request,id):
+def print_as_csv(request):
     import csv
     from django.http import HttpResponse
 
@@ -240,9 +240,11 @@ def print_as_csv(request,id):
         input_vol = 0.0
         input_amount = 0.0
 
+    selected_ids = json.loads(request.GET.get("selected_ids"))
+
     result = []
 
-    for sl_link in NA_SL_LINK.objects.filter(sample_lib__id=id):
+    for sl_link in NA_SL_LINK.objects.filter(id__in=selected_ids):
         report = Report()
         report.sample_lib = sl_link.sample_lib.name
         report.nucacid = sl_link.nucacid.name

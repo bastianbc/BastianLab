@@ -1,5 +1,9 @@
 $( document ).ready(function() {
 
-  $("#id_completion_date").flatpickr();
+  $("#id_completion_date").flatpickr({
+    altInput: true,
+    altFormat: "m/d/Y",
+    dateFormat: "Y-m-d",
+  });
 
 });

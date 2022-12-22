@@ -67,7 +67,7 @@ var KTDatatablesServerSide = function () {
                         if (data > 0) {
                           let pat_id = row["pat_id"];
                           return `
-                              <a href="/blocks?model=patient&id=${pat_id}">${data}</a>`;
+                              <a href="/blocks?model=patient&id=${pat_id}&initial=true">${data}</a>`;
                         }
                         return data;
                     }

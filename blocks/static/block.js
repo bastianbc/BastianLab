@@ -667,10 +667,11 @@ var KTDatatablesServerSide = function () {
       const params = new URLSearchParams(window.location.search);
       const model = params.get('model');
       const id = params.get('id');
+      const initial = params.get('initial');
 
       cleanUrl();
 
-      if (model != null && id !=null) {
+      if (initial =="true" && model != null && id !=null) {
 
         return JSON.stringify({
           "model": model,
