@@ -11,7 +11,7 @@ var KTDatatablesServerSide = function () {
     // Private functions
     var initDatatable = function ( initialValue, filterDateRange, filterNAType ) {
 
-        $.fn.dataTable.moment( 'YYYY-MM-DD' );
+        $.fn.dataTable.moment( 'MM/DD/YYYY' );
 
         dt = $(".table").DataTable({
             // searchDelay: 500,
@@ -44,7 +44,11 @@ var KTDatatablesServerSide = function () {
                 { data: 'name' },
                 { data: 'area' },
                 { data: 'na_type' },
-                { data: 'date'},
+                { data: 'date',
+                  render: function (data) {
+                    return moment(data).format('MM/DD/YYYY');
+                  }
+                },
                 { data: 'method' },
                 { data: 'conc' },
                 { data: 'vol_init' },

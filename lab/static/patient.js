@@ -10,6 +10,9 @@ var KTDatatablesServerSide = function () {
 
     // Private functions
     var initDatatable = function () {
+
+        $.fn.dataTable.moment( 'MM/DD/YYYY' );
+        
         dt = $(".table").DataTable({
             // searchDelay: 500,
             processing: true,
