@@ -126,23 +126,6 @@ var KTDatatablesServerSide = function () {
 
         table = dt.$;
 
-        $.fn.dataTable.moment = function ( format, locale ) {
-          console.log("ffffffffffffffffffffffff");
-            var types = $.fn.dataTable.ext.type;
-
-            // Add type detection
-            types.detect.unshift( function ( d ) {
-                return moment( d, format, locale, true ).isValid() ?
-                    'moment-'+format :
-                    null;
-            } );
-
-            // Add sorting method - use an integer for the sorting
-            types.order[ 'moment-'+format+'-pre' ] = function ( d ) {
-                return moment( d, format, locale, true ).unix();
-            };
-        };
-
         // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
         dt.on('draw', function () {
             initToggleToolbar();
@@ -339,6 +322,13 @@ var KTDatatablesServerSide = function () {
 
       var modal = new bootstrap.Modal(document.getElementById("modal_samplelib_options"));
 
+      function toggleButtons(state) {
+        
+        document.querySelector('[data-kt-stepper-action="print"]').disabled = !state;
+        document.querySelector('[data-kt-stepper-action="submit"]').disabled = state;
+
+      }
+
       function initModal() {
 
         function resetStepper() {
@@ -495,9 +485,10 @@ var KTDatatablesServerSide = function () {
                     customClass: {
                         confirmButton: "btn fw-bold btn-success",
                     }
-                }).then(function(){
-                  dt.draw();
                 });
+
+                toggleButtons(true);
+
               }
               else {
                 Swal.fire({
@@ -510,8 +501,6 @@ var KTDatatablesServerSide = function () {
                     }
                 });
               }
-
-              modal.hide();
 
             });
 
@@ -581,11 +570,13 @@ var KTDatatablesServerSide = function () {
             var id = row.getAttribute("data-id");
             var volume = row.querySelector(".detail-volume").value;
             var amount = row.querySelector(".detail-amount").value;
+            var te = row.querySelector(".detail-te").value;
 
             values.push({
               "id":id,
               "volume":volume,
-              "amount": amount
+              "amount": amount,
+              "te": te
             });
           }
 
@@ -608,9 +599,9 @@ var KTDatatablesServerSide = function () {
 
         function initPrintAsCSV() {
 
-          document.querySelector('[data-kt-stepper-action="print"]').classList.remove("d-none");
-
-          document.querySelector('[data-kt-stepper-action="print"]').setAttribute("href", "/samplelib/print_as_csv?selected_ids=" + getLinkIds());
+          var element = document.querySelector('[data-kt-stepper-action="print"]');
+          element.classList.remove("d-none");
+          element.setAttribute("onclick", "window.location.href='/samplelib/print_as_csv?selected_ids=" + getLinkIds() +"'");
 
         }
 
@@ -642,6 +633,8 @@ var KTDatatablesServerSide = function () {
 
               parent.querySelector(".detail-te").value = shearVolume - this.value;
 
+              toggleButtons(false);
+
             });
 
           }
@@ -662,7 +655,10 @@ var KTDatatablesServerSide = function () {
 
               parent.querySelector(".detail-volume").value = volume;
 
-              parent.querySelector(".detail-te").value = shearVolume - volume;
+              parent.querySelector(".detail-te").value = parseFloat(shearVolume - volume).toFixed(2);
+
+
+              toggleButtons(false);
 
             });
 
@@ -836,7 +832,7 @@ var KTDatatablesServerSide = function () {
 
       return {
         init: function () {
-          initModal(),handleBatchDelete(), uncheckedFirstCheckBox();
+          initModal(),handleBatchDelete(), uncheckedFirstCheckBox(), toggleButtons(true);
         }
       }
 

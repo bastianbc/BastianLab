@@ -94,6 +94,7 @@ def new_samplelib_async(request):
             sample_lib = SampleLib.objects.create(
                 name="%s-%d" % (options["prefix"],autonumber),
                 barcode=Barcode.objects.get(id=barcode_id),
+                shear_volume=float(options["shear_volume"]),
                 method=Method.objects.all().first(),
             )
 
@@ -113,7 +114,7 @@ def new_samplelib_async(request):
                     link = NA_SL_LINK.objects.create(
                         nucacid=nucacid,
                         sample_lib=sample_lib,
-                        input_vol= used_amount / nucacid.conc,
+                        input_vol= round(used_amount / nucacid.conc,2),
                         input_amount= used_amount
                     )
 
@@ -136,7 +137,7 @@ def new_samplelib_async(request):
                 link = NA_SL_LINK.objects.create(
                     nucacid=nucacid,
                     sample_lib=sample_lib,
-                    input_vol= used_amount / nucacid.conc,
+                    input_vol= round(used_amount / nucacid.conc, 2),
                     input_amount= used_amount
                 )
 
@@ -206,12 +207,14 @@ def get_used_nucacids(request,id):
 def update_sl_na_link_async(request):
     try:
         values = json.loads(request.GET.get("values"))
+        print(values)
 
         for value in values:
             link = NA_SL_LINK.objects.get(id=value["id"])
 
             volume = float(value["volume"])
             amount = float(value["amount"])
+            te = float(value["te"])
 
             diff = amount - link.input_amount
 
@@ -221,6 +224,7 @@ def update_sl_na_link_async(request):
 
             sample_lib = link.sample_lib
             sample_lib.amount_in = amount
+            sample_lib.shear_volume = te + volume
             sample_lib.save()
 
             link.nucacid.update_volume(diff)
@@ -239,6 +243,7 @@ def print_as_csv(request):
         nucacid = ""
         input_vol = 0.0
         input_amount = 0.0
+        te = 0.0
 
     selected_ids = json.loads(request.GET.get("selected_ids"))
 
@@ -250,6 +255,7 @@ def print_as_csv(request):
         report.nucacid = sl_link.nucacid.name
         report.input_vol = sl_link.input_vol
         report.input_amount = sl_link.input_amount
+        report.te = sl_link.sample_lib.shear_volume - sl_link.input_vol
         result.append(report)
 
     response = HttpResponse(
@@ -257,7 +263,7 @@ def print_as_csv(request):
         headers={'Content-Disposition': 'attachment; filename="used_nucacids.csv"'},
     )
 
-    field_names = ["sample_lib","nucacid","input_vol","input_amount"]
+    field_names = ["sample_lib","nucacid","input_vol","input_amount","te"]
     writer = csv.writer(response)
     writer.writerow(field_names)
     for item in result:

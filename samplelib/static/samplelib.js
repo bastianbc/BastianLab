@@ -44,10 +44,10 @@ var KTDatatablesServerSide = function () {
                 },
                 { data: 'method' },
                 { data: 'qpcr_conc' },
+                { data: 'vol_init' },
+                { data: 'amount_final' },
                 { data: 'pcr_cycles' },
                 { data: 'amount_in' },
-                { data: 'amount_final' },
-                { data: 'vol_init' },
                 { data: 'vol_remain' },
                 { data: 'num_nucacids' }
             ],
@@ -431,6 +431,8 @@ var KTDatatablesServerSide = function () {
 
       var container = document.querySelector('.table');
 
+      var modal = new bootstrap.Modal(document.getElementById("modal_capturedlib_options"));
+
       document.getElementById("modal_capturedlib_options").addEventListener('show.bs.modal', function(e){
 
         if (!checkSelectedRows()) {
@@ -449,6 +451,20 @@ var KTDatatablesServerSide = function () {
         }
 
       });
+
+      document.getElementById("modal_capturedlib_options").addEventListener('hide.bs.modal', function(e){
+
+        resetForm();
+
+        dt.draw();
+
+      });
+
+      function resetForm() {
+
+        document.getElementById("frm_creation_options").reset();
+
+      }
 
       function getSelectedRows() {
 
@@ -521,8 +537,6 @@ var KTDatatablesServerSide = function () {
                 customClass: {
                     confirmButton: "btn fw-bold btn-success",
                 }
-            }).then(function(){
-              dt.draw();
             });
           }
           else {
@@ -536,6 +550,8 @@ var KTDatatablesServerSide = function () {
                 }
             });
           }
+
+          modal.hide()
 
         });
 

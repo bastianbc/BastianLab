@@ -19,6 +19,7 @@ class SampleLib(models.Model):
     date = models.DateField(default=date.today, verbose_name="Date")
     method = models.ForeignKey("method.Method",related_name="sample_libs",on_delete=models.CASCADE, verbose_name="Method")
     qubit = models.FloatField(default=0, verbose_name="Qubit")
+    shear_volume  = models.FloatField(default=0, verbose_name="Shear Volume")
     qpcr_conc = models.FloatField(default=0, verbose_name="qPCR Concentration")
     pcr_cycles = models.FloatField(default=0, verbose_name="PCR Cycles")
     amount_in = models.FloatField(default=0, verbose_name="Input Amount")
