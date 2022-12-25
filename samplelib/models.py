@@ -34,9 +34,16 @@ class SampleLib(models.Model):
     def __str__(self):
         return self.name
 
+    __vol_init = None
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__vol_init = self.vol_init
+
     def save(self,*args,**kwargs):
-        self.vol_remain = self.vol_init
-        self.amount_final = self.vol_remain * self.qpcr_conc
+        if self.__vol_init != self.vol_init:
+            self.vol_remain = self.vol_init
+            self.amount_final = self.vol_remain * self.qpcr_conc
         super().save(*args, **kwargs)
 
     def update_volume(self, volume):

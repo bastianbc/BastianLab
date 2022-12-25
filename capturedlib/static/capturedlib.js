@@ -12,7 +12,7 @@ var KTDatatablesServerSide = function () {
     var initDatatable = function ( initialValue ) {
 
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
-        
+
         dt = $(".table").DataTable({
             // searchDelay: 500,
             processing: true,
@@ -41,11 +41,11 @@ var KTDatatablesServerSide = function () {
                     return moment(data).format('MM/DD/YYYY');
                   }
                 },
-                // { data: 'bait' },
+                { data: 'bait' },
                 { data: 'frag_size' },
                 { data: 'conc' },
                 { data: 'amp_cycle' },
-                // { data: 'buffer' },
+                { data: 'buffer' },
                 { data: 'nm' },
                 { data: 'vol_init' },
                 { data: 'vol_remain' },
@@ -64,7 +64,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 10,
+                    targets: 12,
                     orderable: false,
                     render: function (data, type, row) {
                         if (data > 0) {
@@ -75,7 +75,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 11,
+                    targets: 13,
                     orderable: false,
                     render: function (data, type, row) {
                         if (data) {
@@ -92,7 +92,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 12,
+                    targets: 14,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -352,103 +352,147 @@ var KTDatatablesServerSide = function () {
 
     var initEditor = function () {
 
-      // updateBaitOptions();
+      var baitOptions = [];
+      var bufferOptions = [];
 
-      editor = new $.fn.dataTable.Editor({
-        ajax: {
-          url: "/capturedlib/edit_capturedlib_async",
-          type: "POST",
-          headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
-          success: function (result) {
-              if (!result.success) {
-                Swal.fire({
-                    text: "Error occurred during data update.",
-                    icon: "error",
-                    buttonsStyling: false,
-                    confirmButtonText: "Ok, got it!",
-                    customClass: {
-                        confirmButton: "btn fw-bold btn-primary",
-                    }
-                });
-              }
+      Promise.all([
+          updateBaitOptions(),
+          updateBufferOptions()
+      ]).then(() => {
 
-              dt.draw();
+        editor = new $.fn.dataTable.Editor({
+          ajax: {
+            url: "/capturedlib/edit_capturedlib_async",
+            type: "POST",
+            headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
+            success: function (result) {
+                if (!result.success) {
+                  Swal.fire({
+                      text: "Error occurred during data update.",
+                      icon: "error",
+                      buttonsStyling: false,
+                      confirmButtonText: "Ok, got it!",
+                      customClass: {
+                          confirmButton: "btn fw-bold btn-primary",
+                      }
+                  });
+                }
+
+                dt.draw();
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                swal("Error updating!", "Please try again!", "error");
+            }
           },
-          error: function (xhr, ajaxOptions, thrownError) {
-              swal("Error updating!", "Please try again!", "error");
-          }
-        },
-        table: ".table",
-        fields: [ {
-               label: "Name:",
-               name: "name"
-           }, {
-               label: "Date:",
-               name: "date",
-               type: "datetime",
-               def: function () { return new Date(); },
-               displayFormat: 'M/D/YYYY',
-               wireFormat: 'YYYY-MM-DD',
-           }, {
-               label: "Fragment Size:",
-               name: "frag_size"
-           },{
-               label: "Concentration:",
-               name: "conc"
-           }, {
-               label: "AMP Cycle:",
-               name: "amp_cycle"
-           },{
-               label: "Volume Init:",
-               name: "vol_init"
-           }, {
-               label: "Volume Remain:",
-               name: "vol_remain"
-           },
-           {
-               label: "Amount:",
-               name: "amount",
-               type: "readonly"
-           },
-       ],
-       formOptions: {
-          inline: {
-            onBlur: 'submit'
-          }
-       }
-     });
-
-     function  updateBaitOptions() {
-
-       $.ajax({
-           url: "/bait/get_bait_choices",
-           type: "GET",
-           success: function (data) {
-
-            var options = [];
-            data.forEach((item, i) => {
-
-              options.push({
-                "label":item["name"],
-                "value":item["id"]
-              })
-
-            });
-
-            editor.field( 'bait' ).update( options );
-
-           }
+          table: ".table",
+          fields: [ {
+                 label: "Name:",
+                 name: "name"
+             }, {
+                 label: "Date:",
+                 name: "date",
+                 type: "datetime",
+                 def: function () { return new Date(); },
+                 displayFormat: 'M/D/YYYY',
+                 wireFormat: 'YYYY-MM-DD',
+             }, {
+                 label: "Fragment Size:",
+                 name: "frag_size"
+             }, {
+                 label: "Concentration:",
+                 name: "conc"
+             }, {
+                 label: "Bait:",
+                 name: "bait",
+                 type: "select",
+                 options: baitOptions,
+             }, {
+                 label: "Buffer:",
+                 name: "buffer",
+                 // type: "select"
+             }, {
+                 label: "AMP Cycle:",
+                 name: "amp_cycle"
+             }, {
+                 label: "Volume Init:",
+                 name: "vol_init"
+             }, {
+                 label: "Volume Remain:",
+                 name: "vol_remain"
+             }, {
+                 label: "Amount:",
+                 name: "amount",
+                 type: "readonly"
+             },
+         ],
+         formOptions: {
+            inline: {
+              onBlur: 'submit'
+            }
+         }
        });
 
-     }
+      }).catch((err) => {
+          console.log(err);
+      });
 
-     $('.table').on( 'click', 'tbody td:not(:first-child)', function (e) {
-          editor.inline( this );
-     });
+      function  updateBaitOptions() {
 
-     $('.table').on( 'key-focus', function ( e, datatable, cell ) {
-          editor.inline( cell.index() );
-     });
+        $.ajax({
+            url: "/bait/get_bait_choices",
+            type: "GET",
+            async: false,
+            success: function (data) {
+
+             // var options = [];
+             data.forEach((item, i) => {
+
+               baitOptions.push({
+                 "label":item["name"],
+                 "value":item["id"]
+               })
+
+             });
+
+             // editor.field( 'bait' ).update( options );
+
+            }
+        });
+
+      }
+
+      function  updateBufferOptions() {
+
+        $.ajax({
+            url: "/buffer/get_buffer_choices",
+            type: "GET",
+            async: false,
+            success: function (data) {
+
+             // var options = [];
+             data.forEach((item, i) => {
+
+               bufferOptions.push({
+                 "label":item["name"],
+                 "value":item["id"]
+               })
+
+             });
+
+             // editor.field( 'buffer' ).update( options );
+
+            }
+        });
+
+      }
+
+      $('.table').on( 'click', 'tbody td:not(:first-child)', function (e) {
+           editor.inline( this );
+      });
+
+      // $('.table').on( 'key-focus', function ( e, datatable, cell ) {
+      //      editor.inline( cell.index() );
+      // });
 
     }
 
@@ -613,7 +657,7 @@ var KTDatatablesServerSide = function () {
 
             var conc = parent.querySelectorAll('div')[1].innerText;
 
-            var volume = this.value / conc;
+            var volume = (this.value / conc).toFixed(2);
 
             parent.querySelector(".detail-volume").value = volume;
 
@@ -985,7 +1029,7 @@ var KTDatatablesServerSide = function () {
                         }).done(function (result) {
                             if (result.deleted) {
                               Swal.fire({
-                                  text: "Nucleic Acid(s) was deleted succesfully.",
+                                  text: "Captured Library(s) was deleted succesfully.",
                                   icon: "info",
                                   buttonsStyling: false,
                                   confirmButtonText: "Ok, got it!",
@@ -998,7 +1042,7 @@ var KTDatatablesServerSide = function () {
                             }
                             else {
                               Swal.fire({
-                                  text: "Nucleic Acid(s) wasn't deleted!",
+                                  text: "Captured Library(s) wasn't deleted!",
                                   icon: "error",
                                   buttonsStyling: false,
                                   confirmButtonText: "Ok, got it!",
@@ -1047,7 +1091,7 @@ var KTDatatablesServerSide = function () {
     })();
 
     var handleFilter = () => {
-      console.log("init filter...");
+
       $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
         var min = parseInt($('#min').val(), 10);
         var max = parseInt($('#max').val(), 10);

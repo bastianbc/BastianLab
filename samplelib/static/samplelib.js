@@ -47,6 +47,7 @@ var KTDatatablesServerSide = function () {
                 { data: 'vol_init' },
                 { data: 'amount_final' },
                 { data: 'pcr_cycles' },
+                { data: 'qubit' },
                 { data: 'amount_in' },
                 { data: 'vol_remain' },
                 { data: 'num_nucacids' }
@@ -67,7 +68,7 @@ var KTDatatablesServerSide = function () {
                   orderable: false,
                 },
                 {
-                    targets: 12,
+                    targets: 13,
                     orderable: false,
                     render: function (data, type, row) {
                         if (data > 0) {
@@ -79,7 +80,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 13,
+                    targets: 14,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -374,6 +375,9 @@ var KTDatatablesServerSide = function () {
            }, {
                label: "PCR Cycles:",
                name: "pcr_cycles"
+           }, {
+               label: "Qubit:",
+               name: "qubit"
            }, {
                label: "Input Amount:",
                name: "amount_in",

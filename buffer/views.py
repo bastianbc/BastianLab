@@ -2,7 +2,8 @@ from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required,permission_required
 from .forms import *
 from django.contrib import messages
-from django.conf import settings
+from .serializers import BufferSerializer
+from django.http import JsonResponse
 
 @permission_required("buffer.view_buffer",raise_exception=True)
 def buffers(request):
@@ -62,3 +63,8 @@ def filter_buffers(request):
     result['recordsFiltered'] = buffers['count']
 
     return JsonResponse(result)
+
+@permission_required("bait.view_bait",raise_exception=True)
+def get_buffer_choices(request):
+    serializer = BufferSerializer(Buffer.objects.all(), many=True)
+    return JsonResponse(serializer.data,safe=False)

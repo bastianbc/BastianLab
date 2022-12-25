@@ -30,10 +30,18 @@ class SampleLibSerializer(serializers.ModelSerializer):
 class UsedNuacidsSerializer(serializers.ModelSerializer):
     sample_lib = serializers.StringRelatedField()
     nucacid = serializers.StringRelatedField()
+    input_amount = serializers.SerializerMethodField()
+    input_vol = serializers.SerializerMethodField()
 
     class Meta:
         model = NA_SL_LINK
         fields = ("sample_lib", "nucacid", "input_vol", "input_amount", )
+
+    def get_input_amount(self,obj):
+        return round(obj.input_amount,2)
+
+    def get_input_vol(self,obj):
+        return round(obj.input_vol,2)
 
 class SavedNuacidsSerializer(serializers.ModelSerializer):
     sample_lib = serializers.StringRelatedField()

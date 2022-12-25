@@ -1,13 +1,19 @@
-from django.db.models.fields import FloatField, IntegerField
+from django.db.models.fields import FloatField, IntegerField, related
 
 def custom_update(model,pk,parameters):
     try:
         obj = model.objects.get(pk=pk)
 
         for key in parameters:
-            if not key == "pk" and type(obj._meta.get_field(key)) == FloatField:
-                parameters[key] = float(parameters[key])
-            setattr(obj, key, parameters[key])
+            if not key == "pk":
+                print("key:%s, value:%s" % (key,parameters[key]))
+                if type(obj._meta.get_field(key)) == FloatField:
+                    parameters[key] = float(parameters[key])
+
+                if obj._meta.get_field(key).related_model:
+                    parameters[key] = obj._meta.get_field(key).related_model.objects.get(pk=parameters[key])
+
+                setattr(obj, key, parameters[key])
 
         obj.save()
         return obj

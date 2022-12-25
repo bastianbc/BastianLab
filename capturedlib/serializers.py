@@ -6,10 +6,12 @@ class CapturedLibSerializer(serializers.ModelSerializer):
     DT_RowId = serializers.SerializerMethodField()
     barcode = serializers.StringRelatedField()
     nm = serializers.SerializerMethodField()
+    bait = serializers.StringRelatedField()
+    buffer = serializers.StringRelatedField()
 
     class Meta:
         model = CapturedLib
-        fields = ("id", "name", "barcode", "date", "bait", "frag_size", "conc", "amp_cycle", "nm", "vol_init", "vol_remain", "amount", "pdf", "DT_RowId",)
+        fields = ("id", "name", "barcode", "date", "bait", "buffer", "frag_size", "conc", "amp_cycle", "nm", "vol_init", "vol_remain", "amount", "pdf", "DT_RowId",)
 
     def get_DT_RowId(self, obj):
        return getattr(obj, 'id')
