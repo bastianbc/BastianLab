@@ -35,11 +35,6 @@ class Blocks(models.Model):
         ("spitz","Spitz"),
     )
 
-    BODY_SITE_TYPES = (
-        ("type1","Type 1"),
-        ("type2","Type 2"),
-    )
-
     bl_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50, blank=True, null=False, unique=True)
     # pat_id = models.CharField(max_length=12, blank=True, null=True)
@@ -49,7 +44,7 @@ class Blocks(models.Model):
         MinValueValidator((0.1), message='Minimum age is 0.1 years'),
         MaxValueValidator((120), message='Maximum age is 120 years'),
         ])
-    body_site = models.CharField(max_length=10, choices=BODY_SITE_TYPES, blank=True, null=True)
+    body_site = models.ForeignKey("body.Body", on_delete=models.CASCADE, blank=True, null=True)
     ulceration = models.BooleanField(blank=True, null=True)
     thickness = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     mitoses = models.IntegerField(blank=True, null=True)
@@ -127,7 +122,7 @@ class Blocks(models.Model):
                 order_column = '-' + order_column
 
             queryset = _get_authorizated_queryset()
-            
+
             total = queryset.count()
 
             is_initial = _is_initial_value(search_value)

@@ -12,7 +12,7 @@ var KTDatatablesServerSide = function () {
     var initDatatable = function () {
 
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
-        
+
         dt = $(".table").DataTable({
             // searchDelay: 500,
             processing: true,
@@ -141,7 +141,7 @@ var KTDatatablesServerSide = function () {
 
         // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
         dt.on('draw', function () {
-            initToggleToolbar();
+            // initToggleToolbar();
             toggleToolbars();
             handleDeleteRows();
             handleResetForm();
@@ -456,7 +456,7 @@ var KTDatatablesServerSide = function () {
         init: function () {
             initDatatable();
             handleSearchDatatable();
-            initToggleToolbar();
+            // initToggleToolbar();
             handleFilterDatatable();
             handleDeleteRows();
             handleResetForm();

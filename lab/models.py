@@ -21,16 +21,21 @@ class Patients(models.Model):
         (4, "Native Hawaiian or Other Pacific Islander"),
     )
 
+    SEX_TYPES = (
+        ("m","Male"),
+        ("f","Female"),
+    )
+
     pat_id = models.CharField(max_length=12, blank=False, null=False, unique=True, verbose_name="Patient ID", help_text="Requires a unique identifier for each patient.")
-    sex = models.CharField(max_length=1, blank=True, null=True, verbose_name="Sex")
+    sex = models.CharField(max_length=1, choices=SEX_TYPES, blank=True, null=True, verbose_name="Sex")
     # age = models.FloatField(blank=True, null=True)
     dob = models.IntegerField(blank=True, null=True, verbose_name="Birthyear")
-    # race = models.SmallIntegerField(choices=RACE_TYPES, default=1)
-    race = models.CharField(max_length=200,blank=True, null=True, verbose_name="Race")
+    race = models.SmallIntegerField(choices=RACE_TYPES, default=1)
+    # race = models.CharField(max_length=200,blank=True, null=True, verbose_name="Race")
     source = models.CharField(max_length=20, blank=True, null=True, verbose_name="Source")
     blocks_temp = models.CharField(max_length=100, blank=True, null=True, verbose_name="Blocks")
     notes = models.TextField(blank=True, null=True, verbose_name="Notes")
-    project = models.CharField(max_length=50, blank=True, null=True, verbose_name="Project")
+    # project = models.CharField(max_length=50, blank=True, null=True, verbose_name="Project")
     pa_id = models.AutoField(primary_key=True)
     date_added = models.DateTimeField(auto_now=True)
 
@@ -53,8 +58,7 @@ class Patients(models.Model):
                 '2': 'sex',
                 '3': 'race',
                 '4': 'source',
-                '5': 'project',
-                '6': 'project',
+                '5': 'date_added'
             }
             draw = int(kwargs.get('draw', None)[0])
             length = int(kwargs.get('length', None)[0])
@@ -75,8 +79,8 @@ class Patients(models.Model):
                 queryset = queryset.filter(
                     Q(pat_id__icontains=search_value) |
                     Q(race__icontains=search_value) |
-                    Q(source__icontains=search_value) |
-                    Q(project__icontains=search_value))
+                    Q(source__icontains=search_value)
+                )
 
             count = queryset.count()
             queryset = queryset.order_by(order_column)[start:start + length]

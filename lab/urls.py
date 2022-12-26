@@ -11,4 +11,6 @@ urlpatterns = [
     path('edit/<str:id>', views.edit_patient, name='edit-patient'),
     path("edit_patient_async", views.edit_patient_async, name="edit-patient-async"),
     path('delete/<str:id>', views.delete_patient, name='delete-patient'),
+    path("get_race_options", views.get_race_options, name="get-race-options"),
+    path("get_sex_options", views.get_sex_options, name="get-sex-options"),
 ] + staticfiles_urlpatterns()

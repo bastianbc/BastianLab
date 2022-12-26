@@ -6,56 +6,32 @@ var KTDatatablesServerSide = function () {
     var table;
     var dt;
     var filterPayment;
-    var editor;
 
     // Private functions
     var initDatatable = function () {
-
-        $.fn.dataTable.moment( 'MM/DD/YYYY' );
-
         dt = $(".table").DataTable({
             // searchDelay: 500,
             processing: true,
             serverSide: true,
-            order: [[5, 'desc']],
+            order: [[1, 'desc']],
             stateSave: false,
             destroy: true,
-            select: {
-                style: 'multi',
-                selector: 'td:first-child input[type="checkbox"]',
-                className: 'row-selected'
-            },
-            keys: {
-              columns: ':not(:first-child)',
-              keys: [ 9 ],
-              editor: editor,
-              editOnFocus: true
-            },
-            ajax: '/lab/filter_patients',
+            ajax: '/body/filter_bodys',
             columns: [
-                { data: null },
-                { data: 'pat_id' },
-                { data: 'source' },
-                { data: 'sex' },
-                { data: 'race' },
-                { data: 'date_added',
-                  render: function (data) {
-                    return moment(data).format('MM/DD/YYYY');
-                  }
-                },
-                { data: 'num_blocks' },
+                { data: 'name' },
+                { data: null }
             ],
             columnDefs: [
-                {
-                    targets: 0,
-                    orderable: false,
-                    render: function (data) {
-                        return `
-                            <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                <input class="form-check-input" type="checkbox" value="${data}" />
-                            </div>`;
-                    }
-                },
+                // {
+                //     targets: 0,
+                //     orderable: false,
+                //     render: function (data) {
+                //         return `
+                //             <div class="form-check form-check-sm form-check-custom form-check-solid">
+                //                 <input class="form-check-input" type="checkbox" value="${data}" />
+                //             </div>`;
+                //     }
+                // },
                 // {
                 //     targets: 4,
                 //     render: function (data, type, row) {
@@ -63,19 +39,7 @@ var KTDatatablesServerSide = function () {
                 //     }
                 // },
                 {
-                    targets: 6,
-                    orderable: false,
-                    render: function (data, type, row) {
-                        if (data > 0) {
-                          let pat_id = row["pat_id"];
-                          return `
-                              <a href="/blocks?model=patient&id=${pat_id}&initial=true">${data}</a>`;
-                        }
-                        return data;
-                    }
-                },
-                {
-                    targets: 7,
+                    targets: -1,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -96,7 +60,7 @@ var KTDatatablesServerSide = function () {
                             <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4" data-kt-menu="true">
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/lab/edit/`+ row["pat_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
+                                    <a href="/body/edit/`+ row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
                                         Edit
                                     </a>
                                 </div>
@@ -104,7 +68,7 @@ var KTDatatablesServerSide = function () {
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/lab/delete/` + row["pat_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
+                                    <a href="/body/delete/` + row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
                                         Delete
                                     </a>
                                 </div>
@@ -125,8 +89,6 @@ var KTDatatablesServerSide = function () {
 
         // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
         dt.on('draw', function () {
-            initToggleToolbar();
-            toggleToolbars();
             handleDeleteRows();
             handleResetForm();
             KTMenu.createInstances();
@@ -183,11 +145,11 @@ var KTDatatablesServerSide = function () {
                 const parent = e.target.closest('tr');
 
                 // Get customer name
-                const customerName = parent.querySelectorAll('td')[1].innerText;
+                const bodyName = parent.querySelectorAll('td')[0].innerText;
 
                 // SweetAlert2 pop up --- official docs reference: https://sweetalert2.github.io/
                 Swal.fire({
-                    text: "Are you sure you want to delete " + customerName + "?",
+                    text: "Are you sure you want to delete " + bodyName + "?",
                     icon: "warning",
                     showCancelButton: true,
                     buttonsStyling: false,
@@ -201,7 +163,7 @@ var KTDatatablesServerSide = function () {
                     if (result.value) {
                         // Simulate delete request -- for demo purpose only
                         Swal.fire({
-                            text: "Deleting " + customerName,
+                            text: "Deleting " + bodyName,
                             icon: "info",
                             buttonsStyling: false,
                             showConfirmButton: false,
@@ -222,7 +184,7 @@ var KTDatatablesServerSide = function () {
                             });
 
                             Swal.fire({
-                                text: "You have deleted " + customerName + "!.",
+                                text: "You have deleted " + bodyName + "!.",
                                 icon: "success",
                                 buttonsStyling: false,
                                 confirmButtonText: "Ok, got it!",
@@ -236,7 +198,7 @@ var KTDatatablesServerSide = function () {
                         });
                     } else if (result.dismiss === 'cancel') {
                         Swal.fire({
-                            text: customerName + " was not deleted.",
+                            text: bodyName + " was not deleted.",
                             icon: "error",
                             buttonsStyling: false,
                             confirmButtonText: "Ok, got it!",
@@ -265,265 +227,14 @@ var KTDatatablesServerSide = function () {
         });
     }
 
-    // Init toggle toolbar
-    var initToggleToolbar = function () {
-        // Toggle selected action toolbar
-        // Select all checkboxes
-        const container = document.querySelector('.table');
-        const checkboxes = container.querySelectorAll('[type="checkbox"]');
-
-        // Toggle delete selected toolbar
-        checkboxes.forEach(c => {
-            // Checkbox on click event
-            c.addEventListener('click', function () {
-                setTimeout(function () {
-                    toggleToolbars();
-                }, 50);
-            });
-        });
-    }
-
-    var handleSelectedRows = function (e) {
-      // Select element
-      const btnCreateBlock = document.querySelector('[data-kt-docs-table-select="event_selected"]');
-
-      // Created blocks for selected rows
-      btnCreateBlock.addEventListener('click', function () {
-
-        const container = document.querySelector('.table');
-
-        const selectedRows = container.querySelectorAll('[type="checkbox"]:checked');
-
-        const selectedIds = [];
-
-        selectedRows.forEach((p) => {
-          // Select parent row
-          const parent = p.closest('tr');
-          // Get customer name
-          const id = parent.querySelectorAll('td')[1].innerText;
-
-          selectedIds.push(id)
-
-        });
-
-        $.ajax({
-          type: "GET",
-          url: "/blocks/add_block_to_patient_async",
-          data: {
-            "selected_ids":JSON.stringify(selectedIds),
-          },
-        }).done(function(result) {
-          console.log("result.success:"+result.success);
-          if (result.success) {
-            Swal.fire({
-                text: "Block(s) was created succesfully.",
-                icon: "info",
-                buttonsStyling: false,
-                confirmButtonText: "Ok, got it!",
-                customClass: {
-                    confirmButton: "btn fw-bold btn-success",
-                }
-            }).then(function(){
-              dt.draw();
-            });
-          }
-          else {
-            Swal.fire({
-                text: "Block(s) was not created.",
-                icon: "error",
-                buttonsStyling: false,
-                confirmButtonText: "Ok, got it!",
-                customClass: {
-                    confirmButton: "btn fw-bold btn-danger",
-                }
-            });
-          }
-        });
-      });
-    }
-
-    // Toggle toolbars
-    var toggleToolbars = function () {
-        // Define variables
-        const container = document.querySelector('.table');
-        const toolbarBase = document.querySelector('[data-kt-docs-table-toolbar="base"]');
-        const toolbarSelected = document.querySelector('[data-kt-docs-table-toolbar="selected"]');
-        const selectedCount = document.querySelector('[data-kt-docs-table-select="selected_count"]');
-
-        // Select refreshed checkbox DOM elements
-        const allCheckboxes = container.querySelectorAll('tbody [type="checkbox"]');
-
-        // Detect checkboxes state & count
-        let checkedState = false;
-        let count = 0;
-
-        // Count checked boxes
-        allCheckboxes.forEach(c => {
-            if (c.checked) {
-                checkedState = true;
-                count++;
-            }
-        });
-
-        // Toggle toolbars
-        if (checkedState) {
-            selectedCount.innerHTML = count;
-            toolbarBase.classList.add('d-none');
-            toolbarSelected.classList.remove('d-none');
-        } else {
-            toolbarBase.classList.remove('d-none');
-            toolbarSelected.classList.add('d-none');
-        }
-    }
-
-    var initEditor = function () {
-
-      var raceOptions = [];
-      var sexOptions = [];
-
-      Promise.all([
-
-        getRaceOptions(),
-        getSexOptions()
-
-      ]).then(function () {
-
-        editor = new $.fn.dataTable.Editor({
-          ajax: {
-            url: "/lab/edit_patient_async",
-            type: "POST",
-            headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
-            success: function () {
-                dt.draw();
-            },
-            error: function (xhr, ajaxOptions, thrownError) {
-                swal("Error updating!", "Please try again!", "error");
-            }
-          },
-          table: ".table",
-          fields: [ {
-                 label: "Source:",
-                 name: "source"
-             }, {
-                 label: "Sex:",
-                 name: "sex",
-                 type: "select",
-                 options: sexOptions,
-             }, {
-                 label: "Race:",
-                 name: "race",
-                 type: "select",
-                 options: raceOptions,
-             }
-         ],
-         formOptions: {
-            inline: {
-              onBlur: 'submit'
-            }
-         }
-       });
-
-      });
-
-      $('.table').on( 'click', 'tbody td:not(:first-child):not(:last-child)', function (e) {
-        editor.inline( dt.cell( this ).index(), {
-            onBlur: 'submit'
-        });
-      });
-
-      function getBodyOptions() {
-
-        $.ajax({
-            url: "/body/get_body_options",
-            type: "GET",
-            async: false,
-            success: function (data) {
-
-             // var options = [];
-             data.forEach((item, i) => {
-
-               bodyOptions.push({
-                 "label":item["name"],
-                 "value":item["id"]
-               })
-
-             });
-
-             // editor.field( 'bait' ).update( options );
-
-            }
-        });
-
-      }
-
-      function getRaceOptions() {
-
-        $.ajax({
-            url: "/lab/get_race_options",
-            type: "GET",
-            async: false,
-            success: function (data) {
-
-             // var options = [];
-             data.forEach((item, i) => {
-
-               raceOptions.push({
-                 "label":item["name"],
-                 "value":item["value"]
-               })
-
-             });
-
-             // editor.field( 'bait' ).update( options );
-
-            }
-        });
-
-      }
-
-      function getSexOptions() {
-
-        $.ajax({
-            url: "/lab/get_sex_options",
-            type: "GET",
-            async: false,
-            success: function (data) {
-
-             // var options = [];
-             data.forEach((item, i) => {
-
-               sexOptions.push({
-                 "label":item["name"],
-                 "value":item["value"]
-               })
-
-             });
-
-             // editor.field( 'bait' ).update( options );
-
-            }
-        });
-
-      }
-
-
-      $('.table').on( 'key-focus', function ( e, datatable, cell ) {
-           editor.inline( cell.index() );
-      });
-
-    }
-
-    // Public methods
+    // Public bodys
     return {
         init: function () {
             initDatatable();
             handleSearchDatatable();
-            initToggleToolbar();
             handleFilterDatatable();
             handleDeleteRows();
             handleResetForm();
-            handleSelectedRows();
-            initEditor();
         }
     }
 }();

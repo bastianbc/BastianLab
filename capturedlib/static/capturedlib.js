@@ -409,7 +409,7 @@ var KTDatatablesServerSide = function () {
              }, {
                  label: "Buffer:",
                  name: "buffer",
-                 // type: "select"
+                 type: "select",
              }, {
                  label: "AMP Cycle:",
                  name: "amp_cycle"
