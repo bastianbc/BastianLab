@@ -6,7 +6,7 @@ import json
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required,permission_required
 
-@login_required
+# @login_required
 def filter_patients(request):
     from .serializers import PatientsSerializer
     from django.http import JsonResponse
@@ -21,11 +21,11 @@ def filter_patients(request):
 
     return JsonResponse(result)
 
-@permission_required("lab.view_patients",raise_exception=True)
+# @permission_required("lab.view_patients",raise_exception=True)
 def patients(request):
     return render(request,"patient_list.html")
 
-@permission_required("lab.add_patients",raise_exception=True)
+# @permission_required("lab.add_patients",raise_exception=True)
 def new_patient(request):
     if request.method=="POST":
         form = PatientForm(request.POST)
@@ -40,7 +40,7 @@ def new_patient(request):
 
     return render(request,"patient.html",locals())
 
-@permission_required("lab.change_patients",raise_exception=True)
+# @permission_required("lab.change_patients",raise_exception=True)
 def edit_patient(request,id):
     patient = Patients.objects.get(pat_id=id)
 
@@ -57,7 +57,7 @@ def edit_patient(request,id):
 
     return render(request,"patient.html",locals())
 
-@permission_required("lab.change_patients",raise_exception=True)
+# @permission_required("lab.change_patients",raise_exception=True)
 def edit_patient_async(request):
     import re
     from core.utils import custom_update
@@ -77,7 +77,7 @@ def edit_patient_async(request):
 
     return JsonResponse({"result":True})
 
-@permission_required("lab.delete_patients",raise_exception=True)
+# @permission_required("lab.delete_patients",raise_exception=True)
 def delete_patient(request,id):
     try:
         patient = Patients.objects.get(pat_id=id)
