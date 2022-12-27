@@ -17,7 +17,7 @@ var KTDatatablesServerSide = function () {
             // searchDelay: 500,
             processing: true,
             serverSide: true,
-            order: [[3, 'desc']],
+            order: [[1, 'desc']],
             stateSave: false,
             destroy: true,
             select: {
@@ -402,15 +402,6 @@ var KTDatatablesServerSide = function () {
                  label: "Concentration:",
                  name: "conc"
              }, {
-                 label: "Bait:",
-                 name: "bait",
-                 type: "select",
-                 options: baitOptions,
-             }, {
-                 label: "Buffer:",
-                 name: "buffer",
-                 type: "select",
-             }, {
                  label: "AMP Cycle:",
                  name: "amp_cycle"
              }, {
@@ -490,9 +481,9 @@ var KTDatatablesServerSide = function () {
            editor.inline( this );
       });
 
-      // $('.table').on( 'key-focus', function ( e, datatable, cell ) {
-      //      editor.inline( cell.index() );
-      // });
+      $('.table').on( 'key-focus', function ( e, datatable, cell ) {
+           editor.inline( cell.index() );
+      });
 
     }
 

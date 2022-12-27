@@ -17,7 +17,7 @@ var KTDatatablesServerSide = function () {
             // searchDelay: 500,
             processing: true,
             serverSide: true,
-            order: [[6, 'desc']],
+            order: [[1, 'desc']],
             stateSave: false,
             destroy: true,
             select: {

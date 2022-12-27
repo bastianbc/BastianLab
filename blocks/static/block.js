@@ -12,12 +12,12 @@ var KTDatatablesServerSide = function () {
     var initDatatable = function ( initialValue ) {
 
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
-        
+
         dt = $(".table").DataTable({
             // searchDelay: 500,
             processing: true,
             serverSide: true,
-            order: [[7, 'desc']],
+            order: [[1, 'desc']],
             stateSave: false,
             destroy: true,
             select: {
