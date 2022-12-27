@@ -65,7 +65,7 @@ class Blocks(models.Model):
     gross = models.TextField(blank=True, null=True)
     clinical = models.TextField(blank=True, null=True)
     # site_code = models.TextField(blank=True, null=True)
-    date_added = models.DateTimeField(blank=True, null=True, auto_now=True)
+    date_added = models.DateTimeField(blank=True, null=True, auto_now_add=True)
 
     class Meta:
         db_table = 'blocks'

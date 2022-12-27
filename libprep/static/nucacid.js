@@ -323,7 +323,7 @@ var KTDatatablesServerSide = function () {
       var modal = new bootstrap.Modal(document.getElementById("modal_samplelib_options"));
 
       function toggleButtons(state) {
-        
+
         document.querySelector('[data-kt-stepper-action="print"]').disabled = !state;
         document.querySelector('[data-kt-stepper-action="submit"]').disabled = state;
 
@@ -434,8 +434,6 @@ var KTDatatablesServerSide = function () {
             }).done(function(result) {
               if (result.success) {
 
-                handleSpinner(false);
-
                 handleSize();
 
                 fillElements(result.data);
@@ -449,7 +447,7 @@ var KTDatatablesServerSide = function () {
               }
               else {
                 Swal.fire({
-                    text: "Sequencing Library(s) was not created.",
+                    text: "Sample Library(s) was not created.",
                     icon: "error",
                     buttonsStyling: false,
                     confirmButtonText: "Ok, got it!",
@@ -458,6 +456,8 @@ var KTDatatablesServerSide = function () {
                     }
                 });
               }
+
+              handleSpinner(false);
 
             });
 

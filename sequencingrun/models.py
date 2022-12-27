@@ -1,5 +1,5 @@
 from django.db import models
-from datetime import date
+from datetime import datetime
 from django.db.models import Q, Count
 
 class SequencingRun(models.Model):
@@ -22,8 +22,8 @@ class SequencingRun(models.Model):
     )
 
     name = models.CharField(max_length=50, unique=True, verbose_name="Name")
-    date_run = models.DateField(default=date.today, verbose_name="Date Run")
-    date = models.DateField(default=date.today, verbose_name="Date")
+    date_run = models.DateTimeField(default=datetime.now, verbose_name="Date Run")
+    date = models.DateTimeField(default=datetime.now, verbose_name="Date")
     facility = models.CharField(max_length=20, choices=FACILITY_TYPES, verbose_name="Facility")
     sequencer = models.CharField(max_length=20, choices=SEQUENCER_TYPES, verbose_name="Sequencer")
     pe = models.CharField(max_length=20, choices=SEQUENCER_TYPES, verbose_name="PE")

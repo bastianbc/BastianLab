@@ -37,7 +37,7 @@ class Patients(models.Model):
     notes = models.TextField(blank=True, null=True, verbose_name="Notes")
     # project = models.CharField(max_length=50, blank=True, null=True, verbose_name="Project")
     pa_id = models.AutoField(primary_key=True)
-    date_added = models.DateTimeField(auto_now=True)
+    date_added = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         managed = True

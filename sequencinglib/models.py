@@ -1,5 +1,5 @@
 from django.db import models
-from datetime import date
+from datetime import datetime
 from django.db.models import Q, Count
 
 class SequencingLib(models.Model):
@@ -10,7 +10,7 @@ class SequencingLib(models.Model):
     )
 
     name = models.CharField(max_length=50, unique=True, verbose_name="Name")
-    date = models.DateField(default=date.today, verbose_name="Date")
+    date = models.DateTimeField(default=datetime.now, verbose_name="Date")
     nmol = models.FloatField(default=0, verbose_name="N Mol")
     target_vol = models.FloatField(default=0, verbose_name="Target Volume")
     buffer = models.CharField(max_length=20, choices=BUFFER_TYPES, verbose_name="Buffer")

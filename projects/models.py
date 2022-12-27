@@ -1,5 +1,5 @@
 from django.db import models
-from datetime import date
+from datetime import datetime
 from django.db.models import Q, Count
 from django.contrib.auth import get_user_model
 
@@ -18,7 +18,7 @@ class Projects(models.Model):
     pi = models.CharField(max_length=2, choices=PI_CHOICES, default=BORIS, blank=True, null=True, verbose_name="Principal Investigator")
     speedtype = models.CharField(max_length=50, blank=True, null=True, verbose_name="Speed Type")
     description = models.CharField(max_length=255, blank=True, null=True, verbose_name="Description")
-    date_start = models.DateField(blank=True, null=True, default=date.today, verbose_name="Start Date")
+    date_start = models.DateTimeField(blank=True, null=True, default=datetime.now, verbose_name="Start Date")
     pr_id = models.AutoField(primary_key=True, verbose_name="Project ID")
     technician = models.ManyToManyField(User, null=True, related_name="technician_projects", verbose_name="Technician")
     researcher = models.ManyToManyField(User, null=True, related_name="researcher_projects", verbose_name="Researcher")

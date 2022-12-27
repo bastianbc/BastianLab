@@ -15,7 +15,7 @@ class NucAcids(models.Model):
     nu_id = models.AutoField(primary_key=True, verbose_name="NA ID")
     area = models.ForeignKey("areas.Areas", on_delete=models.SET_NULL, db_column="area", blank=True, null=True, related_name="nucacids", verbose_name="Area")
     name = models.CharField(max_length=50, unique=True, verbose_name="Name")
-    date = models.DateField(blank=True, null=True, default=date.today, verbose_name="Extraction Date")
+    date = models.DateTimeField(default=datetime.now, verbose_name="Extraction Date")
     method = models.ForeignKey("method.Method",related_name="nuc_acids",on_delete=models.CASCADE, verbose_name="Method")
     na_type = models.CharField(max_length=4, choices=NA_TYPES, verbose_name="NA Type")
     conc = models.FloatField(default=0, verbose_name="Concentration")
@@ -106,7 +106,7 @@ class NucAcids(models.Model):
             count = queryset.count()
             queryset = queryset.order_by(order_column)[start:start + length]
             # queryset = queryset[start:start + length]
-            
+
             return {
                 'items': queryset,
                 'count': count,

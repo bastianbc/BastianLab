@@ -1,6 +1,6 @@
 from django.db import models
 from django.db.models import Q, Count
-from datetime import date
+from datetime import datetime
 from django.utils.crypto import get_random_string
 
 class Areas(models.Model):
@@ -37,7 +37,7 @@ class Areas(models.Model):
     area_type = models.CharField(max_length=10, choices=AREA_TYPE_TYPES, blank=True, null=True)
     # he_image = models.CharField(max_length=200, blank=True, null=True)
     # na_id = models.CharField(max_length=50, blank=True, null=True)
-    completion_date = models.DateField(default=date.today)
+    completion_date = models.DateTimeField(default=datetime.now)
     # investigator = models.CharField(max_length=50, blank=True, null=True)
     image = models.ImageField(null=True, blank=True, upload_to="images/%y/%m/%d")
     notes = models.TextField(blank=True, null=True)
