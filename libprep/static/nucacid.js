@@ -435,12 +435,12 @@ var KTDatatablesServerSide = function () {
               if (result.success) {
 
                 Swal.fire({
-                    text: "Sample Library(s) was not created.",
-                    icon: "error",
+                    text: "Sample Library(s) was created succesfully.",
+                    icon: "info",
                     buttonsStyling: false,
                     confirmButtonText: "Ok, got it!",
                     customClass: {
-                        confirmButton: "btn fw-bold btn-danger",
+                        confirmButton: "btn fw-bold btn-success",
                     }
                 });
 
@@ -457,12 +457,12 @@ var KTDatatablesServerSide = function () {
               }
               else {
                 Swal.fire({
-                    text: "Sample Library(s) was created succesfully.",
-                    icon: "info",
+                    text: "Sample Library(s) was not created.",
+                    icon: "error",
                     buttonsStyling: false,
                     confirmButtonText: "Ok, got it!",
                     customClass: {
-                        confirmButton: "btn fw-bold btn-success",
+                        confirmButton: "btn fw-bold btn-danger",
                     }
                 });
               }

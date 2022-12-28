@@ -124,8 +124,9 @@ class NucAcids(models.Model):
             self.name = "%s-%s-%d" % (self.na_type[0].upper(),self.area.name, na_count + 1)
 
     def _check_changeability(self):
-        if self.sl_links.count() > 0:
-            raise Exception("This record cannot be changed as it is used to create SL.")
+        # if self.sl_links.count() > 0:
+        #     raise Exception("This record cannot be changed as it is used to create SL.")
+        pass
 
     def save(self,*args,**kwargs):
         # if not self.name:
