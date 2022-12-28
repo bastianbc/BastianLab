@@ -121,7 +121,7 @@ class SampleLib(models.Model):
             raise
 
 class NA_SL_LINK(models.Model):
-    nucacid = models.ForeignKey("libprep.NucAcids",on_delete=models.CASCADE, verbose_name="Nucleic Acid")
+    nucacid = models.ForeignKey("libprep.NucAcids",on_delete=models.CASCADE, related_name="sl_links", verbose_name="Nucleic Acid")
     sample_lib = models.ForeignKey(SampleLib, on_delete=models.CASCADE, related_name="nucacids", verbose_name="Sample Library")
     input_vol = models.FloatField(default=0, verbose_name="Te Volume")
     input_amount = models.FloatField(default=0, verbose_name="Input Amount")

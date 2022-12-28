@@ -36,8 +36,16 @@ var KTDatatablesServerSide = function () {
                 { data: null },
                 { data: 'pat_id' },
                 { data: 'source' },
-                { data: 'sex' },
-                { data: 'race' },
+                { data: 'sex' ,
+                  render: function (val, type, row) {
+                    return row["sex_label"];
+                  }
+                },
+                { data: 'race' ,
+                  render: function (val, type, row) {
+                    return row["race_label"];
+                  }
+                },
                 { data: 'date_added',
                   render: function (data) {
                     return moment(data).format('MM/DD/YYYY');
@@ -474,8 +482,8 @@ var KTDatatablesServerSide = function () {
 
              });
 
-             // editor.field( 'bait' ).update( options );
-
+             // editor.field( 'race' ).update( options );
+             console.log(raceOptions);
             }
         });
 
@@ -499,8 +507,8 @@ var KTDatatablesServerSide = function () {
 
              });
 
-             // editor.field( 'bait' ).update( options );
-
+             // editor.field( 'sex' ).update( options );
+             console.log(sexOptions);
             }
         });
 

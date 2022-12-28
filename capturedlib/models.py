@@ -23,6 +23,17 @@ class CapturedLib(models.Model):
     def __str__(self):
         return self.name
 
+    __vol_init = None
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__vol_init = self.vol_init
+
+    def save(self,*args,**kwargs):
+        if self.__vol_init != self.vol_init:
+            self.vol_remain = self.vol_init
+        super().save(*args, **kwargs)
+
     @property
     def amount(self):
         # calculates the amount: amount = vol_init * conc

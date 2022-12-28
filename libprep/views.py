@@ -45,11 +45,14 @@ def edit_nucacid_async(request):
                     v = None
                 parameters[r.groups()[1]] = v
 
-    nucacid = custom_update(NucAcids,pk=parameters["pk"],parameters=parameters)
+    try:
+        nucacid = custom_update(NucAcids,pk=parameters["pk"],parameters=parameters)
+        if nucacid:
+            nucacid.set_init_volume()
+    except Exception as e:
+        return JsonResponse({"success":False, "message": str(e)})
 
-    nucacid.set_init_volume()
-
-    return JsonResponse({"result":True})
+    return JsonResponse({"success":True})
 
 @permission_required("librep.add_nucacids",raise_exception=True)
 def new_nucacid(request):

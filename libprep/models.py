@@ -119,12 +119,20 @@ class NucAcids(models.Model):
 
     def _generate_unique_name(self):
         # blocks.name & Areas.name & first letter of NA_type
-        na_count = self.area.nucacids.filter(area=self.area,na_type=self.na_type).count() # count of existing nucleic acid
-        return "%s-%s-%d" % (self.na_type[0].upper(),self.area.name, na_count + 1)
+        if not self.name:
+            na_count = self.area.nucacids.filter(area=self.area,na_type=self.na_type).count() # count of existing nucleic acid
+            self.name = "%s-%s-%d" % (self.na_type[0].upper(),self.area.name, na_count + 1)
+
+    def _check_changeability(self):
+        if self.sl_links.count() > 0:
+            raise Exception("This record cannot be changed as it is used to create SL.")
 
     def save(self,*args,**kwargs):
-        if not self.name:
-            self.name = self._generate_unique_name()
+        # if not self.name:
+        #     self.name = self._generate_unique_name()
+        self._generate_unique_name()
+
+        self._check_changeability()
 
         super().save(*args, **kwargs)
 

@@ -434,6 +434,16 @@ var KTDatatablesServerSide = function () {
             }).done(function(result) {
               if (result.success) {
 
+                Swal.fire({
+                    text: "Sample Library(s) was not created.",
+                    icon: "error",
+                    buttonsStyling: false,
+                    confirmButtonText: "Ok, got it!",
+                    customClass: {
+                        confirmButton: "btn fw-bold btn-danger",
+                    }
+                });
+
                 handleSize();
 
                 fillElements(result.data);
@@ -447,12 +457,12 @@ var KTDatatablesServerSide = function () {
               }
               else {
                 Swal.fire({
-                    text: "Sample Library(s) was not created.",
-                    icon: "error",
+                    text: "Sample Library(s) was created succesfully.",
+                    icon: "info",
                     buttonsStyling: false,
                     confirmButtonText: "Ok, got it!",
                     customClass: {
-                        confirmButton: "btn fw-bold btn-danger",
+                        confirmButton: "btn fw-bold btn-success",
                     }
                 });
               }
@@ -845,8 +855,25 @@ var KTDatatablesServerSide = function () {
           url: "/libprep/edit_nucacid_async",
           type: "POST",
           headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
-          success: function () {
-              dt.draw();
+          success: function (data) {
+              if ( data.success ) {
+
+                dt.draw();
+
+              }
+              else {
+
+                Swal.fire({
+                    text: data.message,
+                    icon: "error",
+                    buttonsStyling: false,
+                    confirmButtonText: "Ok, got it!",
+                    customClass: {
+                        confirmButton: "btn fw-bold btn-primary",
+                    }
+                });
+
+              }
           },
           error: function (xhr, ajaxOptions, thrownError) {
               swal("Error updating!", "Please try again!", "error");
@@ -866,7 +893,7 @@ var KTDatatablesServerSide = function () {
                label: "Date:",
                name: "date",
                type: "datetime",
-               def: function () { return new Date(); },
+               // def: function () { return new Date(); },
                displayFormat: "M/D/YYYY",
                wireFormat: 'YYYY-MM-DD'
            }, {

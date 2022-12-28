@@ -124,14 +124,14 @@ def new_samplelib_async(request):
 
                     target_amount -= used_amount
 
-                sample_lib.input_amount = total_amount
+                sample_lib.amount_in = total_amount
                 sample_lib.save()
             else:
                 nucacid = group.pop()
 
                 used_amount = nucacid.amount if nucacid.amount < target_amount else target_amount
 
-                sample_lib.input_amount = used_amount
+                sample_lib.amount_in = used_amount
                 sample_lib.save()
 
                 link = NA_SL_LINK.objects.create(
