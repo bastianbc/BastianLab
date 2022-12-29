@@ -17,7 +17,7 @@ var KTDatatablesServerSide = function () {
             // searchDelay: 500,
             processing: true,
             serverSide: true,
-            order: [[1, 'desc']],
+            order: [[2, 'desc']],
             stateSave: false,
             destroy: true,
             select: {
@@ -338,7 +338,6 @@ var KTDatatablesServerSide = function () {
                label: "Date:",
                name: "date",
                type: "datetime",
-               def: function () { return new Date(); },
                displayFormat: "M/D/YYYY",
                wireFormat: 'YYYY-MM-DD'
            }, {

@@ -17,7 +17,7 @@ var KTDatatablesServerSide = function () {
             // searchDelay: 500,
             processing: true,
             serverSide: true,
-            order: [[1, 'desc']],
+            order: [[3, 'desc']],
             stateSave: false,
             destroy: true,
             select: {
@@ -356,8 +356,8 @@ var KTDatatablesServerSide = function () {
       var bufferOptions = [];
 
       Promise.all([
-          updateBaitOptions(),
-          updateBufferOptions()
+          getBaitOptions(),
+          getBufferOptions()
       ]).then(() => {
 
         editor = new $.fn.dataTable.Editor({
@@ -392,9 +392,14 @@ var KTDatatablesServerSide = function () {
                  label: "Date:",
                  name: "date",
                  type: "datetime",
-                 def: function () { return new Date(); },
+                 // def: function () { return new Date(); },
                  displayFormat: 'M/D/YYYY',
                  wireFormat: 'YYYY-MM-DD',
+             }, {
+                 label: "Bait:",
+                 name: "bait",
+                 type: "select",
+                 options: baitOptions
              }, {
                  label: "Fragment Size:",
                  name: "frag_size"
@@ -404,6 +409,11 @@ var KTDatatablesServerSide = function () {
              }, {
                  label: "AMP Cycle:",
                  name: "amp_cycle"
+             }, {
+                 label: "Buffer:",
+                 name: "buffer",
+                 type: "select",
+                 options: bufferOptions
              }, {
                  label: "Volume Init:",
                  name: "vol_init"
@@ -427,7 +437,7 @@ var KTDatatablesServerSide = function () {
           console.log(err);
       });
 
-      function  updateBaitOptions() {
+      function  getBaitOptions() {
 
         $.ajax({
             url: "/bait/get_bait_choices",
@@ -452,7 +462,7 @@ var KTDatatablesServerSide = function () {
 
       }
 
-      function  updateBufferOptions() {
+      function  getBufferOptions() {
 
         $.ajax({
             url: "/buffer/get_buffer_choices",

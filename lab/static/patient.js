@@ -439,31 +439,6 @@ var KTDatatablesServerSide = function () {
         });
       });
 
-      function getBodyOptions() {
-
-        $.ajax({
-            url: "/body/get_body_options",
-            type: "GET",
-            async: false,
-            success: function (data) {
-
-             // var options = [];
-             data.forEach((item, i) => {
-
-               bodyOptions.push({
-                 "label":item["name"],
-                 "value":item["id"]
-               })
-
-             });
-
-             // editor.field( 'bait' ).update( options );
-
-            }
-        });
-
-      }
-
       function getRaceOptions() {
 
         $.ajax({
@@ -476,14 +451,11 @@ var KTDatatablesServerSide = function () {
              data.forEach((item, i) => {
 
                raceOptions.push({
-                 "label":item["name"],
+                 "label":item["label"],
                  "value":item["value"]
                })
 
              });
-
-             // editor.field( 'race' ).update( options );
-             console.log(raceOptions);
             }
         });
 
@@ -501,14 +473,11 @@ var KTDatatablesServerSide = function () {
              data.forEach((item, i) => {
 
                sexOptions.push({
-                 "label":item["name"],
+                 "label":item["label"],
                  "value":item["value"]
                })
 
              });
-
-             // editor.field( 'sex' ).update( options );
-             console.log(sexOptions);
             }
         });
 

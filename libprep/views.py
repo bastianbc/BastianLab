@@ -47,8 +47,6 @@ def edit_nucacid_async(request):
 
     try:
         nucacid = custom_update(NucAcids,pk=parameters["pk"],parameters=parameters)
-        if nucacid:
-            nucacid.set_init_volume()
     except Exception as e:
         return JsonResponse({"success":False, "message": str(e)})
 

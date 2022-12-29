@@ -17,7 +17,7 @@ var KTDatatablesServerSide = function () {
             // searchDelay: 500,
             processing: true,
             serverSide: true,
-            order: [[1, 'desc']],
+            order: [[6, 'desc']],
             stateSave: false,
             destroy: true,
             select: {
@@ -37,8 +37,16 @@ var KTDatatablesServerSide = function () {
               { data: 'name' },
               { data: 'block' },
               { data: 'project' },
-              { data: 'collection' },
-              { data: 'area_type' },
+              { data: 'collection',
+                render: function (val, type, row) {
+                  return row["collection_label"];
+                }
+              },
+              { data: 'area_type',
+                render: function (val, type, row) {
+                  return row["area_type_label"];
+                }
+              },
               { data: 'completion_date',
                 render: function (data) {
                   return moment(data).format('MM/DD/YYYY');
@@ -512,7 +520,17 @@ var KTDatatablesServerSide = function () {
 
     var initEditor = function () {
 
-      editor = new $.fn.dataTable.Editor({
+      var collectionOptions =[];
+      var areaTypeOptions = [];
+
+      Promise.all([
+
+        getCollectionOptions(),
+        getAreaTypeOptions()
+
+      ]).then(function () {
+
+        editor = new $.fn.dataTable.Editor({
         ajax: {
           url: "/areas/edit_area_async",
           type: "POST",
@@ -542,32 +560,16 @@ var KTDatatablesServerSide = function () {
               label: "Collection:",
               name: "collection",
               type: "select",
-              options: [
-                  { label: "Punch", value: "PU" },
-                  { label: "Scraping", value: "SC" },
-                  { label: "Cell Pellet", value: "Pe" },
-                  { label: "Curls", value: "CU" }
-              ]
+              options: collectionOptions
             }, {
               label: "Area Type:",
               name: "area_type",
               type: "select",
-              options: [
-                  { label: "Mel 1", value: "mel1" },
-                  { label: "Mel 2", value: "mel2" },
-                  { label: "Mel 3", value: "mel3" },
-                  { label: "Mel 4", value: "mel4" },
-                  { label: "in situ", value: "in_situ" },
-                  { label: "Nevus 1", value: "nevus1" },
-                  { label: "Nevus 2", value: "nevus2" },
-                  { label: "Normal", value: "normal" },
-                  { label: "Intmediate", value: "intmediate" }
-              ]
+              options: areaTypeOptions
             }, {
               label: "Completion Date:",
               name: "completion_date",
               type: "datetime",
-              def: function () { return new Date(); },
               displayFormat: "M/D/YYYY",
               wireFormat: 'YYYY-MM-DD'
             }, {
@@ -584,16 +586,58 @@ var KTDatatablesServerSide = function () {
        }
      });
 
+      });
 
-     $('.table').on( 'click', 'tbody td:not(:first-child)', function (e) {
+      $('.table').on( 'click', 'tbody td:not(:first-child)', function (e) {
         editor.inline( dt.cell( this ).index(), {
             onBlur: 'submit'
         } );
-    } );
+      } );
 
-     $('.table').on( 'key-focus', function ( e, datatable, cell ) {
-          editor.inline( cell.index() );
-     });
+      $('.table').on( 'key-focus', function ( e, datatable, cell ) {
+        editor.inline( cell.index() );
+      });
+
+      function getCollectionOptions() {
+
+        $.ajax({
+            url: "/areas/get_collections",
+            type: "GET",
+            async: false,
+            success: function (data) {
+
+             data.forEach((item, i) => {
+
+               collectionOptions.push({
+                 "label":item["label"],
+                 "value":item["value"]
+               })
+
+             });
+            }
+        });
+
+      }
+
+      function getAreaTypeOptions() {
+
+        $.ajax({
+            url: "/areas/get_area_types",
+            type: "GET",
+            async: false,
+            success: function (data) {
+
+             data.forEach((item, i) => {
+
+               areaTypeOptions.push({
+                 "label":item["label"],
+                 "value":item["value"]
+               })
+
+             });
+            }
+        });
+      }
 
     }
 

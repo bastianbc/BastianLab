@@ -124,7 +124,7 @@ class CapturedLib(models.Model):
             raise
 
     def update_volume(self, volume):
-        self.vol_remain = 0 if volume > self.vol_remain else self.vol_remain - volume
+        self.vol_remain = 0 if volume > self.vol_remain else round(self.vol_remain - volume,2)
         self.save()
 
 class SL_CL_LINK(models.Model):

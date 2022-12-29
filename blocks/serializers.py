@@ -7,6 +7,7 @@ class BlocksSerializer(serializers.ModelSerializer):
     patient = serializers.StringRelatedField()
     DT_RowId = serializers.SerializerMethodField()
     project = serializers.StringRelatedField()
+    body_site = serializers.StringRelatedField()
 
     class Meta:
         model = Blocks

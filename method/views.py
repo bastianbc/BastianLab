@@ -3,6 +3,8 @@ from django.contrib.auth.decorators import login_required,permission_required
 from .forms import *
 from django.contrib import messages
 from django.conf import settings
+from .serializers import MethodSerializer
+from django.http import JsonResponse
 
 @permission_required("method.view_method",raise_exception=True)
 def methods(request):
@@ -50,9 +52,6 @@ def delete_method(request,id):
 
 @permission_required("method.view_method",raise_exception=True)
 def filter_methods(request):
-    from .serializers import MethodSerializer
-    from django.http import JsonResponse
-
     patients = Method().query_by_args(**request.GET)
     serializer = MethodSerializer(patients['items'], many=True)
     result = dict()
@@ -62,3 +61,7 @@ def filter_methods(request):
     result['recordsFiltered'] = patients['count']
 
     return JsonResponse(result)
+
+def get_methods(request):
+    serializer = MethodSerializer(Method.objects.all(), many=True)
+    return JsonResponse(serializer.data, safe=False)

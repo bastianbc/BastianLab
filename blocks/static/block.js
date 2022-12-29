@@ -17,7 +17,7 @@ var KTDatatablesServerSide = function () {
             // searchDelay: 500,
             processing: true,
             serverSide: true,
-            order: [[1, 'desc']],
+            order: [[7, 'desc']],
             stateSave: false,
             destroy: true,
             select: {
@@ -612,7 +612,15 @@ var KTDatatablesServerSide = function () {
 
     var initEditor = function () {
 
-      editor = new $.fn.dataTable.Editor({
+      var bodyOptions = [];
+
+      Promise.all([
+
+        getBodyOptions()
+
+      ]).then(function () {
+
+        editor = new $.fn.dataTable.Editor({
         ajax: {
           url: "/blocks/edit_block_async",
           type: "POST",
@@ -633,7 +641,9 @@ var KTDatatablesServerSide = function () {
                name: "diagnosis"
            },{
                label: "Body Site:",
-               name: "body_site"
+               name: "body_site",
+               type: "select",
+               options: bodyOptions
            },{
                label: "Thickness:",
                name: "thickness"
@@ -646,16 +656,42 @@ var KTDatatablesServerSide = function () {
        }
      });
 
+      })
 
-     $('.table').on( 'click', 'tbody td:not(:first-child)', function (e) {
-       editor.inline( dt.cell( this ).index(), {
-           onBlur: 'submit'
-       });
-     });
+      function getBodyOptions() {
 
-     $('.table').on( 'key-focus', function ( e, datatable, cell ) {
-          editor.inline( cell.index() );
-     });
+        $.ajax({
+            url: "/body/get_bodies",
+            type: "GET",
+            async: false,
+            success: function (data) {
+
+             // var options = [];
+             data.forEach((item, i) => {
+
+               bodyOptions.push({
+                 "label":item["name"],
+                 "value":item["id"]
+               })
+
+             });
+
+             // editor.field( 'bait' ).update( options );
+
+            }
+        });
+
+      }
+
+      $('.table').on( 'click', 'tbody td:not(:first-child)', function (e) {
+        editor.inline( dt.cell( this ).index(), {
+            onBlur: 'submit'
+        });
+      });
+
+      $('.table').on( 'key-focus', function ( e, datatable, cell ) {
+           editor.inline( cell.index() );
+      });
 
     }
 

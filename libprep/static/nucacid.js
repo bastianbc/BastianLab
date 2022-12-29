@@ -850,83 +850,119 @@ var KTDatatablesServerSide = function () {
 
     var initEditor = function () {
 
-      editor = new $.fn.dataTable.Editor({
-        ajax: {
-          url: "/libprep/edit_nucacid_async",
-          type: "POST",
-          headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
-          success: function (data) {
-              if ( data.success ) {
+      var methodOptions = [];
 
-                dt.draw();
+      Promise.all([
 
-              }
-              else {
+        getMethodOptions(),
 
-                Swal.fire({
-                    text: data.message,
-                    icon: "error",
-                    buttonsStyling: false,
-                    confirmButtonText: "Ok, got it!",
-                    customClass: {
-                        confirmButton: "btn fw-bold btn-primary",
-                    }
-                });
+      ]).then(function() {
 
-              }
+        editor = new $.fn.dataTable.Editor({
+          ajax: {
+            url: "/libprep/edit_nucacid_async",
+            type: "POST",
+            headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
+            success: function (data) {
+                if ( data.success ) {
+
+                  dt.draw();
+
+                }
+                else {
+
+                  Swal.fire({
+                      text: data.message,
+                      icon: "error",
+                      buttonsStyling: false,
+                      confirmButtonText: "Ok, got it!",
+                      customClass: {
+                          confirmButton: "btn fw-bold btn-primary",
+                      }
+                  });
+
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                swal("Error updating!", "Please try again!", "error");
+            }
           },
-          error: function (xhr, ajaxOptions, thrownError) {
-              swal("Error updating!", "Please try again!", "error");
-          }
-        },
-        table: ".table",
-        fields: [ {
-               label: "Name:",
-               name: "name"
-           }, {
-               label: "Area:",
-               name: "area"
-           }, {
-               label: "Nucleic Acid Type:",
-               name: "na_type"
-           }, {
-               label: "Date:",
-               name: "date",
-               type: "datetime",
-               // def: function () { return new Date(); },
-               displayFormat: "M/D/YYYY",
-               wireFormat: 'YYYY-MM-DD'
-           }, {
-               label: "Method:",
-               name: "method"
-           }, {
-               label: "Concentration:",
-               name: "conc",
-           }, {
-               label: "Volume Init:",
-               name: "vol_init"
-           }, {
-               label: "Volume Remain:",
-               name: "vol_remain"
-           }
-       ],
-       formOptions: {
-          inline: {
+          table: ".table",
+          fields: [ {
+                 label: "Name:",
+                 name: "name"
+             }, {
+                 label: "Area:",
+                 name: "area"
+             }, {
+                 label: "Nucleic Acid Type:",
+                 name: "na_type"
+             }, {
+                 label: "Date:",
+                 name: "date",
+                 type: "datetime",
+                 // def: function () { return new Date(); },
+                 displayFormat: "M/D/YYYY",
+                 wireFormat: 'YYYY-MM-DD'
+             }, {
+                 label: "Method:",
+                 name: "method",
+                 type: "select",
+                 options: methodOptions
+             }, {
+                 label: "Concentration:",
+                 name: "conc",
+             }, {
+                 label: "Volume Init:",
+                 name: "vol_init"
+             }, {
+                 label: "Volume Remain:",
+                 name: "vol_remain"
+             }
+         ],
+         formOptions: {
+            inline: {
+              onBlur: 'submit'
+            }
+         }
+        });
+
+      });
+
+      $('.table').on( 'click', 'tbody td:not(:first-child)', function (e) {
+        editor.inline( dt.cell( this ).index(), {
             onBlur: 'submit'
-          }
-       }
-     });
+        });
+      });
 
-
-     $('.table').on( 'click', 'tbody td:not(:first-child)', function (e) {
-       editor.inline( dt.cell( this ).index(), {
-           onBlur: 'submit'
-       });
-     });
-
-     $('.table').on( 'key-focus', function ( e, datatable, cell ) {
+      $('.table').on( 'key-focus', function ( e, datatable, cell ) {
           editor.inline( cell.index() );
-     });
+      });
+
+      function getMethodOptions() {
+
+        $.ajax({
+            url: "/method/get_methods",
+            type: "GET",
+            async: false,
+            success: function (data) {
+
+             // var options = [];
+             data.forEach((item, i) => {
+
+               methodOptions.push({
+                 "label":item["name"],
+                 "value":item["id"]
+               })
+
+             });
+
+             // editor.field( 'method' ).update( options );
+
+            }
+        });
+
+      }
 
     }
 

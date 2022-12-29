@@ -7,4 +7,5 @@ urlpatterns = [
     path("edit/<int:id>", views.edit_method, name="edit-method"),
     path("delete/<int:id>", views.delete_method, name="delete-method"),
     path("filter_methods", views.filter_methods, name="filter-methods"),
+    path("get_methods", views.get_methods, name="get-methods"),
 ]

@@ -118,20 +118,37 @@ class NucAcids(models.Model):
             raise
 
     def _generate_unique_name(self):
-        # blocks.name & Areas.name & first letter of NA_type
+        '''
+        Generates a unique name during new record creation.
+        Notation: First character of NA_TYPE - Area Name - Increasing number from the same type
+        '''
         if not self.name:
             na_count = self.area.nucacids.filter(area=self.area,na_type=self.na_type).count() # count of existing nucleic acid
             self.name = "%s-%s-%d" % (self.na_type[0].upper(),self.area.name, na_count + 1)
 
+    def _set_init_volume(self):
+        '''
+        Sets vol_remain to vol_init during creating new record.
+        '''
+        if not self.nu_id:
+            self.vol_remain = self.vol_init
+
     def _check_changeability(self):
-        # if self.sl_links.count() > 0:
-        #     raise Exception("This record cannot be changed as it is used to create SL.")
-        pass
+        '''
+        Checks that allow only the remaining volume to be changed after the SL is created. If there is a rule violation throws an exception.
+        '''
+        if self.nu_id and self.sl_links.count() > 0:
+            existing_na = NucAcids.objects.get(nu_id=self.nu_id)
+            if not self.conc == existing_na.conc or not self.vol_init == existing_na.vol_init:
+                raise Exception("This record cannot be changed as it is used to create SL.")
 
     def save(self,*args,**kwargs):
-        # if not self.name:
-        #     self.name = self._generate_unique_name()
+        '''
+        Overrides the model's save method.
+        '''
         self._generate_unique_name()
+
+        self._set_init_volume()
 
         self._check_changeability()
 
@@ -148,10 +165,6 @@ class NucAcids(models.Model):
         #
         # return result
         return self.conc * self.vol_remain
-
-    def set_init_volume(self):
-        self.vol_remain = self.vol_init
-        self.save()
 
     def set_zero_volume(self):
         self.vol_remain = 0.0

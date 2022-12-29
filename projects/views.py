@@ -87,3 +87,6 @@ def delete_project(request,id):
         return JsonResponse({ "deleted":False })
 
     return JsonResponse({ "deleted":True })
+
+def get_pi_options(request):
+    return JsonResponse([{ "label":c[1], "value":c[0] } for c in Projects.PI_CHOICES], safe=False)

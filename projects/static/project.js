@@ -17,7 +17,7 @@ var KTDatatablesServerSide = function () {
             // searchDelay: 500,
             processing: true,
             serverSide: true,
-            order: [[1, 'desc']],
+            order: [[4, 'desc']],
             stateSave: false,
             destroy: true,
             select: {
@@ -36,7 +36,11 @@ var KTDatatablesServerSide = function () {
                 { data: null },
                 { data: 'abbreviation' },
                 { data: 'name' },
-                { data: 'pi' },
+                { data: 'pi' ,
+                  render: function (val, type, row) {
+                    return row["pi_label"];
+                  }
+                },
                 { data: 'date_start',
                   render: function (data) {
                     return moment(data).format('MM/DD/YYYY');
@@ -394,7 +398,15 @@ var KTDatatablesServerSide = function () {
 
     var initEditor = function () {
 
-      editor = new $.fn.dataTable.Editor({
+      var piOptions = [];
+
+      Promise.all([
+
+        getPiOptions(),
+
+      ]).then(function () {
+
+        editor = new $.fn.dataTable.Editor({
         ajax: {
           url: "/projects/edit_project_async",
           type: "POST",
@@ -417,15 +429,11 @@ var KTDatatablesServerSide = function () {
                label: "PI:",
                name: "pi",
                type: "select",
-               options : [
-                 {"label": "Boris Bastian", "value": "BB"},
-                 {"label": "Iwei Yeh", "value": "IY"}
-               ]
+               options : piOptions
            }, {
                label: "Start Date:",
                name: "date_start",
                type: "datetime",
-               def: function () { return new Date(); },
                displayFormat: "M/D/YYYY",
                wireFormat: 'YYYY-MM-DD'
            }, {
@@ -440,14 +448,37 @@ var KTDatatablesServerSide = function () {
        }
      });
 
+      });
 
-     $('.table').on( 'click', 'tbody td:not(:first-child):not(:last-child)', function (e) {
-          editor.inline( this );
-     });
+      function getPiOptions() {
 
-     $('.table').on( 'key-focus', function ( e, datatable, cell ) {
-          editor.inline( cell.index() );
-     });
+        $.ajax({
+            url: "/projects/get_pi_options",
+            type: "GET",
+            async: false,
+            success: function (data) {
+
+             // var options = [];
+             data.forEach((item, i) => {
+
+               piOptions.push({
+                 "label":item["label"],
+                 "value":item["value"]
+               })
+
+             });
+            }
+        });
+
+      }
+
+       $('.table').on( 'click', 'tbody td:not(:first-child):not(:last-child)', function (e) {
+            editor.inline( this );
+       });
+
+       $('.table').on( 'key-focus', function ( e, datatable, cell ) {
+            editor.inline( cell.index() );
+       });
 
     }
 
