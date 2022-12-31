@@ -91,7 +91,7 @@ def delete_patient(request,id):
     return JsonResponse({ "deleted":True })
 
 def get_race_options(request):
-    return JsonResponse([{ "label":c[1], "value":c[0] } for c in Patients.RACE_TYPES], safe=False)
+    return JsonResponse([{"label":"---------","value":""}] + [{ "label":c[1], "value":c[0] } for c in Patients.RACE_TYPES], safe=False)
 
 def get_sex_options(request):
-    return JsonResponse([{ "label":c[1], "value":c[0] } for c in Patients.SEX_TYPES], safe=False)
+    return JsonResponse([{"label":"---------","value":""}] + [{ "label":c[1], "value":c[0] } for c in Patients.SEX_TYPES], safe=False)

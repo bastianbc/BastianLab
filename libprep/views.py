@@ -137,3 +137,6 @@ def delete_batch_nucacids(request):
         return JsonResponse({ "deleted":False })
 
     return JsonResponse({ "deleted":True })
+
+def get_na_types(request):
+    return JsonResponse([{"label":"---------","value":""}] + [{ "label":c[1], "value":c[0] } for c in NucAcids.NA_TYPES[:-1]], safe=False)

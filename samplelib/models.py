@@ -70,6 +70,7 @@ class SampleLib(models.Model):
 
         try:
             ORDER_COLUMN_CHOICES = {
+                "0": "id",
                 "1": "name",
                 "2": "barcode",
                 "4": "date",

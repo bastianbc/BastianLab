@@ -17,7 +17,7 @@ var KTDatatablesServerSide = function () {
             // searchDelay: 500,
             processing: true,
             serverSide: true,
-            order: [[7, 'desc']],
+            order: [[0, 'desc']],
             stateSave: false,
             destroy: true,
             select: {
@@ -33,12 +33,16 @@ var KTDatatablesServerSide = function () {
             },
             ajax: '/blocks/filter_blocks',
             columns: [
-              { data: null },
+              { data: 'bl_id' },
               { data: 'name' },
               { data: 'project' },
               { data: 'patient' },
               { data: 'diagnosis' },
-              { data: 'body_site' },
+              { data: 'body_site',
+                render: function (val, type, row) {
+                  return row["body_site_label"];
+                }
+              },
               { data: 'thickness' },
               { data: 'date_added',
                 render: function (data) {

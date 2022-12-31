@@ -3,7 +3,7 @@ $( document ).ready(function() {
   $("#id_date_start").flatpickr({
     altInput: true,
     altFormat: "m/d/Y",
-    dateFormat: "Y-m-d",
+    dateFormat: "Y-m-d H:i:s",
   });
 
 });

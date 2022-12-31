@@ -17,7 +17,7 @@ var KTDatatablesServerSide = function () {
             // searchDelay: 500,
             processing: true,
             serverSide: true,
-            order: [[4, 'desc']],
+            order: [[0, 'desc']],
             stateSave: false,
             destroy: true,
             select: {
@@ -33,7 +33,7 @@ var KTDatatablesServerSide = function () {
             },
             ajax: '/samplelib/filter_samplelibs',
             columns: [
-                { data: null },
+                { data: 'id' },
                 { data: 'name' },
                 { data: 'barcode' },
                 { data: 'area' },
@@ -42,7 +42,11 @@ var KTDatatablesServerSide = function () {
                     return moment(data).format('MM/DD/YYYY');
                   }
                 },
-                { data: 'method' },
+                { data: 'method',
+                  render: function (val, type, row) {
+                    return row["method_label"];
+                  }
+                },
                 { data: 'qpcr_conc' },
                 { data: 'vol_init' },
                 { data: 'amount_final' },
@@ -340,7 +344,15 @@ var KTDatatablesServerSide = function () {
 
     var initEditor = function () {
 
-      editor = new $.fn.dataTable.Editor({
+      var methodOptions = [];
+
+      Promise.all([
+
+        getMethodOptions()
+
+      ]).then(function () {
+
+        editor = new $.fn.dataTable.Editor({
         ajax: {
           url: "/samplelib/edit_samplelib_async",
           type: "POST",
@@ -368,6 +380,8 @@ var KTDatatablesServerSide = function () {
            }, {
                label: "Method:",
                name: "method",
+               type: "select",
+               options: methodOptions
            }, {
                label: "Concentration:",
                name: "qpcr_conc"
@@ -398,18 +412,44 @@ var KTDatatablesServerSide = function () {
             onBlur: 'submit'
           }
        }
-     });
+      });
 
+      });
 
-     $('.table').on( 'click', 'tbody td:not(:first-child)', function (e) {
-       editor.inline( dt.cell( this ).index(), {
-           onBlur: 'submit'
+       $('.table').on( 'click', 'tbody td:not(:first-child)', function (e) {
+         editor.inline( dt.cell( this ).index(), {
+             onBlur: 'submit'
+         });
        });
-     });
 
-     $('.table').on( 'key-focus', function ( e, datatable, cell ) {
-          editor.inline( cell.index() );
-     });
+       $('.table').on( 'key-focus', function ( e, datatable, cell ) {
+            editor.inline( cell.index() );
+       });
+
+       function getMethodOptions() {
+
+         $.ajax({
+             url: "/method/get_methods",
+             type: "GET",
+             async: false,
+             success: function (data) {
+
+              // var options = [];
+              data.forEach((item, i) => {
+
+                methodOptions.push({
+                  "label":item["name"],
+                  "value":item["id"]
+                })
+
+              });
+
+              // editor.field( 'method' ).update( options );
+
+             }
+         });
+
+       }
 
     }
 

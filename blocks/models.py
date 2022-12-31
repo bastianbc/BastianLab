@@ -101,6 +101,7 @@ class Blocks(models.Model):
 
         try:
             ORDER_COLUMN_CHOICES = {
+                "0":"bl_id",
                 "1":"name",
                 "2":"project",
                 "3":"patient",

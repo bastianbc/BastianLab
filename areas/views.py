@@ -123,7 +123,7 @@ def delete_batch_areas(request):
     return JsonResponse({ "deleted":True })
 
 def get_collections(request):
-    return JsonResponse([{ "label":c[1], "value":c[0] } for c in Areas.COLLECTION_CHOICES], safe=False)
+    return JsonResponse(Areas.get_collections(), safe=False)
 
 def get_area_types(request):
-    return JsonResponse([{ "label":c[1], "value":c[0] } for c in Areas.AREA_TYPE_TYPES], safe=False)
+    return JsonResponse(Areas.get_area_types(), safe=False)

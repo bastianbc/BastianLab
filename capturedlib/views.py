@@ -158,7 +158,6 @@ def update_async(request,id):
         values = json.loads(request.GET.get("values"))
         captured_lib = CapturedLib.objects.get(id=id)
         total_volume = 0
-
         for value in values:
             volume = float(value["volume"])
 

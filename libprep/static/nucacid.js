@@ -17,7 +17,7 @@ var KTDatatablesServerSide = function () {
             // searchDelay: 500,
             processing: true,
             serverSide: true,
-            order: [[1, 'desc']],
+            order: [[0, 'desc']],
             stateSave: false,
             destroy: true,
             select: {
@@ -40,16 +40,24 @@ var KTDatatablesServerSide = function () {
               }
             },
             columns: [
-                { data: null },
+                { data: 'nu_id' },
                 { data: 'name' },
                 { data: 'area' },
-                { data: 'na_type' },
+                { data: 'na_type',
+                  render: function (val, type, row) {
+                    return row["na_type_label"];
+                  }
+                },
                 { data: 'date',
                   render: function (data) {
                     return moment(data).format('MM/DD/YYYY');
                   }
                 },
-                { data: 'method' },
+                { data: 'method',
+                  render: function (val, type, row) {
+                    return row["method_label"];
+                  }
+                },
                 { data: 'conc' },
                 { data: 'vol_init' },
                 { data: 'vol_remain' },
@@ -851,10 +859,12 @@ var KTDatatablesServerSide = function () {
     var initEditor = function () {
 
       var methodOptions = [];
+      var naTypeOptions = [];
 
       Promise.all([
 
         getMethodOptions(),
+        getNaTypeOptions()
 
       ]).then(function() {
 
@@ -896,7 +906,9 @@ var KTDatatablesServerSide = function () {
                  name: "area"
              }, {
                  label: "Nucleic Acid Type:",
-                 name: "na_type"
+                 name: "na_type",
+                 type: "select",
+                 options: naTypeOptions
              }, {
                  label: "Date:",
                  name: "date",
@@ -953,6 +965,31 @@ var KTDatatablesServerSide = function () {
                methodOptions.push({
                  "label":item["name"],
                  "value":item["id"]
+               })
+
+             });
+
+             // editor.field( 'method' ).update( options );
+
+            }
+        });
+
+      }
+
+      function getNaTypeOptions() {
+
+        $.ajax({
+            url: "/libprep/get_na_types",
+            type: "GET",
+            async: false,
+            success: function (data) {
+
+             // var options = [];
+             data.forEach((item, i) => {
+
+               naTypeOptions.push({
+                 "label":item["label"],
+                 "value":item["value"]
                })
 
              });

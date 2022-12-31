@@ -17,7 +17,7 @@ var KTDatatablesServerSide = function () {
             // searchDelay: 500,
             processing: true,
             serverSide: true,
-            order: [[1, 'desc']],
+            order: [[0, 'desc']],
             stateSave: false,
             destroy: true,
             select: {
@@ -33,7 +33,7 @@ var KTDatatablesServerSide = function () {
             },
             ajax: '/lab/filter_patients',
             columns: [
-                { data: null },
+                { data: 'pa_id' },
                 { data: 'pat_id' },
                 { data: 'source' },
                 { data: 'sex' ,

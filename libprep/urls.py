@@ -14,4 +14,5 @@ urlpatterns = [
     path('edit/<str:id>', views.edit_nucacid, name='edit-nucacid'),
     path('delete/<str:id>', views.delete_nucacid, name='delete-nucacid'),
     path('batch_delete', views.delete_batch_nucacids, name='delete-batch-nucacids'),
+    path("get_na_types", views.get_na_types, name="get-na-types"),
 ] + staticfiles_urlpatterns()

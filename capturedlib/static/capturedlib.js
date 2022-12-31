@@ -17,7 +17,7 @@ var KTDatatablesServerSide = function () {
             // searchDelay: 500,
             processing: true,
             serverSide: true,
-            order: [[3, 'desc']],
+            order: [[0, 'desc']],
             stateSave: false,
             destroy: true,
             select: {
@@ -33,7 +33,7 @@ var KTDatatablesServerSide = function () {
             },
             ajax: '/capturedlib/filter_capturedlibs',
             columns: [
-                { data: null },
+                { data: 'id' },
                 { data: 'name' },
                 { data: 'barcode' },
                 { data: 'date',
@@ -41,11 +41,19 @@ var KTDatatablesServerSide = function () {
                     return moment(data).format('MM/DD/YYYY');
                   }
                 },
-                { data: 'bait' },
+                { data: 'bait',
+                  render: function (val, type, row) {
+                    return row["bait_label"];
+                  }
+                },
                 { data: 'frag_size' },
                 { data: 'conc' },
                 { data: 'amp_cycle' },
-                { data: 'buffer' },
+                { data: 'buffer',
+                  render: function (val, type, row) {
+                    return row["buffer_label"];
+                  }
+                },
                 { data: 'nm' },
                 { data: 'vol_init' },
                 { data: 'vol_remain' },
@@ -242,7 +250,7 @@ var KTDatatablesServerSide = function () {
                                 headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
                                 success: function () {
                                   Swal.fire({
-                                        text: "Sample Library(s) was deleted succesfully.",
+                                        text: "Captured Library(s) was deleted succesfully.",
                                         icon: "info",
                                         buttonsStyling: false,
                                         confirmButtonText: "Ok, got it!",
@@ -356,8 +364,10 @@ var KTDatatablesServerSide = function () {
       var bufferOptions = [];
 
       Promise.all([
+
           getBaitOptions(),
           getBufferOptions()
+
       ]).then(() => {
 
         editor = new $.fn.dataTable.Editor({
@@ -392,14 +402,13 @@ var KTDatatablesServerSide = function () {
                  label: "Date:",
                  name: "date",
                  type: "datetime",
-                 // def: function () { return new Date(); },
                  displayFormat: 'M/D/YYYY',
                  wireFormat: 'YYYY-MM-DD',
              }, {
                  label: "Bait:",
                  name: "bait",
                  type: "select",
-                 options: baitOptions
+                 options: baitOptions,
              }, {
                  label: "Fragment Size:",
                  name: "frag_size"
@@ -413,7 +422,7 @@ var KTDatatablesServerSide = function () {
                  label: "Buffer:",
                  name: "buffer",
                  type: "select",
-                 options: bufferOptions
+                 options: bufferOptions,
              }, {
                  label: "Volume Init:",
                  name: "vol_init"

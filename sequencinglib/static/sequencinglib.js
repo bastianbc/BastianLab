@@ -17,7 +17,7 @@ var KTDatatablesServerSide = function () {
             // searchDelay: 500,
             processing: true,
             serverSide: true,
-            order: [[2, 'desc']],
+            order: [[0, 'desc']],
             stateSave: false,
             destroy: true,
             select: {
@@ -33,7 +33,7 @@ var KTDatatablesServerSide = function () {
             },
             ajax: '/sequencinglib/filter_sequencinglibs',
             columns: [
-                { data: null },
+                { data: 'id' },
                 { data: 'name' },
                 { data: 'date',
                   render: function (data) {
@@ -205,7 +205,7 @@ var KTDatatablesServerSide = function () {
                                 headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
                                 success: function () {
                                   Swal.fire({
-                                        text: "Sample Library(s) was deleted succesfully.",
+                                        text: "Sequencing Library(s) was deleted succesfully.",
                                         icon: "info",
                                         buttonsStyling: false,
                                         confirmButtonText: "Ok, got it!",
@@ -317,7 +317,7 @@ var KTDatatablesServerSide = function () {
 
       editor = new $.fn.dataTable.Editor({
         ajax: {
-          url: "/samplelib/edit_samplelib_async",
+          url: "/sequencinglib/edit_sequencinglib_async",
           type: "POST",
           headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
           success: function () {
@@ -332,31 +332,18 @@ var KTDatatablesServerSide = function () {
                label: "Name:",
                name: "name"
            }, {
-               label: "Barcode:",
-               name: "barcode"
-           }, {
                label: "Date:",
                name: "date",
                type: "datetime",
                displayFormat: "M/D/YYYY",
                wireFormat: 'YYYY-MM-DD'
            }, {
-               label: "Method:",
-               name: "method",
+               label: "NMol:",
+               name: "nmol",
            }, {
-               label: "Concentration:",
-               name: "conc"
-           }, {
-               label: "Input Amount:",
-               name: "input_amount",
-               type: "readonly"
-           }, {
-               label: "Volume Init:",
-               name: "vol_init"
-           }, {
-               label: "Volume Remain:",
-               name: "vol_remain"
-           },
+               label: "BUffer:",
+               name: "buffer"
+           }
        ],
        formOptions: {
           inline: {

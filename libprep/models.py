@@ -48,6 +48,7 @@ class NucAcids(models.Model):
 
         try:
             ORDER_COLUMN_CHOICES = {
+                "0": "nu_id",
                 "1": "name",
                 "2": "area",
                 "3": "na_type",

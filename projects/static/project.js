@@ -17,7 +17,7 @@ var KTDatatablesServerSide = function () {
             // searchDelay: 500,
             processing: true,
             serverSide: true,
-            order: [[4, 'desc']],
+            order: [[0, 'desc']],
             stateSave: false,
             destroy: true,
             select: {
@@ -33,7 +33,7 @@ var KTDatatablesServerSide = function () {
             },
             ajax: '/projects/filter_projects',
             columns: [
-                { data: null },
+                { data: 'pr_id' },
                 { data: 'abbreviation' },
                 { data: 'name' },
                 { data: 'pi' ,

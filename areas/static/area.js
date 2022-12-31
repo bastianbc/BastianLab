@@ -17,7 +17,7 @@ var KTDatatablesServerSide = function () {
             // searchDelay: 500,
             processing: true,
             serverSide: true,
-            order: [[6, 'desc']],
+            order: [[0, 'desc']],
             stateSave: false,
             destroy: true,
             select: {
@@ -33,7 +33,7 @@ var KTDatatablesServerSide = function () {
             },
             ajax: '/areas/filter_areas',
             columns: [
-              { data: null },
+              { data: 'ar_id' },
               { data: 'name' },
               { data: 'block' },
               { data: 'project' },

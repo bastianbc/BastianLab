@@ -77,6 +77,7 @@ class Areas(models.Model):
 
         try:
             ORDER_COLUMN_CHOICES = {
+                "0":"ar_id",
                 "1":"name",
                 "2":"block",
                 "3":"project",
@@ -129,3 +130,11 @@ class Areas(models.Model):
         except Exception as e:
             print(str(e))
             raise
+
+    @staticmethod
+    def get_area_types():
+        return [{"label":"---------","value":""}] + [{ "label":c[1], "value":c[0] } for c in Areas.AREA_TYPE_TYPES]
+
+    @staticmethod
+    def get_collections():
+        return [{"label":"---------","value":""}] + [{ "label":c[1], "value":c[0] } for c in Areas.COLLECTION_CHOICES]

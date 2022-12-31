@@ -45,6 +45,7 @@ class Projects(models.Model):
 
         try:
             ORDER_COLUMN_CHOICES = {
+                '0': 'pr_id',
                 '1': 'abbreviation',
                 '2': 'name',
                 '3': 'pi',

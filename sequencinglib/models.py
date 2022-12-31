@@ -42,6 +42,7 @@ class SequencingLib(models.Model):
 
         try:
             ORDER_COLUMN_CHOICES = {
+                "0": "id",
                 "1": "name",
                 "2": "date",
                 "3": "nmol",

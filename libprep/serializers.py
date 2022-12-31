@@ -5,22 +5,22 @@ class NucacidsSerializer(serializers.ModelSerializer):
     # block = serializers.IntegerField()
     DT_RowId = serializers.SerializerMethodField()
     area = serializers.StringRelatedField()
-    method = serializers.StringRelatedField()
-    na_type = serializers.SerializerMethodField()
+    method_label = serializers.SerializerMethodField()
+    na_type_label = serializers.SerializerMethodField()
     vol_remain = serializers.SerializerMethodField()
     amount = serializers.SerializerMethodField()
 
     class Meta:
         model = NucAcids
-        fields = ("nu_id", "name", "area", "na_type", "date", "method", "conc", "vol_init", "vol_remain", "amount", "DT_RowId",)
+        fields = ("nu_id", "name", "area", "na_type", "na_type_label", "date", "method", "method_label", "conc", "vol_init", "vol_remain", "amount", "DT_RowId",)
 
     def get_DT_RowId(self, obj):
        return getattr(obj, 'nu_id')
 
-    def get_method(self, obj):
-        return obj.name
+    def get_method_label(self, obj):
+        return obj.method.name
 
-    def get_na_type(self,obj):
+    def get_na_type_label(self,obj):
         return obj.get_na_type_display()
 
     def get_area(self, obj):
@@ -30,4 +30,4 @@ class NucacidsSerializer(serializers.ModelSerializer):
         return round(obj.vol_remain,2)
 
     def get_amount(self, obj):
-        return round(obj.amount,2)    
+        return round(obj.amount,2)

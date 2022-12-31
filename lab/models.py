@@ -54,6 +54,7 @@ class Patients(models.Model):
     def query_by_args(self, **kwargs):
         try:
             ORDER_COLUMN_CHOICES = {
+                '0': 'pa_id',
                 '1': 'pat_id',
                 '2': 'sex',
                 '3': 'race',

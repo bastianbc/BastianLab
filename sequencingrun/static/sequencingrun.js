@@ -17,7 +17,7 @@ var KTDatatablesServerSide = function () {
             // searchDelay: 500,
             processing: true,
             serverSide: true,
-            order: [[2, 'desc']],
+            order: [[0, 'desc']],
             stateSave: false,
             destroy: true,
             select: {
@@ -33,7 +33,7 @@ var KTDatatablesServerSide = function () {
             },
             ajax: '/sequencingrun/filter_sequencingruns',
             columns: [
-                { data: null },
+                { data: 'id' },
                 { data: 'name' },
                 { data: 'date',
                   render: function (data) {

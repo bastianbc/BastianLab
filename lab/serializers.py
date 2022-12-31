@@ -9,7 +9,7 @@ class PatientsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Patients
-        fields = ("pat_id","source","sex","race","sex_label","race_label","date_added","num_blocks","DT_RowId",)
+        fields = ("pa_id","pat_id","source","sex","race","sex_label","race_label","date_added","num_blocks","DT_RowId",)
 
     def get_DT_RowId(self, obj):
         return getattr(obj, 'pa_id')
