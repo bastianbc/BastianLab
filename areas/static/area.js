@@ -225,7 +225,7 @@ var KTDatatablesServerSide = function () {
                                 headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
                                 success: function () {
                                   Swal.fire({
-                                        text: "Sample Library(s) was deleted succesfully.",
+                                        text: "Area(s) was deleted succesfully.",
                                         icon: "info",
                                         buttonsStyling: false,
                                         confirmButtonText: "Ok, got it!",
@@ -536,12 +536,7 @@ var KTDatatablesServerSide = function () {
           type: "POST",
           headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
           success: function (data) {
-              if ( data.success ) {
-
-                dt.draw();
-
-              }
-              else {
+              if ( !data.success ) {
 
                 Swal.fire({
                     text: data.message,
@@ -554,6 +549,9 @@ var KTDatatablesServerSide = function () {
                 });
 
               }
+
+              dt.draw();
+              
           },
           error: function (xhr, ajaxOptions, thrownError) {
               swal("Error updating!", "Please try again!", "error");

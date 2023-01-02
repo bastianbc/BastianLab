@@ -172,5 +172,5 @@ class NucAcids(models.Model):
         self.save()
 
     def update_volume(self,amount):
-        self.vol_remain -= (amount / self.conc)
+        self.vol_remain = round(self.vol_remain - (amount / self.conc),2)
         self.save()

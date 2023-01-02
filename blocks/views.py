@@ -27,7 +27,7 @@ def filter_blocks(request):
 def blocks(request):
     id = request.GET.get("id")
     model = request.GET.get("model")
-    
+
     form = AreaCreationForm()
 
     if model=="project" and id:
@@ -141,7 +141,7 @@ def delete_block(request,id):
     try:
         block = Blocks.objects.get(bl_id=id)
         block.delete()
-        messages.success(request,"Block %s was deleted successfully." % block.pat_id)
+        messages.success(request,"Block %s was deleted successfully." % block.name)
         deleted = True
     except Exception as e:
         messages.error(request, "Block %s wasn't deleted!" % block.pat_id)
