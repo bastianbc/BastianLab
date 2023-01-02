@@ -129,9 +129,9 @@ class NucAcids(models.Model):
 
     def _set_init_volume(self):
         '''
-        Sets vol_remain to vol_init during creating new record.
+        Sets vol_remain to vol_init during changing another values if not used to create SL.
         '''
-        if not self.nu_id:
+        if self.sl_links.count() < 1:
             self.vol_remain = self.vol_init
 
     def _check_changeability(self):
@@ -149,9 +149,9 @@ class NucAcids(models.Model):
         '''
         self._generate_unique_name()
 
-        self._set_init_volume()
-
         self._check_changeability()
+
+        self._set_init_volume()
 
         super().save(*args, **kwargs)
 

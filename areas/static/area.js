@@ -62,7 +62,7 @@ var KTDatatablesServerSide = function () {
                     render: function (data) {
                         return `
                             <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                <input class="form-check-input" type="checkbox" value="${data['ar_id']}" />
+                                <input class="form-check-input" type="checkbox" value="${data}" />
                             </div>`;
                     }
                 },
@@ -535,8 +535,25 @@ var KTDatatablesServerSide = function () {
           url: "/areas/edit_area_async",
           type: "POST",
           headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
-          success: function () {
-              dt.draw();
+          success: function (data) {
+              if ( data.success ) {
+
+                dt.draw();
+
+              }
+              else {
+
+                Swal.fire({
+                    text: data.message,
+                    icon: "error",
+                    buttonsStyling: false,
+                    confirmButtonText: "Ok, got it!",
+                    customClass: {
+                        confirmButton: "btn fw-bold btn-primary",
+                    }
+                });
+
+              }
           },
           error: function (xhr, ajaxOptions, thrownError) {
               swal("Error updating!", "Please try again!", "error");

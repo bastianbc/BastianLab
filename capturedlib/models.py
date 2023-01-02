@@ -32,6 +32,9 @@ class CapturedLib(models.Model):
     def save(self,*args,**kwargs):
         if self.__vol_init != self.vol_init:
             self.vol_remain = self.vol_init
+
+        self._set_nm()
+        
         super().save(*args, **kwargs)
 
     @property
@@ -115,14 +118,9 @@ class CapturedLib(models.Model):
             print(str(e))
             raise
 
-    def set_nm(self):
+    def _set_nm(self):
         # Calculate CL.nM as CL.conc/660 * CL.frag_size * 10^6 and store in CL.nM
-        try:
-            self.nm = round(self.conc/660 * float(self.frag_size) * 10**6,2)
-            self.save()
-        except Exception as e:
-            print("%s in %s" % (str(e),__file__))
-            raise
+        self.nm = round(self.conc/660 * float(self.frag_size) * 10**6,2)
 
     def update_volume(self, volume):
         self.vol_remain = 0 if volume > self.vol_remain else round(self.vol_remain - volume,2)

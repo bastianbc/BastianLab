@@ -9,7 +9,7 @@ class SequencingLibSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SequencingLib
-        fields = ("id", "name", "date", "nmol", "buffer", "DT_RowId",)
+        fields = ("id", "name", "date", "nmol", "buffer", "pdf", "DT_RowId",)
 
     def get_DT_RowId(self, obj):
        return getattr(obj, 'id')

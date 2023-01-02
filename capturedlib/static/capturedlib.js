@@ -67,7 +67,7 @@ var KTDatatablesServerSide = function () {
                     render: function (data) {
                         return `
                             <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                <input class="form-check-input" type="checkbox" value="${data['id']}" />
+                                <input class="form-check-input" type="checkbox" value="${data}" />
                             </div>`;
                     }
                 },
@@ -76,7 +76,6 @@ var KTDatatablesServerSide = function () {
                     orderable: false,
                     render: function (data, type, row) {
                         if (data > 0) {
-                          let id = row["id"];
                           return `<a href="javascript:;" class="detail-link">${data}</a>`;
                         }
                         return data;
@@ -593,8 +592,8 @@ var KTDatatablesServerSide = function () {
               <div class="col-2 align-self-center">${ data[i].conc }</div>
               <div class="col-2 align-self-center text-center">${ data[i].vol_remain }</div>
               <div class="col-2 align-self-center text-center">${ data[i].barcode }</div>
-              <div class="col-2 text-center"><input type="text" class="textinput textInput form-control form-control-sm text-end detail-amount" value="${ data[i].amount }"></div>
-              <div class="col-2 text-center"><input type="text" class="textinput textInput form-control form-control-sm text-end detail-volume" value="${ data[i].volume }"></div>
+              <div class="col-2 text-center"><input type="number" class="textinput textInput form-control form-control-sm text-end detail-amount" value="${ data[i].amount }"></div>
+              <div class="col-2 text-center"><input type="number" class="textinput textInput form-control form-control-sm text-end detail-volume" value="${ data[i].volume }"></div>
             </div>`;
           listEl.innerHTML += row;
 
@@ -700,11 +699,13 @@ var KTDatatablesServerSide = function () {
                   }
               }).then(function(){
                 dt.draw();
+
+                modal.hide();
               });
             }
             else {
               Swal.fire({
-                  text: "Captured Library(s) was not updated.",
+                  text: result.message,
                   icon: "error",
                   buttonsStyling: false,
                   confirmButtonText: "Ok, got it!",
@@ -713,8 +714,6 @@ var KTDatatablesServerSide = function () {
                   }
               });
             }
-
-            modal.hide();
 
           });
 
@@ -726,6 +725,8 @@ var KTDatatablesServerSide = function () {
 
     var handleSelectedRows = ((e) => {
 
+      var isInit = false;
+
       var container = document.querySelector('.table');
 
       var stepper = new KTStepper(document.getElementById("modal_stepper"));
@@ -733,7 +734,6 @@ var KTDatatablesServerSide = function () {
       var modal = new bootstrap.Modal(document.getElementById("modal_sequencinglib_options"));
 
       function initModal() {
-        var isInit = false;
 
         function resetStepper() {
 
@@ -748,8 +748,8 @@ var KTDatatablesServerSide = function () {
         }
 
         document.getElementById("modal_sequencinglib_options").addEventListener('show.bs.modal', function(e){
-
-          if (!checkSelectedRows()) {
+          console.log(">>>>>>>>>>>>>>");
+          if (!checkIdenticalBarcode()) {
 
             Swal.fire({
                 text: "Identical barcodes are used in selected rows.",
@@ -769,7 +769,7 @@ var KTDatatablesServerSide = function () {
           else {
 
             initStepper();
-
+            
             if (!isInit) {
 
               isInit = true;
@@ -973,7 +973,7 @@ var KTDatatablesServerSide = function () {
         return JSON.stringify(options);
       }
 
-      function checkSelectedRows() {
+      function checkIdenticalBarcode() {
 
         var selectedRows = container.querySelectorAll('[type="checkbox"]:checked');
 
@@ -983,7 +983,8 @@ var KTDatatablesServerSide = function () {
 
           const parent = selectedRows[i].closest('tr');
           // Get barcode
-          const barcode = parent.querySelectorAll('td')[2].innerText;
+          const barcode = parent.querySelectorAll('td')[13].innerText;
+          console.log("barcode:" + barcode);
 
           if (barcodeList.indexOf(barcode) > -1 ) {
 

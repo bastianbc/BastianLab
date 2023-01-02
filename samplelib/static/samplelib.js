@@ -63,7 +63,7 @@ var KTDatatablesServerSide = function () {
                     render: function (data) {
                         return `
                             <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                <input class="form-check-input" type="checkbox" value="${data['id']}" />
+                                <input class="form-check-input" type="checkbox" value="${data}" />
                             </div>`;
                     }
                 },
@@ -573,7 +573,7 @@ var KTDatatablesServerSide = function () {
         }).done(function(result) {
           if (result.success) {
             Swal.fire({
-                text: "Sample Library(s) was created succesfully.",
+                text: "Captured Library(s) was created succesfully.",
                 icon: "info",
                 buttonsStyling: false,
                 confirmButtonText: "Ok, got it!",
@@ -584,7 +584,7 @@ var KTDatatablesServerSide = function () {
           }
           else {
             Swal.fire({
-                text: "Sample Library(s) was not created.",
+                text: "Captured Library(s) was not created.",
                 icon: "error",
                 buttonsStyling: false,
                 confirmButtonText: "Ok, got it!",

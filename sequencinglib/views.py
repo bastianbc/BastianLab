@@ -44,7 +44,7 @@ def edit_sequencinglib_async(request):
 
     sequencing_lib = custom_update(SequencingLib,pk=parameters["pk"],parameters=parameters)
 
-    sequencing_lib.set_nm()
+    # sequencing_lib.set_nm()
 
     return JsonResponse({"result":True})
 

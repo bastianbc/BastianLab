@@ -2,10 +2,9 @@ from rest_framework import serializers
 from .models import *
 
 class CapturedLibSerializer(serializers.ModelSerializer):
-    # block = serializers.IntegerField()
     DT_RowId = serializers.SerializerMethodField()
     barcode = serializers.StringRelatedField()
-    nm = serializers.SerializerMethodField()
+    # nm = serializers.SerializerMethodField()
     bait_label = serializers.SerializerMethodField()
     buffer_label = serializers.SerializerMethodField()
 
@@ -15,15 +14,15 @@ class CapturedLibSerializer(serializers.ModelSerializer):
 
     def get_DT_RowId(self, obj):
        return getattr(obj, 'id')
-
-    def get_nm(self,obj):
-        return round(obj.nm,2)
+    #
+    # def get_nm(self,obj):
+    #     return round(obj.nm,2)
 
     def get_bait_label(self,obj):
-        return obj.bait.name
+        return obj.bait.name if obj.bait else None
 
     def get_buffer_label(self,obj):
-        return obj.buffer.name
+        return obj.buffer.name if obj.buffer else None
 
 class UsedSampleLibSerializer(serializers.ModelSerializer):
     # captured_lib = serializers.StringRelatedField()

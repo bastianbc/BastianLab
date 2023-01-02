@@ -45,7 +45,7 @@ def edit_capturedlib_async(request):
 
         captured_lib = custom_update(CapturedLib,pk=parameters["pk"],parameters=parameters)
 
-        captured_lib.set_nm()
+        # captured_lib.set_nm()
     except Exception as e:
         print("%s in %s" % (str(e),__file__))
         return JsonResponse({"success":False})
@@ -154,12 +154,19 @@ def get_used_samplelibs(request,id):
 
 @permission_required("capturedlib.change_capturedlib",raise_exception=True)
 def update_async(request,id):
+    import math
+
     try:
         values = json.loads(request.GET.get("values"))
         captured_lib = CapturedLib.objects.get(id=id)
         total_volume = 0
+
         for value in values:
+
             volume = float(value["volume"])
+
+            if math.isnan(volume):
+                raise Exception("Invalid input!")
 
             sample_lib = SampleLib.objects.get(id=value["id"])
 
@@ -178,6 +185,6 @@ def update_async(request,id):
         captured_lib.save()
     except Exception as e:
         print(str(e))
-        return JsonResponse({"success":False})
+        return JsonResponse({"success":False, "message":str(e)})
 
     return JsonResponse({"success":True})

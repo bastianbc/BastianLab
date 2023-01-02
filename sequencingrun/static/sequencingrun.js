@@ -44,7 +44,11 @@ var KTDatatablesServerSide = function () {
                 { data: 'sequencer' },
                 { data: 'pe' },
                 { data: 'amp_cycles' },
-                { data: 'date_run' },
+                { data: 'date_run',
+                  render: function (data) {
+                    return moment(data).format('MM/DD/YYYY');
+                  }
+                },
             ],
             columnDefs: [
                 {
