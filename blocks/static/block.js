@@ -630,7 +630,21 @@ var KTDatatablesServerSide = function () {
           type: "POST",
           headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
           success: function () {
-              dt.draw();
+            if ( !data.success ) {
+
+              Swal.fire({
+                  text: data.message,
+                  icon: "error",
+                  buttonsStyling: false,
+                  confirmButtonText: "Ok, got it!",
+                  customClass: {
+                      confirmButton: "btn fw-bold btn-primary",
+                  }
+              });
+
+            }
+
+            dt.draw();
           },
           error: function (xhr, ajaxOptions, thrownError) {
               swal("Error updating!", "Please try again!", "error");

@@ -132,7 +132,10 @@ def edit_block_async(request):
                     v = None
                 parameters[r.groups()[1]] = v
 
-    custom_update(Blocks,pk=parameters["pk"],parameters=parameters)
+    try:
+        custom_update(Blocks,pk=parameters["pk"],parameters=parameters)
+    except Exception as e:
+        return JsonResponse({"success":False, "message": str(e)})
 
     return JsonResponse({"result":True})
 
