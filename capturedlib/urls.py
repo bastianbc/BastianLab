@@ -16,4 +16,5 @@ urlpatterns = [
     path('batch_delete', views.delete_batch_capturedlibs, name='delete-batch-capturedlibs'),
     path('<int:id>/used_samplelibs', views.get_used_samplelibs, name='get-used-samplelibs'),
     path('<int:id>/update_async', views.update_async, name='update_async'),
+    path('check_idendical_barcode', views.check_idendical_barcode, name='check-identical-barcode'),
 ] + staticfiles_urlpatterns()

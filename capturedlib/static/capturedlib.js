@@ -746,15 +746,60 @@ var KTDatatablesServerSide = function () {
 
         }
 
+        function checkIdenticalBarcode() {
+
+          var result = false;
+
+          $.ajax({
+            type: "GET",
+            url: "/capturedlib/check_idendical_barcode",
+            data: {
+              "selected_ids": getSelectedRows()
+            },
+            async: false,
+            error: function (xhr, ajaxOptions, thrownError) {
+                swal("Error checking barcode!", "Please try again", "error");
+            }
+          }).done(function(data) {
+
+            result = data.result;
+
+          });
+
+          return result;
+
+        }
+
         document.getElementById("modal_sequencinglib_options").addEventListener('show.bs.modal', function(e){
 
-          initStepper();
+          if (!checkIdenticalBarcode()) {
 
-          if (!isInit) {
+            Swal.fire({
+                text: "Identical barcodes are used in selected rows.",
+                icon: "error",
+                buttonsStyling: false,
+                confirmButtonText: "Ok, got it!",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-primary",
+                }
+            }).then(function () {
 
-            isInit = true;
+              modal.hide();
 
-            initEvents();
+            });
+
+          }
+          else {
+
+            initStepper();
+
+            if (!isInit) {
+
+              isInit = true;
+
+              initEvents();
+            }
+
           }
 
         });
