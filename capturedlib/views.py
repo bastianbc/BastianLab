@@ -82,13 +82,10 @@ def new_capturedlib_async(request):
 
         samplelibs = SampleLib.objects.filter(id__in=selected_ids)
 
-        barcode = Barcode.objects.first()
-
         bait = Bait.objects.get(id=options["bait"])
 
         captured_lib = CapturedLib.objects.create(
             name="%s-%d" % (options["prefix"],autonumber),
-            barcode=barcode,
             date=options["date"],
             bait=bait
         )

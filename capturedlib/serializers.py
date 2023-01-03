@@ -3,20 +3,15 @@ from .models import *
 
 class CapturedLibSerializer(serializers.ModelSerializer):
     DT_RowId = serializers.SerializerMethodField()
-    barcode = serializers.StringRelatedField()
-    # nm = serializers.SerializerMethodField()
     bait_label = serializers.SerializerMethodField()
     buffer_label = serializers.SerializerMethodField()
 
     class Meta:
         model = CapturedLib
-        fields = ("id", "name", "barcode", "date", "bait", "bait_label", "buffer", "buffer_label", "frag_size", "conc", "amp_cycle", "nm", "vol_init", "vol_remain", "amount", "pdf", "DT_RowId",)
+        fields = ("id", "name", "date", "bait", "bait_label", "buffer", "buffer_label", "frag_size", "conc", "amp_cycle", "nm", "vol_init", "vol_remain", "amount", "pdf", "DT_RowId",)
 
     def get_DT_RowId(self, obj):
        return getattr(obj, 'id')
-    #
-    # def get_nm(self,obj):
-    #     return round(obj.nm,2)
 
     def get_bait_label(self,obj):
         return obj.bait.name if obj.bait else None
@@ -25,7 +20,6 @@ class CapturedLibSerializer(serializers.ModelSerializer):
         return obj.buffer.name if obj.buffer else None
 
 class UsedSampleLibSerializer(serializers.ModelSerializer):
-    # captured_lib = serializers.StringRelatedField()
     id = serializers.SerializerMethodField()
     name = serializers.SerializerMethodField()
     conc = serializers.SerializerMethodField()

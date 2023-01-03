@@ -4,7 +4,6 @@ from django.db.models import Q, Count
 
 class CapturedLib(models.Model):
     name = models.CharField(max_length=50, unique=True, verbose_name="Name")
-    barcode = models.ForeignKey("samplelib.Barcode", on_delete=models.CASCADE, verbose_name="Barcode")
     date = models.DateTimeField(default=datetime.now, verbose_name="Date")
     bait = models.ForeignKey("bait.Bait", verbose_name="Bait", on_delete=models.SET_NULL, null=True, blank=True)
     frag_size = models.FloatField(default=0, verbose_name="Fragment Size")
@@ -34,7 +33,7 @@ class CapturedLib(models.Model):
             self.vol_remain = self.vol_init
 
         self._set_nm()
-        
+
         super().save(*args, **kwargs)
 
     @property
@@ -69,7 +68,6 @@ class CapturedLib(models.Model):
             ORDER_COLUMN_CHOICES = {
                 "0": "id",
                 "1": "name",
-                "2": "barcode",
                 "3": "date",
                 "4": "bait",
                 "5": "frag_size",

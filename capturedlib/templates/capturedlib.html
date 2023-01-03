@@ -13,7 +13,6 @@
       {% csrf_token %}
       <div class="row">
         <div class="col-6">{{ form.name|as_crispy_field }}</div>
-        <div class="col-6">{{ form.barcode|as_crispy_field }}</div>
         <div class="col-6">{{ form.date|as_crispy_field }}</div>
         <div class="col-6">{{ form.bait|as_crispy_field }}</div>
         <div class="col-6">{{ form.frag_size|as_crispy_field }}</div>

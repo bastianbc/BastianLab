@@ -729,10 +729,10 @@ var KTDatatablesServerSide = function () {
 
           var row = `<div class="row mb-1 detail-row">
               <div class="col-2 align-self-center" data-id="${ data[i].captured_lib }">${ data[i].name }</div>
-              <div class="col-2 align-self-center">${ data[i].frag_size }</div>
+              <div class="col-1 align-self-center">${ data[i].frag_size }</div>
               <div class="col-2 align-self-center text-center">${ data[i].vol_remain }</div>
-              <div class="col-1 align-self-center text-center">${ data[i].nm }</div>
-              <div class="col-1 align-self-center text-center">${ data[i].nm }</div>
+              <div class="col-1 align-self-center text-center">${ data[i].conc }</div>
+              <div class="col-2 align-self-center text-center">${ data[i].nm }</div>
               <div class="col-2 text-center"><input type="text" class="textinput textInput form-control form-control-sm text-end detail-percentage" value="${ p.toFixed(2) }"></div>
               <div class="col-2 text-center"><input type="text" class="textinput textInput form-control form-control-sm text-end detail-volume" value="${ v.toFixed(2) }"></div>
             </div>`;

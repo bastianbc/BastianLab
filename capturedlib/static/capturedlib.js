@@ -35,7 +35,6 @@ var KTDatatablesServerSide = function () {
             columns: [
                 { data: 'id' },
                 { data: 'name' },
-                { data: 'barcode' },
                 { data: 'date',
                   render: function (data) {
                     return moment(data).format('MM/DD/YYYY');
@@ -72,7 +71,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 12,
+                    targets: 11,
                     orderable: false,
                     render: function (data, type, row) {
                         if (data > 0) {
@@ -82,7 +81,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 13,
+                    targets: 12,
                     orderable: false,
                     render: function (data, type, row) {
                         if (data) {
@@ -99,7 +98,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 14,
+                    targets: 13,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -748,35 +747,14 @@ var KTDatatablesServerSide = function () {
         }
 
         document.getElementById("modal_sequencinglib_options").addEventListener('show.bs.modal', function(e){
-          console.log(">>>>>>>>>>>>>>");
-          if (!checkIdenticalBarcode()) {
 
-            Swal.fire({
-                text: "Identical barcodes are used in selected rows.",
-                icon: "error",
-                buttonsStyling: false,
-                confirmButtonText: "Ok, got it!",
-                customClass: {
-                    confirmButton: "btn fw-bold btn-primary",
-                }
-            }).then(function () {
+          initStepper();
 
-              modal.hide();
+          if (!isInit) {
 
-            });
+            isInit = true;
 
-          }
-          else {
-
-            initStepper();
-
-            if (!isInit) {
-
-              isInit = true;
-
-              initEvents();
-            }
-
+            initEvents();
           }
 
         });
@@ -971,32 +949,6 @@ var KTDatatablesServerSide = function () {
         var options = Object.fromEntries(data.entries());
 
         return JSON.stringify(options);
-      }
-
-      function checkIdenticalBarcode() {
-
-        // var selectedRows = container.querySelectorAll('[type="checkbox"]:checked');
-        //
-        // var barcodeList = [];
-        //
-        // for (var i = 0; i < selectedRows.length; i++) {
-        //
-        //   const parent = selectedRows[i].closest('tr');
-        //   // Get barcode
-        //   const barcode = parent.querySelectorAll('td')[13].innerText;
-        //   console.log("barcode:" + barcode);
-        //
-        //   if (barcodeList.indexOf(barcode) > -1 ) {
-        //
-        //     return false;
-        //
-        //   }
-        //
-        //   barcodeList.push(barcode);
-        // }
-
-        return true;
-
       }
 
       function handleBatchDelete() {
