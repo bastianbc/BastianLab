@@ -769,7 +769,7 @@ var KTDatatablesServerSide = function () {
           else {
 
             initStepper();
-            
+
             if (!isInit) {
 
               isInit = true;
@@ -975,25 +975,25 @@ var KTDatatablesServerSide = function () {
 
       function checkIdenticalBarcode() {
 
-        var selectedRows = container.querySelectorAll('[type="checkbox"]:checked');
-
-        var barcodeList = [];
-
-        for (var i = 0; i < selectedRows.length; i++) {
-
-          const parent = selectedRows[i].closest('tr');
-          // Get barcode
-          const barcode = parent.querySelectorAll('td')[13].innerText;
-          console.log("barcode:" + barcode);
-
-          if (barcodeList.indexOf(barcode) > -1 ) {
-
-            return false;
-
-          }
-
-          barcodeList.push(barcode);
-        }
+        // var selectedRows = container.querySelectorAll('[type="checkbox"]:checked');
+        //
+        // var barcodeList = [];
+        //
+        // for (var i = 0; i < selectedRows.length; i++) {
+        //
+        //   const parent = selectedRows[i].closest('tr');
+        //   // Get barcode
+        //   const barcode = parent.querySelectorAll('td')[13].innerText;
+        //   console.log("barcode:" + barcode);
+        //
+        //   if (barcodeList.indexOf(barcode) > -1 ) {
+        //
+        //     return false;
+        //
+        //   }
+        //
+        //   barcodeList.push(barcode);
+        // }
 
         return true;
 
