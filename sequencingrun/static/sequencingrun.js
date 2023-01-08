@@ -57,7 +57,7 @@ var KTDatatablesServerSide = function () {
                     render: function (data) {
                         return `
                             <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                <input class="form-check-input" type="checkbox" value="${data['id']}" />
+                                <input class="form-check-input" type="checkbox" value="${data}" />
                             </div>`;
                     }
                 },
@@ -584,8 +584,7 @@ var KTDatatablesServerSide = function () {
         for (var i = 0; i < data.length; i++) {
 
           var row = `<div class="row mb-1 detail-row">
-              <div class="col-3 align-self-center" data-id="${ data[i].sequencing_lib }">${ data[i].name }</div>
-              <div class="col-3 align-self-center">${ data[i].date }</div>
+              <div class="col-6 align-self-center" data-id="${ data[i].sequencing_lib }">${ data[i].name }</div>
               <div class="col-3 align-self-center">${ data[i].buffer }</div>
               <div class="col-3 align-self-center text-center">${ data[i].nmol }</div>
             </div>`;

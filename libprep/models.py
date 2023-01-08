@@ -82,8 +82,8 @@ class NucAcids(models.Model):
 
             if date_range:
                 arr = date_range.split(" to ")
-                start_date = datetime.strptime(arr[0],'%m/%d/%Y').date()
-                end_date = datetime.strptime(arr[1],'%m/%d/%Y').date()
+                start_date = datetime.strptime(arr[0],'%Y-%m-%d').date()
+                end_date = datetime.strptime(arr[1],'%Y-%m-%d').date()
                 queryset = queryset.filter(
                     Q(date__gte=start_date) & Q(date__lte=end_date)
                 )

@@ -30,7 +30,7 @@ class Patients(models.Model):
     sex = models.CharField(max_length=1, choices=SEX_TYPES, blank=True, null=True, verbose_name="Sex")
     # age = models.FloatField(blank=True, null=True)
     dob = models.IntegerField(blank=True, null=True, verbose_name="Birthyear")
-    race = models.SmallIntegerField(choices=RACE_TYPES, default=1)
+    race = models.SmallIntegerField(choices=RACE_TYPES, default=1, blank=True, null=True)
     # race = models.CharField(max_length=200,blank=True, null=True, verbose_name="Race")
     source = models.CharField(max_length=20, blank=True, null=True, verbose_name="Source")
     blocks_temp = models.CharField(max_length=100, blank=True, null=True, verbose_name="Blocks")

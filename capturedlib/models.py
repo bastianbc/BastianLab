@@ -50,7 +50,7 @@ class CapturedLib(models.Model):
     def query_by_args(self, user, **kwargs):
 
         def _get_authorizated_queryset():
-            queryset = CapturedLib.objects.all()
+            queryset = CapturedLib.objects.all().annotate(num_samplelibs=Count('sl_links'))
             if not user.is_superuser:
                 return queryset.filter(Q(area__block__project__technician=user) | Q(area__block__project__researcher=user))
             return queryset

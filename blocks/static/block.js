@@ -226,13 +226,12 @@ var KTDatatablesServerSide = function () {
                             $.ajax({
                                 url: parent.querySelector('[data-kt-docs-table-filter="delete_row"]').href,
                                 type: "DELETE",
+                                async:false,
                                 headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
-                                success: function () {
-                                    swal("Done!", "It was succesfully deleted!", "success");
-                                    dt.draw();
-                                },
                                 error: function (xhr, ajaxOptions, thrownError) {
-                                    swal("Error deleting!", "Please try again", "error");
+                                    if (xhr.status == 403) {
+                                      // swal("Error deleting!", "Please try again", "error");
+                                    }
                                 }
                             });
                         });
@@ -629,7 +628,8 @@ var KTDatatablesServerSide = function () {
           url: "/blocks/edit_block_async",
           type: "POST",
           headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
-          success: function () {
+          success: function (data) {
+
             if ( !data.success ) {
 
               Swal.fire({
@@ -651,21 +651,49 @@ var KTDatatablesServerSide = function () {
           }
         },
         table: ".table",
-        fields: [ {
-               label: "Name:",
-               name: "name"
-           },{
-               label: "Diagnosis:",
-               name: "diagnosis"
-           },{
-               label: "Body Site:",
-               name: "body_site",
-               type: "select",
-               options: bodyOptions
-           },{
-               label: "Thickness:",
-               name: "thickness"
-           }
+        fields: [
+          {
+            label: "Name:",
+            name: "name"
+          },
+          {
+            label: "Project:",
+            name: "project",
+            type: "readonly",
+            attr: {
+              disabled:true
+            }
+          },
+          {
+            label: "Patient:",
+            name: "patient",
+            type: "readonly",
+            attr: {
+              disabled:true
+            }
+          },
+          {
+            label: "Diagnosis:",
+            name: "diagnosis"
+          },
+          {
+            label: "Body Site:",
+            name: "body_site",
+            type: "select",
+            options: bodyOptions
+          },
+          {
+            label: "Thickness:",
+            name: "thickness"
+          },
+          {
+            label: "Date Added:",
+            name: "date_added",
+            type: "readonly",
+            attr: {
+              disabled:true
+            }
+          }
        ],
        formOptions: {
           inline: {

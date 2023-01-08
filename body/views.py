@@ -61,7 +61,7 @@ def filter_bodys(request):
 
     return JsonResponse(result)
 
-@permission_required("body.view_body",raise_exception=True)
+@login_required
 def get_bodies(request):
     serializer = BodySerializer(Body.objects.all(), many=True)
     return JsonResponse(serializer.data,safe=False)

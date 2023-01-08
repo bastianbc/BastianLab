@@ -187,14 +187,25 @@ def update_async(request,id):
     return JsonResponse({"success":True})
 
 def check_idendical_barcode(request):
+    from collections import Counter
     selected_ids = json.loads(request.GET.get("selected_ids"))
 
     barcode_list = []
+    clasheds = []
+    is_success = True
 
-    for cl in CapturedLib.objects.filter(id__in=selected_ids):
-        for link in cl.sl_links.all():
-            if link.sample_lib.barcode.name in barcode_list:
-                return JsonResponse({"result":False})
-            barcode_list.append(link.sample_lib.barcode.name)
+    links = SL_CL_LINK.objects.filter(captured_lib__in=selected_ids).values_list("sample_lib__barcode__name","captured_lib__name")
 
-    return JsonResponse({"result":True})
+    for i in range(len(links)):
+        for j in range(i+1,len(links)):
+            if links[i][0] == links[j][0]:
+                is_success = False
+                if not links[i][1] in clasheds:
+                    clasheds.append(links[i][1])
+                if not links[j][1] in clasheds:
+                    clasheds.append(links[j][1])
+
+    return JsonResponse({
+        "clasheds":clasheds,
+        "success": is_success
+    })

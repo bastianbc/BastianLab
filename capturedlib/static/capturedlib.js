@@ -58,6 +58,7 @@ var KTDatatablesServerSide = function () {
                 { data: 'vol_remain' },
                 { data: 'amount' },
                 { data: 'pdf' },
+                { data: 'num_samplelibs' },
             ],
             columnDefs: [
                 {
@@ -73,12 +74,6 @@ var KTDatatablesServerSide = function () {
                 {
                     targets: 11,
                     orderable: false,
-                    render: function (data, type, row) {
-                        if (data > 0) {
-                          return `<a href="javascript:;" class="detail-link">${data}</a>`;
-                        }
-                        return data;
-                    }
                 },
                 {
                     targets: 12,
@@ -99,6 +94,16 @@ var KTDatatablesServerSide = function () {
                 },
                 {
                     targets: 13,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        if (data > 0) {
+                          return `<a href="javascript:;" class="detail-link">${data}</a>`;
+                        }
+                        return data;
+                    }
+                },
+                {
+                    targets: 14,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -587,8 +592,8 @@ var KTDatatablesServerSide = function () {
         for (var i = 0; i < data.length; i++) {
 
           var row = `<div class="row mb-1">
-              <div class="col-2 align-self-center" data-id="${ data[i].id }">${ data[i].name }</div>
-              <div class="col-2 align-self-center">${ data[i].conc }</div>
+              <div class="col-3 align-self-center" data-id="${ data[i].id }">${ data[i].name }</div>
+              <div class="col-1 align-self-center text-center">${ data[i].conc }</div>
               <div class="col-2 align-self-center text-center">${ data[i].vol_remain }</div>
               <div class="col-2 align-self-center text-center">${ data[i].barcode }</div>
               <div class="col-2 text-center"><input type="number" class="textinput textInput form-control form-control-sm text-end detail-amount" value="${ data[i].amount }"></div>
@@ -748,7 +753,7 @@ var KTDatatablesServerSide = function () {
 
         function checkIdenticalBarcode() {
 
-          var result = false;
+          var result = {};
 
           $.ajax({
             type: "GET",
@@ -762,7 +767,7 @@ var KTDatatablesServerSide = function () {
             }
           }).done(function(data) {
 
-            result = data.result;
+            result = data;
 
           });
 
@@ -772,10 +777,12 @@ var KTDatatablesServerSide = function () {
 
         document.getElementById("modal_sequencinglib_options").addEventListener('show.bs.modal', function(e){
 
-          if (!checkIdenticalBarcode()) {
+          var result = checkIdenticalBarcode();
+
+          if (!result.success) {
 
             Swal.fire({
-                text: "Identical barcodes are used in selected rows.",
+                text: "Identical barcodes are used in selected rows. Clashing CLs are " + result.clasheds.toString(),
                 icon: "error",
                 buttonsStyling: false,
                 confirmButtonText: "Ok, got it!",

@@ -8,6 +8,7 @@ from lab.models import Patients
 from projects.models import Projects
 from .serializers import BlocksSerializer
 from django.contrib.auth.decorators import login_required,permission_required
+from core.decorators import permission_required_for_async
 
 @login_required
 def filter_blocks(request):
@@ -137,22 +138,27 @@ def edit_block_async(request):
     except Exception as e:
         return JsonResponse({"success":False, "message": str(e)})
 
-    return JsonResponse({"result":True})
+    return JsonResponse({"success":True})
 
-@permission_required("blocks.delete_blocks",raise_exception=True)
+# @permission_required("blocks.delete_blocks",raise_exception=True)
+# @permission_required_for_async("blocks.delete_blocks")
 def delete_block(request,id):
     try:
         block = Blocks.objects.get(bl_id=id)
-        block.delete()
-        messages.success(request,"Block %s was deleted successfully." % block.name)
-        deleted = True
+        for field in block._meta.related_objects:
+            objects = getattr(block,field.related_name)
+            print("%s: %d" % (field.related_model.__name__,objects.count()))
+
+        # block.delete()
+        # messages.success(request,"Block %s was deleted successfully." % block.name)
+        # deleted = True
     except Exception as e:
         messages.error(request, "Block %s wasn't deleted!" % block.pat_id)
         deleted = False
 
     return JsonResponse({ "deleted":True })
 
-@permission_required("blocks.delete_samplelib",raise_exception=True)
+@permission_required("blocks.delete_blocks",raise_exception=True)
 def delete_batch_blocks(request):
     try:
         selected_ids = json.loads(request.GET.get("selected_ids"))
@@ -162,3 +168,8 @@ def delete_batch_blocks(request):
         return JsonResponse({ "deleted":False })
 
     return JsonResponse({ "deleted":True })
+
+@permission_required_for_async("blocks.delete_blocks")
+def can_deleted(request):
+    block = Blocks.objects.get(bl_id=id)
+    import pdb; pdb.set_trace()

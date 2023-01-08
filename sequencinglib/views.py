@@ -8,6 +8,7 @@ from .forms import *
 from django.contrib import messages
 from capturedlib.models import *
 from sequencingrun.forms import *
+from datetime import datetime
 
 @permission_required("sequencinglib.view_sequencinglib",raise_exception=True)
 def sequencinglibs(request):
@@ -226,7 +227,7 @@ def create_ilab_sheet(request):
     for seq_link in CL_SEQL_LINK.objects.all():
         report = Report()
         report.name = seq_link.sequencing_lib.name
-        report.date = seq_link.sequencing_lib.date
+        report.date = datetime.strftime(seq_link.sequencing_lib.date,"%m/%d/%Y")
         report.nmol = seq_link.sequencing_lib.nmol
         report.buffer = seq_link.sequencing_lib.get_buffer_display()
         for sl_link in seq_link.captured_lib.sl_links.all():
