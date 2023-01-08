@@ -141,7 +141,6 @@ class Blocks(models.Model):
                 queryset = queryset.filter(
                         Q(name__icontains=search_value) |
                         Q(diagnosis__icontains=search_value) |
-                        Q(body_site__icontains=search_value) |
                         Q(gross__icontains=search_value)
                     )
 

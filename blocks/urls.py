@@ -13,4 +13,5 @@ urlpatterns = [
     path("edit_block_async", views.edit_block_async, name="edit-block-async"),
     path('delete/<str:id>', views.delete_block, name='delete-block'),
     path('batch_delete', views.delete_batch_blocks, name='delete-batch-blocks'),
+    path('check_can_deleted_async', views.check_can_deleted_async, name='checkcan-deleted-async'),
 ] + staticfiles_urlpatterns()

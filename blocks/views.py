@@ -140,23 +140,18 @@ def edit_block_async(request):
 
     return JsonResponse({"success":True})
 
-# @permission_required("blocks.delete_blocks",raise_exception=True)
-# @permission_required_for_async("blocks.delete_blocks")
+@permission_required_for_async("blocks.delete_blocks")
 def delete_block(request,id):
     try:
         block = Blocks.objects.get(bl_id=id)
-        for field in block._meta.related_objects:
-            objects = getattr(block,field.related_name)
-            print("%s: %d" % (field.related_model.__name__,objects.count()))
-
-        # block.delete()
-        # messages.success(request,"Block %s was deleted successfully." % block.name)
-        # deleted = True
+        block.delete()
+        messages.success(request,"Block %s was deleted successfully." % block.name)
+        deleted = True
     except Exception as e:
         messages.error(request, "Block %s wasn't deleted!" % block.pat_id)
         deleted = False
 
-    return JsonResponse({ "deleted":True })
+    return JsonResponse({ "deleted":deleted })
 
 @permission_required("blocks.delete_blocks",raise_exception=True)
 def delete_batch_blocks(request):
@@ -170,6 +165,17 @@ def delete_batch_blocks(request):
     return JsonResponse({ "deleted":True })
 
 @permission_required_for_async("blocks.delete_blocks")
-def can_deleted(request):
+def check_can_deleted_async(request):
+    id = request.GET.get("id")
+    print("====>")
+    print("id:",id)
     block = Blocks.objects.get(bl_id=id)
-    import pdb; pdb.set_trace()
+    related_objects = []
+    for field in block._meta.related_objects:
+        relations = getattr(block,field.related_name)
+        related_objects.append({
+            "model": field.related_model.__name__,
+            "count": relations.count()
+        })
+
+    return JsonResponse({"related_objects":related_objects})

@@ -1,12 +1,12 @@
 from django.http import HttpResponseForbidden
 from functools import wraps
 
-def permission_required_for_async(perm):
-    def decorator(func):
-        @wraps(func)
+def permission_required_for_async(permission):
+    def decorator(function):
+        @wraps(function)
         def wrapper(request, *args, **kwargs):
-            print("perm:",perm)
-            if request.user.has_perm(perm):
+            print("perm:",permission)
+            if request.user.has_perm(permission):
                 return function(request, *args, **kwargs)
             else:
                 return HttpResponseForbidden()
