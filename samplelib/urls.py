@@ -17,4 +17,5 @@ urlpatterns = [
     path('<int:id>/used_nucacids', views.get_used_nucacids, name='get-used-nucacids'),
     path('update_async', views.update_sl_na_link_async, name="update-async"),
     path('print_as_csv', views.print_as_csv, name="print_as_csv"),
+    path('check_can_deleted_async', views.check_can_deleted_async, name='checkcan-deleted-async'),
 ] + staticfiles_urlpatterns()

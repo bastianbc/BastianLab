@@ -15,4 +15,5 @@ urlpatterns = [
     path('delete/<str:id>', views.delete_nucacid, name='delete-nucacid'),
     path('batch_delete', views.delete_batch_nucacids, name='delete-batch-nucacids'),
     path("get_na_types", views.get_na_types, name="get-na-types"),
+    path('check_can_deleted_async', views.check_can_deleted_async, name='check-can-deleted-async'),
 ] + staticfiles_urlpatterns()

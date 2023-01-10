@@ -8,6 +8,7 @@ from sequencinglib.models import *
 from .forms import *
 from django.contrib import messages
 from capturedlib.models import *
+from core.decorators import *
 
 @permission_required("sequencingrun.view_sequencingrun",raise_exception=True)
 def sequencingruns(request):
@@ -142,3 +143,18 @@ def get_used_sequencinglibs(request,id):
     used_sequencinglibs = sequencing_run.sequencing_libs.all()
     serializer = UsedSequencingLibSerializer(used_sequencinglibs, many=True)
     return JsonResponse(serializer.data, safe=False)
+
+@permission_required_for_async("blocks.delete_blocks")
+def check_can_deleted_async(request):
+    id = request.GET.get("id")
+    instance = SequencingRun.objects.get(id=id)
+    related_objects = []
+    for field in instance._meta.related_objects:
+        relations = getattr(instance,field.related_name)
+        if relations.count() > 0:
+            related_objects.append({
+                "model": field.related_model.__name__,
+                "count": relations.count()
+            })
+
+    return JsonResponse({"related_objects":related_objects})

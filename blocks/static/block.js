@@ -197,8 +197,7 @@ var KTDatatablesServerSide = function () {
                 // Select parent row
                 const parent = e.target.closest('tr');
 
-                // Get customer name
-                const blockName = parent.querySelectorAll('td')[1].innerText;
+                const name = parent.querySelectorAll('td')[1].innerText;
                 const id = parent.querySelectorAll('td')[0].querySelector(".form-check-input").value;
 
                 $.ajax({
@@ -225,11 +224,11 @@ var KTDatatablesServerSide = function () {
                     }
                 }).done(function (data) {
 
-                  var message = "Are you sure you want to delete " + blockName + "?";
+                  var message = "Are you sure you want to delete " + name + "?";
 
                   if (data.related_objects.length > 0) {
 
-                    message += "It has downstream records:";
+                    message += " It has downstream records:";
 
                     for (var item of data.related_objects) {
 
@@ -254,7 +253,7 @@ var KTDatatablesServerSide = function () {
                       if (result.value) {
                           // Simulate delete request -- for demo purpose only
                           Swal.fire({
-                              text: "Deleting " + blockName,
+                              text: "Deleting " + name,
                               icon: "info",
                               buttonsStyling: false,
                               showConfirmButton: false,
@@ -267,7 +266,7 @@ var KTDatatablesServerSide = function () {
                                 headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
                                 error: function (xhr, ajaxOptions, thrownError) {
                                   Swal.fire({
-                                      text: customerName + " was not deleted.",
+                                      text: name + " was not deleted.",
                                       icon: "error",
                                       buttonsStyling: false,
                                       confirmButtonText: "Ok, got it!",
@@ -300,7 +299,7 @@ var KTDatatablesServerSide = function () {
 
                 });
 
-            })
+            });
         });
     }
 

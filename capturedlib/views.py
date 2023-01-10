@@ -8,6 +8,7 @@ from samplelib.models import SampleLib, Barcode
 from bait.models import Bait
 from .forms import *
 from django.contrib import messages
+from core.decorators import *
 
 @permission_required("capturedlib.view_capturedlib",raise_exception=True)
 def capturedlibs(request):
@@ -209,3 +210,18 @@ def check_idendical_barcode(request):
         "clasheds":clasheds,
         "success": is_success
     })
+
+@permission_required_for_async("blocks.delete_blocks")
+def check_can_deleted_async(request):
+    id = request.GET.get("id")
+    instance = CapturedLib.objects.get(id=id)
+    related_objects = []
+    for field in instance._meta.related_objects:
+        relations = getattr(instance,field.related_name)
+        if relations.count() > 0:
+            related_objects.append({
+                "model": field.related_model.__name__,
+                "count": relations.count()
+            })
+
+    return JsonResponse({"related_objects":related_objects})

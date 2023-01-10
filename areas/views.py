@@ -6,6 +6,7 @@ import json
 from django.contrib import messages
 from blocks.models import *
 from django.contrib.auth.decorators import login_required,permission_required
+from core.decorators import *
 
 @login_required
 def filter_areas(request):
@@ -130,3 +131,18 @@ def get_collections(request):
 
 def get_area_types(request):
     return JsonResponse(Areas.get_area_types(), safe=False)
+
+@permission_required_for_async("blocks.delete_blocks")
+def check_can_deleted_async(request):
+    id = request.GET.get("id")
+    instance = Areas.objects.get(ar_id=id)
+    related_objects = []
+    for field in instance._meta.related_objects:
+        relations = getattr(instance,field.related_name)
+        if relations.count() > 0:
+            related_objects.append({
+                "model": field.related_model.__name__,
+                "count": relations.count()
+            })
+
+    return JsonResponse({"related_objects":related_objects})

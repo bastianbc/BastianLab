@@ -191,52 +191,76 @@ var KTDatatablesServerSide = function () {
                 // Select parent row
                 const parent = e.target.closest('tr');
 
-                // Get customer name
-                const customerName = parent.querySelectorAll('td')[1].innerText;
+                const name = parent.querySelectorAll('td')[1].innerText;
+                const id = parent.querySelectorAll('td')[0].querySelector(".form-check-input").value;
 
-                // SweetAlert2 pop up --- official docs reference: https://sweetalert2.github.io/
-                Swal.fire({
-                    text: "Are you sure you want to delete " + customerName + "?",
-                    icon: "warning",
-                    showCancelButton: true,
-                    buttonsStyling: false,
-                    confirmButtonText: "Yes, delete!",
-                    cancelButtonText: "No, cancel",
-                    customClass: {
-                        confirmButton: "btn fw-bold btn-danger",
-                        cancelButton: "btn fw-bold btn-active-light-primary"
+                $.ajax({
+                    url: "/sequencinglib/check_can_deleted_async",
+                    type: "GET",
+                    data: {
+                      "id": id,
+                    },
+                    async:false,
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        if (xhr.status == 403) {
+
+                          Swal.fire({
+                              text: "You do not have permission to delete.",
+                              icon: "error",
+                              buttonsStyling: false,
+                              confirmButtonText: "Ok, got it!",
+                              customClass: {
+                                  confirmButton: "btn fw-bold btn-primary",
+                              }
+                          });
+
+                        }
                     }
-                }).then(function (result) {
-                    if (result.value) {
-                        // Simulate delete request -- for demo purpose only
-                        Swal.fire({
-                            text: "Deleting " + customerName,
-                            icon: "info",
-                            buttonsStyling: false,
-                            showConfirmButton: false,
-                            timer: 2000
-                        }).then(function () {
-                            // Calling delete request with ajax
+                }).done(function (data) {
+
+                  var message = "Are you sure you want to delete " + name + "?";
+
+                  if (data.related_objects.length > 0) {
+
+                    message += " It has downstream records:";
+
+                    for (var item of data.related_objects) {
+
+                      message += item.model + "(" + item.count + ")"
+
+                    }
+
+                  }
+
+                  Swal.fire({
+                      text: message,
+                      icon: "warning",
+                      showCancelButton: true,
+                      buttonsStyling: false,
+                      confirmButtonText: "Yes, delete!",
+                      cancelButtonText: "No, cancel",
+                      customClass: {
+                          confirmButton: "btn fw-bold btn-danger",
+                          cancelButton: "btn fw-bold btn-active-light-primary"
+                      }
+                  }).then(function (result) {
+                      if (result.value) {
+                          // Simulate delete request -- for demo purpose only
+                          Swal.fire({
+                              text: "Deleting " + name,
+                              icon: "info",
+                              buttonsStyling: false,
+                              showConfirmButton: false,
+                              timer: 1000
+                          }).then(function () {
+
                             $.ajax({
                                 url: parent.querySelector('[data-kt-docs-table-filter="delete_row"]').href,
                                 type: "DELETE",
                                 headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
-                                success: function () {
-                                  Swal.fire({
-                                        text: "Sequencing Library(s) was deleted succesfully.",
-                                        icon: "info",
-                                        buttonsStyling: false,
-                                        confirmButtonText: "Ok, got it!",
-                                        customClass: {
-                                            confirmButton: "btn fw-bold btn-success",
-                                        }
-                                    }).then(function(){
-                                      dt.draw();
-                                    });
-                                },
                                 error: function (xhr, ajaxOptions, thrownError) {
                                   Swal.fire({
-                                      text: customerName + " was not deleted.",
+                                      text: name + " was not deleted.",
                                       icon: "error",
                                       buttonsStyling: false,
                                       confirmButtonText: "Ok, got it!",
@@ -245,20 +269,30 @@ var KTDatatablesServerSide = function () {
                                       }
                                   });
                                 }
+                            }).done(function () {
+
+                              Swal.fire({
+                                    text: "Sequencing Library was deleted succesfully.",
+                                    icon: "info",
+                                    buttonsStyling: false,
+                                    confirmButtonText: "Ok, got it!",
+                                    customClass: {
+                                        confirmButton: "btn fw-bold btn-success",
+                                    }
+                                }).then(function(){
+
+                                  dt.draw();
+
+                                });
+
                             });
-                        });
-                    } else if (result.dismiss === 'cancel') {
-                        Swal.fire({
-                            text: customerName + " was not deleted.",
-                            icon: "error",
-                            buttonsStyling: false,
-                            confirmButtonText: "Ok, got it!",
-                            customClass: {
-                                confirmButton: "btn fw-bold btn-primary",
-                            }
-                        });
-                    }
+
+                          });
+                      }
+                  });
+
                 });
+
             })
         });
     }

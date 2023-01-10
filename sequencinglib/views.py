@@ -9,6 +9,7 @@ from django.contrib import messages
 from capturedlib.models import *
 from sequencingrun.forms import *
 from datetime import datetime
+from core.decorators import *
 
 @permission_required("sequencinglib.view_sequencinglib",raise_exception=True)
 def sequencinglibs(request):
@@ -248,3 +249,18 @@ def create_ilab_sheet(request):
         writer.writerow([getattr(item, field) for field in field_names])
 
     return response
+
+@permission_required_for_async("blocks.delete_blocks")
+def check_can_deleted_async(request):
+    id = request.GET.get("id")
+    instance = SequencingLib.objects.get(id=id)
+    related_objects = []
+    for field in instance._meta.related_objects:
+        relations = getattr(instance,field.related_name)
+        if relations.count() > 0:
+            related_objects.append({
+                "model": field.related_model.__name__,
+                "count": relations.count()
+            })
+
+    return JsonResponse({"related_objects":related_objects})

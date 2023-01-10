@@ -5,7 +5,6 @@ def permission_required_for_async(permission):
     def decorator(function):
         @wraps(function)
         def wrapper(request, *args, **kwargs):
-            print("perm:",permission)
             if request.user.has_perm(permission):
                 return function(request, *args, **kwargs)
             else:

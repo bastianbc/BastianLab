@@ -12,5 +12,6 @@ urlpatterns = [
     path('delete/<str:id>', views.delete_area, name='delete-area'),
     path('batch_delete', views.delete_batch_areas, name='delete-batch-areas'),
     path("get_collections", views.get_collections, name='get-collections'),
-    path("get_area_types", views.get_area_types, name='get-area-types')
+    path("get_area_types", views.get_area_types, name='get-area-types'),
+    path('check_can_deleted_async', views.check_can_deleted_async, name='check-can-deleted-async'),
 ] + staticfiles_urlpatterns()

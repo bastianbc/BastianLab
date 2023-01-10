@@ -167,15 +167,14 @@ def delete_batch_blocks(request):
 @permission_required_for_async("blocks.delete_blocks")
 def check_can_deleted_async(request):
     id = request.GET.get("id")
-    print("====>")
-    print("id:",id)
-    block = Blocks.objects.get(bl_id=id)
+    instance = Blocks.objects.get(bl_id=id)
     related_objects = []
-    for field in block._meta.related_objects:
-        relations = getattr(block,field.related_name)
-        related_objects.append({
-            "model": field.related_model.__name__,
-            "count": relations.count()
-        })
-
+    for field in instance._meta.related_objects:
+        relations = getattr(instance,field.related_name)
+        if relations.count() > 0:
+            related_objects.append({
+                "model": field.related_model.__name__,
+                "count": relations.count()
+            })
+            
     return JsonResponse({"related_objects":related_objects})

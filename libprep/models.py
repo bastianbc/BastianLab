@@ -13,7 +13,7 @@ class NucAcids(models.Model):
     ]
 
     nu_id = models.AutoField(primary_key=True, verbose_name="NA ID")
-    area = models.ForeignKey("areas.Areas", on_delete=models.SET_NULL, db_column="area", blank=True, null=True, related_name="nucacids", verbose_name="Area")
+    area = models.ForeignKey("areas.Areas", on_delete=models.CASCADE, db_column="area", blank=True, null=True, related_name="nucacids", verbose_name="Area")
     name = models.CharField(max_length=50, unique=True, verbose_name="Name")
     date = models.DateTimeField(default=datetime.now, verbose_name="Extraction Date")
     method = models.ForeignKey("method.Method",related_name="nuc_acids",on_delete=models.CASCADE, verbose_name="Method")
