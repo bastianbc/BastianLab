@@ -1,11 +1,14 @@
 from django import forms
 from .models import *
-from areas.models import Areas
+from body.models import Body
 
 class BlockForm(forms.ModelForm):
+    # mock_body_site = forms.ModelChoiceField(queryset = Body.objects.filter(parent=None), label="Body Site", required=False)
+
     class Meta:
         model = Blocks
         fields = "__all__"
+        widgets = {"body_site": forms.HiddenInput()}
 
     def __init__(self, *args, **kwargs):
         super(BlockForm, self).__init__(*args, **kwargs)

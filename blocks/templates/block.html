@@ -12,8 +12,56 @@
     <div class="card-body">
       {% csrf_token %}
       <div class="row">
-        <div class="col-8">
-          {{ form|crispy }}
+        <div class="col-12">
+          <div class="row">
+            <div class="col-8"> {{form.name|as_crispy_field}}</div>
+          </div>
+          <div class="row">
+            <div class="col-8"> {{form.project|as_crispy_field}}</div>
+          </div>
+          <div class="row">
+            <div class="col-8"> {{form.patient|as_crispy_field}}</div>
+          </div>
+          <div class="row">
+            <div class="col-8"> {{form.age|as_crispy_field}}</div>
+          </div>
+          <div class="row body-site-row">
+            {{ form.body_site }}
+            <label for="">Body Site</label>
+          </div>
+          <div class="row">
+            <div class="col-8"> {{form.ulceration|as_crispy_field}}</div>
+          </div>
+          <div class="row">
+            <div class="col-8"> {{form.thickness|as_crispy_field}}</div>
+          </div>
+          <div class="row">
+            <div class="col-8"> {{form.mitoses|as_crispy_field}}</div>
+          </div>
+          <div class="row">
+            <div class="col-8"> {{form.p_stage|as_crispy_field}}</div>
+          </div>
+          <div class="row">
+            <div class="col-8"> {{form.prim|as_crispy_field}}</div>
+          </div>
+          <div class="row">
+            <div class="col-8"> {{form.subtype|as_crispy_field}}</div>
+          </div>
+          <div class="row">
+            <div class="col-8"> {{form.slides|as_crispy_field}}</div>
+          </div>
+          <div class="row">
+            <div class="col-8"> {{form.slides_left|as_crispy_field}}</div>
+          </div>
+          <div class="row">
+            <div class="col-8"> {{form.fixation|as_crispy_field}}</div>
+          </div>
+          <div class="row">
+            <div class="col-8"> {{form.storage|as_crispy_field}}</div>
+          </div>
+          <div class="row">
+            <div class="col-8"> {{form.scan_number|as_crispy_field}}</div>
+          </div>
         </div>
       </div>
     </div>
@@ -23,4 +71,8 @@
     </div>
   </div>
 </form>
+{% endblock %}
+
+{% block scripts %}
+<script src="static/body_site.init.js" charset="utf-8"></script>
 {% endblock %}

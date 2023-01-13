@@ -19,7 +19,7 @@ def samplelibs(request):
     form = CapturedLibCreationOptionsForm()
     return render(request, "samplelib_list.html", locals())
 
-@login_required
+@permission_required_for_async("samplelib.view_samplelib")
 def filter_samplelibs(request):
     samplelibs = SampleLib().query_by_args(request.user,**request.GET)
     serializer = SampleLibSerializer(samplelibs['items'], many=True)
@@ -31,7 +31,7 @@ def filter_samplelibs(request):
 
     return JsonResponse(result)
 
-@permission_required("samplelib.change_samplelib",raise_exception=True)
+@permission_required_for_async("samplelib.change_samplelib")
 def edit_samplelib_async(request):
     import re
     from core.utils import custom_update
@@ -66,7 +66,7 @@ def new_samplelib(request):
 
     return render(request,"samplelib.html",locals())
 
-@permission_required("samplelib.add_samplelib",raise_exception=True)
+@permission_required_for_async("samplelib.add_samplelib")
 def new_samplelib_async(request):
     from itertools import groupby
 
@@ -204,7 +204,7 @@ def get_used_nucacids(request,id):
     serializer = UsedNuacidsSerializer(used_nucacids, many=True)
     return JsonResponse(serializer.data, safe=False)
 
-@permission_required("samplelib.change_samplelib",raise_exception=True)
+@permission_required_for_async("samplelib.change_samplelib")
 def update_sl_na_link_async(request):
     try:
         values = json.loads(request.GET.get("values"))

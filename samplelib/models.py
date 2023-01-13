@@ -53,11 +53,7 @@ class SampleLib(models.Model):
     def query_by_args(self, user, **kwargs):
 
         def _get_authorizated_queryset():
-            # queryset = SampleLib.objects.all()
             queryset = SampleLib.objects.all().annotate(num_nucacids=Count('nucacids'))
-            if not user.is_superuser:
-                return queryset.filter(Q(area__block__project__technician=user) | Q(area__block__project__researcher=user))
-            return queryset
 
         def _parse_value(search_value):
             if "_initial:" in search_value:

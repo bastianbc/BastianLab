@@ -14,11 +14,15 @@ from django.contrib.auth.models import User
 from django.db.models import Q, Count
 
 class Patients(models.Model):
+
     RACE_TYPES = (
-        (1, "White"),
-        (2, "American Indian or Alaska Native"),
+        (1, "American Indian or Alaska Native"),
+        (2, "Asian"),
         (3, "Black or African American"),
         (4, "Native Hawaiian or Other Pacific Islander"),
+        (5, "White"),
+        (6, "Hispanic/Latino/Spanish Origin (of any race)"),
+        (7, "N/A"),
     )
 
     SEX_TYPES = (

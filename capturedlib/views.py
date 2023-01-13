@@ -8,14 +8,14 @@ from samplelib.models import SampleLib, Barcode
 from bait.models import Bait
 from .forms import *
 from django.contrib import messages
-from core.decorators import *
+from core.decorators import permission_required_for_async
 
 @permission_required("capturedlib.view_capturedlib",raise_exception=True)
 def capturedlibs(request):
     form = SequencingLibCreationForm()
     return render(request, "capturedlib_list.html", locals())
 
-@login_required
+@permission_required_for_async("capturedlib.view_capturedlib")
 def filter_capturedlibs(request):
     capturedlibs = CapturedLib().query_by_args(request.user,**request.GET)
     serializer = CapturedLibSerializer(capturedlibs['items'], many=True)
@@ -27,7 +27,7 @@ def filter_capturedlibs(request):
 
     return JsonResponse(result)
 
-@permission_required("capturedlib.change_capturedlib",raise_exception=True)
+@permission_required_for_async("capturedlib.change_capturedlib")
 def edit_capturedlib_async(request):
     import re
     from core.utils import custom_update
@@ -68,7 +68,7 @@ def new_capturedlib(request):
 
     return render(request,"capturedlib.html",locals())
 
-@permission_required("capturedlib.add_capturedlib",raise_exception=True)
+@permission_required_for_async("capturedlib.add_capturedlib")
 def new_capturedlib_async(request):
 
     selected_ids = json.loads(request.GET.get("selected_ids"))
@@ -150,7 +150,7 @@ def get_used_samplelibs(request,id):
     serializer = UsedSampleLibSerializer(used_samplelibs, many=True)
     return JsonResponse(serializer.data, safe=False)
 
-@permission_required("capturedlib.change_capturedlib",raise_exception=True)
+@permission_required_for_async("capturedlib.change_capturedlib")
 def update_async(request,id):
     import math
 
@@ -187,6 +187,7 @@ def update_async(request,id):
 
     return JsonResponse({"success":True})
 
+@permission_required_for_async("samplelib.view_samplelib")
 def check_idendical_barcode(request):
     from collections import Counter
     selected_ids = json.loads(request.GET.get("selected_ids"))

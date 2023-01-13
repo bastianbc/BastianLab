@@ -6,16 +6,15 @@ import json
 
 class Blocks(models.Model):
     P_STAGE_TYPES = (
-        ("1a","1a"),
-        ("1b","1b"),
-        ("IIa","IIa"),
-        ("IIb","IIb"),
-        ("IIIa","IIIa"),
-        ("IIIb","IIIb"),
-        ("IVa","IVa"),
-        ("IVb","IVb"),
-        ("not_known","Not known"),
-        ("na","NA"),
+        ("0","0"),
+        ("I","I"),
+        ("II","II"),
+        ("IIIA","IIIA"),
+        ("IIIB","IIIB"),
+        ("IIIC","IIIC"),
+        ("IIID","IIID"),
+        ("IV","IV"),
+        ("N/A","N/A"),
     )
 
     PRIM_TYPES = (
@@ -24,15 +23,9 @@ class Blocks(models.Model):
     )
 
     SUBTYPE_TYPES = (
-        ("low-csd","Low-CSD"),
-        ("high-csd","High-CSD"),
-        ("desmoplastic","Desmoplastic"),
-        ("acral","Acral"),
-        ("mucosal","Mucosal"),
-        ("uveal","Uveal"),
-        ("blue","Blue"),
-        ("congenital","Congenital"),
-        ("spitz","Spitz"),
+        ("melanoma","Melanoma"),
+        ("basal-cell-carcinoma","Basal Cell Carcinoma"),
+        ("squamous-cell-carcinoma","Squamous Cell Carcinoma"),
     )
 
     bl_id = models.AutoField(primary_key=True)
@@ -50,7 +43,7 @@ class Blocks(models.Model):
     mitoses = models.IntegerField(blank=True, null=True)
     p_stage = models.CharField(max_length=10, choices=P_STAGE_TYPES, blank=True, null=True)
     prim = models.CharField(max_length=10, choices=PRIM_TYPES, blank=True, null=True)
-    subtype = models.CharField(max_length=12, choices=PRIM_TYPES, blank=True, null=True)
+    subtype = models.CharField(max_length=30, choices=PRIM_TYPES, blank=True, null=True)
     slides = models.IntegerField(blank=True, null=True)
     slides_left = models.IntegerField(blank=True, null=True)
     fixation = models.CharField(max_length=10, blank=True, null=True)
@@ -87,8 +80,8 @@ class Blocks(models.Model):
 
         def _get_authorizated_queryset():
             queryset = Blocks.objects.all().annotate(num_areas=Count('block_areas'))
-            # if not user.is_superuser:
-            #     return queryset.filter(Q(project__technician=user) | Q(project__researcher=user))
+            if not user.is_superuser:
+                return queryset.filter(Q(project__technician=user) | Q(project__researcher=user))
             return queryset
 
         def _parse_value(search_value):

@@ -73,7 +73,8 @@ class Projects(models.Model):
                     Q(pr_id__icontains=search_value) |
                     Q(name__icontains=search_value) |
                     Q(pi__icontains=search_value) |
-                    Q(speedtype__icontains=search_value)
+                    Q(speedtype__icontains=search_value) |
+                    Q(abbreviation__icontains=search_value)
                 )
 
             count = queryset.count()

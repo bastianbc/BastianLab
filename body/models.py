@@ -1,10 +1,9 @@
 from django.db import models
-from django.utils.text import slugify
 from django.db.models import Q, Count
 
 class Body(models.Model):
     name = models.CharField(max_length=50, verbose_name="Name")
-    slug = models.SlugField(max_length=50, unique=True)
+    parent = models.ForeignKey("self", on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
         db_table = "body"
@@ -13,7 +12,6 @@ class Body(models.Model):
         return self.name
 
     def save(self,*args,**kwargs):
-        self.slug = slugify(self.name)
         super().save(*args, **kwargs)
 
     def query_by_args(self, **kwargs):

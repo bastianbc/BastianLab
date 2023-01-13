@@ -176,5 +176,5 @@ def check_can_deleted_async(request):
                 "model": field.related_model.__name__,
                 "count": relations.count()
             })
-            
+
     return JsonResponse({"related_objects":related_objects})

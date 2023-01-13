@@ -16,15 +16,38 @@ class Areas(models.Model):
     ]
 
     AREA_TYPE_TYPES = (
-        ("mel1","Mel 1"),
-        ("mel2","Mel 2"),
-        ("mel3","Mel 3"),
-        ("mel4","Mel 4"),
-        ("in_situ","in situ"),
-        ("nevus1","Nevus 1"),
-        ("nevus2","Nevus 2"),
         ("normal","Normal"),
-        ("intmediate","Intmediate")
+        ("normal2","Normal1"),
+        ("normal3","Normal2"),
+        ("melanoma","Melanoma"),
+        ("mel1","Mel1"),
+        ("mel2","Mel2"),
+        ("mel3","Mel3"),
+        ("nevus","Nevus"),
+        ("mis","MIS"),
+        ("mis1","MIS1"),
+        ("mis2","MIS2"),
+        ("mis3","MIS3"),
+        ("metastasis","Metastasis"),
+        ("met1","Met1"),
+        ("met2","Met2"),
+        ("met3","Met3"),
+        ("ln-met","LN Met"),
+        ("ln-met-1","LN Met1"),
+        ("ln-met-2","LN Met2"),
+        ("ln-met-3","LN Met3"),
+        ("invasive-melanoma","Invasive Melanoma"),
+        ("cutaneous-metastasis","Cutaneous Metastasis"),
+        ("subcutaneous-metastasis","Subcutaneous Metastasis"),
+        ("bladder-metastasis","Bladder Metastasis"),
+        ("lung-metastasis","Lung Metastasis"),
+        ("intestine-metastasis","Intestine Metastasis"),
+        ("brain-metastasis","Brain Metastasis"),
+        ("skin-metastasis","Skin Metastasis"),
+        ("salivary-metastasis","Salivary Metastasis"),
+        ("local-recurrent-metastasis","Local Recurrent Metastasis"),
+        ("cells","Cells"),
+        ("other","Other"),
     )
 
     ar_id = models.AutoField(primary_key=True)
@@ -34,7 +57,7 @@ class Areas(models.Model):
     # project = models.CharField(max_length=100, blank=True, null=True)
     # old_block_id = models.CharField(max_length=50, blank=True, null=True)
     collection = models.CharField(max_length=2, choices=COLLECTION_CHOICES, default=SCRAPE)
-    area_type = models.CharField(max_length=10, choices=AREA_TYPE_TYPES, blank=True, null=True)
+    area_type = models.CharField(max_length=30, choices=AREA_TYPE_TYPES, blank=True, null=True)
     # he_image = models.CharField(max_length=200, blank=True, null=True)
     # na_id = models.CharField(max_length=50, blank=True, null=True)
     completion_date = models.DateTimeField(default=datetime.now)

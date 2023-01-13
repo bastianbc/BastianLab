@@ -9,14 +9,14 @@ from django.contrib import messages
 from capturedlib.models import *
 from sequencingrun.forms import *
 from datetime import datetime
-from core.decorators import *
+from core.decorators import permission_required_for_async
 
 @permission_required("sequencinglib.view_sequencinglib",raise_exception=True)
 def sequencinglibs(request):
     form = SequencingRunCreationForm()
     return render(request, "sequencinglib_list.html", locals())
 
-@login_required
+@permission_required_for_async("sequencinglib.view_sequencinglib")
 def filter_sequencinglibs(request):
     sequencinglibs = SequencingLib().query_by_args(request.user,**request.GET)
     serializer = SequencingLibSerializer(sequencinglibs['items'], many=True)
@@ -28,7 +28,7 @@ def filter_sequencinglibs(request):
 
     return JsonResponse(result)
 
-@permission_required("sequencinglib.change_sequencinglib",raise_exception=True)
+@permission_required_for_async("sequencinglib.change_sequencinglib")
 def edit_sequencinglib_async(request):
     import re
     from core.utils import custom_update
@@ -65,7 +65,7 @@ def new_sequencinglib(request):
 
     return render(request,"sequencinglib.html",locals())
 
-@permission_required("sequencinglib.add_sequencinglib",raise_exception=True)
+@permission_required_for_async("sequencinglib.add_sequencinglib")
 def new_sequencinglib_async(request):
 
     selected_ids = json.loads(request.GET.get("selected_ids"))
@@ -105,13 +105,13 @@ def new_sequencinglib_async(request):
 
     return JsonResponse({"success":True})
 
-@permission_required("sequencinglib.view_sequencinglib",raise_exception=True)
+@permission_required_for_async("sequencinglib.view_sequencinglib")
 def get_sequencinglib_async(request,id):
     sequencing_lib = SequencingLib.objects.get(id=id)
     serializer = SequencingLibSerializer(sequencing_lib)
     return JsonResponse(serializer.data, safe=False)
 
-@permission_required("sequencinglib.add_sequencinglib",raise_exception=True)
+@permission_required_for_async("sequencinglib.add_sequencinglib")
 def recreate_sequencinglib_async(request):
     selected_ids = json.loads(request.GET.get("selected_ids"))
     options = json.loads(request.GET.get("options"))

@@ -51,9 +51,6 @@ class CapturedLib(models.Model):
 
         def _get_authorizated_queryset():
             queryset = CapturedLib.objects.all().annotate(num_samplelibs=Count('sl_links'))
-            if not user.is_superuser:
-                return queryset.filter(Q(area__block__project__technician=user) | Q(area__block__project__researcher=user))
-            return queryset
 
         def _parse_value(search_value):
             if "_initial:" in search_value:

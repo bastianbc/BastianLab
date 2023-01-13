@@ -4,9 +4,9 @@ from django.db.models import Q, Count
 
 class SequencingLib(models.Model):
     BUFFER_TYPES = (
-        ("type1", "Type 1"),
-        ("type2", "Type 2"),
-        ("type3", "Type 3"),
+        ("low-te", "Low TE"),
+        ("te", "TE"),
+        ("buffer-eb", "Buffer EB"),
     )
 
     name = models.CharField(max_length=50, unique=True, verbose_name="Name")

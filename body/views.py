@@ -21,6 +21,7 @@ def new_body(request):
             messages.error(request,"Body wasn't created!")
     else:
         form = BodyForm()
+
     return render(request,"body.html",locals())
 
 @permission_required("body.change_body",raise_exception=True)
@@ -62,6 +63,6 @@ def filter_bodys(request):
     return JsonResponse(result)
 
 @login_required
-def get_bodies(request):
-    serializer = BodySerializer(Body.objects.all(), many=True)
+def get_bodies(request,parent_id=None):
+    serializer = BodySerializer(Body.objects.filter(parent_id=parent_id), many=True)
     return JsonResponse(serializer.data,safe=False)

@@ -8,13 +8,13 @@ from sequencinglib.models import *
 from .forms import *
 from django.contrib import messages
 from capturedlib.models import *
-from core.decorators import *
+from core.decorators import permission_required_for_async
 
 @permission_required("sequencingrun.view_sequencingrun",raise_exception=True)
 def sequencingruns(request):
     return render(request, "sequencingrun_list.html", locals())
 
-@login_required
+@permission_required_for_async("sequencingrun.view_sequencingrun")
 def filter_sequencingruns(request):
     sequencingruns = SequencingRun().query_by_args(request.user,**request.GET)
     serializer = SequencingRunSerializer(sequencingruns['items'], many=True)
@@ -26,7 +26,7 @@ def filter_sequencingruns(request):
 
     return JsonResponse(result)
 
-@permission_required("sequencingrun.change_sequencingrun",raise_exception=True)
+@permission_required_for_async("sequencingrun.change_sequencingrun")
 def edit_sequencingrun_async(request):
     import re
     from core.utils import custom_update
@@ -63,7 +63,7 @@ def new_sequencingrun(request):
 
     return render(request,"sequencingrun.html",locals())
 
-@permission_required("sequencingrun.add_sequencingrun",raise_exception=True)
+@permission_required_for_async("sequencingrun.add_sequencingrun")
 def new_sequencingrun_async(request):
 
     selected_ids = json.loads(request.GET.get("selected_ids"))

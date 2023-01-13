@@ -4,21 +4,26 @@ from django.db.models import Q, Count
 
 class SequencingRun(models.Model):
     FACILITY_TYPES = (
-        ("type1", "Type 1"),
-        ("type2", "Type 2"),
-        ("type3", "Type 3"),
+        ("cat","CAT"),
+        ("ihg","IHG"),
+        ("broad-institute","Broad Institute"),
+        ("other","Other"),
     )
 
     SEQUENCER_TYPES = (
-        ("type1", "Type 1"),
-        ("type2", "Type 2"),
-        ("type3", "Type 3"),
+        ("novaseq-6000-sp","NovaSeq 6000 SP"),
+        ("novaseq-6000-s1","NovaSeq 6000 S1"),
+        ("novaseq-6000-s2","NovaSeq 6000 S2"),
+        ("novaseq-6000-s4","NovaSeq 6000 S4"),
+        ("novaseq-x","NovaSeq X"),
+        ("hiseq-2500","HiSeq 2500"),
+        ("hiseq-4000","HiSeq 4000"),
+        ("iseq100","iSeq100"),
     )
 
     PE_TYPES = (
-        ("type1", "Type 1"),
-        ("type2", "Type 2"),
-        ("type3", "Type 3"),
+        ("100", "100"),
+        ("150", "150"),
     )
 
     name = models.CharField(max_length=50, unique=True, verbose_name="Name")
