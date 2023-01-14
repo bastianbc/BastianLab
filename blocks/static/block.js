@@ -38,11 +38,7 @@ var KTDatatablesServerSide = function () {
               { data: 'project' },
               { data: 'patient' },
               { data: 'diagnosis' },
-              { data: 'body_site',
-                render: function (val, type, row) {
-                  return row["body_site_label"];
-                }
-              },
+              { data: 'body_site' },
               { data: 'thickness' },
               { data: 'date_added',
                 render: function (data) {
@@ -741,8 +737,12 @@ var KTDatatablesServerSide = function () {
           {
             label: "Body Site:",
             name: "body_site",
-            type: "select",
-            options: bodyOptions
+            // type: "select",
+            // options: bodyOptions
+            type: "readonly",
+            attr: {
+              disabled:true
+            }
           },
           {
             label: "Thickness:",

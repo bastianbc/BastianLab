@@ -7,11 +7,11 @@ class BlocksSerializer(serializers.ModelSerializer):
     patient = serializers.StringRelatedField()
     DT_RowId = serializers.SerializerMethodField()
     project = serializers.StringRelatedField()
-    body_site_label = serializers.SerializerMethodField()
+    body_site = serializers.SerializerMethodField()
 
     class Meta:
         model = Blocks
-        fields = ("bl_id","name","project","patient","diagnosis","body_site","body_site_label","thickness","date_added","num_areas","DT_RowId",)
+        fields = ("bl_id","name","project","patient","diagnosis","body_site","thickness","date_added","num_areas","DT_RowId",)
 
     def get_value(self,obj):
         return obj.patient.pat_id
@@ -22,5 +22,5 @@ class BlocksSerializer(serializers.ModelSerializer):
     def get_project(self, obj):
         return obj.project.name
 
-    def get_body_site_label(self,obj):
+    def get_body_site(self,obj):
         return obj.body_site.name if obj.body_site else None
