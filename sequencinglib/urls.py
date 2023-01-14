@@ -20,4 +20,5 @@ urlpatterns = [
     path('recreate_sequencinglib_async', views.recreate_sequencinglib_async, name="recreate-sequencinglib-async"),
     path('create_ilab_sheet', views.create_ilab_sheet, name="create-ilab-sheet"),
     path('check_can_deleted_async', views.check_can_deleted_async, name='check-can-deleted-async'),
+    path('get_buffers', views.get_buffers, name="get-buffers"),
 ] + staticfiles_urlpatterns()

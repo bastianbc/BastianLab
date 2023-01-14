@@ -16,7 +16,7 @@ def nucacids(request):
     filter = FilterForm()
     return render(request, "nucacid_list.html", locals())
 
-@login_required
+@permission_required_for_async("librep.view_nucacids")
 def filter_nucacids(request):
     from .serializers import NucacidsSerializer
 
@@ -30,7 +30,7 @@ def filter_nucacids(request):
 
     return JsonResponse(result)
 
-@permission_required("librep.change_nucacids",raise_exception=True)
+@permission_required_for_async("librep.change_nucacids")
 def edit_nucacid_async(request):
     import re
     from core.utils import custom_update
@@ -68,7 +68,7 @@ def new_nucacid(request):
 
     return render(request,"nucacid.html",locals())
 
-@permission_required("librep.add_nucacids",raise_exception=True)
+@permission_required_for_async("librep.add_nucacids")
 def new_nucacid_async(request):
     selected_ids = json.loads(request.GET.get("selected_ids"))
     options = json.loads(request.GET.get("options"))

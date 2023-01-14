@@ -4,24 +4,24 @@ from sequencinglib.models import *
 
 class SequencingRunSerializer(serializers.ModelSerializer):
     DT_RowId = serializers.SerializerMethodField()
-    facility = serializers.SerializerMethodField()
-    sequencer = serializers.SerializerMethodField()
-    pe = serializers.SerializerMethodField()
+    facility_label = serializers.SerializerMethodField()
+    sequencer_label = serializers.SerializerMethodField()
+    pe_label = serializers.SerializerMethodField()
 
     class Meta:
         model = SequencingRun
-        fields = ("id", "name", "date", "facility", "sequencer", "pe", "amp_cycles", "date_run", "DT_RowId",)
+        fields = ("id", "name", "date", "facility", "facility_label", "sequencer", "sequencer_label", "pe", "pe_label", "amp_cycles", "date_run", "DT_RowId",)
 
     def get_DT_RowId(self, obj):
        return getattr(obj, 'id')
 
-    def get_facility(self,obj):
+    def get_facility_label(self,obj):
         return obj.get_facility_display()
 
-    def get_sequencer(self,obj):
+    def get_sequencer_label(self,obj):
         return obj.get_sequencer_display()
 
-    def get_pe(self,obj):
+    def get_pe_label(self,obj):
         return obj.get_pe_display()
 
 class UsedSequencingLibSerializer(serializers.ModelSerializer):

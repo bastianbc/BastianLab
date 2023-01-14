@@ -580,6 +580,7 @@ var KTDatatablesServerSide = function () {
           type: "POST",
           headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
           success: function (data) {
+
               if ( !data.success ) {
 
                 Swal.fire({

@@ -10,7 +10,7 @@ from .serializers import BlocksSerializer
 from django.contrib.auth.decorators import login_required,permission_required
 from core.decorators import permission_required_for_async
 
-@login_required
+@permission_required_for_async("blocks.view_blocks")
 def filter_blocks(request):
     from .serializers import BlocksSerializer
 
@@ -53,7 +53,7 @@ def new_block(request):
 
     return render(request,"block.html",locals())
 
-@permission_required("blocks.add_blocks",raise_exception=True)
+@permission_required_for_async("blocks.add_blocks")
 def add_block_to_patient_async(request):
     selected_ids = json.loads(request.GET.get("selected_ids"))
 
@@ -66,7 +66,7 @@ def add_block_to_patient_async(request):
 
     return JsonResponse({"success":True})
 
-@permission_required("blocks.add_blocks",raise_exception=True)
+@permission_required_for_async("blocks.add_blocks")
 def add_block_to_project_async(request):
     selected_ids = json.loads(request.GET.get("selected_ids"))
     project_id = request.GET.get("project_id")
@@ -83,7 +83,7 @@ def add_block_to_project_async(request):
 
     return JsonResponse({"success":True})
 
-@permission_required("blocks.change_blocks",raise_exception=True)
+@permission_required_for_async("blocks.change_blocks")
 def remove_block_from_project_async(request):
     selected_ids = json.loads(request.GET.get("selected_ids"))
     project_id = request.GET.get("project_id")
@@ -117,7 +117,7 @@ def edit_block(request,id):
 
     return render(request,"block.html",locals())
 
-@permission_required("blocks.change_blocks",raise_exception=True)
+@permission_required_for_async("blocks.change_blocks")
 def edit_block_async(request):
     import re
     from core.utils import custom_update

@@ -47,7 +47,10 @@ def edit_samplelib_async(request):
                     v = None
                 parameters[r.groups()[1]] = v
 
-    custom_update(SampleLib,pk=parameters["pk"],parameters=parameters)
+    try:
+        custom_update(SampleLib,pk=parameters["pk"],parameters=parameters)
+    except Exception as e:
+        return JsonResponse({"success":False, "message": str(e)})
 
     return JsonResponse({"result":True})
 

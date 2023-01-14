@@ -42,11 +42,13 @@ def edit_sequencingrun_async(request):
                     v = None
                 parameters[r.groups()[1]] = v
 
-    sequencing_run = custom_update(SequencingRun,pk=parameters["pk"],parameters=parameters)
+    try:
+        custom_update(SequencingRun,pk=parameters["pk"],parameters=parameters)
+    except Exception as e:
+        print(e)
+        return JsonResponse({"success":False, "message": str(e)})
 
-    sequencing_run.set_nm()
-
-    return JsonResponse({"result":True})
+    return JsonResponse({"success":True})
 
 @permission_required("sequencingrun.add_sequencingrun",raise_exception=True)
 def new_sequencingrun(request):
@@ -158,3 +160,12 @@ def check_can_deleted_async(request):
             })
 
     return JsonResponse({"related_objects":related_objects})
+
+def get_facilities(request):
+    return JsonResponse([{"label":"---------","value":""}] + [{ "label":c[1], "value":c[0] } for c in SequencingRun.FACILITY_TYPES], safe=False)
+
+def get_sequencers(request):
+    return JsonResponse([{"label":"---------","value":""}] + [{ "label":c[1], "value":c[0] } for c in SequencingRun.SEQUENCER_TYPES], safe=False)
+
+def get_pes(request):
+    return JsonResponse([{"label":"---------","value":""}] + [{ "label":c[1], "value":c[0] } for c in SequencingRun.PE_TYPES], safe=False)

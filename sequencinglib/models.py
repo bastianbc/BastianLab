@@ -26,10 +26,7 @@ class SequencingLib(models.Model):
     def query_by_args(self, user, **kwargs):
 
         def _get_authorizated_queryset():
-            queryset = SequencingLib.objects.all()
-            if not user.is_superuser:
-                return queryset.filter(Q(area__block__project__technician=user) | Q(area__block__project__researcher=user))
-            return queryset
+            return SequencingLib.objects.all()
 
         def _parse_value(search_value):
             if "_initial:" in search_value:

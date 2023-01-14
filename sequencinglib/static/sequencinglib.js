@@ -41,7 +41,11 @@ var KTDatatablesServerSide = function () {
                   }
                 },
                 { data: 'nmol' },
-                { data: 'buffer' },
+                { data: 'buffer',
+                  render: function (val, type, row) {
+                    return row["buffer_label"];
+                  }
+                },
                 { data: 'pdf' },
             ],
             columnDefs: [
@@ -367,43 +371,70 @@ var KTDatatablesServerSide = function () {
 
     var initEditor = function () {
 
-      editor = new $.fn.dataTable.Editor({
-        ajax: {
-          url: "/sequencinglib/edit_sequencinglib_async",
-          type: "POST",
-          headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
-          success: function () {
-              dt.draw();
-          },
-          error: function (xhr, ajaxOptions, thrownError) {
-              swal("Error updating!", "Please try again!", "error");
-          }
-        },
-        table: ".table",
-        fields: [ {
-               label: "Name:",
-               name: "name"
-           }, {
-               label: "Date:",
-               name: "date",
-               type: "datetime",
-               displayFormat: "M/D/YYYY",
-               wireFormat: 'YYYY-MM-DD'
-           }, {
-               label: "NMol:",
-               name: "nmol",
-           }, {
-               label: "BUffer:",
-               name: "buffer"
-           }
-       ],
-       formOptions: {
-          inline: {
-            onBlur: 'submit'
-          }
-       }
-     });
+      var bufferOptions = [];
 
+      Promise.all([
+
+        getBufferOptions()
+
+      ]).then(function () {
+
+        editor = new $.fn.dataTable.Editor({
+          ajax: {
+            url: "/sequencinglib/edit_sequencinglib_async",
+            type: "POST",
+            headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
+            success: function (data) {
+
+              if ( !data.success ) {
+
+                Swal.fire({
+                    text: data.message,
+                    icon: "error",
+                    buttonsStyling: false,
+                    confirmButtonText: "Ok, got it!",
+                    customClass: {
+                        confirmButton: "btn fw-bold btn-primary",
+                    }
+                });
+
+              }
+
+              dt.draw();
+
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                swal("Error updating!", "Please try again!", "error");
+            }
+          },
+          table: ".table",
+          fields: [ {
+                 label: "Name:",
+                 name: "name"
+             }, {
+                 label: "Date:",
+                 name: "date",
+                 type: "datetime",
+                 displayFormat: "M/D/YYYY",
+                 wireFormat: 'YYYY-MM-DD'
+             }, {
+                 label: "NMol:",
+                 name: "nmol",
+             }, {
+                 label: "BUffer:",
+                 name: "buffer",
+                 type: "select",
+                 options: bufferOptions
+             }
+         ],
+         formOptions: {
+            inline: {
+              onBlur: 'submit'
+            }
+         }
+        });
+
+      });
 
      $('.table').on( 'click', 'tbody td:not(:first-child)', function (e) {
        editor.inline( dt.cell( this ).index(), {
@@ -414,6 +445,31 @@ var KTDatatablesServerSide = function () {
      $('.table').on( 'key-focus', function ( e, datatable, cell ) {
           editor.inline( cell.index() );
      });
+
+     function getBufferOptions() {
+
+       $.ajax({
+           url: "/sequencinglib/get_buffers",
+           type: "GET",
+           async: false,
+           success: function (data) {
+
+            // var options = [];
+            data.forEach((item, i) => {
+
+              bufferOptions.push({
+                "label":item["label"],
+                "value":item["value"]
+              })
+
+            });
+
+            // editor.field( 'method' ).update( options );
+
+           }
+       });
+
+     }
 
     }
 

@@ -44,11 +44,12 @@ def edit_sequencinglib_async(request):
                     v = None
                 parameters[r.groups()[1]] = v
 
-    sequencing_lib = custom_update(SequencingLib,pk=parameters["pk"],parameters=parameters)
+    try:
+        custom_update(SequencingLib,pk=parameters["pk"],parameters=parameters)
+    except Exception as e:
+        return JsonResponse({"success":False, "message": str(e)})
 
-    # sequencing_lib.set_nm()
-
-    return JsonResponse({"result":True})
+    return JsonResponse({"success":True})
 
 @permission_required("sequencinglib.add_sequencinglib",raise_exception=True)
 def new_sequencinglib(request):
@@ -264,3 +265,6 @@ def check_can_deleted_async(request):
             })
 
     return JsonResponse({"related_objects":related_objects})
+
+def get_buffers(request):
+    return JsonResponse([{"label":"---------","value":""}] + [{ "label":c[1], "value":c[0] } for c in SequencingLib.BUFFER_TYPES], safe=False)

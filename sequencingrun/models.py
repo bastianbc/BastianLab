@@ -31,7 +31,7 @@ class SequencingRun(models.Model):
     date = models.DateTimeField(default=datetime.now, verbose_name="Date")
     facility = models.CharField(max_length=20, choices=FACILITY_TYPES, verbose_name="Facility")
     sequencer = models.CharField(max_length=20, choices=SEQUENCER_TYPES, verbose_name="Sequencer")
-    pe = models.CharField(max_length=20, choices=SEQUENCER_TYPES, verbose_name="PE")
+    pe = models.CharField(max_length=20, choices=PE_TYPES, verbose_name="PE")
     amp_cycles = models.IntegerField(default=0, verbose_name="AMP Cycles")
     notes = models.TextField(blank=True, null=True, verbose_name="Notes")
     sequencing_libs = models.ManyToManyField("sequencinglib.SequencingLib", blank=True)
@@ -45,10 +45,7 @@ class SequencingRun(models.Model):
     def query_by_args(self, user, **kwargs):
 
         def _get_authorizated_queryset():
-            queryset = SequencingRun.objects.all()
-            if not user.is_superuser:
-                return queryset.filter(Q(area__block__project__technician=user) | Q(area__block__project__researcher=user))
-            return queryset
+            return SequencingRun.objects.all()
 
         def _parse_value(search_value):
             if "_initial:" in search_value:

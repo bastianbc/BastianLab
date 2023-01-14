@@ -6,9 +6,9 @@ import json
 from django.contrib import messages
 from blocks.models import *
 from django.contrib.auth.decorators import login_required,permission_required
-from core.decorators import *
+from core.decorators import permission_required_for_async
 
-@login_required
+@permission_required_for_async("lab.view_areas")
 def filter_areas(request):
     from .serializers import AreasSerializer
 

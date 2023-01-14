@@ -40,9 +40,21 @@ var KTDatatablesServerSide = function () {
                     return moment(data).format('MM/DD/YYYY');
                   }
                 },
-                { data: 'facility' },
-                { data: 'sequencer' },
-                { data: 'pe' },
+                { data: 'facility',
+                  render: function (val, type, row) {
+                    return row["facility_label"];
+                  }
+                },
+                { data: 'sequencer',
+                  render: function (val, type, row) {
+                    return row["sequencer_label"];
+                  }
+                },
+                { data: 'pe',
+                  render: function (val, type, row) {
+                    return row["pe_label"];
+                  }
+                },
                 { data: 'amp_cycles' },
                 { data: 'date_run',
                   render: function (data) {
@@ -356,56 +368,90 @@ var KTDatatablesServerSide = function () {
 
     var initEditor = function () {
 
-      editor = new $.fn.dataTable.Editor({
-        ajax: {
-          url: "/samplelib/edit_samplelib_async",
-          type: "POST",
-          headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
-          success: function () {
-              dt.draw();
-          },
-          error: function (xhr, ajaxOptions, thrownError) {
-              swal("Error updating!", "Please try again!", "error");
-          }
-        },
-        table: ".table",
-        fields: [ {
-               label: "Name:",
-               name: "name"
-           }, {
-               label: "Barcode:",
-               name: "barcode"
-           }, {
-               label: "Date:",
-               name: "date",
-               type: "datetime",
-               displayFormat: "M/D/YYYY",
-               wireFormat: 'YYYY-MM-DD'
-           }, {
-               label: "Method:",
-               name: "method",
-           }, {
-               label: "Concentration:",
-               name: "conc"
-           }, {
-               label: "Input Amount:",
-               name: "input_amount",
-               type: "readonly"
-           }, {
-               label: "Volume Init:",
-               name: "vol_init"
-           }, {
-               label: "Volume Remain:",
-               name: "vol_remain"
-           },
-       ],
-       formOptions: {
-          inline: {
-            onBlur: 'submit'
-          }
-       }
-     });
+      var facilityOptions = [];
+      var sequencerOptions = [];
+      var peOptions = [];
 
+      Promise.all([
+
+        getFacilityOptions(),
+        getSequencerOptions(),
+        getPeOptions()
+
+      ]).then(function () {
+
+        editor = new $.fn.dataTable.Editor({
+          ajax: {
+            url: "/sequencingrun/edit_sequencingrun_async",
+            type: "POST",
+            headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
+            success: function (data) {
+
+              if ( !data.success ) {
+
+                Swal.fire({
+                    text: data.message,
+                    icon: "error",
+                    buttonsStyling: false,
+                    confirmButtonText: "Ok, got it!",
+                    customClass: {
+                        confirmButton: "btn fw-bold btn-primary",
+                    }
+                });
+
+              }
+
+              dt.draw();
+
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                swal("Error updating!", "Please try again!", "error");
+            }
+          },
+          table: ".table",
+          fields: [ {
+                 label: "Name:",
+                 name: "name"
+             }, {
+                 label: "Date:",
+                 name: "date",
+                 type: "datetime",
+                 displayFormat: "M/D/YYYY",
+                 wireFormat: 'YYYY-MM-DD'
+             }, {
+                 label: "Facility:",
+                 name: "facility",
+                 type: "select",
+                 options: facilityOptions
+             }, {
+                 label: "Sequencer:",
+                 name: "sequencer",
+                 type: "select",
+                 options: sequencerOptions
+             }, {
+                 label: "PE:",
+                 name: "pe",
+                 type: "select",
+                 options: peOptions
+             }, {
+                 label: "AMP Cycles:",
+                 name: "amp_cycles"
+             }, {
+                 label: "Date Run:",
+                 name: "date_run",
+                 type: "datetime",
+                 displayFormat: "M/D/YYYY",
+                 wireFormat: 'YYYY-MM-DD'
+             },
+         ],
+         formOptions: {
+            inline: {
+              onBlur: 'submit'
+            }
+         }
+        });
+
+      });
 
      $('.table').on( 'click', 'tbody td:not(:first-child)', function (e) {
        editor.inline( dt.cell( this ).index(), {
@@ -416,6 +462,72 @@ var KTDatatablesServerSide = function () {
      $('.table').on( 'key-focus', function ( e, datatable, cell ) {
           editor.inline( cell.index() );
      });
+
+     function getFacilityOptions() {
+
+       $.ajax({
+           url: "/sequencingrun/get_facilities",
+           type: "GET",
+           async: false,
+           success: function (data) {
+
+            // var options = [];
+            data.forEach((item, i) => {
+
+              facilityOptions.push({
+                "label":item["label"],
+                "value":item["value"]
+              })
+
+            });
+           }
+       });
+
+     }
+
+     function getSequencerOptions() {
+
+       $.ajax({
+           url: "/sequencingrun/get_sequencers",
+           type: "GET",
+           async: false,
+           success: function (data) {
+
+            // var options = [];
+            data.forEach((item, i) => {
+
+              sequencerOptions.push({
+                "label":item["label"],
+                "value":item["value"]
+              })
+
+            });
+           }
+       });
+
+     }
+
+     function getPeOptions() {
+
+       $.ajax({
+           url: "/sequencingrun/get_pes",
+           type: "GET",
+           async: false,
+           success: function (data) {
+
+            // var options = [];
+            data.forEach((item, i) => {
+
+              peOptions.push({
+                "label":item["label"],
+                "value":item["value"]
+              })
+
+            });
+           }
+       });
+
+     }
 
     }
 
