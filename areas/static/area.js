@@ -38,7 +38,7 @@ var KTDatatablesServerSide = function () {
                   if (xhr.status == 403) {
 
                     Swal.fire({
-                        text: "You do not have permission to delete.",
+                        text: "You do not have permission to view.",
                         icon: "error",
                         buttonsStyling: false,
                         confirmButtonText: "Ok, got it!",

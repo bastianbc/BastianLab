@@ -31,7 +31,25 @@ var KTDatatablesServerSide = function () {
               editor: editor,
               editOnFocus: true
             },
-            ajax: '/lab/filter_patients',
+            ajax: {
+              url: '/lab/filter_patients',
+              type: 'GET',
+              error: function (xhr, ajaxOptions, thrownError) {
+                  if (xhr.status == 403) {
+
+                    Swal.fire({
+                        text: "You do not have permission to view.",
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn fw-bold btn-primary",
+                        }
+                    });
+
+                  }
+              }
+            },
             columns: [
                 { data: 'pa_id' },
                 { data: 'pat_id' },
