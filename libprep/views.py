@@ -10,13 +10,13 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required,permission_required
 from core.decorators import *
 
-@permission_required("librep.view_nucacids",raise_exception=True)
+@permission_required("libprep.view_nucacids",raise_exception=True)
 def nucacids(request):
     form = SampleLibCreationOptionsForm()
     filter = FilterForm()
     return render(request, "nucacid_list.html", locals())
 
-@permission_required_for_async("librep.view_nucacids")
+@permission_required_for_async("libprep.view_nucacids")
 def filter_nucacids(request):
     from .serializers import NucacidsSerializer
 
@@ -30,7 +30,7 @@ def filter_nucacids(request):
 
     return JsonResponse(result)
 
-@permission_required_for_async("librep.change_nucacids")
+@permission_required_for_async("libprep.change_nucacids")
 def edit_nucacid_async(request):
     import re
     from core.utils import custom_update
@@ -53,7 +53,7 @@ def edit_nucacid_async(request):
 
     return JsonResponse({"success":True})
 
-@permission_required("librep.add_nucacids",raise_exception=True)
+@permission_required("libprep.add_nucacids",raise_exception=True)
 def new_nucacid(request):
     if request.method=="POST":
         form = NucAcidForm(request.POST)
@@ -68,7 +68,7 @@ def new_nucacid(request):
 
     return render(request,"nucacid.html",locals())
 
-@permission_required_for_async("librep.add_nucacids")
+@permission_required_for_async("libprep.add_nucacids")
 def new_nucacid_async(request):
     selected_ids = json.loads(request.GET.get("selected_ids"))
     options = json.loads(request.GET.get("options"))
@@ -98,7 +98,7 @@ def new_nucacid_async(request):
 
     return JsonResponse({"success":True})
 
-@permission_required("librep.change_nucacids",raise_exception=True)
+@permission_required("libprep.change_nucacids",raise_exception=True)
 def edit_nucacid(request,id):
     nucacid = NucAcids.objects.get(nu_id=id)
 
@@ -115,7 +115,7 @@ def edit_nucacid(request,id):
 
     return render(request,"nucacid.html",locals())
 
-@permission_required("librep.delete_nucacids",raise_exception=True)
+@permission_required("libprep.delete_nucacids",raise_exception=True)
 def delete_nucacid(request,id):
     try:
         nucacid = NucAcids.objects.get(nu_id=id)
@@ -128,7 +128,7 @@ def delete_nucacid(request,id):
 
     return JsonResponse({ "deleted":deleted })
 
-@permission_required("librep.delete_nucacids",raise_exception=True)
+@permission_required("libprep.delete_nucacids",raise_exception=True)
 def delete_batch_nucacids(request):
     try:
         selected_ids = json.loads(request.GET.get("selected_ids"))
