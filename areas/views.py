@@ -8,7 +8,7 @@ from blocks.models import *
 from django.contrib.auth.decorators import login_required,permission_required
 from core.decorators import permission_required_for_async
 
-@permission_required_for_async("lab.view_areas")
+@permission_required_for_async("areas.view_areas")
 def filter_areas(request):
     from .serializers import AreasSerializer
 

@@ -21,7 +21,12 @@ var KTDatatablesServerSide = function () {
                 { data: 'username' },
                 { data: 'first_name' },
                 { data: 'last_name' },
-                { data: 'last_login' },
+                { data: 'group' },
+                { data: 'last_login',
+                  render: function (data) {
+                    return moment(data).format('MM/DD/YYYY HH:mm');
+                  }
+                },
                 { data: null }
             ],
             columnDefs: [
@@ -42,7 +47,7 @@ var KTDatatablesServerSide = function () {
                 //     }
                 // },
                 {
-                    targets: 4,
+                    targets: 5,
                     data: null,
                     orderable: false,
                     className: 'text-end',

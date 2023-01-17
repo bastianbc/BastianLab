@@ -52,7 +52,7 @@ def edit_samplelib_async(request):
     except Exception as e:
         return JsonResponse({"success":False, "message": str(e)})
 
-    return JsonResponse({"result":True})
+    return JsonResponse({"success":True})
 
 @permission_required("samplelib.add_samplelib",raise_exception=True)
 def new_samplelib(request):
