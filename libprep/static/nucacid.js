@@ -8,7 +8,12 @@ var KTDatatablesServerSide = function () {
     var filterPayment;
     var editor;
 
-    // Private functions
+    /*
+   * Initializes the datatable.
+   * @param  {String} initialValue  If it comes from another page, it is initialized with this value.
+   * @param  {String} filterDateRange   A parameter of custom filter.
+   * @param  {String} filterNAType A parameter of custom filter.
+   */
     var initDatatable = function ( initialValue, filterDateRange, filterNAType ) {
 
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
@@ -226,7 +231,7 @@ var KTDatatablesServerSide = function () {
                 }).done(function (data) {
 
                   var message = "Are you sure you want to delete " + name + "?";
-                  console.log(data);
+
                   if (data.related_objects.length > 0) {
 
                     message += " It has downstream records:";
@@ -375,6 +380,7 @@ var KTDatatablesServerSide = function () {
         }
     }
 
+    // Functions in selected rows
     var handleSelectedRows = ((e) => {
 
       var isInit = false;
@@ -385,6 +391,7 @@ var KTDatatablesServerSide = function () {
 
       var modal = new bootstrap.Modal(document.getElementById("modal_samplelib_options"));
 
+      // Toggles the enable the print and submit buttons.
       function toggleButtons(state) {
 
         document.querySelector('[data-kt-stepper-action="print"]').disabled = !state;
@@ -392,6 +399,7 @@ var KTDatatablesServerSide = function () {
 
       }
 
+      // Initializes sample library options modal
       function initModal() {
 
         function resetStepper() {
@@ -466,8 +474,10 @@ var KTDatatablesServerSide = function () {
 
       }
 
+      // Initializes modal events
       function initModalEvents() {
 
+        // Capitalizes the character entered in the prefix field
         function initPrefixKeyUp() {
 
           document.getElementById("id_prefix").addEventListener("keyup", function () {
@@ -478,6 +488,7 @@ var KTDatatablesServerSide = function () {
 
         }
 
+        // Initializes Continue button. Creates new sample library using ajax method as asynchronous.
         function initContinueClick() {
 
           document.querySelector('[data-kt-stepper-action="next"]').addEventListener('click', function () {
@@ -511,9 +522,9 @@ var KTDatatablesServerSide = function () {
 
                 fillElements(result.data);
 
-                initDynamicEvents().init();
+                initEventsDynamically().init();
 
-                initPrintAsCSV();
+                handlePrintAsCSV();
 
                 stepper.goNext();
 
@@ -538,6 +549,7 @@ var KTDatatablesServerSide = function () {
 
         }
 
+        // Initializes Submit button. Updates sample library using ajax method as asynchronous.
         function initSubmit() {
 
           document.querySelector('[data-kt-stepper-action="submit"]').addEventListener('click', function () {
@@ -581,6 +593,11 @@ var KTDatatablesServerSide = function () {
 
         }
 
+        /*
+        * Handles the spinner. Spinner is a load indicator which is occur whenever the application processing/waiting for an operation.
+        While the Spinner is loading, you can't interact with target, until the process is completed.
+        * @param  {Boolean} state A value that specifies whether to appear.
+        */
         function handleSpinner(state) {
 
           if (state) {
@@ -596,6 +613,7 @@ var KTDatatablesServerSide = function () {
 
         }
 
+        // If passed to the second step in the stepper, enlarges the modal.
         function handleSize() {
 
           var element = document.getElementById("modal_samplelib_options").getElementsByClassName("modal-dialog")[0];
@@ -606,6 +624,7 @@ var KTDatatablesServerSide = function () {
 
         }
 
+        // Renders the page based on data coming from the server asynchronously.
         function fillElements(data) {
 
           var listEl = document.querySelector(".list-body");
@@ -632,6 +651,10 @@ var KTDatatablesServerSide = function () {
 
         }
 
+        /*
+        * Collects the entered values and creates an array of dictionary.
+        * @return {Array} A list of object created from each rows.
+        */
         function getValues() {
 
           var rows = document.querySelector(".list-body").querySelectorAll(".row");
@@ -657,6 +680,10 @@ var KTDatatablesServerSide = function () {
 
         }
 
+        /*
+        * Object Ids for export to CSV.
+        * @return {String} A list of number as a string.
+        */
         function getLinkIds() {
 
           var result = [];
@@ -670,7 +697,8 @@ var KTDatatablesServerSide = function () {
           return JSON.stringify(result);
         }
 
-        function initPrintAsCSV() {
+        // Exports to CSV file
+        function handlePrintAsCSV() {
 
           var element = document.querySelector('[data-kt-stepper-action="print"]');
           element.classList.remove("d-none");
@@ -686,10 +714,12 @@ var KTDatatablesServerSide = function () {
 
       }
 
-      function initDynamicEvents() {
+      // Events after modal rendered
+      function initEventsDynamically() {
 
         var shearVolume = parseFloat(document.getElementById("id_shear_volume").value);
 
+        // Calculates the values depend on the volume changing for each rows.
         function initVolumeChange() {
 
           for (var amount of document.querySelectorAll(".detail-volume")) {
@@ -714,6 +744,7 @@ var KTDatatablesServerSide = function () {
 
         }
 
+        // Calculates the values depend on the amount changing for each rows.
         function initAmountChange() {
 
           for (var amount of document.querySelectorAll(".detail-amount")) {
@@ -747,6 +778,10 @@ var KTDatatablesServerSide = function () {
 
       }
 
+      /*
+      * Object Ids for some processes like deletion, creation.
+      * @return {String} A list of number as a string.
+      */
       function getSelectedRows() {
 
         const selectedRows = container.querySelectorAll('tbody [type="checkbox"]:checked');
@@ -766,6 +801,10 @@ var KTDatatablesServerSide = function () {
         return JSON.stringify(selectedIds);
       }
 
+      /*
+      * Serializes the form.
+      * @return {String} A list of object as a string.
+      */
       function getCreationOptions() {
 
         var data = new FormData(document.getElementById('frm_creation_options'));
@@ -774,6 +813,10 @@ var KTDatatablesServerSide = function () {
         return JSON.stringify(options);
       }
 
+      /*
+      * Checks that the selected objects must be of the same type.
+      * @return {Boolean} If type of all selected items is same, returns True.
+      */
       function checkSelectedRows() {
 
         const selectedRows = container.querySelectorAll('tbody [type="checkbox"]:checked');
@@ -807,6 +850,7 @@ var KTDatatablesServerSide = function () {
 
       }
 
+      // Deletes all selected rows.
       function handleBatchDelete() {
 
         // Select elements
@@ -891,11 +935,11 @@ var KTDatatablesServerSide = function () {
 
       }
 
+      // Unchecks the checkbox in header of datatable.
       function uncheckedFirstCheckBox() {
 
         dt.on( 'draw', function () {
 
-          // Remove header checked box
           const headerCheckbox = container.querySelectorAll('[type="checkbox"]')[0];
           headerCheckbox.checked = false;
 
@@ -911,6 +955,7 @@ var KTDatatablesServerSide = function () {
 
     })();
 
+    // Provides the datatable to be fully editable. official docs for more info  --> https://editor.datatables.net
     var initEditor = function () {
 
       var methodOptions = [];
@@ -1003,6 +1048,7 @@ var KTDatatablesServerSide = function () {
           editor.inline( cell.index() );
       });
 
+      // Gets the method options and fills the dropdown. It is executed synchronous.
       function getMethodOptions() {
 
         $.ajax({
@@ -1028,6 +1074,7 @@ var KTDatatablesServerSide = function () {
 
       }
 
+      // Gets the nucleic acid type options and fills the dropdown. It is executed synchronous.
       function getNaTypeOptions() {
 
         $.ajax({

@@ -30,20 +30,48 @@ class NucAcids(models.Model):
         return self.name
 
     def query_by_args(self, user, **kwargs):
+        '''
+        This is where the sorting and filtering functions of the datatables are executed.
+        Parameters:
+            user (obj): Active django user
+            kwargs (dict): All parameters that the datatables used
+        Returns:
+            data (dict): Data that the user will see on the screen
+        '''
 
         def _get_authorizated_queryset():
+            '''
+            Users can access to some entities depend on their authorize. While the user having admin role can access to all things,
+            technicians or researchers can access own projects and other entities related to it.
+            '''
             queryset = NucAcids.objects.all()
             if not user.is_superuser:
                 return queryset.filter(Q(area__block__project__technician=user) | Q(area__block__project__researcher=user))
             return queryset
 
         def _parse_value(search_value):
+            '''
+            When the datatables are to be filled with a certain data, the search function of datatables is used.
+            The incoming parameter is parsed ve returned. If there is a initial value, the "search_value" has "_initial" prefix.
+            Parameters:
+                search_value (str): A string
+            Returns:
+                search_value (str): Parsed value
+            '''
             if "_initial:" in search_value:
                 v = search_value.split("_initial:")[1]
                 return None if v == "null" or not v.isnumeric() else v
             return search_value
 
         def _is_initial_value(search_value):
+            '''
+            When the datatables are to be filled with a certain data, the search function of datatables is used.
+            The incoming parameter is parsed ve returned. If there is a initial value, the "search_value" has "_initial" prefix.
+            Parameters:
+                search_value (str): A string
+            Returns:
+                is_initial (boolean): If there is a initial value, it is True
+            '''
             return "_initial:" in search_value and search_value.split("_initial:")[1] != "null"
 
         try:
@@ -157,20 +185,16 @@ class NucAcids(models.Model):
 
     @property
     def amount(self):
-        # calculates the amount: amount = vol_init * conc
-        # result = 0
-        # try:
-        #     result = self.conc * self.vol_init
-        # except Exception as e:
-        #     pass
-        #
-        # return result
+        '''
+        Calculates the amount that vol_init * conc
+        '''
         return self.conc * self.vol_remain
 
-    def set_zero_volume(self):
-        self.vol_remain = 0.0
-        self.save()
-
     def update_volume(self,amount):
+        '''
+        Updates the volume. If this nucleic acid is used to create a sample library, the remaining volume is recalculated and saved.
+        Parameters:
+            amount (float): A float number
+        '''
         self.vol_remain = round(self.vol_remain - (amount / self.conc),2)
         self.save()

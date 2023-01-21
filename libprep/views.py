@@ -9,6 +9,8 @@ import json
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required,permission_required
 from core.decorators import *
+from core.utils import custom_update
+from .serializers import NucacidsSerializer
 
 @permission_required("libprep.view_nucacids",raise_exception=True)
 def nucacids(request):
@@ -18,8 +20,6 @@ def nucacids(request):
 
 @permission_required_for_async("libprep.view_nucacids")
 def filter_nucacids(request):
-    from .serializers import NucacidsSerializer
-
     nucacids = NucAcids().query_by_args(request.user,**request.GET)
     serializer = NucacidsSerializer(nucacids['items'], many=True)
     result = dict()
@@ -32,8 +32,6 @@ def filter_nucacids(request):
 
 @permission_required_for_async("libprep.change_nucacids")
 def edit_nucacid_async(request):
-    import re
-    from core.utils import custom_update
 
     parameters = {}
 
