@@ -15,7 +15,7 @@ class NucAcidForm(forms.ModelForm):
         self.fields["name"].required = False
 
 class SampleLibCreationOptionsForm(forms.Form):
-    barcode_start_with = forms.ModelChoiceField(queryset = Barcode.objects.all.filter(barcode_set__active=True))
+    barcode_start_with = forms.ModelChoiceField(queryset = Barcode.objects.filter(barcode_set__active=True))
     target_amount = forms.FloatField()
     shear_volume = forms.FloatField()
     prefix = forms.CharField()
