@@ -1,6 +1,6 @@
 from django import forms
 from .models import NucAcids
-from samplelib.models import Barcode
+from barcodeset.models import Barcode
 from django.core.exceptions import ValidationError
 
 class NucAcidForm(forms.ModelForm):
@@ -15,7 +15,7 @@ class NucAcidForm(forms.ModelForm):
         self.fields["name"].required = False
 
 class SampleLibCreationOptionsForm(forms.Form):
-    barcode_start_with = forms.ModelChoiceField(queryset = Barcode.objects.all())
+    barcode_start_with = forms.ModelChoiceField(queryset = Barcode.objects.all.filter(barcode_set__active=True))
     target_amount = forms.FloatField()
     shear_volume = forms.FloatField()
     prefix = forms.CharField()

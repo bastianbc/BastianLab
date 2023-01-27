@@ -44,10 +44,10 @@ def delete_bait(request,id):
         instance = Bait.objects.get(id=id)
         instance.delete()
         messages.success(request, "Bait was deleted successfully")
-        return redirect('/bait')
     except Exception as e:
         messages.error(request, "Bait wasn't deleted!")
-    return redirect(coming_url)
+
+    return redirect('/bait')
 
 @permission_required("bait.view_bait",raise_exception=True)
 def filter_baits(request):

@@ -2,20 +2,9 @@ from django.db import models
 from datetime import datetime
 from django.db.models import Q, Count
 
-class Barcode(models.Model):
-    name = models.CharField(max_length=50, unique=True, verbose_name="Name")
-    i5 = models.CharField(max_length=10, unique=True, verbose_name="I5")
-    i7 = models.CharField(max_length=10, unique=True, verbose_name="I7")
-
-    class Meta:
-        db_table = "barcode"
-
-    def __str__(self):
-        return self.name
-
 class SampleLib(models.Model):
     name = models.CharField(max_length=50, unique=True, verbose_name="Name")
-    barcode = models.ForeignKey(Barcode, on_delete=models.CASCADE, verbose_name="Barcode")
+    barcode = models.ForeignKey("barcodeset.Barcode", on_delete=models.CASCADE, verbose_name="Barcode")
     date = models.DateTimeField(default=datetime.now, verbose_name="Date")
     method = models.ForeignKey("method.Method",related_name="sample_libs",on_delete=models.CASCADE, verbose_name="Method")
     qubit = models.FloatField(default=0, verbose_name="Qubit")

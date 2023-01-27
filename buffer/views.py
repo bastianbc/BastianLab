@@ -44,10 +44,10 @@ def delete_buffer(request,id):
         instance = Buffer.objects.get(id=id)
         instance.delete()
         messages.success(request, "Buffer was deleted successfully")
-        return redirect('/buffer')
     except Exception as e:
         messages.error(request, "Buffer wasn't deleted!")
-    return redirect(coming_url)
+    
+    return redirect('/buffer')
 
 @permission_required("buffer.view_buffer",raise_exception=True)
 def filter_buffers(request):

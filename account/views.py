@@ -44,10 +44,10 @@ def delete_account(request,id):
         instance = User.objects.get(id=id)
         instance.delete()
         messages.success(request, "Account was deleted successfully")
-        return redirect('/account')
     except Exception as e:
         messages.error(request, "Account wasn't deleted!")
-    return redirect(coming_url)
+
+    return redirect('/account')
 
 @permission_required("account.view_user",raise_exception=True)
 def filter_accounts(request):

@@ -45,10 +45,10 @@ def delete_method(request,id):
         instance = Method.objects.get(id=id)
         instance.delete()
         messages.success(request, "Method was deleted successfully")
-        return redirect('/method')
     except Exception as e:
         messages.error(request, "Method wasn't deleted!")
-    return redirect(coming_url)
+    
+    return redirect('/method')
 
 @permission_required("method.view_method",raise_exception=True)
 def filter_methods(request):

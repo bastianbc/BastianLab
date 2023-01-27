@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required,permission_required
 from .serializers import *
 from .models import *
-from samplelib.models import SampleLib, Barcode
+from samplelib.models import SampleLib
 from bait.models import Bait
 from .forms import *
 from django.contrib import messages

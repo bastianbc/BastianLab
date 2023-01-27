@@ -1,3 +1,5 @@
+{% load extra %}
+
 <!DOCTYPE html>
 <!--
 Author: Keenthemes
@@ -906,6 +908,11 @@ License: For each use you must have a valid license purchased only from above li
 													<a href="/body" class="menu-link px-5">Body Sites</a>
 												</div>
 												<!--end::Menu item-->
+												<!--begin::Menu item-->
+												<div class="menu-item px-5">
+													<a href="/barcodeset" class="menu-link px-5">Barcode Sets</a>
+												</div>
+												<!--end::Menu item-->
 											</div>
 											<!--end::Admin area menu-->
 											{% endif %}
@@ -1110,8 +1117,7 @@ License: For each use you must have a valid license purchased only from above li
 						</div>
 						<!--end::Header top-->
 						<!--begin::Header bottom-->
-						{{ is_admin_area }}
-						{% if not "group" in request.path and not "account" in request.path  %}
+						{% if not request.path|is_admin_area  %}
 						<div class="header-bottom d-lg-flex flex-column align-items-stretch w-100" id="kt_header_navs" data-kt-drawer="true" data-kt-drawer-name="header-menu" data-kt-drawer-activate="{default: true, lg: false}" data-kt-drawer-overlay="true" data-kt-drawer-width="{default:'200px', '300px': '250px'}" data-kt-drawer-direction="start" data-kt-drawer-toggle="#kt_header_navs_toggle" data-kt-swapper="true" data-kt-swapper-mode="append" data-kt-swapper-parent="{default: '#kt_body', lg: '#kt_header'}">
 							<!--begin::Tabs container-->
 							<div class="container-custom container-xxl d-lg-flex flex-column w-100">

@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<form method="post" action="{% if id %} {% url 'edit-capturedlib' id %} {% else %} {% url 'new-capturedlib' %} {% endif %}" enctype="multipart/form-data" >
+<form method="post" action="{% if id %} {% url 'edit-capturedlib' id %} {% else %} {% url 'new-capturedlib' %} {% endif %}" enctype="multipart/form-data">
   <div class="card">
     <div class="card-header">
       <h3 class="card-title">Captured Library</h3>

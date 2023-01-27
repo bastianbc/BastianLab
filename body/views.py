@@ -45,10 +45,10 @@ def delete_body(request,id):
         instance = Body.objects.get(id=id)
         instance.delete()
         messages.success(request, "Body was deleted successfully")
-        return redirect('/body')
     except Exception as e:
         messages.error(request, "Body wasn't deleted!")
-    return redirect(coming_url)
+
+    return redirect('/body')
 
 @permission_required("body.view_body",raise_exception=True)
 def filter_bodys(request):

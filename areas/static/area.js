@@ -8,7 +8,10 @@ var KTDatatablesServerSide = function () {
     var filterPayment;
     var editor;
 
-    // Private functions
+    /*
+   * Initializes the datatable.
+   * @param  {String} initialValue  If it comes from another page, it is initialized with this value.
+   */
     var initDatatable = function ( initialValue ) {
 
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
@@ -445,11 +448,16 @@ var KTDatatablesServerSide = function () {
         });
     }
 
+    // Functions in selected rows
     var handleSelectedRows = function (e) {
 
       const el = document.getElementById("modal_extract_nucleic_acid");
       const modal = new bootstrap.Modal(el);
 
+      /*
+      * Object Ids for some processes like deletion, creation.
+      * @return {String} A list of number as a string.
+      */
       function getSelectedRows() {
 
         const container = document.querySelector('.table');
@@ -471,6 +479,10 @@ var KTDatatablesServerSide = function () {
         return JSON.stringify(selectedIds);
       }
 
+      /*
+      * Serializes the form.
+      * @return {String} A list of object as a string.
+      */
       function getExtractionOptions() {
 
         var data = new FormData(document.getElementById('frm_extraction_options'));
@@ -479,12 +491,14 @@ var KTDatatablesServerSide = function () {
         return JSON.stringify(options);
       }
 
+      // Opens the modal
       function openModal() {
 
         modal.show();
 
       }
 
+      // Closes the modal.
       function closeModal() {
 
         modal.hide();
@@ -580,6 +594,7 @@ var KTDatatablesServerSide = function () {
         }
     }
 
+    // Provides the datatable to be fully editable. official docs for more info  --> https://editor.datatables.net
     var initEditor = function () {
 
       var collectionOptions =[];
@@ -676,6 +691,7 @@ var KTDatatablesServerSide = function () {
         editor.inline( cell.index() );
       });
 
+      // Gets the collection options and fills the dropdown. It is executed synchronous.
       function getCollectionOptions() {
 
         $.ajax({
@@ -697,6 +713,7 @@ var KTDatatablesServerSide = function () {
 
       }
 
+      // Gets the area type options and fills the dropdown. It is executed synchronous.
       function getAreaTypeOptions() {
 
         $.ajax({

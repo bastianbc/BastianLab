@@ -52,16 +52,10 @@ class Areas(models.Model):
 
     ar_id = models.AutoField(primary_key=True)
     block = models.ForeignKey('blocks.Blocks', on_delete=models.CASCADE, db_column='block', related_name="block_areas")
-    name = models.CharField(max_length=50, blank=True, null=True, unique=True)
-    # area = models.CharField(max_length=6, blank=True, null=True)
-    # project = models.CharField(max_length=100, blank=True, null=True)
-    # old_block_id = models.CharField(max_length=50, blank=True, null=True)
+    name = models.CharField(max_length=50, unique=True)
     collection = models.CharField(max_length=2, choices=COLLECTION_CHOICES, default=SCRAPE)
     area_type = models.CharField(max_length=30, choices=AREA_TYPE_TYPES, blank=True, null=True)
-    # he_image = models.CharField(max_length=200, blank=True, null=True)
-    # na_id = models.CharField(max_length=50, blank=True, null=True)
     completion_date = models.DateTimeField(default=datetime.now)
-    # investigator = models.CharField(max_length=50, blank=True, null=True)
     image = models.ImageField(null=True, blank=True, upload_to="images/%y/%m/%d")
     notes = models.TextField(blank=True, null=True)
 
@@ -71,31 +65,68 @@ class Areas(models.Model):
     def __str__(self):
         return self.name
 
-    def _generate_unique_id(self):
+    def _generate_unique_name(self):
+        '''
+        Generates unique name for new area. An area belongs to a block. An area's unique name is derived from block name.
+        Multiple areas that belong to a block are named incrementally.
+        Returns:
+            name (str): A string
+        '''
         count = Areas.objects.filter(block=self.block).count()
         return "%s_area%d" % (self.block.name, count + 1)
 
     def save(self,*args,**kwargs):
+        '''
+        Overrides the model's save method.
+        '''
         if not self.name:
-            self.name = self._generate_unique_id()
+            self.name = self._generate_unique_name()
 
         super().save(*args, **kwargs)
 
     def query_by_args(self, user, **kwargs):
+        '''
+        This is where the sorting and filtering functions of the datatables are executed.
+        Parameters:
+            user (obj): Active django user
+            kwargs (dict): All parameters that the datatables used
+        Returns:
+            data (dict): Data that the user will see on the screen
+        '''
 
         def _get_authorizated_queryset():
+            '''
+            Users can access to some entities depend on their authorize. While the user having admin role can access to all things,
+            technicians or researchers can access own projects and other entities related to it.
+            '''
             queryset = Areas.objects.all().annotate(num_nucacids=Count('nucacids'))
             if not user.is_superuser:
                 return queryset.filter(Q(block__project__technician=user) | Q(block__project__researcher=user))
             return queryset
 
         def _parse_value(search_value):
+            '''
+            When the datatables are to be filled with a certain data, the search function of datatables is used.
+            The incoming parameter is parsed ve returned. If there is a initial value, the "search_value" has "_initial" prefix.
+            Parameters:
+                search_value (str): A string
+            Returns:
+                search_value (str): Parsed value
+            '''
             if "_initial:" in search_value:
                 v = search_value.split("_initial:")[1]
                 return None if v == "null" or not v.isnumeric() else v
             return search_value
 
         def _is_initial_value(search_value):
+            '''
+            When the datatables are to be filled with a certain data, the search function of datatables is used.
+            The incoming parameter is parsed ve returned. If there is a initial value, the "search_value" has "_initial" prefix.
+            Parameters:
+                search_value (str): A string
+            Returns:
+                is_initial (boolean): If there is a initial value, it is True
+            '''
             return "_initial:" in search_value and search_value.split("_initial:")[1] != "null"
 
         try:
@@ -156,8 +187,14 @@ class Areas(models.Model):
 
     @staticmethod
     def get_area_types():
+        '''
+        Option list of Area Type for the datatables' select field.
+        '''
         return [{"label":"---------","value":""}] + [{ "label":c[1], "value":c[0] } for c in Areas.AREA_TYPE_TYPES]
 
     @staticmethod
     def get_collections():
+        '''
+        Option list of Collection for the datatables' select field.
+        '''
         return [{"label":"---------","value":""}] + [{ "label":c[1], "value":c[0] } for c in Areas.COLLECTION_CHOICES]
