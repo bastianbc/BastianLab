@@ -67,7 +67,7 @@ class Barcode(models.Model):
     def __str__(self):
         return self.name
 
-    def query_by_args(self, **kwargs):
+    def query_by_args(self, *args, **kwargs):
         try:
             ORDER_COLUMN_CHOICES = {
                 "0": "id",
@@ -82,12 +82,16 @@ class Barcode(models.Model):
             order_column = kwargs.get('order[0][column]', None)[0]
             order = kwargs.get('order[0][dir]', None)[0]
 
+            barcode_set_id = args[0]
+
             order_column = ORDER_COLUMN_CHOICES[order_column]
             # django orm '-' -> desc
             if order == 'desc':
                 order_column = '-' + order_column
 
-            queryset = Barcode.objects.all()
+
+            queryset = Barcode.objects.filter(barcode_set__id=barcode_set_id)
+            
             total = queryset.count()
 
             if search_value:

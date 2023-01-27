@@ -91,7 +91,8 @@ def barcodes(request,id):
 
 @permission_required("barcodeset.view_barcode",raise_exception=True)
 def filter_barcodes(request):
-    barcodes = Barcode().query_by_args(**request.GET)
+    barcode_set_id = request.META['HTTP_REFERER'].split("/")[4]
+    barcodes = Barcode().query_by_args(barcode_set_id,**request.GET)
     serializer = BarcodeSerializer(barcodes['items'], many=True)
     result = dict()
     result['data'] = serializer.data
