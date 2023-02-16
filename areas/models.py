@@ -4,17 +4,6 @@ from datetime import datetime
 from django.utils.crypto import get_random_string
 
 class Areas(models.Model):
-    PUNCH = 'PU'
-    SCRAPE = 'SC'
-    PELLET = 'PE'
-    CURLS = 'CU'
-    COLLECTION_CHOICES = [
-        (PUNCH, 'Punch'),
-        (SCRAPE, 'Scraping'),
-        (PELLET, 'Cell Pellet'),
-        (CURLS, 'Curls')
-    ]
-
     AREA_TYPE_TYPES = (
         ("normal","Normal"),
         ("normal2","Normal1"),
@@ -53,7 +42,6 @@ class Areas(models.Model):
     ar_id = models.AutoField(primary_key=True)
     block = models.ForeignKey('blocks.Blocks', on_delete=models.CASCADE, db_column='block', related_name="block_areas")
     name = models.CharField(max_length=50, unique=True)
-    collection = models.CharField(max_length=2, choices=COLLECTION_CHOICES, default=SCRAPE)
     area_type = models.CharField(max_length=30, choices=AREA_TYPE_TYPES, blank=True, null=True)
     completion_date = models.DateTimeField(default=datetime.now)
     image = models.ImageField(null=True, blank=True, upload_to="images/%y/%m/%d")

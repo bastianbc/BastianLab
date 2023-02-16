@@ -12,6 +12,7 @@ def is_admin_area(path):
         "body",
         "method",
         "barcodeset",
+        "migration",
     ]
 
     app_name = path.split("/")[1]

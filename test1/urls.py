@@ -28,6 +28,7 @@ urlpatterns = [
     path('bait/', include('bait.urls')),
     path('body/', include('body.urls')),
     path('barcodeset/', include('barcodeset.urls')),
+    path('migration/', include('migration.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 handler404 = "core.views.error_404"

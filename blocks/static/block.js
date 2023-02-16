@@ -58,6 +58,11 @@ var KTDatatablesServerSide = function () {
               { data: 'diagnosis' },
               { data: 'body_site' },
               { data: 'thickness' },
+              { data: 'collection',
+                render: function (val, type, row) {
+                  return row["collection_label"];
+                }
+              },
               { data: 'date_added',
                 render: function (data) {
                   return moment(data).format('MM/DD/YYYY');
@@ -749,6 +754,12 @@ var KTDatatablesServerSide = function () {
             }
           },
           {
+             label: "Collection:",
+             name: "collection",
+             type: "select",
+             options: collectionOptions
+          }, 
+          {
             label: "Diagnosis:",
             name: "diagnosis"
           },
@@ -783,6 +794,28 @@ var KTDatatablesServerSide = function () {
      });
 
       })
+
+      // Gets the collection options and fills the dropdown. It is executed synchronous.
+      function getCollectionOptions() {
+
+        $.ajax({
+            url: "/areas/get_collections",
+            type: "GET",
+            async: false,
+            success: function (data) {
+
+             data.forEach((item, i) => {
+
+               collectionOptions.push({
+                 "label":item["label"],
+                 "value":item["value"]
+               })
+
+             });
+            }
+        });
+
+      }
 
       function getBodyOptions() {
 

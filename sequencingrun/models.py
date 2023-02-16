@@ -18,7 +18,7 @@ class SequencingRun(models.Model):
         ("novaseq-x","NovaSeq X"),
         ("hiseq-2500","HiSeq 2500"),
         ("hiseq-4000","HiSeq 4000"),
-        ("iseq100","iSeq100"),
+        ("iseq100","iSeq 100"),
     )
 
     PE_TYPES = (
@@ -30,8 +30,8 @@ class SequencingRun(models.Model):
     date_run = models.DateTimeField(default=datetime.now, verbose_name="Date Run")
     date = models.DateTimeField(default=datetime.now, verbose_name="Date")
     facility = models.CharField(max_length=20, choices=FACILITY_TYPES, verbose_name="Facility")
-    sequencer = models.CharField(max_length=20, choices=SEQUENCER_TYPES, verbose_name="Sequencer")
-    pe = models.CharField(max_length=20, choices=PE_TYPES, verbose_name="PE")
+    sequencer = models.CharField(max_length=20, choices=SEQUENCER_TYPES, verbose_name="Sequencer",blank=True, null=True)
+    pe = models.CharField(max_length=20, choices=PE_TYPES, verbose_name="PE",blank=True, null=True)
     amp_cycles = models.IntegerField(default=0, verbose_name="AMP Cycles")
     notes = models.TextField(blank=True, null=True, verbose_name="Notes")
     sequencing_libs = models.ManyToManyField("sequencinglib.SequencingLib", blank=True)

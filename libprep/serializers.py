@@ -18,7 +18,7 @@ class NucacidsSerializer(serializers.ModelSerializer):
        return getattr(obj, 'nu_id')
 
     def get_method_label(self, obj):
-        return obj.method.name
+        return obj.method.name if obj.method else None
 
     def get_na_type_label(self,obj):
         return obj.get_na_type_display()

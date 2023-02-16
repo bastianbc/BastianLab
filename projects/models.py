@@ -29,9 +29,6 @@ class Projects(models.Model):
         verbose_name = 'Project'
         verbose_name_plural = 'Projects'
 
-    # def get_absolute_url(self):
-    #         return reverse('patient-update', kwargs={'pk': self.pk})
-
     def __str__(self):
        return self.name
 

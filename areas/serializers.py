@@ -8,12 +8,12 @@ class AreasSerializer(serializers.ModelSerializer):
     block = serializers.SerializerMethodField()
     project = serializers.SerializerMethodField()
     area_type_label = serializers.SerializerMethodField()
-    collection_label = serializers.SerializerMethodField()
+    # collection_label = serializers.SerializerMethodField()
     investigator = serializers.SerializerMethodField()
 
     class Meta:
         model = Areas
-        fields = ("ar_id", "name", "block", "project", "collection", "collection_label", "area_type", "area_type_label", "completion_date", "investigator","num_nucacids", "DT_RowId",)
+        fields = ("ar_id", "name", "block", "project", "area_type", "area_type_label", "completion_date", "investigator","num_nucacids", "DT_RowId",)
 
     def get_DT_RowId(self, obj):
         return getattr(obj, 'ar_id')

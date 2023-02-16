@@ -6,7 +6,7 @@ class SampleLib(models.Model):
     name = models.CharField(max_length=50, unique=True, verbose_name="Name")
     barcode = models.ForeignKey("barcodeset.Barcode", on_delete=models.CASCADE, verbose_name="Barcode")
     date = models.DateTimeField(default=datetime.now, verbose_name="Date")
-    method = models.ForeignKey("method.Method",related_name="sample_libs",on_delete=models.CASCADE, verbose_name="Method")
+    method = models.ForeignKey("method.Method",related_name="sample_libs",on_delete=models.CASCADE, blank=True, null=True, verbose_name="Method")
     qubit = models.FloatField(default=0, verbose_name="Qubit")
     shear_volume  = models.FloatField(default=0, verbose_name="Shear Volume")
     qpcr_conc = models.FloatField(default=0, verbose_name="qPCR Concentration")

@@ -58,11 +58,6 @@ var KTDatatablesServerSide = function () {
               { data: 'name' },
               { data: 'block' },
               { data: 'project' },
-              { data: 'collection',
-                render: function (val, type, row) {
-                  return row["collection_label"];
-                }
-              },
               { data: 'area_type',
                 render: function (val, type, row) {
                   return row["area_type_label"];
@@ -94,7 +89,7 @@ var KTDatatablesServerSide = function () {
                 //     }
                 // },
                 {
-                    targets: 8,
+                    targets: 7,
                     orderable: false,
                     render: function (data, type, row) {
                         if (data > 0) {
@@ -106,7 +101,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 9,
+                    targets: 8,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -649,12 +644,7 @@ var KTDatatablesServerSide = function () {
              name: "project",
              type: "readonly",
              attr: { disabled:true }
-           },{
-              label: "Collection:",
-              name: "collection",
-              type: "select",
-              options: collectionOptions
-            }, {
+           }, {
               label: "Area Type:",
               name: "area_type",
               type: "select",
@@ -690,28 +680,6 @@ var KTDatatablesServerSide = function () {
       $('.table').on( 'key-focus', function ( e, datatable, cell ) {
         editor.inline( cell.index() );
       });
-
-      // Gets the collection options and fills the dropdown. It is executed synchronous.
-      function getCollectionOptions() {
-
-        $.ajax({
-            url: "/areas/get_collections",
-            type: "GET",
-            async: false,
-            success: function (data) {
-
-             data.forEach((item, i) => {
-
-               collectionOptions.push({
-                 "label":item["label"],
-                 "value":item["value"]
-               })
-
-             });
-            }
-        });
-
-      }
 
       // Gets the area type options and fills the dropdown. It is executed synchronous.
       function getAreaTypeOptions() {

@@ -28,6 +28,17 @@ class Blocks(models.Model):
         ("squamous-cell-carcinoma","Squamous Cell Carcinoma"),
     )
 
+    PUNCH = 'PU'
+    SCRAPE = 'SC'
+    PELLET = 'PE'
+    CURLS = 'CU'
+    COLLECTION_CHOICES = [
+        (PUNCH, 'Punch'),
+        (SCRAPE, 'Scraping'),
+        (PELLET, 'Cell Pellet'),
+        (CURLS, 'Curls')
+    ]
+
     bl_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50, blank=True, null=False, unique=True)
     # pat_id = models.CharField(max_length=12, blank=True, null=True)
@@ -50,7 +61,7 @@ class Blocks(models.Model):
     # area_id = models.CharField(max_length=100, blank=True, null=True)
     # old_project = models.CharField(max_length=50, blank=True, null=True)
     storage = models.CharField(max_length=50, blank=True, null=True)
-    scan_number = models.FloatField(default=0)
+    scan_number = models.CharField(max_length=100,blank=True, null=True)
     icd10 = models.TextField(blank=True, null=True)
     diagnosis = models.TextField(blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
@@ -59,6 +70,8 @@ class Blocks(models.Model):
     clinical = models.TextField(blank=True, null=True)
     # site_code = models.TextField(blank=True, null=True)
     date_added = models.DateTimeField(blank=True, null=True, auto_now_add=True)
+    old_body_site = models.CharField(max_length=600,blank=True, null=True)
+    collection = models.CharField(max_length=2, choices=COLLECTION_CHOICES, default=SCRAPE)
 
     class Meta:
         db_table = 'blocks'

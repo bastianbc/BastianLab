@@ -80,7 +80,8 @@ INSTALLED_APPS = [
     'buffer',
     'bait',
     'body',
-    'barcodeset'
+    'barcodeset',
+    'migration',
 ]
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 CRISPY_FAIL_SILENTLY = not DEBUG

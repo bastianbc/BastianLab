@@ -25,10 +25,10 @@ class SampleLibSerializer(serializers.ModelSerializer):
 
     def get_area(self,obj):
         # Nuclecic Acids have to be from the SAME Area (never many areas) to be combined into one SL.
-        return obj.nucacids.first().nucacid.area.name if obj.nucacids.count() > 0 else None
+        return obj.nucacids.first().nucacid.area.name if obj.nucacids.count() > 0 and obj.nucacids.first().nucacid.area else None
 
     def get_method_label(self,obj):
-        return obj.method.name
+        return obj.method.name if obj.method else None
 
 class UsedNuacidsSerializer(serializers.ModelSerializer):
     sample_lib = serializers.StringRelatedField()
