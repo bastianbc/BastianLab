@@ -162,3 +162,10 @@ class Blocks(models.Model):
         except Exception as e:
             print(str(e))
             raise
+
+    @staticmethod
+    def get_collections():
+        '''
+        Option list of Collection for the datatables' select field.
+        '''
+        return [{"label":"---------","value":""}] + [{ "label":c[1], "value":c[0] } for c in Blocks.COLLECTION_CHOICES]

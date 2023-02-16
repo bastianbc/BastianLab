@@ -126,9 +126,6 @@ def delete_batch_areas(request):
 
     return JsonResponse({ "deleted":True })
 
-def get_collections(request):
-    return JsonResponse(Areas.get_collections(), safe=False)
-
 def get_area_types(request):
     return JsonResponse(Areas.get_area_types(), safe=False)
 

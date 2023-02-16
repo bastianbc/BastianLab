@@ -21,9 +21,6 @@ class AreasSerializer(serializers.ModelSerializer):
     def get_area_type_label(self,obj):
         return obj.get_area_type_display()
 
-    def get_collection_label(self,obj):
-        return obj.get_collection_display()
-
     def get_investigator(self, obj):
         return obj.block.project.pi if obj.block.project else None
 

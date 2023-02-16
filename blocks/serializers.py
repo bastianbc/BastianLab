@@ -8,10 +8,11 @@ class BlocksSerializer(serializers.ModelSerializer):
     DT_RowId = serializers.SerializerMethodField()
     project = serializers.StringRelatedField()
     body_site = serializers.SerializerMethodField()
+    collection_label = serializers.SerializerMethodField()
 
     class Meta:
         model = Blocks
-        fields = ("bl_id","name","project","patient","diagnosis","body_site","thickness","date_added","num_areas","DT_RowId",)
+        fields = ("bl_id","name","project","patient","diagnosis","body_site","thickness","collection","collection_label","date_added","num_areas","DT_RowId",)
 
     def get_value(self,obj):
         return obj.patient.pat_id
@@ -24,3 +25,6 @@ class BlocksSerializer(serializers.ModelSerializer):
 
     def get_body_site(self,obj):
         return obj.body_site.name if obj.body_site else None
+
+    def get_collection_label(self,obj):
+        return obj.get_collection_display()

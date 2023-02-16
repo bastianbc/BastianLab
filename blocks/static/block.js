@@ -697,10 +697,12 @@ var KTDatatablesServerSide = function () {
     var initEditor = function () {
 
       var bodyOptions = [];
+      var collectionOptions = [];
 
       Promise.all([
 
-        getBodyOptions()
+        getBodyOptions(),
+        getCollectionOptions()
 
       ]).then(function () {
 
@@ -758,7 +760,7 @@ var KTDatatablesServerSide = function () {
              name: "collection",
              type: "select",
              options: collectionOptions
-          }, 
+          },
           {
             label: "Diagnosis:",
             name: "diagnosis"
@@ -799,7 +801,7 @@ var KTDatatablesServerSide = function () {
       function getCollectionOptions() {
 
         $.ajax({
-            url: "/areas/get_collections",
+            url: "/blocks/get_collections",
             type: "GET",
             async: false,
             success: function (data) {
