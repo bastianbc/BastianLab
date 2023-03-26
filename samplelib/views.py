@@ -17,18 +17,20 @@ from core.decorators import *
 @permission_required("samplelib.view_samplelib",raise_exception=True)
 def samplelibs(request):
     form = CapturedLibCreationOptionsForm()
+    filter = FilterForm()
     return render(request, "samplelib_list.html", locals())
 
 @permission_required_for_async("samplelib.view_samplelib")
 def filter_samplelibs(request):
     samplelibs = SampleLib().query_by_args(request.user,**request.GET)
     serializer = SampleLibSerializer(samplelibs['items'], many=True)
+    print("6")
     result = dict()
     result['data'] = serializer.data
     result['draw'] = samplelibs['draw']
     result['recordsTotal'] = samplelibs['total']
     result['recordsFiltered'] = samplelibs['count']
-
+    print("7")
     return JsonResponse(result)
 
 @permission_required_for_async("samplelib.change_samplelib")

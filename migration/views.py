@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from .forms import *
+from django.http import HttpResponse
 
 def migrate(request):
     from datetime import datetime
@@ -15,8 +16,10 @@ def migrate(request):
     from samplelib.models import SampleLib, NA_SL_LINK
     from capturedlib.models import CapturedLib, SL_CL_LINK
     from bait.models import Bait
-    from barcodeset.models import Barcode
+    from barcodeset.models import Barcodeset,Barcode
     from sequencingrun.models import SequencingRun
+    from sequencinglib.models import SequencingLib,CL_SEQL_LINK
+    from django.core.exceptions import ObjectDoesNotExist
 
     if request.method=="POST":
         form = MigrationForm(request.POST, request.FILES)
@@ -27,8 +30,9 @@ def migrate(request):
 
             file = form.cleaned_data["file"].read().decode('utf-8')
 
-            reader = csv.reader(StringIO(file))
             report = []
+            reader = csv.reader(StringIO(file))
+            next(reader) #skip first row
 
             for row in reader:
                 try:
@@ -108,11 +112,11 @@ def migrate(request):
                             return qs.first() if qs.exists() else None
 
                         project = Projects.objects.create(
-                            name=row[1],
+                            name=row[1].strip(),
                             abbreviation=get_abbreviation(row[1]),
                             pi=get_pi(row[2]),
                             speedtype="",
-                            description=row[0],
+                            description=row[0].strip(),
                             date_start=datetime.now(),
                         )
 
@@ -135,18 +139,13 @@ def migrate(request):
                                     return x[0]
                             return 7
 
-                        if row[0] != "":
-                            patient = Patients.objects.create(
-                                pat_id=row[0],
-                                sex=get_sex(row[1]),
-                                race=get_race(row[3]),
-                                source=row[4],
-                                notes=row[7]
-                            )
-
-                            report.append({"name":row[0],"status":"OK"})
-                        else:
-                            report.append({"name":row[0],"status":"PASS"})
+                        patient = Patients.objects.create(
+                            pat_id=row[0].strip(),
+                            sex=get_sex(row[1]),
+                            race=get_race(row[3]),
+                            source=row[4],
+                            notes=row[7]
+                        )
                     elif app == "block":
 
                         def get_patient(value):
@@ -173,17 +172,15 @@ def migrate(request):
                         def get_slides(value):
                             return int(value) if value else None
 
-
-
                         def get_slides_left(value):
                             return int(value) if value else None
 
                         Blocks.objects.create(
-                            name=row[0],
-                            patient=get_patient(row[1]),
-                            project=get_project(row[10]),
-                            old_body_site=row[3],
-                            ulceration=get_ulceration(row[4]),
+                            name=row[0].strip(),
+                            patient=get_patient(row[1].strip()),
+                            project=get_project(row[10].strip()),
+                            old_body_site=row[3].strip(),
+                            ulceration=get_ulceration(row[4].strip()),
                             slides=get_slides(row[5]),
                             slides_left=get_slides_left(row[6]),
                             fixation=row[7],
@@ -215,19 +212,15 @@ def migrate(request):
                         def get_completion_date(value):
                             return datetime.strptime(value,'%m/%d/%Y') if value else datetime.now()
 
-                        print("block:",get_block(row[2]))
-                        print("type:",get_area_type(row[4]))
-                        print("date:",get_completion_date(row[7]))
-
                         Areas.objects.create(
-                            name=row[0],
-                            block=get_block(row[2]),
+                            name=row[0].strip(),
+                            block=get_block(row[2].strip("\"\n\ ")),
                             area_type=get_area_type(row[4]),
                             completion_date=get_completion_date(row[7]),
                             notes=row[9],
                         )
 
-                        Blocks.objects.filter(name=row[2]).update(collection=get_collection(row[3]))
+                        Blocks.objects.filter(name=row[2].strip("\"\n\ ")).update(collection=get_collection(row[3]))
                     elif app == "na":
 
                         def get_na_type(value):
@@ -269,11 +262,11 @@ def migrate(request):
                             return result
 
                         NucAcids.objects.create(
-                            name=row[0],
-                            area=get_area(row[1]),
-                            date=get_date(row[3]),
-                            method=get_or_create_method(row[4]),
-                            na_type=get_na_type(row[2]),
+                            name=row[0].strip(),
+                            area=get_area(row[1].strip()),
+                            date=get_date(row[3].strip()),
+                            method=get_or_create_method(row[4].strip()),
+                            na_type=get_na_type(row[2].strip()),
                             conc=row[5],
                             vol_init=row[6],
                             notes=get_notes(row[14],row[8],row[9],row[10],row[11],row[12]),
@@ -333,8 +326,8 @@ def migrate(request):
                             return datetime.strptime(value,'%m/%d/%Y') if value else datetime.now()
 
                         sl = SampleLib.objects.create(
-                            name=row[0],
-                            barcode=get_barcode(row[22]),
+                            name=row[0].strip(),
+                            barcode=get_barcode(row[22].strip()),
                             date=get_date(row[23]),
                             qpcr_conc=row[8],
                             amount_final=row[13],
@@ -344,9 +337,10 @@ def migrate(request):
 
                         create_na_sl_link(sl,row[1],row[10],row[8])
 
-                        cl = create_cl(row[14],row[20],row[14],row[19])
+                        for item in row[16].split(","):
+                            cl = create_cl(item.strip(),row[20].strip(),row[14],row[19])
 
-                        create_sl_cl_link(sl,cl,row[10],row[8])
+                            create_sl_cl_link(sl,cl,row[10],row[8])
                     elif app == "cl":
 
                         def get_date(value):
@@ -368,23 +362,71 @@ def migrate(request):
                                 return SequencingRun.PE_TYPES[1][0]
                             return None
 
-                        SequencingRun.objects.create(
-                            name = row[1],
-                            date = get_date(row[2]),
-                            facility = row[3],
-                            sequencer = get_sequencer(row[4]),
-                            pe = get_pe(row[4]),
-                            notes = row[9]
+                        def get_or_create_sequencinglib(name,date):
+                            try:
+                                return SequencingLib.objects.get(name=name)
+                            except ObjectDoesNotExist as e:
+                                return SequencingLib.objects.create(
+                                    name = name,
+                                    date = date,
+                                    notes = "related with sequencing run",
+                                )
+
+                        def get_capturedlib(value):
+                            return CapturedLib.objects.get(name=value)
+
+                        def create_cl_seql_link(cl,seq_l):
+                            CL_SEQL_LINK.objects.create(
+                                captured_lib = cl,
+                                sequencing_lib = seq_l
+                            )
+
+                        for item in row[1].split(","):
+                            seq_l = get_or_create_sequencinglib(item.strip(),get_date(row[2]))
+                            cl = get_capturedlib(row[0].strip())
+
+                            create_cl_seql_link(cl,seq_l)
+
+                            if not SequencingRun.objects.filter(name = item.strip()).exists():
+                                sequencing_run = SequencingRun.objects.create(
+                                    name = item.strip(),
+                                    date = get_date(row[2]),
+                                    facility = row[3].strip(),
+                                    sequencer = get_sequencer(row[4].strip()),
+                                    pe = get_pe(row[4].strip()),
+                                    notes = row[9]
+                                )
+
+                                sequencing_run.sequencing_libs.add(seq_l)
+                    elif app == "barcode":
+                        Barcode.objects.create(
+                            barcode_set=Barcodeset.objects.get(name="New Barcodes"),
+                            name=row[0],
+                            i5=row[3],
+                            i7=row[2]
                         )
 
                     print("migrated..")
+                    report.append({"name":row[0],"status":"OK","message":""})
                 except Exception as e:
                     print(str(e))
                     print(row)
-                    report.append({"name":row[0],"status":"FAILED"})
-                    pass
+                    report.append({"name":row[0],"status":"FAILED","message":str(e)})
 
             print("Process was completed successfully")
+
+            response = HttpResponse(
+                content_type='text/csv',
+                headers={'Content-Disposition': 'attachment; filename="report-%s.csv"' % app},
+            )
+
+            field_names = ["name","status","message"]
+            writer = csv.writer(response)
+            writer.writerow(field_names)
+            for item in report:
+                writer.writerow([item[field] for field in field_names])
+
+            return response
 
         else:
             print("Process wasn't completed!")

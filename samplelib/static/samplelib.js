@@ -9,7 +9,7 @@ var KTDatatablesServerSide = function () {
     var editor;
 
     // Private functions
-    var initDatatable = function ( initialValue ) {
+    var initDatatable = function ( initialValue, filterSequencingRun, filterPatient, filterBarcode, filterI5, filterI7, filterAreaType, filterBait ) {
 
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
 
@@ -34,6 +34,15 @@ var KTDatatablesServerSide = function () {
             ajax: {
               url: '/samplelib/filter_samplelibs',
               type: 'GET',
+              data :{
+                "sequencing_run": filterSequencingRun,
+                "patient": filterPatient,
+                "barcode": filterBarcode,
+                "i5": filterI5,
+                "i7": filterI7,
+                "area_type": filterAreaType,
+                "bait": filterBait
+              },
               error: function (xhr, ajaxOptions, thrownError) {
                   if (xhr.status == 403) {
 
@@ -164,7 +173,7 @@ var KTDatatablesServerSide = function () {
             initToggleToolbar();
             toggleToolbars();
             handleDeleteRows();
-            handleResetForm();
+            handleResetFilter();
             initModal();
             handleSelectedRows.init();
             KTMenu.createInstances();
@@ -179,32 +188,28 @@ var KTDatatablesServerSide = function () {
         });
     }
 
+
+
     // Filter Datatable
     var handleFilterDatatable = () => {
-        // Select filter options
-        filterPayment = document.querySelectorAll('[data-kt-docs-table-filter="payment_type"] [name="payment_type"]');
+
         const filterButton = document.querySelector('[data-kt-docs-table-filter="filter"]');
 
         // Filter datatable on submit
         filterButton.addEventListener('click', function () {
-            // Get filter values
-            let paymentValue = '';
 
-            // Get payment value
-            filterPayment.forEach(r => {
-                if (r.checked) {
-                    paymentValue = r.value;
-                }
+          var sequencingRun = document.getElementById("id_sequencing_run").value;
+          var patient = document.getElementById("id_patient").value;
+          var barcode = document.getElementById("id_barcode").value;
+          var i5 = document.getElementById("id_i5").value;
+          var i7 = document.getElementById("id_i7").value;
+          var areaType = document.getElementById("id_area_type").value;
+          var bait = document.getElementById("id_bait").value;
 
-                // Reset payment value if "All" is selected
-                if (paymentValue === 'all') {
-                    paymentValue = '';
-                }
-            });
+          initDatatable(null,sequencingRun,patient,barcode,i5,i7,areaType,bait);
 
-            // Filter datatable --- official docs reference: https://datatables.net/reference/api/search()
-            dt.search(paymentValue).draw();
         });
+
     }
 
     // Delete customer
@@ -327,17 +332,23 @@ var KTDatatablesServerSide = function () {
     }
 
     // Reset Filter
-    var handleResetForm = () => {
+    var handleResetFilter = () => {
         // Select reset button
         const resetButton = document.querySelector('[data-kt-docs-table-filter="reset"]');
 
         // Reset datatable
         resetButton.addEventListener('click', function () {
-            // Reset payment type
-            filterPayment[0].checked = true;
 
-            // Reset datatable --- official docs reference: https://datatables.net/reference/api/search()
-            dt.search('').draw();
+          document.getElementById("id_sequencing_run").value="";
+          document.getElementById("id_patient").value="";
+          document.getElementById("id_barcode").value="";
+          document.getElementById("id_i5").value="";
+          document.getElementById("id_i7").value="";
+          document.getElementById("id_area_type").value="";
+          document.getElementById("id_bait").value="";
+
+          initDatatable(null, null, null, null, null, null, null, null);
+
         });
     }
 
@@ -850,12 +861,12 @@ var KTDatatablesServerSide = function () {
     // Public methods
     return {
         init: function () {
-            initDatatable( handleInitialValue() );
+            initDatatable( handleInitialValue(), null, null, null, null, null, null, null );
             handleSearchDatatable();
             initToggleToolbar();
             handleFilterDatatable();
             handleDeleteRows();
-            handleResetForm();
+            handleResetFilter();
             initEditor();
         }
     }

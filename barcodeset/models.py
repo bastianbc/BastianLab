@@ -54,7 +54,6 @@ class Barcodeset(models.Model):
         self.active = True
         self.save()
 
-
 class Barcode(models.Model):
     barcode_set = models.ForeignKey("barcodeset.Barcodeset", on_delete=models.CASCADE, related_name="barcodes")
     name = models.CharField(max_length=50, unique=True, verbose_name="Name")
@@ -89,15 +88,14 @@ class Barcode(models.Model):
             if order == 'desc':
                 order_column = '-' + order_column
 
-
             queryset = Barcode.objects.filter(barcode_set__id=barcode_set_id)
-            
+
             total = queryset.count()
 
             if search_value:
                 queryset = queryset.filter(
-                    Q(name__icontains=search_value),
-                    Q(i5__icontains=search_value),
+                    Q(name__icontains=search_value) |
+                    Q(i5__icontains=search_value) |
                     Q(i7__icontains=search_value)
                 )
 

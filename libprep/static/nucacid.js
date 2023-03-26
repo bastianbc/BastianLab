@@ -175,8 +175,7 @@ var KTDatatablesServerSide = function () {
 
     // Filter Datatable
     var handleFilterDatatable = () => {
-        // Select filter options
-        filterPayment = document.querySelectorAll('[data-kt-docs-table-filter="payment_type"] [name="payment_type"]');
+
         const filterButton = document.querySelector('[data-kt-docs-table-filter="filter"]');
 
         // Filter datatable on submit
@@ -188,6 +187,7 @@ var KTDatatablesServerSide = function () {
           initDatatable(null,dateRange,naType)
 
         });
+        
     }
 
     // Delete nucacid

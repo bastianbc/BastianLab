@@ -42,7 +42,7 @@ class SampleLib(models.Model):
     def query_by_args(self, user, **kwargs):
 
         def _get_authorizated_queryset():
-            return SampleLib.objects.all().annotate(num_nucacids=Count('nucacids'))
+            return SampleLib.objects.all().annotate(num_nucacids=Count('na_sl_links'))
 
         def _parse_value(search_value):
             if "_initial:" in search_value:
@@ -73,19 +73,77 @@ class SampleLib(models.Model):
             search_value = kwargs.get('search[value]', None)[0]
             order_column = kwargs.get('order[0][column]', None)[0]
             order = kwargs.get('order[0][dir]', None)[0]
+            sequencing_run_filter = kwargs.get('sequencing_run', None)[0]
+            patient_filter = kwargs.get('patient', None)[0]
+            barcode_filter = kwargs.get('barcode', None)[0]
+            i5_filter = kwargs.get('i5', None)[0]
+            i7_filter = kwargs.get('i7', None)[0]
+            area_type_filter = kwargs.get('area_type', None)[0]
+            bait_filter = kwargs.get('bait', None)[0]
 
             order_column = ORDER_COLUMN_CHOICES[order_column]
             # django orm '-' -> desc
             if order == 'desc':
                 order_column = '-' + order_column
-
+            print("1")
             queryset = _get_authorizated_queryset()
-
+            print("2")
             total = queryset.count()
-
+            print("3")
             is_initial = _is_initial_value(search_value)
             search_value = _parse_value(search_value)
 
+            if sequencing_run_filter:
+                from sequencingrun.models import SequencingRun
+
+                filter = []
+                try:
+                    seq_r = SequencingRun.objects.get(name=sequencing_run_filter)
+                    for seq_l in seq_r.sequencing_libs.all():
+                        for cl_seql_link in seq_l.cl_seql_links.all():
+                            for sl_cl_link in cl_seql_link.captured_lib.sl_cl_links.all():
+                                filter.append(sl_cl_link.sample_lib.name)
+
+                except Exception as e:
+                    pass
+
+                queryset = queryset.filter(Q(name__in=filter))
+
+            if patient_filter:
+                filter = [na_sl_link.sample_lib.name for na_sl_link in NA_SL_LINK.objects.filter(nucacid__area__block__patient__pat_id=patient_filter)]
+                queryset = queryset.filter(Q(name__in=filter))
+
+            if barcode_filter:
+                queryset = queryset.filter(Q(barcode__id=barcode_filter))
+
+            if i5_filter:
+                queryset = queryset.filter(Q(barcode__i5=i5_filter))
+
+            if i7_filter:
+                queryset = queryset.filter(Q(barcode__i7=i7_filter))
+
+            if area_type_filter:
+                if area_type_filter == "normal":
+                    filter = [na_sl_link.sample_lib.name for na_sl_link in NA_SL_LINK.objects.filter(nucacid__area__area_type=area_type_filter)]
+                else:
+                    filter = [na_sl_link.sample_lib.name for na_sl_link in NA_SL_LINK.objects.exclude(nucacid__area__area_type="normal")]
+
+                queryset = queryset.filter(Q(name__in=filter))
+
+            if bait_filter:
+                from capturedlib.models import CapturedLib
+
+                filter = []
+                try:
+                    for captured_lib in CapturedLib.objects.filter(bait=bait_filter):
+                        for sl_cl_link in captured_lib.sl_cl_links.all():
+                            filter.append(sl_cl_link.sample_lib.name)
+
+                except Exception as e:
+                    pass
+
+                queryset = queryset.filter(Q(name__in=filter))
+            print("4")
             if is_initial:
                 pass
             elif search_value:
@@ -96,6 +154,7 @@ class SampleLib(models.Model):
             count = queryset.count()
             queryset = queryset.order_by(order_column)[start:start + length]
             # queryset = queryset[start:start + length]
+            print("5")
             return {
                 'items': queryset,
                 'count': count,
@@ -107,8 +166,8 @@ class SampleLib(models.Model):
             raise
 
 class NA_SL_LINK(models.Model):
-    nucacid = models.ForeignKey("libprep.NucAcids",on_delete=models.CASCADE, related_name="sl_links", verbose_name="Nucleic Acid")
-    sample_lib = models.ForeignKey(SampleLib, on_delete=models.CASCADE, related_name="nucacids", verbose_name="Sample Library")
+    nucacid = models.ForeignKey("libprep.NucAcids",on_delete=models.CASCADE, related_name="na_sl_links", verbose_name="Nucleic Acid")
+    sample_lib = models.ForeignKey(SampleLib, on_delete=models.CASCADE, related_name="na_sl_links", verbose_name="Sample Library")
     input_vol = models.FloatField(default=0, verbose_name="Te Volume")
     input_amount = models.FloatField(default=0, verbose_name="Input Amount")
 

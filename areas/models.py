@@ -4,7 +4,7 @@ from datetime import datetime
 from django.utils.crypto import get_random_string
 
 class Areas(models.Model):
-    AREA_TYPE_TYPES = (
+    AREA_TYPE_TYPES = [
         ("normal","Normal"),
         ("normal2","Normal1"),
         ("normal3","Normal2"),
@@ -37,7 +37,7 @@ class Areas(models.Model):
         ("local-recurrent-metastasis","Local Recurrent Metastasis"),
         ("cells","Cells"),
         ("other","Other"),
-    )
+    ]
 
     ar_id = models.AutoField(primary_key=True)
     block = models.ForeignKey('blocks.Blocks', on_delete=models.CASCADE, db_column='block', related_name="block_areas")
@@ -123,10 +123,9 @@ class Areas(models.Model):
                 "1":"name",
                 "2":"block",
                 "3":"project",
-                "4":"collection",
-                "5":"area_type",
-                "6":"completion_date",
-                "7":"investigator",
+                "4":"area_type",
+                "5":"completion_date",
+                "6":"investigator",
             }
             draw = int(kwargs.get('draw', None)[0])
             length = int(kwargs.get('length', None)[0])
@@ -155,7 +154,6 @@ class Areas(models.Model):
                 queryset = queryset.filter(
                         Q(name__icontains=search_value) |
                         Q(block__name__icontains=search_value) |
-                        Q(collection__icontains=search_value) |
                         Q(area_type__icontains=search_value) |
                         Q(notes__icontains=search_value)
                     )

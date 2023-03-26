@@ -12,5 +12,6 @@ class MigrationForm(forms.Form):
         ("cl", "CL"),
         ("seql", "SeqL"),
         ("seqr", "SeqR"),
+        ("barcode", "Barcode"),
     ))
     file = forms.FileField()
