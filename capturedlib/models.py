@@ -50,7 +50,7 @@ class CapturedLib(models.Model):
     def query_by_args(self, user, **kwargs):
 
         def _get_authorizated_queryset():
-            return CapturedLib.objects.all().annotate(num_samplelibs=Count('sl_links'))
+            return CapturedLib.objects.all().annotate(num_samplelibs=Count('sl_cl_links'))
 
         def _parse_value(search_value):
             if "_initial:" in search_value:
