@@ -232,7 +232,7 @@ def create_ilab_sheet(request):
         report.date = datetime.strftime(seq_link.sequencing_lib.date,"%m/%d/%Y")
         report.nmol = seq_link.sequencing_lib.nmol
         report.buffer = seq_link.sequencing_lib.get_buffer_display()
-        for sl_link in seq_link.captured_lib.sl_links.all():
+        for sl_link in seq_link.captured_lib.sl_cl_links.all():
                 report.sample_lib = sl_link.sample_lib.id
                 report.i5 = sl_link.sample_lib.barcode.i5
                 report.i7 = sl_link.sample_lib.barcode.i7

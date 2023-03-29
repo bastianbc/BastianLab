@@ -159,14 +159,14 @@ class NucAcids(models.Model):
         '''
         Sets vol_remain to vol_init during changing another values if not used to create SL.
         '''
-        if self.sl_links.count() < 1:
+        if self.na_sl_links.count() < 1:
             self.vol_remain = self.vol_init
 
     def _check_changeability(self):
         '''
         Checks that allow only the remaining volume to be changed after the SL is created. If there is a rule violation throws an exception.
         '''
-        if self.nu_id and self.sl_links.count() > 0:
+        if self.nu_id and self.na_sl_links.count() > 0:
             existing_na = NucAcids.objects.get(nu_id=self.nu_id)
             if not self.conc == existing_na.conc or not self.vol_init == existing_na.vol_init:
                 raise Exception("This record cannot be changed as it is used to create SL.")

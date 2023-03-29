@@ -1,25 +1,25 @@
 from django.shortcuts import render, redirect
 from .forms import *
 from django.http import HttpResponse
+from datetime import datetime
+import csv
+from io import StringIO
+from lab.models import Patients
+from blocks.models import Blocks
+from projects.models import Projects
+from account.models import User
+from areas.models import Areas
+from libprep.models import NucAcids
+from method.models import Method
+from samplelib.models import SampleLib, NA_SL_LINK
+from capturedlib.models import CapturedLib, SL_CL_LINK
+from bait.models import Bait
+from barcodeset.models import Barcodeset,Barcode
+from sequencingrun.models import SequencingRun
+from sequencinglib.models import SequencingLib,CL_SEQL_LINK
+from django.core.exceptions import ObjectDoesNotExist
 
 def migrate(request):
-    from datetime import datetime
-    import csv
-    from io import StringIO
-    from lab.models import Patients
-    from blocks.models import Blocks
-    from projects.models import Projects
-    from account.models import User
-    from areas.models import Areas
-    from libprep.models import NucAcids
-    from method.models import Method
-    from samplelib.models import SampleLib, NA_SL_LINK
-    from capturedlib.models import CapturedLib, SL_CL_LINK
-    from bait.models import Bait
-    from barcodeset.models import Barcodeset,Barcode
-    from sequencingrun.models import SequencingRun
-    from sequencinglib.models import SequencingLib,CL_SEQL_LINK
-    from django.core.exceptions import ObjectDoesNotExist
 
     if request.method=="POST":
         form = MigrationForm(request.POST, request.FILES)
@@ -434,3 +434,46 @@ def migrate(request):
         form = MigrationForm()
 
     return render(request,"migration.html",locals())
+
+def report(request):
+    import csv
+    from io import StringIO
+
+    report = []
+    i = 1
+
+    for seq_r in SequencingRun.objects.all():
+        for seq_l in seq_r.sequencing_libs.all():
+            for cl_seql_link in seq_l.cl_seql_links.all():
+                for sl_cl_link in cl_seql_link.captured_lib.sl_cl_links.all():
+                    sample_lib = sl_cl_link.sample_lib
+                    captured_lib = sl_cl_link.captured_lib
+                    print(i)
+                    i += 1
+                    for na_sl_link in sample_lib.na_sl_links.filter(nucacid__na_type=NucAcids.DNA):
+                        nucacid = na_sl_link.nucacid
+                        report.append({
+                            "sample_lib": sample_lib.name,
+                            "barcode": sample_lib.barcode.name,
+                            "i5": sample_lib.barcode.i5,
+                            "i7": sample_lib.barcode.i7,
+                            "sequencing_run": seq_r.name,
+                            "na_type": nucacid.get_na_type_display() if nucacid.na_type else None,
+                            "area_type": nucacid.area.get_area_type_display() if nucacid.area and nucacid.area.area_type else None,
+                            "patient": nucacid.area.block.patient.pat_id if nucacid.area and nucacid.area.block and nucacid.area.block.patient else None,
+                            "bait": captured_lib.bait.name if captured_lib.bait else None
+                        })
+
+
+    response = HttpResponse(
+        content_type='text/csv',
+        headers={'Content-Disposition': 'attachment; filename="report-sl-review.csv"'},
+    )
+
+    field_names = ["sample_lib","barcode","i5","i7","sequencing_run","na_type","area_type","patient","bait"]
+    writer = csv.writer(response)
+    writer.writerow(field_names)
+    for item in report:
+        writer.writerow([item[field] for field in field_names])
+
+    return response
