@@ -77,4 +77,4 @@ media/
 
 # environment options
 environment.py
-environments/development.py
+development.py
