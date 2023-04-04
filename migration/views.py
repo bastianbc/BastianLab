@@ -18,6 +18,7 @@ from barcodeset.models import Barcodeset,Barcode
 from sequencingrun.models import SequencingRun
 from sequencinglib.models import SequencingLib,CL_SEQL_LINK
 from django.core.exceptions import ObjectDoesNotExist
+import json
 
 def migrate(request):
 
@@ -381,7 +382,7 @@ def migrate(request):
                                 sequencing_lib = seq_l
                             )
 
-                        for item in row[1].split(","):
+                        for item in row[1].replace(";",",").split(","):
                             seq_l = get_or_create_sequencinglib(item.strip(),get_date(row[2]))
                             cl = get_capturedlib(row[0].strip())
 
@@ -477,3 +478,79 @@ def report(request):
         writer.writerow([item[field] for field in field_names])
 
     return response
+
+def sequenced_files(request):
+    import csv
+    from io import StringIO
+
+
+    if request.method == "POST":
+        form = SequencedFilesForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            report = []
+            log = []
+
+            file1 = request.FILES["checksum_file"]
+            file2 = request.FILES["tree2_file"]
+
+            checksum_dataset = json.loads(file1.read())
+            tree2_dataset = json.loads(file2.read())
+
+            for sample_lib in SampleLib.objects.all():
+
+                status = "OK"
+
+                checksum = None
+                for c in checksum_dataset:
+                    if c["sl_id"] == sample_lib.name:
+                        checksum = c["checksum"]
+                        break
+
+                filename = None
+                for t in tree2_dataset:
+                    if t["sl_id"] == sample_lib.name:
+                        filename = t["filename"]
+                        break
+
+                # sequencing_run = sample_lib.sl_cl_links.first().captured_lib.cl_seql_links.first().sequencing_lib.sequencingrun_set.first()
+                sequencing_run_name = None
+                sl = sample_lib.sl_cl_links.first()
+                if sl:
+                    cl = sl.captured_lib.cl_seql_links.first()
+                    if cl:
+                        sequencing_run_name = cl.sequencing_lib.sequencingrun_set.first().name
+
+                if not filename:
+                    status = "missing sequencing files"
+
+                if not checksum:
+                    if filename:
+                        status = "missing checksum"
+                    else:
+                        status += ",missing checksum"
+
+                report.append({
+                    "sample_lib":sample_lib.name,
+                    "directory":sequencing_run_name,
+                    "filename":filename,
+                    "checksum":checksum,
+                    "status":status
+                })
+
+            response = HttpResponse(
+                content_type='text/csv',
+                headers={'Content-Disposition': 'attachment; filename="report-seq-files.csv"'},
+            )
+
+            field_names = ["sample_lib","directory","filename","checksum","status"]
+            writer = csv.writer(response)
+            writer.writerow(field_names)
+            for item in report:
+                writer.writerow([item[field] for field in field_names])
+
+            return response
+    else:
+        form = SequencedFilesForm()
+
+    return render(request,"sequenced_files.html",locals())

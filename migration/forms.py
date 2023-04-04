@@ -15,3 +15,7 @@ class MigrationForm(forms.Form):
         ("barcode", "Barcode"),
     ))
     file = forms.FileField()
+
+class SequencedFilesForm(forms.Form):
+    checksum_file = forms.FileField()
+    tree2_file = forms.FileField()

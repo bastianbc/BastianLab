@@ -109,3 +109,15 @@ class SequencingRun(models.Model):
         except Exception as e:
             print(str(e))
             raise
+
+# class SequencedFile(models.Model):
+#     sample_lib = models.ForeignKey("samplelib.SampleLib", on_delete=models.CASCADE, related_name="sequenced_files")
+#     directory = models.CharField(max_length=50)
+#     file_name = models.CharField(max_length=50)
+#     checksum = models.CharField(max_length=50)
+#
+#     class Meta:
+#         db_table = "sequenced_file"
+#
+#     def __str__(self):
+#         return self.file_name
