@@ -63,7 +63,7 @@ var KTDatatablesServerSide = function () {
                 { data: 'id' },
                 { data: 'name' },
                 { data: 'barcode' },
-                { data: 'area' },
+                { data: 'area_name' },
                 { data: 'date',
                   render: function (data) {
                     return moment(data).format('MM/DD/YYYY');
@@ -95,8 +95,14 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                  targets: 3,
-                  orderable: false,
+                    targets: 3,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        if (data) {
+                          return `<a href="/areas/edit/${row["area_id"]}">${data}</a>`;
+                        }
+                        return "";
+                    }
                 },
                 {
                     targets: 13,
@@ -805,8 +811,8 @@ var KTDatatablesServerSide = function () {
         for (var i = 0; i < data.length; i++) {
 
           var row = `<div class="row m-1">
-            <div class="col-3">${ data[i].sample_lib }</div>
-            <div class="col-5">${ data[i].nucacid }</div>
+            <div class="col-3"><a href="/samplelib/edit/${ data[i].sample_lib_id }">${ data[i].sample_lib_name }</a></div>
+            <div class="col-5"><a href="/libprep/edit/${ data[i].nucacid_id }">${ data[i].nucacid_name }</a></div>
             <div class="col-2 text-center">${ data[i].input_vol }</div>
             <div class="col-2 text-center">${ data[i].input_amount }</div>
           </div>

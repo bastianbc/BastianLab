@@ -819,24 +819,12 @@ var KTDatatablesServerSide = function () {
         for (var i = 0; i < data.length; i++) {
           var p = 0.00;
           var v = 0.00;
-          //
-          // if (totalVolume > 0) {
-          //
-          //   p = data[i].volume / totalVolume;
-          //
-          // }
-          // else {
-          //
-          //   p = 1/data.length;
-          //
-          // }
-          //
-          // v = p * data[i].nmol  / data[i].nm;
+
           v = data[i].volume;
           p = data[i].volume / totalVolume;
 
           var row = `<div class="row mb-1 detail-row">
-              <div class="col-2 align-self-center" data-id="${ data[i].captured_lib }">${ data[i].name }</div>
+              <div class="col-2 align-self-center" data-id="${ data[i].captured_lib }"><a href="/capturedlib/edit/${ data[i].captured_lib }">${ data[i].name }</a></div>
               <div class="col-1 align-self-center">${ data[i].frag_size }</div>
               <div class="col-2 align-self-center text-center">${ data[i].vol_remain }</div>
               <div class="col-1 align-self-center text-center">${ data[i].conc }</div>

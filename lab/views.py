@@ -43,7 +43,7 @@ def new_patient(request):
 
 @permission_required("lab.change_patients",raise_exception=True)
 def edit_patient(request,id):
-    patient = Patients.objects.get(pat_id=id)
+    patient = Patients.objects.get(pa_id=id)
 
     if request.method=="POST":
         form = PatientForm(request.POST,instance=patient)

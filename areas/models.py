@@ -122,7 +122,7 @@ class Areas(models.Model):
                 "0":"ar_id",
                 "1":"name",
                 "2":"block",
-                "3":"project",
+                "3":"block__project",
                 "4":"area_type",
                 "5":"completion_date",
                 "6":"investigator",

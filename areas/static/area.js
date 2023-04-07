@@ -56,8 +56,8 @@ var KTDatatablesServerSide = function () {
             columns: [
               { data: 'ar_id' },
               { data: 'name' },
-              { data: 'block' },
-              { data: 'project' },
+              { data: 'block_name' },
+              { data: 'project_name' },
               { data: 'area_type',
                 render: function (val, type, row) {
                   return row["area_type_label"];
@@ -82,15 +82,30 @@ var KTDatatablesServerSide = function () {
                             </div>`;
                     }
                 },
-                // {
-                //     targets: 4,
-                //     render: function (data, type, row) {
-                //         return `<img src="${hostUrl}media/svg/card-logos/${row.CreditCardType}.svg" class="w-35px me-3" alt="${row.CreditCardType}">` + data;
-                //     }
-                // },
+                {
+                    targets: 2,
+                    orderable: true,
+                    render: function (data, type, row) {
+                        if (data) {
+                          return `<a href="/blocks/edit/${row["block_id"]}">${data}</a>`;
+                        }
+                        return "";
+                    }
+                },
+                {
+                    targets: 3,
+                    orderable: true,
+                    render: function (data, type, row) {
+                        if (data) {
+                          return `<a href="/projects/edit/${row["project_id"]}">${data}</a>`;
+                        }
+                        return "";
+                    }
+                },
                 {
                     targets: 7,
                     orderable: false,
+                    className: "text-center",
                     render: function (data, type, row) {
                         if (data > 0) {
                           let ar_id = row["ar_id"];
@@ -597,7 +612,6 @@ var KTDatatablesServerSide = function () {
 
       Promise.all([
 
-        getCollectionOptions(),
         getAreaTypeOptions()
 
       ]).then(function () {

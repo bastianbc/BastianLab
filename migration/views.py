@@ -554,3 +554,72 @@ def sequenced_files(request):
         form = SequencedFilesForm()
 
     return render(request,"sequenced_files.html",locals())
+
+def sequenced_files_opposite(request):
+    import csv
+    from io import StringIO
+
+    if request.method == "POST":
+        form = SequencedFilesForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            report = []
+            log = []
+
+            file1 = request.FILES["checksum_file"]
+            file2 = request.FILES["tree2_file"]
+
+            checksum_dataset = json.loads(file1.read())
+            tree2_dataset = json.loads(file2.read())
+
+            for t in tree2_dataset:
+                status = "OK"
+
+                checksum = None
+                for c in checksum_dataset:
+                    if c["sl_id"] == t["sl_id"]:
+                        checksum = c["checksum"]
+                        break
+
+                sequencing_run_name = None
+                try:
+                    sample_lib = SampleLib.objects.get(name=t["sl_id"])
+                    sl = sample_lib.sl_cl_links.first()
+                    if sl:
+                        cl = sl.captured_lib.cl_seql_links.first()
+                        if cl:
+                            sequencing_run_name = cl.sequencing_lib.sequencingrun_set.first().name
+                except Exception as e:
+                    sample_lib = None
+                    status = "does not exists in database"
+
+                if not checksum:
+                    if sample_lib:
+                        status = "missing checksum"
+                    else:
+                        status += ",missing checksum"
+
+                report.append({
+                    "sample_lib":t["sl_id"],
+                    "directory":sequencing_run_name,
+                    "filename":t["filename"],
+                    "checksum":checksum,
+                    "status":status
+                })
+
+            response = HttpResponse(
+                content_type='text/csv',
+                headers={'Content-Disposition': 'attachment; filename="report-seq-files-v2.csv"'},
+            )
+
+            field_names = ["sample_lib","directory","filename","checksum","status"]
+            writer = csv.writer(response)
+            writer.writerow(field_names)
+            for item in report:
+                writer.writerow([item[field] for field in field_names])
+
+            return response
+    else:
+        form = SequencedFilesForm()
+
+    return render(request,"sequenced_files.html",locals())

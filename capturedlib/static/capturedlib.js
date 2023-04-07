@@ -644,7 +644,7 @@ var KTDatatablesServerSide = function () {
         for (var i = 0; i < data.length; i++) {
 
           var row = `<div class="row mb-1">
-              <div class="col-3 align-self-center" data-id="${ data[i].id }">${ data[i].name }</div>
+              <div class="col-3 align-self-center" data-id="${ data[i].id }"><a href="/samplelib/edit/${ data[i].id }">${ data[i].name }</a></div>
               <div class="col-1 align-self-center text-center">${ data[i].conc }</div>
               <div class="col-2 align-self-center text-center">${ data[i].vol_remain }</div>
               <div class="col-2 align-self-center text-center">${ data[i].barcode }</div>

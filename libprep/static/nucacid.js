@@ -63,7 +63,7 @@ var KTDatatablesServerSide = function () {
             columns: [
                 { data: 'nu_id' },
                 { data: 'name' },
-                { data: 'area' },
+                { data: 'area_name' },
                 { data: 'na_type',
                   render: function (val, type, row) {
                     return row["na_type_label"];
@@ -95,12 +95,16 @@ var KTDatatablesServerSide = function () {
                             </div>`;
                     }
                 },
-                // {
-                //     targets: 4,
-                //     render: function (data, type, row) {
-                //         return `<img src="${hostUrl}media/svg/card-logos/${row.CreditCardType}.svg" class="w-35px me-3" alt="${row.CreditCardType}">` + data;
-                //     }
-                // },
+                {
+                    targets: 2,
+                    orderable: true,
+                    render: function (data, type, row) {
+                        if (data) {
+                          return `<a href="/areas/edit/${row["area_id"]}">${data}</a>`;
+                        }
+                        return "";
+                    }
+                },
                 {
                     targets: 9,
                     orderable: false
@@ -187,7 +191,7 @@ var KTDatatablesServerSide = function () {
           initDatatable(null,dateRange,naType)
 
         });
-        
+
     }
 
     // Delete nucacid

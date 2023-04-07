@@ -53,8 +53,8 @@ var KTDatatablesServerSide = function () {
             columns: [
               { data: 'bl_id' },
               { data: 'name' },
-              { data: 'project' },
-              { data: 'patient' },
+              { data: 'project_name' },
+              { data: 'patient_name' },
               { data: 'diagnosis' },
               { data: 'body_site' },
               { data: 'thickness' },
@@ -81,14 +81,28 @@ var KTDatatablesServerSide = function () {
                             </div>`;
                     }
                 },
-                // {
-                //     targets: 4,
-                //     render: function (data, type, row) {
-                //         return `<img src="${hostUrl}media/svg/card-logos/${row.CreditCardType}.svg" class="w-35px me-3" alt="${row.CreditCardType}">` + data;
-                //     }
-                // },
                 {
-                    targets: 8,
+                    targets: 2,
+                    orderable: false,
+                    render: function (data, type, row) {
+                      if (data) {
+                        return `<a href="/projects/edit/${row["project_id"]}">${data}</a>`;
+                      }
+                      return "";
+                    }
+                },
+                {
+                    targets: 3,
+                    orderable: false,
+                    render: function (data, type, row) {
+                      if (data) {
+                        return `<a href="/lab/edit/${row["patient_id"]}">${data}</a>`;
+                      }
+                      return "";
+                    }
+                },
+                {
+                    targets: 9,
                     orderable: false,
                     render: function (data, type, row) {
                         if (data > 0) {
@@ -100,7 +114,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 9,
+                    targets: 10,
                     data: null,
                     orderable: false,
                     className: 'text-end',
