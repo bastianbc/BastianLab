@@ -609,7 +609,7 @@ def sequenced_files_opposite(request):
 
             response = HttpResponse(
                 content_type='text/csv',
-                headers={'Content-Disposition': 'attachment; filename="report-seq-files-v2.csv"'},
+                headers={'Content-Disposition': 'attachment; filename="report-seq-files-v3.csv"'},
             )
 
             field_names = ["sample_lib","directory","filename","checksum","status"]

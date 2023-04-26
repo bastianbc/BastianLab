@@ -5,6 +5,8 @@ from django.db.models import Q, Count
 class Bait(models.Model):
     name = models.CharField(max_length=50, verbose_name="Name")
     slug = models.SlugField(max_length=50, unique=True)
+    target_bed = models.FileField(upload_to="baits/", null=True, blank=True)
+    bait_bed = models.FileField(upload_to="baits/", null=True, blank=True)
 
     class Meta:
         db_table = "bait"

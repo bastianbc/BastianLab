@@ -12,7 +12,7 @@ def baits(request):
 @permission_required("bait.add_bait",raise_exception=True)
 def new_bait(request):
     if request.method=="POST":
-        form = BaitForm(request.POST)
+        form = BaitForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             messages.success(request,"Bait was created successfully")
@@ -27,7 +27,7 @@ def new_bait(request):
 def edit_bait(request,id):
     instance = Bait.objects.get(id=id)
     if request.method=="POST":
-        form = BaitForm(request.POST,instance=instance)
+        form = BaitForm(request.POST,request.FILES,instance=instance)
         if form.is_valid():
             form.save()
             messages.success(request,"Bait was updated successfully")

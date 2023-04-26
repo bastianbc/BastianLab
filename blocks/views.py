@@ -181,3 +181,22 @@ def check_can_deleted_async(request):
 
 def get_collections(request):
     return JsonResponse(Blocks.get_collections(), safe=False)
+
+def export_csv_all_data(request):
+    import csv
+    from django.http import HttpResponse
+
+    result = []
+
+    response = HttpResponse(
+        content_type='text/csv',
+        headers={'Content-Disposition': 'attachment; filename="blocks.csv"'},
+    )
+
+    field_names = [f.name for f in Blocks._meta.fields]
+    writer = csv.writer(response)
+    writer.writerow(field_names)
+    for patient in Blocks.objects.all():
+        writer.writerow([getattr(patient, field) for field in field_names])
+
+    return response

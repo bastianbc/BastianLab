@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<form method="post" action="{% if id %} {% url 'edit-bait' id %} {% else %} {% url 'new-bait' %} {% endif %}">
+<form method="post" action="{% if id %} {% url 'edit-bait' id %} {% else %} {% url 'new-bait' %} {% endif %}" enctype="multipart/form-data">
   <div class="card">
     <div class="card-header">
       <h3 class="card-title">Bait</h3>
