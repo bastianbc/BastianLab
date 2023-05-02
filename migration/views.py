@@ -17,6 +17,7 @@ from bait.models import Bait
 from barcodeset.models import Barcodeset,Barcode
 from sequencingrun.models import SequencingRun
 from sequencinglib.models import SequencingLib,CL_SEQL_LINK
+from sequencingfile.models import SequencingFile
 from django.core.exceptions import ObjectDoesNotExist
 import json
 
@@ -34,7 +35,7 @@ def migrate(request):
             report = []
             reader = csv.reader(StringIO(file))
             next(reader) #skip first row
-
+              
             for row in reader:
                 try:
                     if app == "project":
@@ -406,6 +407,34 @@ def migrate(request):
                             i5=row[3],
                             i7=row[2]
                         )
+                    elif app == "sf":
+
+                        def get_sample_lib(value):
+                            try:
+                                return SampleLib.objects.get(name=value)
+                            except Exception as e:
+                                return None
+
+                        r1_files = row[2].split(";")
+                        r1_checksums = row[3].split(";")
+                        r1_counts = row[4].split(";")
+                        r2_files = row[5].split(";")
+                        r2_checksums = row[6].split(";")
+                        r2_counts = row[7].split(";")
+                        for i in range(len(r1_files)):
+                            sf = SequencingFile.objects.create(
+                                sample_lib=get_sample_lib(row[0].strip()),
+                                folder_name=row[1].strip(),
+                                read1_file=r1_files[i].strip(),
+                                read1_checksum=r1_checksums[i].strip(),
+                                read1_count=r1_counts[i].strip(),
+                                read2_file=r2_files[i].strip(),
+                                read2_checksum=r2_checksums[i].strip(),
+                                read2_count=r2_counts[i].strip(),
+                                is_read_count_equal=True if row[8].strip() == "Yes" else False ,
+                                path=row[9].strip(),
+                            )
+
 
                     print("migrated..")
                     report.append({"name":row[0],"status":"OK","message":""})

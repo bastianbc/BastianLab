@@ -13,6 +13,7 @@ class MigrationForm(forms.Form):
         ("seql", "SeqL"),
         ("seqr", "SeqR"),
         ("barcode", "Barcode"),
+        ("sf", "SequencingFile"),
     ))
     file = forms.FileField()
 
