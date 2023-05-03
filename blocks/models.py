@@ -6,26 +6,20 @@ import json
 
 class Blocks(models.Model):
     P_STAGE_TYPES = (
-        ("0","0"),
-        ("I","I"),
-        ("II","II"),
-        ("IIIA","IIIA"),
-        ("IIIB","IIIB"),
-        ("IIIC","IIIC"),
-        ("IIID","IIID"),
-        ("IV","IV"),
-        ("N/A","N/A"),
+        ("Tis", "Tis"),
+        ("T1a", "T1a"),
+        ("T1b", "T1b"),
+        ("T2a", "T2a"),
+        ("T2b", "T2b"),
+        ("T3a", "T3a"),
+        ("T3b", "T3b"),
+        ("T4a", "T4a"),
+        ("T4b", "T4b"),
     )
 
     PRIM_TYPES = (
          ("primary","Primary"),
          ("metastasis","Metastasis"),
-    )
-
-    SUBTYPE_TYPES = (
-        ("melanoma","Melanoma"),
-        ("basal-cell-carcinoma","Basal Cell Carcinoma"),
-        ("squamous-cell-carcinoma","Squamous Cell Carcinoma"),
     )
 
     PUNCH = 'PU'
@@ -44,17 +38,17 @@ class Blocks(models.Model):
     # pat_id = models.CharField(max_length=12, blank=True, null=True)
     patient = models.ForeignKey('lab.Patients', on_delete=models.CASCADE, db_column='patient', blank=True, null=True, related_name="patient_blocks")
     project = models.ForeignKey('projects.Projects', on_delete=models.DO_NOTHING, blank=True, null=True, related_name="project_blocks")
-    age = models.DecimalField(blank=True, null=True, decimal_places=1, max_digits=4, validators=[
+    age = models.FloatField(blank=True, null=True, validators=[
         MinValueValidator((0.1), message='Minimum age is 0.1 years'),
         MaxValueValidator((120), message='Maximum age is 120 years'),
         ])
     body_site = models.ForeignKey("body.Body", on_delete=models.CASCADE, blank=True, null=True)
     ulceration = models.BooleanField(blank=True, null=True)
-    thickness = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    thickness = models.FloatField(blank=True, null=True)
     mitoses = models.IntegerField(blank=True, null=True)
     p_stage = models.CharField(max_length=10, choices=P_STAGE_TYPES, blank=True, null=True)
     prim = models.CharField(max_length=10, choices=PRIM_TYPES, blank=True, null=True)
-    subtype = models.CharField(max_length=30, choices=PRIM_TYPES, blank=True, null=True)
+    subtype = models.CharField(max_length=120, blank=True, null=True)
     slides = models.IntegerField(blank=True, null=True)
     slides_left = models.IntegerField(blank=True, null=True)
     fixation = models.CharField(max_length=10, blank=True, null=True)
@@ -72,6 +66,7 @@ class Blocks(models.Model):
     date_added = models.DateTimeField(blank=True, null=True, auto_now_add=True)
     old_body_site = models.CharField(max_length=600,blank=True, null=True)
     collection = models.CharField(max_length=2, choices=COLLECTION_CHOICES, default=SCRAPE)
+    path_note = models.TextField(blank=True, null=True)
 
     class Meta:
         db_table = 'blocks'

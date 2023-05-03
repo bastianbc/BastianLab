@@ -38,7 +38,7 @@ class BlocksSerializer(serializers.ModelSerializer):
         return obj.project.pr_id if obj.project else None
 
     def get_project_name(self,obj):
-        return obj.project.pat_id if obj.project else None
+        return obj.project.name if obj.project else None
 
     def get_collection_label(self,obj):
         return obj.get_collection_display()

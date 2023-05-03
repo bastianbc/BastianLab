@@ -35,7 +35,7 @@ def migrate(request):
             report = []
             reader = csv.reader(StringIO(file))
             next(reader) #skip first row
-              
+
             for row in reader:
                 try:
                     if app == "project":
@@ -66,9 +66,9 @@ def migrate(request):
 
                             for l in lookup:
                                 if name.lower().strip() in [x.lower() for x in l[0]]:
-                                    qs = Projects.objects.filter(abbreviation__startswith=l[1])
-                                    if qs.exists():
-                                        return "%s-%d" % (l[1],len(qs))
+                                    # qs = Projects.objects.filter(abbreviation__startswith=l[1])
+                                    # if qs.exists():
+                                    #     return "%s-%d" % (l[1],len(qs))
                                     return l[1]
 
                             return ''.join(random.choices(string.digits, k=5))
@@ -143,10 +143,10 @@ def migrate(request):
 
                         patient = Patients.objects.create(
                             pat_id=row[0].strip(),
-                            sex=get_sex(row[1]),
-                            race=get_race(row[3]),
-                            source=row[4],
-                            notes=row[7]
+                            sex=get_sex(row[1].strip()),
+                            race=get_race(row[3].strip()),
+                            source=row[4].strip(),
+                            notes=row[7].strip()
                         )
                     elif app == "block":
 
@@ -165,32 +165,98 @@ def migrate(request):
                         def get_body_site(value):
                             return None
 
+                        def get_value(value):
+                            return value if value and not value == "nan" else None
+
+                        def get_float_value(value):
+                            return float(value) if value and not value == "nan" else None
+
                         def get_ulceration(value):
-                            return True if value else False
+                            if value == "TRUE":
+                                return True
+                            elif value == "FALSE":
+                                return False
+                            else:
+                                return None
 
                         def get_notes(notes,description):
                             return "%s, Alternative Block IDs:%s" % (notes,description) if description else notes
 
                         def get_slides(value):
-                            return int(value) if value else None
+                            return int(value) if value and not value == "nan" else None
 
                         def get_slides_left(value):
-                            return int(value) if value else None
+                            return int(value) if value and not value == "nan" else None
+
+                        def get_collection(value):
+                            for x in Blocks.COLLECTION_CHOICES:
+                                if value.lower() == x[1].lower():
+                                    return x[0]
+                            return Blocks.SCRAPE
+
+                        # print("name: ",row[1].strip())
+                        # print("patient: ",get_patient(row[2].strip()))
+                        # print("project: ",get_project(row[3].strip()))
+                        # print("age: ",row[4].strip())
+                        # print("ulceration: ",get_ulceration(row[6].strip()))
+                        # print("thickness: ",get_value(row[7].strip()))
+                        # print("mitoses: ",get_value(row[8].strip()))
+                        # print("p_stage: ",get_value(row[9].strip()))
+                        # print("subtype: ",get_value(row[11].strip()))
+                        # print("slides: ",get_value(row[12]))
+                        # print("slides_left: ",get_value(row[13]))
+                        # print("fixation: ",get_value(row[14].strip()))
+                        # print("scan_number: ",get_value(row[16].strip()))
+                        # print("icd10: ",get_value(row[17].strip()))
+                        # print("diagnosis: ",get_value(row[18].strip()))
+                        # print("path_note: ",get_value(row[19].strip()),)
+                        # print("notes: ",get_value(row[20].strip()))
+                        # print("micro: ",get_value(row[21].strip()))
+                        # print("gross: ",get_value(row[22].strip()))
+                        # print("clinical: ",get_value(row[23].strip()))
+                        # print("old_body_site: ",get_value(row[25].strip()))
+                        # print("collection: ",get_collection(row[26].strip()))
+                        # print("------------------------------------------")
 
                         Blocks.objects.create(
-                            name=row[0].strip(),
-                            patient=get_patient(row[1].strip()),
-                            project=get_project(row[10].strip()),
-                            old_body_site=row[3].strip(),
-                            ulceration=get_ulceration(row[4].strip()),
-                            slides=get_slides(row[5]),
-                            slides_left=get_slides_left(row[6]),
-                            fixation=row[7],
-                            storage=row[13],
-                            scan_number=row[2],
-                            diagnosis=row[11],
-                            notes=get_notes(row[14],row[12]),
+                            name=row[1].strip(),
+                            patient=get_patient(row[2].strip()),
+                            project=get_project(row[3].strip()),
+                            age=get_float_value(row[4].strip()),
+                            ulceration=get_ulceration(row[6].strip()),
+                            thickness=get_float_value(row[7].strip()),
+                            mitoses=get_value(row[8].strip()),
+                            p_stage=get_value(row[9].strip()),
+                            subtype=get_value(row[11].strip()),
+                            slides=get_value(row[12]),
+                            slides_left=get_value(row[13]),
+                            fixation=get_value(row[14].strip()),
+                            scan_number=get_value(row[16].strip()),
+                            icd10=get_value(row[17].strip()),
+                            diagnosis=get_value(row[18].strip()),
+                            path_note=get_value(row[19].strip()),
+                            notes=get_value(row[20].strip()),
+                            micro=get_value(row[21].strip()),
+                            gross=get_value(row[22].strip()),
+                            clinical=get_value(row[23].strip()),
+                            old_body_site=get_value(row[25].strip()),
+                            collection=get_collection(row[26].strip()),
                         )
+
+                        # Blocks.objects.create(
+                        #     name=row[0].strip(),
+                        #     patient=get_patient(row[1].strip()),
+                        #     project=get_project(row[10].strip()),
+                        #     old_body_site=row[3].strip(),
+                        #     ulceration=get_ulceration(row[4].strip()),
+                        #     slides=get_slides(row[5]),
+                        #     slides_left=get_slides_left(row[6]),
+                        #     fixation=row[7],
+                        #     storage=row[13],
+                        #     scan_number=row[2],
+                        #     diagnosis=row[11],
+                        #     notes=get_notes(row[14],row[12]),
+                        # )
                     elif app == "area":
 
                         def get_block(value):

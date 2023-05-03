@@ -36,4 +36,4 @@ class AreasSerializer(serializers.ModelSerializer):
         return obj.block.project.pr_id if obj.block.project else None
 
     def get_project_name(self,obj):
-        return obj.block.project.pat_id if obj.block.project else None
+        return obj.block.project.name if obj.block.project else None
