@@ -83,7 +83,8 @@ INSTALLED_APPS = [
     'barcodeset',
     'migration',
     'sequencingfile',
-    
+    'variant',
+
 ]
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 CRISPY_FAIL_SILENTLY = not DEBUG

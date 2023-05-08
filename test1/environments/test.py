@@ -50,9 +50,6 @@ INTERNAL_IPS = ('127.0.0.1',)
 
 INSTALLED_APPS = [
     # 'accession.apps.AccessionConfig',
-    'libprep.apps.LibprepConfig',
-    'lab.apps.LabConfig',
-    'projects.apps.ProjectsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -65,14 +62,17 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'rest_framework',
     'crispy_forms',
-    'home.apps.HomeConfig',
-    'authentication.apps.AuthenticationConfig',
-    'group.apps.GroupConfig',
-    'account.apps.AccountConfig',
-    'blocks.apps.BlocksConfig',
-    'areas.apps.AreasConfig',
-    'core.apps.CoreConfig',
-    'method.apps.MethodConfig',
+    'home',
+    'libprep',
+    'lab',
+    'projects',
+    'authentication',
+    'group',
+    'account',
+    'blocks',
+    'areas',
+    'core',
+    'method',
     'samplelib',
     'capturedlib',
     'sequencinglib',
@@ -83,6 +83,7 @@ INSTALLED_APPS = [
     'barcodeset',
     'migration',
     'sequencingfile',
+    'variant',
 ]
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 CRISPY_FAIL_SILENTLY = not DEBUG
