@@ -22,15 +22,15 @@ def samplelibs(request):
 
 @permission_required_for_async("samplelib.view_samplelib")
 def filter_samplelibs(request):
-    samplelibs = SampleLib().query_by_args(request.user,**request.GET)
+    samplelibs = SampleLib.query_by_args(request.user,**request.GET)
     serializer = SampleLibSerializer(samplelibs['items'], many=True)
-    print("6")
+
     result = dict()
     result['data'] = serializer.data
     result['draw'] = samplelibs['draw']
     result['recordsTotal'] = samplelibs['total']
     result['recordsFiltered'] = samplelibs['count']
-    print("7")
+
     return JsonResponse(result)
 
 @permission_required_for_async("samplelib.change_samplelib")
@@ -213,7 +213,6 @@ def get_used_nucacids(request,id):
 def update_sl_na_link_async(request):
     try:
         values = json.loads(request.GET.get("values"))
-        print(values)
 
         for value in values:
             link = NA_SL_LINK.objects.get(id=value["id"])

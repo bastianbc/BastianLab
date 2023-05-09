@@ -1004,7 +1004,7 @@ var KTDatatablesServerSide = function () {
                  name: "name"
              }, {
                  label: "Area:",
-                 name: "area"
+                 name: "area_name"
              }, {
                  label: "Nucleic Acid Type:",
                  name: "na_type",

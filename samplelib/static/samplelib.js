@@ -106,6 +106,18 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
+                    targets: 12,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        if (data > 0) {
+                          let id = row["id"];
+                          return `
+                              <a href="/blocks?model=samplelib&id=${id}&initial=true">${data}</a>`;
+                        }
+                        return data;
+                    }
+                },
+                {
                     targets: 13,
                     orderable: false,
                     render: function (data, type, row) {

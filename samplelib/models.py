@@ -1,6 +1,6 @@
 from django.db import models
 from datetime import datetime
-from django.db.models import Q, Count, Value
+from django.db.models import Q, Count, Sum, F, Value, OuterRef, Subquery
 
 class SampleLib(models.Model):
     name = models.CharField(max_length=50, unique=True, verbose_name="Name")
@@ -39,16 +39,19 @@ class SampleLib(models.Model):
         self.vol_remain = 0 if volume > self.vol_remain else self.vol_remain - volume
         self.save()
 
-    def query_by_args(self, user, **kwargs):
+    def query_by_args(user, **kwargs):
 
         def _get_authorizated_queryset():
             return SampleLib.objects.all().annotate(
                 num_nucacids=Count('na_sl_links'),
-                num_blocks=Value(_get_number_of_blocks())
+                num_blocks=Subquery(
+                    NA_SL_LINK.objects.filter(
+                        sample_lib=OuterRef('pk')
+                    ).annotate(
+                        tmp=Count("nucacid__area__block")
+                      ).values("tmp")
+                )
             )
-
-        def _get_number_of_blocks():
-            return sum([na_sl_link.nucacid.area.block_areas.count() for na_sl_link in self.na_sl_links.all()])
 
         def _parse_value(search_value):
             if "_initial:" in search_value:
@@ -149,7 +152,7 @@ class SampleLib(models.Model):
                     pass
 
                 queryset = queryset.filter(Q(name__in=filter))
-            print("4")
+
             if is_initial:
                 pass
             elif search_value:
@@ -160,7 +163,7 @@ class SampleLib(models.Model):
             count = queryset.count()
             queryset = queryset.order_by(order_column)[start:start + length]
             # queryset = queryset[start:start + length]
-            print("5")
+
             return {
                 'items': queryset,
                 'count': count,

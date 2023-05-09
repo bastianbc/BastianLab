@@ -138,6 +138,11 @@ class Blocks(models.Model):
                     queryset = queryset.filter(
                             Q(patient__pat_id=search_value["id"])
                           )
+                elif search_value["model"] == "samplelib":
+                    from samplelib.models import SampleLib
+                    sample_lib = SampleLib.objects.get(id=search_value["id"])
+                    filter = [na_sl_link.nucacid.area.block.name for na_sl_link in sample_lib.na_sl_links.all()]
+                    queryset = queryset.filter(Q(name__in=filter))
             elif search_value:
                 queryset = queryset.filter(
                         Q(name__icontains=search_value) |
