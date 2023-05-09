@@ -1,7 +1,7 @@
 from django.db import models
 
 class SequencingFile(models.Model):
-    sample_lib = models.ForeignKey("samplelib.SampleLib", on_delete=models.CASCADE, related_name="sequenced_files")
+    sample_lib = models.ForeignKey("samplelib.SampleLib", on_delete=models.CASCADE, related_name="sequencing_files")
     folder_name = models.CharField(max_length=50)
     read1_file = models.CharField(max_length=50)
     read1_checksum = models.CharField(max_length=50)

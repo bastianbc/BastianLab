@@ -1,6 +1,6 @@
 from django.db import models
 from datetime import datetime
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Value
 
 class SampleLib(models.Model):
     name = models.CharField(max_length=50, unique=True, verbose_name="Name")
@@ -42,7 +42,13 @@ class SampleLib(models.Model):
     def query_by_args(self, user, **kwargs):
 
         def _get_authorizated_queryset():
-            return SampleLib.objects.all().annotate(num_nucacids=Count('na_sl_links'))
+            return SampleLib.objects.all().annotate(
+                num_nucacids=Count('na_sl_links'),
+                num_blocks=Value(_get_number_of_blocks())
+            )
+
+        def _get_number_of_blocks():
+            return sum([na_sl_link.nucacid.area.block_areas.count() for na_sl_link in self.na_sl_links.all()])
 
         def _parse_value(search_value):
             if "_initial:" in search_value:
@@ -85,11 +91,11 @@ class SampleLib(models.Model):
             # django orm '-' -> desc
             if order == 'desc':
                 order_column = '-' + order_column
-            print("1")
+
             queryset = _get_authorizated_queryset()
-            print("2")
+
             total = queryset.count()
-            print("3")
+
             is_initial = _is_initial_value(search_value)
             search_value = _parse_value(search_value)
 

@@ -62,7 +62,6 @@ var KTDatatablesServerSide = function () {
             columns: [
                 { data: 'id' },
                 { data: 'name' },
-                { data: 'barcode' },
                 { data: 'area_name' },
                 { data: 'date',
                   render: function (data) {
@@ -81,7 +80,9 @@ var KTDatatablesServerSide = function () {
                 { data: 'qubit' },
                 { data: 'amount_in' },
                 { data: 'vol_remain' },
-                { data: 'num_nucacids' }
+                { data: 'num_blocks' },
+                { data: 'num_nucacids' },
+                { data: 'barcode' },
             ],
             columnDefs: [
                 {
@@ -95,7 +96,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 3,
+                    targets: 2,
                     orderable: false,
                     render: function (data, type, row) {
                         if (data) {
@@ -117,7 +118,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 14,
+                    targets: 15,
                     data: null,
                     orderable: false,
                     className: 'text-end',
