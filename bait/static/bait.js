@@ -34,12 +34,18 @@ var KTDatatablesServerSide = function () {
                 //             </div>`;
                 //     }
                 // },
-                // {
-                //     targets: 4,
-                //     render: function (data, type, row) {
-                //         return `<img src="${hostUrl}media/svg/card-logos/${row.CreditCardType}.svg" class="w-35px me-3" alt="${row.CreditCardType}">` + data;
-                //     }
-                // },
+                {
+                    targets: 1,
+                    render: function (data, type, row) {
+                        return `<a href="${ data }" target="blank"> ${ data }</a>`;
+                    }
+                },
+                {
+                    targets: 2,
+                    render: function (data, type, row) {
+                        return `<a href="${ data }" target="blank"> ${ data }</a>`;
+                    }
+                },
                 {
                     targets: 3,
                     data: null,
