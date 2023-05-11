@@ -37,13 +37,19 @@ var KTDatatablesServerSide = function () {
                 {
                     targets: 1,
                     render: function (data, type, row) {
-                        return `<a href="${ data }" target="blank"> ${ data }</a>`;
+                        if (data) {
+                          return `<a href="${ data }" target="blank"> ${ data }</a>`;
+                        }
+                        return "";
                     }
                 },
                 {
                     targets: 2,
                     render: function (data, type, row) {
+                      if (data) {
                         return `<a href="${ data }" target="blank"> ${ data }</a>`;
+                      }
+                      return "";
                     }
                 },
                 {
