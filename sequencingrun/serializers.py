@@ -7,10 +7,11 @@ class SequencingRunSerializer(serializers.ModelSerializer):
     facility_label = serializers.SerializerMethodField()
     sequencer_label = serializers.SerializerMethodField()
     pe_label = serializers.SerializerMethodField()
+    num_sequencinglibs = serializers.IntegerField()
 
     class Meta:
         model = SequencingRun
-        fields = ("id", "name", "date", "facility", "facility_label", "sequencer", "sequencer_label", "pe", "pe_label", "amp_cycles", "date_run", "DT_RowId",)
+        fields = ("id", "name", "date", "facility", "facility_label", "sequencer", "sequencer_label", "pe", "pe_label", "amp_cycles", "date_run", "num_sequencinglibs", "DT_RowId",)
 
     def get_DT_RowId(self, obj):
        return getattr(obj, 'id')

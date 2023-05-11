@@ -6,10 +6,11 @@ class SequencingLibSerializer(serializers.ModelSerializer):
     DT_RowId = serializers.SerializerMethodField()
     buffer_label = serializers.SerializerMethodField()
     nmol = serializers.SerializerMethodField()
+    num_capturedlibs = serializers.IntegerField()
 
     class Meta:
         model = SequencingLib
-        fields = ("id", "name", "date", "nmol", "buffer", "buffer_label", "pdf", "DT_RowId",)
+        fields = ("id", "name", "date", "nmol", "buffer", "buffer_label", "pdf", "num_capturedlibs", "DT_RowId",)
 
     def get_DT_RowId(self, obj):
        return getattr(obj, 'id')

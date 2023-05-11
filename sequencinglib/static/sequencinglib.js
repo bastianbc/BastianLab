@@ -65,6 +65,8 @@ var KTDatatablesServerSide = function () {
                   }
                 },
                 { data: 'pdf' },
+                { data: 'num_capturedlibs' },
+                { data: null },
             ],
             columnDefs: [
                 {
@@ -96,6 +98,19 @@ var KTDatatablesServerSide = function () {
                 },
                 {
                     targets: 6,
+                    className: 'text-center',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        if (data > 0) {
+                          let id = row["id"];
+                          return `
+                              <a href="javascript:;" class="detail-link">${data}</a>`;
+                        }
+                        return data;
+                    }
+                },
+                {
+                    targets: 7,
                     data: null,
                     orderable: false,
                     className: 'text-end',

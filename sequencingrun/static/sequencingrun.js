@@ -79,6 +79,8 @@ var KTDatatablesServerSide = function () {
                     return moment(data).format('MM/DD/YYYY');
                   }
                 },
+                { data: 'num_sequencinglibs' },
+                { data: null },
             ],
             columnDefs: [
                 {
@@ -93,6 +95,19 @@ var KTDatatablesServerSide = function () {
                 },
                 {
                     targets: 8,
+                    className: 'text-center',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        if (data > 0) {
+                          let id = row["id"];
+                          return `
+                              <a href="javascript:;" class="detail-link">${data}</a>`;
+                        }
+                        return data;
+                    }
+                },
+                {
+                    targets: 9,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -748,7 +763,7 @@ var KTDatatablesServerSide = function () {
         for (var i = 0; i < data.length; i++) {
 
           var row = `<div class="row mb-1 detail-row">
-              <div class="col-6 align-self-center" data-id="${ data[i].sequencing_lib }">${ data[i].name }</div>
+              <div class="col-6 align-self-center" data-id="${ data[i].id }"><a href="/sequencinglib/edit/${ data[i].id }">${ data[i].name }</a></div>
               <div class="col-3 align-self-center">${ data[i].buffer }</div>
               <div class="col-3 align-self-center text-center">${ data[i].nmol }</div>
             </div>`;

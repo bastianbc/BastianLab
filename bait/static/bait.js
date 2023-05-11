@@ -19,6 +19,8 @@ var KTDatatablesServerSide = function () {
             ajax: '/bait/filter_baits',
             columns: [
                 { data: 'name' },
+                { data: 'target_bed' },
+                { data: 'bait_bed' },
                 { data: null }
             ],
             columnDefs: [
@@ -39,7 +41,7 @@ var KTDatatablesServerSide = function () {
                 //     }
                 // },
                 {
-                    targets: -1,
+                    targets: 3,
                     data: null,
                     orderable: false,
                     className: 'text-end',

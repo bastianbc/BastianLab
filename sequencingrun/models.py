@@ -45,7 +45,7 @@ class SequencingRun(models.Model):
     def query_by_args(self, user, **kwargs):
 
         def _get_authorizated_queryset():
-            return SequencingRun.objects.all()
+            return SequencingRun.objects.all().annotate(num_sequencinglibs=Count("sequencing_libs"))
 
         def _parse_value(search_value):
             if "_initial:" in search_value:
