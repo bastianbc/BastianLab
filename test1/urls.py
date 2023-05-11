@@ -30,6 +30,7 @@ urlpatterns = [
     path('barcodeset/', include('barcodeset.urls')),
     path('migration/', include('migration.urls')),
     path('sequencingfile/', include('sequencingfile.urls')),
+    path('variant/', include('variant.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 handler404 = "core.views.error_404"

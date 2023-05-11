@@ -1,0 +1,157 @@
+{% extends "master.html" %}
+
+{% block content %}
+
+<div class="card card-dashed">
+    <div class="card-body">
+
+
+      <div class="header-bottom d-lg-flex flex-column align-items-stretch w-100" id="kt_header_navs" data-kt-drawer="true" data-kt-drawer-name="header-menu" data-kt-drawer-activate="{default: true, lg: false}" data-kt-drawer-overlay="true" data-kt-drawer-width="{default:'200px', '300px': '250px'}" data-kt-drawer-direction="start" data-kt-drawer-toggle="#kt_header_navs_toggle" data-kt-swapper="true" data-kt-swapper-mode="append" data-kt-swapper-parent="{default: '#kt_body', lg: '#kt_header'}">
+        <!--begin::Tabs container-->
+        <div class="container-custom container-xxl d-lg-flex flex-column w-100">
+          <!--begin::Header tabs-->
+          <div class="header-tabs d-flex align-items-stretch w-100 h-60px h-lg-100px overflow-auto mb-5 mb-lg-0" id="kt_header_tabs">
+            <ul class="nav nav-stretch flex-nowrap w-100 h-100">
+              <li class="nav-item flex-equal">
+                <a class="nav-link d-flex flex-column text-nowrap flex-center w-100 {% if 'dashboard' in request.path %} active {% endif %}" href="/dashboard">
+                  <span class="text-uppercase text-dark fw-bold fs-6 fs-lg-5">Dashboard</span>
+                  <span class="text-gray-500 fs-8 fs-lg-7">Stats & Components</span>
+                </a>
+              </li>
+              <li class="nav-item flex-equal">
+                <a class="nav-link d-flex flex-column text-nowrap flex-center w-100 {% if 'call' in request.path %} active {% endif %}" href="/variant/call">
+                  <span class="text-uppercase text-dark fw-bold fs-6 fs-lg-5">Variant Call</span>
+                  <span class="text-gray-500 fs-8 fs-lg-7">Definition</span>
+                </a>
+              </li>
+              <li class="nav-item flex-equal">
+                <a class="nav-link d-flex flex-column text-nowrap flex-center w-100 {% if 'g_variant' in request.path %} active {% endif %}" href="/variant/g_variant">
+                  <span class="text-uppercase text-dark fw-bold fs-6 fs-lg-5">G Variant</span>
+                  <span class="text-gray-500 fs-8 fs-lg-7">Definition</span>
+                </a>
+              </li>
+              <li class="nav-item flex-equal">
+                <a class="nav-link d-flex flex-column text-nowrap flex-center w-100 {% if 'c_variant' in request.path %} active {% endif %}" href="/variant/c_variant">
+                  <span class="text-uppercase text-dark fw-bold fs-6 fs-lg-5">C Variant</span>
+                  <span class="text-gray-500 fs-8 fs-lg-7">Definition</span>
+                </a>
+              </li>
+              <li class="nav-item flex-equal">
+                <a class="nav-link d-flex flex-column text-nowrap flex-center w-100 {% if 'p_variant' in request.path %} active {% endif %}" href="/variant/p_variant">
+                  <span class="text-uppercase text-dark fw-bold fs-6 fs-lg-5">P Variant</span>
+                  <span class="text-gray-500 fs-8 fs-lg-7">Definition</span>
+                </a>
+              </li>
+
+            </ul>
+          </div>
+          <!--end::Header tabs-->
+        </div>
+        <!--end::Tabs container-->
+        <!--begin::Header panel-->
+        <div class="d-flex align-items-stretch" data-kt-sticky="true" data-kt-sticky-name="header-tabs" data-kt-sticky-offset="{default: 'false', lg: '300px'}" data-kt-sticky-dependencies="#kt_wrapper" data-kt-sticky-class="fixed-top bg-body shadow-sm border-0">
+          <!--begin::Panel container-->
+          <div class="container-custom container-xxl d-lg-flex flex-column w-100">
+            <!--begin::Header navs-->
+            <div class="header-navs d-lg-flex flex-column justify-content-lg-center h-100 w-100" id="kt_header_navs_wrapper">
+              <!--begin::Header tab content-->
+              <div class="tab-content" data-kt-scroll="true" data-kt-scroll-activate="{default: true, lg: false}" data-kt-scroll-height="auto" data-kt-scroll-offset="70px">
+
+                {% if 'dashboard' in request.path %}
+
+                {% endif %}
+
+                {% if 'lab' in request.path %}
+                <!--begin::Tab panel-->
+                <div class="tab-pane fade" id="kt_header_navs_tab_2">
+                  <!--begin::Wrapper-->
+                  <div class="d-flex flex-column flex-lg-row flex-lg-stack flex-wrap gap-2 px-4 px-lg-0">
+                    <div class="d-flex flex-column flex-lg-row gap-2">
+                      <a class="btn btn-sm btn-light-primary fw-bold" href="../../demo21/dist/documentation/base/forms/controls.html">Controls</a>
+                      <a class="btn btn-sm btn-light-success fw-bold" href="../../demo21/dist/documentation/base/forms/advanced.html">Advanced</a>
+                      <a class="btn btn-sm btn-light-danger fw-bold" href="../../demo21/dist/documentation/base/forms/floating-labels.html">Floating Labels</a>
+                    </div>
+                    <div class="d-flex flex-column flex-lg-row gap-2">
+                      <a class="btn btn-sm btn-light-info fw-bold" href="../../demo21/dist/documentation/forms/autosize.html">More Components</a>
+                    </div>
+                  </div>
+                  <!--end::Wrapper-->
+                </div>
+                <!--end::Tab panel-->
+                {% endif %}
+
+                {% if 'accession' in request.path %}
+                <!--begin::Tab panel-->
+                <div class="tab-pane fade" id="kt_header_navs_tab_2">
+                  <!--begin::Wrapper-->
+                  <div class="d-flex flex-column flex-lg-row flex-lg-stack flex-wrap gap-2 px-4 px-lg-0">
+                    <div class="d-flex flex-column flex-lg-row gap-2">
+                      <a class="btn btn-sm btn-light-primary fw-bold" href="../../demo21/dist/documentation/base/forms/controls.html">Controls</a>
+                      <a class="btn btn-sm btn-light-success fw-bold" href="../../demo21/dist/documentation/base/forms/advanced.html">Advanced</a>
+                      <a class="btn btn-sm btn-light-danger fw-bold" href="../../demo21/dist/documentation/base/forms/floating-labels.html">Floating Labels</a>
+                    </div>
+                    <div class="d-flex flex-column flex-lg-row gap-2">
+                      <a class="btn btn-sm btn-light-info fw-bold" href="../../demo21/dist/documentation/forms/autosize.html">More Components</a>
+                    </div>
+                  </div>
+                  <!--end::Wrapper-->
+                </div>
+                <!--end::Tab panel-->
+                {% endif %}
+
+                {% if 'libprep' in request.path %}
+                <!--begin::Tab panel-->
+                <div class="tab-pane fade" id="kt_header_navs_tab_3">
+                  <!--begin::Wrapper-->
+                  <div class="d-flex flex-column flex-lg-row flex-lg-stack flex-wrap gap-2 px-4 px-lg-0">
+                    <div class="d-flex flex-column flex-lg-row gap-2">
+                      <a class="btn btn-sm btn-light-primary fw-bold" href="../../demo21/dist/apps/user-management/users/list.html">User Management</a>
+                      <a class="btn btn-sm btn-light-success fw-bold" href="../../demo21/dist/apps/inbox/listing.html">Inbox</a>
+                      <a class="btn btn-sm btn-light-danger fw-bold" href="../../demo21/dist/apps/file-manager/folders.html">File Manager</a>
+                    </div>
+                    <div class="d-flex flex-column flex-lg-row gap-2">
+                      <a class="btn btn-sm btn-light-info fw-bold" href="../../demo21/dist/apps/subscriptions/view.html">More Apps</a>
+                    </div>
+                  </div>
+                  <!--end::Wrapper-->
+                </div>
+                <!--end::Tab panel-->
+                {% endif %}
+
+                {% if 'projects' in request.path %}
+                <!--begin::Tab panel-->
+                <div class="tab-pane fade" id="kt_header_navs_tab_4">
+                  <!--begin::Wrapper-->
+                  <div class="d-flex flex-column flex-lg-row flex-lg-stack flex-wrap gap-2 px-4 px-lg-0">
+                    <div class="d-flex flex-column flex-lg-row gap-2">
+                      <a class="btn btn-sm btn-light-primary fw-bold" href="../../demo21/dist/apps/ecommerce/catalog/products.html">eCommerce</a>
+                      <a class="btn btn-sm btn-light-danger fw-bold" href="../../demo21/dist/apps/file-manager/folders.html">File Manager</a>
+                    </div>
+                    <div class="d-flex flex-column flex-lg-row gap-2">
+                      <a class="btn btn-sm btn-light-info fw-bold" href="../../demo21/dist/apps/subscriptions/view.html">More Apps</a>
+                    </div>
+                  </div>
+                  <!--end::Wrapper-->
+                </div>
+                <!--end::Tab panel-->
+                {% endif %}
+
+              </div>
+              <!--end::Header tab content-->
+            </div>
+            <!--end::Header navs-->
+          </div>
+          <!--end::Panel container-->
+        </div>
+        <!--end::Header panel-->
+      </div>
+
+
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/group.js" charset="utf-8"></script>
+{% endblock %}
