@@ -83,6 +83,7 @@ var KTDatatablesServerSide = function () {
                 { data: 'vol_init' },
                 { data: 'vol_remain' },
                 { data: 'amount' },
+                { data: 'num_samplelibs' },
             ],
             columnDefs: [
                 {
@@ -111,6 +112,18 @@ var KTDatatablesServerSide = function () {
                 },
                 {
                     targets: 10,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        if (data > 0) {
+                          let id = row["nu_id"];
+                          return `
+                              <a href="/samplelib?model=nucacid&id=${id}&initial=true">${data}</a>`;
+                        }
+                        return data;
+                    }
+                },
+                {
+                    targets: 11,
                     data: null,
                     orderable: false,
                     className: 'text-end',

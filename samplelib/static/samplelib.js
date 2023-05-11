@@ -10,7 +10,7 @@ var KTDatatablesServerSide = function () {
 
     // Private functions
     var initDatatable = function ( initialValue, filterSequencingRun, filterPatient, filterBarcode, filterI5, filterI7, filterAreaType, filterBait ) {
-
+        console.log("initialValue: " + initialValue);
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
 
         dt = $(".table").DataTable({
@@ -560,11 +560,22 @@ var KTDatatablesServerSide = function () {
       }
 
       const params = new URLSearchParams(window.location.search);
-      const x = params.get('initial');
+      const model = params.get('model');
+      const id = params.get('id');
+      const initial = params.get('initial');
 
       cleanUrl();
 
-      return x;
+      if (initial =="true" && model != null && id !=null) {
+
+        return JSON.stringify({
+          "model": model,
+          "id": id
+        });
+
+      }
+
+      return null;
 
     }
 

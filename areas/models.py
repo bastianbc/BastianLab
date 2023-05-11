@@ -1,7 +1,8 @@
 from django.db import models
-from django.db.models import Q, Count
+from django.db.models import Q, Count, OuterRef, Subquery, Sum, Value
 from datetime import datetime
 from django.utils.crypto import get_random_string
+from django.db.models.functions import Coalesce
 
 class Areas(models.Model):
     AREA_TYPE_TYPES = [
@@ -87,7 +88,19 @@ class Areas(models.Model):
             Users can access to some entities depend on their authorize. While the user having admin role can access to all things,
             technicians or researchers can access own projects and other entities related to it.
             '''
-            queryset = Areas.objects.all().annotate(num_nucacids=Count('nucacids'))
+            from samplelib.models import NA_SL_LINK
+
+            queryset = Areas.objects.all().annotate(
+                num_nucacids=Count('nucacids'),
+                num_samplelibs=Coalesce(Subquery(
+                    NA_SL_LINK.objects.filter(
+                        nucacid__area=OuterRef("pk")
+                    ).values("nucacid__area").annotate(
+                        cnt=Count("nucacid__area")
+                    ).values("cnt")
+                ),Value(0))
+            )
+
             if not user.is_superuser:
                 return queryset.filter(Q(block__project__technician=user) | Q(block__project__researcher=user))
             return queryset

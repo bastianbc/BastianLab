@@ -44,7 +44,7 @@ class NucAcids(models.Model):
             Users can access to some entities depend on their authorize. While the user having admin role can access to all things,
             technicians or researchers can access own projects and other entities related to it.
             '''
-            queryset = NucAcids.objects.all()
+            queryset = NucAcids.objects.all().annotate(num_samplelibs=Count('na_sl_links'))
             if not user.is_superuser:
                 return queryset.filter(Q(area__block__project__technician=user) | Q(area__block__project__researcher=user))
             return queryset

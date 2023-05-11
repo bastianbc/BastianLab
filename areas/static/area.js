@@ -69,7 +69,8 @@ var KTDatatablesServerSide = function () {
                 }
               },
               { data: 'investigator' },
-              { data: 'num_nucacids' }
+              { data: 'num_nucacids' },
+              { data: 'num_samplelibs' },
             ],
             columnDefs: [
                 {
@@ -117,6 +118,19 @@ var KTDatatablesServerSide = function () {
                 },
                 {
                     targets: 8,
+                    orderable: false,
+                    className: "text-center",
+                    render: function (data, type, row) {
+                        if (data > 0) {
+                          let id = row["ar_id"];
+                          return `
+                              <a href="/samplelib?model=area&id=${id}&initial=true">${data}</a>`;
+                        }
+                        return data;
+                    }
+                },
+                {
+                    targets: 9,
                     data: null,
                     orderable: false,
                     className: 'text-end',

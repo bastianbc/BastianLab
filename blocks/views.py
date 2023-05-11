@@ -14,7 +14,7 @@ from core.decorators import permission_required_for_async
 def filter_blocks(request):
     from .serializers import BlocksSerializer
 
-    blocks = Blocks().query_by_args(request.user,**request.GET)
+    blocks = Blocks.query_by_args(request.user,**request.GET)
     serializer = BlocksSerializer(blocks['items'], many=True)
     result = dict()
     result['data'] = serializer.data

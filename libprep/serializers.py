@@ -10,10 +10,11 @@ class NucacidsSerializer(serializers.ModelSerializer):
     na_type_label = serializers.SerializerMethodField()
     vol_remain = serializers.SerializerMethodField()
     amount = serializers.SerializerMethodField()
+    num_samplelibs = serializers.IntegerField()
 
     class Meta:
         model = NucAcids
-        fields = ("nu_id", "name", "area_id", "area_name", "na_type", "na_type_label", "date", "method", "method_label", "conc", "vol_init", "vol_remain", "amount", "DT_RowId",)
+        fields = ("nu_id", "name", "area_id", "area_name", "na_type", "na_type_label", "date", "method", "method_label", "conc", "vol_init", "vol_remain", "amount", "num_samplelibs", "DT_RowId",)
 
     def get_DT_RowId(self, obj):
        return getattr(obj, 'nu_id')

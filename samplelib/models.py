@@ -1,6 +1,7 @@
 from django.db import models
 from datetime import datetime
-from django.db.models import Q, Count, Sum, F, Value, OuterRef, Subquery
+from django.db.models import Q, Count, OuterRef, Subquery
+import json
 
 class SampleLib(models.Model):
     name = models.CharField(max_length=50, unique=True, verbose_name="Name")
@@ -55,8 +56,7 @@ class SampleLib(models.Model):
 
         def _parse_value(search_value):
             if "_initial:" in search_value:
-                v = search_value.split("_initial:")[1]
-                return None if v == "null" or not v.isnumeric() else v
+                return json.loads(search_value.split("_initial:")[1])
             return search_value
 
         def _is_initial_value(search_value):
@@ -154,7 +154,12 @@ class SampleLib(models.Model):
                 queryset = queryset.filter(Q(name__in=filter))
 
             if is_initial:
-                pass
+                if search_value["model"] == "nucacid":
+                    filter = [na_sl_link.sample_lib.id for na_sl_link in NA_SL_LINK.objects.filter(nucacid=search_value["id"])]
+                    queryset = queryset.filter(Q(id__in=filter))
+                if search_value["model"] == "area":
+                    filter = [na_sl_link.sample_lib.id for na_sl_link in NA_SL_LINK.objects.filter(nucacid__area=search_value["id"])]
+                    queryset = queryset.filter(Q(id__in=filter))
             elif search_value:
                 queryset = queryset.filter(
                     Q(name__icontains=search_value)

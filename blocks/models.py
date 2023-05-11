@@ -84,21 +84,60 @@ class Blocks(models.Model):
 
         super().save(*args, **kwargs)
 
-    def query_by_args(self, user, **kwargs):
-
+    def query_by_args(user, **kwargs):
+        '''
+        This is where the sorting and filtering functions of the datatables are executed.
+        Parameters:
+            user (obj): Active django user
+            kwargs (dict): All parameters that the datatables used
+        Returns:
+            data (dict): Data that the user will see on the screen
+        '''
         def _get_authorizated_queryset():
+            '''
+            Users can access to some entities depend on their authorize. While the user having admin role can access to all things,
+            technicians or researchers can access own projects and other entities related to it.
+            '''
             queryset = Blocks.objects.all().annotate(num_areas=Count('block_areas'))
             if not user.is_superuser:
                 return queryset.filter(Q(project__technician=user) | Q(project__researcher=user))
             return queryset
 
         def _parse_value(search_value):
+            '''
+            When the datatables are to be filled with a certain data, the search function of datatables is used.
+            The incoming parameter is parsed ve returned. If there is a initial value, the "search_value" has "_initial" prefix.
+            Parameters:
+                search_value (str): A string
+            Returns:
+                search_value (str): Parsed value
+            '''
             if "_initial:" in search_value:
                 return json.loads(search_value.split("_initial:")[1])
             return search_value
 
         def _is_initial_value(search_value):
+            '''
+            When the datatables are to be filled with a certain data, the search function of datatables is used.
+            The incoming parameter is parsed ve returned. If there is a initial value, the "search_value" has "_initial" prefix.
+            Parameters:
+                search_value (str): A string
+            Returns:
+                is_initial (boolean): If there is a initial value, it is True
+            '''
             return "_initial:" in search_value and search_value.split("_initial:")[1] != "null"
+
+        def _filter_by_project(value):
+            return queryset.filter(Q(project__pr_id=value))
+
+        def _filter_by_patient(value):
+            return queryset.filter(Q(patient__pat_id=value))
+
+        def _filter_by_samplelib(value):
+            from samplelib.models import SampleLib
+            sample_lib = SampleLib.objects.get(id=value)
+            filter = [na_sl_link.nucacid.area.block.name for na_sl_link in sample_lib.na_sl_links.all()]
+            return queryset.filter(Q(name__in=filter))
 
         try:
             ORDER_COLUMN_CHOICES = {
@@ -131,18 +170,11 @@ class Blocks(models.Model):
             search_value = _parse_value(search_value)
             if is_initial:
                 if search_value["model"] == "project":
-                    queryset = queryset.filter(
-                            Q(project__pr_id=search_value["id"])
-                          )
+                    queryset = _filter_by_project(search_value["id"])
                 elif search_value["model"] == "patient":
-                    queryset = queryset.filter(
-                            Q(patient__pat_id=search_value["id"])
-                          )
+                    queryset = _filter_by_patient(search_value["id"])
                 elif search_value["model"] == "samplelib":
-                    from samplelib.models import SampleLib
-                    sample_lib = SampleLib.objects.get(id=search_value["id"])
-                    filter = [na_sl_link.nucacid.area.block.name for na_sl_link in sample_lib.na_sl_links.all()]
-                    queryset = queryset.filter(Q(name__in=filter))
+                    queryset = _filter_by_samplelib(search_value["id"])
             elif search_value:
                 queryset = queryset.filter(
                         Q(name__icontains=search_value) |
