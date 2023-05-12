@@ -77,6 +77,7 @@ var KTDatatablesServerSide = function () {
                 { data: 'amount' },
                 { data: 'pdf' },
                 { data: 'num_samplelibs' },
+                { data: 'num_sequencinglibs' },
             ],
             columnDefs: [
                 {
@@ -122,6 +123,17 @@ var KTDatatablesServerSide = function () {
                 },
                 {
                     targets: 14,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        if (data > 0) {
+                          let id = row["id"];
+                          return `<a href="/sequencinglib?initial=${id}">${data}</a>`;
+                        }
+                        return data;
+                    }
+                },
+                {
+                    targets: 15,
                     data: null,
                     orderable: false,
                     className: 'text-end',
