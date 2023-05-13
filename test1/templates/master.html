@@ -1135,12 +1135,6 @@ License: For each use you must have a valid license purchased only from above li
 								<div class="header-tabs d-flex align-items-stretch w-100 h-60px h-lg-100px overflow-auto mb-5 mb-lg-0" id="kt_header_tabs">
 									<ul class="nav nav-stretch flex-nowrap w-100 h-100">
 										<li class="nav-item flex-equal">
-											<a class="nav-link d-flex flex-column text-nowrap flex-center w-100 {% if 'dashboard' in request.path %} active {% endif %}" href="/dashboard">
-												<span class="text-uppercase text-dark fw-bold fs-6 fs-lg-5">Dashboard</span>
-												<span class="text-gray-500 fs-8 fs-lg-7">Stats & Components</span>
-											</a>
-										</li>
-										<li class="nav-item flex-equal">
 											<a class="nav-link d-flex flex-column text-nowrap flex-center w-100 {% if 'projects' in request.path %} active {% endif %}" href="/projects">
 												<span class="text-uppercase text-dark fw-bold fs-6 fs-lg-5">Projects</span>
 												<span class="text-gray-500 fs-8 fs-lg-7">Definition</span>
@@ -1192,6 +1186,12 @@ License: For each use you must have a valid license purchased only from above li
 											<a class="nav-link d-flex flex-column text-nowrap flex-center w-100 {% if 'sequencingrun' in request.path %} active {% endif %}" href="/sequencingrun">
 												<span class="text-uppercase text-dark fw-bold fs-6 fs-lg-5">SeqR</span>
 												<span class="text-gray-500 fs-8 fs-lg-7">Sequencing Runs</span>
+											</a>
+										</li>
+										<li class="nav-item flex-equal">
+											<a class="nav-link d-flex flex-column text-nowrap flex-center w-100 {% if 'variant' in request.path %} active {% endif %}" href="/variant">
+												<span class="text-uppercase text-dark fw-bold fs-6 fs-lg-5">Variants</span>
+												<span class="text-gray-500 fs-8 fs-lg-7">C, G and P Variants</span>
 											</a>
 										</li>
 
