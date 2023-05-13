@@ -1,6 +1,6 @@
 from django.db import models
 from datetime import datetime
-from django.db.models import Q, Count, OuterRef, Subquery
+from django.db.models import Q, Count, OuterRef, Subquery, Value
 import json
 
 class SampleLib(models.Model):
@@ -43,15 +43,11 @@ class SampleLib(models.Model):
     def query_by_args(user, **kwargs):
 
         def _get_authorizated_queryset():
+
             return SampleLib.objects.all().annotate(
-                num_nucacids=Count('na_sl_links'),
-                num_blocks=Subquery(
-                    NA_SL_LINK.objects.filter(
-                        sample_lib=OuterRef('pk')
-                    ).annotate(
-                        tmp=Count("nucacid__area__block")
-                      ).values("tmp")
-                )
+                num_nucacids=Count('na_sl_links',distinct=True),
+                num_blocks=Count('na_sl_links', distinct=True),
+                num_capturedlibs=Count('sl_cl_links'),
             )
 
         def _parse_value(search_value):

@@ -11,10 +11,11 @@ class SampleLibSerializer(serializers.ModelSerializer):
     area_id = serializers.SerializerMethodField()
     area_name = serializers.SerializerMethodField()
     num_blocks = serializers.IntegerField()
+    num_capturedlibs = serializers.IntegerField()
 
     class Meta:
         model = SampleLib
-        fields = ("id", "name", "barcode", "area_id", "area_name","date", "method", "method_label", "amount_final", "qpcr_conc", "amount_in", "vol_init", "vol_remain", "pcr_cycles", "qubit", "num_blocks", "num_nucacids", "DT_RowId",)
+        fields = ("id", "name", "barcode", "area_id", "area_name","date", "method", "method_label", "amount_final", "qpcr_conc", "amount_in", "vol_init", "vol_remain", "pcr_cycles", "qubit", "num_blocks", "num_nucacids", "num_capturedlibs", "DT_RowId",)
 
     def get_DT_RowId(self, obj):
        return getattr(obj, 'id')

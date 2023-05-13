@@ -34,7 +34,7 @@ class SequencingRun(models.Model):
     pe = models.CharField(max_length=20, choices=PE_TYPES, verbose_name="PE",blank=True, null=True)
     amp_cycles = models.IntegerField(default=0, verbose_name="AMP Cycles")
     notes = models.TextField(blank=True, null=True, verbose_name="Notes")
-    sequencing_libs = models.ManyToManyField("sequencinglib.SequencingLib", blank=True)
+    sequencing_libs = models.ManyToManyField("sequencinglib.SequencingLib", blank=True, related_name="sequencing_runs")
 
     class Meta:
         db_table = "sequencing_run"
@@ -87,7 +87,8 @@ class SequencingRun(models.Model):
             search_value = _parse_value(search_value)
 
             if is_initial:
-                pass
+                filter = [sequencing_run.id for sequencing_run in SequencingRun.objects.filter(id=search_value)]
+                queryset = queryset.filter(Q(id__in=filter))
             elif search_value:
                 queryset = queryset.filter(
                     Q(name__icontains=search_value) |

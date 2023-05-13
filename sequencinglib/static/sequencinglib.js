@@ -66,6 +66,7 @@ var KTDatatablesServerSide = function () {
                 },
                 { data: 'pdf' },
                 { data: 'num_capturedlibs' },
+                { data: 'num_sequencingruns' },
                 { data: null },
             ],
             columnDefs: [
@@ -111,6 +112,19 @@ var KTDatatablesServerSide = function () {
                 },
                 {
                     targets: 7,
+                    className: 'text-center',
+                    orderable: false,
+                    render: function (data, type, row) {
+                        if (data > 0) {
+                          let id = row["id"];
+                          return `
+                              <a href="/sequencingrun?initial=${id}">${data}</a>`;
+                        }
+                        return data;
+                    }
+                },
+                {
+                    targets: 8,
                     data: null,
                     orderable: false,
                     className: 'text-end',
