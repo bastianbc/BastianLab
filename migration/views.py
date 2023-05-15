@@ -737,20 +737,20 @@ def variant(request):
             for line in lines[1:]:
                 values = str(line).split("\\t")
 
+                variant_call = VariantCall.objects.create(
+                    coverage = values[59],
+                    ref_read = values[60],
+                    alt_read = values[61],
+                )
+
                 g_variant = GVariant.objects.create(
+                    variant_call = variant_call,
                     chrom = values[0],
                     start = values[1],
                     end = values[2],
                     ref = values[3],
                     alt = values[4],
                     avsnp150 = values[29]
-                )
-
-                variant_call = VariantCall.objects.create(
-                    coverage = values[59],
-                    ref_read = values[60],
-                    alt_read = values[61],
-                    g_variant = g_variant
                 )
 
                 for value in values[9].split(","):
