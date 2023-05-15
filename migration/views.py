@@ -18,6 +18,7 @@ from barcodeset.models import Barcodeset,Barcode
 from sequencingrun.models import SequencingRun
 from sequencinglib.models import SequencingLib,CL_SEQL_LINK
 from sequencingfile.models import SequencingFile
+from variant.models import *
 from django.core.exceptions import ObjectDoesNotExist
 import json
 
@@ -501,7 +502,6 @@ def migrate(request):
                                 path=row[9].strip(),
                             )
 
-
                     print("migrated..")
                     report.append({"name":row[0],"status":"OK","message":""})
                 except Exception as e:
@@ -718,3 +718,66 @@ def sequenced_files_opposite(request):
         form = SequencedFilesForm()
 
     return render(request,"sequenced_files.html",locals())
+
+def variant(request):
+    def get_value_by_startswith(v,k):
+        for t in v.split(":"):
+            if t.startswith(k):
+                return t.strip()
+        return None
+
+    if request.method == "POST":
+        form = VariantForm(request.POST, request.FILES)
+        if form.is_valid():
+            file = request.FILES["file"]
+            lines = file.readlines()
+            cols = str(lines[0]).split("\\t")
+            # for i,col in enumerate(cols):
+            #     print("%s(%d)" % (col.strip(),i))
+            for line in lines[1:]:
+                values = str(line).split("\\t")
+
+                g_variant = GVariant.objects.create(
+                    chrom = values[0],
+                    start = values[1],
+                    end = values[2],
+                    ref = values[3],
+                    alt = values[4],
+                    avsnp150 = values[29]
+                )
+
+                variant_call = VariantCall.objects.create(
+                    coverage = values[59],
+                    ref_read = values[60],
+                    alt_read = values[61],
+                    g_variant = g_variant
+                )
+
+                for value in values[9].split(","):
+                    print(value.strip()) #ALK:NM_004304:exon16:c.T2743G:p.W915G
+
+                    parts =  value.split(":")
+
+                    if len(parts)>1:
+                        c_variant = CVariant.objects.create(
+                            g_variant = g_variant,
+                            gene =parts[0].strip(),
+                            nm_id = parts[1].strip(),
+                            c_var = get_value_by_startswith(value,"c."),
+                            exon = get_value_by_startswith(value,"exon").split("exon")[1],
+                            func = values[5],
+                            gene_detail = values[7]
+                        )
+
+                        p_var = get_value_by_startswith(value,"p.")
+
+                        p_variant = PVariant.objects.create(
+                            c_variant = c_variant,
+                            ref = p_var.split("p.")[1][1],
+                            pos = p_var.split("p.")[1][:-1],
+                            alt = p_var.split("p.")[1][-1]
+                        )
+
+    else:
+        form = VariantForm()
+    return render(request, "variant.html", locals())

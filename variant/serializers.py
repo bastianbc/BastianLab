@@ -8,10 +8,11 @@ class VariantSerializer(serializers.ModelSerializer):
     ref = serializers.SerializerMethodField()
     pos = serializers.SerializerMethodField()
     alt = serializers.SerializerMethodField()
+    gene = serializers.SerializerMethodField()
 
     class Meta:
         model = VariantCall
-        fields = ("id", "sample_lib", "sequencing_run", "block", "area", "Ref", "Pos", "Alt", "Gene",)
+        fields = ("id", "sample_lib", "sequencing_run", "block", "area", "ref", "pos", "alt", "gene",)
 
     def get_block(self,obj):
         return ""
@@ -20,10 +21,25 @@ class VariantSerializer(serializers.ModelSerializer):
         return ""
 
     def get_ref(self,obj):
-        return ""
+        if obj.g_variant:
+            if obj.g_variant.c_variants.first():
+                if obj.g_variant.c_variants.first().p_variants.first():
+                    return obj.g_variant.c_variants.first().p_variants.first().ref
+        return None
 
     def get_pos(self,obj):
-        return ""
+        if obj.g_variant:
+            if obj.g_variant.c_variants.first():
+                if obj.g_variant.c_variants.first().p_variants.first():
+                    return obj.g_variant.c_variants.first().p_variants.first().pos
+        return None
 
     def get_alt(self,obj):
+        if obj.g_variant:
+            if obj.g_variant.c_variants.first():
+                if obj.g_variant.c_variants.first().p_variants.first():
+                    return obj.g_variant.c_variants.first().p_variants.first().alt
+        return None
+
+    def get_gene(self,obj):
         return ""

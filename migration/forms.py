@@ -14,9 +14,13 @@ class MigrationForm(forms.Form):
         ("seqr", "SeqR"),
         ("barcode", "Barcode"),
         ("sf", "SequencingFile"),
+        ("variant", "Variant"),
     ))
     file = forms.FileField()
 
 class SequencedFilesForm(forms.Form):
     checksum_file = forms.FileField()
     tree2_file = forms.FileField()
+
+class VariantForm(forms.Form):
+    file = forms.FileField()
