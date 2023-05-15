@@ -1,38 +1,5 @@
 from django.db import models
 
-class GVariant(models.Model):
-    hg = models.IntegerField(default=0)
-    chrom = models.CharField(max_length=30, blank=True, null=True)
-    start = models.IntegerField(default=0)
-    end = models.IntegerField(default=0)
-    ref = models.CharField(max_length=30, blank=True, null=True)
-    alt = models.CharField(max_length=30, blank=True, null=True)
-    avsnp150 = models.CharField(max_length=30, blank=True, null=True)
-
-    class Meta:
-        db_table = "g_variant"
-
-class CVariant(models.Model):
-    g_variant = models.ForeignKey(GVariant, on_delete=models.CASCADE, related_name="c_variants", blank=True, null=True)
-    gene = models.CharField(max_length=30, blank=True, null=True)
-    nm_id = models.CharField(max_length=30, blank=True, null=True)
-    c_var = models.CharField(max_length=30, blank=True, null=True)
-    exon = models.CharField(max_length=30, blank=True, null=True)
-    func = models.CharField(max_length=30, blank=True, null=True)
-    gene_detail = models.CharField(max_length=30)
-
-    class Meta:
-        db_table = "c_variant"
-
-class PVariant(models.Model):
-    c_variant = models.ForeignKey(CVariant, on_delete=models.CASCADE, related_name="p_variants")
-    ref = models.CharField(max_length=30, blank=True, null=True)
-    pos = models.CharField(max_length=30, blank=True, null=True)
-    alt = models.CharField(max_length=30, blank=True, null=True)
-
-    class Meta:
-        db_table = "p_variant"
-
 class VariantCall(models.Model):
     sample_lib = models.ForeignKey("samplelib.SampleLib", on_delete=models.CASCADE, related_name="variant_calls", blank=True, null=True)
     sequencing_run = models.ForeignKey("sequencingrun.SequencingRun", on_delete=models.CASCADE, related_name="variant_calls", blank=True, null=True)
@@ -44,7 +11,6 @@ class VariantCall(models.Model):
     label = models.CharField(max_length=30, blank=True, null=True)
     ref_read = models.IntegerField(default=0)
     alt_read = models.IntegerField(default=0)
-    g_variant = models.ForeignKey(GVariant, on_delete=models.CASCADE, related_name="variant_calls")
 
     class Meta:
         db_table = "variant_call"
@@ -112,3 +78,37 @@ class VariantCall(models.Model):
         except Exception as e:
             print(str(e))
             raise
+
+class GVariant(models.Model):
+    variant_call = models.ForeignKey(VariantCall, on_delete=models.CASCADE, related_name="variant_calls")
+    hg = models.IntegerField(default=0)
+    chrom = models.CharField(max_length=30, blank=True, null=True)
+    start = models.IntegerField(default=0)
+    end = models.IntegerField(default=0)
+    ref = models.CharField(max_length=30, blank=True, null=True)
+    alt = models.CharField(max_length=30, blank=True, null=True)
+    avsnp150 = models.CharField(max_length=30, blank=True, null=True)
+
+    class Meta:
+        db_table = "g_variant"
+
+class CVariant(models.Model):
+    g_variant = models.ForeignKey(GVariant, on_delete=models.CASCADE, related_name="c_variants", blank=True, null=True)
+    gene = models.CharField(max_length=30, blank=True, null=True)
+    nm_id = models.CharField(max_length=30, blank=True, null=True)
+    c_var = models.CharField(max_length=30, blank=True, null=True)
+    exon = models.CharField(max_length=30, blank=True, null=True)
+    func = models.CharField(max_length=30, blank=True, null=True)
+    gene_detail = models.CharField(max_length=30)
+
+    class Meta:
+        db_table = "c_variant"
+
+class PVariant(models.Model):
+    c_variant = models.ForeignKey(CVariant, on_delete=models.CASCADE, related_name="p_variants")
+    ref = models.CharField(max_length=30, blank=True, null=True)
+    pos = models.CharField(max_length=30, blank=True, null=True)
+    alt = models.CharField(max_length=30, blank=True, null=True)
+
+    class Meta:
+        db_table = "p_variant"
