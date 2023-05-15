@@ -21,25 +21,22 @@ class VariantSerializer(serializers.ModelSerializer):
         return ""
 
     def get_ref(self,obj):
-        if obj.g_variant:
-            if obj.g_variant.c_variants.first():
-                if obj.g_variant.c_variants.first().p_variants.first():
-                    return obj.g_variant.c_variants.first().p_variants.first().ref
-        return None
+        try:
+            return PVariant.objects.get(c_variant__g_variant__variant_call=obj).ref
+        except Exception as e:
+            return None
 
     def get_pos(self,obj):
-        if obj.g_variant:
-            if obj.g_variant.c_variants.first():
-                if obj.g_variant.c_variants.first().p_variants.first():
-                    return obj.g_variant.c_variants.first().p_variants.first().pos
-        return None
+        try:
+            return PVariant.objects.get(c_variant__g_variant__variant_call=obj).pos
+        except Exception as e:
+            return None
 
     def get_alt(self,obj):
-        if obj.g_variant:
-            if obj.g_variant.c_variants.first():
-                if obj.g_variant.c_variants.first().p_variants.first():
-                    return obj.g_variant.c_variants.first().p_variants.first().alt
-        return None
+        try:
+            return PVariant.objects.get(c_variant__g_variant__variant_call=obj).alt
+        except Exception as e:
+            return None
 
     def get_gene(self,obj):
         return ""

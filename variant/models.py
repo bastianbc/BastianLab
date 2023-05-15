@@ -80,7 +80,7 @@ class VariantCall(models.Model):
             raise
 
 class GVariant(models.Model):
-    variant_call = models.ForeignKey(VariantCall, on_delete=models.CASCADE, related_name="variant_calls")
+    variant_call = models.ForeignKey(VariantCall, on_delete=models.CASCADE, related_name="g_variants")
     hg = models.IntegerField(default=0)
     chrom = models.CharField(max_length=30, blank=True, null=True)
     start = models.IntegerField(default=0)
