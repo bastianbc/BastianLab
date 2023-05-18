@@ -19,6 +19,7 @@ from sequencingrun.models import SequencingRun
 from sequencinglib.models import SequencingLib,CL_SEQL_LINK
 from sequencingfile.models import SequencingFile
 from variant.models import *
+from gene.models import *
 from django.core.exceptions import ObjectDoesNotExist
 import json
 
@@ -781,3 +782,40 @@ def variant(request):
     else:
         form = VariantForm()
     return render(request, "variant.html", locals())
+
+def gene(request):
+    def get_int_value(v):
+        try:
+            return int(v)
+        except Exception as e:
+            return 0
+
+    if request.method == "POST":
+        form = GeneForm(request.POST, request.FILES)
+        if form.is_valid():
+            file = request.FILES["file"]
+            lines = file.readlines()
+            cols = str(lines[0]).split("\\t")
+
+            # for i,col in enumerate(cols):
+            #     print("%s(%d)" % (col.strip(),i))
+
+            for line in lines[1:]:
+                values = str(line).split("\\t")
+
+                try:
+                    gene = Gene.objects.create(
+                        name = values[2],
+                        chr = values[10],
+                        start = get_int_value(values[12]),
+                        end = get_int_value(values[13]),
+                    )
+
+                    print("created for ", gene.__dict__)
+                except Exception as e:
+                    print(values[6])
+                    print(len(values[6]))
+                    raise
+    else:
+        form = GeneForm()
+    return render(request, "gene.html", locals())

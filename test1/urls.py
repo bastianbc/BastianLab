@@ -31,6 +31,7 @@ urlpatterns = [
     path('migration/', include('migration.urls')),
     path('sequencingfile/', include('sequencingfile.urls')),
     path('variant/', include('variant.urls')),
+    path('gene/', include('gene.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 handler404 = "core.views.error_404"

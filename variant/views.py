@@ -10,7 +10,7 @@ def variants(request):
     filter = FilterForm()
     return render(request,"variants.html",locals())
 
-@permission_required_for_async("sequencingrun.view_sequencingrun")
+@permission_required_for_async("variant.view_variant")
 def filter_variants(request):
     variants = VariantCall.query_by_args(request.user,**request.GET)
     serializer = VariantSerializer(variants['items'], many=True)

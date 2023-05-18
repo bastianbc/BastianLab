@@ -24,3 +24,6 @@ class SequencedFilesForm(forms.Form):
 
 class VariantForm(forms.Form):
     file = forms.FileField()
+
+class GeneForm(forms.Form):
+    file = forms.FileField()

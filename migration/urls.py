@@ -7,4 +7,5 @@ urlpatterns = [
     path("sequenced_files", views.sequenced_files, name="sequenced-files"),
     path("sequenced_files_opposite", views.sequenced_files_opposite, name="sequenced-files-opposite"),
     path("variant", views.variant, name="variant"),
+    path("gene", views.gene, name="gene"),
 ]

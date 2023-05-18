@@ -14,6 +14,7 @@ def is_admin_area(path):
         "barcodeset",
         "migration",
         "sequencingfile",
+        "gene",
     ]
 
     app_name = path.split("/")[1]
