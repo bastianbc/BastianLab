@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q, Count
 
 class Gene(models.Model):
     name = models.CharField(max_length=30, verbose_name="Name")
@@ -59,7 +60,7 @@ class Gene(models.Model):
             elif search_value:
                 queryset = queryset.filter(
                     Q(name__icontains=search_value) |
-                    Q(chr__icontains=search_value) 
+                    Q(chr__icontains=search_value)
                 )
 
             count = queryset.count()
