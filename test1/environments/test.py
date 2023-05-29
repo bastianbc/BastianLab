@@ -198,7 +198,7 @@ REST_FRAMEWORK = {
 # Authentication settings
 LOGIN_URL = '/auth/login'
 LOGOUT_URL = '/auth/logout'
-LOGIN_REDIRECT_URL = '/dashboard'
+LOGIN_REDIRECT_URL = '/projects'
 
 TECHNICIAN_GROUP_NAME = "Technicians"
 RESEARCHER_GROUP_NAME = "Researchers"

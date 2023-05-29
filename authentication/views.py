@@ -39,7 +39,7 @@ def log_in(request):
 
 def log_out(request):
     logout(request)
-    return redirect("/")
+    return redirect("/auth/login")
 
 @login_required
 def change_password(request):

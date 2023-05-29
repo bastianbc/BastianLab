@@ -8,4 +8,5 @@ urlpatterns = [
     path("sequenced_files_opposite", views.sequenced_files_opposite, name="sequenced-files-opposite"),
     path("variant", views.variant, name="variant"),
     path("gene", views.gene, name="gene"),
+    path("lookup", views.lookup_all_data, name="lookup-all-data"),
 ]

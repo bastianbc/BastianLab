@@ -22,6 +22,7 @@ from variant.models import *
 from gene.models import *
 from django.core.exceptions import ObjectDoesNotExist
 import json
+import xlrd
 
 def migrate(request):
 
@@ -819,3 +820,184 @@ def gene(request):
     else:
         form = GeneForm()
     return render(request, "gene.html", locals())
+
+def consolidated_data(request):
+    def get_int_value(v):
+        try:
+            return int(v)
+        except Exception as e:
+            return 0
+
+    if request.method == "POST":
+        form = ConsolidatedDataForm(request.POST, request.FILES)
+        if form.is_valid():
+            file = request.FILES["file"]
+            lines = file.readlines()
+            cols = str(lines[0]).split("\\t")
+
+            # for i,col in enumerate(cols):
+            #     print("%s(%d)" % (col.strip(),i))
+
+            for line in lines[1:]:
+                values = str(line).split("\\t")
+
+                try:
+                    gene = SampleLib.objects.create(
+                        name = values[0],
+                        barcode = values[0],
+                        date = values[0],
+                        method = values[0],
+                        qubit = values[0],
+                        shear_volume = values[0],
+                        qpcr_conc = values[0],
+                        pcr_cycles = values[0],
+                        amount_in = values[0],
+                        amount_final = values[0],
+                        vol_init = values[0],
+                        vol_remain = values[0],
+                        notes = values[0],
+                    )
+
+                    print("created for ", gene.__dict__)
+                except Exception as e:
+                    print(values[6])
+                    print(len(values[6]))
+                    raise
+    else:
+        form = GeneForm()
+    return render(request, "gene.html", locals())
+
+def lookup_all_data(request):
+    result = []
+    tree2_dataset = None
+
+    class Report:
+        sample_lib = None
+        nucleic_acid = None
+        area = None
+        block = None
+        patient = None
+        sequencing_run = None
+        fastq_file = None
+        bait = None
+        source = None
+
+
+        def __init__(self,source):
+            self.source = source
+
+    def __search_in_database(value):
+        try:
+            for seq_l in sequencing_run.sequencing_libs.all():
+                for cl_seql_link in seq_l.cl_seql_links.all():
+                    for sl_cl_link in cl_seql_link.captured_lib.sl_cl_links.all():
+                        sample_lib = sl_cl_link.sample_lib
+                        captured_lib = sl_cl_link.captured_lib
+                        for na_sl_link in sample_lib.na_sl_links.all():
+                            nucacid = na_sl_link.nucacid
+                            return {
+                                "sample_lib": sample_lib.name,
+                                "nucleic_acid": nucacid.name,
+                                "area": nucacid.area.name if nucacid.area else None,
+                                "block": nucacid.area.block.name if nucacid.area and nucacid.area.block else None,
+                                "patient": nucacid.area.block.patient.pat_id if nucacid.area and nucacid.area.block and nucacid.area.block.patient else None,
+                                "bait": captured_lib.bait.name if captured_lib.bait else None
+                            }
+
+        except Exception as e:
+            return None
+
+    def __search_in_tree2(value):
+        for t in tree2_dataset:
+            if t["sl"] == value:
+                return {
+                    "fastq_file": t["filename"],
+                    "sequencing_run": t["seq_r"]
+                }
+        return None
+
+    def _run_consolidated_data(f):
+        xl_workbook = xlrd.open_workbook(file_contents=f.read())
+        sheet_names = xl_workbook.sheet_names()
+        xl_sheet = xl_workbook.sheet_by_name(sheet_names[0])
+
+        for i in range(1,xl_sheet.nrows):
+            row = xl_sheet.row(i)
+
+            report = Report(source="consolidated_data")
+            report.sample_lib = row[0].value
+
+            tree2_values = __search_in_tree2(str(row[0].value))
+
+            if tree2_values:
+                report.fastq_file = tree2_values["fastq_file"]
+                report.sequencing_run = tree2_values["sequencing_run"]
+
+                db_values = __search_in_database(tree2_values["sequencing_run"])
+
+                if db_values:
+                    report.sample_lib = db_values["sample_lib"]
+                    report.nucleic_acid = db_values["nucleic_acid"]
+                    report.area= db_values["area"]
+                    report.block = db_values["block"]
+                    report.patient = db_values["patient"]
+
+            result.append(report)
+
+    def _run_md5_summary(f):
+        xl_workbook = xlrd.open_workbook(file_contents=f.read())
+        sheet_names = xl_workbook.sheet_names()
+        xl_sheet = xl_workbook.sheet_by_name(sheet_names[0])
+
+        for i in range(1,xl_sheet.nrows):
+            row = xl_sheet.row(i)
+
+            report = Report(source="md5_summary")
+            report.sample_lib = row[0].value
+
+            tree2_values = __search_in_tree2(row[0].value)
+
+            if tree2_values:
+                report.fastq_file = tree2_values["fastq_file"]
+                report.sequencing_run = tree2_values["sequencing_run"]
+
+                db_values = __search_in_database(tree2_values["sequencing_run"])
+
+                if db_values:
+                    report.sample_lib = db_values["sample_lib"]
+                    report.nucleic_acid = db_values["nucleic_acid"]
+                    report.area= db_values["area"]
+                    report.block = db_values["block"]
+                    report.patient = db_values["patient"]
+
+            result.append(report)
+
+    if request.method == "POST":
+        form = LookupAllDataForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            consolidated_data_file = request.FILES["consolidated_data_file"]
+            md5_summary_file = request.FILES["md5_summary_file"]
+            tree2_dataset = json.loads(request.FILES["tree2_file"].read())
+
+            _run_consolidated_data(consolidated_data_file)
+
+            # _run_md5_summary(md5_summary_file)
+
+            response = HttpResponse(
+                content_type='text/csv',
+                headers={'Content-Disposition': 'attachment; filename="report-seq-files-v2.csv"'},
+            )
+
+            field_names = ["sample_lib","nucleic_acid","area","block","patient","sequencing_run","fastq_file","bait","source"]
+            writer = csv.writer(response)
+            writer.writerow(field_names)
+
+            for item in result:
+                writer.writerow([getattr(item,field) for field in field_names])
+
+            return response
+    else:
+        form = LookupAllDataForm()
+
+    return render(request,"lookup.html",locals())
