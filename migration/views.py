@@ -869,7 +869,7 @@ def consolidated_data(request):
 
 def lookup_all_data(request):
     result = []
-    tree2_dataset = None
+    tree2_dataset = []
 
     class Report:
         sample_lib = None
@@ -888,6 +888,7 @@ def lookup_all_data(request):
 
     def __search_in_database(value):
         try:
+            sequencing_run = SequencingRun.objects.get(name=value)
             for seq_l in sequencing_run.sequencing_libs.all():
                 for cl_seql_link in seq_l.cl_seql_links.all():
                     for sl_cl_link in cl_seql_link.captured_lib.sl_cl_links.all():
@@ -907,12 +908,20 @@ def lookup_all_data(request):
         except Exception as e:
             return None
 
+    def _simplify_tree2(f):
+        while True:
+            line = f.readline().decode("utf-8").strip()
+            if not line:
+                break
+            if "fastq.gz" in line:
+                tree2_dataset.append(line)
+
     def __search_in_tree2(value):
-        for t in tree2_dataset:
-            if t["sl"] == value:
+        for line in tree2_dataset:
+            if value in line:
+                parts = line.split("/")
                 return {
-                    "fastq_file": t["filename"],
-                    "sequencing_run": t["seq_r"]
+                    "fastq_file": parts[-1],
                 }
         return None
 
@@ -926,14 +935,14 @@ def lookup_all_data(request):
 
             report = Report(source="consolidated_data")
             report.sample_lib = row[0].value
+            report.sequencing_run = row[11].value.split("_")[-1]
 
             tree2_values = __search_in_tree2(str(row[0].value))
 
             if tree2_values:
                 report.fastq_file = tree2_values["fastq_file"]
-                report.sequencing_run = tree2_values["sequencing_run"]
 
-                db_values = __search_in_database(tree2_values["sequencing_run"])
+                db_values = __search_in_database(row[11].value.split("_")[-1])
 
                 if db_values:
                     report.sample_lib = db_values["sample_lib"]
@@ -954,14 +963,14 @@ def lookup_all_data(request):
 
             report = Report(source="md5_summary")
             report.sample_lib = row[0].value
+            report.sequencing_run = row[1].value.strip().split("_")[-1] if "_" in row[1].value and not row[2].value in ["Acral_melenoma_lines_mRNA_Seq_AL1806051_R1","Acral_Mel_Exome-01","BCB018_Part1","BCB018_Part2",] else row[1].value.strip()
 
             tree2_values = __search_in_tree2(row[0].value)
 
             if tree2_values:
                 report.fastq_file = tree2_values["fastq_file"]
-                report.sequencing_run = tree2_values["sequencing_run"]
 
-                db_values = __search_in_database(tree2_values["sequencing_run"])
+                db_values = __search_in_database(row[1].value.strip())
 
                 if db_values:
                     report.sample_lib = db_values["sample_lib"]
@@ -978,11 +987,13 @@ def lookup_all_data(request):
         if form.is_valid():
             consolidated_data_file = request.FILES["consolidated_data_file"]
             md5_summary_file = request.FILES["md5_summary_file"]
-            tree2_dataset = json.loads(request.FILES["tree2_file"].read())
+            tree2_file = request.FILES["tree2_file"]
+
+            _simplify_tree2(tree2_file)
 
             _run_consolidated_data(consolidated_data_file)
 
-            # _run_md5_summary(md5_summary_file)
+            _run_md5_summary(md5_summary_file)
 
             response = HttpResponse(
                 content_type='text/csv',
