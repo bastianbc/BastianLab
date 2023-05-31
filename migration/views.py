@@ -950,6 +950,7 @@ def lookup_all_data(request):
                     report.area= db_values["area"]
                     report.block = db_values["block"]
                     report.patient = db_values["patient"]
+                    report.bait = db_values["bait"]
 
             result.append(report)
 
@@ -978,6 +979,7 @@ def lookup_all_data(request):
                     report.area= db_values["area"]
                     report.block = db_values["block"]
                     report.patient = db_values["patient"]
+                    report.bait = db_values["bait"]
 
             result.append(report)
 
@@ -997,7 +999,7 @@ def lookup_all_data(request):
 
             response = HttpResponse(
                 content_type='text/csv',
-                headers={'Content-Disposition': 'attachment; filename="report-seq-files-v2.csv"'},
+                headers={'Content-Disposition': 'attachment; filename="report-seq-files-v4.csv"'},
             )
 
             field_names = ["sample_lib","nucleic_acid","area","block","patient","sequencing_run","fastq_file","bait","source"]
