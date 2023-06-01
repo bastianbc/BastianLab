@@ -870,18 +870,24 @@ def consolidated_data(request):
 def lookup_all_data(request):
     result = []
     tree2_dataset = []
+    checksum_dataset = None
 
     class Report:
         sample_lib = None
         nucleic_acid = None
         area = None
         block = None
-        patient = None
+        # patient = None
         sequencing_run = None
-        fastq_file = None
+        sequencing_lib = None
+        captured_lib = None
         bait = None
+        spike = None
         source = None
-
+        directory = None
+        fastq_file = None
+        checksum = None
+        path = None
 
         def __init__(self,source):
             self.source = source
@@ -901,7 +907,9 @@ def lookup_all_data(request):
                                 "nucleic_acid": nucacid.name,
                                 "area": nucacid.area.name if nucacid.area else None,
                                 "block": nucacid.area.block.name if nucacid.area and nucacid.area.block else None,
-                                "patient": nucacid.area.block.patient.pat_id if nucacid.area and nucacid.area.block and nucacid.area.block.patient else None,
+                                # "patient": nucacid.area.block.patient.pat_id if nucacid.area and nucacid.area.block and nucacid.area.block.patient else None,
+                                "captured_lib": captured_lib,
+                                "sequencing_lib": seq_l,
                                 "bait": captured_lib.bait.name if captured_lib.bait else None
                             }
 
@@ -922,6 +930,8 @@ def lookup_all_data(request):
                 parts = line.split("/")
                 return {
                     "fastq_file": parts[-1],
+                    "directory": parts[1],
+                    "path": line
                 }
         return None
 
@@ -935,22 +945,23 @@ def lookup_all_data(request):
 
             report = Report(source="consolidated_data")
             report.sample_lib = row[0].value
+            report.block = row[1].value
             report.sequencing_run = row[11].value.split("_")[-1]
+            report.nucleic_acid = row[12].value
+            report.area = row[15].value
+            report.sequencing_lib = row[13].value
+            report.captured_lib = row[14].value
+            report.bait = row[9].value
+            report.spike = row[10].value
+            report.checksum = _get_checksum(row[0].value)
 
             tree2_values = __search_in_tree2(str(row[0].value))
 
             if tree2_values:
                 report.fastq_file = tree2_values["fastq_file"]
+                report.directory = tree2_values["directory"]
+                report.path = tree2_values["path"]
 
-                db_values = __search_in_database(row[11].value.split("_")[-1])
-
-                if db_values:
-                    report.sample_lib = db_values["sample_lib"]
-                    report.nucleic_acid = db_values["nucleic_acid"]
-                    report.area= db_values["area"]
-                    report.block = db_values["block"]
-                    report.patient = db_values["patient"]
-                    report.bait = db_values["bait"]
 
             result.append(report)
 
@@ -964,7 +975,8 @@ def lookup_all_data(request):
 
             report = Report(source="md5_summary")
             report.sample_lib = row[0].value
-            report.sequencing_run = row[1].value.strip().split("_")[-1] if "_" in row[1].value and not row[2].value in ["Acral_melenoma_lines_mRNA_Seq_AL1806051_R1","Acral_Mel_Exome-01","BCB018_Part1","BCB018_Part2",] else row[1].value.strip()
+            report.sequencing_run = row[1].value.strip().split("_")[-1] if "_" in row[1].value and not row[1].value in ["Acral_melenoma_lines_mRNA_Seq_AL1806051_R1","Acral_Mel_Exome-01","BCB018_Part1","BCB018_Part2",] else row[1].value.strip()
+            report.checksum = _get_checksum(row[0].value)
 
             tree2_values = __search_in_tree2(row[0].value)
 
@@ -978,10 +990,18 @@ def lookup_all_data(request):
                     report.nucleic_acid = db_values["nucleic_acid"]
                     report.area= db_values["area"]
                     report.block = db_values["block"]
-                    report.patient = db_values["patient"]
+                    report.captured_lib = db_values["captured_lib"]
+                    report.sequencing_lib = db_values["sequencing_lib"]
                     report.bait = db_values["bait"]
 
+
             result.append(report)
+
+    def _get_checksum(value):
+        for c in checksum_dataset:
+            if c["sl_id"] == value:
+                return c["checksum"]
+        return None
 
     if request.method == "POST":
         form = LookupAllDataForm(request.POST, request.FILES)
@@ -990,6 +1010,7 @@ def lookup_all_data(request):
             consolidated_data_file = request.FILES["consolidated_data_file"]
             md5_summary_file = request.FILES["md5_summary_file"]
             tree2_file = request.FILES["tree2_file"]
+            checksum_dataset = json.loads(request.FILES["checksum_dataset"].read())
 
             _simplify_tree2(tree2_file)
 
@@ -1002,7 +1023,7 @@ def lookup_all_data(request):
                 headers={'Content-Disposition': 'attachment; filename="report-seq-files-v4.csv"'},
             )
 
-            field_names = ["sample_lib","nucleic_acid","area","block","patient","sequencing_run","fastq_file","bait","source"]
+            field_names = ["sample_lib","nucleic_acid","area","block","captured_lib","sequencing_lib","sequencing_run","bait","directory","checksum","fastq_file","path","source"]
             writer = csv.writer(response)
             writer.writerow(field_names)
 
