@@ -947,7 +947,7 @@ def lookup_all_data(request):
             report.sample_lib = row[0].value
             report.block = row[1].value
             report.sequencing_run = row[11].value.split("_")[-1]
-            report.nucleic_acid = row[12].value
+            report.nucleic_acid = row[12].value if not row[12].value == "nan_NA" else None
             report.area = row[15].value
             report.sequencing_lib = row[13].value
             report.captured_lib = row[14].value
