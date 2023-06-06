@@ -965,6 +965,35 @@ def lookup_all_data(request):
 
             result.append(report)
 
+    def _run_consolidated_matched_data(f):
+        xl_workbook = xlrd.open_workbook(file_contents=f.read())
+        sheet_names = xl_workbook.sheet_names()
+        xl_sheet = xl_workbook.sheet_by_name(sheet_names[0])
+
+        for i in range(1,xl_sheet.nrows):
+            row = xl_sheet.row(i)
+
+            report = Report(source="consolidated_data")
+            report.sample_lib = row[0].value
+            report.block = row[1].value  if not row[1].value == "nan" else None
+            report.sequencing_run = row[9].value.split("_")[-1]
+            report.nucleic_acid = row[10].value
+            report.area = row[13].value
+            report.sequencing_lib = row[11].value
+            report.captured_lib = row[12].value
+            report.bait = row[14].value
+            report.checksum = _get_checksum(row[0].value)
+
+            tree2_values = __search_in_tree2(str(row[0].value))
+
+            if tree2_values:
+                report.fastq_file = tree2_values["fastq_file"]
+                report.directory = tree2_values["directory"]
+                report.path = tree2_values["path"]
+
+
+            result.append(report)
+
     def _run_md5_summary(f):
         xl_workbook = xlrd.open_workbook(file_contents=f.read())
         sheet_names = xl_workbook.sheet_names()
@@ -1014,7 +1043,8 @@ def lookup_all_data(request):
 
             _simplify_tree2(tree2_file)
 
-            _run_consolidated_data(consolidated_data_file)
+            # _run_consolidated_data(consolidated_data_file)
+            _run_consolidated_matched_data(consolidated_data_file)
 
             _run_md5_summary(md5_summary_file)
 
