@@ -822,50 +822,132 @@ def gene(request):
     return render(request, "gene.html", locals())
 
 def consolidated_data(request):
-    def get_int_value(v):
+    def get_barcode(name):
         try:
-            return int(v)
+            return Barcode.objects.get(name=name)
         except Exception as e:
-            return 0
+            return None
+
+    def get_or_create_bait(value):
+        try:
+            return Bait.objects.get(name=value)
+        except Exception as e:
+            return Bait.objects.create(
+                name=value
+            )
+
+    def get_or_create_capturedlib(name,bait):
+        try:
+            return CapturedLib.objects.get(name=name)
+        except Exception as e:
+            return CapturedLib.objects.create(
+                name=name,
+                bait=bait,
+            )
+
+    def get_or_create_samplelib(**kwargs):
+        try:
+            return SampleLib.objects.get(name=kwargs["name"])
+        except ObjectDoesNotExist as e:
+            return SampleLib.objects.create(**kwargs)
+
+    def get_or_create_sequencingrun(name):
+        try:
+            return SequencingRun.objects.get(name=name)
+        except ObjectDoesNotExist as e:
+            return SequencingRun.objects.create(
+                name = name,
+            )
+
+    def create_sequencingfile(**kwargs):
+        return SequencingFile.objects.create(**kwargs)
+
+    def get_or_create_patient(**kwargs):
+        try:
+            return Patients.objects.get(pat_id=kwargs["id"])
+        except ObjectDoesNotExist as e:
+            return Patients.objects.create(kwargs)
+
+    def get_or_create_block(**kwargs):
+        try:
+            return Blocks.objects.get(name=kwargs["name"])
+        except ObjectDoesNotExist as e:
+            return Blocks.objects.create(**kwargs)
+
+    def get_or_create_area(**kwargs):
+        try:
+            return Area.objects.get(name=kwargs["name"])
+        except ObjectDoesNotExist as e:
+            return Area.objects.create(**kwargs)
+
+    def get_or_create_nucacid(name,area):
+        try:
+            return NucAcids.objects.get(name=kwargs["name"])
+        except ObjectDoesNotExist as e:
+            return NucAcids.objects.create(**kwargs)
 
     if request.method == "POST":
         form = ConsolidatedDataForm(request.POST, request.FILES)
+
         if form.is_valid():
-            file = request.FILES["file"]
-            lines = file.readlines()
-            cols = str(lines[0]).split("\\t")
+            consolidated_data_file = request.FILES["consolidated_data_file"]
+            # md5_summary_file = request.FILES["md5_summary_file"]
+            tree2_file = request.FILES["tree2_file"]
+            checksum_dataset = json.loads(request.FILES["checksum_dataset"].read())
 
-            # for i,col in enumerate(cols):
-            #     print("%s(%d)" % (col.strip(),i))
+            # xl_workbook = xlrd.open_workbook(file_contents=consolidated_data_file.read())
+            # sheet_names = xl_workbook.sheet_names()
+            # xl_sheet = xl_workbook.sheet_by_name(sheet_names[0])
 
-            for line in lines[1:]:
-                values = str(line).split("\\t")
+            # for i in range(0,xl_sheet.ncols):
+            #     row = xl_sheet.row(0)
+            #     print("%d: %s" % (i,row[i].value))
 
-                try:
-                    gene = SampleLib.objects.create(
-                        name = values[0],
-                        barcode = values[0],
-                        date = values[0],
-                        method = values[0],
-                        qubit = values[0],
-                        shear_volume = values[0],
-                        qpcr_conc = values[0],
-                        pcr_cycles = values[0],
-                        amount_in = values[0],
-                        amount_final = values[0],
-                        vol_init = values[0],
-                        vol_remain = values[0],
-                        notes = values[0],
-                    )
+            _simplify_tree2(tree2_file)
 
-                    print("created for ", gene.__dict__)
-                except Exception as e:
-                    print(values[6])
-                    print(len(values[6]))
-                    raise
+            patient = get_or_create_patient(row[27].value, row[20].value)
+
+            block = get_or_create_block(**{"name":row[1].value,"patient":patient,"age":row[21].value,"diagnosis":row[7].value,"micro":row[19],"p_stage":row[22].value,"thickness":row[23].value,"subtype":row[24].value,"prim":row[25].value,"mitoses":row[26].value,"dx_text":row[17].value,"notes":row[8].value})
+
+            area = get_or_create_area(**{"name":row[13].value,"block":block, "area_type": "other" if row[13].value and row[13].value=="Tumor" else row[13].value.lower() })
+
+            nucacid = get_or_create_nucacid(**{"name":row[10].value,"area":area})
+
+            barcode = get_barcode(row[2].value)
+
+            amount_in = None
+            if not row[5].value.isnumeric():
+                parts = row[5].value.split(" ")
+                if parts[1] == "ug":
+                    amount_in = float(parts[0]) * 1000
+                elif parts[1] == "ng":
+                    amount_in = float(parts[0])
+
+            sample_lib = get_or_create_samplelib({"name":row[0].value,"barcode":barcode,"amount_in":amount_in,"notes":"Notes:%s, Condition:%s, Input Hyb Conc.:%s" % (row[18].value, row[4].value, row[6].value)})
+
+            bait = get_or_create_bait(value)
+
+            captured_lib = get_or_create_capturedlib(row[12].value,bait)
+
+            sequencing_run = get_or_create_sequencingrun(row[9].value.split("_")[1])
+
+            checksum = _get_checksum(row[0].value)
+
+            tree2_values = __search_in_tree2(str(row[0].value))
+
+            fastq_file = None
+            directory = None
+            path = None
+            if tree2_values:
+                fastq_file = tree2_values["fastq_file"]
+                directory = tree2_values["directory"]
+                path = tree2_values["path"]
+
+            sequencing_file = create_sequencingfile({"sample_lib":sample_lib,"folder_name":sequencing_run,"read1_file":fastq_file,"read1_checksum":checksum,"path":path})
+
     else:
-        form = GeneForm()
-    return render(request, "gene.html", locals())
+        form = ConsolidatedDataForm()
+    return render(request, "consolidated_data.html", locals())
 
 def lookup_all_data(request):
     result = []

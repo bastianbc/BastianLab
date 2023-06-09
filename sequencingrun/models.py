@@ -29,7 +29,7 @@ class SequencingRun(models.Model):
     name = models.CharField(max_length=50, unique=True, verbose_name="Name")
     date_run = models.DateTimeField(default=datetime.now, verbose_name="Date Run")
     date = models.DateTimeField(default=datetime.now, verbose_name="Date")
-    facility = models.CharField(max_length=20, choices=FACILITY_TYPES, verbose_name="Facility")
+    facility = models.CharField(max_length=20, choices=FACILITY_TYPES, blank=True, null=True, verbose_name="Facility")
     sequencer = models.CharField(max_length=20, choices=SEQUENCER_TYPES, verbose_name="Sequencer",blank=True, null=True)
     pe = models.CharField(max_length=20, choices=PE_TYPES, verbose_name="PE",blank=True, null=True)
     amp_cycles = models.IntegerField(default=0, verbose_name="AMP Cycles")

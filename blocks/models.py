@@ -67,6 +67,7 @@ class Blocks(models.Model):
     old_body_site = models.CharField(max_length=600,blank=True, null=True)
     collection = models.CharField(max_length=2, choices=COLLECTION_CHOICES, default=SCRAPE)
     path_note = models.TextField(blank=True, null=True)
+    ip_dx = models.TextField(blank=True, null=True)
 
     class Meta:
         db_table = 'blocks'
