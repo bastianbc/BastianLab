@@ -471,7 +471,7 @@ def migrate(request):
                                 sequencing_run.sequencing_libs.add(seq_l)
                     elif app == "barcode":
                         Barcode.objects.create(
-                            barcode_set=Barcodeset.objects.get(name="New Barcodes"),
+                            barcode_set=Barcodeset.objects.get(name="Old Barcodes"),
                             name=row[0],
                             i5=row[3],
                             i7=row[2]
@@ -502,6 +502,20 @@ def migrate(request):
                                 read2_count=r2_counts[i].strip(),
                                 is_read_count_equal=True if row[8].strip() == "Yes" else False ,
                                 path=row[9].strip(),
+                            )
+                    elif app == "md5":
+                        for i,sub in enumerate(row[2].split(";")):
+                            SequencingFile.objects.create(
+                                sample_lib = SampleLib.objects.get_or_create(name=row[0].strip())[0],
+                                folder_name = row[1].strip(),
+                                read1_file = sub,
+                                read1_checksum = row[3].split(";")[i],
+                                read1_count = row[4].split(";")[i],
+                                read2_file = row[5].split(";")[i],
+                                read2_checksum = row[6].split(";")[i],
+                                read2_count = row[7].split(";")[i],
+                                is_read_count_equal = True if row[8].strip() == "Yes" else False,
+                                path = row[9].strip(),
                             )
 
                     print("migrated..")
@@ -537,42 +551,73 @@ def report(request):
     import csv
     from io import StringIO
 
-    report = []
-    i = 1
+    result = []
 
-    for seq_r in SequencingRun.objects.all():
-        for seq_l in seq_r.sequencing_libs.all():
-            for cl_seql_link in seq_l.cl_seql_links.all():
-                for sl_cl_link in cl_seql_link.captured_lib.sl_cl_links.all():
-                    sample_lib = sl_cl_link.sample_lib
-                    captured_lib = sl_cl_link.captured_lib
-                    print(i)
-                    i += 1
-                    for na_sl_link in sample_lib.na_sl_links.filter(nucacid__na_type=NucAcids.DNA):
-                        nucacid = na_sl_link.nucacid
-                        report.append({
-                            "sample_lib": sample_lib.name,
-                            "barcode": sample_lib.barcode.name,
-                            "i5": sample_lib.barcode.i5,
-                            "i7": sample_lib.barcode.i7,
-                            "sequencing_run": seq_r.name,
-                            "na_type": nucacid.get_na_type_display() if nucacid.na_type else None,
-                            "area_type": nucacid.area.get_area_type_display() if nucacid.area and nucacid.area.area_type else None,
-                            "patient": nucacid.area.block.patient.pat_id if nucacid.area and nucacid.area.block and nucacid.area.block.patient else None,
-                            "bait": captured_lib.bait.name if captured_lib.bait else None
-                        })
+    class Report():
+        sample_lib = None
+        captured_lib = None
+        bait = None
+        sequencing_lib = None
+        sequencing_run = None
+        fastq_file = None
+        checksum = None
+        path = None
+        na_type = None
+        area_type = None
 
+    for sample_lib in SampleLib.objects.all():
 
+        report = Report()
+
+        fastq_files = []
+        md5_checksums = []
+        paths = []
+        for x in sample_lib.sequencing_files.all():
+            if x.read1_file:
+                fastq_files.append(x.read1_file)
+            if x.read2_file:
+                fastq_files.append(x.read2_file)
+            if x.path:
+                paths.append(x.path)
+            if x.read1_checksum:
+                md5_checksums.append(x.read1_checksum)
+            if x.read2_checksum:
+                md5_checksums.append(x.read2_checksum)
+
+        report.sample_lib = sample_lib.name
+        report.fastq_file = ",".join(fastq_files)
+        report.checksum = ",".join(md5_checksums)
+        report.path = ",".join(list(set(paths)))
+
+        # from sample_lib to nucleic_acid..->project
+        for na_sl_link in sample_lib.na_sl_links.all():
+            report.na_type = na_sl_link.nucacid.get_na_type_display() if na_sl_link.nucacid else None
+            report.area_type = na_sl_link.nucacid.area.get_area_type_display() if na_sl_link.nucacid.area and na_sl_link.nucacid.area.area_type else None
+
+        # from sample_lib to captured_lib..->sequencing_run
+        for sl_cl_link in sample_lib.sl_cl_links.all():
+            report.captured_lib = sl_cl_link.captured_lib.name
+            report.bait = sl_cl_link.captured_lib.bait
+
+            for cl_seql_link in sl_cl_link.captured_lib.cl_seql_links.all():
+                report.sequencing_lib = cl_seql_link.sequencing_lib.name
+                for sequencing_run in cl_seql_link.sequencing_lib.sequencing_runs.all():
+                    report.sequencing_run = sequencing_run.name
+
+        result.append(report)
+
+    for value in range(10):
+        result.append(Report())
     response = HttpResponse(
         content_type='text/csv',
         headers={'Content-Disposition': 'attachment; filename="report-sl-review.csv"'},
     )
 
-    field_names = ["sample_lib","barcode","i5","i7","sequencing_run","na_type","area_type","patient","bait"]
+    field_names = ["sample_lib","captured_lib","bait","sequencing_lib","sequencing_run","fastq_file","checksum","path","na_type","area_type"]
     writer = csv.writer(response)
     writer.writerow(field_names)
-    for item in report:
-        writer.writerow([item[field] for field in field_names])
+    for item in result:
+        writer.writerow([getattr(item,field) for field in field_names])
 
     return response
 
@@ -822,16 +867,71 @@ def gene(request):
     return render(request, "gene.html", locals())
 
 def consolidated_data(request):
+    tree2_dataset = []
+    checksum_dataset = None
+    result = []
+
+    def _simplify_tree2(f):
+        while True:
+            line = f.readline().decode("utf-8").strip()
+            if not line:
+                break
+            if "fastq.gz" in line:
+                tree2_dataset.append(line)
+
+    def _get_checksum(value):
+        for c in checksum_dataset:
+            if c["sl_id"] == value:
+                return c["checksum"]
+        return None
+
+    def __search_in_tree2(value):
+        for line in tree2_dataset:
+            if value in line:
+                parts = line.split("/")
+                return {
+                    "fastq_file": parts[-1],
+                    "directory": parts[1],
+                    "path": line
+                }
+        return None
+
     def get_barcode(name):
         try:
             return Barcode.objects.get(name=name)
         except Exception as e:
-            return None
+            return Barcode.objects.get(name="Unknown")
+
+    def get_or_create_sl_cl_link(sl,cl):
+        try:
+            return SL_CL_LINK.objects.get(
+                captured_lib=cl,
+                sample_lib=sl
+            )
+        except Exception as e:
+            return SL_CL_LINK.objects.create(
+                captured_lib=cl,
+                sample_lib=sl
+            )
+
+    def get_or_create_cl_seql_link(cl,seq_l):
+        try:
+            return CL_SEQL_LINK.objects.get(
+                captured_lib = cl,
+                sequencing_lib = seq_l
+            )
+        except Exception as e:
+            return CL_SEQL_LINK.objects.create(
+                captured_lib = cl,
+                sequencing_lib = seq_l
+            )
 
     def get_or_create_bait(value):
         try:
             return Bait.objects.get(name=value)
         except Exception as e:
+            if not value:
+                return None
             return Bait.objects.create(
                 name=value
             )
@@ -859,14 +959,25 @@ def consolidated_data(request):
                 name = name,
             )
 
-    def create_sequencingfile(**kwargs):
-        return SequencingFile.objects.create(**kwargs)
+    def get_or_create_sequencinglib(name):
+        try:
+            return SequencingLib.objects.get(name=name)
+        except ObjectDoesNotExist as e:
+            return SequencingLib.objects.create(
+                name = name,
+            )
+
+    def get_or_create_sequencingfile(**kwargs):
+        try:
+            return SequencingFile.objects.get(sample_lib=kwargs["sample_lib"])
+        except Exception as e:
+            return SequencingFile.objects.create(**kwargs)
 
     def get_or_create_patient(**kwargs):
         try:
-            return Patients.objects.get(pat_id=kwargs["id"])
+            return Patients.objects.get(pat_id=kwargs["pat_id"])
         except ObjectDoesNotExist as e:
-            return Patients.objects.create(kwargs)
+            return Patients.objects.create(**kwargs)
 
     def get_or_create_block(**kwargs):
         try:
@@ -876,11 +987,11 @@ def consolidated_data(request):
 
     def get_or_create_area(**kwargs):
         try:
-            return Area.objects.get(name=kwargs["name"])
+            return Areas.objects.get(name=kwargs["name"])
         except ObjectDoesNotExist as e:
-            return Area.objects.create(**kwargs)
+            return Areas.objects.create(**kwargs)
 
-    def get_or_create_nucacid(name,area):
+    def get_or_create_nucacid(**kwargs):
         try:
             return NucAcids.objects.get(name=kwargs["name"])
         except ObjectDoesNotExist as e:
@@ -905,45 +1016,89 @@ def consolidated_data(request):
 
             _simplify_tree2(tree2_file)
 
-            patient = get_or_create_patient(row[27].value, row[20].value)
+            xl_workbook = xlrd.open_workbook(file_contents=consolidated_data_file.read())
+            sheet_names = xl_workbook.sheet_names()
+            xl_sheet = xl_workbook.sheet_by_name(sheet_names[0])
 
-            block = get_or_create_block(**{"name":row[1].value,"patient":patient,"age":row[21].value,"diagnosis":row[7].value,"micro":row[19],"p_stage":row[22].value,"thickness":row[23].value,"subtype":row[24].value,"prim":row[25].value,"mitoses":row[26].value,"dx_text":row[17].value,"notes":row[8].value})
+            for i in range(1,xl_sheet.nrows):
+                report = {}
+                row = xl_sheet.row(i)
 
-            area = get_or_create_area(**{"name":row[13].value,"block":block, "area_type": "other" if row[13].value and row[13].value=="Tumor" else row[13].value.lower() })
+                patient = get_or_create_patient(**{"pat_id":row[27].value, "sex":row[20].value.lower() if row[20].value else None})
+                report["patient"] = patient
 
-            nucacid = get_or_create_nucacid(**{"name":row[10].value,"area":area})
+                block = get_or_create_block(**{"name":row[1].value,"patient":patient,"age":int(row[21].value) if row[21].value else None,"diagnosis":row[7].value,"micro":row[19],"p_stage":row[22].value,"thickness":float(row[23].value) if row[23].value else None,"subtype":row[24].value,"prim":row[25].value,"mitoses":int(row[26].value) if row[26].value else None,"ip_dx":row[17].value,"notes":row[8].value})
+                report["block"] = block
 
-            barcode = get_barcode(row[2].value)
+                area = get_or_create_area(**{"name":row[13].value,"block":block, "area_type": "other" if row[13].value and row[13].value=="Tumor" else row[13].value.lower() })
+                report["area"] = area
 
-            amount_in = None
-            if not row[5].value.isnumeric():
-                parts = row[5].value.split(" ")
-                if parts[1] == "ug":
-                    amount_in = float(parts[0]) * 1000
-                elif parts[1] == "ng":
-                    amount_in = float(parts[0])
+                nucacid = get_or_create_nucacid(**{"name":row[10].value,"area":area})
+                report["nucacid"] = nucacid
 
-            sample_lib = get_or_create_samplelib({"name":row[0].value,"barcode":barcode,"amount_in":amount_in,"notes":"Notes:%s, Condition:%s, Input Hyb Conc.:%s" % (row[18].value, row[4].value, row[6].value)})
+                barcode = get_barcode(row[2].value.strip() if not isinstance(row[2].value,float) else int(row[2].value))
+                report["barcode"] = barcode
 
-            bait = get_or_create_bait(value)
+                amount_in = 0
+                if row[5].value and not isinstance(row[5].value, float):
+                    parts = row[5].value.split(" ")
+                    if parts[1] == "ug":
+                        amount_in = float(parts[0]) * 1000
+                    elif parts[1] == "ng":
+                        amount_in = float(parts[0])
 
-            captured_lib = get_or_create_capturedlib(row[12].value,bait)
+                sample_lib = get_or_create_samplelib(**{"name":row[0].value,"barcode":barcode,"amount_in":amount_in,"notes":"Notes:%s, Condition:%s, Input Hyb Conc.:%s" % (row[18].value, row[4].value, row[6].value)})
+                report["sample_lib"] = sample_lib
 
-            sequencing_run = get_or_create_sequencingrun(row[9].value.split("_")[1])
+                bait = get_or_create_bait(row[14].value)
+                report["bait"] = bait
 
-            checksum = _get_checksum(row[0].value)
+                captured_lib = get_or_create_capturedlib(row[12].value,bait)
+                report["captured_lib"] = captured_lib
 
-            tree2_values = __search_in_tree2(str(row[0].value))
+                sl_cl_link = get_or_create_sl_cl_link(sample_lib,captured_lib)
+                report["sl_cl_link"] = sl_cl_link
 
-            fastq_file = None
-            directory = None
-            path = None
-            if tree2_values:
-                fastq_file = tree2_values["fastq_file"]
-                directory = tree2_values["directory"]
-                path = tree2_values["path"]
+                sequencing_lib = get_or_create_sequencinglib(row[9].value.split("_")[1])
+                # report["sequencing_lib"] = sequencing_lib
 
-            sequencing_file = create_sequencingfile({"sample_lib":sample_lib,"folder_name":sequencing_run,"read1_file":fastq_file,"read1_checksum":checksum,"path":path})
+                cl_seql_link = get_or_create_cl_seql_link(captured_lib,sequencing_lib)
+                # report["cl_seql_link"] = cl_seql_link
+
+                sequencing_run = get_or_create_sequencingrun(row[9].value.split("_")[1])
+                report["sequencing_run"] = sequencing_run
+
+                sequencing_run.sequencing_libs.add(sequencing_lib)
+
+                checksum = _get_checksum(row[0].value)
+
+                tree2_values = __search_in_tree2(str(row[0].value))
+
+                fastq_file = None
+                directory = None
+                path = None
+                if tree2_values:
+                    fastq_file = tree2_values["fastq_file"]
+                    directory = tree2_values["directory"]
+                    path = tree2_values["path"]
+
+                sequencing_file = get_or_create_sequencingfile(**{"sample_lib":sample_lib,"folder_name":sequencing_run.name,"read1_file":fastq_file,"read1_checksum":checksum,"path":path})
+                report["sequencing_file"] = sequencing_file
+
+                result.append(report)
+
+            response = HttpResponse(
+                content_type='text/csv',
+                headers={'Content-Disposition': 'attachment; filename="report-consolidated_data.csv"'},
+            )
+
+            field_names = list(result[0].keys())
+            writer = csv.writer(response)
+            writer.writerow(field_names)
+            for item in result:
+                writer.writerow([item[field] for field in field_names])
+
+            return response
 
     else:
         form = ConsolidatedDataForm()

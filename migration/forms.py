@@ -15,6 +15,7 @@ class MigrationForm(forms.Form):
         ("barcode", "Barcode"),
         ("sf", "SequencingFile"),
         ("variant", "Variant"),
+        ("md5", "MD5 Summary"),
     ))
     file = forms.FileField()
 

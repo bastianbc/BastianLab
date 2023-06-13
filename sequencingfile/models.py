@@ -2,12 +2,12 @@ from django.db import models
 
 class SequencingFile(models.Model):
     sample_lib = models.ForeignKey("samplelib.SampleLib", on_delete=models.CASCADE, related_name="sequencing_files")
-    folder_name = models.CharField(max_length=50, blank=True, null=True)
-    read1_file = models.CharField(max_length=50, blank=True, null=True)
-    read1_checksum = models.CharField(max_length=50, blank=True, null=True)
+    folder_name = models.CharField(max_length=100, blank=True, null=True)
+    read1_file = models.CharField(max_length=100, blank=True, null=True)
+    read1_checksum = models.CharField(max_length=100, blank=True, null=True)
     read1_count = models.IntegerField(default=0, blank=True, null=True)
-    read2_file = models.CharField(max_length=50, blank=True, null=True)
-    read2_checksum = models.CharField(max_length=50, blank=True, null=True)
+    read2_file = models.CharField(max_length=100, blank=True, null=True)
+    read2_checksum = models.CharField(max_length=100, blank=True, null=True)
     read2_count = models.IntegerField(default=0, blank=True, null=True)
     is_read_count_equal = models.BooleanField(default=False, blank=True, null=True)
     path = models.CharField(max_length=200, blank=True, null=True)
@@ -16,7 +16,7 @@ class SequencingFile(models.Model):
         db_table = "sequencing_file"
 
     def __str__(self):
-        return self.folder_name
+        return self.path if self.path else ""
 
     def query_by_args(self, user, **kwargs):
 

@@ -43,8 +43,7 @@ has the same prefix as DM3_Tumor)
 The consolidated.CSV spreadsheet is a list of samples. You will have to determine, how to link
 new entries in SL to the upstream, NA, Area, Block, Patient, Project tables following the rules
 above.
-Prepare CSV file for pipeline
-Once you have imported everything in the database, you will be able to produce the CSV file for
+Prepare CSV file for pipeline Once you have imported everything in the database, you will be able to produce the CSV file for
 sequencing. You will need to have things in the database so that you can identify any matching
 normal DNA from the same patient. A matching normal for an SL for any area type !=normal is
 an SL from an area type==normal from the same patient.
@@ -58,4 +57,5 @@ This spreadsheet requires the following columns:
 • File path to the FASTQ files
 • MD5
 • NA type (DNA or RNA)
-• Area type (normal for normal, tumor for all other like Melanoma, Nevus, etc.)• Matching normal SL id
+• Area type (normal for normal, tumor for all other like Melanoma, Nevus, etc.)
+• Matching normal SL id
