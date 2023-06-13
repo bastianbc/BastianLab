@@ -37,7 +37,11 @@ def migrate(request):
 
             report = []
             reader = csv.reader(StringIO(file))
-            next(reader) #skip first row
+            row = next(reader) #skip first row
+
+            for i,col in enumerate(row):
+                print("%s:%d" % (col,i))
+
 
             for row in reader:
                 try:
@@ -197,69 +201,21 @@ def migrate(request):
                                     return x[0]
                             return Blocks.SCRAPE
 
-                        # print("name: ",row[1].strip())
-                        # print("patient: ",get_patient(row[2].strip()))
-                        # print("project: ",get_project(row[3].strip()))
-                        # print("age: ",row[4].strip())
-                        # print("ulceration: ",get_ulceration(row[6].strip()))
-                        # print("thickness: ",get_value(row[7].strip()))
-                        # print("mitoses: ",get_value(row[8].strip()))
-                        # print("p_stage: ",get_value(row[9].strip()))
-                        # print("subtype: ",get_value(row[11].strip()))
-                        # print("slides: ",get_value(row[12]))
-                        # print("slides_left: ",get_value(row[13]))
-                        # print("fixation: ",get_value(row[14].strip()))
-                        # print("scan_number: ",get_value(row[16].strip()))
-                        # print("icd10: ",get_value(row[17].strip()))
-                        # print("diagnosis: ",get_value(row[18].strip()))
-                        # print("path_note: ",get_value(row[19].strip()),)
-                        # print("notes: ",get_value(row[20].strip()))
-                        # print("micro: ",get_value(row[21].strip()))
-                        # print("gross: ",get_value(row[22].strip()))
-                        # print("clinical: ",get_value(row[23].strip()))
-                        # print("old_body_site: ",get_value(row[25].strip()))
-                        # print("collection: ",get_collection(row[26].strip()))
-                        # print("------------------------------------------")
-
                         Blocks.objects.create(
-                            name=row[1].strip(),
-                            patient=get_patient(row[2].strip()),
-                            project=get_project(row[3].strip()),
-                            age=get_float_value(row[4].strip()),
-                            ulceration=get_ulceration(row[6].strip()),
-                            thickness=get_float_value(row[7].strip()),
-                            mitoses=get_value(row[8].strip()),
-                            p_stage=get_value(row[9].strip()),
-                            subtype=get_value(row[11].strip()),
-                            slides=get_value(row[12]),
-                            slides_left=get_value(row[13]),
-                            fixation=get_value(row[14].strip()),
-                            scan_number=get_value(row[16].strip()),
-                            icd10=get_value(row[17].strip()),
-                            diagnosis=get_value(row[18].strip()),
-                            path_note=get_value(row[19].strip()),
-                            notes=get_value(row[20].strip()),
-                            micro=get_value(row[21].strip()),
-                            gross=get_value(row[22].strip()),
-                            clinical=get_value(row[23].strip()),
-                            old_body_site=get_value(row[25].strip()),
-                            collection=get_collection(row[26].strip()),
+                            name=row[0].strip(),
+                            patient=get_patient(row[1].strip()),
+                            scan_number=get_value(row[2].strip()),
+                            body_site=get_body_site(row[3].strip()),
+                            ulceration=get_ulceration(row[4].strip()),
+                            slides=get_value(row[5]),
+                            slides_left=get_value(row[6]),
+                            fixation=get_value(row[7].strip()),
+                            collection=get_collection(row[8].strip()),
+                            project=get_project(row[10].strip()),
+                            diagnosis=get_value(row[11].strip()),
+                            notes="Notes:%s;Description:%s" % (get_value(row[14].strip()),get_value(row[12].strip())),
                         )
 
-                        # Blocks.objects.create(
-                        #     name=row[0].strip(),
-                        #     patient=get_patient(row[1].strip()),
-                        #     project=get_project(row[10].strip()),
-                        #     old_body_site=row[3].strip(),
-                        #     ulceration=get_ulceration(row[4].strip()),
-                        #     slides=get_slides(row[5]),
-                        #     slides_left=get_slides_left(row[6]),
-                        #     fixation=row[7],
-                        #     storage=row[13],
-                        #     scan_number=row[2],
-                        #     diagnosis=row[11],
-                        #     notes=get_notes(row[14],row[12]),
-                        # )
                     elif app == "area":
 
                         def get_block(value):
@@ -332,14 +288,17 @@ def migrate(request):
 
                             return result
 
+                        def get_float_value(value):
+                            return float(value) if value else 0
+
                         NucAcids.objects.create(
                             name=row[0].strip(),
                             area=get_area(row[1].strip()),
+                            na_type=get_na_type(row[2].strip()),
                             date=get_date(row[3].strip()),
                             method=get_or_create_method(row[4].strip()),
-                            na_type=get_na_type(row[2].strip()),
-                            conc=row[5],
-                            vol_init=row[6],
+                            conc=get_float_value(row[5]),
+                            vol_init=get_float_value(row[6]),
                             notes=get_notes(row[14],row[8],row[9],row[10],row[11],row[12]),
                         )
                     elif app == "sl":
@@ -396,13 +355,16 @@ def migrate(request):
                         def get_date(value):
                             return datetime.strptime(value,'%m/%d/%Y') if value else datetime.now()
 
+                        def get_float_value(value):
+                            return float(value) if value else 0
+
                         sl = SampleLib.objects.create(
                             name=row[0].strip(),
                             barcode=get_barcode(row[22].strip()),
                             date=get_date(row[23]),
-                            qpcr_conc=row[8],
-                            amount_final=row[13],
-                            vol_init=row[9],
+                            qpcr_conc=get_float_value(row[8]),
+                            amount_final=get_float_value(row[13]),
+                            vol_init=get_float_value(row[9]),
                             notes=row[24],
                         )
 
@@ -592,6 +554,7 @@ def report(request):
         # from sample_lib to nucleic_acid..->project
         for na_sl_link in sample_lib.na_sl_links.all():
             report.na_type = na_sl_link.nucacid.get_na_type_display() if na_sl_link.nucacid else None
+            print("%s,%s" % (na_sl_link.nucacid,na_sl_link.nucacid.area))
             report.area_type = na_sl_link.nucacid.area.get_area_type_display() if na_sl_link.nucacid.area and na_sl_link.nucacid.area.area_type else None
 
         # from sample_lib to captured_lib..->sequencing_run
@@ -902,6 +865,18 @@ def consolidated_data(request):
         except Exception as e:
             return Barcode.objects.get(name="Unknown")
 
+    def get_or_create_na_sl_link(sl,na):
+        try:
+            return NA_SL_LINK.objects.get(
+                nucacid=na,
+                sample_lib=sl
+            )
+        except Exception as e:
+            return NA_SL_LINK.objects.create(
+                nucacid=na,
+                sample_lib=sl
+            )
+
     def get_or_create_sl_cl_link(sl,cl):
         try:
             return SL_CL_LINK.objects.get(
@@ -1049,6 +1024,8 @@ def consolidated_data(request):
 
                 sample_lib = get_or_create_samplelib(**{"name":row[0].value,"barcode":barcode,"amount_in":amount_in,"notes":"Notes:%s, Condition:%s, Input Hyb Conc.:%s" % (row[18].value, row[4].value, row[6].value)})
                 report["sample_lib"] = sample_lib
+
+                na_sl_link = get_or_create_na_sl_link(sample_lib,nucacid)
 
                 bait = get_or_create_bait(row[14].value)
                 report["bait"] = bait

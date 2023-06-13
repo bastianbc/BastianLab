@@ -55,7 +55,7 @@ class Blocks(models.Model):
     # area_id = models.CharField(max_length=100, blank=True, null=True)
     # old_project = models.CharField(max_length=50, blank=True, null=True)
     storage = models.CharField(max_length=50, blank=True, null=True)
-    scan_number = models.CharField(max_length=100,blank=True, null=True)
+    scan_number = models.CharField(max_length=200,blank=True, null=True)
     icd10 = models.TextField(blank=True, null=True)
     diagnosis = models.TextField(blank=True, null=True)
     notes = models.TextField(blank=True, null=True)

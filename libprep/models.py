@@ -17,7 +17,7 @@ class NucAcids(models.Model):
     name = models.CharField(max_length=50, unique=True, verbose_name="Name")
     date = models.DateTimeField(default=datetime.now, verbose_name="Extraction Date")
     method = models.ForeignKey("method.Method",related_name="nuc_acids",on_delete=models.CASCADE, blank=True, null=True, verbose_name="Method")
-    na_type = models.CharField(max_length=4, choices=NA_TYPES, verbose_name="NA Type")
+    na_type = models.CharField(max_length=4, choices=NA_TYPES, blank=True, null=True, verbose_name="NA Type")
     conc = models.FloatField(default=0, verbose_name="Concentration")
     vol_init = models.FloatField(default=0, verbose_name="Volume Initialize")
     vol_remain = models.FloatField(default=0, verbose_name="Volume Remain")
