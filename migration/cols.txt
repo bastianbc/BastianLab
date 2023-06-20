@@ -1,31 +1,48 @@
-0: Sample
-1: Block
-2: Barcode ID
-3: Barcode
-4: Condition
-5: Input Conc.
-6: Input Hyb Conc.
-7: Diagnosis
-8: Notes/Other
-9: Sequencing Run
-10: NA
-11: SeqL
-12: CL
-13: Area
-14: Bait
-15: dept_number
-16: spec_id
-17: dx_text
-18: note
-19: micro
-20: gender
-21: pat_age
-22: p_stage
-23: thickness
-24: subtype
-25: prim
-26: mitoses
-27: pat_id
+NA_ID:0
+Area ID:1
+NA_TYPE:2
+Date extracted:3
+Method:4
+Qubit Concentration (ng/ul):5
+Volumn (ul):6
+Amount (ng):7
+Re-extraction amount:8
+Total extracted NA amount (ng):9
+NA sheared/used (ng):10
+Shearing volume DNA input (ul):11
+Volume of TE buffer (ul)  for shearing:12
+SL_ID:13
+Notes:14
+Assigned Projects:15
+
+
+
+# Block_ID:0
+# Pat_ID:1
+# HE image:2
+# Specimen site:3
+# Ulceration:4
+# Slides:5
+# Slides left:6
+# Fixation:7
+# Collection Method:8
+# Area_ID:9
+# Assigned project:10
+# Diagnosis/Type:11
+# Description:12
+# Block storage location:13
+# Notes:14
+
+Pat_ID:0
+Gender:1
+Age:2
+Race:3
+Source:4
+Date received:5
+Blocks _ID:6
+Notes:7
+Assigned Projects:8
+
 
 
 Import legacy data into database

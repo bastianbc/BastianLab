@@ -23,6 +23,10 @@ from gene.models import *
 from django.core.exceptions import ObjectDoesNotExist
 import json
 import xlrd
+import string
+import random
+from itertools import groupby,chain
+import re
 
 def migrate(request):
 
@@ -215,7 +219,6 @@ def migrate(request):
                             diagnosis=get_value(row[11].strip()),
                             notes="Notes:%s;Description:%s" % (get_value(row[14].strip()),get_value(row[12].strip())),
                         )
-
                     elif app == "area":
 
                         def get_block(value):
@@ -972,6 +975,50 @@ def consolidated_data(request):
         except ObjectDoesNotExist as e:
             return NucAcids.objects.create(**kwargs)
 
+    def __get_random_string():
+        return ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
+
+    def _generate_pat_id_by_block(xl_sheet):
+        pattern = "^[A-Z]+\-\d+\-\d+|^[A-Z]+\d+\-\d{2,6}|^HW[0-9]\-|^HW Acral #[0-9]+\s|^[A-Z]+\_[0-9]+\_|^[0-9]{2}\-[0-9]{5}"
+
+        blocks = [xl_sheet.row(i)[1].value.strip() for i in range(0,xl_sheet.nrows) if not xl_sheet.row(i)[27].value and not xl_sheet.row(i)[1].value == "nan"]
+
+        def projection(val):
+            x = re.findall(pattern,val)
+            return x[0] if x else random.randint(0,9999999999999)
+
+        x_sorted = sorted(blocks) # sort the data
+        x_grouped_for_equals = list([x for x in [list(it) for k, it in groupby(x_sorted)] if len(x)>1]) #the group of the records with same block id
+
+        blocks = [x for x in blocks if x not in list(chain(*x_grouped_for_equals))] #remove from list the found ones
+
+        x_sorted = sorted(blocks) # sort again
+        x_grouped_for_similars = list([x for x in [list(it) for k, it in groupby(x_sorted,projection)] if len(x)>1]) #the group of the records with similar block id
+
+        blocks = [x for x in blocks if x not in list(chain(*x_grouped_for_similars))] #remove from list the found ones
+
+        result = x_grouped_for_equals + x_grouped_for_similars + blocks
+
+        return [(x,__get_random_string()) for i,x in enumerate(result)]
+
+    def _generate_pat_id_by_sample_lib(xl_sheet):
+        pattern="^[A-Z]+\_\d+|^[A-Z]+\d+\_|^[A-Z][A-Z]\_|^[A-Za-z]+\s\d+|^[A-Za-z]+\_\d+|^[A-Za-z]+\-[A-Z0-9]+\-|[0-9]+\_"
+
+        sample_libs = [xl_sheet.row(i)[0].value.strip() for i in range(0,xl_sheet.nrows) if not xl_sheet.row(i)[27].value and xl_sheet.row(i)[1].value == "nan"]
+
+        def projection(val):
+            x = re.findall(pattern,val)
+            return x[0] if x else random.randint(0,9999999999999)
+
+        x_sorted = sorted(sample_libs) # sort the data
+        x_grouped = list([x for x in [list(it) for k, it in groupby(x_sorted)] if len(x)>1])
+
+        single_sample_libs = [x for x in sample_libs if x not in list(chain(*x_grouped))] #remove from list the found ones
+
+        result = x_grouped + sample_libs
+
+        return [(x,__get_random_string()) for i,x in enumerate(result)]
+
     if request.method == "POST":
         form = ConsolidatedDataForm(request.POST, request.FILES)
 
@@ -995,11 +1042,24 @@ def consolidated_data(request):
             sheet_names = xl_workbook.sheet_names()
             xl_sheet = xl_workbook.sheet_by_name(sheet_names[0])
 
+            generated_pat_ids_by_block = _generate_pat_id_by_block(xl_sheet)
+
+            generated_pat_ids_by_sample_lib = _generate_pat_id_by_sample_lib(xl_sheet)
+
             for i in range(1,xl_sheet.nrows):
                 report = {}
                 row = xl_sheet.row(i)
 
-                patient = get_or_create_patient(**{"pat_id":row[27].value, "sex":row[20].value.lower() if row[20].value else None})
+                if row[27].value:
+                    patient = get_or_create_patient(**{"pat_id":row[27].value, "sex":row[20].value.lower() if row[20].value else None})
+                else:
+                    if row[1].value == "nan": #
+                        pat_id = [x[1] for x in generated_pat_ids_by_sample_lib if row[0].value.strip() in x[0]][0]
+                    else:
+                        pat_id = [x[1] for x in generated_pat_ids_by_block if row[1].value.strip() in x[0]][0]
+
+                    patient = get_or_create_patient(**{"pat_id":pat_id, "sex":row[20].value.lower() if row[20].value else None})
+
                 report["patient"] = patient
 
                 block = get_or_create_block(**{"name":row[1].value,"patient":patient,"age":int(row[21].value) if row[21].value else None,"diagnosis":row[7].value,"micro":row[19],"p_stage":row[22].value,"thickness":float(row[23].value) if row[23].value else None,"subtype":row[24].value,"prim":row[25].value,"mitoses":int(row[26].value) if row[26].value else None,"ip_dx":row[17].value,"notes":row[8].value})
