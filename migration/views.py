@@ -519,6 +519,10 @@ def report(request):
     result = []
 
     class Report():
+        patient = None
+        block = None
+        area1 = None
+        nucacid = None
         sample_lib = None
         captured_lib = None
         bait = None
@@ -557,8 +561,11 @@ def report(request):
         # from sample_lib to nucleic_acid..->project
         for na_sl_link in sample_lib.na_sl_links.all():
             report.na_type = na_sl_link.nucacid.get_na_type_display() if na_sl_link.nucacid else None
-            print("%s,%s" % (na_sl_link.nucacid,na_sl_link.nucacid.area))
             report.area_type = na_sl_link.nucacid.area.get_area_type_display() if na_sl_link.nucacid.area and na_sl_link.nucacid.area.area_type else None
+            # report.nucacid = na_sl_link.nucacid if na_sl_link else None
+            # report.area1 = na_sl_link.nucacid.area.name if na_sl_link.nucacid.area else None
+            # report.block = na_sl_link.nucacid.area.block if na_sl_link.nucacid and na_sl_link.nucacid.area else None
+            report.patient = na_sl_link.nucacid.area.block.patient if na_sl_link.nucacid.area and na_sl_link.nucacid.area.block and na_sl_link.nucacid.area.block.patient else None
 
         # from sample_lib to captured_lib..->sequencing_run
         for sl_cl_link in sample_lib.sl_cl_links.all():
@@ -572,14 +579,12 @@ def report(request):
 
         result.append(report)
 
-    for value in range(10):
-        result.append(Report())
     response = HttpResponse(
         content_type='text/csv',
         headers={'Content-Disposition': 'attachment; filename="report-sl-review.csv"'},
     )
 
-    field_names = ["sample_lib","captured_lib","bait","sequencing_lib","sequencing_run","fastq_file","checksum","path","na_type","area_type"]
+    field_names = ["patient","block","area1","nucacid","sample_lib","captured_lib","bait","sequencing_lib","sequencing_run","fastq_file","checksum","path","na_type","area_type"]
     writer = csv.writer(response)
     writer.writerow(field_names)
     for item in result:
@@ -836,6 +841,7 @@ def consolidated_data(request):
     tree2_dataset = []
     checksum_dataset = None
     result = []
+    old_pat_ids = []
 
     def _simplify_tree2(f):
         while True:
@@ -844,6 +850,13 @@ def consolidated_data(request):
                 break
             if "fastq.gz" in line:
                 tree2_dataset.append(line)
+
+    def _simplify_old_pat_id(f):
+        xl_workbook = xlrd.open_workbook(file_contents=f.read())
+        sheet_names = xl_workbook.sheet_names()
+        xl_sheet = xl_workbook.sheet_by_name(sheet_names[0])
+        for i in range(0,xl_sheet.nrows):
+            old_pat_ids.append((xl_sheet.row(i)[0].value,xl_sheet.row(i)[19].value))
 
     def _get_checksum(value):
         for c in checksum_dataset:
@@ -860,6 +873,12 @@ def consolidated_data(request):
                     "directory": parts[1],
                     "path": line
                 }
+        return None
+
+    def __search_in_pat_id(value):
+        for p in old_pat_ids:
+            if p[0] == value:
+                return p[1]
         return None
 
     def get_barcode(name):
@@ -978,6 +997,20 @@ def consolidated_data(request):
     def __get_random_string():
         return ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
 
+    def __get_area_type_by_block(group):
+        if not type(group) == list:
+            group = [group]
+        return any([xl_sheet.row(i)[13].value.strip()=="Normal" for i in range(0,xl_sheet.nrows) for g in group if g == xl_sheet.row(i)[1].value.strip()])
+
+    def __get_pat_id(group):
+        result = None
+        if not type(group) == list:
+            group = [group]
+        for g in group:
+            result = __search_in_pat_id(g)
+            break
+        return result if result else __get_random_string()
+
     def _generate_pat_id_by_block(xl_sheet):
         pattern = "^[A-Z]+\-\d+\-\d+|^[A-Z]+\d+\-\d{2,6}|^HW[0-9]\-|^HW Acral #[0-9]+\s|^[A-Z]+\_[0-9]+\_|^[0-9]{2}\-[0-9]{5}"
 
@@ -999,7 +1032,7 @@ def consolidated_data(request):
 
         result = x_grouped_for_equals + x_grouped_for_similars + blocks
 
-        return [(x,__get_random_string()) for i,x in enumerate(result)]
+        return [(x,__get_pat_id(x), __get_area_type_by_block(x)) for x in result]
 
     def _generate_pat_id_by_sample_lib(xl_sheet):
         pattern="^[A-Z]+\_\d+|^[A-Z]+\d+\_|^[A-Z][A-Z]\_|^[A-Za-z]+\s\d+|^[A-Za-z]+\_\d+|^[A-Za-z]+\-[A-Z0-9]+\-|[0-9]+\_"
@@ -1017,7 +1050,7 @@ def consolidated_data(request):
 
         result = x_grouped + sample_libs
 
-        return [(x,__get_random_string()) for i,x in enumerate(result)]
+        return [(x,__get_random_string()) for x in enumerate(result)]
 
     if request.method == "POST":
         form = ConsolidatedDataForm(request.POST, request.FILES)
@@ -1027,6 +1060,7 @@ def consolidated_data(request):
             # md5_summary_file = request.FILES["md5_summary_file"]
             tree2_file = request.FILES["tree2_file"]
             checksum_dataset = json.loads(request.FILES["checksum_dataset"].read())
+            pat_id_file = request.FILES["old_pat_id_file"]
 
             # xl_workbook = xlrd.open_workbook(file_contents=consolidated_data_file.read())
             # sheet_names = xl_workbook.sheet_names()
@@ -1037,6 +1071,8 @@ def consolidated_data(request):
             #     print("%d: %s" % (i,row[i].value))
 
             _simplify_tree2(tree2_file)
+
+            _simplify_old_pat_id(pat_id_file)
 
             xl_workbook = xlrd.open_workbook(file_contents=consolidated_data_file.read())
             sheet_names = xl_workbook.sheet_names()
