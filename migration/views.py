@@ -533,6 +533,7 @@ def report(request):
         path = None
         na_type = None
         area_type = None
+        matching_sl = []
 
     for sample_lib in SampleLib.objects.all():
 
@@ -577,14 +578,16 @@ def report(request):
                 for sequencing_run in cl_seql_link.sequencing_lib.sequencing_runs.all():
                     report.sequencing_run = sequencing_run.name
 
+        report.matching_sl = ",".join(list(NA_SL_LINK.objects.filter(nucacid__area__block__patient=report.patient,nucacid__area__area_type__in=["normal","normal2","normal3"]).values_list("sample_lib__name",flat=True)))
+
         result.append(report)
 
     response = HttpResponse(
         content_type='text/csv',
-        headers={'Content-Disposition': 'attachment; filename="report-consolidated_data.csv"'},
+        headers={'Content-Disposition': 'attachment; filename="report-consolidated_data-v3.csv"'},
     )
 
-    field_names = ["patient","block","area","nucacid","sample_lib","captured_lib","bait","sequencing_lib","sequencing_run","fastq_file","checksum","path","na_type","area_type"]
+    field_names = ["patient","block","area","nucacid","sample_lib","captured_lib","bait","sequencing_lib","sequencing_run","fastq_file","checksum","path","na_type","area_type","matching_sl"]
     writer = csv.writer(response)
     writer.writerow(field_names)
     for item in result:
@@ -1095,7 +1098,7 @@ def consolidated_data(request):
 
                     patient = get_or_create_patient(**{"pat_id":get_value(row[29].value), "sex":row[22].value.lower() if row[22].value else None})
 
-                    block = get_or_create_block(**{"name":row[1].value,"patient":patient,"age":int(row[23].value) if row[23].value else None,"diagnosis":row[7].value,"micro":row[21],"p_stage":row[24].value,"thickness":float(row[25].value) if row[25].value else None,"subtype":row[26].value,"prim":row[27].value,"mitoses":int(row[28].value) if row[28].value else None,"ip_dx":row[18].value,"notes":row[8].value})
+                    block = get_or_create_block(**{"name":get_value(row[1].value),"patient":patient,"age":int(row[23].value) if row[23].value else None,"diagnosis":row[7].value,"micro":row[21],"p_stage":row[24].value,"thickness":float(row[25].value) if row[25].value else None,"subtype":row[26].value,"prim":row[27].value,"mitoses":int(row[28].value) if row[28].value else None,"ip_dx":row[18].value,"notes":row[8].value})
 
                     area = get_or_create_area(**{"name":row[14].value,"block":block, "area_type": "other" if row[12].value and row[12].value=="Tumor" else row[12].value.lower() })
 
@@ -1111,7 +1114,7 @@ def consolidated_data(request):
                         elif parts[1] == "ng":
                             amount_in = float(parts[0])
 
-                    sample_lib = get_or_create_samplelib(**{"name":row[0].value,"barcode":barcode,"amount_in":amount_in,"notes":"Notes:%s, Condition:%s, Input Hyb Conc.:%s" % (row[20].value, row[4].value, row[6].value)})
+                    sample_lib = get_or_create_samplelib(**{"name":get_value(row[0].value),"barcode":barcode,"amount_in":amount_in,"notes":"Notes:%s, Condition:%s, Input Hyb Conc.:%s" % (row[20].value, row[4].value, row[6].value)})
 
                     na_sl_link = get_or_create_na_sl_link(sample_lib,nucacid)
 
