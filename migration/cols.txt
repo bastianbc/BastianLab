@@ -30,3 +30,41 @@ This spreadsheet requires the following columns:
 • NA type (DNA or RNA)
 • Area type (normal for normal, tumor for all other like Melanoma, Nevus, etc.)
 • Matching normal SL id
+
+(A matching normal for an SL for any area type !=normal is an SL
+from an area type==normal from the same patient. )
+o 5 area type for 1 pa ent if it has 4 tumor and 1 normal get 4 tumor SL ID add
+Normal keyword
+o Pa ent Look for Pa ent_ID then Look for block ID the pre x of SL ID It will be
+same from same pa ent
+
+0: Sample
+1: Block
+2: Barcode ID
+3: Barcode
+4: Condition
+5: Input Conc.
+6: Input Hyb Conc.
+7: Diagnosis
+8: Notes/Other
+9: Sequencing Run
+10: SeqL
+11: CL
+12: Area
+13: Bait
+14: Area_id
+15: NA_id
+16: dept_number
+17: specimen
+18: dx_text
+19: icd9
+20: note
+21: micro
+22: gender
+23: pat_age
+24: p_stage
+25: thickness
+26: subtype
+27: prim
+28: mitoses
+29: pat_id

@@ -40,4 +40,4 @@ class ConsolidatedDataForm(forms.Form):
     # md5_summary_file = forms.FileField()
     tree2_file = forms.FileField()
     checksum_dataset = forms.FileField()
-    old_pat_id_file = forms.FileField()
+    # old_pat_id_file = forms.FileField()
