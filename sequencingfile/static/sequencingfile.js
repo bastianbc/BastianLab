@@ -25,7 +25,6 @@ var KTDatatablesServerSide = function () {
             order: [[0, 'desc']],
             stateSave: false,
             destroy: true,
-            pageLength: 100,
             select: {
                 style: 'multi',
                 selector: 'td:first-child input[type="checkbox"]',
@@ -40,8 +39,6 @@ var KTDatatablesServerSide = function () {
             ajax: {
               url: '/sequencingfile/filter_sequencingfiles',
               type: "GET",
-              data:{
-              },
               error: function (xhr, ajaxOptions, thrownError) {
                   if (xhr.status == 403) {
 
@@ -505,7 +502,7 @@ var KTDatatablesServerSide = function () {
     return {
         init: function () {
             initDatatable( handleInitialValue() );
-            // handleSearchDatatable();
+            handleSearchDatatable();
             // initToggleToolbar();
             // handleFilterDatatable();
             // handleDeleteRows();

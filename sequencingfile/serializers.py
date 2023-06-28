@@ -4,6 +4,7 @@ from sequencinglib.models import *
 
 class SequencingFileSerializer(serializers.ModelSerializer):
     DT_RowId = serializers.SerializerMethodField()
+    sample_lib = serializers.SerializerMethodField()
 
     class Meta:
         model = SequencingFile
@@ -11,3 +12,6 @@ class SequencingFileSerializer(serializers.ModelSerializer):
 
     def get_DT_RowId(self, obj):
        return getattr(obj, 'id')
+
+    def get_sample_lib(self,obj):
+        return obj.sample_lib.name

@@ -1,4 +1,6 @@
 from django.db import models
+from datetime import datetime
+from django.db.models import Q, Count, OuterRef, Subquery, Value
 
 class SequencingFile(models.Model):
     sample_lib = models.ForeignKey("samplelib.SampleLib", on_delete=models.CASCADE, related_name="sequencing_files")
@@ -71,6 +73,7 @@ class SequencingFile(models.Model):
                 )
 
             count = queryset.count()
+            print(count)
             queryset = queryset.order_by(order_column)[start:start + length]
             # queryset = queryset[start:start + length]
             return {

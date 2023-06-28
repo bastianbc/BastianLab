@@ -529,7 +529,6 @@ def report(request):
         sequencing_lib = None
         sequencing_run = None
         fastq_file = None
-        checksum = None
         path = None
         na_type = None
         area_type = None
@@ -539,24 +538,15 @@ def report(request):
 
         report = Report()
 
-        fastq_files = []
+        fastq_files = {}
         md5_checksums = []
         paths = []
+
         for x in sample_lib.sequencing_files.all():
-            if x.read1_file:
-                fastq_files.append(x.read1_file)
-            if x.read2_file:
-                fastq_files.append(x.read2_file)
-            if x.path:
-                paths.append(x.path)
-            if x.read1_checksum:
-                md5_checksums.append(x.read1_checksum)
-            if x.read2_checksum:
-                md5_checksums.append(x.read2_checksum)
+            fastq_files.update({x.read1_file:x.read1_checksum})
 
         report.sample_lib = sample_lib.name
-        report.fastq_file = ",".join(fastq_files)
-        report.checksum = ",".join(md5_checksums)
+        report.fastq_file = fastq_files
         report.path = ",".join(list(set(paths)))
 
         # from sample_lib to nucleic_acid..->project
@@ -578,7 +568,7 @@ def report(request):
                 for sequencing_run in cl_seql_link.sequencing_lib.sequencing_runs.all():
                     report.sequencing_run = sequencing_run.name
 
-        report.matching_sl = ",".join(list(NA_SL_LINK.objects.filter(nucacid__area__block__patient=report.patient,nucacid__area__area_type__in=["normal","normal2","normal3"]).values_list("sample_lib__name",flat=True)))
+        report.matching_sl = ",".join(list(NA_SL_LINK.objects.filter(nucacid__area__block__patient=report.patient).exclude(nucacid__area__area_type__in=["normal","normal2","normal3"]).values_list("sample_lib__name",flat=True)))
 
         result.append(report)
 
@@ -587,7 +577,7 @@ def report(request):
         headers={'Content-Disposition': 'attachment; filename="report-consolidated_data-v3.csv"'},
     )
 
-    field_names = ["patient","block","area","nucacid","sample_lib","captured_lib","bait","sequencing_lib","sequencing_run","fastq_file","checksum","path","na_type","area_type","matching_sl"]
+    field_names = ["patient","block","area","nucacid","sample_lib","captured_lib","bait","sequencing_lib","sequencing_run","fastq_file","path","na_type","area_type","matching_sl"]
     writer = csv.writer(response)
     writer.writerow(field_names)
     for item in result:
@@ -867,22 +857,25 @@ def consolidated_data(request):
         for i in range(0,xl_sheet.nrows):
             old_pat_ids.append((xl_sheet.row(i)[0].value,xl_sheet.row(i)[19].value))
 
-    def _get_checksum(value):
+    def _get_checksum(sl_id,filename):
         for c in checksum_dataset:
-            if c["sl_id"] == value:
+            if c["sl_id"] == sl_id and c["filename"] == filename:
                 return c["checksum"]
         return None
 
-    def __search_in_tree2(value):
+    def __search_in_tree2(sl_id,seq_r):
+        files = []
         for line in tree2_dataset:
-            if value in line:
+            if sl_id in line:
                 parts = line.split("/")
-                return {
-                    "fastq_file": parts[-1],
-                    "directory": parts[1],
-                    "path": line
-                }
-        return None
+                if seq_r.name in parts[1]:
+                    files.append({
+                        "fastq_file": parts[-1],
+                        "directory": parts[1],
+                        "path": line,
+                        "checksum": _get_checksum(sl_id,parts[-1])
+                    })
+        return files
 
     def __search_in_pat_id(value):
         for p in old_pat_ids:
@@ -975,9 +968,9 @@ def consolidated_data(request):
 
     def get_or_create_sequencingfile(**kwargs):
         try:
-            return SequencingFile.objects.get(sample_lib=kwargs["sample_lib"])
+            return SequencingFile.objects.get_or_create(**kwargs)[0]
         except Exception as e:
-            return SequencingFile.objects.create(**kwargs)
+            return None
 
     def get_or_create_patient(**kwargs):
         try:
@@ -1132,19 +1125,16 @@ def consolidated_data(request):
 
                     sequencing_run.sequencing_libs.add(sequencing_lib)
 
-                    checksum = _get_checksum(row[0].value)
+                    fastq_files = __search_in_tree2(str(row[0].value),sequencing_run)
 
-                    tree2_values = __search_in_tree2(str(row[0].value))
-
-                    fastq_file = None
-                    directory = None
-                    path = None
-                    if tree2_values:
-                        fastq_file = tree2_values["fastq_file"]
-                        directory = tree2_values["directory"]
-                        path = tree2_values["path"]
-
-                    sequencing_file = get_or_create_sequencingfile(**{"sample_lib":sample_lib,"folder_name":sequencing_run.name,"read1_file":fastq_file,"read1_checksum":checksum,"path":path})
+                    for f in fastq_files:
+                        sequencing_file = get_or_create_sequencingfile(**{
+                            "sample_lib":sample_lib,
+                            "folder_name":f["directory"],
+                            "read1_file":f["fastq_file"],
+                            "read1_checksum":f["checksum"],
+                            "path":f["path"]
+                        })
 
                     result.append(report)
                 except Exception as e:
@@ -1224,7 +1214,7 @@ def lookup_all_data(request):
             if "fastq.gz" in line:
                 tree2_dataset.append(line)
 
-    def __search_in_tree2(value):
+    def __search_in_tree2(sl_id,sequencing_run):
         for line in tree2_dataset:
             if value in line:
                 parts = line.split("/")
