@@ -532,7 +532,7 @@ def report(request):
         path = None
         na_type = None
         area_type = None
-        matching_sl = []
+        matching_normal_sl = None
 
     for sample_lib in SampleLib.objects.all():
 
@@ -558,6 +558,9 @@ def report(request):
             report.block = na_sl_link.nucacid.area.block if na_sl_link.nucacid and na_sl_link.nucacid.area else None
             report.patient = na_sl_link.nucacid.area.block.patient if na_sl_link.nucacid.area and na_sl_link.nucacid.area.block and na_sl_link.nucacid.area.block.patient else None
 
+            if not report.area_type == "Normal":
+                report.matching_normal_sl = ",".join(list(NA_SL_LINK.objects.filter(nucacid__area__block__patient=report.patient,nucacid__area__area_type__in=["normal","normal2","normal3"]).values_list("sample_lib__name",flat=True)))
+
         # from sample_lib to captured_lib..->sequencing_run
         for sl_cl_link in sample_lib.sl_cl_links.all():
             report.captured_lib = sl_cl_link.captured_lib.name
@@ -568,16 +571,17 @@ def report(request):
                 for sequencing_run in cl_seql_link.sequencing_lib.sequencing_runs.all():
                     report.sequencing_run = sequencing_run.name
 
-        report.matching_sl = ",".join(list(NA_SL_LINK.objects.filter(nucacid__area__block__patient=report.patient).exclude(nucacid__area__area_type__in=["normal","normal2","normal3"]).values_list("sample_lib__name",flat=True)))
+
+        NA_SL_LINK.objects.filter(nucacid__area__block__patient=report.patient).exclude(nucacid__area__area_type__in=["normal","normal2","normal3"]).values_list("sample_lib__name",flat=True)
 
         result.append(report)
 
     response = HttpResponse(
         content_type='text/csv',
-        headers={'Content-Disposition': 'attachment; filename="report-consolidated_data-v3.csv"'},
+        headers={'Content-Disposition': 'attachment; filename="report-consolidated_data-v4.csv"'},
     )
 
-    field_names = ["patient","block","area","nucacid","sample_lib","captured_lib","bait","sequencing_lib","sequencing_run","fastq_file","path","na_type","area_type","matching_sl"]
+    field_names = ["patient","block","area","nucacid","sample_lib","captured_lib","bait","sequencing_lib","sequencing_run","fastq_file","path","na_type","area_type","matching_normal_sl"]
     writer = csv.writer(response)
     writer.writerow(field_names)
     for item in result:
