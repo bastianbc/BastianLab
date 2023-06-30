@@ -37,7 +37,7 @@ class LookupAllDataForm(forms.Form):
 
 class ConsolidatedDataForm(forms.Form):
     consolidated_data_file = forms.FileField()
-    # md5_summary_file = forms.FileField()
-    tree2_file = forms.FileField()
-    checksum_dataset = forms.FileField()
+    md5_summary_file = forms.FileField()
+    # tree2_file = forms.FileField()
+    # checksum_dataset = forms.FileField()
     # old_pat_id_file = forms.FileField()

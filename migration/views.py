@@ -834,7 +834,7 @@ def gene(request):
         form = GeneForm()
     return render(request, "gene.html", locals())
 
-def consolidated_data(request):
+def consolidated_data_old(request):
     tree2_dataset = []
     checksum_dataset = None
     result = []
@@ -1359,3 +1359,243 @@ def lookup_all_data(request):
         form = LookupAllDataForm()
 
     return render(request,"lookup.html",locals())
+
+def consolidated_data(request):
+
+    def get_value(value):
+        if str(value).replace(".", "").isnumeric():
+            return str(int(value))
+        else:
+            return value
+
+    def get_barcode(name):
+        try:
+            return Barcode.objects.get(name=name)
+        except Exception as e:
+            return Barcode.objects.get(name="Unknown")
+
+    def get_or_create_na_sl_link(sl,na):
+        try:
+            return NA_SL_LINK.objects.get(
+                nucacid=na,
+                sample_lib=sl
+            )
+        except Exception as e:
+            return NA_SL_LINK.objects.create(
+                nucacid=na,
+                sample_lib=sl
+            )
+
+    def get_or_create_sl_cl_link(sl,cl):
+        try:
+            return SL_CL_LINK.objects.get(
+                captured_lib=cl,
+                sample_lib=sl
+            )
+        except Exception as e:
+            return SL_CL_LINK.objects.create(
+                captured_lib=cl,
+                sample_lib=sl
+            )
+
+    def get_or_create_cl_seql_link(cl,seq_l):
+        try:
+            return CL_SEQL_LINK.objects.get(
+                captured_lib = cl,
+                sequencing_lib = seq_l
+            )
+        except Exception as e:
+            return CL_SEQL_LINK.objects.create(
+                captured_lib = cl,
+                sequencing_lib = seq_l
+            )
+
+    def get_or_create_bait(value):
+        try:
+            return Bait.objects.get(name=value)
+        except Exception as e:
+            if not value:
+                return None
+            return Bait.objects.create(
+                name=value
+            )
+
+    def get_or_create_capturedlib(name,bait):
+        try:
+            return CapturedLib.objects.get(name=name)
+        except Exception as e:
+            return CapturedLib.objects.create(
+                name=name,
+                bait=bait,
+            )
+
+    def get_or_create_samplelib(**kwargs):
+        try:
+            return SampleLib.objects.get(name=kwargs["name"])
+        except ObjectDoesNotExist as e:
+            return SampleLib.objects.create(**kwargs)
+
+    def get_or_create_sequencingrun(name):
+        try:
+            return SequencingRun.objects.get(name=name)
+        except ObjectDoesNotExist as e:
+            return SequencingRun.objects.create(
+                name = name,
+            )
+
+    def get_or_create_sequencinglib(name):
+        try:
+            return SequencingLib.objects.get(name=name)
+        except ObjectDoesNotExist as e:
+            return SequencingLib.objects.create(
+                name = name,
+            )
+
+    def get_or_create_sequencingfile(**kwargs):
+        try:
+            return SequencingFile.objects.get_or_create(**kwargs)[0]
+        except Exception as e:
+            return None
+
+    def get_or_create_patient(**kwargs):
+        try:
+            return Patients.objects.get(pat_id=kwargs["pat_id"])
+        except ObjectDoesNotExist as e:
+            return Patients.objects.create(**kwargs)
+
+    def get_or_create_block(**kwargs):
+        try:
+            return Blocks.objects.get(name=kwargs["name"])
+        except ObjectDoesNotExist as e:
+            return Blocks.objects.create(**kwargs)
+
+    def get_or_create_area(**kwargs):
+        try:
+            return Areas.objects.get(name=kwargs["name"])
+        except ObjectDoesNotExist as e:
+            return Areas.objects.create(**kwargs)
+
+    def get_or_create_nucacid(**kwargs):
+        try:
+            return NucAcids.objects.get(name=kwargs["name"])
+        except ObjectDoesNotExist as e:
+            return NucAcids.objects.create(**kwargs)
+
+    def initialize_consolidated_data(f):
+        xl_workbook = xlrd.open_workbook(file_contents=f.read())
+        sheet_names = xl_workbook.sheet_names()
+        xl_sheet = xl_workbook.sheet_by_name(sheet_names[0])
+        return [[xl_sheet.row(i)[j].value for j in range(0,xl_sheet.ncols)] for i in range(1,xl_sheet.nrows)]
+
+    def initialize_md5_summary(f):
+        xl_workbook = xlrd.open_workbook(file_contents=f.read())
+        sheet_names = xl_workbook.sheet_names()
+        xl_sheet = xl_workbook.sheet_by_name(sheet_names[0])
+        return [[xl_sheet.row(i)[j].value for j in range(0,xl_sheet.ncols)] for i in range(1,xl_sheet.nrows)]
+
+    added = []
+    def get_fastq_files(md5_summary,seq_r):
+        result = []
+        for m in md5_summary:
+            if m[1] == seq_r and m[1] not in added:
+                read1_files = list(zip(m[2].split(";"),m[3].split(";")))
+                read2_files = list(zip(m[5].split(";"),m[6].split(";")))
+                for i in range(0,len(read1_files)):
+                    result.append({
+                        "folder_name":m[0],
+                        "read1_file":read1_files[i][0],
+                        "read1_checksum":read1_files[i][1],
+                        "read2_file":read2_files[i][0],
+                        "read2_checksum":read2_files[i][1],
+                        "is_read_count_equal": True if row[8].strip() == "Yes" else False ,
+                        "path":m[9]
+                    })
+                added.append(seq_r)
+        return result
+
+    if request.method == "POST":
+        form = ConsolidatedDataForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            consolidated_data_file = request.FILES["consolidated_data_file"]
+            md5_summary_file = request.FILES["md5_summary_file"]
+
+            # for i in range(0,xl_sheet.ncols):
+            #     row = xl_sheet.row(0)
+            #     print("%d: %s" % (i,row[i].value))
+            md5_summary = initialize_md5_summary(md5_summary_file)
+
+            consolidated_data = initialize_consolidated_data(consolidated_data_file)
+
+            for row in consolidated_data:
+                try:
+                    patient = get_or_create_patient(**{"pat_id":get_value(row[29]), "sex":row[22].lower() if row[22] else None})
+
+                    block = get_or_create_block(**{"name":get_value(row[1]),"patient":patient,"age":int(row[23]) if row[23] else None,"diagnosis":row[7],"micro":row[21],"p_stage":row[24],"thickness":float(row[25]) if row[25] else None,"subtype":row[26],"prim":row[27],"mitoses":int(row[28]) if row[28] else None,"ip_dx":row[18],"notes":row[8]})
+
+                    area = get_or_create_area(**{"name":row[14],"block":block, "area_type": "other" if row[12] and row[12]=="Tumor" else row[12].lower() })
+
+                    nucacid = get_or_create_nucacid(**{"name":row[15],"area":area})
+
+                    barcode = get_barcode(row[2].strip() if not isinstance(row[2],float) else int(row[2]))
+
+                    amount_in = 0
+                    if row[5] and not isinstance(row[5], float):
+                        parts = row[5].split(" ")
+                        if parts[1] == "ug":
+                            amount_in = float(parts[0]) * 1000
+                        elif parts[1] == "ng":
+                            amount_in = float(parts[0])
+
+                    sample_lib = get_or_create_samplelib(**{"name":get_value(row[0]),"barcode":barcode,"amount_in":amount_in,"notes":"Notes:%s, Condition:%s, Input Hyb Conc.:%s" % (row[20], row[4], row[6])})
+
+                    na_sl_link = get_or_create_na_sl_link(sample_lib,nucacid)
+
+                    bait = get_or_create_bait(row[13])
+
+                    captured_lib = get_or_create_capturedlib(row[11],bait)
+
+                    sl_cl_link = get_or_create_sl_cl_link(sample_lib,captured_lib)
+
+                    sequencing_lib = get_or_create_sequencinglib(row[9].split("_")[1])
+
+                    cl_seql_link = get_or_create_cl_seql_link(captured_lib,sequencing_lib)
+
+                    sequencing_run = get_or_create_sequencingrun(row[9].split("_")[1])
+
+                    sequencing_run.sequencing_libs.add(sequencing_lib)
+
+                    fastq_files = get_fastq_files(md5_summary,row[9])
+
+                    for f in fastq_files:
+
+                        sequencing_file = get_or_create_sequencingfile(**{
+                            "sample_lib":sample_lib,
+                            "folder_name":f["folder_name"],
+                            "read1_file":f["read1_file"],
+                            "read1_checksum":f["read1_checksum"],
+                            "read2_file":f["read2_file"],
+                            "read2_checksum":f["read2_checksum"],
+                            "is_read_count_equal":f["is_read_count_equal"],
+                            "path":f["path"]
+                        })
+
+                except Exception as e:
+                    print(str(e))
+
+            # response = HttpResponse(
+            #     content_type='text/csv',
+            #     headers={'Content-Disposition': 'attachment; filename="report-consolidated_data.csv"'},
+            # )
+            #
+            # field_names = list(result[0].keys())
+            # writer = csv.writer(response)
+            # writer.writerow(field_names)
+            # for item in result:
+            #     writer.writerow([item[field] for field in field_names])
+            #
+            # return response
+
+    else:
+        form = ConsolidatedDataForm()
+    return render(request, "consolidated_data.html", locals())
