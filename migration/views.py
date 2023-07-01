@@ -544,6 +544,7 @@ def report(request):
 
         for x in sample_lib.sequencing_files.all():
             fastq_files.update({x.read1_file:x.read1_checksum})
+            paths.append(x.path)
 
         report.sample_lib = sample_lib.name
         report.fastq_file = fastq_files
@@ -578,7 +579,7 @@ def report(request):
 
     response = HttpResponse(
         content_type='text/csv',
-        headers={'Content-Disposition': 'attachment; filename="report-consolidated_data-v4.csv"'},
+        headers={'Content-Disposition': 'attachment; filename="report-consolidated_data-v5.csv"'},
     )
 
     field_names = ["patient","block","area","nucacid","sample_lib","captured_lib","bait","sequencing_lib","sequencing_run","fastq_file","path","na_type","area_type","matching_normal_sl"]
@@ -1362,6 +1363,11 @@ def lookup_all_data(request):
 
 def consolidated_data(request):
 
+    consolidated_data = []
+    md5_summary = []
+    x1 = 0
+    x2 = 0
+
     def get_value(value):
         if str(value).replace(".", "").isnumeric():
             return str(int(value))
@@ -1494,7 +1500,7 @@ def consolidated_data(request):
         return [[xl_sheet.row(i)[j].value for j in range(0,xl_sheet.ncols)] for i in range(1,xl_sheet.nrows)]
 
     added = []
-    def get_fastq_files(md5_summary,seq_r):
+    def get_fastq_files_by_sequencing_run(md5_summary,seq_r):
         result = []
         for m in md5_summary:
             if m[1] == seq_r and m[1] not in added:
@@ -1507,10 +1513,31 @@ def consolidated_data(request):
                         "read1_checksum":read1_files[i][1],
                         "read2_file":read2_files[i][0],
                         "read2_checksum":read2_files[i][1],
-                        "is_read_count_equal": True if row[8].strip() == "Yes" else False ,
+                        "is_read_count_equal": True if row[8].strip() == "Yes" else False,
                         "path":m[9]
                     })
                 added.append(seq_r)
+
+        return result
+
+    def get_fastq_files_by_sample_lib(md5_summary,sample_lib, sequencing_run):
+        result = []
+        for m in md5_summary:
+            if str(sample_lib) in str(m[0]) and m[1] == sequencing_run:
+                read1_files = list(zip(m[2].split(";"),m[3].split(";")))
+                read2_files = list(zip(m[5].split(";"),m[6].split(";")))
+                for i in range(0,len(read1_files)):
+                    result.append({
+                        "folder_name":m[0],
+                        "read1_file":read1_files[i][0],
+                        "read1_checksum":read1_files[i][1],
+                        "read1_count":m[4],
+                        "read2_file":read2_files[i][0],
+                        "read2_checksum":read2_files[i][1],
+                        "read2_count":m[7],
+                        "is_read_count_equal": True if m[8].strip() == "Yes" else False,
+                        "path":m[9]
+                    })
         return result
 
     if request.method == "POST":
@@ -1565,10 +1592,9 @@ def consolidated_data(request):
 
                     sequencing_run.sequencing_libs.add(sequencing_lib)
 
-                    fastq_files = get_fastq_files(md5_summary,row[9])
+                    fastq_files = get_fastq_files_by_sample_lib(md5_summary,row[0],row[9])
 
                     for f in fastq_files:
-
                         sequencing_file = get_or_create_sequencingfile(**{
                             "sample_lib":sample_lib,
                             "folder_name":f["folder_name"],
@@ -1581,8 +1607,8 @@ def consolidated_data(request):
                         })
 
                 except Exception as e:
+                    print(row)
                     print(str(e))
-
             # response = HttpResponse(
             #     content_type='text/csv',
             #     headers={'Content-Disposition': 'attachment; filename="report-consolidated_data.csv"'},
