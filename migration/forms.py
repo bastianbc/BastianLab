@@ -41,3 +41,6 @@ class ConsolidatedDataForm(forms.Form):
     # tree2_file = forms.FileField()
     # checksum_dataset = forms.FileField()
     # old_pat_id_file = forms.FileField()
+
+class BodySitesForm(forms.Form):
+    file = forms.FileField()

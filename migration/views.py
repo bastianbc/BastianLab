@@ -20,6 +20,7 @@ from sequencinglib.models import SequencingLib,CL_SEQL_LINK
 from sequencingfile.models import SequencingFile
 from variant.models import *
 from gene.models import *
+from body.models import *
 from django.core.exceptions import ObjectDoesNotExist
 import json
 import xlrd
@@ -1625,3 +1626,24 @@ def consolidated_data(request):
     else:
         form = ConsolidatedDataForm()
     return render(request, "consolidated_data.html", locals())
+
+def import_body_sites(request):
+    if request.method == "POST":
+        form = BodySitesForm(request.POST, request.FILES)
+        if form.is_valid():
+            file = request.FILES["file"]
+            xl_workbook = xlrd.open_workbook(file_contents=file.read())
+            sheet_names = xl_workbook.sheet_names()
+            xl_sheet = xl_workbook.sheet_by_name(sheet_names[0])
+            data = [[xl_sheet.row(i)[j].value for j in range(0,xl_sheet.ncols)] for i in range(1,xl_sheet.nrows)]
+            for row in data:
+                parent = None
+                for i in range(len(row)-1,-1,-1):
+                    parent, created = Body.objects.get_or_create(
+                        name = row[i],
+                        parent = parent
+                    )
+    else:
+        form = BodySitesForm()
+
+    return render(request,"body_sites.html", locals())

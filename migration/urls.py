@@ -10,4 +10,5 @@ urlpatterns = [
     path("gene", views.gene, name="gene"),
     path("lookup", views.lookup_all_data, name="lookup-all-data"),
     path("consolidated_data", views.consolidated_data, name="consolidated-data"),
+    path("body_sites", views.import_body_sites, name="import-body-sites"),
 ]
