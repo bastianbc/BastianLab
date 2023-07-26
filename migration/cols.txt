@@ -1,70 +1,36 @@
-
-Import legacy data into database
-Ground rules:
-1. If rows have the same Block number, they are from the same patient (e.g. 12-6261A and
-12-6261B have the same number 12-6261)
-2. If rows have the same Block prefix, they are from the same patient (e.g. HW2-Normal
-and HW2-Tumor h the same prefix)
-3. If rows have the same Sample prefix, they are from the same patient (e.g. DM3_Normal
-has the same prefix as DM3_Tumor)
-4. If rows have the same number in Patient, they are from the patient
-5. If there are multiple area types with the same name from the same block, number them
-(e.g. Melanoma1, Melanoma2).
-6.
-The consolidated.CSV spreadsheet is a list of samples. You will have to determine, how to link
-new entries in SL to the upstream, NA, Area, Block, Patient, Project tables following the rules
-above.
-Prepare CSV file for pipeline Once you have imported everything in the database, you will be able to produce the CSV file for
-sequencing. You will need to have things in the database so that you can identify any matching
-normal DNA from the same patient. A matching normal for an SL for any area type !=normal is
-an SL from an area type==normal from the same patient.
-Not all SLs have a matching normal SL, but we need to list the matching normal SL for those that
-do.
-This spreadsheet requires the following columns:
-• SL id
-• Bait,
-• SeqRun ID,
-• A list of all FASTQ file names [file1,file2,...]
-• File path to the FASTQ files
-• MD5
-• NA type (DNA or RNA)
-• Area type (normal for normal, tumor for all other like Melanoma, Nevus, etc.)
-• Matching normal SL id
-
-(A matching normal for an SL for any area type !=normal is an SL
-from an area type==normal from the same patient. )
-o 5 area type for 1 pa ent if it has 4 tumor and 1 normal get 4 tumor SL ID add
-Normal keyword
-o Pa ent Look for Pa ent_ID then Look for block ID the pre x of SL ID It will be
-same from same pa ent
-
-0: Sample
-1: Block
-2: Barcode ID
-3: Barcode
-4: Condition
-5: Input Conc.
-6: Input Hyb Conc.
-7: Diagnosis
-8: Notes/Other
-9: Sequencing Run
-10: SeqL
-11: CL
-12: Area
-13: Bait
-14: Area_id
-15: NA_id
-16: dept_number
-17: specimen
-18: dx_text
-19: icd9
-20: note
-21: micro
-22: gender
-23: pat_age
-24: p_stage
-25: thickness
-26: subtype
-27: prim
-28: mitoses
-29: pat_id
+0:
+1: Unnamed: 0
+2: pat_id_airtable
+3: patient
+4: block
+5: area
+6: nucacid
+7: sample_lib
+8: air_table.1
+9: captured_lib
+10: bait
+11: sequencing_lib
+12: sequencing_run
+13: fastq_file
+14: path
+15: na_type
+16: area_type
+17: matching_normal_sl
+18: dept_number
+19: specimen
+20: dx_text
+21: site_code
+22: icd9
+23: note
+24: micro
+25: gender
+26: pat_age
+27: p_stage
+28: thickness
+29: subtype
+30: prim
+31: md5
+32: bam
+33: bai
+34: path_bam
+35: path_bai

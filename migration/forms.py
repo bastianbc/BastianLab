@@ -44,3 +44,6 @@ class ConsolidatedDataForm(forms.Form):
 
 class BodySitesForm(forms.Form):
     file = forms.FileField()
+
+class AirtableConsolidatedDataForm(forms.Form):
+    file = forms.FileField()

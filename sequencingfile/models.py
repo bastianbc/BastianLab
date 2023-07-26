@@ -12,7 +12,7 @@ class SequencingFile(models.Model):
     read2_checksum = models.CharField(max_length=100, blank=True, null=True)
     read2_count = models.IntegerField(default=0, blank=True, null=True)
     is_read_count_equal = models.BooleanField(default=False, blank=True, null=True)
-    path = models.CharField(max_length=200, blank=True, null=True)
+    path = models.CharField(max_length=500, blank=True, null=True)
 
     class Meta:
         db_table = "sequencing_file"

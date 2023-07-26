@@ -28,6 +28,7 @@ import string
 import random
 from itertools import groupby,chain
 import re
+import ast
 
 def migrate(request):
 
@@ -1647,3 +1648,225 @@ def import_body_sites(request):
         form = BodySitesForm()
 
     return render(request,"body_sites.html", locals())
+
+def airtable_consolidated_data(request):
+
+    consolidated_data = []
+
+    def get_value(value):
+        if str(value).replace(".", "").isnumeric():
+            return str(int(value))
+        else:
+            return value
+
+    def get_barcode(name):
+        try:
+            return Barcode.objects.get(name=name)
+        except Exception as e:
+            return Barcode.objects.get(name="Unknown")
+
+    def get_or_create_na_sl_link(sl,na):
+        try:
+            return NA_SL_LINK.objects.get(
+                nucacid=na,
+                sample_lib=sl
+            )
+        except Exception as e:
+            return NA_SL_LINK.objects.create(
+                nucacid=na,
+                sample_lib=sl
+            )
+
+    def get_or_create_sl_cl_link(sl,cl):
+        try:
+            return SL_CL_LINK.objects.get(
+                captured_lib=cl,
+                sample_lib=sl
+            )
+        except Exception as e:
+            return SL_CL_LINK.objects.create(
+                captured_lib=cl,
+                sample_lib=sl
+            )
+
+    def get_or_create_cl_seql_link(cl,seq_l):
+        try:
+            return CL_SEQL_LINK.objects.get(
+                captured_lib = cl,
+                sequencing_lib = seq_l
+            )
+        except Exception as e:
+            return CL_SEQL_LINK.objects.create(
+                captured_lib = cl,
+                sequencing_lib = seq_l
+            )
+
+    def get_or_create_bait(value):
+        try:
+            return Bait.objects.get(name=value)
+        except Exception as e:
+            if not value:
+                return None
+            return Bait.objects.create(
+                name=value
+            )
+
+    def get_or_create_capturedlib(name,bait):
+        try:
+            return CapturedLib.objects.get(name=name)
+        except Exception as e:
+            return CapturedLib.objects.create(
+                name=name,
+                bait=bait,
+            )
+
+    def get_or_create_samplelib(**kwargs):
+        try:
+            return SampleLib.objects.get(name=kwargs["name"])
+        except ObjectDoesNotExist as e:
+            return SampleLib.objects.create(**kwargs)
+
+    def get_or_create_sequencingrun(**kwargs):
+        try:
+            return SequencingRun.objects.get(name=kwargs["name"])
+        except ObjectDoesNotExist as e:
+            return SequencingRun.objects.create(**kwargs)
+
+    def get_or_create_sequencinglib(name):
+        try:
+            return SequencingLib.objects.get(name=name)
+        except ObjectDoesNotExist as e:
+            return SequencingLib.objects.create(
+                name = name,
+            )
+
+    def create_sequencingfile(**kwargs):
+        try:
+            SequencingFile.objects.create(**kwargs)
+        except Exception as e:
+            print(str(e))
+
+    def get_or_create_patient(**kwargs):
+        try:
+            return Patients.objects.get(pat_id=kwargs["pat_id"])
+        except ObjectDoesNotExist as e:
+            return Patients.objects.create(**kwargs)
+
+    def get_or_create_block(**kwargs):
+        try:
+            return Blocks.objects.get(name=kwargs["name"])
+        except ObjectDoesNotExist as e:
+            return Blocks.objects.create(**kwargs)
+
+    def get_or_create_area(**kwargs):
+        try:
+            return Areas.objects.get(name=kwargs["name"])
+        except ObjectDoesNotExist as e:
+            return Areas.objects.create(**kwargs)
+
+    def get_or_create_nucacid(**kwargs):
+        try:
+            return NucAcids.objects.get(name=kwargs["name"])
+        except ObjectDoesNotExist as e:
+            return NucAcids.objects.create(**kwargs)
+
+    def get_area_type(value):
+        for x in Areas.AREA_TYPE_TYPES:
+            if value and value.lower() == x[1].lower():
+                return x[0]
+        return None
+
+    def create_sequencingfile_for_fastq_files(sample_lib,sequencing_run,fastq_files,path):
+        if fastq_files:
+            fastq_files = fastq_files.replace("nan","None")
+            for key,value in ast.literal_eval(fastq_files).items():
+                create_sequencingfile(**{
+                    "sample_lib":sample_lib,
+                    "folder_name":sequencing_run,
+                    "read1_file":key.strip() if key else None,
+                    "read1_checksum":value.strip() if value else None,
+                    "path":path.strip()
+                })
+
+    def create_sequencingfile_for_bam_files(sample_lib,sequencing_run,bam_files,path):
+        if bam_files:
+            bam_files = bam_files.replace("nan","None")
+            for key,value in ast.literal_eval(bam_files).items():
+                create_sequencingfile(**{
+                    "sample_lib":sample_lib,
+                    "folder_name":sequencing_run,
+                    "read1_file":key.strip() if key else None,
+                    "read1_checksum":value.strip() if value else None,
+                    "path":path.strip()
+                })
+
+    def create_sequencingfile_for_bai_files(sample_lib,sequencing_run,bai_files,path):
+        if bai_files:
+            bai_files = bai_files.replace("nan","None")
+            for key,value in ast.literal_eval(bai_files).items():
+                create_sequencingfile(**{
+                    "sample_lib":sample_lib,
+                    "folder_name":sequencing_run,
+                    "read1_file":key.strip() if key else None,
+                    "read1_checksum":value.strip() if value else None,
+                    "path":path.strip()
+                })
+
+    def initialize_consolidated_data(f):
+        xl_workbook = xlrd.open_workbook(file_contents=f.read())
+        sheet_names = xl_workbook.sheet_names()
+        xl_sheet = xl_workbook.sheet_by_name(sheet_names[0])
+        # for i in range(0,xl_sheet.ncols):
+        #     row = xl_sheet.row(0)
+        #     print("%d: %s" % (i,row[i].value))
+        return [[xl_sheet.row(i)[j].value for j in range(0,xl_sheet.ncols)] for i in range(1,xl_sheet.nrows)]
+
+    if request.method == "POST":
+        form = AirtableConsolidatedDataForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            file = request.FILES["file"]
+
+            consolidated_data = initialize_consolidated_data(file)
+
+            for row in consolidated_data:
+                try:
+                    patient = get_or_create_patient(**{"pat_id":get_value(row[3]), "sex":row[25].lower() if row[25] else None,"notes":"number:%d,unnamed:%d,pat_id_airtable:%s" % (row[0], row[1], row[2])})
+
+                    block = get_or_create_block(**{"name":row[4],"patient":patient,"age":int(row[26]) if row[26] else None,"micro":row[24],"p_stage":row[27],"thickness":float(row[28]) if row[28] else None,"subtype":row[29],"prim":row[30],"ip_dx":row[20],"notes":"dept_number:%s,specimen:%s,site_code:%s,icd9:%s" % (row[18],row[19],row[21],row[22])})
+
+                    area = get_or_create_area(**{"name":row[5],"block":block, "area_type": get_area_type(row[16]) })
+
+                    nucacid = get_or_create_nucacid(**{"name":row[6],"area":area})
+
+                    sample_lib = get_or_create_samplelib(**{"name":get_value(row[11]),"notes":"air_table.1:%s" % row[8]})
+
+                    na_sl_link = get_or_create_na_sl_link(sample_lib,nucacid)
+
+                    bait = get_or_create_bait(row[10])
+
+                    captured_lib = get_or_create_capturedlib(row[9],bait)
+
+                    sl_cl_link = get_or_create_sl_cl_link(sample_lib,captured_lib)
+
+                    sequencing_lib = get_or_create_sequencinglib(row[11])
+
+                    cl_seql_link = get_or_create_cl_seql_link(captured_lib,sequencing_lib)
+
+                    sequencing_run = get_or_create_sequencingrun(**{"name":row[9],"notes":"md5:%s" % row[31]})
+
+                    sequencing_run.sequencing_libs.add(sequencing_lib)
+
+                    create_sequencingfile_for_fastq_files(sample_lib,sequencing_run,row[13],row[14])
+
+                    create_sequencingfile_for_bam_files(sample_lib,sequencing_run,row[32],row[34])
+
+                    create_sequencingfile_for_bai_files(sample_lib,sequencing_run,row[33],row[35])
+
+                except Exception as e:
+                    print(row)
+                    print(str(e))
+
+    else:
+        form = AirtableConsolidatedDataForm()
+    return render(request, "airtable.html", locals())
