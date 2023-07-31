@@ -436,9 +436,16 @@ def migrate(request):
                                 )
 
                                 sequencing_run.sequencing_libs.add(seq_l)
-                    elif app == "barcode":
+                    elif app == "old_barcode":
                         Barcode.objects.create(
                             barcode_set=Barcodeset.objects.get(name="Old Barcodes"),
+                            name=row[0],
+                            i5=row[3],
+                            i7=row[2]
+                        )
+                    elif app == "new_barcode":
+                        Barcode.objects.create(
+                            barcode_set=Barcodeset.objects.get(name="New Barcodes"),
                             name=row[0],
                             i5=row[3],
                             i7=row[2]

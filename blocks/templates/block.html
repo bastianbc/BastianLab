@@ -26,7 +26,7 @@
             <div class="col-8"> {{form.age|as_crispy_field}}</div>
           </div>
           <div class="row body-site-row">
-            {{ form.body_site }}
+            <!-- {{ form.body_site|as_crispy_field }} -->
             <label for="">Body Site</label>
           </div>
           <div class="row">
@@ -79,6 +79,9 @@
           </div>
           <div class="row">
             <div class="col-8"> {{form.path_note|as_crispy_field}}</div>
+          </div>
+          <div class="row">
+            <div class="col-8"> {{form.collection|as_crispy_field}}</div>
           </div>
           <div class="row">
             <div class="col-8"> {{form.notes|as_crispy_field}}</div>
