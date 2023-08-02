@@ -44,10 +44,10 @@ def new_block(request):
         form = BlockForm(request.POST)
         if form.is_valid():
             block = form.save()
-            messages.success(request,"Block %s was created successfully." % block.bl_id)
+            messages.success(request,"Block %s created successfully." % block.bl_id)
             return redirect("blocks")
         else:
-            messages.error(request,"Block wasn't created.")
+            messages.error(request,"Block not created.")
     else:
         form = BlockForm()
 
@@ -108,10 +108,10 @@ def edit_block(request,id):
         form = BlockForm(request.POST,instance=block)
         if form.is_valid():
             block = form.save()
-            messages.success(request,"The block was updated successfully.")
+            messages.success(request,"The block updated successfully.")
             return redirect("blocks")
         else:
-            messages.error(request,"The block wasn't updated!")
+            messages.error(request,"The block not updated!")
     else:
         form = BlockForm(instance=block)
 
@@ -145,10 +145,10 @@ def delete_block(request,id):
     try:
         block = Blocks.objects.get(bl_id=id)
         block.delete()
-        messages.success(request,"Block %s was deleted successfully." % block.name)
+        messages.success(request,"Block %s deleted successfully." % block.name)
         deleted = True
     except Exception as e:
-        messages.error(request, "Block %s wasn't deleted!" % block.pat_id)
+        messages.error(request, "Block %s not deleted!" % block.pat_id)
         deleted = False
 
     return JsonResponse({ "deleted":deleted })

@@ -44,7 +44,7 @@ class Blocks(models.Model):
         ])
     body_site = models.ForeignKey("body.Body", on_delete=models.CASCADE, blank=True, null=True)
     ulceration = models.BooleanField(blank=True, null=True)
-    thickness = models.FloatField(blank=True, null=True)
+    thickness = models.FloatField(blank=True, null=True, help_text="float field ex. 0.1")
     mitoses = models.IntegerField(blank=True, null=True)
     p_stage = models.CharField(max_length=10, choices=P_STAGE_TYPES, blank=True, null=True)
     prim = models.CharField(max_length=10, choices=PRIM_TYPES, blank=True, null=True)

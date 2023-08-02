@@ -107,12 +107,29 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
+                    targets: 6,
+                    orderable: false,
+                    className: "text-center"
+                },
+                {
+                    targets: 7,
+                    orderable: false,
+                    className: "text-center"
+                },
+                {
+                    targets: 8,
+                    orderable: false,
+                    className: "text-center"
+                },
+                {
                     targets: 9,
-                    orderable: false
+                    orderable: false,
+                    className: "text-center"
                 },
                 {
                     targets: 10,
                     orderable: false,
+                    className: "text-center",
                     render: function (data, type, row) {
                         if (data > 0) {
                           let id = row["nu_id"];

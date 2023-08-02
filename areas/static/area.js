@@ -621,7 +621,6 @@ var KTDatatablesServerSide = function () {
     // Provides the datatable to be fully editable. official docs for more info  --> https://editor.datatables.net
     var initEditor = function () {
 
-      var collectionOptions =[];
       var areaTypeOptions = [];
 
       Promise.all([
@@ -659,20 +658,11 @@ var KTDatatablesServerSide = function () {
           }
         },
         table: ".table",
-        fields: [ {
-               label: "Name:",
-               name: "name"
-           }, {
-             label: "Block:",
-             name: "block",
-             type: "readonly",
-             attr: { disabled:true }
-           }, {
-             label: "Project:",
-             name: "project",
-             type: "readonly",
-             attr: { disabled:true }
-           }, {
+        fields: [
+            {
+             label: "Name:",
+             name: "name"
+            }, {
               label: "Area Type:",
               name: "area_type",
               type: "select",
@@ -718,7 +708,7 @@ var KTDatatablesServerSide = function () {
             async: false,
             success: function (data) {
 
-             data.forEach((item, i) => {
+              data.forEach((item, i) => {
 
                areaTypeOptions.push({
                  "label":item["label"],
