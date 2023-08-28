@@ -1837,42 +1837,37 @@ def airtable_consolidated_data(request):
             consolidated_data = initialize_consolidated_data(file)
 
             for row in consolidated_data:
-                try:
-                    patient = get_or_create_patient(**{"pat_id":get_value(row[3]), "sex":row[25].lower() if row[25] else None,"notes":"number:%d,unnamed:%d,pat_id_airtable:%s" % (row[0], row[1], row[2])})
+                patient = get_or_create_patient(**{"pat_id":get_value(row[3]), "sex":row[25].lower() if row[25] else None,"notes":"number:%s,unnamed:%s,pat_id_airtable:%s" % (row[0], row[1], row[2])})
 
-                    block = get_or_create_block(**{"name":row[4],"patient":patient,"age":int(row[26]) if row[26] else None,"micro":row[24],"p_stage":row[27],"thickness":float(row[28]) if row[28] else None,"subtype":row[29],"prim":row[30],"ip_dx":row[20],"notes":"dept_number:%s,specimen:%s,site_code:%s,icd9:%s" % (row[18],row[19],row[21],row[22])})
+                block = get_or_create_block(**{"name":row[4],"patient":patient,"age":int(row[26]) if row[26] else None,"micro":row[24],"p_stage":row[27],"thickness":float(row[28]) if row[28] else None,"subtype":row[29],"prim":row[30],"ip_dx":row[20],"notes":"dept_number:%s,specimen:%s,site_code:%s,icd9:%s" % (row[18],row[19],row[21],row[22])})
 
-                    area = get_or_create_area(**{"name":row[5],"block":block, "area_type": get_area_type(row[16]) })
+                area = get_or_create_area(**{"name":row[5],"block":block, "area_type": get_area_type(row[16]) })
 
-                    nucacid = get_or_create_nucacid(**{"name":row[6],"area":area})
+                nucacid = get_or_create_nucacid(**{"name":row[6],"area":area})
 
-                    sample_lib = get_or_create_samplelib(**{"name":get_value(row[11]),"notes":"air_table.1:%s" % row[8]})
+                sample_lib = get_or_create_samplelib(**{"name":get_value(row[7]),"notes":"air_table.1:%s" % row[8]})
 
-                    na_sl_link = get_or_create_na_sl_link(sample_lib,nucacid)
+                na_sl_link = get_or_create_na_sl_link(sample_lib,nucacid)
 
-                    bait = get_or_create_bait(row[10])
+                bait = get_or_create_bait(row[10])
 
-                    captured_lib = get_or_create_capturedlib(row[9],bait)
+                captured_lib = get_or_create_capturedlib(row[9],bait)
 
-                    sl_cl_link = get_or_create_sl_cl_link(sample_lib,captured_lib)
+                sl_cl_link = get_or_create_sl_cl_link(sample_lib,captured_lib)
 
-                    sequencing_lib = get_or_create_sequencinglib(row[11])
+                sequencing_lib = get_or_create_sequencinglib(row[11])
 
-                    cl_seql_link = get_or_create_cl_seql_link(captured_lib,sequencing_lib)
+                cl_seql_link = get_or_create_cl_seql_link(captured_lib,sequencing_lib)
 
-                    sequencing_run = get_or_create_sequencingrun(**{"name":row[9],"notes":"md5:%s" % row[31]})
+                sequencing_run = get_or_create_sequencingrun(**{"name":row[12],"notes":"md5:%s" % row[31]})
 
-                    sequencing_run.sequencing_libs.add(sequencing_lib)
+                sequencing_run.sequencing_libs.add(sequencing_lib)
 
-                    create_sequencingfile_for_fastq_files(sample_lib,sequencing_run,row[13],row[14])
+                create_sequencingfile_for_fastq_files(sample_lib,sequencing_run,row[13],row[14])
 
-                    create_sequencingfile_for_bam_files(sample_lib,sequencing_run,row[32],row[34])
+                create_sequencingfile_for_bam_files(sample_lib,sequencing_run,row[32],row[34])
 
-                    create_sequencingfile_for_bai_files(sample_lib,sequencing_run,row[33],row[35])
-
-                except Exception as e:
-                    print(row)
-                    print(str(e))
+                create_sequencingfile_for_bai_files(sample_lib,sequencing_run,row[33],row[35])
 
     else:
         form = AirtableConsolidatedDataForm()
