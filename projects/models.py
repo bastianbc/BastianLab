@@ -21,7 +21,7 @@ class Projects(models.Model):
     date_start = models.DateTimeField(blank=True, null=True, default=datetime.now, verbose_name="Start Date")
     pr_id = models.AutoField(primary_key=True, verbose_name="Project ID")
     technician = models.ManyToManyField(User, null=True, related_name="technician_projects", verbose_name="Technician")
-    researcher = models.ManyToManyField(User, null=True, related_name="researcher_projects", verbose_name="Researcher")
+    researcher = models.ManyToManyField(User, null=True, blank=True, related_name="researcher_projects", verbose_name="Researcher")
 
     class Meta:
         managed = True
