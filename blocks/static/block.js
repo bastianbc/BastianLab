@@ -754,28 +754,6 @@ var KTDatatablesServerSide = function () {
             name: "name"
           },
           {
-            label: "Project:",
-            name: "project",
-            type: "readonly",
-            attr: {
-              disabled:true
-            }
-          },
-          {
-            label: "Patient:",
-            name: "patient",
-            type: "readonly",
-            attr: {
-              disabled:true
-            }
-          },
-          {
-             label: "Collection:",
-             name: "collection",
-             type: "select",
-             options: collectionOptions
-          },
-          {
             label: "Diagnosis:",
             name: "diagnosis"
           },
@@ -792,6 +770,12 @@ var KTDatatablesServerSide = function () {
           {
             label: "Thickness:",
             name: "thickness"
+          },
+          {
+             label: "Collection:",
+             name: "collection",
+             type: "select",
+             options: collectionOptions
           },
           {
             label: "Date Added:",
