@@ -15,6 +15,7 @@ __pycache__/
 
 # Distribution / packaging
 .Python
+venv/
 env/
 build/
 develop-eggs/
@@ -79,3 +80,4 @@ media/
 # environment options
 environment.py
 development.py
+venv/
