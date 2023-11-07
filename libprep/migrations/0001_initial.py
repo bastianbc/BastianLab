@@ -10,7 +10,6 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('areas', '0003_areas_old_area_id'),
     ]
 
     operations = [

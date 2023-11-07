@@ -43,8 +43,6 @@ SECRET_KEY = 'e6l2xn#ojz2g=tlgloq*oo*kxm)3z*8pcl*6e^)$n@-u8=n*s&'
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-INTERNAL_IPS = ('127.0.0.1',)
-
 
 # Application definition
 
@@ -132,7 +130,7 @@ DATABASES = {
         'USER': 'testuser',
         'PASSWORD': '1235',
         'NAME': 'labdb',
-        'HOST': '127.0.0.1',
+        'HOST': '126.0.0.1',
         'PORT': '5432',
         'DISABLE_SERVER_SIDE_CURSORS': True
     }
