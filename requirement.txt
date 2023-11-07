@@ -7,7 +7,10 @@ django-tables2==2.4.1
 django-widget-tweaks==1.4.12
 djangorestframework==3.13.1
 Pillow==9.2.0
+<<<<<<< HEAD
 #psycopg2==2.9.3
+=======
+>>>>>>> a83034de8b6c3880aba4bc6b9a561e7a170c2510
 pytz==2022.2.1
 sqlparse==0.4.2
 xlrd==1.2.0
