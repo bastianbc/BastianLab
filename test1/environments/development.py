@@ -130,7 +130,7 @@ DATABASES = {
         'USER': 'testuser',
         'PASSWORD': '1235',
         'NAME': 'labdb',
-        'HOST': '126.0.0.1',
+        'HOST': '127.0.0.1',
         'PORT': '5432',
         'DISABLE_SERVER_SIDE_CURSORS': True
     }
@@ -200,4 +200,4 @@ LOGOUT_URL = '/auth/logout'
 LOGIN_REDIRECT_URL = '/projects'
 
 TECHNICIAN_GROUP_NAME = "Technicians"
-RESEARCHER_GROUP_NAME = "Researchers"
+ESEARCHER_GROUP_NAME = "Researchers"

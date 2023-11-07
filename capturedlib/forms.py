@@ -8,6 +8,10 @@ class CapturedLibForm(forms.ModelForm):
         model = CapturedLib
         fields = "__all__"
 
+    def __init__(self, *args, **kwargs):
+        super(CapturedLibForm, self).__init__(*args, **kwargs)
+        self.fields["nm"].required = False
+
 class SequencingLibCreationForm(forms.Form):
     sequencing_lib = forms.ModelChoiceField(queryset=SequencingLib.objects.all(), label="Sequencing Library")
     prefix = forms.CharField()
