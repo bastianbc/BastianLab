@@ -20,7 +20,7 @@ class Projects(models.Model):
     description = models.CharField(max_length=255, blank=True, null=True, verbose_name="Description")
     date_start = models.DateTimeField(blank=True, null=True, default=datetime.now, verbose_name="Start Date")
     pr_id = models.AutoField(primary_key=True, verbose_name="Project ID")
-    technician = models.ManyToManyField(User, null=True, related_name="technician_projects", verbose_name="Technician")
+    technician = models.ManyToManyField(User, null=True, blank=True, related_name="technician_projects", verbose_name="Technician")
     researcher = models.ManyToManyField(User, null=True, blank=True, related_name="researcher_projects", verbose_name="Researcher")
 
     class Meta:
@@ -31,6 +31,7 @@ class Projects(models.Model):
 
     def __str__(self):
        return self.name
+
 
     def query_by_args(self, user, **kwargs):
 
@@ -45,9 +46,11 @@ class Projects(models.Model):
                 '0': 'pr_id',
                 '1': 'abbreviation',
                 '2': 'name',
-                '3': 'pi',
-                '4': 'date_start',
-                '5': 'speedtype',
+                '3': 'technician',
+                '4': 'researcher',
+                '5': 'pi',
+                '6': 'date_start',
+                '7': 'speedtype',
             }
             draw = int(kwargs.get('draw', None)[0])
             length = int(kwargs.get('length', None)[0])

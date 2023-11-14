@@ -11,7 +11,6 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('areas', '0001_initial'),
-        ('method', '0001_initial'),
     ]
 
     operations = [
