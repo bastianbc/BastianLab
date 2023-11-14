@@ -18,7 +18,6 @@ def filter_projects(request):
     serializer = ProjectsSerializer(projects['items'], many=True)
     result = dict()
     result['data'] = serializer.data
-    print(serializer.data)
     result['draw'] = projects['draw']
     result['recordsTotal'] = projects['total']
     result['recordsFiltered'] = projects['count']
@@ -111,7 +110,6 @@ def delete_batch_projects(request):
 
 def get_abb(i, name):
     l = [s[:i] for s in name.split()]
-    print(("".join(l)).upper())
     return ("".join(l)).upper()[:6]
 
 
@@ -130,7 +128,6 @@ def get_or_create_projects(name):
                             speedtype="",
                             date_start=datetime.now(),
                         )
-            print("Created_1")
         except IntegrityError as e:
             Projects.objects.create(
                 name=name,
@@ -138,13 +135,11 @@ def get_or_create_projects(name):
                 speedtype="",
                 date_start=datetime.now(),
             )
-            print("Created_2", e)
 
 def _cerate_projects_from_airtable():
     from pyairtable import Api
     api = Api('keyEDswuVpUGOz8Tp')
     t = api.table("appA7qA5hhuLgiAwt", "tblv5WQXW7cNCbt0o")
     for i in t.all():
-        print(i.get("fields").get("Assigned project",""))
         for s in i.get("fields").get("Assigned project", []):
             get_or_create_projects(s)
