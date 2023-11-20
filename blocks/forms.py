@@ -12,7 +12,7 @@ class BlockForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(BlockForm, self).__init__(*args, **kwargs)
-        self.fields["patient"].required = True
+        # self.fields["patient"].required = True
 
     def clean(self):
         """

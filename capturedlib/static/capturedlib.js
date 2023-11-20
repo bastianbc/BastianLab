@@ -685,10 +685,12 @@ var KTDatatablesServerSide = function () {
 
           var id = row.querySelectorAll('div')[0].getAttribute("data-id");
           var volume = row.querySelector(".detail-volume").value;
+          var amount = row.querySelector(".detail-amount").value;
 
           values.push({
             "id":id,
-            "volume":volume
+            "volume":volume,
+            "amount":amount
           });
         }
 

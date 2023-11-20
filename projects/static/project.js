@@ -18,6 +18,7 @@ var KTDatatablesServerSide = function () {
 
         dt = $(".table").DataTable({
             // searchDelay: 500,
+            pageLength: 100,
             processing: true,
             serverSide: true,
             order: [[0, 'desc']],
@@ -30,7 +31,7 @@ var KTDatatablesServerSide = function () {
             },
             keys: {
               columns: ':not(:first-child)',
-              keys: [ 11 ],
+              keys: [ 9 ],
               editor: editor,
               editOnFocus: true
             },
@@ -58,20 +59,6 @@ var KTDatatablesServerSide = function () {
                 { data: 'pr_id' },
                 { data: 'abbreviation' },
                 { data: 'name' },
-                { data: 'technician',
-                  render: function(data, type, row) {
-                       return $.map(data, function(d, i) {
-                            return d.first_name + ' ' + d.last_name;
-                        }).join(', ');
-                   }
-               },
-                { data: 'researcher',
-                  render: function(data, type, row) {
-                       return $.map(data, function(d, i) {
-                            return d.first_name + ' ' + d.last_name;
-                        }).join(', ');
-                   }
-               },
                 { data: 'pi' ,
                   render: function (val, type, row) {
                     return row["pi_label"];
@@ -97,7 +84,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 8,
+                    targets: 6,
                     orderable: false,
                     render: function (data, type, row) {
                         if (data > 0) {
@@ -115,7 +102,7 @@ var KTDatatablesServerSide = function () {
                 //     }
                 // },
                 {
-                    targets: 9,
+                    targets: 7,
                     data: null,
                     orderable: false,
                     className: 'text-end',

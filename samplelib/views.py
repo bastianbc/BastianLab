@@ -13,6 +13,10 @@ from django.contrib.auth.decorators import login_required,permission_required
 from .serializers import *
 from django.db.models import Q
 from core.decorators import *
+from pyairtable import Api
+import pandas as pd
+from pathlib import Path
+from barcodeset.models import Barcodeset, Barcode
 
 @permission_required("samplelib.view_samplelib",raise_exception=True)
 def samplelibs(request):
@@ -22,6 +26,8 @@ def samplelibs(request):
 
 @permission_required_for_async("samplelib.view_samplelib")
 def filter_samplelibs(request):
+    # _cerate_na_from_at()
+    # barcodes()
     samplelibs = SampleLib.query_by_args(request.user,**request.GET)
     serializer = SampleLibSerializer(samplelibs['items'], many=True)
 
@@ -290,3 +296,101 @@ def check_can_deleted_async(request):
             })
 
     return JsonResponse({"related_objects":related_objects})
+
+
+def create_na_sl_link(sl, value, lp_dna, qPCR):
+    try:
+        vol = round(lp_dna / qPCR, 2)
+    except Exception as e:
+        vol = 0
+
+    for na in value.split(","):
+        na = NucAcids.objects.get(name=na)
+        na_sl_link = NA_SL_LINK.objects.filter(
+            nucacid=na,
+            sample_lib=sl
+        ).update(input_vol=vol)
+        print("na_sl_link updated")
+
+
+def sl_get_or_create_at(row):
+    try:
+        if pd.isnull(row["New Barcode"]) and pd.isnull(row["Old Barcode"]):
+            return
+        sl = SampleLib.objects.get(name=row["SL_ID"])
+        barcode = row["New Barcode"] or row["Old Barcode"]
+        print(row["SL_ID"], row["New Barcode"] , row["Old Barcode"], barcode)
+        try:
+            sl.barcode = Barcode.objects.get(name=barcode)
+            sl.save()
+            print("saved")
+        except Exception as e:
+            print(e)
+        # sl.qubit = row["Post-lib Qubit (ng/ul)"]
+        # # sl.shear_volume = row["Post-lib qPCR (ng/ul)"] #TODO need to return this from NA table
+        # sl.qpcr_conc = row["Post-lib qPCR (ng/ul)"]
+        # sl.pcr_cycles = row["Post-hyb PCR cycles"]
+        # sl.amount_final = row["Total LP DNA for capture (ng)"]
+        # sl.vol_init = row["Total LP DNA for capture (ng)"]
+        # sl.notes = row["Notes"]
+        # sl.save()
+        # if not pd.isnull(row["NA_ID"]):
+        #     create_na_sl_link(sl, row["NA_ID"], row["LP DNA (ng)"], row["Post-lib qPCR (ng/ul)"])
+        # print("saved")
+    except Exception as e:
+        print(e)
+
+
+def _cerate_na_from_at():
+    file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view-6.csv")
+    df = pd.read_csv(file)
+    df[~pd.isnull(df["SL_ID"])].apply(lambda row: sl_get_or_create_at(row), axis=1)
+
+
+
+def sl_get_or_create_consolidated_2(row):
+    try:
+        print(row["Sample"])
+        SampleLib.objects.create(name=row["Sample"])
+        print("created")
+    except Exception as e:
+        print(e)
+
+def sl_get_or_create_consolidated_3(row):
+    try:
+        if pd.isnull(row["NA_id"]):
+            return
+        print(row["Sample"], row["NA_id"])
+        NA_SL_LINK.objects.get(nucacid=row["Sample"],sample_lib=row["NA_id"])
+        print("pass")
+    except Exception as e:
+        try:
+            sl = SampleLib.objects.get(name=row["Sample"])
+            na = NucAcids.objects.get(name=row["NA_id"])
+            NA_SL_LINK.objects.create(nucacid=na, sample_lib=sl)
+            print("created")
+        except Exception as e:
+            print(e)
+
+def _cerate_na_from_consolidated_data_2():
+    file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
+    df = pd.read_csv(file)
+    df[~pd.isnull(df["Sample"])].apply(lambda row: sl_get_or_create_consolidated_3(row), axis=1)
+
+def barcode_get(row):
+    print(row["Barcode_ID"])
+    try:
+        Barcode.objects.get(name=row["Barcode_ID"])
+    except:
+        Barcode.objects.create(name=row["Barcode_ID"],
+                               barcode_set=Barcodeset.objects.get(name="Old Barcodes"),
+                               i5=row["Index-i5"],
+                               i7=row["Index-i7"]
+                               )
+        print("created")
+
+def barcodes():
+    file = Path(Path(__file__).parent.parent / "uploads" / "Old Barcodes-Grid view-2.csv")
+    df = pd.read_csv(file)
+    df.apply(lambda row: barcode_get(row), axis=1)
+    # df[~pd.isnull(df["Old Barcode"])].apply(lambda row: barcode_get(row), axis=1)

@@ -13,7 +13,6 @@ from django.core.exceptions import MultipleObjectsReturned
 
 @login_required
 def filter_projects(request):
-    # _cerate_projects_from_airtable()
     projects = Projects().query_by_args(request.user,**request.GET)
     serializer = ProjectsSerializer(projects['items'], many=True)
     result = dict()
