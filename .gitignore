@@ -81,3 +81,8 @@ media/
 environment.py
 development.py
 venv/
+*/__pycache__/*
+**/migrations/**
+!**/migrations
+!**/migrations/__init__.py
+*.pyc 
