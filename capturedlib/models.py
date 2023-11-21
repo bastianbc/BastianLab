@@ -123,6 +123,7 @@ class CapturedLib(models.Model):
         # Calculate CL.nM as CL.conc/660 * CL.frag_size * 10^6 and store in CL.nM
         self.nm = round(self.conc/(660 * float(self.frag_size)) * 10**6,2)
 
+
     def update_volume(self, volume):
         self.vol_remain = 0 if volume > self.vol_remain else round(self.vol_remain - volume,2)
         self.save()
@@ -131,7 +132,7 @@ class SL_CL_LINK(models.Model):
     captured_lib = models.ForeignKey("capturedlib.CapturedLib",on_delete=models.CASCADE, verbose_name="Captured Library", related_name="sl_cl_links")
     sample_lib = models.ForeignKey("samplelib.SampleLib", on_delete=models.CASCADE, verbose_name="Sample Library", related_name="sl_cl_links")
     volume = models.FloatField(default=0, verbose_name="Volume")
-    amount = models.FloatField(default=0, verbose_name="Input Amount")
+    amount = models.FloatField(default=0, verbose_name="Amount")
 
     class Meta:
         db_table = "sl_cl_link"

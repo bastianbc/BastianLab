@@ -20,7 +20,6 @@ def capturedlibs(request):
 
 @permission_required_for_async("capturedlib.view_capturedlib")
 def filter_capturedlibs(request):
-    # _cerate_cl_from_consolideated_data()
     capturedlibs = CapturedLib().query_by_args(request.user,**request.GET)
     serializer = CapturedLibSerializer(capturedlibs['items'], many=True)
     result = dict()
