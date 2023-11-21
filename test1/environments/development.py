@@ -71,7 +71,7 @@ INSTALLED_APPS = [
     'areas.apps.AreasConfig',
     'core.apps.CoreConfig',
     'method.apps.MethodConfig',
-    'capturedlib.apps.CapturedlibConfig',
+    # 'capturedlib.apps.CapturedlibConfig',
     'samplelib',
     'sequencinglib',
     'sequencingrun',
