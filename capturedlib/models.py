@@ -121,8 +121,8 @@ class CapturedLib(models.Model):
 
     def _set_nm(self):
         # Calculate CL.nM as CL.conc/660 * CL.frag_size * 10^6 and store in CL.nM
-        # self.nm = round(self.conc/(660 * float(self.frag_size)) * 10**6,2)
-        pass
+        self.nm = round(self.conc/(660 * float(self.frag_size)) * 10**6,2)
+
 
     def update_volume(self, volume):
         self.vol_remain = 0 if volume > self.vol_remain else round(self.vol_remain - volume,2)
