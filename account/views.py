@@ -15,10 +15,10 @@ def new_account(request):
         form = CreateAccountForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request,"Account was created successfully")
+            messages.success(request,"Account created successfully")
             return redirect('/account')
         else:
-            messages.error(request,"Account wasn't created!")
+            messages.error(request,"Account could not be created!")
     else:
         form = CreateAccountForm()
     return render(request,"account.html",locals())
@@ -30,10 +30,10 @@ def edit_account(request,id):
         form = EditAccountForm(request.POST,instance=instance)
         if form.is_valid():
             form.save()
-            messages.success(request,"Account was updated successfully")
+            messages.success(request,"Account updated successfully")
             return redirect('/account')
         else:
-            messages.error(request,"Account wasn't updated!")
+            messages.error(request,"Account could not be updated!")
     else:
         form = EditAccountForm(instance=instance)
     return render(request,"account.html",locals())
@@ -43,9 +43,9 @@ def delete_account(request,id):
     try:
         instance = User.objects.get(id=id)
         instance.delete()
-        messages.success(request, "Account was deleted successfully")
+        messages.success(request, "Account deleted successfully")
     except Exception as e:
-        messages.error(request, "Account wasn't deleted!")
+        messages.error(request, "Account could not be deleted!")
 
     return redirect('/account')
 
@@ -68,5 +68,5 @@ def filter_accounts(request):
 def reset_password(request,id):
     user = User.objects.get(id=id)
     user.reset_password()
-    messages.success(request,"Account's Password was reseted ")
+    messages.success(request,"Account's Password reset. ")
     return redirect("/account")

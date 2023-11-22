@@ -62,10 +62,10 @@ def new_nucacid(request):
         form = NucAcidForm(request.POST)
         if form.is_valid():
             nucacid = form.save()
-            messages.success(request,"Nuclecic Acid %s was created successfully." % nucacid.nu_id)
+            messages.success(request,"Nuclecic Acid %s created successfully." % nucacid.nu_id)
             return redirect("nucacids")
         else:
-            messages.error(request,"Nucleic Acid wasn't created.")
+            messages.error(request,"Nucleic Acid could not be created.")
     else:
         form = NucAcidForm()
 
@@ -109,10 +109,10 @@ def edit_nucacid(request,id):
         form = NucAcidForm(request.POST,instance=nucacid)
         if form.is_valid():
             nucacid = form.save()
-            messages.success(request,"Nuclecic Acid %s was updated successfully." % nucacid.nu_id)
+            messages.success(request,"Nuclecic Acid %s updated successfully." % nucacid.nu_id)
             return redirect("nucacids")
         else:
-            messages.error(request,"Nucleic Acid wasn't updated!")
+            messages.error(request,"Nucleic Acid could not be updated!")
     else:
         form = NucAcidForm(instance=nucacid)
 
@@ -123,10 +123,10 @@ def delete_nucacid(request,id):
     try:
         nucacid = NucAcids.objects.get(nu_id=id)
         nucacid.delete()
-        messages.success(request,"Nucleci Acid %s was deleted successfully." % nucacid.name)
+        messages.success(request,"Nucleci Acid %s deleted successfully." % nucacid.name)
         deleted = True
     except Exception as e:
-        messages.error(request, "Nuclecic Acid %s wasn't deleted!" % nucacid.name)
+        messages.error(request, "Nuclecic Acid %s could not be deleted!" % nucacid.name)
         deleted = False
 
     return JsonResponse({ "deleted":deleted })

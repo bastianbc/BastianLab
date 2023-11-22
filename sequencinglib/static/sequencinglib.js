@@ -311,7 +311,7 @@ var KTDatatablesServerSide = function () {
                                 headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
                                 error: function (xhr, ajaxOptions, thrownError) {
                                   Swal.fire({
-                                      text: name + " was not deleted.",
+                                      text: name + " could not deleted.",
                                       icon: "error",
                                       buttonsStyling: false,
                                       confirmButtonText: "Ok, got it!",
@@ -323,7 +323,7 @@ var KTDatatablesServerSide = function () {
                             }).done(function () {
 
                               Swal.fire({
-                                    text: "Sequencing Library was deleted succesfully.",
+                                    text: "Sequencing Library deleted succesfully.",
                                     icon: "info",
                                     buttonsStyling: false,
                                     confirmButtonText: "Ok, got it!",
@@ -500,7 +500,6 @@ var KTDatatablesServerSide = function () {
            type: "GET",
            async: false,
            success: function (data) {
-
             // var options = [];
             data.forEach((item, i) => {
 
@@ -587,7 +586,7 @@ var KTDatatablesServerSide = function () {
           }).done(function(result) {
             if (result.success) {
               Swal.fire({
-                  text: "Sequencing Library(s) was created succesfully.",
+                  text: "Sequencing Library(s) created succesfully.",
                   icon: "info",
                   buttonsStyling: false,
                   confirmButtonText: "Ok, got it!",
@@ -603,7 +602,7 @@ var KTDatatablesServerSide = function () {
             }
             else {
               Swal.fire({
-                  text: "Sequencing Library(s) was not created.",
+                  text: "Sequencing Library(s) could not created.",
                   icon: "error",
                   buttonsStyling: false,
                   confirmButtonText: "Ok, got it!",
@@ -715,7 +714,7 @@ var KTDatatablesServerSide = function () {
                         }).done(function (result) {
                             if (result.deleted) {
                               Swal.fire({
-                                  text: "Sequencing Library(s) was deleted succesfully.",
+                                  text: "Sequencing Library(s) deleted succesfully.",
                                   icon: "info",
                                   buttonsStyling: false,
                                   confirmButtonText: "Ok, got it!",
@@ -728,7 +727,7 @@ var KTDatatablesServerSide = function () {
                             }
                             else {
                               Swal.fire({
-                                  text: "Sequencing Library(s) wasn't deleted!",
+                                  text: "Sequencing Library(s) could not deleted!",
                                   icon: "error",
                                   buttonsStyling: false,
                                   confirmButtonText: "Ok, got it!",
@@ -844,13 +843,17 @@ var KTDatatablesServerSide = function () {
           totalVolume += data[i].volume;
 
         }
-
         for (var i = 0; i < data.length; i++) {
           var p = 0.00;
           var v = 0.00;
 
           v = data[i].volume;
-          p = data[i].volume / totalVolume;
+          p = v / totalVolume || 0;
+          console.log("aa");
+          console.log("volume:"+data[i].volume);
+          console.log("totalVolume:"+totalVolume);
+          console.log("p:");
+          console.log(p);
 
           var row = `<div class="row mb-1 detail-row">
               <div class="col-2 align-self-center" data-id="${ data[i].captured_lib }"><a href="/capturedlib/edit/${ data[i].captured_lib }">${ data[i].name }</a></div>
@@ -932,8 +935,6 @@ var KTDatatablesServerSide = function () {
 
         var targetVol = parseFloat(document.querySelector(".list-body").getAttribute("data-target_vol"));
 
-        console.log("totalVolume:"+totalVolume+"targetVol:"+targetVol);
-
         var bufferAmount = (targetVol - totalVolume).toFixed(2);
 
         document.querySelector("#buffer_amount").value = bufferAmount;
@@ -979,7 +980,7 @@ var KTDatatablesServerSide = function () {
 
         function checkTotalPercentage() {
 
-          return parseFloat(document.getElementById("total_percentage").value) == 1;
+          return parseFloat(document.getElementById("total_percentage").value) == 100;
 
         }
 
@@ -1011,7 +1012,7 @@ var KTDatatablesServerSide = function () {
           }).done(function(result) {
             if (result.success) {
               Swal.fire({
-                  text: "Captured Library(s) was updated succesfully.",
+                  text: "Captured Library(s) updated succesfully.",
                   icon: "info",
                   buttonsStyling: false,
                   confirmButtonText: "Ok, got it!",
@@ -1024,7 +1025,7 @@ var KTDatatablesServerSide = function () {
             }
             else {
               Swal.fire({
-                  text: "Captured Library(s) was not updated.",
+                  text: "Captured Library(s) could not updated.",
                   icon: "error",
                   buttonsStyling: false,
                   confirmButtonText: "Ok, got it!",

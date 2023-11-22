@@ -37,11 +37,11 @@ def new_barcodeset(request):
                     print(str(e))
                     pass
 
-            messages.success(request,"Barcode set was created successfully")
+            messages.success(request,"Barcode set created successfully")
 
             return redirect('/barcodeset')
         else:
-            messages.error(request,"Barcode set wasn't created!")
+            messages.error(request,"Barcode set could not be created!")
     else:
         form = NewBarcodesetForm()
     return render(request,"barcodeset.html",locals())
@@ -53,10 +53,10 @@ def edit_barcodeset(request,id):
         form = EditBarcodesetForm(request.POST,instance=instance)
         if form.is_valid():
             form.save()
-            messages.success(request,"Barcode set was updated successfully")
+            messages.success(request,"Barcode set updated successfully")
             return redirect('/barcodeset')
         else:
-            messages.error(request,"Barcodeset wasn't updated!")
+            messages.error(request,"Barcodeset could not be updated!")
     else:
         form = EditBarcodesetForm(instance=instance)
     return render(request,"barcodeset.html",locals())
@@ -66,9 +66,9 @@ def delete_barcodeset(request,id):
     try:
         instance = Barcodeset.objects.get(id=id)
         instance.delete()
-        messages.success(request, "Barcode set was deleted successfully")
+        messages.success(request, "Barcode set deleted successfully")
     except Exception as e:
-        messages.error(request, "Barcode set wasn't deleted! \n%s" % str(e))
+        messages.error(request, "Barcode set could not be deleted! \n%s" % str(e))
 
     return redirect('/barcodeset')
 

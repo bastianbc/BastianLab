@@ -32,10 +32,10 @@ def new_project(request):
         form = ProjectForm(request.POST)
         if form.is_valid():
             project = form.save()
-            messages.success(request,"Project %s was created successfully." % project.pr_id)
+            messages.success(request,"Project %s created successfully." % project.pr_id)
             return redirect("projects")
         else:
-            messages.error(request,"Project wasn't created.")
+            messages.error(request,"Project could not be created.")
     else:
         form = ProjectForm()
 
@@ -49,10 +49,10 @@ def edit_project(request,id):
         form = ProjectForm(request.POST,instance=project)
         if form.is_valid():
             project = form.save()
-            messages.success(request,"Project %s was updated successfully." % project.pr_id)
+            messages.success(request,"Project %s updated successfully." % project.pr_id)
             return redirect("projects")
         else:
-            messages.error(request,"Project wasn't updated!")
+            messages.error(request,"Project could not be updated!")
     else:
         form = ProjectForm(instance=project)
 
@@ -86,9 +86,9 @@ def delete_project(request,id):
     try:
         project = Projects.objects.get(pr_id=id)
         project.delete()
-        messages.success(request,"Project %s was deleted successfully." % project.pr_id)
+        messages.success(request,"Project %s deleted successfully." % project.pr_id)
     except Exception as e:
-        messages.error(request, "Project %s wasn't deleted!")
+        messages.error(request, "Project %s could not be deleted!")
         return JsonResponse({ "deleted":False })
 
     return JsonResponse({ "deleted":True })
