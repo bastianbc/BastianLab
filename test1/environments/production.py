@@ -47,6 +47,10 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    # 'accession.apps.AccessionConfig',
+    'libprep.apps.LibprepConfig',
+    'lab.apps.LabConfig',
+    'projects.apps.ProjectsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -62,22 +66,19 @@ INSTALLED_APPS = [
     'home.apps.HomeConfig',
     'authentication.apps.AuthenticationConfig',
     'group.apps.GroupConfig',
-    'core.apps.CoreConfig',
     'account.apps.AccountConfig',
-    'projects.apps.ProjectsConfig',
     'blocks.apps.BlocksConfig',
     'areas.apps.AreasConfig',
-    'libprep.apps.LibprepConfig',
-    'lab.apps.LabConfig',
+    'core.apps.CoreConfig',
+    'method.apps.MethodConfig',
+    'samplelib.apps.SamplelibConfig',
     'capturedlib.apps.CapturedlibConfig',
-    'samplelib',
     'sequencinglib',
     'sequencingrun',
     'buffer',
     'bait',
     'body',
     'barcodeset',
-    'method.apps.MethodConfig',
     'migration',
     'sequencingfile',
     'variant',
@@ -125,21 +126,21 @@ WSGI_APPLICATION = 'test1.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'USER': 'testuser',
-        'PASSWORD': '1235',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'USER': 'postgres',
+        'PASSWORD': '12345678',
         'NAME': 'labdb',
-        'HOST': '127.0.0.1',
+        'HOST': 'development.c7oasmx9kbh5.us-east-1.rds.amazonaws.com',
         'PORT': '5432',
         'DISABLE_SERVER_SIDE_CURSORS': True
-    }
-# }
+   }
+}
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',
 #         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
 #     }
-}
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-password-validators

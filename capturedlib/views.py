@@ -9,6 +9,9 @@ from bait.models import Bait
 from .forms import *
 from django.contrib import messages
 from core.decorators import permission_required_for_async
+from pyairtable import Api
+import pandas as pd
+from pathlib import Path
 
 @permission_required("capturedlib.view_capturedlib",raise_exception=True)
 def capturedlibs(request):
@@ -162,6 +165,8 @@ def update_async(request,id):
         for value in values:
 
             volume = float(value["volume"])
+            amount = float(value["amount"])
+
 
             if math.isnan(volume):
                 raise Exception("Invalid input!")
@@ -226,3 +231,77 @@ def check_can_deleted_async(request):
             })
 
     return JsonResponse({"related_objects":related_objects})
+
+
+def create_cl(name, frag_size, amp_cycle):
+    try:
+        return CapturedLib.objects.get(name=name)
+    except Exception as e:
+        return CapturedLib.objects.create(
+            name=name,
+            frag_size=frag_size if frag_size else 0,
+            amp_cycle=amp_cycle if amp_cycle else 0
+        )
+
+
+def create_sl_cl_link(sl, cl, lp_dna, qPCR):
+    try:
+        vol = round(lp_dna / qPCR, 2)
+    except Exception as e:
+        vol = 0
+
+    SL_CL_LINK.objects.create(
+        captured_lib=cl,
+        sample_lib=sl,
+        volume=vol
+    )
+
+def cl_get_or_create_at(row):
+    # try:
+    if pd.isnull(row["CL_ID"]):
+        return
+    # TODO ask boris about details of this frag_size
+    frag_size = row["Insert size (bp)"] if not pd.isnull(row["Insert size (bp)"]) else 0
+    amp_cycle = row["Post-hyb PCR cycles"] if not pd.isnull(row["Post-hyb PCR cycles"]) else 0
+    lp_dna = row["LP DNA (ng)"] if not pd.isnull(row["LP DNA (ng)"]) else 0
+    qPCR = row["Post-lib qPCR (ng/ul)"] if not pd.isnull(row["Post-lib qPCR (ng/ul)"]) else 0
+    print(row["SL_ID"], row["CL_ID"])
+    sl = SampleLib.objects.get(name=row["SL_ID"])
+    for item in row["CL_ID"].split(","):
+        cl = create_cl(item.strip(), frag_size, amp_cycle)
+        create_sl_cl_link(sl, cl, lp_dna, qPCR)
+    print("created")
+    # except Exception as e:
+    #     print(e)
+
+def _cerate_cl_from_at():
+    file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view-6.csv")
+    df = pd.read_csv(file)
+    df.apply(lambda row: cl_get_or_create_at(row), axis=1)
+
+
+def cl_get_or_create_consolidated(row):
+    # try:
+    print(row["Sample"], row["CL"])
+    sl = SampleLib.objects.get(name=row["Sample"])
+    try:
+        cl = CapturedLib.objects.get(name=row["CL"])
+        try:
+            SL_CL_LINK.objects.get(captured_lib=cl, sample_lib=sl)
+            print("saved")
+        except:
+            SL_CL_LINK.objects.create(captured_lib=cl, sample_lib=sl)
+            print("created_1")
+    except:
+        cl = CapturedLib.objects.create(name=row["CL"])
+        SL_CL_LINK.objects.create(captured_lib=cl, sample_lib=sl)
+        print("created_2")
+    # except Exception as e:
+    #     print(e)
+
+
+def _cerate_cl_from_consolideated_data():
+    file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
+    df = pd.read_csv(file)
+    df.apply(lambda row: cl_get_or_create_consolidated(row), axis=1)
+

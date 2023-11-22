@@ -8,13 +8,17 @@ var KTDatatablesServerSide = function () {
     var filterPayment;
     var editor;
 
-    // Private functions
-    var initDatatable = function () {
+    /*
+   * Initializes the datatable.
+   * @param  {String} initialValue  If it comes from another page, it is initialized with this value.
+   */
+    var initDatatable = function ( initialValue ) {
 
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
 
         dt = $(".table").DataTable({
             // searchDelay: 500,
+            pageLength: 100,
             processing: true,
             serverSide: true,
             order: [[0, 'desc']],
@@ -50,6 +54,7 @@ var KTDatatablesServerSide = function () {
                   }
               }
             },
+
             columns: [
                 { data: 'pr_id' },
                 { data: 'abbreviation' },
@@ -163,13 +168,13 @@ var KTDatatablesServerSide = function () {
 
         // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
         dt.on('draw', function () {
-            // initToggleToolbar();
+            initToggleToolbar();
             toggleToolbars();
             handleDeleteRows();
             handleResetForm();
             KTMenu.createInstances();
         });
-    }
+    };
 
     // Search Datatable --- official docs reference: https://datatables.net/reference/api/search()
     var handleSearchDatatable = function () {
@@ -205,9 +210,9 @@ var KTDatatablesServerSide = function () {
             // Filter datatable --- official docs reference: https://datatables.net/reference/api/search()
             dt.search(paymentValue).draw();
         });
-    }
+    };
 
-    // Delete customer
+    // Delete project
     var handleDeleteRows = () => {
         // Select all delete buttons
         const deleteButtons = document.querySelectorAll('[data-kt-docs-table-filter="delete_row"]');
@@ -301,7 +306,7 @@ var KTDatatablesServerSide = function () {
             // Reset datatable --- official docs reference: https://datatables.net/reference/api/search()
             dt.search('').draw();
         });
-    }
+    };
 
     // Init toggle toolbar
     var initToggleToolbar = function () {
@@ -318,6 +323,7 @@ var KTDatatablesServerSide = function () {
             // Checkbox on click event
             c.addEventListener('click', function () {
                 setTimeout(function () {
+                    console.log("111");
                     toggleToolbars();
                 }, 50);
             });
@@ -326,57 +332,93 @@ var KTDatatablesServerSide = function () {
         // Deleted selected rows
         deleteSelected.addEventListener('click', function () {
             // SweetAlert2 pop up --- official docs reference: https://sweetalert2.github.io/
-            // Swal.fire({
-            //     text: "Are you sure you want to delete selected customers?",
-            //     icon: "warning",
-            //     showCancelButton: true,
-            //     buttonsStyling: false,
-            //     showLoaderOnConfirm: true,
-            //     confirmButtonText: "Yes, delete!",
-            //     cancelButtonText: "No, cancel",
-            //     customClass: {
-            //         confirmButton: "btn fw-bold btn-danger",
-            //         cancelButton: "btn fw-bold btn-active-light-primary"
-            //     },
-            // }).then(function (result) {
-            //     if (result.value) {
-            //         // Simulate delete request -- for demo purpose only
-            //         Swal.fire({
-            //             text: "Deleting selected records",
-            //             icon: "info",
-            //             buttonsStyling: false,
-            //             showConfirmButton: false,
-            //             timer: 2000
-            //         }).then(function () {
-            //             Swal.fire({
-            //                 text: "You have deleted all selected customers!.",
-            //                 icon: "success",
-            //                 buttonsStyling: false,
-            //                 confirmButtonText: "Ok, got it!",
-            //                 customClass: {
-            //                     confirmButton: "btn fw-bold btn-primary",
-            //                 }
-            //             }).then(function () {
-            //                 // delete row data from server and re-draw datatable
-            //                 dt.draw();
-            //             });
-            //
-            //             // Remove header checked box
-            //             const headerCheckbox = container.querySelectorAll('[type="checkbox"]')[0];
-            //             headerCheckbox.checked = false;
-            //         });
-            //     } else if (result.dismiss === 'cancel') {
-            //         Swal.fire({
-            //             text: "Selected customers could not be deleted.",
-            //             icon: "error",
-            //             buttonsStyling: false,
-            //             confirmButtonText: "Ok, got it!",
-            //             customClass: {
-            //                 confirmButton: "btn fw-bold btn-primary",
-            //             }
-            //         });
-            //     }
-            // });
+            Swal.fire({
+                text: "Are you sure you want to delete selected records?",
+                icon: "warning",
+                showCancelButton: true,
+                buttonsStyling: false,
+                showLoaderOnConfirm: true,
+                confirmButtonText: "Yes, delete!",
+                cancelButtonText: "No, cancel",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-danger",
+                    cancelButton: "btn fw-bold btn-active-light-primary"
+                },
+            }).then(function (result) {
+                if (result.value) {
+                    // Simulate delete request -- for demo purpose only
+                    Swal.fire({
+                        text: "Deleting selected records",
+                        icon: "info",
+                        buttonsStyling: false,
+                        showConfirmButton: false,
+                        timer: 2000
+                    }).then(function () {
+
+                        function getSelectedRows() {
+
+                        const container = document.querySelector('.table');
+
+                        const selectedRows = container.querySelectorAll('[type="checkbox"]:checked');
+
+                        const selectedIds = [];
+
+                        selectedRows.forEach((p) => {
+                          // Select parent row
+                          const parent = p.closest('tr');
+                          // Get customer name
+                          const id = parent.querySelector('input[type=checkbox]').value;
+
+                          selectedIds.push(id);
+
+                        });
+
+                        return JSON.stringify(selectedIds);
+                      }
+
+                        // Calling delete request with ajax
+                        $.ajax({
+                            type: "GET",
+                            url: "/projects/batch_delete",
+                            data: {
+                              "selected_ids": getSelectedRows(),
+                            },
+                            error: function (xhr, ajaxOptions, thrownError) {
+                                swal("Error deleting!", "Please try again", "error");
+                            }
+                        }).done(function (result) {
+                            if (result.deleted) {
+                              Swal.fire({
+                                  text: "Projects(s) was deleted succesfully.",
+                                  icon: "info",
+                                  buttonsStyling: false,
+                                  confirmButtonText: "Ok, got it!",
+                                  customClass: {
+                                      confirmButton: "btn fw-bold btn-success",
+                                  }
+                              }).then(function(){
+                                dt.draw();
+                              });
+                            }
+                            else {
+                              Swal.fire({
+                                  text: "Projects(s) wasn't deleted!",
+                                  icon: "error",
+                                  buttonsStyling: false,
+                                  confirmButtonText: "Ok, got it!",
+                                  customClass: {
+                                      confirmButton: "btn fw-bold btn-success",
+                                  }
+                              });
+                            }
+                        });
+
+                        // Remove header checked box
+                        const headerCheckbox = container.querySelectorAll('[type="checkbox"]')[0];
+                        headerCheckbox.checked = false;
+                    });
+                }
+            });
         });
     }
 
@@ -412,8 +454,9 @@ var KTDatatablesServerSide = function () {
             toolbarBase.classList.remove('d-none');
             toolbarSelected.classList.add('d-none');
         }
-    }
+    };
 
+    // Provides the datatable to be fully editable. official docs for more info  --> https://editor.datatables.net
     var initEditor = function () {
 
       var piOptions = [];
@@ -514,20 +557,20 @@ var KTDatatablesServerSide = function () {
             editor.inline( cell.index() );
        });
 
-    }
+    };
 
     // Public methods
     return {
         init: function () {
             initDatatable();
             handleSearchDatatable();
-            // initToggleToolbar();
+            initToggleToolbar();
             handleFilterDatatable();
             handleDeleteRows();
             handleResetForm();
             initEditor();
         }
-    }
+    };
 }();
 
 // On document ready

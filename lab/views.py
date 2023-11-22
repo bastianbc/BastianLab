@@ -6,12 +6,13 @@ import json
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required,permission_required
 from core.decorators import permission_required_for_async
+from blocks.models import Blocks
 
 @permission_required_for_async("lab.view_patients")
 def filter_patients(request):
     from .serializers import PatientsSerializer
     from django.http import JsonResponse
-
+    # _cerate_patients_from_consolidated_data()
     patients = Patients().query_by_args(**request.GET)
     serializer = PatientsSerializer(patients['items'], many=True)
     result = dict()
@@ -118,3 +119,50 @@ def export_csv_all_data(request):
         writer.writerow([getattr(patient, field) for field in field_names])
 
     return response
+
+
+def get_race(value):
+    for x in Patients.RACE_TYPES:
+        if value.lower() == x[1].lower():
+            return x[0]
+    return 7
+
+def _pat_get_or_create(fields:dict):
+    try:
+        pat = Patients.objects.get(pat_id=fields.get("Pat_ID"))
+        pat.sex = fields.get("Gender","")
+        pat.race = get_race(fields.get("Race",""))
+        pat.source = fields.get("Source","")
+        pat.notes = fields.get("Notes","")
+        pat.save()
+    except Exception as e:
+        print(e)
+
+def _pat_get_or_create_consolidated(row):
+    try:
+        print(row["pat_id"], row["Block"])
+        b = Blocks.objects.get(name=row["Block"])
+        b.patient = Patients.objects.get(pat_id=str(row["pat_id"]).replace(".0",""))
+        b.save()
+        print("saved")
+    except Exception as e:
+        print(e)
+
+
+def _cerate_patients_from_airtable():
+    from pyairtable import Api
+    api = Api('keyEDswuVpUGOz8Tp')
+    pat_table = api.table("appA7qA5hhuLgiAwt", "tblxWxK1fH2VMbI4Q")
+    block_table = api.table("appA7qA5hhuLgiAwt", "tblv5WQXW7cNCbt0o")
+    for i in pat_table.all():
+        # print(i.get("fields"))
+        _pat_get_or_create(i.get("fields"))
+
+def _cerate_patients_from_consolidated_data():
+    import pandas as pd
+    from pathlib import Path
+
+    file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
+    df = pd.read_csv(file)
+    df[~df["pat_id"].isnull()].apply(lambda row: _pat_get_or_create_consolidated(row), axis=1)
+

@@ -6,10 +6,13 @@ from django.http import JsonResponse
 import json
 from .serializers import ProjectsSerializer
 from django.contrib.auth.decorators import login_required,permission_required
+from django.core.exceptions import ObjectDoesNotExist
+from datetime import datetime
+from django.db.utils import IntegrityError
+from django.core.exceptions import MultipleObjectsReturned
 
 @login_required
 def filter_projects(request):
-
     projects = Projects().query_by_args(request.user,**request.GET)
     serializer = ProjectsSerializer(projects['items'], many=True)
     result = dict()
@@ -17,7 +20,6 @@ def filter_projects(request):
     result['draw'] = projects['draw']
     result['recordsTotal'] = projects['total']
     result['recordsFiltered'] = projects['count']
-
     return JsonResponse(result)
 
 @permission_required("projects.view_projects",raise_exception=True)
@@ -93,3 +95,50 @@ def delete_project(request,id):
 
 def get_pi_options(request):
     return JsonResponse([{"label":"---------","value":""}] + [{ "label":c[1], "value":c[0] } for c in Projects.PI_CHOICES], safe=False)
+
+
+@permission_required("projects.delete_projects",raise_exception=True)
+def delete_batch_projects(request):
+    try:
+        selected_ids = json.loads(request.GET.get("selected_ids"))
+        Projects.objects.filter(pr_id__in=selected_ids).delete()
+    except Exception as e:
+        return JsonResponse({ "deleted":False })
+
+    return JsonResponse({ "deleted":True })
+
+def get_abb(i, name):
+    l = [s[:i] for s in name.split()]
+    return ("".join(l)).upper()[:6]
+
+
+
+def get_or_create_projects(name):
+    try:
+        try:
+            return Projects.objects.get(name=name)
+        except MultipleObjectsReturned:
+            return
+    except ObjectDoesNotExist as e:
+        try:
+            Projects.objects.create(
+                            name=name,
+                            abbreviation=get_abb(1, name),
+                            speedtype="",
+                            date_start=datetime.now(),
+                        )
+        except IntegrityError as e:
+            Projects.objects.create(
+                name=name,
+                abbreviation=get_abb(2, name),
+                speedtype="",
+                date_start=datetime.now(),
+            )
+
+def _cerate_projects_from_airtable():
+    from pyairtable import Api
+    api = Api('keyEDswuVpUGOz8Tp')
+    t = api.table("appA7qA5hhuLgiAwt", "tblv5WQXW7cNCbt0o")
+    for i in t.all():
+        for s in i.get("fields").get("Assigned project", []):
+            get_or_create_projects(s)

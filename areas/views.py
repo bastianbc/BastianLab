@@ -7,11 +7,15 @@ from django.contrib import messages
 from blocks.models import *
 from django.contrib.auth.decorators import login_required,permission_required
 from core.decorators import permission_required_for_async
+from pyairtable import Api
+import pandas as pd
+from pathlib import Path
+
 
 @permission_required_for_async("areas.view_areas")
 def filter_areas(request):
     from .serializers import AreasSerializer
-
+    # _create_areas_from_consolidated_data()
     areas = Areas().query_by_args(request.user,**request.GET)
     serializer = AreasSerializer(areas['items'], many=True)
     result = dict()
@@ -143,3 +147,75 @@ def check_can_deleted_async(request):
             })
 
     return JsonResponse({"related_objects":related_objects})
+
+def get_block(pk):
+    try:
+        api = Api('keyEDswuVpUGOz8Tp')
+        t = api.table("appA7qA5hhuLgiAwt", "tblv5WQXW7cNCbt0o")
+        return Blocks.objects.get(name=t.get(pk).get("fields").get("Block_ID"))
+    except Exception as e:
+        print(e, pk)
+
+def get_area_type(value):
+    for x in Areas.AREA_TYPE_TYPES:
+        if value.lower() == x[1].lower():
+            return x[0]
+    return None
+
+def get_or_create_areas(field:dict):
+    try:
+        Areas.objects.create(name=field.get("Area_ID"),
+                             block=get_block(field.get("Block_ID")[0]))
+        print("created")
+    except Exception as e:
+        print(e)
+
+def get_or_create_areas_from_file(row):
+    try:
+        if not row["Block_ID"]:
+            return
+        print(row["Area_ID"], row["Block_ID"])
+        Areas.objects.get(name=row["Area_ID"])
+
+    except Exception as e:
+        try:
+            b = Blocks.objects.get(name="UndefinedBlock")
+            Areas.objects.create(name=row["Area_ID"],
+                                 block=b,
+                                 area_type="other")
+            print("created")
+        except Exception as e:
+            print("error"*10,e)
+
+
+
+
+def _create_blocks_airtable():
+    api = Api('keyEDswuVpUGOz8Tp')
+    t = api.table("appA7qA5hhuLgiAwt", "tblBuw1B6zkdTRK3a")
+    for i in t.all():
+        get_or_create_areas(i.get("fields"))
+
+def _create_areas_from_file():
+    file = Path(Path(__file__).parent.parent / "uploads" / "Areas-Grid view-3.csv")
+    df = pd.read_csv(file)
+    # print(df[df["Block_ID"]])
+    df[df["Block_ID"].isnull()].apply(lambda row: get_or_create_areas_from_file(row), axis=1)
+
+
+def get_or_create_areas_consolidated(row):
+    try:
+        print(row["Area_id"], row["Block"])
+        b = Blocks.objects.get(name=row["Block"])
+        Areas.objects.create(name=row["Area_id"],
+                             block=b,
+                             area_type=row["Area"])
+        print("created")
+    except Exception as e:
+        print("error"*3,e)
+
+def _create_areas_from_consolidated_data():
+    file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
+    df = pd.read_csv(file)
+    df.apply(lambda row: get_or_create_areas_consolidated(row), axis=1)
+
