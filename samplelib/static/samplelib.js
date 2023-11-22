@@ -705,6 +705,7 @@ var KTDatatablesServerSide = function () {
             });
           }
           else {
+              console.log(result.error);
             Swal.fire({
                 text: "Captured Library(s) could not be created.",
                 icon: "error",

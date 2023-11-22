@@ -13,7 +13,7 @@ class NucAcidForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(NucAcidForm, self).__init__(*args, **kwargs)
         self.fields["name"].required = False
-        self.fields["amount"].initial = kwargs["instance"].amount
+
 
 class SampleLibCreationOptionsForm(forms.Form):
     barcode_start_with = forms.ModelChoiceField(queryset = Barcode.objects.filter(barcode_set__active=True))

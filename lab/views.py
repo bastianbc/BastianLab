@@ -148,16 +148,6 @@ def _pat_get_or_create_consolidated(row):
     except Exception as e:
         print(e)
 
-
-def _cerate_patients_from_airtable():
-    from pyairtable import Api
-    api = Api('keyEDswuVpUGOz8Tp')
-    pat_table = api.table("appA7qA5hhuLgiAwt", "tblxWxK1fH2VMbI4Q")
-    block_table = api.table("appA7qA5hhuLgiAwt", "tblv5WQXW7cNCbt0o")
-    for i in pat_table.all():
-        # print(i.get("fields"))
-        _pat_get_or_create(i.get("fields"))
-
 def _cerate_patients_from_consolidated_data():
     import pandas as pd
     from pathlib import Path
@@ -165,4 +155,3 @@ def _cerate_patients_from_consolidated_data():
     file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
     df = pd.read_csv(file)
     df[~df["pat_id"].isnull()].apply(lambda row: _pat_get_or_create_consolidated(row), axis=1)
-

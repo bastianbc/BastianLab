@@ -46,4 +46,5 @@ class UsedSampleLibSerializer(serializers.ModelSerializer):
         return obj.sample_lib.vol_remain
 
     def get_barcode(self, obj):
+        import pdb; pdb.set_trace()
         return obj.sample_lib.barcode.name
