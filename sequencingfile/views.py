@@ -15,7 +15,6 @@ def sequencingfiles(request):
 
 @permission_required_for_async("sequencingfile.view_sequencingfile")
 def filter_sequencingfiles(request):
-    _cerate_files_from_consolideated_data()
     sequencingfiles = SequencingFile().query_by_args(request.user,**request.GET)
     serializer = SequencingFileSerializer(sequencingfiles['items'], many=True)
     result = dict()
