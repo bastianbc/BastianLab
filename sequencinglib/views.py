@@ -10,9 +10,6 @@ from capturedlib.models import *
 from sequencingrun.forms import *
 from datetime import datetime
 from core.decorators import permission_required_for_async
-import pandas as pd
-from pathlib import Path
-
 
 @permission_required("sequencinglib.view_sequencinglib",raise_exception=True)
 def sequencinglibs(request):
@@ -60,10 +57,10 @@ def new_sequencinglib(request):
         form = SequencingLibForm(request.POST, request.FILES)
         if form.is_valid():
             sequencinglib = form.save()
-            messages.success(request,"Captured Library %s was created successfully." % sequencinglib.name)
+            messages.success(request,"Captured Library %s created successfully." % sequencinglib.name)
             return redirect("sequencinglibs")
         else:
-            messages.error(request,"Captured Library wasn't created.")
+            messages.error(request,"Captured Library could not be created.")
     else:
         form = SequencingLibForm()
 
@@ -112,7 +109,7 @@ def new_sequencinglib_async(request):
 @permission_required_for_async("sequencinglib.view_sequencinglib")
 def get_sequencinglib_async(request,id):
     sequencing_lib = SequencingLib.objects.get(id=id)
-    serializer = SequencingLibSerializer(sequencing_lib)
+    serializer = SingleSequencingLibSerializer(sequencing_lib,many=False)
     return JsonResponse(serializer.data, safe=False)
 
 @permission_required_for_async("sequencinglib.add_sequencinglib")
@@ -155,10 +152,10 @@ def edit_sequencinglib(request,id):
         form = SequencingLibForm(request.POST,request.FILES,instance=sequencinglib)
         if form.is_valid():
             sequencinglib = form.save()
-            messages.success(request,"Captured Library %s was updated successfully." % sequencinglib.name)
+            messages.success(request,"Captured Library %s updated successfully." % sequencinglib.name)
             return redirect("sequencinglibs")
         else:
-            messages.error(request,"Captured Library wasn't updated!")
+            messages.error(request,"Captured Library could not be updated!")
     else:
         form = SequencingLibForm(instance=sequencinglib)
 
@@ -169,10 +166,10 @@ def delete_sequencinglib(request,id):
     try:
         sequencinglib = SequencingLib.objects.get(id=id)
         sequencinglib.delete()
-        messages.success(request,"Captured Library %s was deleted successfully." % sequencinglib.name)
+        messages.success(request,"Captured Library %s deleted successfully." % sequencinglib.name)
         deleted = True
     except Exception as e:
-        messages.error(request, "Captured Library wasn't deleted!")
+        messages.error(request, "Captured Library could not be deleted!")
         deleted = False
 
     return JsonResponse({"deleted":deleted })
@@ -271,68 +268,3 @@ def check_can_deleted_async(request):
 
 def get_buffers(request):
     return JsonResponse([{"label":"---------","value":""}] + [{ "label":c[1], "value":c[0] } for c in SequencingLib.BUFFER_TYPES], safe=False)
-
-
-def get_or_create_seql(value):
-    if value:
-        obj, created = SequencingLib.objects.get_or_create(
-            name=value
-        )
-        return obj
-    return None
-
-def get_or_create_cl_seql(seqLib,cl):
-    if seqLib:
-        obj, created = CL_SEQL_LINK.objects.get_or_create(
-            sequencing_lib=seqLib, captured_lib=cl
-        )
-        return obj
-    return None
-
-def get_or_create_seqrun(value):
-    if value:
-        obj, created = SequencingRun.objects.get_or_create(
-            name=value
-        )
-        return obj
-    return None
-
-def seql_get_or_create_at(row):
-    try:
-        print(row["CL_ID"], row["Sequencing_run_ID"])
-        cl = CapturedLib.objects.get(name=row["CL_ID"])
-        for ss in row["Sequencing_run_ID"].replace(";",",").split(","):
-            print(ss.strip())
-            seq_run = get_or_create_seqrun(ss.strip())
-            name = ss.strip() + "_SeqL"
-            seqLib = get_or_create_seql(name)
-            seq_run.sequencing_libs.add(seqLib)
-            get_or_create_cl_seql(seqLib, cl)
-        print("created")
-    except Exception as e:
-        print(e)
-
-
-def _cerate_seql_from_at():
-    file = Path(Path(__file__).parent.parent / "uploads" / "Captured Library and Sequencing Run-Grid view-3.csv")
-    df = pd.read_csv(file)
-    df[~pd.isnull(df["Sequencing_run_ID"])].apply(lambda row: seql_get_or_create_at(row), axis=1)
-
-
-def ss_get_or_create_consolidated(row):
-    print(row["CL"], row["Sequencing Run"], row["SeqL"])
-    cl = CapturedLib.objects.get(name=row["CL"])
-    seq_run = get_or_create_seqrun(row["Sequencing Run"])
-    seqLib = get_or_create_seql(row["SeqL"])
-    seq_run.sequencing_libs.add(seqLib)
-    get_or_create_cl_seql(seqLib, cl)
-    print("created")
-
-
-
-def _cerate_ss_from_consolideated_data():
-    file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
-    df = pd.read_csv(file)
-    df.apply(lambda row: ss_get_or_create_consolidated(row), axis=1)
-
-

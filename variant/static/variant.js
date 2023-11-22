@@ -274,7 +274,7 @@ var KTDatatablesServerSide = function () {
                                 headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
                                 error: function (xhr, ajaxOptions, thrownError) {
                                   Swal.fire({
-                                      text: name + " was not deleted.",
+                                      text: name + " could not be deleted.",
                                       icon: "error",
                                       buttonsStyling: false,
                                       confirmButtonText: "Ok, got it!",
@@ -286,7 +286,7 @@ var KTDatatablesServerSide = function () {
                             }).done(function () {
 
                               Swal.fire({
-                                    text: "Sequencing Run was deleted succesfully.",
+                                    text: "Sequencing Run deleted succesfully.",
                                     icon: "info",
                                     buttonsStyling: false,
                                     confirmButtonText: "Ok, got it!",
@@ -639,7 +639,7 @@ var KTDatatablesServerSide = function () {
                         }).done(function (result) {
                             if (result.deleted) {
                               Swal.fire({
-                                  text: "Sequencing Run(s) was deleted succesfully.",
+                                  text: "Sequencing Run(s) deleted succesfully.",
                                   icon: "info",
                                   buttonsStyling: false,
                                   confirmButtonText: "Ok, got it!",
@@ -652,7 +652,7 @@ var KTDatatablesServerSide = function () {
                             }
                             else {
                               Swal.fire({
-                                  text: "Sequencing Run(s) wasn't deleted!",
+                                  text: "Sequencing Run(s) could not be deleted!",
                                   icon: "error",
                                   buttonsStyling: false,
                                   confirmButtonText: "Ok, got it!",

@@ -1,13 +1,12 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required,permission_required
 from core.decorators import permission_required_for_async
 from .models import SequencingFile
 from .serializers import SequencingFileSerializer
 from django.http import JsonResponse
-import pandas as pd
-from pathlib import Path
+from .forms import SequencingFileForm
+from django.contrib import messages
 import json
-from samplelib.models import SampleLib
 
 @permission_required("sequencingfile.view_sequencingfile",raise_exception=True)
 def sequencingfiles(request):
@@ -25,76 +24,73 @@ def filter_sequencingfiles(request):
 
     return JsonResponse(result)
 
+@permission_required("sequencingfile.add_sequencingfile",raise_exception=True)
+def new_sequencingfile(request):
+    if request.method=="POST":
+        form = SequencingFileForm(request.POST)
+        if form.is_valid():
+            sequencingfile = form.save()
+            messages.success(request,"Sequencing File %s created successfully." % sequencingfile.folder_name)
+            return redirect("sequencingfiles")
+        else:
+            messages.error(request,"Sequencing File could not be created.")
+    else:
+        form = SequencingFileForm()
 
-def get_or_create_fastq_file(d:dict):
+    return render(request,"sequencingfile.html",locals())
 
-    SequencingFile.objects.create(
-        sample_lib=d.get("sample_lib"),
-        folder_name=d.get("folder_name"),
-        read1_file=d.get("read1_file"),
-        read1_checksum=d.get("read1_checksum"),
-        read2_file=d.get("read2_file"),
-        read2_checksum=d.get("read2_checksum"),
-        path=d.get("fastq_path")
-    )
+@permission_required("sequencingfile.change_sequencingfile",raise_exception=True)
+def edit_sequencingfile(request,id):
+    sequencingfile = SequencingFile.objects.get(id=id)
 
+    if request.method=="POST":
+        form = SequencingFileForm(request.POST,instance=sequencingfile)
+        if form.is_valid():
+            sequencingfile = form.save()
+            messages.success(request,"Sequencing File %s updated successfully." % sequencingfile.folder_name)
+            return redirect("sequencingfiles")
+        else:
+            messages.error(request,"Sequencing File could not be updated!")
+    else:
+        form = SequencingFileForm(instance=sequencingfile)
 
+    return render(request,"sequencingfile.html",locals())
 
+@permission_required("sequencingfile.delete_sequencingfile",raise_exception=True)
+def delete_sequencingfile(request,id):
+    try:
+        sequencingfile = SequencingFile.objects.get(id=id)
+        sequencingfile.delete()
+        messages.success(request,"Sequencing File %s deleted successfully." % sequencingfile.name)
+        deleted = True
+    except Exception as e:
+        messages.error(request, "Sequencing File could not be deleted!")
+        deleted = False
 
-def get_or_create_sample_lib(value):
-    if value:
-        obj, created = SampleLib.objects.get_or_create(
-            name=value
-        )
-        print("created")
-        return obj
-    return None
+    return JsonResponse({"deleted":deleted })
 
-def file_get_or_create_from_report(row):
+@permission_required("sequencingfile.delete_sequencingfile",raise_exception=True)
+def delete_batch_sequencingfiles(request):
+    try:
+        selected_ids = json.loads(request.GET.get("selected_ids"))
+        SequencingFile.objects.filter(id__in=selected_ids).delete()
+    except Exception as e:
+        print(str(e))
+        return JsonResponse({ "deleted":False })
 
-    d={}
-    d["read1_file"] = ""
-    d["read1_checksum"] = ""
-    d["read2_file"] = ""
-    d["read2_checksum"] = ""
-    sl = get_or_create_sample_lib(row["sample_lib"])
-    d["sample_lib"]=sl
-    print("SLLLL:",sl)
-    for k,v in row["fastq_file"].items():
-        file=k.strip()
-        d["folder_name"] = row["sequencing_run"]
-        if "_R1_" in file:
-            d["read1_file"] = file
-            d["read1_checksum"] = v if v else None
-        if "_R2_" in file:
-            d["read2_file"] = file
-            d["read2_checksum"] = v if v else None
-        d["path"] = row["fastq_path"]
+    return JsonResponse({ "deleted":True })
 
-        get_or_create_fastq_file(d)
-        print("created")
+@permission_required_for_async("sequencingfile.sequencingfile_blocks")
+def check_can_deleted_async(request):
+    id = request.GET.get("id")
+    instance = SequencingFile.objects.get(id=id)
+    related_objects = []
+    for field in instance._meta.related_objects:
+        relations = getattr(instance,field.related_name)
+        if relations.count() > 0:
+            related_objects.append({
+                "model": field.related_model.__name__,
+                "count": relations.count()
+            })
 
-def _cerate_files_from_consolideated_data():
-    file = Path(Path(__file__).parent.parent / "uploads" / "m.csv")
-    df = pd.read_csv(file)
-
-    df['fastq_file'] = df['fastq_file'].str.replace('"', "'").str.replace("'", '"')
-    df["fastq_file"] = df["fastq_file"].astype('str')
-
-    df['bam_bai_file'] = df['bam_bai_file'].str.replace('"', "'").str.replace("'", '"')
-    df["bam_bai_file"] = df["bam_bai_file"].astype('str')
-
-    df['bam_file'] = df['bam_file'].str.replace('"', "'").str.replace("'", '"')
-    df["bam_file"] = df["bam_file"].astype('str')
-
-    def make_dict(d):
-        try:
-            return json.loads(d)
-        except:
-            return None
-
-    df["fastq_file"] = df["fastq_file"].apply(lambda x: make_dict(x))
-    df["bam_bai_file"] = df["fastq_file"].apply(lambda x: make_dict(x))
-    df["bam_file"] = df["fastq_file"].apply(lambda x: make_dict(x))
-
-    df[~pd.isnull(df["fastq_file"])].apply(lambda row: file_get_or_create_from_report(row), axis=1)
+    return JsonResponse({"related_objects":related_objects})

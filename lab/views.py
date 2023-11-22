@@ -33,10 +33,10 @@ def new_patient(request):
         form = PatientForm(request.POST)
         if form.is_valid():
             patient = form.save()
-            messages.success(request,"Patient %s was created successfully." % patient.pat_id)
+            messages.success(request,"Patient %s created successfully." % patient.pat_id)
             return redirect("patients")
         else:
-            messages.error(request,"Patient wasn't created.")
+            messages.error(request,"Patient could not be created.")
     else:
         form = PatientForm()
 
@@ -50,10 +50,10 @@ def edit_patient(request,id):
         form = PatientForm(request.POST,instance=patient)
         if form.is_valid():
             patient = form.save()
-            messages.success(request,"Patient %s was updated successfully." % patient.pat_id)
+            messages.success(request,"Patient %s updated successfully." % patient.pat_id)
             return redirect("patients")
         else:
-            messages.error(request,"Patient wasn't updated!")
+            messages.error(request,"Patient could not be updated!")
     else:
         form = PatientForm(instance=patient)
 
@@ -87,10 +87,10 @@ def delete_patient(request,id):
     try:
         patient = Patients.objects.get(pat_id=id)
         patient.delete()
-        messages.success(request,"Patient %s was deleted successfully." % patient.pat_id)
+        messages.success(request,"Patient %s deleted successfully." % patient.pat_id)
         deleted = True
     except Exception as e:
-        messages.error(request, "Patient %s wasn't deleted!" % patient.pat_id)
+        messages.error(request, "Patient %s could not be deleted!" % patient.pat_id)
         deleted = False
 
     return JsonResponse({ "deleted":True })
@@ -148,16 +148,6 @@ def _pat_get_or_create_consolidated(row):
     except Exception as e:
         print(e)
 
-
-def _cerate_patients_from_airtable():
-    from pyairtable import Api
-    api = Api('keyEDswuVpUGOz8Tp')
-    pat_table = api.table("appA7qA5hhuLgiAwt", "tblxWxK1fH2VMbI4Q")
-    block_table = api.table("appA7qA5hhuLgiAwt", "tblv5WQXW7cNCbt0o")
-    for i in pat_table.all():
-        # print(i.get("fields"))
-        _pat_get_or_create(i.get("fields"))
-
 def _cerate_patients_from_consolidated_data():
     import pandas as pd
     from pathlib import Path
@@ -165,4 +155,3 @@ def _cerate_patients_from_consolidated_data():
     file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
     df = pd.read_csv(file)
     df[~df["pat_id"].isnull()].apply(lambda row: _pat_get_or_create_consolidated(row), axis=1)
-

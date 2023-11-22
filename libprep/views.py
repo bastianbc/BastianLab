@@ -11,10 +11,6 @@ from django.contrib.auth.decorators import login_required,permission_required
 from core.decorators import *
 from core.utils import custom_update
 from .serializers import NucacidsSerializer
-from pyairtable import Api
-import pandas as pd
-from pathlib import Path
-
 
 @permission_required("libprep.view_nucacids",raise_exception=True)
 def nucacids(request):
@@ -62,10 +58,10 @@ def new_nucacid(request):
         form = NucAcidForm(request.POST)
         if form.is_valid():
             nucacid = form.save()
-            messages.success(request,"Nuclecic Acid %s was created successfully." % nucacid.nu_id)
+            messages.success(request,"Nuclecic Acid %s created successfully." % nucacid.nu_id)
             return redirect("nucacids")
         else:
-            messages.error(request,"Nucleic Acid wasn't created.")
+            messages.error(request,"Nucleic Acid could not be created.")
     else:
         form = NucAcidForm()
 
@@ -109,10 +105,10 @@ def edit_nucacid(request,id):
         form = NucAcidForm(request.POST,instance=nucacid)
         if form.is_valid():
             nucacid = form.save()
-            messages.success(request,"Nuclecic Acid %s was updated successfully." % nucacid.nu_id)
+            messages.success(request,"Nuclecic Acid %s updated successfully." % nucacid.nu_id)
             return redirect("nucacids")
         else:
-            messages.error(request,"Nucleic Acid wasn't updated!")
+            messages.error(request,"Nucleic Acid could not be updated!")
     else:
         form = NucAcidForm(instance=nucacid)
 
@@ -123,10 +119,10 @@ def delete_nucacid(request,id):
     try:
         nucacid = NucAcids.objects.get(nu_id=id)
         nucacid.delete()
-        messages.success(request,"Nucleci Acid %s was deleted successfully." % nucacid.name)
+        messages.success(request,"Nucleci Acid %s deleted successfully." % nucacid.name)
         deleted = True
     except Exception as e:
-        messages.error(request, "Nuclecic Acid %s wasn't deleted!" % nucacid.name)
+        messages.error(request, "Nuclecic Acid %s could not be deleted!" % nucacid.name)
         deleted = False
 
     return JsonResponse({ "deleted":deleted })
@@ -159,90 +155,3 @@ def check_can_deleted_async(request):
             })
 
     return JsonResponse({"related_objects":related_objects})
-
-
-def get_na_type(value):
-    for x in NucAcids.NA_TYPES:
-        if value.lower() == x[1].lower():
-            return x[0]
-    return None
-
-
-def get_or_create_method(value):
-    if value:
-        obj, created = Method.objects.get_or_create(
-            name=value
-        )
-        return obj
-    return None
-
-def get_or_create_na_from_file(row):
-    try:
-        print(row["NA_ID"], row["Area ID"])
-        if pd.isnull(row["Area ID"]):
-            a = Areas.objects.get(name="UndefinedArea")
-        else:
-            try:
-                a = Areas.objects.get(name=row["Area ID"])
-            except:
-                a = Areas.objects.get(name="UndefinedArea")
-                print(f" {row['Area ID']} Areas matching query does not exist")
-        na = NucAcids.objects.get(name=row["NA_ID"])
-        na.area = a
-        na.conc = row["Qubit Concentration (ng/ul)"]
-        na.vol_init = row["Volumn (ul)"]
-        na.na_type = get_na_type(row["NA_TYPE"]) if not pd.isnull(row["NA_TYPE"]) else ""
-        na.method = get_or_create_method(row["Method"])
-        na.save()
-        print("saved")
-    except Exception as e:
-        print("error"*5,e)
-
-def get_o(row):
-    area_id = row["Area ID"].split(",")[0].strip()
-    print(row["Area ID"])
-    # try:
-    #     try:
-    #         a = Areas.objects.get(name=area_id)
-    #     except:
-    #         a = Areas.objects.get(name="UndefinedArea")
-    #         print(f" {area_id} Areas matching query does not exist")
-    #
-    #     na = NucAcids.objects.get(name=row["NA_ID"])
-    #     na.area = a
-    #     print("saved")
-    # except Exception as e:
-    #     print("error"*5,e)
-
-def _create_areas_from_file():
-    file = Path(Path(__file__).parent.parent / "uploads" / "Nucleic Acids-Grid view-4.csv")
-    df = pd.read_csv(file)
-    # print(df[df["Block_ID"]])
-    # df[~df["NA_ID"].isnull()].apply(lambda row: get_or_create_na_from_file(row), axis=1)
-    df[df["Area ID"].str.contains(",") & df["Area ID"].notna()].apply(lambda row: get_o(row), axis=1)
-
-
-def _na_get_or_create_consolidated(row):
-    try:
-        print(row["NA_id"], row["Area_id"])
-        na = NucAcids.objects.get(name=row["NA_id"])
-        na.area = Areas.objects.get(name=row["Area_id"])
-        na.save()
-        print("saved")
-    except Exception as e:
-        try:
-            NucAcids.objects.create(
-                name=row["NA_id"],
-                area=Areas.objects.get(name=row["Area_id"])
-            )
-            print("created"*3)
-        except Exception as ed:
-            print("not created", ed)
-
-def _cerate_na_from_consolidated_data():
-    file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
-    df = pd.read_csv(file)
-    df[~df["NA_id"].isnull()].apply(lambda row: _na_get_or_create_consolidated(row), axis=1)
-
-
-

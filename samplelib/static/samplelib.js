@@ -326,7 +326,7 @@ var KTDatatablesServerSide = function () {
                                 headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
                                 error: function (xhr, ajaxOptions, thrownError) {
                                   Swal.fire({
-                                      text: name + " was not deleted.",
+                                      text: name + " could not be deleted.",
                                       icon: "error",
                                       buttonsStyling: false,
                                       confirmButtonText: "Ok, got it!",
@@ -338,7 +338,7 @@ var KTDatatablesServerSide = function () {
                             }).done(function () {
 
                               Swal.fire({
-                                    text: "Sample Library was deleted succesfully.",
+                                    text: "Sample Library deleted succesfully.",
                                     icon: "info",
                                     buttonsStyling: false,
                                     confirmButtonText: "Ok, got it!",
@@ -695,7 +695,7 @@ var KTDatatablesServerSide = function () {
         }).done(function(result) {
           if (result.success) {
             Swal.fire({
-                text: `Captured Library(s) was created succesfully.`,
+                text: "Captured Library(s) created succesfully.",
                 icon: "info",
                 buttonsStyling: false,
                 confirmButtonText: "Ok, got it!",
@@ -707,8 +707,7 @@ var KTDatatablesServerSide = function () {
           else {
               console.log(result.error);
             Swal.fire({
-                title:`Captured Library(s) was not created.`,
-                text: `${result.error}`,
+                text: "Captured Library(s) could not be created.",
                 icon: "error",
                 buttonsStyling: false,
                 confirmButtonText: "Ok, got it!",
@@ -783,7 +782,7 @@ var KTDatatablesServerSide = function () {
                         }).done(function (result) {
                             if (result.deleted) {
                               Swal.fire({
-                                  text: "Sample Library(s) was deleted succesfully.",
+                                  text: "Sample Library(s) deleted succesfully.",
                                   icon: "info",
                                   buttonsStyling: false,
                                   confirmButtonText: "Ok, got it!",
@@ -796,7 +795,7 @@ var KTDatatablesServerSide = function () {
                             }
                             else {
                               Swal.fire({
-                                  text: "Sample Library(s) wasn't deleted!",
+                                  text: "Sample Library(s) could not be deleted!",
                                   icon: "error",
                                   buttonsStyling: false,
                                   confirmButtonText: "Ok, got it!",
@@ -810,7 +809,7 @@ var KTDatatablesServerSide = function () {
                     });
                 } else if (result.dismiss === 'cancel') {
                     Swal.fire({
-                        text: "Selected customers was not deleted.",
+                        text: "Selected customers could not be deleted.",
                         icon: "error",
                         buttonsStyling: false,
                         confirmButtonText: "Ok, got it!",

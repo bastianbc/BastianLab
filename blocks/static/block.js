@@ -299,7 +299,7 @@ var KTDatatablesServerSide = function () {
                                 headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
                                 error: function (xhr, ajaxOptions, thrownError) {
                                   Swal.fire({
-                                      text: name + " was not deleted.",
+                                      text: name + " could not be deleted.",
                                       icon: "error",
                                       buttonsStyling: false,
                                       confirmButtonText: "Ok, got it!",
@@ -311,7 +311,7 @@ var KTDatatablesServerSide = function () {
                             }).done(function () {
 
                               Swal.fire({
-                                    text: "Block was deleted succesfully.",
+                                    text: "Block deleted succesfully.",
                                     icon: "info",
                                     buttonsStyling: false,
                                     confirmButtonText: "Ok, got it!",
@@ -431,7 +431,7 @@ var KTDatatablesServerSide = function () {
                         }).done(function (result) {
                             if (result.deleted) {
                               Swal.fire({
-                                  text: "Block(s) was deleted succesfully.",
+                                  text: "Block(s) deleted succesfully.",
                                   icon: "info",
                                   buttonsStyling: false,
                                   confirmButtonText: "Ok, got it!",
@@ -444,7 +444,7 @@ var KTDatatablesServerSide = function () {
                             }
                             else {
                               Swal.fire({
-                                  text: "Block(s) wasn't deleted!",
+                                  text: "Block(s) could not be deleted!",
                                   icon: "error",
                                   buttonsStyling: false,
                                   confirmButtonText: "Ok, got it!",
@@ -529,7 +529,7 @@ var KTDatatablesServerSide = function () {
             }
             else {
               Swal.fire({
-                  text: "Areas(s) was not created.",
+                  text: "Areas(s) could not be created.",
                   icon: "error",
                   buttonsStyling: false,
                   confirmButtonText: "Ok, got it!",
@@ -596,7 +596,7 @@ var KTDatatablesServerSide = function () {
           }).done(function(result) {
             if (result.success) {
               Swal.fire({
-                  text: "Block(s) was added succesfully.",
+                  text: "Block(s) added succesfully.",
                   icon: "info",
                   buttonsStyling: false,
                   confirmButtonText: "Ok, got it!",
@@ -609,7 +609,7 @@ var KTDatatablesServerSide = function () {
             }
             else {
               Swal.fire({
-                  text: "Block(s) was not added.",
+                  text: "Block(s) could not be added.",
                   icon: "error",
                   buttonsStyling: false,
                   confirmButtonText: "Ok, got it!",
@@ -638,7 +638,7 @@ var KTDatatablesServerSide = function () {
           }).done(function(result) {
             if (result.success) {
               Swal.fire({
-                  text: "Block(s) was removed succesfully.",
+                  text: "Block(s) removed succesfully.",
                   icon: "info",
                   buttonsStyling: false,
                   confirmButtonText: "Ok, got it!",
@@ -651,7 +651,7 @@ var KTDatatablesServerSide = function () {
             }
             else {
               Swal.fire({
-                  text: "Block(s) was not removed.",
+                  text: "Block(s) could not be removed.",
                   icon: "error",
                   buttonsStyling: false,
                   confirmButtonText: "Ok, got it!",

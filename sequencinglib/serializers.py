@@ -22,6 +22,11 @@ class SequencingLibSerializer(serializers.ModelSerializer):
     def get_buffer_label(self,obj):
         return obj.get_buffer_display()
 
+class SingleSequencingLibSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SequencingLib
+        fields = "__all__"
+
 class UsedCapturedLibSerializer(serializers.ModelSerializer):
     # captured_lib = serializers.StringRelatedField()
     name = serializers.SerializerMethodField()

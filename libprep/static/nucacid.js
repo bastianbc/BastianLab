@@ -306,7 +306,7 @@ var KTDatatablesServerSide = function () {
                                 headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
                                 error: function (xhr, ajaxOptions, thrownError) {
                                   Swal.fire({
-                                      text: name + " was not deleted.",
+                                      text: name + " could not be deleted.",
                                       icon: "error",
                                       buttonsStyling: false,
                                       confirmButtonText: "Ok, got it!",
@@ -318,7 +318,7 @@ var KTDatatablesServerSide = function () {
                             }).done(function () {
 
                               Swal.fire({
-                                    text: "Nucleic acid was deleted succesfully.",
+                                    text: "Nucleic acid deleted succesfully.",
                                     icon: "info",
                                     buttonsStyling: false,
                                     confirmButtonText: "Ok, got it!",
@@ -543,7 +543,7 @@ var KTDatatablesServerSide = function () {
               if (result.success) {
 
                 Swal.fire({
-                    text: "Sample Library(s) was created succesfully.",
+                    text: "Sample Library(s) created succesfully.",
                     icon: "info",
                     buttonsStyling: false,
                     confirmButtonText: "Ok, got it!",
@@ -565,7 +565,7 @@ var KTDatatablesServerSide = function () {
               }
               else {
                 Swal.fire({
-                    text: "Sample Library(s) was not created.",
+                    text: "Sample Library(s) could not be created.",
                     icon: "error",
                     buttonsStyling: false,
                     confirmButtonText: "Ok, got it!",
@@ -597,7 +597,7 @@ var KTDatatablesServerSide = function () {
             }).done(function(result) {
               if (result.success) {
                 Swal.fire({
-                    text: "Sample Library(s) was updated succesfully.",
+                    text: "Sample Library(s) updated succesfully.",
                     icon: "info",
                     buttonsStyling: false,
                     confirmButtonText: "Ok, got it!",
@@ -611,7 +611,7 @@ var KTDatatablesServerSide = function () {
               }
               else {
                 Swal.fire({
-                    text: "Sample Library(s) was not updated.",
+                    text: "Sample Library(s) could not be updated.",
                     icon: "error",
                     buttonsStyling: false,
                     confirmButtonText: "Ok, got it!",
@@ -928,7 +928,7 @@ var KTDatatablesServerSide = function () {
                         }).done(function (result) {
                             if (result.deleted) {
                               Swal.fire({
-                                  text: "Nucleic Acid(s) was deleted succesfully.",
+                                  text: "Nucleic Acid(s) deleted succesfully.",
                                   icon: "info",
                                   buttonsStyling: false,
                                   confirmButtonText: "Ok, got it!",
@@ -941,7 +941,7 @@ var KTDatatablesServerSide = function () {
                             }
                             else {
                               Swal.fire({
-                                  text: "Nucleic Acid(s) wasn't deleted!",
+                                  text: "Nucleic Acid(s) could not be deleted!",
                                   icon: "error",
                                   buttonsStyling: false,
                                   confirmButtonText: "Ok, got it!",
@@ -955,7 +955,7 @@ var KTDatatablesServerSide = function () {
                     });
                 } else if (result.dismiss === 'cancel') {
                     Swal.fire({
-                        text: "Selected nucacids was not deleted.",
+                        text: "Selected nucacids could not be deleted.",
                         icon: "error",
                         buttonsStyling: false,
                         confirmButtonText: "Ok, got it!",

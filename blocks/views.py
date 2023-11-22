@@ -9,9 +9,6 @@ from projects.models import Projects
 from .serializers import BlocksSerializer
 from django.contrib.auth.decorators import login_required,permission_required
 from core.decorators import permission_required_for_async
-import pandas as pd
-from pathlib import Path
-
 
 @permission_required_for_async("blocks.view_blocks")
 def filter_blocks(request):

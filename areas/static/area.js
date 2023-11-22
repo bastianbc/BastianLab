@@ -307,7 +307,7 @@ var KTDatatablesServerSide = function () {
                                 headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
                                 error: function (xhr, ajaxOptions, thrownError) {
                                   Swal.fire({
-                                      text: name + " was not deleted.",
+                                      text: name + " could not be deleted.",
                                       icon: "error",
                                       buttonsStyling: false,
                                       confirmButtonText: "Ok, got it!",
@@ -319,7 +319,7 @@ var KTDatatablesServerSide = function () {
                             }).done(function () {
 
                               Swal.fire({
-                                    text: "Area was deleted succesfully.",
+                                    text: "Area deleted succesfully.",
                                     icon: "info",
                                     buttonsStyling: false,
                                     confirmButtonText: "Ok, got it!",
@@ -439,7 +439,7 @@ var KTDatatablesServerSide = function () {
                         }).done(function (result) {
                             if (result.deleted) {
                               Swal.fire({
-                                  text: "Area(s) was deleted succesfully.",
+                                  text: "Area(s) deleted succesfully.",
                                   icon: "info",
                                   buttonsStyling: false,
                                   confirmButtonText: "Ok, got it!",
@@ -452,7 +452,7 @@ var KTDatatablesServerSide = function () {
                             }
                             else {
                               Swal.fire({
-                                  text: "Area(s) wasn't deleted!",
+                                  text: "Area(s) could not be deleted!",
                                   icon: "error",
                                   buttonsStyling: false,
                                   confirmButtonText: "Ok, got it!",
@@ -554,7 +554,7 @@ var KTDatatablesServerSide = function () {
         }).done(function(result) {
           if (result.success) {
             Swal.fire({
-                text: "Nucleic acid(s) was created succesfully.",
+                text: "Nucleic acid(s) created succesfully.",
                 icon: "info",
                 buttonsStyling: false,
                 confirmButtonText: "Ok, got it!",
@@ -567,7 +567,7 @@ var KTDatatablesServerSide = function () {
           }
           else {
             Swal.fire({
-                text: "Area(s) was not created.",
+                text: "Area(s) could not be created.",
                 icon: "error",
                 buttonsStyling: false,
                 confirmButtonText: "Ok, got it!",

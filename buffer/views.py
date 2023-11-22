@@ -15,10 +15,10 @@ def new_buffer(request):
         form = BufferForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request,"Buffer was created successfully")
+            messages.success(request,"Buffer created successfully")
             return redirect('/buffer')
         else:
-            messages.error(request,"Buffer wasn't created!")
+            messages.error(request,"Buffer could not be created!")
     else:
         form = BufferForm()
     return render(request,"buffer.html",locals())
@@ -30,10 +30,10 @@ def edit_buffer(request,id):
         form = BufferForm(request.POST,instance=instance)
         if form.is_valid():
             form.save()
-            messages.success(request,"Buffer was updated successfully")
+            messages.success(request,"Buffer updated successfully")
             return redirect('/buffer')
         else:
-            messages.error(request,"Buffer wasn't updated!")
+            messages.error(request,"Buffer could not be updated!")
     else:
         form = BufferForm(instance=instance)
     return render(request,"buffer.html",locals())
@@ -43,9 +43,9 @@ def delete_buffer(request,id):
     try:
         instance = Buffer.objects.get(id=id)
         instance.delete()
-        messages.success(request, "Buffer was deleted successfully")
+        messages.success(request, "Buffer deleted successfully")
     except Exception as e:
-        messages.error(request, "Buffer wasn't deleted!")
+        messages.error(request, "Buffer could not be deleted!")
     
     return redirect('/buffer')
 
