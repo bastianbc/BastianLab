@@ -16,10 +16,10 @@ def new_method(request):
         form = MethodForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request,"Method was created successfully")
+            messages.success(request,"Method created successfully")
             return redirect('/method')
         else:
-            messages.error(request,"Method wasn't created!")
+            messages.error(request,"Method could not be created!")
     else:
         form = MethodForm()
     return render(request,"method.html",locals())
@@ -31,10 +31,10 @@ def edit_method(request,id):
         form = MethodForm(request.POST,instance=instance)
         if form.is_valid():
             form.save()
-            messages.success(request,"Method was updated successfully")
+            messages.success(request,"Method updated successfully")
             return redirect('/method')
         else:
-            messages.error(request,"Method wasn't updated!")
+            messages.error(request,"Method could not be updated!")
     else:
         form = MethodForm(instance=instance)
     return render(request,"method.html",locals())
@@ -44,9 +44,9 @@ def delete_method(request,id):
     try:
         instance = Method.objects.get(id=id)
         instance.delete()
-        messages.success(request, "Method was deleted successfully")
+        messages.success(request, "Method deleted successfully")
     except Exception as e:
-        messages.error(request, "Method wasn't deleted!")
+        messages.error(request, "Method could not be deleted!")
     
     return redirect('/method')
 

@@ -320,7 +320,7 @@ var KTDatatablesServerSide = function () {
                                 headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
                                 error: function (xhr, ajaxOptions, thrownError) {
                                   Swal.fire({
-                                      text: name + " was not deleted.",
+                                      text: name + " could not be deleted.",
                                       icon: "error",
                                       buttonsStyling: false,
                                       confirmButtonText: "Ok, got it!",
@@ -332,7 +332,7 @@ var KTDatatablesServerSide = function () {
                             }).done(function () {
 
                               Swal.fire({
-                                    text: "Captured Library was deleted succesfully.",
+                                    text: "Captured Library deleted succesfully.",
                                     icon: "info",
                                     buttonsStyling: false,
                                     confirmButtonText: "Ok, got it!",
@@ -758,7 +758,7 @@ var KTDatatablesServerSide = function () {
           }).done(function(result) {
             if (result.success) {
               Swal.fire({
-                  text: "Captured Library(s) was updated succesfully.",
+                  text: "Captured Library(s) updated succesfully.",
                   icon: "info",
                   buttonsStyling: false,
                   confirmButtonText: "Ok, got it!",
@@ -964,7 +964,7 @@ var KTDatatablesServerSide = function () {
             }
             else {
               Swal.fire({
-                  text: "Sequencing Library(s) was not created.",
+                  text: "Sequencing Library(s) could not be created.",
                   icon: "error",
                   buttonsStyling: false,
                   confirmButtonText: "Ok, got it!",
@@ -990,7 +990,7 @@ var KTDatatablesServerSide = function () {
           }).done(function(result) {
             if (result.success) {
               Swal.fire({
-                  text: "Sequencing Library(s) was created succesfully.",
+                  text: "Sequencing Library(s) created succesfully.",
                   icon: "info",
                   buttonsStyling: false,
                   confirmButtonText: "Ok, got it!",
@@ -1006,7 +1006,7 @@ var KTDatatablesServerSide = function () {
             }
             else {
               Swal.fire({
-                  text: "Sequencing Library(s) was not created.",
+                  text: "Sequencing Library(s) could not be created.",
                   icon: "error",
                   buttonsStyling: false,
                   confirmButtonText: "Ok, got it!",
@@ -1108,7 +1108,7 @@ var KTDatatablesServerSide = function () {
                         }).done(function (result) {
                             if (result.deleted) {
                               Swal.fire({
-                                  text: "Captured Library(s) was deleted succesfully.",
+                                  text: "Captured Library(s) deleted succesfully.",
                                   icon: "info",
                                   buttonsStyling: false,
                                   confirmButtonText: "Ok, got it!",
@@ -1121,7 +1121,7 @@ var KTDatatablesServerSide = function () {
                             }
                             else {
                               Swal.fire({
-                                  text: "Captured Library(s) wasn't deleted!",
+                                  text: "Captured Library(s) could not be deleted!",
                                   icon: "error",
                                   buttonsStyling: false,
                                   confirmButtonText: "Ok, got it!",
@@ -1135,7 +1135,7 @@ var KTDatatablesServerSide = function () {
                     });
                 } else if (result.dismiss === 'cancel') {
                     Swal.fire({
-                        text: "Selected customers was not deleted.",
+                        text: "Selected customers could not be deleted.",
                         icon: "error",
                         buttonsStyling: false,
                         confirmButtonText: "Ok, got it!",

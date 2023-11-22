@@ -57,10 +57,10 @@ def new_sequencinglib(request):
         form = SequencingLibForm(request.POST, request.FILES)
         if form.is_valid():
             sequencinglib = form.save()
-            messages.success(request,"Captured Library %s was created successfully." % sequencinglib.name)
+            messages.success(request,"Captured Library %s created successfully." % sequencinglib.name)
             return redirect("sequencinglibs")
         else:
-            messages.error(request,"Captured Library wasn't created.")
+            messages.error(request,"Captured Library could not be created.")
     else:
         form = SequencingLibForm()
 
@@ -109,7 +109,7 @@ def new_sequencinglib_async(request):
 @permission_required_for_async("sequencinglib.view_sequencinglib")
 def get_sequencinglib_async(request,id):
     sequencing_lib = SequencingLib.objects.get(id=id)
-    serializer = SequencingLibSerializer(sequencing_lib)
+    serializer = SingleSequencingLibSerializer(sequencing_lib,many=False)
     return JsonResponse(serializer.data, safe=False)
 
 @permission_required_for_async("sequencinglib.add_sequencinglib")
@@ -152,10 +152,10 @@ def edit_sequencinglib(request,id):
         form = SequencingLibForm(request.POST,request.FILES,instance=sequencinglib)
         if form.is_valid():
             sequencinglib = form.save()
-            messages.success(request,"Captured Library %s was updated successfully." % sequencinglib.name)
+            messages.success(request,"Captured Library %s updated successfully." % sequencinglib.name)
             return redirect("sequencinglibs")
         else:
-            messages.error(request,"Captured Library wasn't updated!")
+            messages.error(request,"Captured Library could not be updated!")
     else:
         form = SequencingLibForm(instance=sequencinglib)
 
@@ -166,10 +166,10 @@ def delete_sequencinglib(request,id):
     try:
         sequencinglib = SequencingLib.objects.get(id=id)
         sequencinglib.delete()
-        messages.success(request,"Captured Library %s was deleted successfully." % sequencinglib.name)
+        messages.success(request,"Captured Library %s deleted successfully." % sequencinglib.name)
         deleted = True
     except Exception as e:
-        messages.error(request, "Captured Library wasn't deleted!")
+        messages.error(request, "Captured Library could not be deleted!")
         deleted = False
 
     return JsonResponse({"deleted":deleted })

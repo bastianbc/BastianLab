@@ -14,10 +14,10 @@ def new_group(request):
         form = GroupForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request,"Group was created successfully")
+            messages.success(request,"Group created successfully")
             return redirect('/group')
         else:
-            messages.error(request,"Group wasn't created!")
+            messages.error(request,"Group could not be created!")
     else:
         form = GroupForm()
     return render(request,"group.html",locals())
@@ -29,10 +29,10 @@ def edit_group(request,id):
         form = GroupForm(request.POST,instance=instance)
         if form.is_valid():
             form.save()
-            messages.success(request,"Group was updated successfully")
+            messages.success(request,"Group updated successfully")
             return redirect('/group')
         else:
-            messages.error(request,"Group wasn't updated!")
+            messages.error(request,"Group could not be updated!")
     else:
         form = GroupForm(instance=instance)
     return render(request,"group.html",locals())
@@ -42,10 +42,10 @@ def delete_group(request,id):
     try:
         instance = Group.objects.get(id=id)
         instance.delete()
-        messages.success(request, "Group was deleted successfully")
+        messages.success(request, "Group deleted successfully")
         return redirect('/group')
     except Exception as e:
-        messages.error(request, "Group wasn't deleted!")
+        messages.error(request, "Group could not be deleted!")
     return redirect("/group")
 
 def filter_groups(request):

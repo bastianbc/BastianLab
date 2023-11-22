@@ -56,10 +56,10 @@ def new_sequencingrun(request):
         form = SequencingRunForm(request.POST)
         if form.is_valid():
             sequencingrun = form.save()
-            messages.success(request,"Sequencing Run %s was created successfully." % sequencingrun.name)
+            messages.success(request,"Sequencing Run %s created successfully." % sequencingrun.name)
             return redirect("sequencingruns")
         else:
-            messages.error(request,"Sequencing Run wasn't created.")
+            messages.error(request,"Sequencing Run could not be created.")
     else:
         form = SequencingRunForm()
 
@@ -107,10 +107,10 @@ def edit_sequencingrun(request,id):
         form = SequencingRunForm(request.POST,instance=sequencing_run)
         if form.is_valid():
             form.save()
-            messages.success(request,"Sequencing Run %s was updated successfully." % sequencing_run.name)
+            messages.success(request,"Sequencing Run %s updated successfully." % sequencing_run.name)
             return redirect("sequencingruns")
         else:
-            messages.error(request,"Sequencing Run wasn't updated!")
+            messages.error(request,"Sequencing Run could not be updated!")
     else:
         form = SequencingRunForm(instance=sequencing_run)
 
@@ -121,10 +121,10 @@ def delete_sequencingrun(request,id):
     try:
         sequencing_run = SequencingRun.objects.get(id=id)
         sequencing_run.delete()
-        messages.success(request,"Sequencing Run %s was deleted successfully." % sequencing_run.name)
+        messages.success(request,"Sequencing Run %s deleted successfully." % sequencing_run.name)
         deleted = True
     except Exception as e:
-        messages.error(request, "Sequencing Run wasn't deleted!")
+        messages.error(request, "Sequencing Run could not be deleted!")
         deleted = False
 
     return JsonResponse({"deleted":deleted })

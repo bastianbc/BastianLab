@@ -34,12 +34,12 @@ def new_area(request):
         if form.is_valid():
             try:
                 area = form.save()
-                messages.success(request,"Area %s was created successfully." % area.ar_id)
+                messages.success(request,"Area %s created successfully." % area.ar_id)
                 return redirect("areas")
             except Exception as e:
-                messages.error(request,"Area wasn't created. %s" % str(e))
+                messages.error(request,"Area could not be created. %s" % str(e))
         else:
-            messages.error(request,"Area wasn't created.")
+            messages.error(request,"Area could not be created.")
     else:
         form = AreaForm()
 
@@ -71,10 +71,10 @@ def edit_area(request,id):
         form = AreaForm(request.POST,instance=area)
         if form.is_valid():
             area = form.save()
-            messages.success(request,"Area %s was updated successfully." % area.ar_id)
+            messages.success(request,"Area %s updated successfully." % area.ar_id)
             return redirect("areas")
         else:
-            messages.error(request,"Area wasn't updated!")
+            messages.error(request,"Area could not be updated!")
     else:
         form = AreaForm(instance=area)
 
@@ -108,10 +108,10 @@ def delete_area(request,id):
     try:
         area = Areas.objects.get(ar_id=id)
         area.delete()
-        messages.success(request,"Area %s was deleted successfully." % area.ar_id)
+        messages.success(request,"Area %s deleted successfully." % area.ar_id)
         deleted = True
     except Exception as e:
-        messages.error(request, "Area %s wasn't deleted!" % area.ar_id)
+        messages.error(request, "Area %s could not be deleted!" % area.ar_id)
         deleted = False
 
     return JsonResponse({ "deleted":True })

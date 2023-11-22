@@ -32,10 +32,10 @@ def new_patient(request):
         form = PatientForm(request.POST)
         if form.is_valid():
             patient = form.save()
-            messages.success(request,"Patient %s was created successfully." % patient.pat_id)
+            messages.success(request,"Patient %s created successfully." % patient.pat_id)
             return redirect("patients")
         else:
-            messages.error(request,"Patient wasn't created.")
+            messages.error(request,"Patient could not be created.")
     else:
         form = PatientForm()
 
@@ -49,10 +49,10 @@ def edit_patient(request,id):
         form = PatientForm(request.POST,instance=patient)
         if form.is_valid():
             patient = form.save()
-            messages.success(request,"Patient %s was updated successfully." % patient.pat_id)
+            messages.success(request,"Patient %s updated successfully." % patient.pat_id)
             return redirect("patients")
         else:
-            messages.error(request,"Patient wasn't updated!")
+            messages.error(request,"Patient could not be updated!")
     else:
         form = PatientForm(instance=patient)
 
@@ -86,10 +86,10 @@ def delete_patient(request,id):
     try:
         patient = Patients.objects.get(pat_id=id)
         patient.delete()
-        messages.success(request,"Patient %s was deleted successfully." % patient.pat_id)
+        messages.success(request,"Patient %s deleted successfully." % patient.pat_id)
         deleted = True
     except Exception as e:
-        messages.error(request, "Patient %s wasn't deleted!" % patient.pat_id)
+        messages.error(request, "Patient %s could not be deleted!" % patient.pat_id)
         deleted = False
 
     return JsonResponse({ "deleted":True })

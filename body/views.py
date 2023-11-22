@@ -15,10 +15,10 @@ def new_body(request):
         form = BodyForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request,"Body was created successfully")
+            messages.success(request,"Body created successfully")
             return redirect('/body')
         else:
-            messages.error(request,"Body wasn't created!")
+            messages.error(request,"Body could not be created!")
     else:
         form = BodyForm()
 
@@ -31,10 +31,10 @@ def edit_body(request,id):
         form = BodyForm(request.POST,instance=instance)
         if form.is_valid():
             form.save()
-            messages.success(request,"Body was updated successfully")
+            messages.success(request,"Body updated successfully")
             return redirect('/body')
         else:
-            messages.error(request,"Body wasn't updated!")
+            messages.error(request,"Body could not be updated!")
     else:
         form = BodyForm(instance=instance)
     return render(request,"body.html",locals())
@@ -44,9 +44,9 @@ def delete_body(request,id):
     try:
         instance = Body.objects.get(id=id)
         instance.delete()
-        messages.success(request, "Body was deleted successfully")
+        messages.success(request, "Body deleted successfully")
     except Exception as e:
-        messages.error(request, "Body wasn't deleted!")
+        messages.error(request, "Body could not be deleted!")
 
     return redirect('/body')
 

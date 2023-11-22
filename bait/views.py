@@ -15,10 +15,10 @@ def new_bait(request):
         form = BaitForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            messages.success(request,"Bait was created successfully")
+            messages.success(request,"Bait created successfully")
             return redirect('/bait')
         else:
-            messages.error(request,"Bait wasn't created!")
+            messages.error(request,"Bait could not be created!")
     else:
         form = BaitForm()
     return render(request,"bait.html",locals())
@@ -30,10 +30,10 @@ def edit_bait(request,id):
         form = BaitForm(request.POST,request.FILES,instance=instance)
         if form.is_valid():
             form.save()
-            messages.success(request,"Bait was updated successfully")
+            messages.success(request,"Bait updated successfully")
             return redirect('/bait')
         else:
-            messages.error(request,"Bait wasn't updated!")
+            messages.error(request,"Bait could not be updated!")
     else:
         form = BaitForm(instance=instance)
     return render(request,"bait.html",locals())
@@ -43,9 +43,9 @@ def delete_bait(request,id):
     try:
         instance = Bait.objects.get(id=id)
         instance.delete()
-        messages.success(request, "Bait was deleted successfully")
+        messages.success(request, "Bait deleted successfully")
     except Exception as e:
-        messages.error(request, "Bait wasn't deleted!")
+        messages.error(request, "Bait could not be deleted!")
 
     return redirect('/bait')
 

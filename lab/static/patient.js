@@ -239,7 +239,7 @@ var KTDatatablesServerSide = function () {
                                 type: "DELETE",
                                 headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
                                 success: function () {
-                                    swal("Done!", "It was succesfully deleted!", "success");
+                                    swal("Done!", "It deleted succesfully!", "success");
                                     dt.draw();
                                 },
                                 error: function (xhr, ajaxOptions, thrownError) {
@@ -262,7 +262,7 @@ var KTDatatablesServerSide = function () {
                         });
                     } else if (result.dismiss === 'cancel') {
                         Swal.fire({
-                            text: customerName + " was not deleted.",
+                            text: customerName + " could not be deleted.",
                             icon: "error",
                             buttonsStyling: false,
                             confirmButtonText: "Ok, got it!",
@@ -342,7 +342,7 @@ var KTDatatablesServerSide = function () {
           console.log("result.success:"+result.success);
           if (result.success) {
             Swal.fire({
-                text: "Block(s) was created succesfully.",
+                text: "Block(s) created succesfully.",
                 icon: "info",
                 buttonsStyling: false,
                 confirmButtonText: "Ok, got it!",
@@ -355,7 +355,7 @@ var KTDatatablesServerSide = function () {
           }
           else {
             Swal.fire({
-                text: "Block(s) was not created.",
+                text: "Block(s) could not be created.",
                 icon: "error",
                 buttonsStyling: false,
                 confirmButtonText: "Ok, got it!",

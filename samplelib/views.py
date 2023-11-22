@@ -62,10 +62,10 @@ def new_samplelib(request):
         form = SampleLibForm(request.POST)
         if form.is_valid():
             samplelib = form.save()
-            messages.success(request,"Sample Library %s was created successfully." % samplelib.name)
+            messages.success(request,"Sample Library %s created successfully." % samplelib.name)
             return redirect("samplelibs")
         else:
-            messages.error(request,"Sample Library wasn't created.")
+            messages.error(request,"Sample Library could not be created.")
     else:
         form = SampleLibForm()
 
@@ -170,10 +170,10 @@ def edit_samplelib(request,id):
         form = SampleLibForm(request.POST,instance=samplelib)
         if form.is_valid():
             samplelib = form.save()
-            messages.success(request,"Sample Library %s was updated successfully." % samplelib.name)
+            messages.success(request,"Sample Library %s updated successfully." % samplelib.name)
             return redirect("samplelibs")
         else:
-            messages.error(request,"Sample Library wasn't updated!")
+            messages.error(request,"Sample Library could not be updated!")
     else:
         form = SampleLibForm(instance=samplelib)
 
@@ -184,10 +184,10 @@ def delete_samplelib(request,id):
     try:
         samplelib = SampleLib.objects.get(id=id)
         samplelib.delete()
-        messages.success(request,"Sample Library %s was deleted successfully." % samplelib.name)
+        messages.success(request,"Sample Library %s deleted successfully." % samplelib.name)
         deleted = True
     except Exception as e:
-        messages.error(request, "Sample Library wasn't deleted!")
+        messages.error(request, "Sample Library could not be deleted!")
         deleted = False
 
     return JsonResponse({"deleted":deleted })

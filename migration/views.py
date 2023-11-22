@@ -499,7 +499,7 @@ def migrate(request):
                     print(row)
                     report.append({"name":row[0],"status":"FAILED","message":str(e)})
 
-            print("Process was completed successfully")
+            print("Process completed successfully")
 
             response = HttpResponse(
                 content_type='text/csv',
@@ -515,7 +515,7 @@ def migrate(request):
             return response
 
         else:
-            print("Process wasn't completed!")
+            print("Process could not be completed!")
     else:
         form = MigrationForm()
 
@@ -1870,7 +1870,7 @@ def airtable_consolidated_data(request):
 
                     create_sequencingfile_for_bai_files(sample_lib,sequencing_run,row[33],row[35])
                 except Exception as e:
-                    print(str(e)) 
+                    print(str(e))
 
     else:
         form = AirtableConsolidatedDataForm()

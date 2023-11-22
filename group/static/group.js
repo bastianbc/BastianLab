@@ -175,7 +175,7 @@ var KTDatatablesServerSide = function () {
                                 type: "DELETE",
                                 headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
                                 success: function () {
-                                    swal("Done!", "It was succesfully deleted!", "success");
+                                    swal("Done!", "It deleted succesfully!", "success");
                                     dt.draw();
                                 },
                                 error: function (xhr, ajaxOptions, thrownError) {
@@ -198,7 +198,7 @@ var KTDatatablesServerSide = function () {
                         });
                     } else if (result.dismiss === 'cancel') {
                         Swal.fire({
-                            text: customerName + " was not deleted.",
+                            text: customerName + " could not be deleted.",
                             icon: "error",
                             buttonsStyling: false,
                             confirmButtonText: "Ok, got it!",

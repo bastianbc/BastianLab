@@ -47,10 +47,10 @@ def change_password(request):
         form = PasswordChangeForm(user=request.user,data=request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request,"Password was changed successfully")
+            messages.success(request,"Password changed successfully")
             return redirect("/")
         else:
-            messages.error(request,"Password wasn't changed!")
+            messages.error(request,"Password could not be changed!")
     else:
         form = PasswordChangeForm(user=request.user)
 
@@ -63,10 +63,10 @@ def set_password(request):
         if form.is_valid():
             form.save()
             login(request,user)
-            messages.success(request,"Password was setted successfully")
+            messages.success(request,"Password set successfully")
             return redirect("/")
         else:
-            messages.error(request,"Password wasn't setted!")
+            messages.error(request,"Password could not be set!")
     else:
         form = SetPasswordForm(user=user)
 

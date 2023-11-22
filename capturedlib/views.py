@@ -59,10 +59,10 @@ def new_capturedlib(request):
         form = CapturedLibForm(request.POST, request.FILES)
         if form.is_valid():
             capturedlib = form.save()
-            messages.success(request,"Captured Library %s was created successfully." % capturedlib.name)
+            messages.success(request,"Captured Library %s created successfully." % capturedlib.name)
             return redirect("capturedlibs")
         else:
-            messages.error(request,"Captured Library wasn't created.")
+            messages.error(request,"Captured Library could not be created.")
     else:
         form = CapturedLibForm()
 
@@ -112,10 +112,10 @@ def edit_capturedlib(request,id):
         form = CapturedLibForm(request.POST,request.FILES,instance=capturedlib)
         if form.is_valid():
             capturedlib = form.save()
-            messages.success(request,"Captured Library %s was updated successfully." % capturedlib.name)
+            messages.success(request,"Captured Library %s updated successfully." % capturedlib.name)
             return redirect("capturedlibs")
         else:
-            messages.error(request,"Captured Library wasn't updated!")
+            messages.error(request,"Captured Library could not be updated!")
     else:
         form = CapturedLibForm(instance=capturedlib)
 
@@ -126,10 +126,10 @@ def delete_capturedlib(request,id):
     try:
         capturedlib = CapturedLib.objects.get(id=id)
         capturedlib.delete()
-        messages.success(request,"Captured Library %s was deleted successfully." % capturedlib.name)
+        messages.success(request,"Captured Library %s deleted successfully." % capturedlib.name)
         deleted = True
     except Exception as e:
-        messages.error(request, "Captured Library wasn't deleted!")
+        messages.error(request, "Captured Library could not be deleted!")
         deleted = False
 
     return JsonResponse({"deleted":deleted })
