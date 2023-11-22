@@ -21,7 +21,6 @@ def sequencinglibs(request):
 
 @permission_required_for_async("sequencinglib.view_sequencinglib")
 def filter_sequencinglibs(request):
-    _cerate_ss_from_consolideated_data()
     sequencinglibs = SequencingLib().query_by_args(request.user,**request.GET)
     serializer = SequencingLibSerializer(sequencinglibs['items'], many=True)
     result = dict()

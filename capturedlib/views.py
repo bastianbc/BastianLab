@@ -103,7 +103,7 @@ def new_capturedlib_async(request):
 
     except Exception as e:
         print(str(e))
-        return JsonResponse({"success":False})
+        return JsonResponse({"success":False, "error":str(e)})
 
     return JsonResponse({"success":True})
 
