@@ -695,7 +695,7 @@ var KTDatatablesServerSide = function () {
         }).done(function(result) {
           if (result.success) {
             Swal.fire({
-                text: "Captured Library(s) was created succesfully.",
+                text: `Captured Library(s) was created succesfully.`,
                 icon: "info",
                 buttonsStyling: false,
                 confirmButtonText: "Ok, got it!",
@@ -705,8 +705,10 @@ var KTDatatablesServerSide = function () {
             });
           }
           else {
+              console.log(result.error);
             Swal.fire({
-                text: "Captured Library(s) was not created.",
+                title:`Captured Library(s) was not created.`,
+                text: `${result.error}`,
                 icon: "error",
                 buttonsStyling: false,
                 confirmButtonText: "Ok, got it!",

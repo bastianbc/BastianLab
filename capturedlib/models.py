@@ -121,6 +121,8 @@ class CapturedLib(models.Model):
 
     def _set_nm(self):
         # Calculate CL.nM as CL.conc/660 * CL.frag_size * 10^6 and store in CL.nM
+        if not self.frag_size or self.frag_size == 0:
+            return
         self.nm = round(self.conc/(660 * float(self.frag_size)) * 10**6,2)
 
 
