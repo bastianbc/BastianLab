@@ -110,7 +110,7 @@ var KTDatatablesServerSide = function () {
                             <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4" data-kt-menu="true">
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="#" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
+                                    <a href="/sequencingfile/edit/` + row["id"] + `" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
                                         Edit
                                     </a>
                                 </div>
@@ -118,7 +118,7 @@ var KTDatatablesServerSide = function () {
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="#" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
+                                    <a href="/sequencingfile/delete/` + row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
                                         Delete
                                     </a>
                                 </div>
@@ -187,7 +187,7 @@ var KTDatatablesServerSide = function () {
                 const id = parent.querySelectorAll('td')[0].querySelector(".form-check-input").value;
 
                 $.ajax({
-                    url: "/libprep/check_can_deleted_async",
+                    url: "/sequencingfile/check_can_deleted_async",
                     type: "GET",
                     data: {
                       "id": id,
@@ -264,7 +264,7 @@ var KTDatatablesServerSide = function () {
                             }).done(function () {
 
                               Swal.fire({
-                                    text: "Nucleic acid deleted succesfully.",
+                                    text: "Sequencing file deleted succesfully.",
                                     icon: "info",
                                     buttonsStyling: false,
                                     confirmButtonText: "Ok, got it!",
@@ -378,7 +378,6 @@ var KTDatatablesServerSide = function () {
 
       // Deletes all selected rows.
       function handleBatchDelete() {
-
         // Select elements
         var deleteSelected = document.querySelector('[data-kt-docs-table-select="delete_selected"]');
 
@@ -410,7 +409,7 @@ var KTDatatablesServerSide = function () {
 
                         $.ajax({
                             type: "GET",
-                            url: "/libprep/batch_delete",
+                            url: "/sequencingfile/batch_delete",
                             data: {
                               "selected_ids": getSelectedRows(),
                             },
@@ -420,7 +419,7 @@ var KTDatatablesServerSide = function () {
                         }).done(function (result) {
                             if (result.deleted) {
                               Swal.fire({
-                                  text: "Nucleic Acid(s) deleted succesfully.",
+                                  text: "Sequencing File(s) deleted succesfully.",
                                   icon: "info",
                                   buttonsStyling: false,
                                   confirmButtonText: "Ok, got it!",
@@ -433,7 +432,7 @@ var KTDatatablesServerSide = function () {
                             }
                             else {
                               Swal.fire({
-                                  text: "Nucleic Acid(s) could not be deleted!",
+                                  text: "Sequencing File(s) could not be deleted!",
                                   icon: "error",
                                   buttonsStyling: false,
                                   confirmButtonText: "Ok, got it!",
@@ -447,7 +446,7 @@ var KTDatatablesServerSide = function () {
                     });
                 } else if (result.dismiss === 'cancel') {
                     Swal.fire({
-                        text: "Selected nucacids could not be deleted.",
+                        text: "Selected sequencing file could not be deleted.",
                         icon: "error",
                         buttonsStyling: false,
                         confirmButtonText: "Ok, got it!",
@@ -507,7 +506,7 @@ var KTDatatablesServerSide = function () {
             // handleFilterDatatable();
             // handleDeleteRows();
             // handleResetForm();
-            // handleSelectedRows.init();
+            handleSelectedRows.init();
             // initEditor();
         }
     }

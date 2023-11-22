@@ -707,8 +707,7 @@ var KTDatatablesServerSide = function () {
           else {
               console.log(result.error);
             Swal.fire({
-                title:`Captured Library(s) was not created.`,
-                text: `${result.error}`,
+                text: "Captured Library(s) could not be created.",
                 icon: "error",
                 buttonsStyling: false,
                 confirmButtonText: "Ok, got it!",

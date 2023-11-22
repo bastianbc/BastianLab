@@ -134,11 +134,3 @@ def get_or_create_projects(name):
                 speedtype="",
                 date_start=datetime.now(),
             )
-
-def _cerate_projects_from_airtable():
-    from pyairtable import Api
-    api = Api('keyEDswuVpUGOz8Tp')
-    t = api.table("appA7qA5hhuLgiAwt", "tblv5WQXW7cNCbt0o")
-    for i in t.all():
-        for s in i.get("fields").get("Assigned project", []):
-            get_or_create_projects(s)
