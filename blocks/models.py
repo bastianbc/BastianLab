@@ -202,3 +202,11 @@ class Blocks(models.Model):
         Option list of Collection for the datatables' select field.
         '''
         return [{"label":"---------","value":""}] + [{ "label":c[1], "value":c[0] } for c in Blocks.COLLECTION_CHOICES]
+
+
+class BlockUrl(models.Model):
+    url = models.CharField(max_length=1000, blank=True, null=True, verbose_name="")
+
+    class Meta:
+        db_table = 'blockurl'
+        managed = True

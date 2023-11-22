@@ -16,7 +16,6 @@ from pathlib import Path
 @permission_required_for_async("blocks.view_blocks")
 def filter_blocks(request):
     from .serializers import BlocksSerializer
-    # _create_blocks_from_file()
     blocks = Blocks.query_by_args(request.user,**request.GET)
     serializer = BlocksSerializer(blocks['items'], many=True)
     result = dict()
@@ -205,6 +204,21 @@ def export_csv_all_data(request):
     return response
 
 
+def edit_block_url(request):
+    instance = BlockUrl.objects.first()
+    if request.method=="POST":
+        form = BlockUrlForm(request.POST,instance=instance)
+        if form.is_valid():
+            form.save()
+            messages.success(request,"Block URL was updated successfully")
+            # return redirect('/blocks/edit_block_url')
+        else:
+            messages.error(request,"Block URL wasn't updated!")
+    else:
+        form = BlockUrlForm(instance=instance)
+    return render(request,"block_url.html",locals())
+
+
 def _assign_projects_to_blocks():
     from pyairtable import Api
     api = Api('keyEDswuVpUGOz8Tp')
@@ -318,10 +332,11 @@ def _create_blocks_consolidated_data():
 
 def get_or_create_blocks_from_file(row):
     try:
-        print(row["Block_ID"], row["Assigned project"])
-        b = Blocks.objects.get(name=row["Block_ID"])
-        b.project = Projects.objects.get(name=row["Assigned project"])
-        b.save()
+        print(row["Block_ID"])
+        if "=" in row["HE image"]:
+            Blocks.objects.filter(name=row["Block_ID"]).update(scan_number=row["HE image"].split("=")[-1])
+        else:
+            Blocks.objects.filter(name=row["Block_ID"]).update(scan_number=row["HE image"].split("/")[-1])
         print("saved")
     except Exception as e:
         print("error"*10,e)
@@ -331,4 +346,4 @@ def get_or_create_blocks_from_file(row):
 def _create_blocks_from_file():
     file = Path(Path(__file__).parent.parent / "uploads" / "Blocks-Grid view-5.csv")
     df = pd.read_csv(file)
-    df[~df["Assigned project"].isnull()].apply(lambda row: get_or_create_blocks_from_file(row), axis=1)
+    df[~pd.isnull(df["HE image"])].apply(lambda row: get_or_create_blocks_from_file(row), axis=1)
