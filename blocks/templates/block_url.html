@@ -1,0 +1,44 @@
+{% extends "master.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<form method="post" action="{% url 'edit_block_url' %}">
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Edit Block URL</h3>
+    </div>
+    <div class="card-body">
+      {% csrf_token %}
+      <div class="row">
+        {{form|crispy}}
+      </div>
+    </div>
+    <div class="card-footer">
+      <a href="/blocks/edit_block_url" class="btn btn-secondary">Cancel</a>
+      <button type="submit" class="btn btn-success">Save</button>
+    </div>
+  </div>
+</form>
+    <script type="text/javascript">
+            console.log(messages);
+			{% for message in messages %}
+
+				{% if message.tags == "alert-success" %}
+
+				Swal.fire({
+						text: "{{ message|safe }}",
+						icon: "success",
+						buttonsStyling: false,
+						confirmButtonText: "Ok, got it!",
+						customClass: {
+								confirmButton: "btn fw-bold btn-primary",
+						}
+				});
+
+				{% endif %}
+
+			{% endfor %}
+		</script>
+{% endblock %}

@@ -25,3 +25,9 @@ class BlockForm(forms.ModelForm):
 class AreaCreationForm(forms.Form):
     # area_type = forms.ChoiceField(choices=Areas.AREA_TYPE_TYPES)
     number = forms.IntegerField(initial=1, label="How many areas for block do you want to create?")
+
+
+class BlockUrlForm(forms.ModelForm):
+    class Meta:
+        model = BlockUrl
+        fields = "__all__"

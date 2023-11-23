@@ -22,15 +22,18 @@ class Blocks(models.Model):
          ("metastasis","Metastasis"),
     )
 
+
     PUNCH = 'PU'
     SCRAPE = 'SC'
     PELLET = 'PE'
     CURLS = 'CU'
+    FFPE = 'FF'
     COLLECTION_CHOICES = [
         (PUNCH, 'Punch'),
         (SCRAPE, 'Scraping'),
         (PELLET, 'Cell Pellet'),
-        (CURLS, 'Curls')
+        (CURLS, 'Curls'),
+        (FFPE, 'FFPE')
     ]
 
     bl_id = models.AutoField(primary_key=True)
@@ -51,7 +54,7 @@ class Blocks(models.Model):
     subtype = models.CharField(max_length=120, blank=True, null=True)
     slides = models.IntegerField(blank=True, null=True)
     slides_left = models.IntegerField(blank=True, null=True)
-    fixation = models.CharField(max_length=10, blank=True, null=True)
+    fixation = models.CharField(max_length=100, blank=True, null=True)
     # area_id = models.CharField(max_length=100, blank=True, null=True)
     # old_project = models.CharField(max_length=50, blank=True, null=True)
     storage = models.CharField(max_length=50, blank=True, null=True)
@@ -202,3 +205,11 @@ class Blocks(models.Model):
         Option list of Collection for the datatables' select field.
         '''
         return [{"label":"---------","value":""}] + [{ "label":c[1], "value":c[0] } for c in Blocks.COLLECTION_CHOICES]
+
+
+class BlockUrl(models.Model):
+    url = models.CharField(max_length=1000, blank=True, null=True, verbose_name="")
+
+    class Meta:
+        db_table = 'blockurl'
+        managed = True

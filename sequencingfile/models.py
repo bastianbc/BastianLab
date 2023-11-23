@@ -20,6 +20,12 @@ class SequencingFile(models.Model):
     def __str__(self):
         return self.path if self.path else ""
 
+    def save(self, *args, **kwargs):
+
+        self.read1_count = SampleLib.objects.filter()
+        self.read2_count = slugify(self.title)
+        super(SequencingFile, self).save(*args, **kwargs)
+
     def query_by_args(self, user, **kwargs):
 
         def _get_authorizated_queryset():
