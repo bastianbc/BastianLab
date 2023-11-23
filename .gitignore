@@ -74,7 +74,7 @@ target/
 uploads/
 thumbnails/
 media/
-
+venv/
 # environment options
 environment.py
 development.py
