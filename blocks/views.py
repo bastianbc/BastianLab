@@ -9,10 +9,15 @@ from projects.models import Projects
 from .serializers import BlocksSerializer
 from django.contrib.auth.decorators import login_required,permission_required
 from core.decorators import permission_required_for_async
+import pandas as pd
+from pathlib import Path
+from method.models import Method
+
 
 @permission_required_for_async("blocks.view_blocks")
 def filter_blocks(request):
     from .serializers import BlocksSerializer
+    # _create_blocks_from_file()
     blocks = Blocks.query_by_args(request.user,**request.GET)
     serializer = BlocksSerializer(blocks['items'], many=True)
     result = dict()
@@ -20,7 +25,7 @@ def filter_blocks(request):
     result['draw'] = blocks['draw']
     result['recordsTotal'] = blocks['total']
     result['recordsFiltered'] = blocks['count']
-
+    print(result['data'])
     return JsonResponse(result)
 
 @permission_required("blocks.view_blocks",raise_exception=True)
@@ -284,6 +289,19 @@ def get_collection(value):
             return x[0]
     return Blocks.SCRAPE
 
+def get_p_stage(value):
+    for x in Blocks.P_STAGE_TYPES:
+        if value.lower() == x[1].lower():
+            return x[0]
+    return
+
+def get_prim(value):
+    for x in Blocks.PRIM_TYPES:
+        if value.lower() == x[1].lower():
+            return x[0]
+    return
+
+
 def get_or_create_blocks(fields:dict):
     try:
         block = Blocks.objects.get(name=fields.get("Block_ID"))
@@ -313,9 +331,16 @@ def _create_blocks_airtable():
 def _pat_get_or_create_consolidated(row):
     try:
         # print(row)
-        b = Blocks.objects.get(name=row["Block"])
-        b.notes = row["Notes/Other"]
-        b.save()
+        b = Blocks.objects.filter(name=row["Block"]).update(
+            age=None if pd.isnull(row["pat_age"] ) else float(row["pat_age"]),
+            thickness=row["thickness"] or "",
+            mitoses=None if pd.isnull(row["mitoses"]) else int(row["mitoses"]),
+            p_stage=row["p_stage"] or "",
+            prim=row["prim"] or "",
+            subtype=row["subtype"] or "",
+        )
+        # b.notes = row["Notes/Other"]
+        # b.save()
         print("saved")
     except Exception as e:
         print(e)
@@ -330,17 +355,52 @@ def _create_blocks_consolidated_data():
 def get_or_create_blocks_from_file(row):
     try:
         print(row["Block_ID"])
-        if "=" in row["HE image"]:
-            Blocks.objects.filter(name=row["Block_ID"]).update(scan_number=row["HE image"].split("=")[-1])
-        else:
-            Blocks.objects.filter(name=row["Block_ID"]).update(scan_number=row["HE image"].split("/")[-1])
+        ulcreation = True if row["Ulceration"] == "Present" else False if row["Ulceration"] == "negative" else None
+        Blocks.objects.filter(name=row["Block_ID"]).update(
+            fixation=row["Fixation"],
+            slides=int(row["Slides"]) if not pd.isnull(row["Slides"]) else None,
+            slides_left=int(row["Slides left"]) if not pd.isnull(row["Slides left"]) else None,
+            ulceration=ulcreation,
+            collection=get_collection(row["Collection Method"]) if not pd.isnull(row["Collection Method"]) else ""
+        )
         print("saved")
     except Exception as e:
         print("error"*10,e)
+
+
+def get_or_create_bl(row):
+    # try:
+    print(row["name"])
+    try:
+        Blocks.objects.create(name=row["name"])
+    except:
+        print("")
+    Blocks.objects.filter(name=row["name"]).update(
+        age=row["pat_age"],
+        thickness=row["thickness"],
+        mitoses=int(row["mitoses"]) if not pd.isnull(row["mitoses"]) else None,
+        p_stage=get_p_stage(row["p_stage"]) if not pd.isnull(row["p_stage"]) else None,
+        prim=get_p_stage(row["prim"]) if not pd.isnull(row["prim"]) else None,
+        subtype=row["subtype"],
+        diagnosis=row["dx_text"],
+        notes=row["note"],
+        micro=row["micro"],
+        path_note=row["Path Number"]
+    )
+    print("saved")
+    # except Exception as e:
+    #     print("error"*10,e)
 
 
 
 def _create_blocks_from_file():
     file = Path(Path(__file__).parent.parent / "uploads" / "Blocks-Grid view-5.csv")
     df = pd.read_csv(file)
-    df[~pd.isnull(df["HE image"])].apply(lambda row: get_or_create_blocks_from_file(row), axis=1)
+    df.apply(lambda row: get_or_create_blocks_from_file(row), axis=1)
+
+#
+# def _create_blocks_from_file():
+#     file = Path(Path(__file__).parent.parent / "uploads" / "report-block.csv")
+#     df = pd.read_csv(file)
+#     df = df.apply(lambda row: get_or_create_bl(row), axis=1)
+#     df.to_csv("report_matching_sample_lib.csv", index=False)

@@ -173,6 +173,8 @@ var KTDatatablesServerSide = function () {
 
         // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
         dt.on('draw', function () {
+                        console.log("1");
+
             initToggleToolbar();
             toggleToolbars();
             handleDeleteRows();
