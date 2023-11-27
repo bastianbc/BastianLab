@@ -7,12 +7,13 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required,permission_required
 from core.decorators import permission_required_for_async
 from blocks.models import Blocks
+import pandas as pd
 
 @permission_required_for_async("lab.view_patients")
 def filter_patients(request):
     from .serializers import PatientsSerializer
     from django.http import JsonResponse
-    # _cerate_patients_from_consolidated_data()
+    _cerate_patients_from_patients_done()
     patients = Patients().query_by_args(**request.GET)
     serializer = PatientsSerializer(patients['items'], many=True)
     result = dict()
@@ -138,6 +139,22 @@ def _pat_get_or_create(fields:dict):
     except Exception as e:
         print(e)
 
+def _patient_get_or_create(value):
+    if value:
+        obj, created = Patients.objects.get_or_create(
+            pat_id=value
+        )
+        return obj
+    return None
+
+def _block_get_or_create(value):
+    if value:
+        obj, created = Blocks.objects.get_or_create(
+            name=value
+        )
+        return obj
+    return None
+
 def _pat_get_or_create_consolidated(row):
     try:
         print(row["pat_id"], row["Block"])
@@ -145,6 +162,21 @@ def _pat_get_or_create_consolidated(row):
         b.patient = Patients.objects.get(pat_id=str(row["pat_id"]).replace(".0",""))
         b.save()
         print("saved")
+    except Exception as e:
+        print(e)
+
+def _pat_done_import(row):
+    try:
+        print(row["pat_id"], row["Block"])
+        if not pd.isnull(row["Block"]):
+            try:
+                Blocks.objects.get(name=row["Block"])
+            except:
+                b = Blocks.objects.create(name=row["Block"])
+                patient = _patient_get_or_create(row["pat_id"])
+                b.patient = patient
+                b.save()
+                print("saved")
     except Exception as e:
         print(e)
 
@@ -162,4 +194,4 @@ def _cerate_patients_from_patients_done():
 
     file = Path(Path(__file__).parent.parent / "uploads" / "patients_done.csv")
     df = pd.read_csv(file)
-    df[~df["pat_id"].isnull()].apply(lambda row: _pat_get_or_create_consolidated(row), axis=1)
+    df.apply(lambda row: _pat_done_import(row), axis=1)

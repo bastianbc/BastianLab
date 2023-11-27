@@ -8,7 +8,8 @@ db.sqlite3
 __pycache__/
 *.py[cod]
 *$py.class
-
+*.pyo
+*.pyc
 # C extensions
 *.so
 
@@ -75,6 +76,9 @@ uploads/
 thumbnails/
 media/
 venv/
+
 # environment options
 environment.py
 development.py
+
+
