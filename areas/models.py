@@ -6,10 +6,13 @@ from django.db.models.functions import Coalesce
 
 class Areas(models.Model):
     AREA_TYPE_TYPES = [
+        ("tumor","Tumor"),
         ("normal","Normal"),
-        ("normal2","Normal1"),
-        ("normal3","Normal2"),
+        ("normal1","Normal1"),
+        ("normal2","Normal2"),
+        ("normal3","Normal3"),
         ("melanoma","Melanoma"),
+        ("mel","Mel"),
         ("mel1","Mel1"),
         ("mel2","Mel2"),
         ("mel3","Mel3"),
@@ -19,6 +22,7 @@ class Areas(models.Model):
         ("mis2","MIS2"),
         ("mis3","MIS3"),
         ("metastasis","Metastasis"),
+        ("met","Met"),
         ("met1","Met1"),
         ("met2","Met2"),
         ("met3","Met3"),

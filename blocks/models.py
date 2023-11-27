@@ -207,6 +207,10 @@ class Blocks(models.Model):
         return [{"label":"---------","value":""}] + [{ "label":c[1], "value":c[0] } for c in Blocks.COLLECTION_CHOICES]
 
 
+    @staticmethod
+    def get_block_url():
+        return BlockUrl.objects.values("url").first()
+
 class BlockUrl(models.Model):
     url = models.CharField(max_length=1000, blank=True, null=True, verbose_name="")
 

@@ -151,11 +151,27 @@ var KTDatatablesServerSide = function () {
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
+                                  <a href="javascript:;" class="menu-link px-3" data-block_id=` + row["bl_id"] + ` data-block_name=` + row["name"] + ` data-bs-toggle="modal" data-bs-target="#block_details">
+                                      Block Details
+                                  </a>
+                                </div>
+                                <!--end::Menu item-->
+
+                                <!--begin::Menu item-->
+                                <div class="menu-item px-3">
                                     <a href="/blocks/delete/` + row["bl_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
                                         Delete
                                     </a>
                                 </div>
                                 <!--end::Menu item-->
+                                <!--begin::Menu item-->
+                                <div class="menu-item px-3">
+                                    <a href="`+ row["block_url"]["url"] + row["scan_number"] +`" class="menu-link px-3">
+                                        Scan URL
+                                    </a>
+                                </div>
+                                <!--end::Menu item-->
+                                
                             </div>
                             <!--end::Menu-->
                         `;
@@ -173,8 +189,6 @@ var KTDatatablesServerSide = function () {
 
         // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
         dt.on('draw', function () {
-                        console.log("1");
-
             initToggleToolbar();
             toggleToolbars();
             handleDeleteRows();
@@ -466,6 +480,41 @@ var KTDatatablesServerSide = function () {
         });
 
     }
+
+    var handleBlockDetails = (function (e) {
+      // var modal = new bootstrap.Modal(document.getElementById("block_details"));
+    document.getElementById("block_details").addEventListener('show.bs.modal', function(e){
+        var selectedItem = {};
+        console.log("123");
+        selectedItem = {
+              "id": e.relatedTarget.getAttribute("data-block_id"),
+              "name": e.relatedTarget.getAttribute("data-block_name")
+          };
+
+        var html = (key, value) => `<span><h3 class="text-active-dark bold">${key}</h3>${value}</p>`
+        var contentDiv = $('#d_details');
+      $.ajax({
+          type: "GET",
+          url: "/blocks/get_block_async",
+          data: {
+            id: selectedItem["id"],
+          },
+          dataType: 'json',
+          success: function (data) {
+              for (var key in data) {
+                if (data.hasOwnProperty(key)) {
+                    var value = data[key];
+                    contentDiv.append(html(key,value));
+                }
+             }
+        }
+        });
+
+    });
+
+
+
+    });
 
     var handleSelectedRows = (function (e) {
 
@@ -819,6 +868,7 @@ var KTDatatablesServerSide = function () {
 
       }
 
+
       function getBodyOptions() {
 
         $.ajax({
@@ -895,6 +945,7 @@ var KTDatatablesServerSide = function () {
             handleResetForm();
             handleSelectedRows.init();
             initEditor();
+            handleBlockDetails();
         }
     }
 }();
