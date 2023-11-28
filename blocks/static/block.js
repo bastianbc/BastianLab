@@ -8,6 +8,7 @@ var KTDatatablesServerSide = function () {
     var filterPayment;
     var editor;
 
+
     // Private functions
     var initDatatable = function ( initialValue ) {
 
@@ -17,7 +18,7 @@ var KTDatatablesServerSide = function () {
             // searchDelay: 500,
             processing: true,
             serverSide: true,
-            order: [[0, 'desc']],
+            order: [[1, 'desc']],
             stateSave: false,
             destroy: true,
             select: {
@@ -51,28 +52,25 @@ var KTDatatablesServerSide = function () {
               }
             },
             columns: [
+                {
+                    class: 'dt-control',
+                    orderable: false,
+                    data: null,
+                    defaultContent: ''
+                },
               { data: 'bl_id' },
-              { data: 'name' },
-              { data: 'project_name' },
+              { data: 'name'},
+
+              { data: 'project_name'},
               { data: 'patient_name' },
               { data: 'diagnosis' },
               { data: 'body_site' },
-              { data: 'thickness' },
-              { data: 'collection',
-                render: function (val, type, row) {
-                  return row["collection_label"];
-                }
-              },
-              { data: 'date_added',
-                render: function (data) {
-                  return moment(data).format('MM/DD/YYYY');
-                }
-              },
+              { data: 'scan_number'},
               { data: 'num_areas' },
             ],
             columnDefs: [
                 {
-                    targets: 0,
+                    targets: 1,
                     orderable: false,
                     render: function (data) {
                         return `
@@ -81,8 +79,9 @@ var KTDatatablesServerSide = function () {
                             </div>`;
                     }
                 },
+
                 {
-                    targets: 2,
+                    targets: 3,
                     orderable: false,
                     render: function (data, type, row) {
                       if (data) {
@@ -92,7 +91,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 3,
+                    targets: 4,
                     orderable: false,
                     render: function (data, type, row) {
                       if (data) {
@@ -102,7 +101,17 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 9,
+                    targets: 7,
+                    orderable: true,
+                    render: function (data, type, row) {
+                      if (data) {
+                        return `<a href="`+ row["block_url"]["url"] + row["scan_number"] +`"><i class="fa-solid fa-image fa-xl" style="color: #00f900;"></i></a>`;
+                      }
+                      return "";
+                    }
+                },
+                {
+                    targets: 8,
                     orderable: false,
                     render: function (data, type, row) {
                         if (data > 0) {
@@ -114,7 +123,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 10,
+                    targets: 9,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -195,7 +204,40 @@ var KTDatatablesServerSide = function () {
             handleResetForm();
             KTMenu.createInstances();
         });
+
+        // Add event listener for opening and closing details
+        dt.on('click', 'td.dt-control', function (e) {
+        console.log("123", this);
+        var tr = event.target.closest('tr');
+        var row = dt.row(tr);
+
+        console.log("123", row.data()["bl_id"]);
+
+        $('#block_details').modal('toggle');
+        var html = (key, value) => `<div class="col-3" id="d_details">
+                    <p><h3 class="text-active-dark bold">${key}</h3>${value}</p>
+                </div>`
+        var contentDiv = $('#d_details');
+          $.ajax({
+              type: "GET",
+              url: "/blocks/get_block_async",
+              data: {
+                id: row.data()["bl_id"],
+              },
+              dataType: 'json',
+              success: function (data) {
+                  for (var key in data) {
+                    if (data.hasOwnProperty(key)) {
+                        var value = data[key];
+                        contentDiv.append(html(key,value));
+                    }
+                 }
+            }
+            });
+    });
     }
+
+
 
     // Search Datatable --- official docs reference: https://datatables.net/reference/api/search()
     var handleSearchDatatable = function () {
@@ -491,7 +533,9 @@ var KTDatatablesServerSide = function () {
               "name": e.relatedTarget.getAttribute("data-block_name")
           };
 
-        var html = (key, value) => `<span><h3 class="text-active-dark bold">${key}</h3>${value}</p>`
+        var html = (key, value) => `<div class="col-3" id="d_details">
+                    <p><h3 class="text-active-dark bold">${key}</h3>${value}</p>
+                </div>`
         var contentDiv = $('#d_details');
       $.ajax({
           type: "GET",
@@ -501,6 +545,7 @@ var KTDatatablesServerSide = function () {
           },
           dataType: 'json',
           success: function (data) {
+              contentDiv.empty();
               for (var key in data) {
                 if (data.hasOwnProperty(key)) {
                     var value = data[key];
