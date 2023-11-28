@@ -173,14 +173,6 @@ var KTDatatablesServerSide = function () {
                                     </a>
                                 </div>
                                 <!--end::Menu item-->
-                                <!--begin::Menu item-->
-                                <div class="menu-item px-3">
-                                    <a href="`+ row["block_url"]["url"] + row["scan_number"] +`" class="menu-link px-3">
-                                        Scan URL
-                                    </a>
-                                </div>
-                                <!--end::Menu item-->
-                                
                             </div>
                             <!--end::Menu-->
                         `;

@@ -13,6 +13,8 @@
       {% csrf_token %}
       <div class="row">
         {{form|crispy}}
+          <b>Note:</b>
+          <p>Scan URL`s format like: <span>https://64.54.108.121/app/WebViewer/view/image/</span> and ends with <span>"/"</span></p>
       </div>
     </div>
     <div class="card-footer">
