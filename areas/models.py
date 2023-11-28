@@ -41,6 +41,7 @@ class Areas(models.Model):
         ("salivary-metastasis","Salivary Metastasis"),
         ("local-recurrent-metastasis","Local Recurrent Metastasis"),
         ("cells","Cells"),
+        ("cell-line","Cell Line"),
         ("other","Other"),
     ]
 
