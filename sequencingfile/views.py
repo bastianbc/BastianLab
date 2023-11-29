@@ -13,7 +13,7 @@ from capturedlib.models import CapturedLib
 from sequencinglib.models import SequencingLib
 from pathlib import Path
 import pandas as pd
-
+from blocks.models import Blocks
 
 @permission_required("sequencingfile.view_sequencingfile",raise_exception=True)
 def sequencingfiles(request):
@@ -266,8 +266,9 @@ def get_or_create_files_from_file(row):
     except Exception as e:
         print(e)
 
-def _create_file_from_file():
 
+
+def _create_file_from_file():
     file = Path(Path(__file__).parent.parent / "uploads" / "report_matching_sample_lib_with_bait_after_reducing_fastq_files.csv")
     df = pd.read_csv(file)
     print(df.columns)
@@ -276,3 +277,28 @@ def _create_file_from_file():
     df["fastq_file"] = df["fastq_file"].apply(lambda x: make_dict(x))
 
     df[~df["fastq_file"].isnull()].apply(lambda row: get_or_create_files_from_file(row), axis=1)
+    # df.apply(lambda row: get_or(row), axis=1)
+
+
+def get_or(row):
+    try:
+        Blocks.objects.get(name=row["Block_ID"])
+    except:
+        print(row["Block_ID"])
+
+def get_or_cons(row):
+    try:
+        Blocks.objects.get(name=row["Block"])
+    except:
+        print(row["Block"])
+
+def _blocks():
+    # file = Path(Path(__file__).parent.parent / "uploads" / "Blocks-Grid view-5.csv")
+    # df = pd.read_csv(file)
+    # df.apply(lambda row: get_or(row), axis=1)
+    file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
+    df = pd.read_csv(file)
+    df.apply(lambda row: get_or_cons(row), axis=1)
+
+
+

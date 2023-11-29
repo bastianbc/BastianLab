@@ -1,4 +1,4 @@
-﻿SL_ID,NA_ID,Area_ID,Pat_ID,Age,Block_ID,Pre-hyb PCR cycles,Post-lib Qubit (ng/ul),Post-lib qPCR (ng/ul),Volume of library (ul),LP DNA (ng),RE LP amount (ng),Re LP2 amount (ng),Total LP DNA for capture (ng),Insert size (bp),Capture status,CL_ID,Input LP DNA for capture (ng),Input LP Volume,Post-hyb PCR cycles,Capture Panel,Old Barcode,New Barcode,Date of prep,Notes,Tissue Type,Assigned Projects,Sequencing Run_ID
+SL_ID,NA_ID,Area_ID,Pat_ID,Age,Block_ID,Pre-hyb PCR cycles,Post-lib Qubit (ng/ul),Post-lib qPCR (ng/ul),Volume of library (ul),LP DNA (ng),RE LP amount (ng),Re LP2 amount (ng),Total LP DNA for capture (ng),Insert size (bp),Capture status,CL_ID,Input LP DNA for capture (ng),Input LP Volume,Post-hyb PCR cycles,Capture Panel,Old Barcode,New Barcode,Date of prep,Notes,Tissue Type,Assigned Projects,Sequencing Run_ID
 ,,,,,,,,,,0.0,,,0.0,,,,,NaN,,,,,,,,,
 ,,,,,,,,,,0.0,,,0.0,,,,,NaN,,,,,,,,,
 ,,,,,,,,,,0.0,,,0.0,,,,,NaN,,,,,,,,,
@@ -11,9 +11,9 @@
 7,7_NA,2403 Melanocytic Nevus,,,12-12467,,,20.00,50,1000.0,,,1000.0,,Captured,BB2_CL,50.0,2.50,16,SureSelect Human All Exon V4,NF-96-4,,5/14/2012,Hybridization Input DNA Manipulation,Tumor,2010-2017,HiSeq1_BB2
 11,11_NA,2404 BCC,,,12-12470D,,,9.60,50,480.0,,,480.0,,Captured,BB2_CL,62.5,6.51,16,SureSelect Human All Exon V4,NF-96-8,,5/14/2012,None,Tumor,2010-2017,HiSeq1_BB2
 12_M,12_M_NA,,,,,,,,,0.0,,,0.0,,,,,NaN,13,Ampliconseq,L2DR11,,,"Hunter, Desmoplastic Melanoma Amplicon Sequence",Tumor,2010-2017,Nimblegen29_BB34
-13,13_NA,2405 ,,,12-562,,,20.00,50,1000.0,,,1000.0,,Captured,BB2_CL,62.5,3.13,16,SureSelect Human All Exon V4,NF-96-10,,5/14/2012,None,Tumor,2010-2017,HiSeq1_BB2
+13,13_NA,2405,,,12-562,,,20.00,50,1000.0,,,1000.0,,Captured,BB2_CL,62.5,3.13,16,SureSelect Human All Exon V4,NF-96-10,,5/14/2012,None,Tumor,2010-2017,HiSeq1_BB2
 15,15_NA,2406 Melanocytic Nevus,,,12-12647,,,6.60,50,330.0,,,330.0,,Captured,BB2_CL,62.5,9.47,16,SureSelect Human All Exon V4,NF-96-12,,5/14/2012,None,Tumor,2010-2017,HiSeq1_BB2
-20,20_NA,2407 Cellular Dermatofibroma ,,,12-12626,,,20.00,50,1000.0,,,1000.0,,Captured,BB2_CL,25.0,1.25,16,SureSelect Human All Exon V4,NF-96-13,,5/14/2012,Hybridization Input DNA Manipulation,Tumor,2010-2017,HiSeq1_BB2
+20,20_NA,2407 Cellular Dermatofibroma,,,12-12626,,,20.00,50,1000.0,,,1000.0,,Captured,BB2_CL,25.0,1.25,16,SureSelect Human All Exon V4,NF-96-13,,5/14/2012,Hybridization Input DNA Manipulation,Tumor,2010-2017,HiSeq1_BB2
 21-1,21-1_NA,,,,10-41439,,,,,0.0,,,0.0,,Captured,BB5_CL,62.5,Infinity,,NimV1,L2DR01,,,RIGHT MID UPPER BACK,Mel,2010-2017,Nimblegen2_BB5
 21-2,21-2_NA,,,,10-41439,,,,,0.0,,,0.0,,Captured,BB5_CL,62.5,Infinity,,NimV1,L2DR02,,,RIGHT MID UPPER BACK,Mel,2010-2017,Nimblegen2_BB5
 21-3,21-3_NA,,,,10-41439,,,,,0.0,,,0.0,,Captured,BB5_CL,62.5,Infinity,,NimV1,L2DR03,,,RIGHT MID UPPER BACK,Nevus,2010-2017,Nimblegen2_BB5
@@ -46,9 +46,9 @@
 40,40_NA,2418 Melanocytic Nevus,,,12-22901A,,,20.00,50,1000.0,,,1000.0,,Captured,BB2_CL,62.5,3.13,16,SureSelect Human All Exon V4,NF-96-26,,5/14/2012,Normal Tumor Pair,Tumor,2010-2017,HiSeq1_BB2
 41,41_NA,2419 Mel,,,12-22776B5,,,20.00,50,1000.0,,,1000.0,,Captured,BB2_CL,62.5,3.13,16,SureSelect Human All Exon V4,NF-96-27,,5/14/2012,None,Normal,2010-2017,HiSeq1_BB2
 43,43_NA,2420 Buffy Coat DNA,,,Buffy Coat,,,20.00,50,1000.0,,,1000.0,,Captured,BB2_CL,62.5,3.13,16,SureSelect Human All Exon V4,NF-96-28,,5/14/2012,Buffy Coat Derived DNA,Tumor,2010-2017,HiSeq1_BB2
-44,44_NA,2421 SCC,,,12-13587B2,,,15.00,50,750.0,,,750.0,,Captured,BB2_CL,62.5,4.17,16,SureSelect Human All Exon V4,NF-96-29,,5/14/2012,"Diluted Input Library DNA, Samples 44-46 were dilutions made from sample 23 to test how the same template with varying input concentrations under the required 1 ug input effects sequencing. ",Tumor,2010-2017,HiSeq1_BB2
-45,45_NA,2422 SCC,,,12-13587B2,,,10.00,50,500.0,,,500.0,,Captured,BB2_CL,62.5,6.25,16,SureSelect Human All Exon V4,NF-96-30,,5/14/2012,"Diluted Input Library DNA, Samples 44-46 were dilutions made from sample 23 to test how the same template with varying input concentrations under the required 1 ug input effects sequencing. ",Tumor,2010-2017,HiSeq1_BB2
-46,46_NA,2423 SCC,,,12-13587B2,,,5.00,50,250.0,,,250.0,,Captured,BB2_CL,62.5,12.50,16,SureSelect Human All Exon V4,NF-96-31,,5/14/2012,"Diluted Input Library DNA, Samples 44-46 were dilutions made from sample 23 to test how the same template with varying input concentrations under the required 1 ug input effects sequencing. ",Tumor,2010-2017,HiSeq1_BB2
+44,44_NA,2421 SCC,,,12-13587B2,,,15.00,50,750.0,,,750.0,,Captured,BB2_CL,62.5,4.17,16,SureSelect Human All Exon V4,NF-96-29,,5/14/2012,"Diluted Input Library DNA, Samples 44-46 were dilutions made from sample 23 to test how the same template with varying input concentrations under the required 1 ug input effects sequencing.",Tumor,2010-2017,HiSeq1_BB2
+45,45_NA,2422 SCC,,,12-13587B2,,,10.00,50,500.0,,,500.0,,Captured,BB2_CL,62.5,6.25,16,SureSelect Human All Exon V4,NF-96-30,,5/14/2012,"Diluted Input Library DNA, Samples 44-46 were dilutions made from sample 23 to test how the same template with varying input concentrations under the required 1 ug input effects sequencing.",Tumor,2010-2017,HiSeq1_BB2
+46,46_NA,2423 SCC,,,12-13587B2,,,5.00,50,250.0,,,250.0,,Captured,BB2_CL,62.5,12.50,16,SureSelect Human All Exon V4,NF-96-31,,5/14/2012,"Diluted Input Library DNA, Samples 44-46 were dilutions made from sample 23 to test how the same template with varying input concentrations under the required 1 ug input effects sequencing.",Tumor,2010-2017,HiSeq1_BB2
 47,43_NA,2424 SCC,,,12-22775,,,20.00,50,1000.0,,,1000.0,,Captured,BB3_CL,62.5,3.13,16,SureSelect Human All Exon V4,NF-96-32,,6/8/2012,,Tumor,2010-2017,HiSeq2_BB3
 48,47_NA,2425 Mel,,,12-22794A,,,20.00,50,1000.0,,,1000.0,,Captured,BB3_CL,,0.00,16,SureSelect Human All Exon V4,NF-96-33,,6/8/2012,,Tumor,2010-2017,HiSeq2_BB3
 49,48_NA,2426 Melanocytic Nevus,,,12-22573,,,20.00,50,1000.0,,,1000.0,,Captured,BB3_CL,62.5,3.13,16,SureSelect Human All Exon V4,NF-96-34,,6/8/2012,,Tumor,2010-2017,HiSeq2_BB3
@@ -72,11 +72,10 @@
 70,68_NA,2440 Melanocytic Nevus,,,12-22894B,,,6.06,50,303.0,,,303.0,,Captured,BB3_CL,62.5,10.31,16,SureSelect Human All Exon V4,NF-96-55,,6/8/2012,,Tumor,2010-2017,HiSeq2_BB3
 71,70_NA,2441 Melanocytic Nevus,,,12-22898,,,19.62,50,981.0,,,981.0,,Captured,BB3_CL,62.5,3.19,16,SureSelect Human All Exon V4,NF-96-56,,6/8/2012,,Tumor,2010-2017,HiSeq2_BB3
 72,71_NA,2442 SCC,,,12-22900,,,12.08,50,604.0,,,604.0,,Captured,BB3_CL,62.5,5.17,16,SureSelect Human All Exon V4,NF-96-57,,6/8/2012,,Tumor,2010-2017,HiSeq2_BB3
-73,72_NA,2430 BCC,,,12-22597,,,14.00,50,700.0,,,700.0,,Captured,BB3_CL,62.5,4.46,16,SureSelect Human All Exon V4,NF-96-58,,6/8/2012,"Samples 73-76 were dilutions made from sample 58 to test how the same template with varying input concentrations ( under the required 1 ug input) effects sequencing. 
-",Tumor,2010-2017,HiSeq2_BB3
-74,73_NA,2430 BCC,,,12-22597,,,10.00,50,500.0,,,500.0,,Captured,BB3_CL,62.5,6.25,16,SureSelect Human All Exon V4,NF-96-59,,6/8/2012,Samples 73-76 were dilutions made from sample 58 to test how the same template with varying input concentrations ( under the required 1 ug input) effects sequencing. ,Tumor,2010-2017,HiSeq2_BB3
-75,74_NA,2430 BCC,,,12-22597,,,5.00,50,250.0,,,250.0,,Captured,BB3_CL,62.5,12.50,16,SureSelect Human All Exon V4,NF-96-60,,6/8/2012,Samples 73-76 were dilutions made from sample 58 to test how the same template with varying input concentrations ( under the required 1 ug input) effects sequencing. ,Tumor,2010-2017,HiSeq2_BB3
-76,75_NA,2430 BCC,,,12-22597,,,2.00,50,100.0,,,100.0,,Captured,BB3_CL,62.5,31.25,16,SureSelect Human All Exon V4,NF-96-61,,6/8/2012,Samples 73-76 were dilutions made from sample 58 to test how the same template with varying input concentrations ( under the required 1 ug input) effects sequencing. ,Tumor,2010-2017,HiSeq2_BB3
+73,72_NA,2430 BCC,,,12-22597,,,14.00,50,700.0,,,700.0,,Captured,BB3_CL,62.5,4.46,16,SureSelect Human All Exon V4,NF-96-58,,6/8/2012,Samples 73-76 were dilutions made from sample 58 to test how the same template with varying input concentrations ( under the required 1 ug input) effects sequencing.,Tumor,2010-2017,HiSeq2_BB3
+74,73_NA,2430 BCC,,,12-22597,,,10.00,50,500.0,,,500.0,,Captured,BB3_CL,62.5,6.25,16,SureSelect Human All Exon V4,NF-96-59,,6/8/2012,Samples 73-76 were dilutions made from sample 58 to test how the same template with varying input concentrations ( under the required 1 ug input) effects sequencing.,Tumor,2010-2017,HiSeq2_BB3
+75,74_NA,2430 BCC,,,12-22597,,,5.00,50,250.0,,,250.0,,Captured,BB3_CL,62.5,12.50,16,SureSelect Human All Exon V4,NF-96-60,,6/8/2012,Samples 73-76 were dilutions made from sample 58 to test how the same template with varying input concentrations ( under the required 1 ug input) effects sequencing.,Tumor,2010-2017,HiSeq2_BB3
+76,75_NA,2430 BCC,,,12-22597,,,2.00,50,100.0,,,100.0,,Captured,BB3_CL,62.5,31.25,16,SureSelect Human All Exon V4,NF-96-61,,6/8/2012,Samples 73-76 were dilutions made from sample 58 to test how the same template with varying input concentrations ( under the required 1 ug input) effects sequencing.,Tumor,2010-2017,HiSeq2_BB3
 892_Mel,"DNA-132,DNA-266",892 Mel,ME-29,,17-125030,,,,,0.0,,,0.0,,Captured,BI-112022,,NaN,,Somatic Human WES v6,,,11/15/2022,SM-MRJ8I; GATK4-Mutect2/CNV pipeline,Mel,Broad Institute,BCB041
 893_Nevus,DNA-133,893 Nevus,ME-29,,17-125030,,,,,0.0,,,0.0,,Captured,BI-112022,,NaN,,Somatic Human WES v6,,,11/15/2022,SM-MQT6A; GATK4-Mutect2/CNV pipeline,Nevus,Broad Institute,BCB041
 894_Normal,"DNA-131,DNA-267,DNA-270,DNA-271",894 Normal,ME-29,,17-125030,,,,,0.0,,,0.0,,Captured,BI-112022,,NaN,,Somatic Human WES v6,,,11/15/2022,SM-MRJ5L; GATK4-Mutect2/CNV pipeline,Normal,Broad Institute,BCB041
@@ -228,10 +227,10 @@
 2496_Normal,LMM D-006,2496 Normal,LMM-02,,21-7055B1,,,,,0.0,,,0.0,,Captured,BI-082023,,NaN,,Somatic Human WES v6,,,,,Normal,Broad Institute,BCB060
 2497_Invasive,LMM D-007,2497 Invasive,LMM-03,,21-457C,,,,,0.0,,,0.0,,Captured,BI-082023,,NaN,,Somatic Human WES v6,,,,,Others,Broad Institute,BCB060
 2498_MIS,LMM D-008,2498 MIS,LMM-03,,21-457B,,,,,0.0,,,0.0,,Captured,BI-082023,,NaN,,Somatic Human WES v6,,,,,MIS,Broad Institute,BCB060
-2499_Normal_flag,LMM D-009,2499 Normal,LMM-04,,21-25546B2,,,,,0.0,,,0.0,,Captured,BI-082023,,NaN,,Somatic Human WES v6,,,,,Normal,Broad Institute,BCB060
+2499_Normal,LMM D-009,2499 Normal,LMM-04,,21-25546B2,,,,,0.0,,,0.0,,Captured,BI-082023,,NaN,,Somatic Human WES v6,,,,,Normal,Broad Institute,BCB060
 2500_Invasive,LMM D-010,2500 Invasive,LMM-04,,21-21304A10,,,,,0.0,,,0.0,,Captured,BI-082023,,NaN,,Somatic Human WES v6,,,,,Others,Broad Institute,BCB060
 2501_MIS,LMM D-011,2501 MIS,LMM-04,,21-21304A1,,,,,0.0,,,0.0,,Captured,BI-082023,,NaN,,Somatic Human WES v6,,,,,MIS,Broad Institute,BCB060
-2502_Normal_flag,LMM D-012,2502 Normal,LMM-03,,21-35943A,,,,,0.0,,,0.0,,Captured,BI-082023,,NaN,,Somatic Human WES v6,,,,,Normal,Broad Institute,BCB060
+2502_Normal,LMM D-012,2502 Normal,LMM-03,,21-35943A,,,,,0.0,,,0.0,,Captured,BI-082023,,NaN,,Somatic Human WES v6,,,,,Normal,Broad Institute,BCB060
 2503_Invasive,LMM D-013,2503 Invasive,LMM-05,,22-91699A4,,,,,0.0,,,0.0,,Captured,BI-082023,,NaN,,Somatic Human WES v6,,,,,Others,Broad Institute,BCB060
 2504_MIS,LMM D-014,2504 MIS,LMM-05,,22-91699A1,,,,,0.0,,,0.0,,Captured,BI-082023,,NaN,,Somatic Human WES v6,,,,,MIS,Broad Institute,BCB060
 2505_Normal,LMM D-015,2505 Normal,LMM-05,,22-91699A7,,,,,0.0,,,0.0,,Captured,BI-082023,,NaN,,Somatic Human WES v6,,,,,Normal,Broad Institute,BCB060
@@ -618,7 +617,7 @@ AMLP-323,AM2 D-470,1471 Mel1,AM2-086,,13-30315A3,4,4.36,1.87,50,93.5,,,93.5,299,
 AMLP-324,AM2 D-260,1474 Met1,AM2-086,,15-29364A1,4,2.99,0.94,50,47.0,,,47.0,306,Captured,AGEX-26,47.0,50.00,10,SureSelect XT HS Human All Exon V7,,154,5/27/2021,,Met,Acral Melanoma,BCB031
 AMLP-325,AM2 D-471,1541 Normal,AM2-100,,15-48543A1,4,1.76,0.88,50,44.0,,,44.0,302,Captured,AGEX-26,43.8,49.77,10,SureSelect XT HS Human All Exon V7,,155,5/27/2021,,Normal,Acral Melanoma,BCB031
 AMLP-326,AM2 D-472,1542 Skin Met1,AM2-100,,15-48543A1,4,2.83,1.36,50,68.0,,,68.0,314,Captured,AGEX-26,68.0,50.00,10,SureSelect XT HS Human All Exon V7,,156,5/27/2021,,Met,Acral Melanoma,BCB031
-AMLP-327,AM2 D-474,1540 MIS2; 1625 MIS2 In situ,AM2-100,, 14-51352,4,2.55,1.42,50,71.0,,,71.0,324,Captured,AGEX-26,71.0,50.00,10,SureSelect XT HS Human All Exon V7,,157,5/27/2021,,MIS,Acral Melanoma,BCB031
+AMLP-327,AM2 D-474,1540 MIS2; 1625 MIS2 In situ,AM2-100,,14-51352,4,2.55,1.42,50,71.0,,,71.0,324,Captured,AGEX-26,71.0,50.00,10,SureSelect XT HS Human All Exon V7,,157,5/27/2021,,MIS,Acral Melanoma,BCB031
 AMLP-328,AM2 D-348,1568 LN Met 8,AM2-102,,17-14203A2,4,5.06,3.42,50,171.0,,,171.0,338,Pending,,,0.00,,,,158,5/27/2021,,Met,Acral Melanoma,
 AMLP-329,AM2 D-475,1588 MIS2,AM2-108,,19-44348A1,4,5.41,4.61,50,230.5,,,230.5,350,Pending,,,0.00,,,,167,5/27/2021,,MIS,Acral Melanoma,
 AMLP-330,AM2 D-476,1603 Normal 2; 1604 Normal,AM2-111,,19-51759; 20-28721A1,4,3.15,2.69,50,134.5,,,134.5,347,Captured,AGEX-26,75.0,27.88,10,SureSelect XT HS Human All Exon V7,,179,5/27/2021,,Normal,Acral Melanoma,BCB031
@@ -691,7 +690,7 @@ AMLP-393,AM2 D-493,"421 MIS2, 1245 MIS2",AM2-082,,K23-A-B,4,1.45,0.93,50,46.5,,,
 AMLP-394,AM2 D-494,1618 MIS3,AM2-082,,K23-D,4,2.85,1.20,50,60.0,,,60.0,331,Pending,,,0.00,,,,145,1/26/2022,"HyperPREP, Ligation: 30 min at 20 oC",,Acral Melanoma,
 AMLP-395,AM2 D-495,1619 MIS4,AM2-082,,K23-D,4,2.35,1.20,50,60.0,,,60.0,330,Captured,SGPC-20,58.0,48.33,12,Small Gene Panel,,147,1/26/2022,"HyperPREP, Ligation: 30 min at 20 oC. Cat.#: 1080577, xGen Hyb Capture of DNA Libraries, v5.",MIS,Acral Melanoma,BCB036
 AMLP-396,AM2 D-496,1542 Skin Met1,AM2-100,,15-48543A1,4,5.49,4.67,50,233.5,,,233.5,313,Captured,SGPC-20,60.0,12.85,12,Small Gene Panel,,148,1/26/2022,"HyperPREP, Ligation: 30 min at 20 oC. Cat.#: 1080577, xGen Hyb Capture of DNA Libraries, v5.",Met,Acral Melanoma,BCB036
-AMLP-397,AM2 D-446,1621 MIS4,AM2-049,,K1-A.2,4,3.73,2.90,50,145.0,,,145.0,324,Captured,SGPC-24,60.0,20.69,12,Small Gene Panel,,106,4/27/2022,"HyperPREP, Ligation: 30 min at 20 oC. ",MIS,Acral Melanoma,BCB040
+AMLP-397,AM2 D-446,1621 MIS4,AM2-049,,K1-A.2,4,3.73,2.90,50,145.0,,,145.0,324,Captured,SGPC-24,60.0,20.69,12,Small Gene Panel,,106,4/27/2022,"HyperPREP, Ligation: 30 min at 20 oC.",MIS,Acral Melanoma,BCB040
 AMLP-398,AM2 D-36,84 Mel,AM2-050,,,4,5.72,4.06,50,203.0,,,203.0,327,Captured,SGPC-24,50.0,12.32,12,Small Gene Panel,,112,4/27/2022,"HyperPREP, Ligation: 30 min at 20 oC.",Mel,Acral Melanoma,BCB040
 AMLP-399,AM2 D-129,378 Mel1,AM2-068,,K9-A-B,4,10.90,5.93,50,296.5,,,296.5,,Captured,SGPC-24,60.0,10.12,12,Small Gene Panel,,113,4/27/2022,"HyperPREP, Ligation: 30 min at 20 oC.",Mel,Acral Melanoma,BCB040
 AMLP-400,AM2 D-130,379 LN Met 1,AM2-068,,K9-C,4,19.60,7.44,50,372.0,,,372.0,328,Captured,SGPC-24,60.0,8.06,12,Small Gene Panel,,114,4/27/2022,"HyperPREP, Ligation: 30 min at 20 oC.",Met,Acral Melanoma,BCB040
@@ -933,14 +932,14 @@ BN_M1,BN_M1_NA,,,,,,,,,0.0,,,0.0,,Captured,,,NaN,13,NimV2,L2DR15,,,Hunter Blue N
 BN_M2,BN_M2_NA,,,,,,,,,0.0,,,0.0,,Captured,,,NaN,13,NimV2,L2DR16,,,Hunter Blue Nevus (Melanoma in Nevus Project),Tumor,2010-2017,Nimblegen36_BB43
 BN_N1,BN_N1_NA,,,,,,,,,0.0,,,0.0,,Captured,,,NaN,13,NimV2,L2DR13,,,Hunter Blue Nevus (Melanoma in Nevus Project),Tumor,2010-2017,Nimblegen36_BB43
 BN_N2,BN_N2_NA,,,,,,,,,0.0,,,0.0,,Captured,,,NaN,13,NimV2,L2DR14,,,Hunter Blue Nevus (Melanoma in Nevus Project),Tumor,2010-2017,Nimblegen36_BB43
-CCRLP-0001,"MMD-09,MMD-55,MMD-69",1634 Mel,CCR-003,,14-34758,4,1.23,0.41,50,20.5,,,20.5,,Captured,SGPC-23,20.5,50.00,12,Small Gene Panel,,107,10/16/2021,"HyperPlus; Frag: 10min,37oC; Ligation: 20min, 20oC. ",Mel,California Cancer Registry,BCB038
-CCRLP-0002,MMD-172,1764 Mel,CCR-004,,07-55149,4,1.87,1.32,50,66.0,,,66.0,,Captured,SGPC-23,66.0,50.00,12,Small Gene Panel,,108,10/16/2021,"HyperPlus; Frag: 10min,37oC; Ligation: 20min, 20oC. ",Mel,California Cancer Registry,BCB038
-CCRLP-0003,"MMD-28,MMD-59",1648 Mel,CCR-005,,99-14477,4,0.76,0.19,50,9.5,,,9.5,,Captured,SGPC-23,9.5,50.00,12,Small Gene Panel,,116,10/16/2021,"HyperPlus; Frag: 10min,37oC; Ligation: 20min, 20oC. ",Mel,California Cancer Registry,BCB038
-CCRLP-0004,MMD-20,1645 Mel,CCR-007,,00-14127,4,0.97,0.31,50,15.5,,,15.5,,Captured,SGPC-23,15.5,50.00,12,Small Gene Panel,,117,10/16/2021,"HyperPlus; Frag: 10min,37oC; Ligation: 20min, 20oC. ",Mel,California Cancer Registry,BCB038
-CCRLP-0005,"MMD-16,MMD-24",1641 Mel,CCR-008,,02-7356,4,2.15,1.04,50,52.0,,,52.0,,Captured,SGPC-23,52.0,50.00,12,Small Gene Panel,,118,10/16/2021,"HyperPlus; Frag: 10min,37oC; Ligation: 20min, 20oC. ",Mel,California Cancer Registry,BCB038
-CCRLP-0006,MMD-60,1651 Mel,CCR-009,,06-18321,4,5.30,3.77,50,188.5,,,188.5,,Captured,SGPC-23,136.0,36.07,12,Small Gene Panel,,119,10/16/2021,"HyperPlus; Frag: 10min,37oC; Ligation: 20min, 20oC. ",Mel,California Cancer Registry,BCB038
-CCRLP-0007,"MMD-19,MMD-25",1644 Mel,CCR-014,,09-90221,4,2.12,3.85,50,192.5,,,192.5,,Captured,SGPC-23,136.0,35.32,12,Small Gene Panel,,120,10/16/2021,"HyperPlus; Frag: 10min,37oC; Ligation: 20min, 20oC. ",Mel,California Cancer Registry,BCB038
-CCRLP-0008,"MMD-33,MMD-62,MMD-106",1653 Mel,CCR-015,,08-51663,4,1.89,1.56,50,78.0,,,78.0,,Captured,SGPC-23,78.0,50.00,12,Small Gene Panel,,121,10/16/2021,"HyperPlus; Frag: 10min,37oC; Ligation: 20min, 20oC. ",Mel,California Cancer Registry,BCB038
+CCRLP-0001,"MMD-09,MMD-55,MMD-69",1634 Mel,CCR-003,,14-34758,4,1.23,0.41,50,20.5,,,20.5,,Captured,SGPC-23,20.5,50.00,12,Small Gene Panel,,107,10/16/2021,"HyperPlus; Frag: 10min,37oC; Ligation: 20min, 20oC.",Mel,California Cancer Registry,BCB038
+CCRLP-0002,MMD-172,1764 Mel,CCR-004,,07-55149,4,1.87,1.32,50,66.0,,,66.0,,Captured,SGPC-23,66.0,50.00,12,Small Gene Panel,,108,10/16/2021,"HyperPlus; Frag: 10min,37oC; Ligation: 20min, 20oC.",Mel,California Cancer Registry,BCB038
+CCRLP-0003,"MMD-28,MMD-59",1648 Mel,CCR-005,,99-14477,4,0.76,0.19,50,9.5,,,9.5,,Captured,SGPC-23,9.5,50.00,12,Small Gene Panel,,116,10/16/2021,"HyperPlus; Frag: 10min,37oC; Ligation: 20min, 20oC.",Mel,California Cancer Registry,BCB038
+CCRLP-0004,MMD-20,1645 Mel,CCR-007,,00-14127,4,0.97,0.31,50,15.5,,,15.5,,Captured,SGPC-23,15.5,50.00,12,Small Gene Panel,,117,10/16/2021,"HyperPlus; Frag: 10min,37oC; Ligation: 20min, 20oC.",Mel,California Cancer Registry,BCB038
+CCRLP-0005,"MMD-16,MMD-24",1641 Mel,CCR-008,,02-7356,4,2.15,1.04,50,52.0,,,52.0,,Captured,SGPC-23,52.0,50.00,12,Small Gene Panel,,118,10/16/2021,"HyperPlus; Frag: 10min,37oC; Ligation: 20min, 20oC.",Mel,California Cancer Registry,BCB038
+CCRLP-0006,MMD-60,1651 Mel,CCR-009,,06-18321,4,5.30,3.77,50,188.5,,,188.5,,Captured,SGPC-23,136.0,36.07,12,Small Gene Panel,,119,10/16/2021,"HyperPlus; Frag: 10min,37oC; Ligation: 20min, 20oC.",Mel,California Cancer Registry,BCB038
+CCRLP-0007,"MMD-19,MMD-25",1644 Mel,CCR-014,,09-90221,4,2.12,3.85,50,192.5,,,192.5,,Captured,SGPC-23,136.0,35.32,12,Small Gene Panel,,120,10/16/2021,"HyperPlus; Frag: 10min,37oC; Ligation: 20min, 20oC.",Mel,California Cancer Registry,BCB038
+CCRLP-0008,"MMD-33,MMD-62,MMD-106",1653 Mel,CCR-015,,08-51663,4,1.89,1.56,50,78.0,,,78.0,,Captured,SGPC-23,78.0,50.00,12,Small Gene Panel,,121,10/16/2021,"HyperPlus; Frag: 10min,37oC; Ligation: 20min, 20oC.",Mel,California Cancer Registry,BCB038
 CCRLP-0009,MMD-91,1695 Mel,CCR-090,,"03-57585A, 03-57585C",4,1.11,1.23,50,61.5,,,61.5,,Captured,SGPC-23,61.5,50.00,12,Small Gene Panel,,122,10/22/2021,"HyperPREP; Ligation: 20min, 20oC.",Mel,California Cancer Registry,BCB038
 CCRLP-0010,MMD-81,1686 Mel,CCR-083,,07-67657A,4,4.98,1.99,50,99.5,,,99.5,,Captured,SGPC-23,99.5,50.00,12,Small Gene Panel,,123,10/22/2021,"HyperPREP; Ligation: 20min, 20oC.",Mel,California Cancer Registry,BCB038
 CCRLP-0011,MMD-76,1682 Mel,CCR-074,,08-1851A,4,1.34,0.08,50,4.0,,,4.0,,Captured,SGPC-23,4.0,50.00,12,Small Gene Panel,,124,10/22/2021,"HyperPREP; Ligation: 20min, 20oC.",Mel,California Cancer Registry,BCB038
@@ -998,10 +997,10 @@ CGH10_17,CGH10_17_NA,,,,Iwei CGH10-17,,,,,0.0,,,0.0,,Captured,BB10_CL,,NaN,,NimV
 CGH10_020,CGH10_020_NA,,,,CGH10-020,,,,,0.0,,,0.0,,Captured,BB14_CL,,NaN,,NimV2,L2DR06,,,Iwei Translocation Cases,Tumor,2010-2017,Nimblegen11_BB14
 CGH10_049,CGH10_049_NA,,,,CGH10-049,,,,,0.0,,,0.0,,Captured,BB14_CL,,NaN,,NimV2,L2DR07,,,Iwei Translocation Cases,Tumor,2010-2017,Nimblegen11_BB14
 CGH10_058,CGH10_058_NA,,,,CGH10-058,,,,,0.0,,,0.0,,Captured,BB14_CL,,NaN,,NimV2,L2DR04,,,Iwei Translocation Cases,Tumor,2010-2017,Nimblegen11_BB14
-CGH10-028,CGH10-028_NA,,,,,,,,,0.0,,,0.0,,Captured,BB21_CL,,NaN,,NimV2,L2DR06,,," Iwei, 7QGain",Tumor,2010-2017,Nimblegen18_BB21
-CGH10-045,CGH10-045_NA,,,,,,,,,0.0,,,0.0,,Captured,BB21_CL,,NaN,,NimV2,L2DR07,,," Iwei, 7QGain",Tumor,2010-2017,Nimblegen18_BB21
+CGH10-028,CGH10-028_NA,,,,,,,,,0.0,,,0.0,,Captured,BB21_CL,,NaN,,NimV2,L2DR06,,,"Iwei, 7QGain",Tumor,2010-2017,Nimblegen18_BB21
+CGH10-045,CGH10-045_NA,,,,,,,,,0.0,,,0.0,,Captured,BB21_CL,,NaN,,NimV2,L2DR07,,,"Iwei, 7QGain",Tumor,2010-2017,Nimblegen18_BB21
 CGH10-058,CGH10-058_NA,,,,,,,,,0.0,,,0.0,,Captured,BB22_CL,,NaN,,WGS,L2DR04,,,,Tumor,2010-2017,WGS1_BB22
-CGH10-062,CGH10-062_NA,,,,,,,,,0.0,,,0.0,,Captured,BB21_CL,,NaN,,NimV2,L2DR08,,," Iwei, 7QGain",Tumor,2010-2017,Nimblegen18_BB21
+CGH10-062,CGH10-062_NA,,,,,,,,,0.0,,,0.0,,Captured,BB21_CL,,NaN,,NimV2,L2DR08,,,"Iwei, 7QGain",Tumor,2010-2017,Nimblegen18_BB21
 CGH11_020,CGH11_020_NA,,,,CGH11-020,,,,,0.0,,,0.0,,Captured,BB14_CL,,NaN,,NimV2,L2DR08,,,Iwei Translocation Cases,Tumor,2010-2017,Nimblegen11_BB14
 CGH11_035,CGH11_035_NA,,,,Iwei CGH11-035,,,,,0.0,,,0.0,,Captured,BB10_CL,,NaN,,NimV1,L2DR09,,,Iwei Translocation Case,Tumor,2010-2017,Nimblegen7_BB10
 CGH11_60,CGH11_60_NA,,,,Iwei CGH11-60,,,,,0.0,,,0.0,,Captured,BB10_CL,,NaN,,NimV1,L2DR14,,,Iwei Translocation Case,Tumor,2010-2017,Nimblegen7_BB10
@@ -1018,19 +1017,19 @@ CGH11_310,CGH11_310_NA,,,,,,,,,0.0,,,0.0,,Captured,BB21_CL,,NaN,,NimV2,L2DR03,,,
 CGH11_319,CGH11_319_NA,,,,,,,,,0.0,,,0.0,,Captured,BB21_CL,,NaN,,NimV2,L2DR04,,,"NTRK1 Iwei, Translocation",Tumor,2010-2017,Nimblegen18_BB21
 CGH11_343,CGH11_343_NA,,,,Iwei CGH11-343,,,,,0.0,,,0.0,,Captured,BB10_CL,,NaN,,NimV1,L2DR10,,,Iwei Translocation Case,Tumor,2010-2017,Nimblegen7_BB10
 CGH11_348,CGH11_348_NA,,,,,,,,,0.0,,,0.0,,Captured,BB21_CL,,NaN,,NimV2,L2DR05,,,"NTRK1 Iwei, Translocation",Tumor,2010-2017,Nimblegen18_BB21
-CGH11_410,CGH11_410_NA,,,,,,,,,0.0,,,0.0,,,,,NaN,13,NimV2,L2DR16,,,"Iwei CGH, 7Q Gain ",Tumor,2010-2017,Nimblegen33_BB39
-CGH11_424,CGH11_424_NA,,,,,,,,,0.0,,,0.0,,,,,NaN,13,NimV2,L2DR01,,,"Iwei CGH, 7Q Gain ",Tumor,2010-2017,Nimblegen33_BB39
-CGH11-011,CGH11-011_NA,,,,,,,,,0.0,,,0.0,,Captured,BB21_CL,,NaN,,NimV2,L2DR09,,," Iwei, 7QGain",Tumor,2010-2017,Nimblegen18_BB21
+CGH11_410,CGH11_410_NA,,,,,,,,,0.0,,,0.0,,,,,NaN,13,NimV2,L2DR16,,,"Iwei CGH, 7Q Gain",Tumor,2010-2017,Nimblegen33_BB39
+CGH11_424,CGH11_424_NA,,,,,,,,,0.0,,,0.0,,,,,NaN,13,NimV2,L2DR01,,,"Iwei CGH, 7Q Gain",Tumor,2010-2017,Nimblegen33_BB39
+CGH11-011,CGH11-011_NA,,,,,,,,,0.0,,,0.0,,Captured,BB21_CL,,NaN,,NimV2,L2DR09,,,"Iwei, 7QGain",Tumor,2010-2017,Nimblegen18_BB21
 CGH11-035,CGH11-035_NA,,,,,,,,,0.0,,,0.0,,Captured,BB22_CL,,NaN,,WGS,L2DR09,,,,Tumor,2010-2017,WGS1_BB22
 CGH11-051,CGH11-051,,,,,,39.40,,30,0.0,,,0.0,,Captured,BB53_CL,,NaN,,NimV2,NextFlex 1,,7/31/2013,Iwei Translocation,,Kinome CGH Project,BioSci3_BB53
-CGH11-072,CGH11-072_NA,,,,,,,,,0.0,,,0.0,,Captured,BB21_CL,,NaN,,NimV2,L2DR10,,," Iwei, 7QGain",Tumor,2010-2017,Nimblegen18_BB21
-CGH11-087,CGH11-087_NA,,,,,,,,,0.0,,,0.0,,Captured,BB21_CL,,NaN,,NimV2,L2DR11,,," Iwei, 7QGain",Tumor,2010-2017,Nimblegen18_BB21
-CGH11-089,CGH11-089_NA,,,,,,,,,0.0,,,0.0,,Captured,BB21_CL,,NaN,,NimV2,L2DR13,,," Iwei, 7QGain",Tumor,2010-2017,Nimblegen18_BB21
+CGH11-072,CGH11-072_NA,,,,,,,,,0.0,,,0.0,,Captured,BB21_CL,,NaN,,NimV2,L2DR10,,,"Iwei, 7QGain",Tumor,2010-2017,Nimblegen18_BB21
+CGH11-087,CGH11-087_NA,,,,,,,,,0.0,,,0.0,,Captured,BB21_CL,,NaN,,NimV2,L2DR11,,,"Iwei, 7QGain",Tumor,2010-2017,Nimblegen18_BB21
+CGH11-089,CGH11-089_NA,,,,,,,,,0.0,,,0.0,,Captured,BB21_CL,,NaN,,NimV2,L2DR13,,,"Iwei, 7QGain",Tumor,2010-2017,Nimblegen18_BB21
 CGH11-115,CGH11-115_NA,,,,,,,,,0.0,,,0.0,,,,,NaN,13,NimV2,L2DR02,,,"Iwei, Translocation CGH, PDGFRB",Tumor,2010-2017,Nimblegen25_BB30
-CGH11-147,CGH11-147_NA,,,,,,,,,0.0,,,0.0,,Captured,BB21_CL,,NaN,,NimV2,L2DR12,,," Iwei, 7QGain",Tumor,2010-2017,Nimblegen18_BB21
-CGH11-158,CGH11-158_NA,,,,,,,,,0.0,,,0.0,,Captured,BB21_CL,,NaN,,NimV2,L2DR14,,," Iwei, 7QGain",Tumor,2010-2017,Nimblegen18_BB21
-CGH11-166,CGH11-166_NA,,,,,,,,,0.0,,,0.0,,Captured,BB21_CL,,NaN,,NimV2,L2DR15,,," Iwei, 7QGain",Tumor,2010-2017,Nimblegen18_BB21
-CGH11-172,CGH11-172_NA,,,,,,,,,0.0,,,0.0,,Captured,BB21_CL,,NaN,,NimV2,L2DR16,,," Iwei, 7QGain",Tumor,2010-2017,Nimblegen18_BB21
+CGH11-147,CGH11-147_NA,,,,,,,,,0.0,,,0.0,,Captured,BB21_CL,,NaN,,NimV2,L2DR12,,,"Iwei, 7QGain",Tumor,2010-2017,Nimblegen18_BB21
+CGH11-158,CGH11-158_NA,,,,,,,,,0.0,,,0.0,,Captured,BB21_CL,,NaN,,NimV2,L2DR14,,,"Iwei, 7QGain",Tumor,2010-2017,Nimblegen18_BB21
+CGH11-166,CGH11-166_NA,,,,,,,,,0.0,,,0.0,,Captured,BB21_CL,,NaN,,NimV2,L2DR15,,,"Iwei, 7QGain",Tumor,2010-2017,Nimblegen18_BB21
+CGH11-172,CGH11-172_NA,,,,,,,,,0.0,,,0.0,,Captured,BB21_CL,,NaN,,NimV2,L2DR16,,,"Iwei, 7QGain",Tumor,2010-2017,Nimblegen18_BB21
 CGH11-184,CGH11-184_NA,,,,,,,,,0.0,,,0.0,,,,,NaN,13,NimV2,L2DR03,,,"Iwei, Translocation CGH, PDGFRB",Tumor,2010-2017,Nimblegen25_BB30
 CGH11-194,CGH11-194_NA,,,,,,,,,0.0,,,0.0,,Captured,BB22_CL,,NaN,,WGS,L2DR15,,,,Tumor,2010-2017,WGS1_BB22
 CGH11-224,CGH11-224_NA,,,,,,,,,0.0,,,0.0,,Captured,,,NaN,13,NimV2,L2DR11,,,"Iwei CGH, 7Q Gain",Tumor,2010-2017,Nimblegen35_BB41
@@ -1041,22 +1040,19 @@ CGH11-237,CGH11-237_NA,,,,,,28.50,,30,0.0,,,0.0,,Captured,BB36_CL,90.9,Infinity,
 CGH11-252,CGH11-252_NA,,,,,,,,,0.0,,,0.0,,Captured,BB22_CL,,NaN,,WGS,L2DR01,,,,Tumor,2010-2017,WGS1_BB22
 CGH11-259,CGH11-259_NA,,,,,,20.30,,30,0.0,,,0.0,,Captured,BB22_CL,90.9,Infinity,13,NimV2,L2DR11,,,Iwei 7Q Gain,Tumor,2010-2017,Nimblegen31_BB36
 CGH11-275,CGH11-275,,,,,,,,,0.0,,,0.0,,Captured,,,NaN,,NimV2,L2DR12,,7/9/2013,"Iwei 7Q gain
-, Swapna CGH screened, FFPE derived; Not sequenced, <2 ul volume remaining
-
-",,Kinome CGH Project,Nimblegen31_BB36
+, Swapna CGH screened, FFPE derived; Not sequenced, <2 ul volume remaining",,Kinome CGH Project,Nimblegen31_BB36
 CGH11-315,CGH11-315_NA,,,,,,15.80,,30,0.0,,,0.0,,Captured,BB22_CL,90.9,Infinity,13,NimV2,L2DR12,,,Iwei 7Q Gain,Tumor,2010-2017,Nimblegen31_BB36
 CGH11-339,CGH11-339_NA,,,,,,20.80,,30,0.0,,,0.0,,Captured,BB22_CL,90.9,Infinity,13,NimV2,L2DR13,,,Iwei 7Q Gain,Tumor,2010-2017,Nimblegen31_BB36
 CGH11-399,CGH11-399,1342 Tumor,,,,,,,,0.0,,,0.0,,Captured,,,NaN,,NimV2,L2DR15,,7/9/2013,"Iwei 7Q gain
-, Swapna CGH screened, FFPE derived; Not sequenced, <2 ul volume remaining
-",,Kinome CGH Project,Nimblegen31_BB36
+, Swapna CGH screened, FFPE derived; Not sequenced, <2 ul volume remaining",,Kinome CGH Project,Nimblegen31_BB36
 CGH11-402,CGH11-402,1343 Tumor,,,,,18.50,,30,0.0,,,0.0,,Captured,,,NaN,,NimV2,L2DR14,,7/9/2013,"Iwei 7Q gain, Swapna CGH screened, FFPE derived",,Kinome CGH Project,Nimblegen31_BB36
 CGH11-404,CGH11-404_NA,,,,,,21.70,,30,0.0,,,0.0,,Captured,BB22_CL,90.9,Infinity,13,NimV2,L2DR15,,,Iwei 7Q Gain,Tumor,2010-2017,Nimblegen31_BB36
 CGH11-409,CGH11-409_NA,,,,,,16.00,,30,0.0,,,0.0,,Captured,BB22_CL,90.9,Infinity,13,NimV2,L2DR16,,,Iwei 7Q Gain,Tumor,2010-2017,Nimblegen31_BB36
-CGH12_026,CGH12_026_NA,,,,,,,,,0.0,,,0.0,,Captured,,,NaN,13,NimV2,L2DR02,,,"Iwei CGH, 7Q Gain ",Tumor,2010-2017,Nimblegen33_BB39
-CGH12_039,CGH12_039_NA,,,,,,,,,0.0,,,0.0,,Captured,,,NaN,13,NimV2,L2DR03,,,"Iwei CGH, 7Q Gain ",Tumor,2010-2017,Nimblegen33_BB39
-CGH12_040,CGH12_040_NA,,,,,,,,,0.0,,,0.0,,Captured,,,NaN,13,NimV2,L2DR04,,,"Iwei CGH, 7Q Gain ",Tumor,2010-2017,Nimblegen33_BB39
-CGH12_053,CGH12_053_NA,,,,,,,,,0.0,,,0.0,,Captured,,,NaN,13,NimV2,L2DR05,,,"Iwei CGH, 7Q Gain ",Tumor,2010-2017,Nimblegen33_BB39
-CGH12_056,CGH12_056_NA,,,,,,,,,0.0,,,0.0,,Captured,,,NaN,13,NimV2,L2DR06,,,"Iwei CGH, 7Q Gain ",Tumor,2010-2017,Nimblegen33_BB39
+CGH12_026,CGH12_026_NA,,,,,,,,,0.0,,,0.0,,Captured,,,NaN,13,NimV2,L2DR02,,,"Iwei CGH, 7Q Gain",Tumor,2010-2017,Nimblegen33_BB39
+CGH12_039,CGH12_039_NA,,,,,,,,,0.0,,,0.0,,Captured,,,NaN,13,NimV2,L2DR03,,,"Iwei CGH, 7Q Gain",Tumor,2010-2017,Nimblegen33_BB39
+CGH12_040,CGH12_040_NA,,,,,,,,,0.0,,,0.0,,Captured,,,NaN,13,NimV2,L2DR04,,,"Iwei CGH, 7Q Gain",Tumor,2010-2017,Nimblegen33_BB39
+CGH12_053,CGH12_053_NA,,,,,,,,,0.0,,,0.0,,Captured,,,NaN,13,NimV2,L2DR05,,,"Iwei CGH, 7Q Gain",Tumor,2010-2017,Nimblegen33_BB39
+CGH12_056,CGH12_056_NA,,,,,,,,,0.0,,,0.0,,Captured,,,NaN,13,NimV2,L2DR06,,,"Iwei CGH, 7Q Gain",Tumor,2010-2017,Nimblegen33_BB39
 CGH12_058,CGH12_058_NA,,,,,,,,,0.0,,,0.0,,Captured,,,NaN,13,NimV2,L2DR14,,,"Iwei CGH, Translocation FLT4",Tumor,2010-2017,Nimblegen33_BB39
 CGH12_135,CGH12_135_NA,,,,,,,,,0.0,,,0.0,,Captured,BB11_CL,,NaN,,NimV1,L2DR15,,,NTRK1,Tumor,2010-2017,Nimblegen8_BB11
 CGH12_161,CGH12_161_NA,,,,,,,,,0.0,,,0.0,,Captured,BB11_CL,,NaN,,NimV1,L2DR16,,,NTRK1,Tumor,2010-2017,Nimblegen8_BB11
@@ -1154,8 +1150,7 @@ CGP-1577,,2283 Mel,JJS28,,15-21741,,0.00,0.00,50,0.0,,,0.0,,Captured,CL_95,,NaN,
 CGP-9008,D-8692,,CCGL-2973,,18-28169,,,9.89,50,494.4,,,494.4,,Captured,KAPAEX-03,,0.00,, SeqCap EZ MedExome,,87,,,Tumor,Clinical Cases-BCC,BCB005
 CGP-9023,D-8691,,CCGL-2973,,18-68921A,,,13.23,50,661.4,,,661.4,,Captured,KAPAEX-03,,0.00,, SeqCap EZ MedExome,,6,,,Normal,Clinical Cases-BCC,BCB005
 CHG11-402,CHG11-402_NA,,,,,,,,,0.0,,,0.0,,,,,NaN,13,NimV2,L2DR14,,,Iwei 7Q Gain,Tumor,2010-2017,Nimblegen31_BB36
-CHG11-409,CHG11-409,,,,,,16.00,,30,0.0,,,0.0,,Captured,BB36_CL,,NaN,,NimV2,L2DR16,,7/9/2013,"Iwei 7Q gain, Swapna CGH screened, FFPE derived
-",,Kinome CGH Project,Nimblegen31_BB36
+CHG11-409,CHG11-409,,,,,,16.00,,30,0.0,,,0.0,,Captured,BB36_CL,,NaN,,NimV2,L2DR16,,7/9/2013,"Iwei 7Q gain, Swapna CGH screened, FFPE derived",,Kinome CGH Project,Nimblegen31_BB36
 CHG12-335,CHG12-335_NA,,,,,,,,,0.0,,,0.0,,Captured,BB24_CL,,NaN,,NimV2,L2DR12,,,"Iwei, Translocation CGH BRAF",Tumor,2010-2017,Nimblegen20_BB24
 ChIP1_1,ChIP1_1_NA,2887 Cell Line - Control,,,ct-Input,,,,,0.0,,,0.0,,,,,NaN,,,L2DR01,,,,,,ChipSeq1_BB37
 ChIP1_2,ChIP1_2_NA,2888 Cell Line - Control,,,ct-H3K4,,,,,0.0,,,0.0,,,,,NaN,,,L2DR02,,,,,,ChipSeq1_BB37
@@ -1172,7 +1167,7 @@ ChIP1_12,ChIP1_12_NA,2898 Cell Line - Knockdown,,,sh-H3K27,,,,,0.0,,,0.0,,,,,NaN
 CNS_29_Normal,CNS_29_Normal_NA,,,,W09-1121,,,,,0.0,,,0.0,,Captured,BB17_CL,,NaN,,NimV2,L2DR02,,,N14_2,Tumor,2010-2017,Nimblegen14_BB17
 CNS_29_Tumor,CNS_29_Tumor_NA,,,,W09-1121,,,,,0.0,,,0.0,,Captured,BB17_CL,,NaN,,NimV2,L2DR01,,,N14_1,Tumor,2010-2017,Nimblegen14_BB17
 CNS_30_Tumor,CNS_30_Tumor_NA,,,,W10-143,,,,,0.0,,,0.0,,Captured,BB17_CL,,NaN,,NimV2,L2DR03,,,N14_3,Tumor,2010-2017,Nimblegen14_BB17
-CNS_31_Tumor,CNS_31_Tumor_NA,,,,S94-31062  ,,,,,0.0,,,0.0,,Captured,BB17_CL,,NaN,,NimV2,L2DR04,,,N14_4,Tumor,2010-2017,Nimblegen14_BB17
+CNS_31_Tumor,CNS_31_Tumor_NA,,,,S94-31062,,,,,0.0,,,0.0,,Captured,BB17_CL,,NaN,,NimV2,L2DR04,,,N14_4,Tumor,2010-2017,Nimblegen14_BB17
 CNS_33_Tumor,CNS_33_Tumor_NA,,,,S02-23636  A02,,,,,0.0,,,0.0,,Captured,BB17_CL,,NaN,,NimV2,L2DR05,,,N14_5,Tumor,2010-2017,Nimblegen14_BB17
 CNS_34_Normal,CNS_34_Normal_NA,,,,S02-33818  A03,,,,,0.0,,,0.0,,Captured,BB17_CL,,NaN,,NimV2,L2DR07,,,N14_7,Tumor,2010-2017,Nimblegen14_BB17
 CNS_34_Tumor,CNS_34_Tumor_NA,,,,S02-33818  A03,,,,,0.0,,,0.0,,Captured,BB17_CL,,NaN,,NimV2,L2DR06,,,N14_6,Tumor,2010-2017,Nimblegen14_BB17
@@ -1394,8 +1389,7 @@ DM-81-Tumor,DM-81-Tumor_NA,,,,,,,,,0.0,,,0.0,,Captured,,,NaN,13,NimV2mix3,NextFl
 DM1_Normal,DM1_Normal_NA,,,,DM_1_Normal,,,,,0.0,,,0.0,,Captured,BB13_CL,,NaN,13,NimV2mix1,L2DR01,,,,Normal,Desmoplastic Melanoma,Nimblegen10_BB13
 DM1_Tumor,DM1_Tumor_NA,,,,DM_1_Tumor,,,,,0.0,,,0.0,,Captured,BB13_CL,,NaN,13,NimV2mix1,L2DR02,,,,Tumor,Desmoplastic Melanoma,Nimblegen10_BB13
 DM1-Tert-Amplicon,DM_1_Tumor_NA,,,,,,,,,0.0,,,0.0,,Captured,,,NaN,,NimV2,,,,"Hunter Amplicon Sequencing
-; Tert 1, Tert 2, and Tert 3 spike-in at 10pg/ul; SF3B1 1 and SF3B1 2 spike-in at 4pg/ul; NFKBIE spike-in at 10pg/ul
-",Tumor,Desmoplastic Melanoma,Nimblegen44_BB54
+; Tert 1, Tert 2, and Tert 3 spike-in at 10pg/ul; SF3B1 1 and SF3B1 2 spike-in at 4pg/ul; NFKBIE spike-in at 10pg/ul",Tumor,Desmoplastic Melanoma,Nimblegen44_BB54
 DM2_Normal,DM2_Normal_NA,,,,DM_2_Normal,,,,,0.0,,,0.0,,Captured,BB13_CL,,NaN,13,NimV2mix1,L2DR03,,,,Normal,Desmoplastic Melanoma,Nimblegen10_BB13
 DM2_Tumor,DM2_Tumor_NA,,,,DM_2_Tumor,,,,,0.0,,,0.0,,Captured,BB13_CL,,NaN,13,NimV2mix1,L2DR04,,,,Tumor,Desmoplastic Melanoma,Nimblegen10_BB13
 DM2-Tert-Amplicon,DM_2_Tumor_NA,,,,,,,,,0.0,,,0.0,,Captured,,,NaN,,NimV2,,,,"Hunter Amplicon Sequencing
@@ -1409,9 +1403,7 @@ DM8TumorCrest,,,,,,,,,,0.0,,,0.0,,Captured,,,NaN,,NimV2mix1,,,,,Tumor,Desmoplast
 DM11_Normal,DM11_Normal_NA,,,,,,,,,0.0,,,0.0,,Captured,BB15_CL,,NaN,,NimV2,L2DR02,,,Less than the optimal 100 ng input conc. For End Repair,Tumor,Desmoplastic Melanoma,Nimblegen12_BB15
 DM11_Tumor,DM11_Tumor_NA,,,,,,,,,0.0,,,0.0,,Captured,BB15_CL,,NaN,,NimV2,L2DR01,,,,Tumor,Desmoplastic Melanoma,Nimblegen12_BB15
 DM11-Tert-Amplicon,DM_11_Tumor_NA,,,,,,,,,0.0,,,0.0,,Captured,,,NaN,,NimV2,,,,"Hunter DM Amplicon Sequencing; Tert 1, Tert 2, and Tert 3 spike-in at 10pg/ul
-; SF3B1 1 and SF3B1 2 spike-in at 4pg/ul; NFKBIE spike-in at 10pg/ul
-
-",Tumor,Desmoplastic Melanoma,Nimblegen40_BB47
+; SF3B1 1 and SF3B1 2 spike-in at 4pg/ul; NFKBIE spike-in at 10pg/ul",Tumor,Desmoplastic Melanoma,Nimblegen40_BB47
 DM12_Normal,DM12_Normal_NA,,,,DM_12_Normal,,,,,0.0,,,0.0,,Captured,BB13_CL,,NaN,13,NimV2mix1,L2DR09,,,,Normal,Desmoplastic Melanoma,Nimblegen10_BB13
 DM12_Tumor,DM12_Tumor_NA,,,,DM_12_Tumor,,,,,0.0,,,0.0,,Captured,BB13_CL,,NaN,13,NimV2mix1,L2DR10,,,,Tumor,Desmoplastic Melanoma,Nimblegen10_BB13
 DM13_Normal,DM13_Normal_NA,,,,DM_13_Normal,,,,,0.0,,,0.0,,Captured,BB13_CL,,NaN,13,NimV2mix1,L2DR11,,,,Normal,Desmoplastic Melanoma,Nimblegen10_BB13
@@ -1455,35 +1447,35 @@ DM93_Normal,DM93_Normal_NA,,,,DM_93_Normal,,,,,0.0,,,0.0,,Captured,BB13_CL,,NaN,
 DM93-NFKBIE-Amplicon,,,,,,,,,,0.0,,,0.0,,Captured,,,NaN,,NimV2,,,,"Hunter Amplicon Sequencing
 ; Tert 1, Tert 2, and Tert 3 spike-in at 10pg/ul; SF3B1 1 and SF3B1 2 spike-in at 4pg/ul; NFKBIE spike-in at 10pg/ul",,Desmoplastic Melanoma,Nimblegen44_BB54
 DM93Tumor,,,,,,,,,,0.0,,,0.0,,Captured,,,NaN,,NimV2mix1,,,,,Tumor,Desmoplastic Melanoma,Nimblegen10_BB13
-DP12_200,DP12_200_NA,,,,DP12-200 ,,,,,0.0,,,0.0,,Captured,BB10_CL,,NaN,,NimV1,L2DR11,,,Dr. Lutzky's Case,Tumor,Desmoplastic Melanoma,Nimblegen7_BB10
-DPN_1_Tumor,DPN_1_Tumor_NA,2859 Tumor,,,11-71241 ,,,,,0.0,,,0.0,,Captured,BB25_CL,,NaN,,NimV2,L2DR08,,,Iwei DPN,Tumor,Deep Penetrating Nevus,Nimblegen21_BB25
-DPN_3_Tumor,DPN_3_Tumor_NA,2860 Tumor,,,11-26903 ,,,,,0.0,,,0.0,,Captured,BB25_CL,,NaN,,NimV2,L2DR09,,,Iwei DPN,Tumor,Deep Penetrating Nevus,Nimblegen21_BB25
-DPN_4_Tumor,DPN_4_Tumor_NA,2861 Tumor,,,11-28912B ,,,,,0.0,,,0.0,,Captured,BB25_CL,,NaN,,NimV2,L2DR10,,,Iwei DPN,Tumor,Deep Penetrating Nevus,Nimblegen21_BB25
+DP12_200,DP12_200_NA,,,,DP12-200,,,,,0.0,,,0.0,,Captured,BB10_CL,,NaN,,NimV1,L2DR11,,,Dr. Lutzky's Case,Tumor,Desmoplastic Melanoma,Nimblegen7_BB10
+DPN_1_Tumor,DPN_1_Tumor_NA,2859 Tumor,,,11-71241,,,,,0.0,,,0.0,,Captured,BB25_CL,,NaN,,NimV2,L2DR08,,,Iwei DPN,Tumor,Deep Penetrating Nevus,Nimblegen21_BB25
+DPN_3_Tumor,DPN_3_Tumor_NA,2860 Tumor,,,11-26903,,,,,0.0,,,0.0,,Captured,BB25_CL,,NaN,,NimV2,L2DR09,,,Iwei DPN,Tumor,Deep Penetrating Nevus,Nimblegen21_BB25
+DPN_4_Tumor,DPN_4_Tumor_NA,2861 Tumor,,,11-28912B,,,,,0.0,,,0.0,,Captured,BB25_CL,,NaN,,NimV2,L2DR10,,,Iwei DPN,Tumor,Deep Penetrating Nevus,Nimblegen21_BB25
 DPN_5_Normal,DPN_5_Normal_NA,2862 Normal,,,11-38149,,,,,0.0,,,0.0,,,,,NaN,13,NimV2,L2DR08,,,Iwei DPN,Tumor,Deep Penetrating Nevus,Nimblegen37_BB44
-DPN_5_Tumor,DPN_5_Tumor_NA,2863 Tumor,,,11-5210D ,,,,,0.0,,,0.0,,Captured,BB25_CL,,NaN,,NimV2,L2DR11,,,Iwei DPN,Tumor,Deep Penetrating Nevus,Nimblegen21_BB25
-DPN_6_Tumor,DPN_6_Tumor_NA,2864 Tumor,,,10-83193 ,,,,,0.0,,,0.0,,Captured,BB25_CL,,NaN,,NimV2,L2DR12,,,Iwei DPN,Tumor,Deep Penetrating Nevus,Nimblegen21_BB25
-DPN_7_Tumor,DPN_7_Tumor_NA,2865 Tumor,,,11-95856 ,,,,,0.0,,,0.0,,Captured,BB25_CL,,NaN,,NimV2,L2DR13,,,Iwei DPN,Tumor,Deep Penetrating Nevus,Nimblegen21_BB25
+DPN_5_Tumor,DPN_5_Tumor_NA,2863 Tumor,,,11-5210D,,,,,0.0,,,0.0,,Captured,BB25_CL,,NaN,,NimV2,L2DR11,,,Iwei DPN,Tumor,Deep Penetrating Nevus,Nimblegen21_BB25
+DPN_6_Tumor,DPN_6_Tumor_NA,2864 Tumor,,,10-83193,,,,,0.0,,,0.0,,Captured,BB25_CL,,NaN,,NimV2,L2DR12,,,Iwei DPN,Tumor,Deep Penetrating Nevus,Nimblegen21_BB25
+DPN_7_Tumor,DPN_7_Tumor_NA,2865 Tumor,,,11-95856,,,,,0.0,,,0.0,,Captured,BB25_CL,,NaN,,NimV2,L2DR13,,,Iwei DPN,Tumor,Deep Penetrating Nevus,Nimblegen21_BB25
 DPN_8_Normal,DPN_8_Normal_NA,,,,,,,,,0.0,,,0.0,,,,,NaN,13,NimV2,L2DR08,,,Iwei DPN,Tumor,Deep Penetrating Nevus,Nimblegen34_BB40
-DPN_8_Tumor,DPN_8_Tumor_NA,2866 Tumor,,,10-23569A ,,,,,0.0,,,0.0,,Captured,BB25_CL,,NaN,,NimV2,L2DR14,,,Iwei DPN,Tumor,Deep Penetrating Nevus,Nimblegen21_BB25
+DPN_8_Tumor,DPN_8_Tumor_NA,2866 Tumor,,,10-23569A,,,,,0.0,,,0.0,,Captured,BB25_CL,,NaN,,NimV2,L2DR14,,,Iwei DPN,Tumor,Deep Penetrating Nevus,Nimblegen21_BB25
 DPN_9_Normal,DPN_9_Normal_NA,,,,,,,,,0.0,,,0.0,,,,,NaN,13,NimV2,L2DR09,,,Iwei DPN,Tumor,Deep Penetrating Nevus,Nimblegen34_BB40
-DPN_9_Tumor,DPN_9_Tumor_NA,2867 Tumor,,,09-92749 ,,,,,0.0,,,0.0,,Captured,BB25_CL,,NaN,,NimV2,L2DR15,,,Iwei DPN,Tumor,Deep Penetrating Nevus,Nimblegen21_BB25
-DPN_10_Tumor,DPN_10_Tumor_NA,2868 Tumor,,,09-72944 ,,,,,0.0,,,0.0,,Captured,BB25_CL,,NaN,,NimV2,L2DR16,,,Iwei DPN,Tumor,Deep Penetrating Nevus,Nimblegen21_BB25
-DPN_11_Tumor,DPN_11_Tumor_NA,2869 Tumor,,,10-46536 ,,,,,0.0,,,0.0,,Captured,BB25_CL,,NaN,,NimV2,L2DR01,,,Iwei DPN,Tumor,Deep Penetrating Nevus,Nimblegen21_BB25
-DPN_12_Tumor,DPN_12_Tumor_NA,2870 Tumor,,,10-83613A ,,,,,0.0,,,0.0,,Captured,BB25_CL,,NaN,,NimV2,L2DR02,,,Iwei DPN,Tumor,Deep Penetrating Nevus,Nimblegen21_BB25
+DPN_9_Tumor,DPN_9_Tumor_NA,2867 Tumor,,,09-92749,,,,,0.0,,,0.0,,Captured,BB25_CL,,NaN,,NimV2,L2DR15,,,Iwei DPN,Tumor,Deep Penetrating Nevus,Nimblegen21_BB25
+DPN_10_Tumor,DPN_10_Tumor_NA,2868 Tumor,,,09-72944,,,,,0.0,,,0.0,,Captured,BB25_CL,,NaN,,NimV2,L2DR16,,,Iwei DPN,Tumor,Deep Penetrating Nevus,Nimblegen21_BB25
+DPN_11_Tumor,DPN_11_Tumor_NA,2869 Tumor,,,10-46536,,,,,0.0,,,0.0,,Captured,BB25_CL,,NaN,,NimV2,L2DR01,,,Iwei DPN,Tumor,Deep Penetrating Nevus,Nimblegen21_BB25
+DPN_12_Tumor,DPN_12_Tumor_NA,2870 Tumor,,,10-83613A,,,,,0.0,,,0.0,,Captured,BB25_CL,,NaN,,NimV2,L2DR02,,,Iwei DPN,Tumor,Deep Penetrating Nevus,Nimblegen21_BB25
 DPN_14_Tumor,DPN_14_Tumor_NA,2871 Tumor,,,10-32987,,,,,0.0,,,0.0,,Captured,BB27_CL,,NaN,,NimV2mix3,L2DR03,,,Iwei DPN,Tumor,Deep Penetrating Nevus,Nimblegen22_BB27
 DPN_16_Tumor,DPN_16_Tumor_NA,2872 Tumor,,,06-08042,,,,,0.0,,,0.0,,Captured,BB27_CL,,NaN,,NimV2mix3,L2DR04,,,Iwei DPN,Tumor,Deep Penetrating Nevus,Nimblegen22_BB27
 DPN_17_Tumor,DPN_17_Tumor_NA,2873 Tumor,,,06-00911,,,,,0.0,,,0.0,,Captured,BB27_CL,,NaN,,NimV2mix3,L2DR05,,,Iwei DPN,Tumor,Deep Penetrating Nevus,Nimblegen22_BB27
 DPN_18_Normal,DPN_18_Normal_NA,,,,,,,,,0.0,,,0.0,,,,,NaN,13,NimV2,L2DR11,,,Iwei DPN,Tumor,Deep Penetrating Nevus,Nimblegen34_BB40
 DPN_18_Tumor,DPN_18_Tumor_NA,2874 Tumor,,,06-21363,,,,,0.0,,,0.0,,Captured,BB27_CL,,NaN,,NimV2mix3,L2DR06,,,Iwei DPN,Tumor,Deep Penetrating Nevus,Nimblegen22_BB27
 DPN_19_Tumor,DPN_19_Tumor_NA,2875 Tumor,,,06-47334,,,,,0.0,,,0.0,,Captured,BB27_CL,,NaN,,NimV2mix3,L2DR07,,,Iwei DPN,Tumor,Deep Penetrating Nevus,Nimblegen22_BB27
-DPN_35,DPN_35_NA,2876 ,,,13-59840,,,,,0.0,,,0.0,,Captured,,,NaN,13,NimV2,L2DR04,,,Iwei DPN,Tumor,Deep Penetrating Nevus,Nimblegen38_BB45
-DPN_CNN 30,DPN_CNN 30_NA,2877 ,,,11-73238A,,,,,0.0,,,0.0,,Captured,,,NaN,13,NimV2,L2DR12,,,Iwei DPN (Control Normal Nevus),Normal,Deep Penetrating Nevus,Nimblegen37_BB44
-DPN_CNN 32,DPN_CNN 32_NA,2878 ,,,11-73999,,,,,0.0,,,0.0,,Captured,,,NaN,13,NimV2,L2DR13,,,Iwei DPN (Control Normal Nevus),Normal,Deep Penetrating Nevus,Nimblegen37_BB44
-DPN_Conv_35,DPN_Conv_35_NA,2879 ,,,13-59840,,,,,0.0,,,0.0,,Captured,,,NaN,13,NimV2,L2DR05,,,Iwei DPN,Tumor,Deep Penetrating Nevus,Nimblegen38_BB45
-DPN_MM 20,DPN_MM 20_NA,2880 ,,,13-2939B,,,,,0.0,,,0.0,,Captured,,,NaN,13,NimV2,L2DR09,,,Iwei DPN (DPN like Melanoma),Tumor,Deep Penetrating Nevus,Nimblegen37_BB44
-DPN_MM 21,DPN_MM 21_NA,2881 ,,,13-48798,,,,,0.0,,,0.0,,Captured,,,NaN,13,NimV2,L2DR10,,,Iwei DPN (DPN like Melanoma),Tumor,Deep Penetrating Nevus,Nimblegen37_BB44
-DPN_MM 22,DPN_MM 22_NA,2882 ,,,13-51115A,,,,,0.0,,,0.0,,Captured,,,NaN,13,NimV2,L2DR11,,,Iwei DPN (DPN like Melanoma),Tumor,Deep Penetrating Nevus,Nimblegen37_BB44
-DPN-49-Graz,DPN 49,2696 ,,,61000/00 (LN),6,5.27,2.86,50,143.0,,,143.0,,Captured,BB90_CL,55.6,19.42,,NimV3,C1,,,,,Deep Penetrating Nevus,Kapa17_BB90
+DPN_35,DPN_35_NA,2876,,,13-59840,,,,,0.0,,,0.0,,Captured,,,NaN,13,NimV2,L2DR04,,,Iwei DPN,Tumor,Deep Penetrating Nevus,Nimblegen38_BB45
+DPN_CNN 30,DPN_CNN 30_NA,2877,,,11-73238A,,,,,0.0,,,0.0,,Captured,,,NaN,13,NimV2,L2DR12,,,Iwei DPN (Control Normal Nevus),Normal,Deep Penetrating Nevus,Nimblegen37_BB44
+DPN_CNN 32,DPN_CNN 32_NA,2878,,,11-73999,,,,,0.0,,,0.0,,Captured,,,NaN,13,NimV2,L2DR13,,,Iwei DPN (Control Normal Nevus),Normal,Deep Penetrating Nevus,Nimblegen37_BB44
+DPN_Conv_35,DPN_Conv_35_NA,2879,,,13-59840,,,,,0.0,,,0.0,,Captured,,,NaN,13,NimV2,L2DR05,,,Iwei DPN,Tumor,Deep Penetrating Nevus,Nimblegen38_BB45
+DPN_MM 20,DPN_MM 20_NA,2880,,,13-2939B,,,,,0.0,,,0.0,,Captured,,,NaN,13,NimV2,L2DR09,,,Iwei DPN (DPN like Melanoma),Tumor,Deep Penetrating Nevus,Nimblegen37_BB44
+DPN_MM 21,DPN_MM 21_NA,2881,,,13-48798,,,,,0.0,,,0.0,,Captured,,,NaN,13,NimV2,L2DR10,,,Iwei DPN (DPN like Melanoma),Tumor,Deep Penetrating Nevus,Nimblegen37_BB44
+DPN_MM 22,DPN_MM 22_NA,2882,,,13-51115A,,,,,0.0,,,0.0,,Captured,,,NaN,13,NimV2,L2DR11,,,Iwei DPN (DPN like Melanoma),Tumor,Deep Penetrating Nevus,Nimblegen37_BB44
+DPN-49-Graz,DPN 49,2696,,,61000/00 (LN),6,5.27,2.86,50,143.0,,,143.0,,Captured,BB90_CL,55.6,19.42,,NimV3,C1,,,,,Deep Penetrating Nevus,Kapa17_BB90
 DPN49-Tumor,DPN 49,,,,,,,,,0.0,,,0.0,,Captured,BB87_CL,,NaN,,NimV3,,,,,Tumor,Deep Penetrating Nevus,Kapa14_BB87
 DPN50-Tumor,,,,,,,,,,0.0,,,0.0,,Captured,BB87_CL,,NaN,,NimV3,,,,,Tumor,Deep Penetrating Nevus,Kapa14_BB87
 DPN51-Tumor,,,,,,,,,,0.0,,,0.0,,Captured,BB87_CL,,NaN,,NimV3,,,,,Tumor,Deep Penetrating Nevus,Kapa14_BB87
@@ -1498,7 +1490,7 @@ DPN59-Tumor,,,,,,,,,,0.0,,,0.0,,Captured,,,NaN,,NimV3,,,,,Tumor,Deep Penetrating
 DPN60-Tumor,,,,,,,,,,0.0,,,0.0,,Captured,BB87_CL,,NaN,,NimV3,,,,,Tumor,Deep Penetrating Nevus,Kapa14_BB87
 DPN61-Tumor,,,,,,,,,,0.0,,,0.0,,Captured,BB87_CL,,NaN,,NimV3,,,,,Tumor,Deep Penetrating Nevus,Kapa14_BB87
 DPN62-Tumor,,,,,,,,,,0.0,,,0.0,,Captured,BB87_CL,,NaN,,NimV3,,,,,Tumor,Deep Penetrating Nevus,Kapa14_BB87
-DT10_63051C,DT10_63051C_NA,,,,10_63051C,,,,,0.0,,,0.0,,,,,NaN,13,NimV2,L2DR07,,,Ivanka Normal (for #9) ,Normal,2010-2017,Nimblegen33_BB39
+DT10_63051C,DT10_63051C_NA,,,,10_63051C,,,,,0.0,,,0.0,,,,,NaN,13,NimV2,L2DR07,,,Ivanka Normal (for #9),Normal,2010-2017,Nimblegen33_BB39
 EXLP-01,PROG D-01,1311 Normal,WS-02,,07-210-4,4,3.84,3.07,50,153.5,,,153.5,327,Captured,"WGS-01,WGS-03,WGS-01_rerun,WGS-03_rerun",21.5,6.99,,Whole Genome Sequencing,,121,8/5/2020,Whole Genome Sequencing (WGS),Normal,Werner Syndrome,"BCB022,BCB024,BCB034,BCB035"
 EXLP-02,PROG D-02,1312 Met1,WS-02,,07-210-4,4,1.63,1.14,50,57.0,,,57.0,,Pending,,,0.00,,,,122,8/5/2020,,Met,Werner Syndrome,
 EXLP-03,PROG D-03,1313 Met2,WS-02,,07-210-4,4,0.65,0.35,50,17.5,,,17.5,,Pending,,,0.00,,,,123,8/5/2020,,Met,Werner Syndrome,
@@ -1553,22 +1545,14 @@ EXLP-51,PROG R-25,2309 Met9,WS-02,,07-1791,8,0.63,0.77,106,81.6,,,81.6,,Pending,
 EXLP-52,PROG R-26,2310 Met10,WS-02,,7-1841,8,0.24,0.27,106,28.6,,,28.6,,Pending,KAPAEX-27,,0.00,,KAPA HyperExome V1 Probes,,170,6/19/2023,"65oC X 1 min, 15 uM adapter; 8 cycles; 1 hr adapter ligation at 20oC",Met,Werner Syndrome,
 EXLP-53,PROG R-22,2306 Met6,WS-02,,07-2479-2,8,0.36,0.31,106,32.9,,,32.9,,Pending,KAPAEX-27,,0.00,,KAPA HyperExome V1 Probes,,166,6/30/2023,"65oC X 1 min, 15 uM adapter; 8 cycles; 1 hr adapter ligation at 20oC",Met,Werner Syndrome,
 EXLP-54,PROG R-26,2310 Met10,WS-02,,7-1841,8,0.25,0.16,106,17.0,,,17.0,,Pending,KAPAEX-27,,0.00,,KAPA HyperExome V1 Probes,,170,6/30/2023,"65oC X 1 min, 15 uM adapter; 8 cycles; 1 hr adapter ligation at 20oC",Met,Werner Syndrome,
-FKP-01,Fusion-01,1315 Tumor,KF-01,,12-4251,4,,112.22,50,5611.0,,,5611.0,,Captured,SGPC-04,8.5,0.08,13,Whole Genome Sequencing,B5,,3/5/2018,"KAPA RNA LP Kit, Capture hyb at 65c for 4 hours. 
-",,Fusion RNA,SGPC-04
-FKP-02,Fusion-02,1320 Tumor,KF-02,,11-31904,4,,28.73,50,1436.5,,,1436.5,,Captured,SGPC-04,8.5,0.30,13,Whole Genome Sequencing,B6,,3/5/2018,"KAPA RNA LP Kit, Capture hyb at 65c for 4 hours. 
-",,Fusion RNA,SGPC-04
-FKP-05,Fusion-05,1321 Tumor,KF-05,,11-5482,4,,413.29,50,20664.5,,,20664.5,,Captured,SGPC-04,8.5,0.02,13,Whole Genome Sequencing,B7,,3/5/2018,"KAPA RNA LP Kit, Capture hyb at 65c for 4 hours. 
-",,Fusion RNA,SGPC-04
-FKP-06,Fusion-06,1322 Tumor,DP-09,,12-11041,4,,1033.36,50,51668.0,,,51668.0,,Captured,SGPC-04,8.5,0.01,13,Whole Genome Sequencing,B8,,3/5/2018,"KAPA RNA LP Kit, Capture hyb at 65c for 4 hours. 
-",,Fusion RNA,SGPC-04
-FKP-08,Fusion-08,1323 Tumor,KF-08,,11-61046,4,,491.30,50,24565.0,,,24565.0,,Captured,SGPC-04,8.5,0.02,13,Whole Genome Sequencing,B9,,3/5/2018,"KAPA RNA LP Kit, Capture hyb at 65c for 4 hours. 
-",,Fusion RNA,SGPC-04
-FKP-09,Fusion-09,1324 Tumor,DP-17,,11-23710,4,,1062.35,50,53117.5,,,53117.5,,Captured,SGPC-04,8.5,0.01,13,Whole Genome Sequencing,B10,,3/5/2018,"KAPA RNA LP Kit, Capture hyb at 65c for 4 hours. 
-",,Fusion RNA,SGPC-04
-FKP-10,Fusion-10,1325 Tumor,KF-10,,Cell line MA9254,4,,3337.20,50,166860.0,,,166860.0,,Captured,SGPC-04,8.5,0.00,13,Whole Genome Sequencing,B11,,3/5/2018,"KAPA RNA LP Kit, Capture hyb at 65c for 4 hours. 
-",,Fusion RNA,SGPC-04
-FKP-11,Fusion-11,2250 Tumor,KF-11,,Lung canceer with ALK fusion,4,,863.29,50,43164.5,,,43164.5,,Captured,SGPC-04,8.5,0.01,13,Whole Genome Sequencing,B12,,3/5/2018,"KAPA RNA LP Kit, Capture hyb at 65c for 4 hours. 
-",,Fusion RNA,SGPC-04
+-FKP 1.00,Fusion-01,1315 Tumor,KF-01,,12-4251,4,,112.22,50,5611.0,,,5611.0,,Captured,SGPC-04,8.5,0.08,13,Whole Genome Sequencing,B5,,3/5/2018,"KAPA RNA LP Kit, Capture hyb at 65c for 4 hours.",,Fusion RNA,SGPC-04
+-FKP 2.00,Fusion-02,1320 Tumor,KF-02,,11-31904,4,,28.73,50,1436.5,,,1436.5,,Captured,SGPC-04,8.5,0.30,13,Whole Genome Sequencing,B6,,3/5/2018,"KAPA RNA LP Kit, Capture hyb at 65c for 4 hours.",,Fusion RNA,SGPC-04
+-FKP 5.00,Fusion-05,1321 Tumor,KF-05,,11-5482,4,,413.29,50,20664.5,,,20664.5,,Captured,SGPC-04,8.5,0.02,13,Whole Genome Sequencing,B7,,3/5/2018,"KAPA RNA LP Kit, Capture hyb at 65c for 4 hours.",,Fusion RNA,SGPC-04
+-FKP 6.00,Fusion-06,1322 Tumor,DP-09,,12-11041,4,,1033.36,50,51668.0,,,51668.0,,Captured,SGPC-04,8.5,0.01,13,Whole Genome Sequencing,B8,,3/5/2018,"KAPA RNA LP Kit, Capture hyb at 65c for 4 hours.",,Fusion RNA,SGPC-04
+-FKP 8.00,Fusion-08,1323 Tumor,KF-08,,11-61046,4,,491.30,50,24565.0,,,24565.0,,Captured,SGPC-04,8.5,0.02,13,Whole Genome Sequencing,B9,,3/5/2018,"KAPA RNA LP Kit, Capture hyb at 65c for 4 hours.",,Fusion RNA,SGPC-04
+-FKP 9.00,Fusion-09,1324 Tumor,DP-17,,11-23710,4,,1062.35,50,53117.5,,,53117.5,,Captured,SGPC-04,8.5,0.01,13,Whole Genome Sequencing,B10,,3/5/2018,"KAPA RNA LP Kit, Capture hyb at 65c for 4 hours.",,Fusion RNA,SGPC-04
+-FKP 10.00,Fusion-10,1325 Tumor,KF-10,,Cell line MA9254,4,,3337.20,50,166860.0,,,166860.0,,Captured,SGPC-04,8.5,0.00,13,Whole Genome Sequencing,B11,,3/5/2018,"KAPA RNA LP Kit, Capture hyb at 65c for 4 hours.",,Fusion RNA,SGPC-04
+-FKP 11.00,Fusion-11,2250 Tumor,KF-11,,Lung canceer with ALK fusion,4,,863.29,50,43164.5,,,43164.5,,Captured,SGPC-04,8.5,0.01,13,Whole Genome Sequencing,B12,,3/5/2018,"KAPA RNA LP Kit, Capture hyb at 65c for 4 hours.",,Fusion RNA,SGPC-04
 G3 DP08-21965C Normal,G3 DP08-21965C Normal_NA,,,,DP08-21965C,,,,,0.0,,,0.0,,,,,NaN,13,NimV2,L2DR04,,,Normal,Normal,2010-2017,Nimblegen30_BB35
 G3 DP08-21965C Tumor,G3 DP08-21965C Tumor_NA,,,,DP08-21965C,,,,,0.0,,,0.0,,,,,NaN,13,NimV2,L2DR03,,,Tumor,Tumor,2010-2017,Nimblegen30_BB35
 G5 DP08-4205A Normal,G5 DP08-4205A Normal_NA,,,,DP08-4205A,,,,,0.0,,,0.0,,,,,NaN,13,NimV2,L2DR06,,,Normal,Normal,2010-2017,Nimblegen30_BB35
@@ -1686,7 +1670,7 @@ JBU7-MVP,JBU7-MVP,,,,,,,,,0.0,,,0.0,,Captured,BB86_CL,,NaN,,,,,,,,,Kapa13_BB86
 JBU7-Norm,JBU7-Norm,,,,,,,,,0.0,,,0.0,,Captured,BB86_CL,,NaN,,,,,,,Normal,,Kapa13_BB86
 JBU8-MVP,JBU8-MVP,,,,,,,,,0.0,,,0.0,,Captured,BB86_CL,,NaN,,,,,,,,,Kapa13_BB86
 JBU8-Norm,JBU8-Norm,,,,,,,,,0.0,,,0.0,,Captured,BB86_CL,,NaN,,,,,,,Normal,,Kapa13_BB86
-JBU10-MVP,JBU10-MVP,2752 MVP,,,,,,,,0.0,,,0.0,,Captured,BB86_CL,,NaN,,,,,,,,,Kapa13_BB86
+JBU10-MVP,JBU10-MVP,MVP 2752.00,,,,,,,,0.0,,,0.0,,Captured,BB86_CL,,NaN,,,,,,,,,Kapa13_BB86
 JBU10-Norm,JBU10-Norm,,,,,,,,,0.0,,,0.0,,Captured,BB86_CL,,NaN,,,,,,,Normal,,Kapa13_BB86
 JBU11-MVP,JBU11-MVP,,,,,,,,,0.0,,,0.0,,Captured,BB86_CL,,NaN,,,,,,,,,Kapa13_BB86
 JBU11-Norm,JBU11-Norm,,,,,,,,,0.0,,,0.0,,Captured,BB86_CL,,NaN,,,,,,,Normal,,Kapa13_BB86
@@ -1925,13 +1909,13 @@ NGS 1-1,NGS 1-1_NA,2848 Tumor,,,12-146,,,,,0.0,,,0.0,,Captured,BB26_CL,,NaN,,,,,
 NGS 1-3,NGS 1-3_NA,2849 Normal,,,13-034,,,,,0.0,,,0.0,,Captured,BB26_CL,,NaN,,,,,,,Normal,,
 NGS 1-4,NGS 1-4_NA,2850 Tumor,,,13-026,,,,,0.0,,,0.0,,Captured,BB26_CL,,NaN,,,,,,,Tumor,,
 NGS 1-5,NGS 1-5_NA,2851 Tumor,,,13-014,,,,,0.0,,,0.0,,Captured,BB26_CL,,NaN,,,,,,,Tumor,,
-NGS 1-6,NGS 1-6_NA,2852 Tumor,,,13-9682 ,,,,,0.0,,,0.0,,Captured,BB26_CL,,NaN,,,,,,,Tumor,,
-NGS 1-7,NGS 1-7_NA,2853 Tumor,,,13-2054 ,,,,,0.0,,,0.0,,Captured,BB26_CL,,NaN,,,,,,,Tumor,,
+NGS 1-6,NGS 1-6_NA,2852 Tumor,,,13-9682,,,,,0.0,,,0.0,,Captured,BB26_CL,,NaN,,,,,,,Tumor,,
+NGS 1-7,NGS 1-7_NA,2853 Tumor,,,13-2054,,,,,0.0,,,0.0,,Captured,BB26_CL,,NaN,,,,,,,Tumor,,
 NGS 1-8,NGS 1-8_NA,2854 Normal,,,10-42241,,,,,0.0,,,0.0,,Captured,BB26_CL,,NaN,,,,,,,Normal,,
-NGS 1-9,NGS 1-9_NA,2855 ,,,CGH13-008,,,,,0.0,,,0.0,,Captured,BB26_CL,,NaN,,,,,,,Tumor,,
-NGS 1-10,NGS 1-10_NA,2856 ,,,CGH13-010,,,,,0.0,,,0.0,,Captured,BB26_CL,,NaN,,,,,,,Tumor,,
-NGS 1-13,NGS 1-13_NA,2857 ,,,CGH13-026,,,,,0.0,,,0.0,,Captured,BB26_CL,,NaN,,,,,,,Tumor,,
-NGS 1-14,NGS 1-14_NA,2858 ,,,CGH13-094,,,,,0.0,,,0.0,,Captured,BB26_CL,,NaN,,,,,,,Tumor,,
+NGS 1-9,NGS 1-9_NA,2855,,,CGH13-008,,,,,0.0,,,0.0,,Captured,BB26_CL,,NaN,,,,,,,Tumor,,
+NGS 1-10,NGS 1-10_NA,2856,,,CGH13-010,,,,,0.0,,,0.0,,Captured,BB26_CL,,NaN,,,,,,,Tumor,,
+NGS 1-13,NGS 1-13_NA,2857,,,CGH13-026,,,,,0.0,,,0.0,,Captured,BB26_CL,,NaN,,,,,,,Tumor,,
+NGS 1-14,NGS 1-14_NA,2858,,,CGH13-094,,,,,0.0,,,0.0,,Captured,BB26_CL,,NaN,,,,,,,Tumor,,
 NGS-2-1,,,,,,,,,,0.0,,,0.0,,,,,NaN,,,NextFlex 1,,,,,,Clinical2_BB52
 NGS-2-2,,,,,,,,,,0.0,,,0.0,,,,,NaN,,,NextFlex 2,,,,,,Clinical2_BB52
 NGS-2-3,,,,,,,,,,0.0,,,0.0,,,,,NaN,,,NextFlex 3,,,,,,Clinical2_BB52
@@ -1996,30 +1980,14 @@ NMLP-050,NM D-063,600 Nodular Mel,NM-63,,176323,4,8.63,0.46,46,21.2,,,21.2,,Capt
 NMLP-051,NM D-064,601 Nodular Mel,NM-64,,17-1468II 2,4,5.67,0.47,46,21.6,,,21.6,,Captured,SGPC-06,10.9,23.19,12,Small Gene Panel,,71,,,Tumor,Nodular Melanoma,"BCB002,BCB008"
 NMLP-052,NM D-065,602 Nodular Mel,NM-65,,17-1741 I,4,8.63,2.79,46,128.3,,,128.3,,Captured,SGPC-06,10.9,3.91,12,Small Gene Panel,,72,,,Tumor,Nodular Melanoma,"BCB002,BCB008"
 NMLP-053,NM D-068,1006 Nodular Mel,NM-68,,718/12 a,4,1.83,0.31,50,15.5,,,15.5,301,Captured,SGPC-19,11.0,35.48,12,Small Gene Panel,,154,9/8/2021,"KAPA HyperPLUS, 10 min Frag at 37oC, 30 min ligation at 20oC",Tumor,Nodular Melanoma,BCB032
-Nu-01,Fusion-01,1315 Tumor,KF-01,,12-4251,,,0.90,50,45.0,,,45.0,,Captured,SGPC-04,1.4,1.54,,Whole Genome Sequencing,A01,,,"NuGen LP Kit, Spiked after capture clean up, NuGen A01 adapter, CACGTCTA
-
-",,Fusion RNA,SGPC-04
-Nu-02,Fusion-02,1320 Tumor,KF-02,,11-31904,,,3.10,50,155.0,,,155.0,,Captured,SGPC-04,1.4,0.45,,Whole Genome Sequencing,B01,,,"NuGen LP Kit, Spiked after capture clean up, NuGen B01, AGCTAGTG
-
-",,Fusion RNA,SGPC-04
-Nu-05,Fusion-05,1321 Tumor,KF-05,,11-5482,,,1.60,50,80.0,,,80.0,,Captured,SGPC-04,1.4,0.87,,Whole Genome Sequencing,C01,,,"NuGen LP Kit, Spiked after capture clean up, NuGen C01, ACTATCGC
-
-",,Fusion RNA,SGPC-04
-Nu-06,Fusion-06,1322 Tumor,DP-09,,12-11041,,,2.80,50,140.0,,,140.0,,Captured,SGPC-04,1.4,0.50,,Whole Genome Sequencing,D01,,,"NuGen LP Kit, Spiked after capture clean up, NuGen D01, GCGTATCA
-
-",,Fusion RNA,SGPC-04
-Nu-08,Fusion-08,1323 Tumor,KF-08,,11-61046,,,3.70,50,185.0,,,185.0,,Captured,SGPC-04,1.4,0.38,,Whole Genome Sequencing,E01,,,"NuGen LP Kit, Spiked after capture clean up, NuGen E01, ACTCTCCA
-
-",,Fusion RNA,SGPC-04
-Nu-09,Fusion-09,1324 Tumor,DP-17,,11-23710,,,3.80,50,190.0,,,190.0,,Captured,SGPC-04,1.4,0.37,,Whole Genome Sequencing,F01,,,"NuGen LP Kit, Spiked after capture clean up, NuGen F01, CGTCCATT
-
-",,Fusion RNA,SGPC-04
-Nu-10,Fusion-10,1325 Tumor,KF-10,,Cell line MA9254,,,11.20,50,560.0,,,560.0,,Captured,SGPC-04,1.4,0.12,,Whole Genome Sequencing,G01,,,"NuGen LP Kit, Spiked after capture clean up, NuGen G01, AGCCGTAA
-
-",,Fusion RNA,SGPC-04
-Nu-11,Fusion-11,2250 Tumor,KF-11,,Lung canceer with ALK fusion,,,2.10,50,105.0,,,105.0,,Captured,SGPC-04,1.4,0.66,,Whole Genome Sequencing,H01,,,"NuGen LP Kit, Spiked after capture clean up, NuGen H01, GAGTAGAG. Lung cancer with ALK fusion
-
-",,Fusion RNA,SGPC-04
+Nu-01,Fusion-01,1315 Tumor,KF-01,,12-4251,,,0.90,50,45.0,,,45.0,,Captured,SGPC-04,1.4,1.54,,Whole Genome Sequencing,A01,,,"NuGen LP Kit, Spiked after capture clean up, NuGen A01 adapter, CACGTCTA",,Fusion RNA,SGPC-04
+Nu-02,Fusion-02,1320 Tumor,KF-02,,11-31904,,,3.10,50,155.0,,,155.0,,Captured,SGPC-04,1.4,0.45,,Whole Genome Sequencing,B01,,,"NuGen LP Kit, Spiked after capture clean up, NuGen B01, AGCTAGTG",,Fusion RNA,SGPC-04
+Nu-05,Fusion-05,1321 Tumor,KF-05,,11-5482,,,1.60,50,80.0,,,80.0,,Captured,SGPC-04,1.4,0.87,,Whole Genome Sequencing,C01,,,"NuGen LP Kit, Spiked after capture clean up, NuGen C01, ACTATCGC",,Fusion RNA,SGPC-04
+Nu-06,Fusion-06,1322 Tumor,DP-09,,12-11041,,,2.80,50,140.0,,,140.0,,Captured,SGPC-04,1.4,0.50,,Whole Genome Sequencing,D01,,,"NuGen LP Kit, Spiked after capture clean up, NuGen D01, GCGTATCA",,Fusion RNA,SGPC-04
+Nu-08,Fusion-08,1323 Tumor,KF-08,,11-61046,,,3.70,50,185.0,,,185.0,,Captured,SGPC-04,1.4,0.38,,Whole Genome Sequencing,E01,,,"NuGen LP Kit, Spiked after capture clean up, NuGen E01, ACTCTCCA",,Fusion RNA,SGPC-04
+Nu-09,Fusion-09,1324 Tumor,DP-17,,11-23710,,,3.80,50,190.0,,,190.0,,Captured,SGPC-04,1.4,0.37,,Whole Genome Sequencing,F01,,,"NuGen LP Kit, Spiked after capture clean up, NuGen F01, CGTCCATT",,Fusion RNA,SGPC-04
+Nu-10,Fusion-10,1325 Tumor,KF-10,,Cell line MA9254,,,11.20,50,560.0,,,560.0,,Captured,SGPC-04,1.4,0.12,,Whole Genome Sequencing,G01,,,"NuGen LP Kit, Spiked after capture clean up, NuGen G01, AGCCGTAA",,Fusion RNA,SGPC-04
+Nu-11,Fusion-11,2250 Tumor,KF-11,,Lung canceer with ALK fusion,,,2.10,50,105.0,,,105.0,,Captured,SGPC-04,1.4,0.66,,Whole Genome Sequencing,H01,,,"NuGen LP Kit, Spiked after capture clean up, NuGen H01, GAGTAGAG. Lung cancer with ALK fusion",,Fusion RNA,SGPC-04
 OMLP-001,OM-15D (P040_11D),,OM-15,59,BB21-21351,4,4.53,2.27,50,113.5,,,113.5,,,,,0.00,,Small Gene Panel,,188,8/4/2021,DO NOT USE! Adapter Ligation: O/N (15 hrs) at 20oC,,Oral Mucosa Lesions,
 OMLP-002,OM-15D (P040_11D),,OM-15,59,BB21-21351,4,3.93,1.91,50,95.5,,,95.5,272,Captured,SGPC-19,44.5,23.30,12,Small Gene Panel,,167,8/6/2021,"Purigen, HyperPlus; Frag: 12min,37oC; Ligation: 17 hrs,16oC. SGPC-21: xx Cycles post Hyb, XXng captured",,Oral Mucosa Lesions,BCB032
 OMLP-003,OM-15D (P040_11D),,OM-15,59,BB21-21351,4,2.88,0.89,50,44.5,,,44.5,290,Captured,SGPC-19,44.5,50.00,12,Small Gene Panel,,153,8/6/2021,"HyperPrep, NEBRepair, Ligation: 17 hrs,16oC.",,Oral Mucosa Lesions,BCB032
@@ -2434,7 +2402,7 @@ SGLP-0109,TPP 2_13,2417 DN,DN-030,43,16-98055 A,,4.90,2.50,50,125.0,,,125.0,,Cap
 SGLP-0110,TPP 2_14,2418 DN,DN-030,43,16-98055 B,,4.20,1.90,50,95.0,,,95.0,,Captured,SGPC-03,5.9,3.08,,Small Gene Panel,B2,,8/15/2017,,Tumor,Dysplastic Nevi,SGPC-03
 SGLP-0111,TPP 2_15,2419 DN,DN-047,51,17-3829 B,,0.60,0.20,50,10.0,,,10.0,,Captured,SGPC-03,5.9,29.25,,Small Gene Panel,B3,,8/15/2017,,Tumor,Dysplastic Nevi,SGPC-03
 SGLP-0112,TPP 2_16,2420 DN,DN-048,52,16-119467B,,3.90,1.60,50,80.0,,,80.0,,Captured,SGPC-03,5.9,3.66,,Small Gene Panel,B4,,8/15/2017,,Tumor,Dysplastic Nevi,SGPC-03
-SGLP-0113,TPP 2_17,2421 DN,DN-048,52,16-119467C ,,6.60,2.90,50,145.0,,,145.0,,Captured,SGPC-03,5.9,2.02,,Small Gene Panel,B5,,8/15/2017,,Tumor,Dysplastic Nevi,SGPC-03
+SGLP-0113,TPP 2_17,2421 DN,DN-048,52,16-119467C,,6.60,2.90,50,145.0,,,145.0,,Captured,SGPC-03,5.9,2.02,,Small Gene Panel,B5,,8/15/2017,,Tumor,Dysplastic Nevi,SGPC-03
 SGLP-0114,TPP 2_18,2422 DN,DN-048,52,16-119467D,,4.80,2.10,50,105.0,,,105.0,,Captured,SGPC-03,5.9,2.79,,Small Gene Panel,B6,,8/15/2017,,Tumor,Dysplastic Nevi,SGPC-03
 SGLP-0115,TPP 2_19,2423 DN,DN-046,50,16-98043,,4.70,1.50,50,75.0,,,75.0,,Captured,SGPC-03,5.9,3.90,,Small Gene Panel,B7,,8/15/2017,,Tumor,Dysplastic Nevi,SGPC-03
 SGLP-0117,TPP 2_21,2424 DN,DN-050,56,17-26447,,4.60,2.60,50,130.0,,,130.0,,Captured,SGPC-03,5.8,2.25,,Small Gene Panel,B9,,8/15/2017,,Tumor,Dysplastic Nevi,SGPC-03
@@ -2504,21 +2472,21 @@ SGLP-0181,TPP 2_85,2487 DN,DN-074,73,17-62251,4,5.50,2.30,50,115.0,,,115.0,,Capt
 SGLP-0182,TPP 2_86,2488 DN,DN-076,71,17-65315B,,5.80,5.50,50,275.0,,,275.0,,Captured,SGPC-03,5.8,1.05,,Small Gene Panel,H9,,8/28/2017,,Tumor,Dysplastic Nevi,SGPC-03
 SGLP-0183,TPP 2_87,2489 DN,DN-079,72,17-63890C,4,2.80,1.70,50,85.0,,,85.0,,Captured,"SGPC-08,SGPC-11,SGPC-03",7.8,4.59,12,Small Gene Panel,H10,,8/28/2017,,Tumor,Dysplastic Nevi,"BCB004,BCB011,SGPC-03"
 SGLP-0184,TPP 2_88,2490 DN,DN-077,73,17-65160B,4,5.70,3.60,50,180.0,,,180.0,,Captured,"SGPC-08,SGPC-11,SGPC-03",7.8,2.17,12,Small Gene Panel,H11,,8/28/2017,,Tumor,Dysplastic Nevi,"BCB004,BCB011,SGPC-03"
-SGLP-0185,CGH17-017,1404 Tumor,DP-84,,17-2120,,4.20,1.30,50,65.0,,,65.0,,Captured,SGPC-04,6.5,5.00,,Small Gene Panel,F5,,3/20/2018,Capture hyb at 65c for 4 hours. ,Tumor,CGH Validation,SGPC-04
-SGLP-0186,CGH17-021,1405 Tumor,DP-85,,17-6351,,2.70,1.00,50,50.0,,,50.0,,Captured,SGPC-04,6.5,6.50,,Small Gene Panel,F6,,3/20/2018,Capture hyb at 65c for 4 hours. ,Tumor,CGH Validation,SGPC-04
-SGLP-0187,CGH17-024,1406 Tumor,DP-86,,17-6368,,3.00,1.10,50,55.0,,,55.0,,Captured,SGPC-04,6.5,5.91,,Small Gene Panel,F7,,3/20/2018,Capture hyb at 65c for 4 hours. ,Tumor,CGH Validation,SGPC-04
-SGLP-0188,CGH17-026,1407 Tumor,DP-87,,17-8968,,2.60,0.90,50,45.0,,,45.0,,Captured,SGPC-04,6.5,7.22,,Small Gene Panel,F8,,3/20/2018,Capture hyb at 65c for 4 hours. ,Tumor,CGH Validation,SGPC-04
-SGLP-0189,CGH17-031,1408 Tumor,DP-88,,17-9550,,3.80,2.30,50,115.0,,,115.0,,Captured,SGPC-04,6.5,2.83,,Small Gene Panel,F9,,3/20/2018,Capture hyb at 65c for 4 hours. ,Tumor,CGH Validation,SGPC-04
-SGLP-0190,CGH17-033,1409 Tumor,DP-89,,17-10585,,2.30,0.60,50,30.0,,,30.0,,Captured,SGPC-04,6.5,10.83,,Small Gene Panel,F10,,3/20/2018,Capture hyb at 65c for 4 hours. ,Tumor,CGH Validation,SGPC-04
-SGLP-0191,CGH17-039,1410 Tumor,DP-90,,17-14313,,2.00,0.80,50,40.0,,,40.0,,Captured,SGPC-04,6.5,8.13,,Small Gene Panel,F11,,3/20/2018,Capture hyb at 65c for 4 hours. ,Tumor,CGH Validation,SGPC-04
-SGLP-0192,CGH17-052,1411 Tumor,DP-91,,17-26078,,5.50,2.40,50,120.0,,,120.0,,Captured,SGPC-04,6.5,2.71,,Small Gene Panel,F12,,3/20/2018,Capture hyb at 65c for 4 hours. ,Tumor,CGH Validation,SGPC-04
-SGLP-0193,CGH17-058,1412 Tumor,DP-92,,17-29457B,,3.40,1.10,50,55.0,,,55.0,,Captured,SGPC-04,6.5,5.91,,Small Gene Panel,G1,,3/20/2018,Capture hyb at 65c for 4 hours. ,Tumor,CGH Validation,SGPC-04
-SGLP-0194,CGH17-076,1413 Tumor,DP-93,,17-13205,,2.00,0.50,50,25.0,,,25.0,,Captured,SGPC-04,6.5,13.00,,Small Gene Panel,G2,,3/20/2018,Capture hyb at 65c for 4 hours. ,Tumor,CGH Validation,SGPC-04
-SGLP-0195,CGH17-083,1414 Tumor,DP-94,,17-42757,,2.60,1.30,50,65.0,,,65.0,,Captured,SGPC-04,6.5,5.00,,Small Gene Panel,G3,,3/20/2018,Capture hyb at 65c for 4 hours. ,Tumor,CGH Validation,SGPC-04
-SGLP-0196,CGH17-095,1415 Tumor,DP-95,,17-48219,,1.50,0.40,50,20.0,,,20.0,,Captured,SGPC-04,6.5,16.25,,Small Gene Panel,G4,,3/20/2018,Capture hyb at 65c for 4 hours. ,Tumor,CGH Validation,SGPC-04
-SGLP-0197,CGH17-097,1416 Tumor,DP-96,,17-49361,,3.30,1.20,50,60.0,,,60.0,,Captured,SGPC-04,6.5,5.42,,Small Gene Panel,G5,,3/20/2018,Capture hyb at 65c for 4 hours. ,Tumor,CGH Validation,SGPC-04
-SGLP-0198,CGH17-104,1417 Tumor,DP-97,,17-50829,,3.00,1.40,50,70.0,,,70.0,,Captured,SGPC-04,6.5,4.64,,Small Gene Panel,G6,,3/20/2018,Capture hyb at 65c for 4 hours. ,Tumor,CGH Validation,SGPC-04
-SGLP-0199,KIT-01,1328 Tumor,KIT-01,,DP14-077,4,1.20,0.30,50,15.0,,,15.0,,Captured,SGPC-04,6.5,21.67,13,Small Gene Panel,G7,,3/20/2018,"KIT mutant DNA samples, Capture hyb at 65c for 4 hours. ",,Kit mutants,SGPC-04
+SGLP-0185,CGH17-017,1404 Tumor,DP-84,,17-2120,,4.20,1.30,50,65.0,,,65.0,,Captured,SGPC-04,6.5,5.00,,Small Gene Panel,F5,,3/20/2018,Capture hyb at 65c for 4 hours.,Tumor,CGH Validation,SGPC-04
+SGLP-0186,CGH17-021,1405 Tumor,DP-85,,17-6351,,2.70,1.00,50,50.0,,,50.0,,Captured,SGPC-04,6.5,6.50,,Small Gene Panel,F6,,3/20/2018,Capture hyb at 65c for 4 hours.,Tumor,CGH Validation,SGPC-04
+SGLP-0187,CGH17-024,1406 Tumor,DP-86,,17-6368,,3.00,1.10,50,55.0,,,55.0,,Captured,SGPC-04,6.5,5.91,,Small Gene Panel,F7,,3/20/2018,Capture hyb at 65c for 4 hours.,Tumor,CGH Validation,SGPC-04
+SGLP-0188,CGH17-026,1407 Tumor,DP-87,,17-8968,,2.60,0.90,50,45.0,,,45.0,,Captured,SGPC-04,6.5,7.22,,Small Gene Panel,F8,,3/20/2018,Capture hyb at 65c for 4 hours.,Tumor,CGH Validation,SGPC-04
+SGLP-0189,CGH17-031,1408 Tumor,DP-88,,17-9550,,3.80,2.30,50,115.0,,,115.0,,Captured,SGPC-04,6.5,2.83,,Small Gene Panel,F9,,3/20/2018,Capture hyb at 65c for 4 hours.,Tumor,CGH Validation,SGPC-04
+SGLP-0190,CGH17-033,1409 Tumor,DP-89,,17-10585,,2.30,0.60,50,30.0,,,30.0,,Captured,SGPC-04,6.5,10.83,,Small Gene Panel,F10,,3/20/2018,Capture hyb at 65c for 4 hours.,Tumor,CGH Validation,SGPC-04
+SGLP-0191,CGH17-039,1410 Tumor,DP-90,,17-14313,,2.00,0.80,50,40.0,,,40.0,,Captured,SGPC-04,6.5,8.13,,Small Gene Panel,F11,,3/20/2018,Capture hyb at 65c for 4 hours.,Tumor,CGH Validation,SGPC-04
+SGLP-0192,CGH17-052,1411 Tumor,DP-91,,17-26078,,5.50,2.40,50,120.0,,,120.0,,Captured,SGPC-04,6.5,2.71,,Small Gene Panel,F12,,3/20/2018,Capture hyb at 65c for 4 hours.,Tumor,CGH Validation,SGPC-04
+SGLP-0193,CGH17-058,1412 Tumor,DP-92,,17-29457B,,3.40,1.10,50,55.0,,,55.0,,Captured,SGPC-04,6.5,5.91,,Small Gene Panel,G1,,3/20/2018,Capture hyb at 65c for 4 hours.,Tumor,CGH Validation,SGPC-04
+SGLP-0194,CGH17-076,1413 Tumor,DP-93,,17-13205,,2.00,0.50,50,25.0,,,25.0,,Captured,SGPC-04,6.5,13.00,,Small Gene Panel,G2,,3/20/2018,Capture hyb at 65c for 4 hours.,Tumor,CGH Validation,SGPC-04
+SGLP-0195,CGH17-083,1414 Tumor,DP-94,,17-42757,,2.60,1.30,50,65.0,,,65.0,,Captured,SGPC-04,6.5,5.00,,Small Gene Panel,G3,,3/20/2018,Capture hyb at 65c for 4 hours.,Tumor,CGH Validation,SGPC-04
+SGLP-0196,CGH17-095,1415 Tumor,DP-95,,17-48219,,1.50,0.40,50,20.0,,,20.0,,Captured,SGPC-04,6.5,16.25,,Small Gene Panel,G4,,3/20/2018,Capture hyb at 65c for 4 hours.,Tumor,CGH Validation,SGPC-04
+SGLP-0197,CGH17-097,1416 Tumor,DP-96,,17-49361,,3.30,1.20,50,60.0,,,60.0,,Captured,SGPC-04,6.5,5.42,,Small Gene Panel,G5,,3/20/2018,Capture hyb at 65c for 4 hours.,Tumor,CGH Validation,SGPC-04
+SGLP-0198,CGH17-104,1417 Tumor,DP-97,,17-50829,,3.00,1.40,50,70.0,,,70.0,,Captured,SGPC-04,6.5,4.64,,Small Gene Panel,G6,,3/20/2018,Capture hyb at 65c for 4 hours.,Tumor,CGH Validation,SGPC-04
+SGLP-0199,KIT-01,1328 Tumor,KIT-01,,DP14-077,4,1.20,0.30,50,15.0,,,15.0,,Captured,SGPC-04,6.5,21.67,13,Small Gene Panel,G7,,3/20/2018,"KIT mutant DNA samples, Capture hyb at 65c for 4 hours.",,Kit mutants,SGPC-04
 SGLP-0200,KIT-02,1135 Tumor,KIT-02,,DP13-207,4,3.20,1.10,50,55.0,,,55.0,,Captured,"SGPC-04,SGPC-16",46.0,41.82,13,Small Gene Panel,G8,,3/20/2018,KIT mutant DNA samples,,Kit mutants,"SGPC-04,BCB017"
 SGLP-0201,KIT-03,1136 Tumor,KIT-03,,DP13-140,4,5.00,1.30,50,65.0,,,65.0,,Captured,"SGPC-04,SGPC-16",60.0,46.15,13,Small Gene Panel,G9,,3/20/2018,KIT mutant DNA samples,,Kit mutants,"SGPC-04,BCB017"
 SGLP-0202,KIT-04,1137 Tumor,KIT-04,,DP13-129,4,7.30,2.00,50,100.0,,,100.0,,Captured,"SGPC-04,SGPC-16",60.0,30.00,13,Small Gene Panel,G10,,3/20/2018,KIT mutant DNA samples,,Kit mutants,"SGPC-04,BCB017"
@@ -2529,54 +2497,54 @@ SGLP-0206,KIT-08,1141 Tumor,KIT-08,,DP12-073,4,1.30,0.40,50,20.0,,,20.0,,Capture
 SGLP-0207,KIT-09,1142 Tumor,KIT-09,,DP12-095,4,2.30,0.80,50,40.0,,,40.0,,Captured,"SGPC-04,SGPC-16",33.0,41.25,13,Small Gene Panel,H3,,3/20/2018,KIT mutant DNA samples,,Kit mutants,"SGPC-04,BCB017"
 SGLP-0208,KIT-10,1143 Tumor,KIT-10,,DP12-122,4,3.30,1.00,50,50.0,,,50.0,,Captured,"SGPC-04,SGPC-16",43.0,43.00,13,Small Gene Panel,H4,,3/20/2018,KIT mutant DNA samples,,Kit mutants,"SGPC-04,BCB017"
 SGLP-0209,KIT-11,1144 Tumor,KIT-11,,DP12-169,4,1.60,0.30,50,15.0,,,15.0,,Captured,"SGPC-04,SGPC-16",6.7,22.33,13,Small Gene Panel,H5,,3/20/2018,KIT mutant DNA samples,,Kit mutants,"SGPC-04,BCB017"
-SGLP-0210,KIT-12,1329 Tumor,KIT-12,,DP12-200,4,1.30,0.10,50,5.0,,,5.0,,Captured,SGPC-04,6.5,65.00,13,Small Gene Panel,H6,,3/20/2018,"KIT mutant DNA samples, Capture hyb at 65c for 4 hours. ",,Kit mutants,SGPC-04
-SGLP-0211,KIT-13,1330 Tumor,KIT-13,,DP11-072,4,4.90,1.00,50,50.0,,,50.0,,Captured,SGPC-04,6.5,6.50,13,Small Gene Panel,H7,,3/20/2018,"KIT mutant DNA samples, Capture hyb at 65c for 4 hours. ",,Kit mutants,SGPC-04
-SGLP-0212,KIT-14,1331 Tumor,KIT-14,,DP11-091,4,10.50,2.40,50,120.0,,,120.0,,Captured,SGPC-04,6.5,2.71,13,Small Gene Panel,H8,,3/20/2018,"KIT mutant DNA samples, Capture hyb at 65c for 4 hours. ",,Kit mutants,SGPC-04
-SGLP-0213,KIT-15,1332 Tumor,KIT-15,,DP11-133,4,3.70,0.70,50,35.0,,,35.0,,Captured,SGPC-04,6.5,9.29,13,Small Gene Panel,H9,,3/20/2018,"KIT mutant DNA samples, Capture hyb at 65c for 4 hours. ",,Kit mutants,SGPC-04
-SGLP-0214,KIT-16,1333 Tumor,KIT-16,,DP11-154,4,4.70,1.40,50,70.0,,,70.0,,Captured,SGPC-04,6.5,4.64,13,Small Gene Panel,H10,,3/20/2018,"KIT mutant DNA samples, Capture hyb at 65c for 4 hours. ",,Kit mutants,SGPC-04
-SGLP-0215,KIT-17,1334 Tumor,KIT-17,,DP11-172,4,5.80,2.20,50,110.0,,,110.0,,Captured,SGPC-04,6.5,2.95,13,Small Gene Panel,H11,,3/20/2018,"KIT mutant DNA samples, Capture hyb at 65c for 4 hours. ",,Kit mutants,SGPC-04
-SGLP-0216,KIT-18,1335 Tumor,KIT-18,,DP11-256,4,4.60,1.60,50,80.0,,,80.0,,Captured,SGPC-04,6.5,4.06,13,Small Gene Panel,H12,,3/20/2018,"KIT mutant DNA samples, Capture hyb at 65c for 4 hours. ",,Kit mutants,SGPC-04
-SGLP-0217,MDD-01,632 Mel,MD-01,,00-21551 T3,4,2.70,0.90,50,45.0,,,45.0,,Captured,SGPC-04,6.5,7.22,13,Small Gene Panel,A1,,,Capture hyb at 65c for 4 hours. ,Tumor,Melanoma Prognosis,SGPC-04
-SGLP-0218,MDD-02,633 Mel,MD-02,,01-00027 T1,4,2.50,0.50,50,25.0,,,25.0,,Captured,SGPC-04,6.5,13.00,13,Small Gene Panel,A2,,,Capture hyb at 65c for 4 hours. ,Tumor,Melanoma Prognosis,SGPC-04
-SGLP-0219,MDD-03,634 Mel,MD-03,,01-07957 T4,4,3.70,0.80,50,40.0,,,40.0,,Captured,SGPC-04,6.5,8.13,13,Small Gene Panel,A3,,,Capture hyb at 65c for 4 hours. ,Tumor,Melanoma Prognosis,SGPC-04
-SGLP-0220,MDD-04,635 Mel,MD-04,,01-20248 T3,4,2.90,0.90,50,45.0,,,45.0,,Captured,"SGPC-04,SGPC-16",6.5,7.22,13,Small Gene Panel,A4,,,Capture hyb at 65c for 4 hours. ,Tumor,Melanoma Prognosis,"SGPC-04,BCB017"
-SGLP-0221,MDD-05,636 Mel,MD-05,,02-05776 T1,4,2.00,0.40,50,20.0,,,20.0,,Captured,"SGPC-04,SGPC-16",6.5,16.25,13,Small Gene Panel,A5,,,Capture hyb at 65c for 4 hours. ,Tumor,Melanoma Prognosis,"SGPC-04,BCB017"
-SGLP-0222,MDD-06,637 Mel,MD-06,,03-26518 T1,4,3.40,0.90,50,45.0,,,45.0,,Captured,SGPC-04,6.5,7.22,13,Small Gene Panel,A6,,,Capture hyb at 65c for 4 hours. ,Tumor,Melanoma Prognosis,SGPC-04
-SGLP-0223,MDD-07,638 Mel,MD-07,,04-28824 T2,4,2.10,0.40,50,20.0,,,20.0,,Captured,"SGPC-04,SGPC-16",6.5,16.25,13,Small Gene Panel,A7,,,Capture hyb at 65c for 4 hours. ,Tumor,Melanoma Prognosis,"SGPC-04,BCB017"
-SGLP-0224,MDD-08,639 Mel,MD-08,,04-01809 T4,4,3.20,1.30,50,65.0,,,65.0,,Captured,"SGPC-04,SGPC-16",6.5,5.00,13,Small Gene Panel,A8,,,Capture hyb at 65c for 4 hours. ,Tumor,Melanoma Prognosis,"SGPC-04,BCB017"
-SGLP-0225,MDD-09,640 Mel,MD-09,,04-05355 T4,4,3.10,0.40,50,20.0,,,20.0,,Captured,SGPC-04,6.5,16.25,13,Small Gene Panel,A9,,,Capture hyb at 65c for 4 hours. ,Tumor,Melanoma Prognosis,SGPC-04
-SGLP-0226,MDD-10,641 Mel,MD-10,,05-23001 T4,4,3.40,0.60,50,30.0,,,30.0,,Captured,SGPC-04,6.5,10.83,13,Small Gene Panel,A10,,,Capture hyb at 65c for 4 hours. ,Tumor,Melanoma Prognosis,SGPC-04
-SGLP-0227,MDD-11,642 Mel,MD-11,,05-14988 T3,4,3.00,0.60,50,30.0,,,30.0,,Captured,SGPC-04,6.5,10.83,13,Small Gene Panel,A11,,,Capture hyb at 65c for 4 hours. ,Tumor,Melanoma Prognosis,SGPC-04
-SGLP-0228,MDD-12,643 Mel,MD-12,,05-29322 T3,4,4.00,0.90,50,45.0,,,45.0,,Captured,SGPC-04,6.5,7.22,13,Small Gene Panel,A12,,,Capture hyb at 65c for 4 hours. ,Tumor,Melanoma Prognosis,SGPC-04
-SGLP-0229,MDD-13,644 Mel,MD-13,,06-05518 T4,4,5.00,1.20,50,60.0,,,60.0,,Captured,SGPC-04,6.5,5.42,13,Small Gene Panel,B1,,,Capture hyb at 65c for 4 hours. ,Tumor,Melanoma Prognosis,SGPC-04
-SGLP-0230,MDD-14,645 Mel,MD-14,,06-01845 T4,4,3.40,1.40,50,70.0,,,70.0,,Captured,"SGPC-04,SGPC-16",6.5,4.64,13,Small Gene Panel,B2,,,Capture hyb at 65c for 4 hours. ,Tumor,Melanoma Prognosis,"SGPC-04,BCB017"
-SGLP-0231,MDD-15,646 Mel,MD-15,,06-04915 T2,4,3.40,0.70,50,35.0,,,35.0,,Captured,SGPC-04,6.5,9.29,13,Small Gene Panel,B3,,,Capture hyb at 65c for 4 hours. ,Tumor,Melanoma Prognosis,SGPC-04
-SGLP-0232,MDD-16,647 Mel,MD-16,,06-14812-D T2,4,3.30,1.20,50,60.0,,,60.0,,Captured,"SGPC-04,SGPC-16",6.5,5.42,13,Small Gene Panel,B4,,,Capture hyb at 65c for 4 hours. ,Tumor,Melanoma Prognosis,"SGPC-04,BCB017"
-SGLP-0233,MDD-17,648 Mel,MD-17,,06-17441 T2,4,3.10,0.60,50,30.0,,,30.0,,Captured,SGPC-04,6.5,10.83,13,Small Gene Panel,C1,,,Capture hyb at 65c for 4 hours. ,Tumor,Melanoma Prognosis,SGPC-04
-SGLP-0234,MDD-18,649 Mel,MD-18,,06-25697 T1,4,3.80,1.40,50,70.0,,,70.0,,Captured,SGPC-04,6.5,4.64,13,Small Gene Panel,C2,,,Capture hyb at 65c for 4 hours. ,Tumor,Melanoma Prognosis,SGPC-04
-SGLP-0235,MDD-19,650 Mel,MD-19,,06-23345 T1,4,2.20,0.70,50,35.0,,,35.0,,Captured,"SGPC-04,SGPC-16",6.5,9.29,13,Small Gene Panel,C3,,,Capture hyb at 65c for 4 hours. ,Tumor,Melanoma Prognosis,"SGPC-04,BCB017"
-SGLP-0236,MDD-20,651 Mel,MD-20,,06-27633 T1,4,3.70,1.40,50,70.0,,,70.0,,Captured,SGPC-04,6.5,4.64,13,Small Gene Panel,C4,,,Capture hyb at 65c for 4 hours. ,Tumor,Melanoma Prognosis,SGPC-04
-SGLP-0237,MDD-21,652 Mel,MD-21,,06-23587 T1,4,6.00,1.80,50,90.0,,,90.0,,Captured,SGPC-04,6.5,3.61,13,Small Gene Panel,C5,,,Capture hyb at 65c for 4 hours. ,Tumor,Melanoma Prognosis,SGPC-04
-SGLP-0238,MDD-22,653 Mel,MD-22,,06-16759 T1,4,2.00,0.60,50,30.0,,,30.0,,Captured,SGPC-04,6.5,10.83,13,Small Gene Panel,C6,,,Capture hyb at 65c for 4 hours. ,Tumor,Melanoma Prognosis,SGPC-04
-SGLP-0239,MDD-23,654 Mel,MD-23,,07-25593 T2,4,4.20,1.50,50,75.0,,,75.0,,Captured,SGPC-04,6.5,4.33,13,Small Gene Panel,C7,,,Capture hyb at 65c for 4 hours. ,Tumor,Melanoma Prognosis,SGPC-04
-SGLP-0240,MDD-24,655 Mel,MD-24,,08-21729 T2,4,4.00,1.30,50,65.0,,,65.0,,Captured,"SGPC-04,SGPC-16",6.5,5.00,13,Small Gene Panel,C8,,,Capture hyb at 65c for 4 hours. ,Tumor,Melanoma Prognosis,"SGPC-04,BCB017"
-SGLP-0241,MDD-25,656 Mel,MD-25,,09-21320 T2,4,3.50,1.70,50,85.0,,,85.0,,Captured,"SGPC-04,SGPC-16",6.5,3.82,13,Small Gene Panel,C9,,,Capture hyb at 65c for 4 hours. ,Tumor,Melanoma Prognosis,"SGPC-04,BCB017"
-SGLP-0242,MDD-26,657 Mel,MD-26,,10-10275 T2,4,4.50,1.60,50,80.0,,,80.0,,Captured,"SGPC-04,SGPC-16",6.5,4.06,13,Small Gene Panel,C10,,,Capture hyb at 65c for 4 hours. ,Tumor,Melanoma Prognosis,"SGPC-04,BCB017"
-SGLP-0243,MDD-27,658 Mel,MD-27,,11-03286 T3,4,5.50,3.00,50,150.0,,,150.0,,Captured,"SGPC-04,SGPC-16",6.5,2.17,13,Small Gene Panel,C11,,,Capture hyb at 65c for 4 hours. ,Tumor,Melanoma Prognosis,"SGPC-04,BCB017"
-SGLP-0244,MDD-28,659 Mel,MD-28,,11-27846 T3,4,4.50,1.70,50,85.0,,,85.0,,Captured,"SGPC-04,SGPC-16",6.5,3.82,13,Small Gene Panel,C12,,,Capture hyb at 65c for 4 hours. ,Tumor,Melanoma Prognosis,"SGPC-04,BCB017"
-SGLP-0245,MDD-29,660 Mel,MD-29,,12-05858 T3,4,5.80,3.30,50,165.0,,,165.0,,Captured,"SGPC-04,SGPC-16",6.5,1.97,13,Small Gene Panel,D1,,,Capture hyb at 65c for 4 hours. ,Tumor,Melanoma Prognosis,"SGPC-04,BCB017"
-SGLP-0246,MDD-30,661 Mel,MD-30,,12-12352 T3,4,5.30,2.50,50,125.0,,,125.0,,Captured,"SGPC-04,SGPC-16",6.5,2.60,13,Small Gene Panel,D2,,,Capture hyb at 65c for 4 hours. ,Tumor,Melanoma Prognosis,"SGPC-04,BCB017"
-SGLP-0247,MDD-31,662 Mel,MD-31,,13-24372-A T1,4,4.20,2.10,50,105.0,,,105.0,,Captured,SGPC-04,6.5,3.10,13,Small Gene Panel,D3,,,Capture hyb at 65c for 4 hours. ,Tumor,Melanoma Prognosis,SGPC-04
-SGLP-0248,MDD-32,663 Mel,MD-32,,13-26846 T4,4,4.50,2.60,50,130.0,,,130.0,,Captured,"SGPC-04,SGPC-16",6.5,2.50,13,Small Gene Panel,D4,,,Capture hyb at 65c for 4 hours. ,Tumor,Melanoma Prognosis,"SGPC-04,BCB017"
-SGLP-0249,MDD-33,664 Mel,MD-33,,14-03473 T3,4,4.10,1.20,50,60.0,,,60.0,,Captured,"SGPC-04,SGPC-16",6.5,5.42,13,Small Gene Panel,D5,,,Capture hyb at 65c for 4 hours. ,Tumor,Melanoma Prognosis,"SGPC-04,BCB017"
-SGLP-0250,MDD-34,665 Mel,MD-34,,15-02416 T2,4,5.00,1.30,50,65.0,,,65.0,,Captured,SGPC-04,6.5,5.00,13,Small Gene Panel,D6,,,Capture hyb at 65c for 4 hours. ,Tumor,Melanoma Prognosis,SGPC-04
-SGLP-0251,MDD-35,666 Mel,MD-35,,15-22166 T4,4,6.60,1.70,50,85.0,,,85.0,,Captured,SGPC-04,6.5,3.82,13,Small Gene Panel,D7,,,Capture hyb at 65c for 4 hours. ,Tumor,Melanoma Prognosis,SGPC-04
+SGLP-0210,KIT-12,1329 Tumor,KIT-12,,DP12-200,4,1.30,0.10,50,5.0,,,5.0,,Captured,SGPC-04,6.5,65.00,13,Small Gene Panel,H6,,3/20/2018,"KIT mutant DNA samples, Capture hyb at 65c for 4 hours.",,Kit mutants,SGPC-04
+SGLP-0211,KIT-13,1330 Tumor,KIT-13,,DP11-072,4,4.90,1.00,50,50.0,,,50.0,,Captured,SGPC-04,6.5,6.50,13,Small Gene Panel,H7,,3/20/2018,"KIT mutant DNA samples, Capture hyb at 65c for 4 hours.",,Kit mutants,SGPC-04
+SGLP-0212,KIT-14,1331 Tumor,KIT-14,,DP11-091,4,10.50,2.40,50,120.0,,,120.0,,Captured,SGPC-04,6.5,2.71,13,Small Gene Panel,H8,,3/20/2018,"KIT mutant DNA samples, Capture hyb at 65c for 4 hours.",,Kit mutants,SGPC-04
+SGLP-0213,KIT-15,1332 Tumor,KIT-15,,DP11-133,4,3.70,0.70,50,35.0,,,35.0,,Captured,SGPC-04,6.5,9.29,13,Small Gene Panel,H9,,3/20/2018,"KIT mutant DNA samples, Capture hyb at 65c for 4 hours.",,Kit mutants,SGPC-04
+SGLP-0214,KIT-16,1333 Tumor,KIT-16,,DP11-154,4,4.70,1.40,50,70.0,,,70.0,,Captured,SGPC-04,6.5,4.64,13,Small Gene Panel,H10,,3/20/2018,"KIT mutant DNA samples, Capture hyb at 65c for 4 hours.",,Kit mutants,SGPC-04
+SGLP-0215,KIT-17,1334 Tumor,KIT-17,,DP11-172,4,5.80,2.20,50,110.0,,,110.0,,Captured,SGPC-04,6.5,2.95,13,Small Gene Panel,H11,,3/20/2018,"KIT mutant DNA samples, Capture hyb at 65c for 4 hours.",,Kit mutants,SGPC-04
+SGLP-0216,KIT-18,1335 Tumor,KIT-18,,DP11-256,4,4.60,1.60,50,80.0,,,80.0,,Captured,SGPC-04,6.5,4.06,13,Small Gene Panel,H12,,3/20/2018,"KIT mutant DNA samples, Capture hyb at 65c for 4 hours.",,Kit mutants,SGPC-04
+SGLP-0217,MDD-01,632 Mel,MD-01,,00-21551 T3,4,2.70,0.90,50,45.0,,,45.0,,Captured,SGPC-04,6.5,7.22,13,Small Gene Panel,A1,,,Capture hyb at 65c for 4 hours.,Tumor,Melanoma Prognosis,SGPC-04
+SGLP-0218,MDD-02,633 Mel,MD-02,,01-00027 T1,4,2.50,0.50,50,25.0,,,25.0,,Captured,SGPC-04,6.5,13.00,13,Small Gene Panel,A2,,,Capture hyb at 65c for 4 hours.,Tumor,Melanoma Prognosis,SGPC-04
+SGLP-0219,MDD-03,634 Mel,MD-03,,01-07957 T4,4,3.70,0.80,50,40.0,,,40.0,,Captured,SGPC-04,6.5,8.13,13,Small Gene Panel,A3,,,Capture hyb at 65c for 4 hours.,Tumor,Melanoma Prognosis,SGPC-04
+SGLP-0220,MDD-04,635 Mel,MD-04,,01-20248 T3,4,2.90,0.90,50,45.0,,,45.0,,Captured,"SGPC-04,SGPC-16",6.5,7.22,13,Small Gene Panel,A4,,,Capture hyb at 65c for 4 hours.,Tumor,Melanoma Prognosis,"SGPC-04,BCB017"
+SGLP-0221,MDD-05,636 Mel,MD-05,,02-05776 T1,4,2.00,0.40,50,20.0,,,20.0,,Captured,"SGPC-04,SGPC-16",6.5,16.25,13,Small Gene Panel,A5,,,Capture hyb at 65c for 4 hours.,Tumor,Melanoma Prognosis,"SGPC-04,BCB017"
+SGLP-0222,MDD-06,637 Mel,MD-06,,03-26518 T1,4,3.40,0.90,50,45.0,,,45.0,,Captured,SGPC-04,6.5,7.22,13,Small Gene Panel,A6,,,Capture hyb at 65c for 4 hours.,Tumor,Melanoma Prognosis,SGPC-04
+SGLP-0223,MDD-07,638 Mel,MD-07,,04-28824 T2,4,2.10,0.40,50,20.0,,,20.0,,Captured,"SGPC-04,SGPC-16",6.5,16.25,13,Small Gene Panel,A7,,,Capture hyb at 65c for 4 hours.,Tumor,Melanoma Prognosis,"SGPC-04,BCB017"
+SGLP-0224,MDD-08,639 Mel,MD-08,,04-01809 T4,4,3.20,1.30,50,65.0,,,65.0,,Captured,"SGPC-04,SGPC-16",6.5,5.00,13,Small Gene Panel,A8,,,Capture hyb at 65c for 4 hours.,Tumor,Melanoma Prognosis,"SGPC-04,BCB017"
+SGLP-0225,MDD-09,640 Mel,MD-09,,04-05355 T4,4,3.10,0.40,50,20.0,,,20.0,,Captured,SGPC-04,6.5,16.25,13,Small Gene Panel,A9,,,Capture hyb at 65c for 4 hours.,Tumor,Melanoma Prognosis,SGPC-04
+SGLP-0226,MDD-10,641 Mel,MD-10,,05-23001 T4,4,3.40,0.60,50,30.0,,,30.0,,Captured,SGPC-04,6.5,10.83,13,Small Gene Panel,A10,,,Capture hyb at 65c for 4 hours.,Tumor,Melanoma Prognosis,SGPC-04
+SGLP-0227,MDD-11,642 Mel,MD-11,,05-14988 T3,4,3.00,0.60,50,30.0,,,30.0,,Captured,SGPC-04,6.5,10.83,13,Small Gene Panel,A11,,,Capture hyb at 65c for 4 hours.,Tumor,Melanoma Prognosis,SGPC-04
+SGLP-0228,MDD-12,643 Mel,MD-12,,05-29322 T3,4,4.00,0.90,50,45.0,,,45.0,,Captured,SGPC-04,6.5,7.22,13,Small Gene Panel,A12,,,Capture hyb at 65c for 4 hours.,Tumor,Melanoma Prognosis,SGPC-04
+SGLP-0229,MDD-13,644 Mel,MD-13,,06-05518 T4,4,5.00,1.20,50,60.0,,,60.0,,Captured,SGPC-04,6.5,5.42,13,Small Gene Panel,B1,,,Capture hyb at 65c for 4 hours.,Tumor,Melanoma Prognosis,SGPC-04
+SGLP-0230,MDD-14,645 Mel,MD-14,,06-01845 T4,4,3.40,1.40,50,70.0,,,70.0,,Captured,"SGPC-04,SGPC-16",6.5,4.64,13,Small Gene Panel,B2,,,Capture hyb at 65c for 4 hours.,Tumor,Melanoma Prognosis,"SGPC-04,BCB017"
+SGLP-0231,MDD-15,646 Mel,MD-15,,06-04915 T2,4,3.40,0.70,50,35.0,,,35.0,,Captured,SGPC-04,6.5,9.29,13,Small Gene Panel,B3,,,Capture hyb at 65c for 4 hours.,Tumor,Melanoma Prognosis,SGPC-04
+SGLP-0232,MDD-16,647 Mel,MD-16,,06-14812-D T2,4,3.30,1.20,50,60.0,,,60.0,,Captured,"SGPC-04,SGPC-16",6.5,5.42,13,Small Gene Panel,B4,,,Capture hyb at 65c for 4 hours.,Tumor,Melanoma Prognosis,"SGPC-04,BCB017"
+SGLP-0233,MDD-17,648 Mel,MD-17,,06-17441 T2,4,3.10,0.60,50,30.0,,,30.0,,Captured,SGPC-04,6.5,10.83,13,Small Gene Panel,C1,,,Capture hyb at 65c for 4 hours.,Tumor,Melanoma Prognosis,SGPC-04
+SGLP-0234,MDD-18,649 Mel,MD-18,,06-25697 T1,4,3.80,1.40,50,70.0,,,70.0,,Captured,SGPC-04,6.5,4.64,13,Small Gene Panel,C2,,,Capture hyb at 65c for 4 hours.,Tumor,Melanoma Prognosis,SGPC-04
+SGLP-0235,MDD-19,650 Mel,MD-19,,06-23345 T1,4,2.20,0.70,50,35.0,,,35.0,,Captured,"SGPC-04,SGPC-16",6.5,9.29,13,Small Gene Panel,C3,,,Capture hyb at 65c for 4 hours.,Tumor,Melanoma Prognosis,"SGPC-04,BCB017"
+SGLP-0236,MDD-20,651 Mel,MD-20,,06-27633 T1,4,3.70,1.40,50,70.0,,,70.0,,Captured,SGPC-04,6.5,4.64,13,Small Gene Panel,C4,,,Capture hyb at 65c for 4 hours.,Tumor,Melanoma Prognosis,SGPC-04
+SGLP-0237,MDD-21,652 Mel,MD-21,,06-23587 T1,4,6.00,1.80,50,90.0,,,90.0,,Captured,SGPC-04,6.5,3.61,13,Small Gene Panel,C5,,,Capture hyb at 65c for 4 hours.,Tumor,Melanoma Prognosis,SGPC-04
+SGLP-0238,MDD-22,653 Mel,MD-22,,06-16759 T1,4,2.00,0.60,50,30.0,,,30.0,,Captured,SGPC-04,6.5,10.83,13,Small Gene Panel,C6,,,Capture hyb at 65c for 4 hours.,Tumor,Melanoma Prognosis,SGPC-04
+SGLP-0239,MDD-23,654 Mel,MD-23,,07-25593 T2,4,4.20,1.50,50,75.0,,,75.0,,Captured,SGPC-04,6.5,4.33,13,Small Gene Panel,C7,,,Capture hyb at 65c for 4 hours.,Tumor,Melanoma Prognosis,SGPC-04
+SGLP-0240,MDD-24,655 Mel,MD-24,,08-21729 T2,4,4.00,1.30,50,65.0,,,65.0,,Captured,"SGPC-04,SGPC-16",6.5,5.00,13,Small Gene Panel,C8,,,Capture hyb at 65c for 4 hours.,Tumor,Melanoma Prognosis,"SGPC-04,BCB017"
+SGLP-0241,MDD-25,656 Mel,MD-25,,09-21320 T2,4,3.50,1.70,50,85.0,,,85.0,,Captured,"SGPC-04,SGPC-16",6.5,3.82,13,Small Gene Panel,C9,,,Capture hyb at 65c for 4 hours.,Tumor,Melanoma Prognosis,"SGPC-04,BCB017"
+SGLP-0242,MDD-26,657 Mel,MD-26,,10-10275 T2,4,4.50,1.60,50,80.0,,,80.0,,Captured,"SGPC-04,SGPC-16",6.5,4.06,13,Small Gene Panel,C10,,,Capture hyb at 65c for 4 hours.,Tumor,Melanoma Prognosis,"SGPC-04,BCB017"
+SGLP-0243,MDD-27,658 Mel,MD-27,,11-03286 T3,4,5.50,3.00,50,150.0,,,150.0,,Captured,"SGPC-04,SGPC-16",6.5,2.17,13,Small Gene Panel,C11,,,Capture hyb at 65c for 4 hours.,Tumor,Melanoma Prognosis,"SGPC-04,BCB017"
+SGLP-0244,MDD-28,659 Mel,MD-28,,11-27846 T3,4,4.50,1.70,50,85.0,,,85.0,,Captured,"SGPC-04,SGPC-16",6.5,3.82,13,Small Gene Panel,C12,,,Capture hyb at 65c for 4 hours.,Tumor,Melanoma Prognosis,"SGPC-04,BCB017"
+SGLP-0245,MDD-29,660 Mel,MD-29,,12-05858 T3,4,5.80,3.30,50,165.0,,,165.0,,Captured,"SGPC-04,SGPC-16",6.5,1.97,13,Small Gene Panel,D1,,,Capture hyb at 65c for 4 hours.,Tumor,Melanoma Prognosis,"SGPC-04,BCB017"
+SGLP-0246,MDD-30,661 Mel,MD-30,,12-12352 T3,4,5.30,2.50,50,125.0,,,125.0,,Captured,"SGPC-04,SGPC-16",6.5,2.60,13,Small Gene Panel,D2,,,Capture hyb at 65c for 4 hours.,Tumor,Melanoma Prognosis,"SGPC-04,BCB017"
+SGLP-0247,MDD-31,662 Mel,MD-31,,13-24372-A T1,4,4.20,2.10,50,105.0,,,105.0,,Captured,SGPC-04,6.5,3.10,13,Small Gene Panel,D3,,,Capture hyb at 65c for 4 hours.,Tumor,Melanoma Prognosis,SGPC-04
+SGLP-0248,MDD-32,663 Mel,MD-32,,13-26846 T4,4,4.50,2.60,50,130.0,,,130.0,,Captured,"SGPC-04,SGPC-16",6.5,2.50,13,Small Gene Panel,D4,,,Capture hyb at 65c for 4 hours.,Tumor,Melanoma Prognosis,"SGPC-04,BCB017"
+SGLP-0249,MDD-33,664 Mel,MD-33,,14-03473 T3,4,4.10,1.20,50,60.0,,,60.0,,Captured,"SGPC-04,SGPC-16",6.5,5.42,13,Small Gene Panel,D5,,,Capture hyb at 65c for 4 hours.,Tumor,Melanoma Prognosis,"SGPC-04,BCB017"
+SGLP-0250,MDD-34,665 Mel,MD-34,,15-02416 T2,4,5.00,1.30,50,65.0,,,65.0,,Captured,SGPC-04,6.5,5.00,13,Small Gene Panel,D6,,,Capture hyb at 65c for 4 hours.,Tumor,Melanoma Prognosis,SGPC-04
+SGLP-0251,MDD-35,666 Mel,MD-35,,15-22166 T4,4,6.60,1.70,50,85.0,,,85.0,,Captured,SGPC-04,6.5,3.82,13,Small Gene Panel,D7,,,Capture hyb at 65c for 4 hours.,Tumor,Melanoma Prognosis,SGPC-04
 SGLP-0252,MDD-36,618 Mel,MD-36,,15-32174 T2,4,4.20,1.70,50,85.0,,,85.0,,Captured,"SGPC-07,SGPC-10,SGPC-14",10.9,6.41,12,Small Gene Panel,D8,,,Madrid Melanoma,Tumor,Melanoma Prognosis,"BCB002,BCB008,BCB015"
 SGLP-0253,MDD-37,627 Mel,MD-37,,16-31317 T4,4,5.70,2.20,50,110.0,,,110.0,,Captured,"SGPC-07,SGPC-10,SGPC-14",10.9,4.95,12,Small Gene Panel,D9,,,Madrid Melanoma,Tumor,Melanoma Prognosis,"BCB002,BCB008,BCB015"
 SGLP-0254,MDD-38,628 Mel,MD-38,,05-01411 T4,4,1.40,0.20,50,10.0,,,10.0,,Captured,"SGPC-07,SGPC-14",10.0,50.00,12,Small Gene Panel,D10,,,Madrid Melanoma,Tumor,Melanoma Prognosis,"BCB002,BCB008,BCB015"
 SGLP-0255,MDD-39,629 Mel,MD-39,,06-08092 T3,4,3.30,1.40,50,70.0,,,70.0,,Captured,"SGPC-07,SGPC-10,SGPC-14",10.9,7.79,12,Small Gene Panel,D11,,,Madrid Melanoma,Tumor,Melanoma Prognosis,"BCB002,BCB008,BCB015"
-SGLP-0256,MDD-40,630 Mel,MD-16,,06-14812-E ,4,4.40,1.90,50,95.0,,,95.0,,Captured,"SGPC-07,SGPC-10,SGPC-14",10.9,5.74,12,Small Gene Panel,D12,,,Madrid Melanoma,Tumor,Melanoma Prognosis,"BCB002,BCB008,BCB015"
-SGLP-0257,MDD-41,631 Mel,MD-31,,13-24372-B ,4,5.30,2.90,50,145.0,,,145.0,,Captured,"SGPC-07,SGPC-10,SGPC-14",10.9,3.76,12,Small Gene Panel,E1,,,Madrid Melanoma,Tumor,Melanoma Prognosis,"BCB002,BCB008,BCB015"
+SGLP-0256,MDD-40,630 Mel,MD-16,,06-14812-E,4,4.40,1.90,50,95.0,,,95.0,,Captured,"SGPC-07,SGPC-10,SGPC-14",10.9,5.74,12,Small Gene Panel,D12,,,Madrid Melanoma,Tumor,Melanoma Prognosis,"BCB002,BCB008,BCB015"
+SGLP-0257,MDD-41,631 Mel,MD-31,,13-24372-B,4,5.30,2.90,50,145.0,,,145.0,,Captured,"SGPC-07,SGPC-10,SGPC-14",10.9,3.76,12,Small Gene Panel,E1,,,Madrid Melanoma,Tumor,Melanoma Prognosis,"BCB002,BCB008,BCB015"
 SGLP-0258,TPP_3-01,110 DN,DN-048,52,16-119467B,4,,1.50,50,75.0,,,75.0,,Captured,SGPC-05,7.0,4.67,,Small Gene Panel,A1,,,,,Dysplastic Nevi,SGPC-05
 SGLP-0259,TPP_3-02,111 DN,DN-064,65,16-118019,4,,2.20,50,110.0,,,110.0,,Captured,SGPC-05,7.0,3.18,,Small Gene Panel,A2,,,,,Dysplastic Nevi,SGPC-05
 SGLP-0260,TPP_3-03,112 DN,DN-063,64,17-20908,4,,2.80,50,140.0,,,140.0,,Captured,SGPC-05,7.0,2.50,,Small Gene Panel,A3,,,,,Dysplastic Nevi,SGPC-05
@@ -2699,17 +2667,17 @@ SGLP-0377,SM D-22,"445 common, sclerotic dermal component",SM-022,,18-113402B,4,
 SGLP-0378,SM D-23,"446 DPN, pure",SM-023,,12-16974C,4,0.83,0.29,50,14.5,,,14.5,,Captured,SGPC-07,10.9,37.59,12,Small Gene Panel,,95,12/20/2018,Nevus from Iwei,Tumor,Nevus Library,"BCB002,BCB008"
 SGLP-0379,SM D-24,447 balloon cell nevus,SM-024,,17-128346A,4,1.54,0.70,50,35.0,,,35.0,,Captured,SGPC-07,10.9,15.57,12,Small Gene Panel,,96,12/20/2018,Nevus from Iwei,Tumor,Nevus Library,"BCB002,BCB008"
 SGLP-0380,SM D-25,448 common & balloon,SM-025,,18-85718,4,2.36,4.80,50,240.0,,,240.0,,Captured,"SGPC-07,SGPC-16",10.9,2.27,12,Small Gene Panel,,38,12/20/2018,Nevus from Iwei,Tumor,Nevus Library,"BCB002,BCB008"
-SGLP-0381,BND-001,463 cellular blue nevus,BN-001,,12-37217,4,2.20,1.05,46,48.3,,,48.3,,Captured,SGPC-09,7.8,7.44,12,Small Gene Panel,,69,2/21/2019,,Tumor,Nevus Library,"BCB004,BCB017"
-SGLP-0382,BND-002,464 cellular blue nevus,BN-002,,12-52736,4,2.81,1.56,46,71.8,,,71.8,,Captured,SGPC-09,7.8,5.01,12,Small Gene Panel,,70,2/21/2019,,Tumor,Nevus Library,BCB004
-SGLP-0383,BND-003,465 cellular blue nevus,BN-003,,12-97918,4,3.85,0.43,46,19.8,,,19.8,,Captured,"SGPC-09,SGPC-11",7.8,18.16,12,Small Gene Panel,,71,2/21/2019,,Tumor,Nevus Library,"BCB004,BCB011"
-SGLP-0384,BND-004,466 cellular blue nevus,BN-004,,12-6550,4,1.14,0.81,46,37.3,,,37.3,,Captured,SGPC-09,7.8,9.64,12,Small Gene Panel,,72,2/21/2019,,Tumor,Nevus Library,BCB004
-SGLP-0385,BND-005,467 cellular blue nevus,BN-005,,12-20144,4,0.66,0.17,50,8.5,,,8.5,,Captured,SGPC-16,8.3,48.82,12,Small Gene Panel,,73,2/21/2019,Blue Nevus,Tumor,Nevus Library,BCB017
-SGLP-0386,BND-006,468 cellular blue nevus,BN-006,,12-32138,4,1.13,0.38,46,17.5,,,17.5,,Captured,SGPC-09,7.8,20.55,12,Small Gene Panel,,74,2/21/2019,,Tumor,Nevus Library,BCB004
-SGLP-0387,BND-007,469 cellular blue nevus,BN-007,,11-47908,4,0.84,0.15,50,7.5,,,7.5,,Captured,SGPC-16,7.3,48.67,12,Small Gene Panel,,75,2/21/2019,Blue Nevus,Tumor,Nevus Library,BCB017
-SGLP-0388,BND-008,470 cellular blue nevus,BN-008,,11-59209,4,0.78,0.38,46,17.5,,,17.5,,Captured,SGPC-09,7.8,20.55,12,Small Gene Panel,,76,2/21/2019,,Tumor,Nevus Library,BCB004
-SGLP-0389,BND-009,471 cellular blue nevus,BN-009,,11-85008,4,1.96,0.47,46,21.6,,,21.6,,Captured,SGPC-09,7.8,16.62,12,Small Gene Panel,,73,2/21/2019,,Tumor,Nevus Library,BCB004
-SGLP-0390,BND-011,473 cellular blue nevus,BN-011,,11-19048,4,13.20,1.42,46,65.3,,,65.3,,Captured,SGPC-09,7.8,5.50,12,Small Gene Panel,,74,2/21/2019,,Tumor,Nevus Library,BCB004
-SGLP-0391,BND-012,474 cellular blue nevus,BN-012,,11-43354,4,1.59,0.55,46,25.3,,,25.3,,Captured,SGPC-09,7.8,14.20,12,Small Gene Panel,,79,2/21/2019,,Tumor,Nevus Library,BCB004
+SGLP-0381,-BND 1.00,463 cellular blue nevus,BN-001,,12-37217,4,2.20,1.05,46,48.3,,,48.3,,Captured,SGPC-09,7.8,7.44,12,Small Gene Panel,,69,2/21/2019,,Tumor,Nevus Library,"BCB004,BCB017"
+SGLP-0382,-BND 2.00,464 cellular blue nevus,BN-002,,12-52736,4,2.81,1.56,46,71.8,,,71.8,,Captured,SGPC-09,7.8,5.01,12,Small Gene Panel,,70,2/21/2019,,Tumor,Nevus Library,BCB004
+SGLP-0383,-BND 3.00,465 cellular blue nevus,BN-003,,12-97918,4,3.85,0.43,46,19.8,,,19.8,,Captured,"SGPC-09,SGPC-11",7.8,18.16,12,Small Gene Panel,,71,2/21/2019,,Tumor,Nevus Library,"BCB004,BCB011"
+SGLP-0384,-BND 4.00,466 cellular blue nevus,BN-004,,12-6550,4,1.14,0.81,46,37.3,,,37.3,,Captured,SGPC-09,7.8,9.64,12,Small Gene Panel,,72,2/21/2019,,Tumor,Nevus Library,BCB004
+SGLP-0385,-BND 5.00,467 cellular blue nevus,BN-005,,12-20144,4,0.66,0.17,50,8.5,,,8.5,,Captured,SGPC-16,8.3,48.82,12,Small Gene Panel,,73,2/21/2019,Blue Nevus,Tumor,Nevus Library,BCB017
+SGLP-0386,-BND 6.00,468 cellular blue nevus,BN-006,,12-32138,4,1.13,0.38,46,17.5,,,17.5,,Captured,SGPC-09,7.8,20.55,12,Small Gene Panel,,74,2/21/2019,,Tumor,Nevus Library,BCB004
+SGLP-0387,-BND 7.00,469 cellular blue nevus,BN-007,,11-47908,4,0.84,0.15,50,7.5,,,7.5,,Captured,SGPC-16,7.3,48.67,12,Small Gene Panel,,75,2/21/2019,Blue Nevus,Tumor,Nevus Library,BCB017
+SGLP-0388,-BND 8.00,470 cellular blue nevus,BN-008,,11-59209,4,0.78,0.38,46,17.5,,,17.5,,Captured,SGPC-09,7.8,20.55,12,Small Gene Panel,,76,2/21/2019,,Tumor,Nevus Library,BCB004
+SGLP-0389,-BND 9.00,471 cellular blue nevus,BN-009,,11-85008,4,1.96,0.47,46,21.6,,,21.6,,Captured,SGPC-09,7.8,16.62,12,Small Gene Panel,,73,2/21/2019,,Tumor,Nevus Library,BCB004
+SGLP-0390,-BND 11.00,473 cellular blue nevus,BN-011,,11-19048,4,13.20,1.42,46,65.3,,,65.3,,Captured,SGPC-09,7.8,5.50,12,Small Gene Panel,,74,2/21/2019,,Tumor,Nevus Library,BCB004
+SGLP-0391,-BND 12.00,474 cellular blue nevus,BN-012,,11-43354,4,1.59,0.55,46,25.3,,,25.3,,Captured,SGPC-09,7.8,14.20,12,Small Gene Panel,,79,2/21/2019,,Tumor,Nevus Library,BCB004
 SGLP-0392,NLD-014,478 nevus or nevus like,NL-014,,18-129422,4,12.60,3.08,46,141.7,,,141.7,,Captured,SGPC-09,7.8,2.54,12,Small Gene Panel,,80,2/21/2019,,Tumor,Nevus Library,BCB004
 SGLP-0393,NLD-015,479 nevus or nevus like,NL-015,,19-1978C,4,34.20,5.74,46,264.0,,,264.0,,Captured,SGPC-09,7.8,1.36,12,Small Gene Panel,,81,2/21/2019,,Tumor,Nevus Library,BCB004
 SGLP-0394,NLD-016,480 nevus or nevus like,NL-016,,19-2264A,4,6.10,7.83,46,360.2,,,360.2,,Captured,SGPC-09,7.8,1.00,12,Small Gene Panel,,82,2/21/2019,,Tumor,Nevus Library,BCB004
@@ -2948,8 +2916,7 @@ SGLP-0628,MDD-123,1035 Mel,MD-121,,06-21073-E T3,4,2.80,1.04,50,52.0,,,52.0,,Cap
 SGLP-0629,MDD-123,1035 Mel,MD-121,,06-21073-E T3,4,2.84,1.31,50,65.5,,,65.5,,Captured,SGPC-16,52.0,39.69,12,Small Gene Panel,,86,10/16/2019,Madrid Melanoma; 250 ng; repair,Tumor,Melanoma Prognosis,BCB017
 SGLP-0630,MDD-132,1044 Mel,MD-130,,06-01846-D T1,4,5.35,1.73,50,86.5,,,86.5,,Captured,SGPC-16,60.0,34.68,12,Small Gene Panel,,88,10/16/2019,Madrid Melanoma; 500ng; No repair,Tumor,Melanoma Prognosis,BCB017
 SGLP-0631,MDD-132,1044 Mel,MD-130,,06-01846-D T1,4,5.62,2.53,50,126.5,,,126.5,,Captured,SGPC-16,60.0,23.72,12,Small Gene Panel,,89,10/16/2019,Madrid Melanoma; 500ng; repair,Tumor,Melanoma Prognosis,BCB017
-SGLP-0632,MDD-113,1025 Mel,MD-111,,06-01845-E T4,4,9.07,2.73,50,136.5,,,136.5,,Captured,SGPC-16,60.0,21.98,12,Small Gene Panel,,90,10/16/2019,"Madrid Melanoma; 500ng; No repair; 4 Cycles
-",Tumor,Melanoma Prognosis,BCB017
+SGLP-0632,MDD-113,1025 Mel,MD-111,,06-01845-E T4,4,9.07,2.73,50,136.5,,,136.5,,Captured,SGPC-16,60.0,21.98,12,Small Gene Panel,,90,10/16/2019,Madrid Melanoma; 500ng; No repair; 4 Cycles,Tumor,Melanoma Prognosis,BCB017
 SGLP-0633,MDD-123,1035 Mel,MD-121,,06-21073-E T3,4,5.88,1.68,50,84.0,,,84.0,,Captured,SGPC-16,60.0,35.71,12,Small Gene Panel,,93,10/16/2019,Madrid Melanoma; 500ng; No repair; 4 Cycles,Tumor,Melanoma Prognosis,BCB017
 SGLP-0634,MDD-145,1057 Mel,MD-143,,05-23001-E T4,4,13.70,0.79,50,39.5,,,39.5,,Captured,SGPC-16,25.5,32.28,12,Small Gene Panel,,95,10/16/2019,Madrid Melanoma; 500ng; No repair; 4 Cycles,Tumor,Melanoma Prognosis,BCB017
 SGLP-0635,MDD-145,1057 Mel,MD-143,,05-23001-E T4,4,28.70,0.51,50,25.5,,,25.5,,Captured,SGPC-16,25.5,50.00,12,Small Gene Panel,,96,10/16/2019,Madrid Melanoma; 1000ng; No repair; 4 Cycles,Tumor,Melanoma Prognosis,BCB017
@@ -3226,10 +3193,8 @@ U5LP-10,N-2,2260 Normal,MP-02,,04-35102A,4,2.91,1.66,100,166.0,,,166.0,,Captured
 U5LP-11,N-3,2261 Normal,MP-03,,08-6790A,4,3.01,1.27,100,127.0,,,127.0,,Captured,UCSF500-01,60.0,47.24,,UCSF500,,45,7/2/2019,,Normal,Hockemeyer Melanoma Project,BCB009
 U5LP-12,N-4,2262 Normal,MP-04,,96-004039,4,3.16,1.33,100,133.0,,,133.0,,Captured,UCSF500-01,60.0,45.11,,UCSF500,,46,7/2/2019,,Normal,Hockemeyer Melanoma Project,BCB009
 U5LP-13,MM-3,2253 Tumor,MP-03,,11-19653B2,4,0.48,0.05,50,2.5,,,2.5,,Captured,UCSF500-01,4.5,90.00,,UCSF500,,49,7/2/2019,,Tumor,Hockemeyer Melanoma Project,BCB009
-UM_1,UM1_NA,2760 Uveal Mel,,,,,,,,0.0,,,0.0,,Captured,,,NaN,,NimV2,,,,"Tert 1, Tert 2, and Tert 3 spike-in at 10pg/ul; SF3B1 1 and SF3B1 2 spike-in at 4pg/ul; NFKBIE spike-in at 10pg/ul
-",Tumor,Uveal Melanoma,Nimblegen38_BB45
-UM_2,UM2_NA,2761 Uveal Mel,,,,,,,,0.0,,,0.0,,Captured,,,NaN,,NimV2,,,,"Tert 1, Tert 2, and Tert 3 spike-in at 10pg/ul; SF3B1 1 and SF3B1 2 spike-in at 4pg/ul; NFKBIE spike-in at 10pg/ul
-",Tumor,Uveal Melanoma,Nimblegen38_BB45
+UM_1,UM1_NA,2760 Uveal Mel,,,,,,,,0.0,,,0.0,,Captured,,,NaN,,NimV2,,,,"Tert 1, Tert 2, and Tert 3 spike-in at 10pg/ul; SF3B1 1 and SF3B1 2 spike-in at 4pg/ul; NFKBIE spike-in at 10pg/ul",Tumor,Uveal Melanoma,Nimblegen38_BB45
+UM_2,UM2_NA,2761 Uveal Mel,,,,,,,,0.0,,,0.0,,Captured,,,NaN,,NimV2,,,,"Tert 1, Tert 2, and Tert 3 spike-in at 10pg/ul; SF3B1 1 and SF3B1 2 spike-in at 4pg/ul; NFKBIE spike-in at 10pg/ul",Tumor,Uveal Melanoma,Nimblegen38_BB45
 UM23,,,,,,,,,,0.0,,,0.0,,Captured,BB74_CL,,NaN,,,NextFlex 19,,,,Mel,2010-2017,Kapa3_BB74
 UM24,,,,,,,,,,0.0,,,0.0,,Captured,BB74_CL,,NaN,,,NextFlex 20,,,,Mel,2010-2017,Kapa3_BB74
 UM25,,,,,,,,,,0.0,,,0.0,,Captured,BB74_CL,,NaN,,,NextFlex 21,,,,Mel,2010-2017,Kapa3_BB74
