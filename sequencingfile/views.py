@@ -283,6 +283,13 @@ def get_or_create_files_from_file(row):
                 checksum=checksum,
                 type="bam"
             )
+        for file_, checksum_ in row["bam_bai_file"].items():
+            get_or_create_file(
+                sequencing_file_set=set_,
+                name=file_,
+                checksum=checksum_,
+                type="bai"
+            )
         print("created")
     except Exception as e:
         print(e)
@@ -300,6 +307,10 @@ def _create_file_from_file():
     df['bam_file'] = df['bam_file'].str.replace('"', "'").str.replace("'", '"')
     df["bam_file"] = df["bam_file"].astype('str')
     df["bam_file"] = df["bam_file"].apply(lambda x: make_dict(x))
+
+    df['bam_bai_file'] = df['bam_bai_file'].str.replace('"', "'").str.replace("'", '"')
+    df["bam_bai_file"] = df["bam_bai_file"].astype('str')
+    df["bam_bai_file"] = df["bam_bai_file"].apply(lambda x: make_dict(x))
 
     df[~df["bam_file"].isnull()].apply(lambda row: get_or_create_files_from_file(row), axis=1)
     # df[~df["fastq_file"].isnull()].apply(lambda row: get_or_create_files_from_file(row), axis=1)
