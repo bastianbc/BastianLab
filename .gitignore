@@ -72,7 +72,6 @@ target/
 *.config
 *.vscode
 *.ipynb_checkpoints
-#uploads/
 thumbnails/
 media/
 venv/
