@@ -15,3 +15,21 @@ class SequencingFileSerializer(serializers.ModelSerializer):
 
     def get_sample_lib(self,obj):
         return obj.sample_lib.name
+
+class SequencingFileSetSerializer(serializers.ModelSerializer):
+    DT_RowId = serializers.SerializerMethodField()
+    sample_lib = serializers.SerializerMethodField()
+    sequencing_run = serializers.SerializerMethodField()
+
+    class Meta:
+        model = SequencingFileSet
+        fields = ("set_id","DT_RowId", "sample_lib", "sequencing_run", "prefix", "path", "date_added")
+
+    def get_DT_RowId(self, obj):
+       return getattr(obj, 'set_id')
+
+    def get_sample_lib(self,obj):
+        return obj.sample_lib.name
+
+    def get_sequencing_run(self,obj):
+        return obj.sequencing_run.name

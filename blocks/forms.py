@@ -1,6 +1,8 @@
 from django import forms
 from .models import *
 from body.models import Body
+from django.core.exceptions import ValidationError
+
 
 class BlockForm(forms.ModelForm):
     # mock_body_site = forms.ModelChoiceField(queryset = Body.objects.filter(parent=None), label="Body Site", required=False)
@@ -31,3 +33,9 @@ class BlockUrlForm(forms.ModelForm):
     class Meta:
         model = BlockUrl
         fields = "__all__"
+
+    def clean_url(self):
+        data = self.cleaned_data["url"]
+        if not data.endswith("/"):
+            raise ValidationError("URL needs to be ended with /")
+        return data
