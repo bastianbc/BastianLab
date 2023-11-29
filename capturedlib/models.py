@@ -96,9 +96,7 @@ class CapturedLib(models.Model):
             search_value = _parse_value(search_value)
 
             if is_initial:
-                print(search_value)
                 filter = [sl_cl_link.captured_lib.id for sl_cl_link in SL_CL_LINK.objects.filter(sample_lib__id=search_value)]
-                print(filter)
                 queryset = queryset.filter(Q(id__in=filter))
             elif search_value:
                 queryset = queryset.filter(

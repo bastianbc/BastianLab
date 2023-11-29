@@ -61,6 +61,7 @@ var KTDatatablesServerSide = function () {
               { data: 'sample_lib' },
               { data: 'sequencing_run' },
               { data: 'path' },
+              { data: 'num_sequencing_files'},
 
             ],
             columnDefs: [
@@ -76,6 +77,18 @@ var KTDatatablesServerSide = function () {
                 },
                 {
                     targets: 5,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        if (data > 0) {
+                          let set_id = row["set_id"];
+                          return `
+                              <a href="/sequencingfile?initial=${set_id}">${data}</a>`;
+                        }
+                        return data;
+                    }
+                },
+                {
+                    targets: 6,
                     data: null,
                     orderable: false,
                     className: 'text-end',

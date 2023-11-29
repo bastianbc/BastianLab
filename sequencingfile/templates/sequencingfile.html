@@ -12,16 +12,10 @@
     <div class="card-body">
       {% csrf_token %}
       <div class="row">
-        <div class="col-12">{{ form.sample_lib|as_crispy_field }}</div>
-        <div class="col-12">{{ form.folder_name|as_crispy_field }}</div>
-        <div class="col-5">{{ form.read1_file|as_crispy_field }}</div>
-        <div class="col-5">{{ form.read1_checksum|as_crispy_field }}</div>
-        <div class="col-2">{{ form.read1_count|as_crispy_field }}</div>
-        <div class="col-5">{{ form.read2_file|as_crispy_field }}</div>
-        <div class="col-5">{{ form.read2_checksum|as_crispy_field }}</div>
-        <div class="col-2">{{ form.read2_count|as_crispy_field }}</div>
-        <div class="col-12">{{ form.is_read_count_equal|as_crispy_field }}</div>
-        <div class="col-12">{{ form.path|as_crispy_field }}</div>
+        <div class="col-12">{{ form.sequencing_file_set|as_crispy_field }}</div>
+        <div class="col-12">{{ form.name|as_crispy_field }}</div>
+        <div class="col-5">{{ form.checksum|as_crispy_field }}</div>
+        <div class="col-5">{{ form.type|as_crispy_field }}</div>
       </div>
     </div>
     <div class="card-footer">
