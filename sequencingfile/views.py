@@ -319,23 +319,44 @@ def get_or_create_seqrun(cl, name):
         )
         return obj
     return None
+#
+# def get_or_create_files_from_file(row):
+#     prefix = next(iter(row['fastq_file'])).split("_L0")[0]
+#     print(prefix)
+#     try:
+#         set_ = get_or_create_set(
+#             prefix=prefix,
+#             path=row['fastq_path'],
+#             sample_lib=SampleLib.objects.get(name=row["sample_lib"]),
+#             sequencing_run=SequencingRun.objects.get(name=row["sequencing_run"]),
+#         )
+#         for file, checksum in row["fastq_file"].items():
+#             get_or_create_file(
+#                 sequencing_file_set=set_,
+#                 name=file,
+#                 checksum=checksum,
+#                 type="fastq"
+#             )
+#         print("created")
+#     except Exception as e:
+#         print(e)
 
 def get_or_create_files_from_file(row):
-    prefix = next(iter(row['fastq_file'])).split("_L0")[0]
+    prefix = next(iter(row['bam_file'])).split(".bam")[0]
     print(prefix)
     try:
         set_ = get_or_create_set(
             prefix=prefix,
-            path=row['fastq_path'],
+            path=row['bam_bai_file_path'],
             sample_lib=SampleLib.objects.get(name=row["sample_lib"]),
             sequencing_run=SequencingRun.objects.get(name=row["sequencing_run"]),
         )
-        for file, checksum in row["fastq_file"].items():
+        for file, checksum in row["bam_file"].items():
             get_or_create_file(
                 sequencing_file_set=set_,
                 name=file,
                 checksum=checksum,
-                type="fastq"
+                type="bam"
             )
         print("created")
     except Exception as e:
@@ -347,11 +368,16 @@ def _create_file_from_file():
     file = Path(Path(__file__).parent.parent / "uploads" / "report_matching_sample_lib_with_bait_after_reducing_fastq_files.csv")
     df = pd.read_csv(file)
     print(df.columns)
-    df['fastq_file'] = df['fastq_file'].str.replace('"', "'").str.replace("'", '"')
-    df["fastq_file"] = df["fastq_file"].astype('str')
-    df["fastq_file"] = df["fastq_file"].apply(lambda x: make_dict(x))
+    # df['fastq_file'] = df['fastq_file'].str.replace('"', "'").str.replace("'", '"')
+    # df["fastq_file"] = df["fastq_file"].astype('str')
+    # df["fastq_file"] = df["fastq_file"].apply(lambda x: make_dict(x))
 
-    df[~df["fastq_file"].isnull()].apply(lambda row: get_or_create_files_from_file(row), axis=1)
+    df['bam_file'] = df['bam_file'].str.replace('"', "'").str.replace("'", '"')
+    df["bam_file"] = df["bam_file"].astype('str')
+    df["bam_file"] = df["bam_file"].apply(lambda x: make_dict(x))
+
+    df[~df["bam_file"].isnull()].apply(lambda row: get_or_create_files_from_file(row), axis=1)
+    # df[~df["fastq_file"].isnull()].apply(lambda row: get_or_create_files_from_file(row), axis=1)
     # df.apply(lambda row: get_or(row), axis=1)
 
 
