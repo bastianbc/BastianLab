@@ -9,6 +9,9 @@ from .forms import *
 from django.contrib import messages
 from capturedlib.models import *
 from core.decorators import permission_required_for_async
+from pathlib import Path
+import pandas as pd
+
 
 @permission_required("sequencingrun.view_sequencingrun",raise_exception=True)
 def sequencingruns(request):
@@ -169,3 +172,18 @@ def get_sequencers(request):
 
 def get_pes(request):
     return JsonResponse([{"label":"---------","value":""}] + [{ "label":c[1], "value":c[0] } for c in SequencingRun.PE_TYPES], safe=False)
+
+def get_or_create_files_from_file(row):
+    print()
+
+
+def _create_file_from_file():
+    file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view-7.csv")
+    df = pd.read_csv(file)
+    # print(df.columns)
+    # df['fastq_file'] = df['fastq_file'].str.replace('"', "'").str.replace("'", '"')
+    # df["fastq_file"] = df["fastq_file"].astype('str')
+    # df["fastq_file"] = df["fastq_file"].apply(lambda x: make_dict(x))
+
+    df[~df["fastq_file"].isnull()].apply(lambda row: get_or_create_files_from_file(row), axis=1)
+
