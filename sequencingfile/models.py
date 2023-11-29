@@ -21,7 +21,7 @@ class SequencingFileSet(models.Model):
     def query_by_args(self, user, **kwargs):
 
         def _get_authorizated_queryset():
-            return SequencingFileSet.objects.all()
+            return SequencingFileSet.objects.all().annotate(num_sequencing_files=Count('sequencing_files'))
 
         def _parse_value(search_value):
             if "_initial:" in search_value:
@@ -58,7 +58,9 @@ class SequencingFileSet(models.Model):
             search_value = _parse_value(search_value)
 
             if is_initial:
-                pass
+                queryset = queryset.filter(
+                    Q(sequencing_files__file_id=search_value)
+                )
             elif search_value:
                 queryset = queryset.filter(
                     Q(folder_prefix__icontains=search_value) |
@@ -139,7 +141,9 @@ class SequencingFile(models.Model):
             search_value = _parse_value(search_value)
 
             if is_initial:
-                pass
+                queryset = queryset.filter(
+                    Q(sequencing_file_set__set_id=search_value)
+                )
             elif search_value:
                 queryset = queryset.filter(
                     Q(folder_name__icontains=search_value) |

@@ -184,7 +184,7 @@ def sequencingfilesets(request):
 
 @permission_required_for_async("sequencingfileset.view_sequencingfileset")
 def filter_sequencingfilesets(request):
-    _create_file_from_file()
+    # _create_file_from_file()
     sequencingfilesets = SequencingFileSet().query_by_args(request.user,**request.GET)
     serializer = SequencingFileSetSerializer(sequencingfilesets['items'], many=True)
     result = dict()

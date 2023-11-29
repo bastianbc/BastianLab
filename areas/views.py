@@ -14,7 +14,6 @@ from pathlib import Path
 @permission_required_for_async("areas.view_areas")
 def filter_areas(request):
     from .serializers import AreasSerializer
-    _create_blocks_from_file()
     areas = Areas().query_by_args(request.user,**request.GET)
     serializer = AreasSerializer(areas['items'], many=True)
     result = dict()
@@ -162,8 +161,6 @@ def get_area_types_t():
     for area in Areas.objects.filter():
         try:
             n = re.search(pattern, area.name.replace("_"," ")).group(1)
-            print(area.name, n)
-
             t = get_area_type(n)
             area.area_type = t
             area.save()
