@@ -1951,6 +1951,30 @@ def qpcr_at_sl(request):
     df[~df["SL_ID"].isnull()].apply(lambda row: get_at_sl(row), axis=1)
 
 
+def get_or_create_seqrun(name):
+    if name:
+        obj, created = SequencingRun.objects.get_or_create(
+            name=name
+        )
+        return obj
+    return None
+
+def create_seq_run(row):
+    print(row["Sequencing Run_ID"])
+    if "," in row["Sequencing Run_ID"]:
+        for seqrun in row["Sequencing Run_ID"].split(','):
+            get_or_create_seqrun(name=seqrun)
+    else:
+        get_or_create_seqrun(name=row["Sequencing Run_ID"])
+
+
+
+def qpcr_at_seqrun(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view (2).csv")
+    df = pd.read_csv(file)
+    df[~df["Sequencing Run_ID"].isnull()].apply(lambda row: create_seq_run(row), axis=1)
+
+
 def checkfiles(row):
     try:
         SequencingFileSet.objects.get(prefix=next(iter(row['fastq_file'])).split("_L0")[0])
@@ -2003,14 +2027,14 @@ def get_or_create_seql(cl, name):
         return obj
     return None
 
-def get_or_create_seqrun(cl, name):
-    if name:
-        obj, created = SequencingLib.objects.get_or_create(
-            name=name,
-            captured_lib=cl
-        )
-        return obj
-    return None
+# def get_or_create_seqrun(cl, name):
+#     if name:
+#         obj, created = SequencingLib.objects.get_or_create(
+#             name=name,
+#             captured_lib=cl
+#         )
+#         return obj
+#     return None
 
 def get_or_create_files_from_file(row):
     prefix = next(iter(row['fastq_file'])).split("_L0")[0]
