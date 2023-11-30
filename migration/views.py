@@ -2038,6 +2038,12 @@ def get_or_create_seql(cl, name):
 
 def get_or_create_files_from_file(row):
     prefix = next(iter(row['fastq_file'])).split("_L0")[0]
+    if "FKP" in row["sample_lib"]:
+        # Remove the leading '-' and spaces
+        row["sample_lib"] = row["sample_lib"].lstrip('-').replace(' ', '')
+
+        # Format the string as "FKP-01"
+        row["sample_lib"] = row["sample_lib"][:3] + '-' + row["sample_lib"][3:].zfill(2)
     try:
         set_ = get_or_create_set(
             prefix=prefix,
