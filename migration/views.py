@@ -1963,6 +1963,74 @@ def make_dict(d):
     except:
         return None
 
+def get_or_create_set(prefix, path, sample_lib, sequencing_run):
+    if prefix:
+        obj, created = SequencingFileSet.objects.get_or_create(
+            prefix=prefix,
+            path=path,
+            sample_lib=sample_lib,
+            sequencing_run=sequencing_run
+        )
+        return obj
+    return None
+
+def get_or_create_file(sequencing_file_set, name, checksum, type):
+    if sequencing_file_set:
+        obj, created = SequencingFile.objects.get_or_create(
+            sequencing_file_set=sequencing_file_set,
+            name=name,
+            checksum=checksum,
+            type=type
+        )
+        return obj
+    return None
+
+def get_or_create_cl(sl, name):
+    if name:
+        obj, created = CapturedLib.objects.get_or_create(
+            name=name,
+            samplelib=sl
+        )
+        return obj
+    return None
+
+def get_or_create_seql(cl, name):
+    if name:
+        obj, created = SequencingLib.objects.get_or_create(
+            name=name,
+            captured_lib=cl
+        )
+        return obj
+    return None
+
+def get_or_create_seqrun(cl, name):
+    if name:
+        obj, created = SequencingLib.objects.get_or_create(
+            name=name,
+            captured_lib=cl
+        )
+        return obj
+    return None
+
+def get_or_create_files_from_file(row):
+    prefix = next(iter(row['fastq_file'])).split("_L0")[0]
+    try:
+        set_ = get_or_create_set(
+            prefix=prefix,
+            path=row['fastq_path'],
+            sample_lib=SampleLib.objects.get(name=row["sample_lib"]),
+            sequencing_run=SequencingRun.objects.get(name=row["sequencing_run"]),
+        )
+        for file, checksum in row["fastq_file"].items():
+            get_or_create_file(
+                sequencing_file_set=set_,
+                name=file,
+                checksum=checksum,
+                type="fastq"
+            )
+    except Exception as e:
+        print(e, row["sample_lib"], row["sequencing_run"])
+
 def create_file_from_file(request):
     file = Path(Path(
         __file__).parent.parent / "uploads" / "report_matching_sample_lib_with_bait_after_reducing_fastq_files.csv")
@@ -1980,6 +2048,6 @@ def create_file_from_file(request):
     df["bam_bai_file"] = df["bam_bai_file"].astype('str')
     df["bam_bai_file"] = df["bam_bai_file"].apply(lambda x: make_dict(x))
 
-    df[~df["fastq_file"].isnull()].apply(lambda row: checkfiles(row), axis=1)
+    df[~df["fastq_file"].isnull()].apply(lambda row: get_or_create_files_from_file(row), axis=1)
     # df[~df["fastq_file"].isnull()].apply(lambda row: get_or_create_files_from_file(row), axis=1)
     # df.apply(lambda row: get_or(row), axis=1)
