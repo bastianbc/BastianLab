@@ -184,7 +184,6 @@ def sequencingfilesets(request):
 
 @permission_required_for_async("sequencingfileset.view_sequencingfileset")
 def filter_sequencingfilesets(request):
-    # _create_file_from_file()
     sequencingfilesets = SequencingFileSet().query_by_args(request.user,**request.GET)
     serializer = SequencingFileSetSerializer(sequencingfilesets['items'], many=True)
     result = dict()
@@ -404,13 +403,7 @@ def get_or_cons(row):
     except:
         print(row["Block"])
 
-def _blocks():
-    # file = Path(Path(__file__).parent.parent / "uploads" / "Blocks-Grid view-5.csv")
-    # df = pd.read_csv(file)
-    # df.apply(lambda row: get_or(row), axis=1)
-    file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
-    df = pd.read_csv(file)
-    df.apply(lambda row: get_or_cons(row), axis=1)
+
 
 
 

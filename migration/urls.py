@@ -12,4 +12,5 @@ urlpatterns = [
     path("consolidated_data", views.consolidated_data, name="consolidated-data"),
     path("body_sites", views.import_body_sites, name="import-body-sites"),
     path("airtable", views.airtable_consolidated_data, name="airtable-consolidated-data"),
+    path("qpcr_consolidated_data", views.qpcr_consolidated_data, name="qpcr_consolidated_data"),
 ]
