@@ -14,4 +14,5 @@ urlpatterns = [
     path("airtable", views.airtable_consolidated_data, name="airtable-consolidated-data"),
     path("qpcr_consolidated_data", views.qpcr_consolidated_data, name="qpcr_consolidated_data"),
     path("qpcr_at_na", views.qpcr_at_na, name="qpcr_at_na"),
+    path("qpcr_at_sl", views.qpcr_at_sl, name="qpcr_at_sl"),
 ]

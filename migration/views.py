@@ -1909,3 +1909,23 @@ def qpcr_at_na(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "Nucleic Acids-Grid view (1).csv")
     df = pd.read_csv(file)
     df[~df["NA_ID"].isnull()].apply(lambda row: get_at_na(row), axis=1)
+
+
+def get_at_sl(row):
+    print(row['SL_ID'])
+    try:
+        SampleLib.objects.filter(name=row['SL_ID']).update(
+            qubit=float(row['Post-lib Qubit (ng/ul)']),
+            qpcr_conc=float(row['Post-lib qPCR (ng/ul)']),
+            pcr_cycles=float(row['Pre-hyb PCR cycles']),
+            amount_final=float(row['Total LP DNA for capture (ng)']),
+            vol_init=float(row['Volume of library (ul)']),
+        )
+    except Exception as e:
+        print(e)
+
+
+def qpcr_at_sl(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view (1).csv")
+    df = pd.read_csv(file)
+    df.apply(lambda row: get_at_sl(row), axis=1)
