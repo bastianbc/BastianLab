@@ -2269,43 +2269,43 @@ RLP-262,RNA-314,2131 Mel,ME-40,,17-100072A,8,0.72,0.76,100,76.0,,,76.0,,Captured
 RLP-263,RNA-315,2132 Nevus,ME-40,,17-100072A,8,0.38,0.36,50,18.0,,,18.0,,Captured,KAPAEX-39,18.0,50.00,13,KAPA HyperExome V1 Probes,,178,8/29/2023,"65oC X 1 min, 15 uM adapter; 8 cycles; 1 hr adapter ligation at 20oC",Nevus,Melanoma Epigenetics,BCB068
 RLP-264,RNA-344,2193 Mel,ME-51,,19-36210A,8,2.34,2.72,100,272.0,,,272.0,,Captured,KAPAEX-39,140.0,51.47,13,KAPA HyperExome V1 Probes,,179,8/29/2023,"65oC X 1 min, 15 uM adapter; 8 cycles; 1 hr adapter ligation at 20oC",Mel,Melanoma Epigenetics,BCB068
 RLP-265,RNA-346,2194 Nevus,ME-51,,19-36210A,8,2.21,2.62,50,131.0,,,131.0,,Captured,KAPAEX-39,131.0,50.00,13,KAPA HyperExome V1 Probes,,180,8/29/2023,"65oC X 1 min, 15 uM adapter; 8 cycles; 1 hr adapter ligation at 20oC",Nevus,Melanoma Epigenetics,BCB068
-RNA-01,RNA-01,280 Normal,ME-01,,16-109659 A4,11,13.60,8.90,50,445.0,,,445.0,,Captured,VM_BB_02,333.0,37.42,12, SeqCap EZ MedExome,B7,,8/20/2018,RLP-01,Normal,Melanoma Epigenetics,
-RNA-02,RNA-02,281 Nevus,ME-01,,16-109659 A4,11,13.10,7.80,50,390.0,,,390.0,,Captured,VM_BB_02,333.0,42.69,12, SeqCap EZ MedExome,D8,,8/20/2018,RLP-02,Nevus,Melanoma Epigenetics,
-RNA-03,RNA-03,282 Mel,ME-01,,16-109659 A4,11,21.60,16.40,50,820.0,,,820.0,,Captured,VM_BB_01,333.0,20.30,12, SeqCap EZ MedExome,D9,,8/20/2018,RLP-03,Mel,Melanoma Epigenetics,
-RNA-04,RNA-04,283 Normal,ME-02,,16-84820,11,2.80,2.60,50,130.0,,,130.0,,Captured,VM_BB_01,100.0,38.46,12, SeqCap EZ MedExome,D10,,8/20/2018,RLP-04,Normal,Melanoma Epigenetics,
-RNA-05,RNA-05,284 Nevus,ME-02,,16-84820,11,3.20,2.20,50,110.0,,,110.0,,Captured,VM_BB_01,100.0,45.45,12, SeqCap EZ MedExome,D11,,8/20/2018,RLP-05,Nevus,Melanoma Epigenetics,
-RNA-06,RNA-06,285 Mel,ME-02,,16-84820,11,9.10,4.40,50,220.0,,,220.0,,Captured,VM_BB_02,210.0,47.73,12, SeqCap EZ MedExome,D12,,8/20/2018,RLP-06,Mel,Melanoma Epigenetics,
-RNA-07,RNA-07,286 Normal,ME-03,,17-26457,11,4.80,2.10,50,105.0,,,105.0,,Captured,VM_BB_01,100.0,47.62,12, SeqCap EZ MedExome,UN,,8/20/2018,RLP-07,Normal,Melanoma Epigenetics,
-RNA-08,RNA-08,287 Nevus,ME-03,,17-26457,11,6.50,4.20,50,210.0,,,210.0,,Captured,VM_BB_02,210.0,50.00,12, SeqCap EZ MedExome,E9,,8/20/2018,RLP-08,Nevus,Melanoma Epigenetics,
-RNA-09,RNA-09,288 Mel,ME-03,,17-26457,11,12.10,7.40,50,370.0,,,370.0,,Captured,VM_BB_02,333.0,45.00,12, SeqCap EZ MedExome,E10,,8/20/2018,RLP-09,Mel,Melanoma Epigenetics,
+RNA-01,RNA-01,280 Normal,ME-01,,16-109659 A4,11,13.60,8.90,50,445.0,,,445.0,,Captured,VM_BB_02,333.0,37.42,12, SeqCap EZ MedExome,B7,,8/20/2018,RLP-01,Normal,Melanoma Epigenetics,Matched_sample_RNAseq_Batch2
+RNA-02,RNA-02,281 Nevus,ME-01,,16-109659 A4,11,13.10,7.80,50,390.0,,,390.0,,Captured,VM_BB_02,333.0,42.69,12, SeqCap EZ MedExome,D8,,8/20/2018,RLP-02,Nevus,Melanoma Epigenetics,Matched_sample_RNAseq_Batch2
+RNA-03,RNA-03,282 Mel,ME-01,,16-109659 A4,11,21.60,16.40,50,820.0,,,820.0,,Captured,VM_BB_01,333.0,20.30,12, SeqCap EZ MedExome,D9,,8/20/2018,RLP-03,Mel,Melanoma Epigenetics,Matched_sample_RNAseq_Batch1
+RNA-04,RNA-04,283 Normal,ME-02,,16-84820,11,2.80,2.60,50,130.0,,,130.0,,Captured,VM_BB_01,100.0,38.46,12, SeqCap EZ MedExome,D10,,8/20/2018,RLP-04,Normal,Melanoma Epigenetics,Matched_sample_RNAseq_Batch1
+RNA-05,RNA-05,284 Nevus,ME-02,,16-84820,11,3.20,2.20,50,110.0,,,110.0,,Captured,VM_BB_01,100.0,45.45,12, SeqCap EZ MedExome,D11,,8/20/2018,RLP-05,Nevus,Melanoma Epigenetics,Matched_sample_RNAseq_Batch1
+RNA-06,RNA-06,285 Mel,ME-02,,16-84820,11,9.10,4.40,50,220.0,,,220.0,,Captured,VM_BB_02,210.0,47.73,12, SeqCap EZ MedExome,D12,,8/20/2018,RLP-06,Mel,Melanoma Epigenetics,Matched_sample_RNAseq_Batch2
+RNA-07,RNA-07,286 Normal,ME-03,,17-26457,11,4.80,2.10,50,105.0,,,105.0,,Captured,VM_BB_01,100.0,47.62,12, SeqCap EZ MedExome,UN,,8/20/2018,RLP-07,Normal,Melanoma Epigenetics,Matched_sample_RNAseq_Batch1
+RNA-08,RNA-08,287 Nevus,ME-03,,17-26457,11,6.50,4.20,50,210.0,,,210.0,,Captured,VM_BB_02,210.0,50.00,12, SeqCap EZ MedExome,E9,,8/20/2018,RLP-08,Nevus,Melanoma Epigenetics,Matched_sample_RNAseq_Batch2
+RNA-09,RNA-09,288 Mel,ME-03,,17-26457,11,12.10,7.40,50,370.0,,,370.0,,Captured,VM_BB_02,333.0,45.00,12, SeqCap EZ MedExome,E10,,8/20/2018,RLP-09,Mel,Melanoma Epigenetics,Matched_sample_RNAseq_Batch2
 RNA-10,RNA-10,289 Normal,ME-04,,16-106975,11,1.90,1.20,50,60.0,,,60.0,,Pending,,,0.00,,,E11,,8/20/2018,RLP-10,Normal,Melanoma Epigenetics,
-RNA-11,RNA-11,290 Nevus,ME-04,,16-106975,11,13.30,11.50,50,575.0,,,575.0,,Captured,VM_BB_01,333.0,28.96,12, SeqCap EZ MedExome,H8,,8/20/2018,RLP-11,Nevus,Melanoma Epigenetics,
-RNA-12,RNA-12,291 Mel,ME-04,,16-106975,11,12.30,11.70,50,585.0,,,585.0,,Captured,VM_BB_01,333.0,28.46,12, SeqCap EZ MedExome,H9,,8/20/2018,RLP-12,Mel,Melanoma Epigenetics,
-RNA-13,RNA-13,292 Nevus,ME-05,,17-12444,11,18.20,17.90,50,895.0,,,895.0,,Captured,VM_BB_01,333.0,18.60,12, SeqCap EZ MedExome,A3,,8/20/2018,RLP-13,Nevus,Melanoma Epigenetics,
-RNA-14,RNA-14,293 Mel,ME-05,,17-12444,11,27.00,23.40,50,1170.0,,,1170.0,,Captured,VM_BB_01,333.0,14.23,12, SeqCap EZ MedExome,A5,,8/20/2018,RLP-14,Mel,Melanoma Epigenetics,
-RNA-15,RNA-15,294 Nevus,ME-06,,17-88262,11,10.20,7.30,50,365.0,,,365.0,,Captured,VM_BB_02,333.0,45.62,12, SeqCap EZ MedExome,B4,,8/20/2018,RLP-15,Nevus,Melanoma Epigenetics,
-RNA-16,RNA-16,295 Mel,ME-06,,17-88262,11,11.00,7.30,50,365.0,,,365.0,,Captured,VM_BB_02,333.0,45.62,12, SeqCap EZ MedExome,B5,,8/20/2018,RLP-16,Mel,Melanoma Epigenetics,
-RNA-18,RNA-18,297 Mel,ME-07,,16-107007,11,20.40,13.00,50,650.0,,,650.0,,Captured,VM_BB_02,333.0,25.62,12, SeqCap EZ MedExome,D9,,8/20/2018,RLP-18,Mel,Melanoma Epigenetics,
+RNA-11,RNA-11,290 Nevus,ME-04,,16-106975,11,13.30,11.50,50,575.0,,,575.0,,Captured,VM_BB_01,333.0,28.96,12, SeqCap EZ MedExome,H8,,8/20/2018,RLP-11,Nevus,Melanoma Epigenetics,Matched_sample_RNAseq_Batch1
+RNA-12,RNA-12,291 Mel,ME-04,,16-106975,11,12.30,11.70,50,585.0,,,585.0,,Captured,VM_BB_01,333.0,28.46,12, SeqCap EZ MedExome,H9,,8/20/2018,RLP-12,Mel,Melanoma Epigenetics,Matched_sample_RNAseq_Batch1
+RNA-13,RNA-13,292 Nevus,ME-05,,17-12444,11,18.20,17.90,50,895.0,,,895.0,,Captured,VM_BB_01,333.0,18.60,12, SeqCap EZ MedExome,A3,,8/20/2018,RLP-13,Nevus,Melanoma Epigenetics,Matched_sample_RNAseq_Batch1
+RNA-14,RNA-14,293 Mel,ME-05,,17-12444,11,27.00,23.40,50,1170.0,,,1170.0,,Captured,VM_BB_01,333.0,14.23,12, SeqCap EZ MedExome,A5,,8/20/2018,RLP-14,Mel,Melanoma Epigenetics,Matched_sample_RNAseq_Batch1
+RNA-15,RNA-15,294 Nevus,ME-06,,17-88262,11,10.20,7.30,50,365.0,,,365.0,,Captured,VM_BB_02,333.0,45.62,12, SeqCap EZ MedExome,B4,,8/20/2018,RLP-15,Nevus,Melanoma Epigenetics,Matched_sample_RNAseq_Batch2
+RNA-16,RNA-16,295 Mel,ME-06,,17-88262,11,11.00,7.30,50,365.0,,,365.0,,Captured,VM_BB_02,333.0,45.62,12, SeqCap EZ MedExome,B5,,8/20/2018,RLP-16,Mel,Melanoma Epigenetics,Matched_sample_RNAseq_Batch2
+RNA-18,RNA-18,297 Mel,ME-07,,16-107007,11,20.40,13.00,50,650.0,,,650.0,,Captured,VM_BB_02,333.0,25.62,12, SeqCap EZ MedExome,D9,,8/20/2018,RLP-18,Mel,Melanoma Epigenetics,Matched_sample_RNAseq_Batch2
 RNA-19,RNA-19,298 Nevus,ME-08,,16-88453A,11,1.60,1.10,50,55.0,,,55.0,,Pending,,,0.00,,,D10,,8/20/2018,"RLP-19, Sample removed from study",Nevus,Melanoma Epigenetics,
 RNA-20,RNA-20,299 Mel,ME-08,,16-88453A,11,2.80,1.40,50,70.0,,,70.0,,Pending,,,0.00,,,D12,,8/20/2018,"RLP-20, Sample removed from study",Mel,Melanoma Epigenetics,
-RNA-21,RNA-21,300 Nevus,ME-09,,16-110683,11,8.10,5.30,50,265.0,,,265.0,,Captured,VM_BB_02,210.0,39.62,12, SeqCap EZ MedExome,UN,,8/20/2018,"RLP-21, Sample removed from study",Nevus,Melanoma Epigenetics,
-RNA-22,RNA-22,301 Mel,ME-09,,16-110683,11,19.70,24.20,50,1210.0,,,1210.0,,Captured,VM_BB_01,333.0,13.76,12, SeqCap EZ MedExome,E9,,8/20/2018,"RLP-22, Sample removed from study",Mel,Melanoma Epigenetics,
+RNA-21,RNA-21,300 Nevus,ME-09,,16-110683,11,8.10,5.30,50,265.0,,,265.0,,Captured,VM_BB_02,210.0,39.62,12, SeqCap EZ MedExome,UN,,8/20/2018,"RLP-21, Sample removed from study",Nevus,Melanoma Epigenetics,Matched_sample_RNAseq_Batch2
+RNA-22,RNA-22,301 Mel,ME-09,,16-110683,11,19.70,24.20,50,1210.0,,,1210.0,,Captured,VM_BB_01,333.0,13.76,12, SeqCap EZ MedExome,E9,,8/20/2018,"RLP-22, Sample removed from study",Mel,Melanoma Epigenetics,Matched_sample_RNAseq_Batch1
 RNA-23,RNA-23,302 Normal,ME-10,,17-68446,11,0.60,0.40,50,20.0,,,20.0,,Pending,,,0.00,, SeqCap EZ MedExome,E10,,8/20/2018,RLP-23,Normal,Melanoma Epigenetics,
-RNA-26,RNA-26,305 Normal,ME-12,,17-33401C,11,6.60,11.00,47,517.0,,,517.0,,Captured,VM_BB_03,333.0,30.27,13, SeqCap EZ MedExome,,2,9/27/2018,RLP-26,Normal,Melanoma Epigenetics,
-RNA-27,RNA-27,343 MIS,ME-12,,17-33401C,11,10.20,19.10,47,897.7,,,897.7,,Captured,VM_BB_03,333.0,17.43,13, SeqCap EZ MedExome,,3,9/27/2018,RLP-27,MIS,Melanoma Epigenetics,
-RNA-28,RNA-28,344 Mel,ME-12,,17-33401C,11,17.30,33.80,47,1588.6,,,1588.6,,Captured,VM_BB_03,333.0,9.85,13, SeqCap EZ MedExome,,4,9/27/2018,RLP-28,Mel,Melanoma Epigenetics,
-RNA-29,RNA-29,345 Normal,ME-13,,17-130286,11,17.80,37.80,47,1776.6,,,1776.6,,Captured,VM_BB_03,333.0,8.81,13, SeqCap EZ MedExome,,5,9/27/2018,RLP-29,Normal,Melanoma Epigenetics,
-RNA-30,RNA-30,346 Nevus,ME-13,,17-130286,11,5.20,10.50,47,493.5,,,493.5,,Captured,VM_BB_03,333.0,31.71,13, SeqCap EZ MedExome,,6,9/27/2018,RLP-30,Nevus,Melanoma Epigenetics,
-RNA-31,RNA-31,347 Mel,ME-13,,17-130286,11,14.30,31.30,47,1471.1,,,1471.1,,Captured,VM_BB_03,333.0,10.64,13, SeqCap EZ MedExome,,7,9/27/2018,RLP-31,Mel,Melanoma Epigenetics,
-RNA-32,RNA-32,348 Nevus,ME-14,,16-103438,11,4.80,10.70,47,502.9,,,502.9,,Captured,VM_BB_03,333.0,31.12,13, SeqCap EZ MedExome,,8,9/27/2018,RLP-32,Nevus,Melanoma Epigenetics,
-RNA-33,RNA-33,349 Mel,ME-14,,16-103438,11,5.70,9.70,47,455.9,,,455.9,,Captured,VM_BB_03,333.0,34.33,13, SeqCap EZ MedExome,,9,9/27/2018,RLP-33,Mel,Melanoma Epigenetics,
-RNA-34,RNA-34,350 Nevus,ME-15,,16-99265,11,7.40,11.80,47,554.6,,,554.6,,Captured,VM_BB_03,333.0,28.22,13, SeqCap EZ MedExome,,10,9/27/2018,RLP-34,Nevus,Melanoma Epigenetics,
-RNA-35,RNA-35,351 Mel,ME-15,,16-99265,11,4.80,8.80,47,413.6,,,413.6,,Captured,VM_BB_03,333.0,37.84,13, SeqCap EZ MedExome,,11,9/27/2018,RLP-35,Mel,Melanoma Epigenetics,
-RNA-36,RNA-36,352 Nevus,ME-16,,17-83378,11,9.10,18.50,47,869.5,,,869.5,,Captured,VM_BB_03,333.0,18.00,13, SeqCap EZ MedExome,,12,9/27/2018,RLP-36,Nevus,Melanoma Epigenetics,
-RNA-37,RNA-37,353 Mel,ME-16,,17-83378,11,7.40,19.00,47,893.0,,,893.0,,Captured,VM_BB_03,333.0,17.53,13, SeqCap EZ MedExome,,13,9/27/2018,RLP-37,Mel,Melanoma Epigenetics,
-RNA-38,RNA-38,354 Normal,ME-17,,16-101803B,11,9.80,18.30,47,860.1,,,860.1,,Captured,VM_BB_03,333.0,18.20,13, SeqCap EZ MedExome,,14,9/27/2018,"RLP-38, Sample removed from study",Normal,Melanoma Epigenetics,
-RNA-39,RNA-39,355 MIS,ME-17,,16-101803B,11,8.50,17.60,47,827.2,,,827.2,,Captured,VM_BB_03,333.0,18.92,13, SeqCap EZ MedExome,,15,9/27/2018,"RLP-39, Sample removed from study",MIS,Melanoma Epigenetics,
-RNA-40,RNA-40,356 Mel,ME-17,,16-101803B,11,9.10,16.90,47,794.3,,,794.3,,Captured,VM_BB_03,333.0,19.70,13, SeqCap EZ MedExome,,16,9/27/2018,"RLP-40, Sample removed from study",Mel,Melanoma Epigenetics,
+RNA-26,RNA-26,305 Normal,ME-12,,17-33401C,11,6.60,11.00,47,517.0,,,517.0,,Captured,VM_BB_03,333.0,30.27,13, SeqCap EZ MedExome,,2,9/27/2018,RLP-26,Normal,Melanoma Epigenetics,Matched_sample_RNAseq_Batch3
+RNA-27,RNA-27,343 MIS,ME-12,,17-33401C,11,10.20,19.10,47,897.7,,,897.7,,Captured,VM_BB_03,333.0,17.43,13, SeqCap EZ MedExome,,3,9/27/2018,RLP-27,MIS,Melanoma Epigenetics,Matched_sample_RNAseq_Batch3
+RNA-28,RNA-28,344 Mel,ME-12,,17-33401C,11,17.30,33.80,47,1588.6,,,1588.6,,Captured,VM_BB_03,333.0,9.85,13, SeqCap EZ MedExome,,4,9/27/2018,RLP-28,Mel,Melanoma Epigenetics,Matched_sample_RNAseq_Batch3
+RNA-29,RNA-29,345 Normal,ME-13,,17-130286,11,17.80,37.80,47,1776.6,,,1776.6,,Captured,VM_BB_03,333.0,8.81,13, SeqCap EZ MedExome,,5,9/27/2018,RLP-29,Normal,Melanoma Epigenetics,Matched_sample_RNAseq_Batch3
+RNA-30,RNA-30,346 Nevus,ME-13,,17-130286,11,5.20,10.50,47,493.5,,,493.5,,Captured,VM_BB_03,333.0,31.71,13, SeqCap EZ MedExome,,6,9/27/2018,RLP-30,Nevus,Melanoma Epigenetics,Matched_sample_RNAseq_Batch3
+RNA-31,RNA-31,347 Mel,ME-13,,17-130286,11,14.30,31.30,47,1471.1,,,1471.1,,Captured,VM_BB_03,333.0,10.64,13, SeqCap EZ MedExome,,7,9/27/2018,RLP-31,Mel,Melanoma Epigenetics,Matched_sample_RNAseq_Batch3
+RNA-32,RNA-32,348 Nevus,ME-14,,16-103438,11,4.80,10.70,47,502.9,,,502.9,,Captured,VM_BB_03,333.0,31.12,13, SeqCap EZ MedExome,,8,9/27/2018,RLP-32,Nevus,Melanoma Epigenetics,Matched_sample_RNAseq_Batch3
+RNA-33,RNA-33,349 Mel,ME-14,,16-103438,11,5.70,9.70,47,455.9,,,455.9,,Captured,VM_BB_03,333.0,34.33,13, SeqCap EZ MedExome,,9,9/27/2018,RLP-33,Mel,Melanoma Epigenetics,Matched_sample_RNAseq_Batch3
+RNA-34,RNA-34,350 Nevus,ME-15,,16-99265,11,7.40,11.80,47,554.6,,,554.6,,Captured,VM_BB_03,333.0,28.22,13, SeqCap EZ MedExome,,10,9/27/2018,RLP-34,Nevus,Melanoma Epigenetics,Matched_sample_RNAseq_Batch3
+RNA-35,RNA-35,351 Mel,ME-15,,16-99265,11,4.80,8.80,47,413.6,,,413.6,,Captured,VM_BB_03,333.0,37.84,13, SeqCap EZ MedExome,,11,9/27/2018,RLP-35,Mel,Melanoma Epigenetics,Matched_sample_RNAseq_Batch3
+RNA-36,RNA-36,352 Nevus,ME-16,,17-83378,11,9.10,18.50,47,869.5,,,869.5,,Captured,VM_BB_03,333.0,18.00,13, SeqCap EZ MedExome,,12,9/27/2018,RLP-36,Nevus,Melanoma Epigenetics,Matched_sample_RNAseq_Batch3
+RNA-37,RNA-37,353 Mel,ME-16,,17-83378,11,7.40,19.00,47,893.0,,,893.0,,Captured,VM_BB_03,333.0,17.53,13, SeqCap EZ MedExome,,13,9/27/2018,RLP-37,Mel,Melanoma Epigenetics,Matched_sample_RNAseq_Batch3
+RNA-38,RNA-38,354 Normal,ME-17,,16-101803B,11,9.80,18.30,47,860.1,,,860.1,,Captured,VM_BB_03,333.0,18.20,13, SeqCap EZ MedExome,,14,9/27/2018,"RLP-38, Sample removed from study",Normal,Melanoma Epigenetics,Matched_sample_RNAseq_Batch3
+RNA-39,RNA-39,355 MIS,ME-17,,16-101803B,11,8.50,17.60,47,827.2,,,827.2,,Captured,VM_BB_03,333.0,18.92,13, SeqCap EZ MedExome,,15,9/27/2018,"RLP-39, Sample removed from study",MIS,Melanoma Epigenetics,Matched_sample_RNAseq_Batch3
+RNA-40,RNA-40,356 Mel,ME-17,,16-101803B,11,9.10,16.90,47,794.3,,,794.3,,Captured,VM_BB_03,333.0,19.70,13, SeqCap EZ MedExome,,16,9/27/2018,"RLP-40, Sample removed from study",Mel,Melanoma Epigenetics,Matched_sample_RNAseq_Batch3
 Rob-T001-Mel,,,,,,,,,,0.0,,,0.0,,,,,NaN,,,,,,,Mel,,Kapa17_BB90
 Rob-T001-Normal,,,,,,,,,,0.0,,,0.0,,,,,NaN,,,,,,,Normal,,Kapa17_BB90
 Rob-T003-Mel,,,,,,,,,,0.0,,,0.0,,,,,NaN,,,,,,,Mel,,Kapa17_BB90
