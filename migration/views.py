@@ -1926,6 +1926,6 @@ def get_at_sl(row):
 
 
 def qpcr_at_sl(request):
-    file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view (1).csv")
+    file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view (2).csv")
     df = pd.read_csv(file)
-    df.apply(lambda row: get_at_sl(row), axis=1)
+    df[~df["SL_ID"].isnull()].apply(lambda row: get_at_sl(row), axis=1)
