@@ -17,7 +17,7 @@ from bait.models import Bait
 from barcodeset.models import Barcodeset,Barcode
 from sequencingrun.models import SequencingRun
 from sequencinglib.models import SequencingLib,CL_SEQL_LINK
-from sequencingfile.models import SequencingFile
+from sequencingfile.models import SequencingFile, SequencingFileSet
 from variant.models import *
 from gene.models import *
 from body.models import *
@@ -1949,3 +1949,37 @@ def qpcr_at_sl(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view (2).csv")
     df = pd.read_csv(file)
     df[~df["SL_ID"].isnull()].apply(lambda row: get_at_sl(row), axis=1)
+
+
+def checkfiles(row):
+    try:
+        SequencingFileSet.objects.get(prefix=next(iter(row['fastq_file'])).split("_L0")[0])
+    except Exception as e:
+        print(e, row['sample_lib'])
+
+def make_dict(d):
+    try:
+        return json.loads(d)
+    except:
+        return None
+
+def create_file_from_file(request):
+    file = Path(Path(
+        __file__).parent.parent / "uploads" / "report_matching_sample_lib_with_bait_after_reducing_fastq_files.csv")
+    df = pd.read_csv(file)
+    print(df.columns)
+    df['fastq_file'] = df['fastq_file'].str.replace('"', "'").str.replace("'", '"')
+    df["fastq_file"] = df["fastq_file"].astype('str')
+    df["fastq_file"] = df["fastq_file"].apply(lambda x: make_dict(x))
+
+    df['bam_file'] = df['bam_file'].str.replace('"', "'").str.replace("'", '"')
+    df["bam_file"] = df["bam_file"].astype('str')
+    df["bam_file"] = df["bam_file"].apply(lambda x: make_dict(x))
+
+    df['bam_bai_file'] = df['bam_bai_file'].str.replace('"', "'").str.replace("'", '"')
+    df["bam_bai_file"] = df["bam_bai_file"].astype('str')
+    df["bam_bai_file"] = df["bam_bai_file"].apply(lambda x: make_dict(x))
+
+    df[~df["fastq_file"].isnull()].apply(lambda row: checkfiles(row), axis=1)
+    # df[~df["fastq_file"].isnull()].apply(lambda row: get_or_create_files_from_file(row), axis=1)
+    # df.apply(lambda row: get_or(row), axis=1)
