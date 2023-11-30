@@ -29,6 +29,9 @@ import random
 from itertools import groupby,chain
 import re
 import ast
+from pathlib import Path
+import pandas as pd
+
 
 def migrate(request):
 
@@ -1875,3 +1878,18 @@ def airtable_consolidated_data(request):
     else:
         form = AirtableConsolidatedDataForm()
     return render(request, "airtable.html", locals())
+
+def get_or_cons(row):
+    print(row['Sample'],row['Input Conc.'])
+    try:
+        SampleLib.objects.filter(name=row["Sample"]).update(qpcr_conc=10)
+        SL_CL_LINK.objects.filter(captured_lib=CapturedLib.objects.get(name=row["CL"]),
+            sample_lib=SampleLib.objects.get(name=row["Sample"])).update(volume=float(row['Input Conc.'])/10)
+    except Exception as e:
+        print(e)
+
+
+def qpcr_consolidated_data(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
+    df = pd.read_csv(file)
+    df[~df["Input Conc."].isnull()].apply(lambda row: get_or_cons(row), axis=1)
