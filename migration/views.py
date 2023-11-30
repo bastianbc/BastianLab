@@ -1970,7 +1970,7 @@ def create_seq_run(row):
 
 
 def qpcr_at_seqrun(request):
-    file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view (2).csv")
+    file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view (3).csv")
     df = pd.read_csv(file)
     df[~df["Sequencing Run_ID"].isnull()].apply(lambda row: create_seq_run(row), axis=1)
 
