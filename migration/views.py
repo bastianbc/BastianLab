@@ -1895,12 +1895,12 @@ def qpcr_consolidated_data(request):
     df[~df["Input Conc."].isnull()].apply(lambda row: get_or_cons(row), axis=1)
 
 def get_at_na(row):
-    print(row['NA_ID'],row['Shearing volume DNA input (ul)'])
+    print(row['NA_ID'], row['Shearing volume DNA input (ul)'])
     try:
         if not pd.isnull(row['Shearing volume DNA input (ul)']):
             for sl in row["SL_ID"].split(","):
-                SampleLib.objects.filter(name=sl.strip()).update(shear_volume=float(row['Shearing volume DNA input (ul)']))
-
+                SampleLib.objects.filter(name=sl.strip()).update(shear_volume=float(row['Shearing volume DNA input (ul)']),
+                                                                 amount_in=float(row['NA sheared/used (ng)']))
     except Exception as e:
         print(e)
 
