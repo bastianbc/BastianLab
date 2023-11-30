@@ -1893,3 +1893,19 @@ def qpcr_consolidated_data(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
     df = pd.read_csv(file)
     df[~df["Input Conc."].isnull()].apply(lambda row: get_or_cons(row), axis=1)
+
+def get_at_na(row):
+    print(row['NA_ID'],row['Shearing volume DNA input (ul)'])
+    try:
+        if not pd.isnull(row['Shearing volume DNA input (ul)']):
+            for sl in row["SL_ID"].split(","):
+                SampleLib.objects.filter(name=sl.strip()).update(shear_volume=float(row['Shearing volume DNA input (ul)']))
+
+    except Exception as e:
+        print(e)
+
+
+def qpcr_at_na(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "Nucleic Acids-Grid view (1).csv")
+    df = pd.read_csv(file)
+    df[~df["NA_ID"].isnull()].apply(lambda row: get_at_na(row), axis=1)
