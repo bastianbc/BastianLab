@@ -1920,9 +1920,29 @@ def get_at_sl(row):
             pcr_cycles=float(row['Pre-hyb PCR cycles']),
             amount_final=float(row['Total LP DNA for capture (ng)']),
             vol_init=float(row['Volume of library (ul)']),
+            notes=row['Notes'],
         )
+
     except Exception as e:
         print(e)
+    if pd.isnull(row['Post-hyb PCR cycles']):
+        return
+    try:
+        print(row["CL_ID"])
+        if "," in row["CL_ID"]:
+            for cl in row["CL_ID"].split(","):
+                print(row["CL_ID"])
+                CapturedLib.objects.filter(name=cl.strip()).update(
+                    amp_cycle=float(row['Post-hyb PCR cycles']),
+                    notes=row['Notes']
+                )
+        else:
+            CapturedLib.objects.filter(name=row["CL_ID"]).update(
+                amp_cycle=float(row['Post-hyb PCR cycles'])
+            )
+    except Exception as e:
+        print(e)
+
 
 
 def qpcr_at_sl(request):
