@@ -2160,7 +2160,7 @@ def get_barcodes(row):
     try:
         print(row["Sample"], row["Barcode ID"])
         SampleLib.objects.filter(
-        name=row["Sample"]).update(barcode=Barcode.objects.get(name=row["Barcode ID"]))
+        name=row["Sample"]).update(barcode=Barcode.objects.get(name=row["Barcode ID"].strip()))
     except Exception as e:
         print(e)
 
