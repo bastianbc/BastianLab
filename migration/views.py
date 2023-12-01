@@ -2205,12 +2205,12 @@ def get_baits(row):
         if "," in row["CL_ID"]:
             for cl in row["CL_ID"].split(","):
                 obj, created = Bait.objects.get(
-                    name=row["Capture Panel"]
+                    name=row["Capture Panel"].strip()
                 )
                 CapturedLib.objects.filter(name=cl).update(bait=obj)
             return
         obj, created = Bait.objects.get(
-            name=row["Capture Panel"]
+            name=row["Capture Panel"].strip()
         )
         CapturedLib.objects.filter(name=row["CL_ID"]).update(bait=obj)
     except Exception as e:
