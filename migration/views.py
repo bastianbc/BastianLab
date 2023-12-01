@@ -2201,7 +2201,7 @@ def get_barcodes(row):
 
 def get_baits(row):
     try:
-        print(row["CL_ID"], row["Capture Panel"])
+        # print(row["CL_ID"], row["Capture Panel"])
         if "," in row["CL_ID"]:
             for cl in row["CL_ID"].split(","):
                 obj = Bait.objects.get(
