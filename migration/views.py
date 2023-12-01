@@ -2077,28 +2077,35 @@ def create_file_from_file(request):
     # df.apply(lambda row: get_or(row), axis=1)
 
 
-file=[]
-path=[]
-data = {
-    'file': [],
-    'path': [],
-}
 def leftover(row):
+
     try:
         SequencingFile.objects.get(name=row["file"])
-    except:
-        file.append(row["file"])
-        path.append(row["path"])
+    except ObjectDoesNotExist as e:
+        try:
+            prefix = row['file'].split("_L0")[0]
+            print(prefix, row["file"])
+            sequencing_run = row["path"].split("/")[-1] if "HiSeqData_Vivek" in row["path"] else row["path"].split("/")[1]
+            set_ = get_or_create_set(
+                prefix=prefix,
+                path=row['path'],
+                sample_lib=SampleLib.objects.get(name="Undefined"),
+                sequencing_run=get_or_create_seqrun(name=sequencing_run),
+            )
+            get_or_create_file(
+                sequencing_file_set=set_,
+                name=row["file"],
+                checksum="",
+                type="fastq"
+            )
+            print("created")
+        except Exception as e:
+            print(e)
 
 
 def qpcr_at_leftover(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "df_fq.csv")
     df = pd.read_csv(file)
     df[~df["file"].isnull()].apply(lambda row: leftover(row), axis=1)
-    data["file"]=file
-    data["path"]=path
-    df_left = pd.DataFrame(data)
-    df_left.to_csv("df_left.csv", index=False)
-
 
 
