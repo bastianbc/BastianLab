@@ -2165,9 +2165,7 @@ def get_barcodes(row):
         match = re.search(r'AD(\d+)', row["Barcode ID"])
 
         if match:
-            print(match.group(1))
             name = df2[df2["Barcode_Name"].str.contains(match.group(1))]["Barcode_ID"].to_list()[0]
-            print(name)
             SampleLib.objects.filter(
                 name=row["Sample"]).update(barcode=Barcode.objects.get(name=name))
             return
