@@ -2,9 +2,9 @@ from django import forms
 from .models import *
 from body.models import Body
 from django.core.exceptions import ValidationError
+from core.forms import BaseForm
 
-
-class BlockForm(forms.ModelForm):
+class BlockForm(BaseForm, forms.ModelForm):
     # mock_body_site = forms.ModelChoiceField(queryset = Body.objects.filter(parent=None), label="Body Site", required=False)
 
     class Meta:

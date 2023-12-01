@@ -1650,9 +1650,12 @@ def import_body_sites(request):
             for row in data:
                 parent = None
                 for i in range(len(row)-1,-1,-1):
+                    num = 10 - (i + 6)
+                    name = str(num) + "-" + row[i]
+                    print(name)
                     parent, created = Body.objects.get_or_create(
-                        name = row[i],
-                        parent = parent
+                        name=name,
+                        parent=parent
                     )
     else:
         form = BodySitesForm()
