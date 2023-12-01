@@ -2089,7 +2089,7 @@ def leftover(row):
         data["path"].append(row["path"])
 
 
-def qpcr_at_seqrun(request):
+def qpcr_at_leftover(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "df_fq.csv")
     df = pd.read_csv(file)
     df[~df["file"].isnull()].apply(lambda row: leftover(row), axis=1)
