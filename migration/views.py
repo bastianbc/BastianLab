@@ -2144,21 +2144,29 @@ def remove_NAN(request):
     #
     # table.objects.filter(qs)
 
+# def get_barcodes(row):
+    # print(row["Barcode_ID"], row["Barcode_Name"].split(" ")[0])
+    # obj, created = Barcodeset.objects.get_or_create(name=row["Barcode_Name"].split(" ")[0])
+    # print(obj)
+    # Barcode.objects.create(
+    #     barcode_set=obj,
+    #     name=row["Barcode_ID"],
+    #     i5=row["Index-i5"],
+    #     i7=row["Index-i7"]
+    # )
+    # print("created")
+
 def get_barcodes(row):
-    print(row["Barcode_ID"], row["Barcode_Name"].split(" ")[0])
-    obj, created = Barcodeset.objects.get_or_create(name=row["Barcode_Name"].split(" ")[0])
-    print(obj)
-    Barcode.objects.create(
-        barcode_set=obj,
-        name=row["Barcode_ID"],
-        i5=row["Index-i5"],
-        i7=row["Index-i7"]
-    )
-    print("created")
+    try:
+        print(row["Sample"], row["Barcode ID"])
+        SampleLib.objects.filter(
+        name=row["Sample"]).update(barcode=Barcode.objects.get(name=row["Barcode ID"]))
+    except Exception as e:
+        print(e)
 
 
 def uploads_barcodes(request):
-    file = Path(Path(__file__).parent.parent / "uploads" / "Old Barcodes-Grid view (1).csv")
+    file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
     df = pd.read_csv(file)
-    df.apply(lambda row: get_barcodes(row), axis=1)
+    df[~df["Barcode ID"].isnull()].apply(lambda row: get_barcodes(row), axis=1)
 
