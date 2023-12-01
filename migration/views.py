@@ -2128,16 +2128,14 @@ def remove_NAN(request):
         fields = [f for f in model._meta.fields if isinstance(f, FloatField) or isinstance(f, CharField) or isinstance(f, TextField)]
         # print(fields)
         for field in fields:
-            print(field.name)
-            n = field.name
+            print(model, field.name)
             qs = Q(**{field.name: "NaN"})
-            print(qs)
-            # print(model.objects.filter(qs))
-            try:
-                model.objects.filter(qs).update(**{field.name:None})
-                print("updated")
-            except Exception as e:
-                model.objects.filter(qs).update(**{field.name:0})
+            print(model.objects.filter(qs))
+            # try:
+            #     model.objects.filter(qs).update(**{field.name:None})
+            #     print("updated")
+            # except Exception as e:
+            #     model.objects.filter(qs).update(**{field.name:0})
             # queries = [Q(**{field.name: SEARCH_TERM}) for f in fields]
 
     # qs = Q()
