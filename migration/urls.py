@@ -19,4 +19,5 @@ urlpatterns = [
     path("qpcr_at_seqrun", views.qpcr_at_seqrun, name="qpcr_at_seqrun"),
     path("qpcr_at_leftover", views.qpcr_at_leftover, name="qpcr_at_leftover"),
     path("import_body_sites", views.import_body_sites, name="import_body_sites"),
+    path("remove_NAN", views.remove_NAN, name="remove_NAN"),
 ]
