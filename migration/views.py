@@ -21,7 +21,7 @@ from sequencingfile.models import SequencingFile, SequencingFileSet
 from variant.models import *
 from gene.models import *
 from body.models import *
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 import json
 import xlrd
 import string
@@ -2081,6 +2081,11 @@ def leftover(row):
 
     try:
         SequencingFile.objects.get(name=row["file"])
+
+    except MultipleObjectsReturned:
+        # Handle the case where multiple objects were returned
+        print("Multiple objects returned. Handle this case appropriately.")
+
     except ObjectDoesNotExist as e:
         try:
             prefix = row['file'].split("_L0")[0]
