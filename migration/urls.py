@@ -17,5 +17,5 @@ urlpatterns = [
     path("qpcr_at_sl", views.qpcr_at_sl, name="qpcr_at_sl"),
     path("create_file_from_file", views.create_file_from_file, name="create_file_from_file"),
     path("qpcr_at_seqrun", views.qpcr_at_seqrun, name="qpcr_at_seqrun"),
-    path("leftover", views.leftover, name="leftover"),
+    path("qpcr_at_leftover", views.qpcr_at_leftover, name="qpcr_at_leftover"),
 ]
