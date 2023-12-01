@@ -2162,7 +2162,7 @@ def get_barcodes(row):
 
     try:
         # print(row["Sample"], row["Barcode ID"])
-        match = re.search(r'AD(\d+)', row["Barcode ID"])
+        match = re.search(r'\b\d{3}\b', row["Barcode ID"])
 
         if match:
             name = df2[df2["Barcode_Name"].str.contains(match.group(1))]["Barcode_ID"].to_list()[0]
