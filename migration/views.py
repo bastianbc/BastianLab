@@ -2166,8 +2166,9 @@ def get_barcodes(row):
         name=row["Sample"]).update(barcode=Barcode.objects.get(name=row["Barcode ID"].strip()))
     except Exception as e:
         match = re.search(r'AD(\d+)', row["Barcode ID"])
-        print(match.group(1))
+
         if match:
+            print(match.group(1))
             name = df2[df2["Barcode_Name"].str.contains(match.group(1))]["Barcode_ID"]
             SampleLib.objects.filter(
                 name=row["Sample"]).update(barcode=Barcode.objects.get(name=name))
