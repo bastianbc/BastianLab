@@ -2155,31 +2155,52 @@ def remove_NAN(request):
     #     i7=row["Index-i7"]
     # )
     # print("created")
+#
+# def get_barcodes(row):
+#     file = Path(Path(__file__).parent.parent / "uploads" / "Old Barcodes-Grid view (1).csv")
+#     df2 = pd.read_csv(file)
+#
+#     try:
+#         # print(row["Sample"], row["Barcode ID"])
+#         match = re.search(r'\b\d{3}\b', row["Barcode ID"])
+#
+#         if match:
+#             name = df2[df2["Barcode_Name"].str.contains(match.group(1))]["Barcode_ID"].to_list()[0]
+#             SampleLib.objects.filter(
+#                 name=row["Sample"]).update(barcode=Barcode.objects.get(name=name))
+#             return
+#         SampleLib.objects.filter(
+#             name=row["Sample"]).update(barcode=Barcode.objects.get(name=row["Barcode ID"].strip())
+#                                        )
+#     except Exception as e:
+#         print(row["Sample"], row["Barcode ID"])
+#
+#         print(e)
+
+#
+# def uploads_barcodes(request):
+#     file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
+#     df = pd.read_csv(file)
+#     df[~df["Barcode ID"].isnull()].apply(lambda row: get_barcodes(row), axis=1)
 
 def get_barcodes(row):
-    file = Path(Path(__file__).parent.parent / "uploads" / "Old Barcodes-Grid view (1).csv")
-    df2 = pd.read_csv(file)
-
     try:
-        # print(row["Sample"], row["Barcode ID"])
-        match = re.search(r'\b\d{3}\b', row["Barcode ID"])
-
-        if match:
-            name = df2[df2["Barcode_Name"].str.contains(match.group(1))]["Barcode_ID"].to_list()[0]
+        print(row["SL_ID"], row["Old Barcode"], row["New Barcode"])
+        if not pd.isnull(row["Old Barcode"]):
             SampleLib.objects.filter(
-                name=row["Sample"]).update(barcode=Barcode.objects.get(name=name))
+                    name=row["SL_ID"]).update(barcode=Barcode.objects.get(name=row["Old Barcode"].strip())
+                                           )
             return
-        SampleLib.objects.filter(
-            name=row["Sample"]).update(barcode=Barcode.objects.get(name=row["Barcode ID"].strip())
-                                       )
+        if not pd.isnull(row["New Barcode"]):
+            SampleLib.objects.filter(
+                    name=row["SL_ID"]).update(barcode=Barcode.objects.get(name=row["New Barcode"].strip())
+                                           )
+            return
     except Exception as e:
-        print(row["Sample"], row["Barcode ID"])
-
         print(e)
 
-
 def uploads_barcodes(request):
-    file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
+    file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view (3).csv")
     df = pd.read_csv(file)
-    df[~df["Barcode ID"].isnull()].apply(lambda row: get_barcodes(row), axis=1)
+    df[~df["SL_ID"].isnull()].apply(lambda row: get_barcodes(row), axis=1)
 
