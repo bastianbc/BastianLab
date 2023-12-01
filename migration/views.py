@@ -2199,8 +2199,25 @@ def get_barcodes(row):
     except Exception as e:
         print(e)
 
-def uploads_barcodes(request):
+def get_baits(row):
+    try:
+        print(row["CL_ID"], row["Capture Panel"])
+        if "," in row["CL_ID"]:
+            for cl in row["CL_ID"].split(","):
+                obj, created = Bait.objects.get_or_create(
+                    name=row["Capture Panel"]
+                )
+                CapturedLib.objects.filter(name=cl).update(bait=obj)
+            return
+        obj, created = Bait.objects.get_or_create(
+            name=row["Capture Panel"]
+        )
+        CapturedLib.objects.filter(name=row["CL_ID"]).update(bait=obj)
+    except Exception as e:
+        print(e)
+
+def uploads_baits(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view (3).csv")
     df = pd.read_csv(file)
-    df[~df["SL_ID"].isnull()].apply(lambda row: get_barcodes(row), axis=1)
+    df[~df["Capture Panel"].isnull()].apply(lambda row: get_baits(row), axis=1)
 

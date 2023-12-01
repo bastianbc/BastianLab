@@ -20,5 +20,6 @@ urlpatterns = [
     path("qpcr_at_leftover", views.qpcr_at_leftover, name="qpcr_at_leftover"),
     path("import_body_sites", views.import_body_sites, name="import_body_sites"),
     path("remove_NAN", views.remove_NAN, name="remove_NAN"),
-    path("uploads_barcodes", views.uploads_barcodes, name="uploads_barcodes"),
+    # path("uploads_barcodes", views.uploads_barcodes, name="uploads_barcodes"),
+    path("uploads_baits", views.uploads_baits, name="uploads_baits"),
 ]
