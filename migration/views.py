@@ -2076,7 +2076,9 @@ def create_file_from_file(request):
     # df[~df["fastq_file"].isnull()].apply(lambda row: get_or_create_files_from_file(row), axis=1)
     # df.apply(lambda row: get_or(row), axis=1)
 
-df_left = pd.DataFrame(columns=['file','path'])
+
+file=[]
+path=[]
 data = {
     'file': [],
     'path': [],
@@ -2085,14 +2087,17 @@ def leftover(row):
     try:
         SequencingFile.objects.get(name=row["file"])
     except:
-        data["file"].append(row["file"])
-        data["path"].append(row["path"])
+        file.append(row["file"])
+        path.append(row["path"])
 
 
 def qpcr_at_leftover(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "df_fq.csv")
     df = pd.read_csv(file)
     df[~df["file"].isnull()].apply(lambda row: leftover(row), axis=1)
+    data["file"]=file
+    data["path"]=path
+    df_left = pd.DataFrame(data)
     df_left.to_csv("df_left.csv", index=False)
 
 
