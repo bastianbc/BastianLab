@@ -18,4 +18,5 @@ urlpatterns = [
     path("create_file_from_file", views.create_file_from_file, name="create_file_from_file"),
     path("qpcr_at_seqrun", views.qpcr_at_seqrun, name="qpcr_at_seqrun"),
     path("qpcr_at_leftover", views.qpcr_at_leftover, name="qpcr_at_leftover"),
+    path("import_body_sites", views.import_body_sites, name="import_body_sites"),
 ]

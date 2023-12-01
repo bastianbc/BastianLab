@@ -2,8 +2,10 @@ from django import forms
 from .models import *
 from libprep.models import NucAcids
 from method.models import Method
+from core.forms import BaseForm
 
-class AreaForm(forms.ModelForm):
+
+class AreaForm(BaseForm, forms.ModelForm):
     class Meta:
         model = Areas
         fields = "__all__"

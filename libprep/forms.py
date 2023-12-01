@@ -2,8 +2,10 @@ from django import forms
 from .models import NucAcids
 from barcodeset.models import Barcode
 from django.core.exceptions import ValidationError
+from core.forms import BaseForm
 
-class NucAcidForm(forms.ModelForm):
+
+class NucAcidForm(BaseForm, forms.ModelForm):
     amount = forms.FloatField()
 
     class Meta:

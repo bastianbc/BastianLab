@@ -4,8 +4,9 @@ from datetime import date
 from bait.models import Bait
 from barcodeset.models import Barcode
 from areas.models import Areas
+from core.forms import BaseForm
 
-class SampleLibForm(forms.ModelForm):
+class SampleLibForm(BaseForm, forms.ModelForm):
     class Meta:
         model = SampleLib
         fields = "__all__"
