@@ -2157,11 +2157,20 @@ def remove_NAN(request):
     # print("created")
 
 def get_barcodes(row):
+    file = Path(Path(__file__).parent.parent / "uploads" / "Old Barcodes-Grid view (1).csv")
+    df2 = pd.read_csv(file)
+
     try:
-        print(row["Sample"], row["Barcode ID"])
+        # print(row["Sample"], row["Barcode ID"])
         SampleLib.objects.filter(
         name=row["Sample"]).update(barcode=Barcode.objects.get(name=row["Barcode ID"].strip()))
     except Exception as e:
+        match = re.search(r'AD(\d+)', row["Barcode ID"])
+        print(match.group(1))
+        if match:
+            name = df2[df2["Barcode_Name"].str.contains(match.group(1))]["Barcode_ID"]
+            SampleLib.objects.filter(
+                name=row["Sample"]).update(barcode=Barcode.objects.get(name=name))
         print(e)
 
 
