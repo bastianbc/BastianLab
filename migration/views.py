@@ -2117,3 +2117,32 @@ def qpcr_at_leftover(request):
     df[~df["file"].isnull()].apply(lambda row: leftover(row), axis=1)
 
 
+def remove_NAN(request):
+    from django.db.models import CharField, BooleanField, DateTimeField, DateField, FloatField, TextField
+    from django.db.models import Q
+    import django.apps
+    apps = django.apps.apps.get_models()
+
+    # print(apps)
+    for model in apps:
+        fields = [f for f in model._meta.fields if isinstance(f, FloatField) or isinstance(f, CharField) or isinstance(f, TextField)]
+        # print(fields)
+        for field in fields:
+            print(field.name)
+            n = field.name
+            qs = Q(**{field.name: "NaN"})
+            print(qs)
+            # print(model.objects.filter(qs))
+            try:
+                model.objects.filter(qs).update(**{field.name:None})
+                print("updated")
+            except Exception as e:
+                model.objects.filter(qs).update(**{field.name:0})
+            # queries = [Q(**{field.name: SEARCH_TERM}) for f in fields]
+
+    # qs = Q()
+    # for query in queries:
+    #     qs = qs | query
+    #
+    # table.objects.filter(qs)
+
