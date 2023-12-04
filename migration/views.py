@@ -2221,3 +2221,17 @@ def uploads_baits(request):
     df = pd.read_csv(file)
     df[~df["Capture Panel"].isnull()].apply(lambda row: get_baits(row), axis=1)
 
+def get_file_tree(row):
+    if "==" in row["HiSeqData/"]:
+        print(row["HiSeqData/"])
+        name, checksum = row["HiSeqData/"].strip().split("==")
+        SequencingFile.objects.filter(name=name, checksum__isnull=True).update(
+            checksum=checksum
+        )
+
+
+def upload_file_tree(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "file_tree_with_vivek.txt")
+    df = pd.read_csv(file, index_col=False, encoding='iso-8859-1', on_bad_lines = 'warn')
+    df.apply(lambda row: get_file_tree(row), axis=1)
+
