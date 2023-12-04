@@ -2227,7 +2227,7 @@ def get_file_tree(row):
             path, file = row["HiSeqData/"].strip().split("-->")
             # print(path,file)
             SequencingFile.objects.get(name=file)
-    except Exception as e:
+    except ObjectDoesNotExist as e:
         print(row["HiSeqData/"].strip())
         print(e)
 
