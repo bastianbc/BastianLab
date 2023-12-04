@@ -22,4 +22,5 @@ urlpatterns = [
     path("remove_NAN", views.remove_NAN, name="remove_NAN"),
     # path("uploads_barcodes", views.uploads_barcodes, name="uploads_barcodes"),
     path("uploads_baits", views.uploads_baits, name="uploads_baits"),
+    path("upload_file_tree", views.upload_file_tree, name="upload_file_tree"),
 ]
