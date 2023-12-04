@@ -2238,15 +2238,20 @@ def uploads_baits(request):
 
 
 def get_file_tree(row):
+    l=[]
     try:
         if row["HiSeqData/"].strip().endswith(".fastq.gz"):
             path, file = row["HiSeqData/"].strip().split("-->")
             # print(path,file)
             SequencingFile.objects.get(name=file)
     except ObjectDoesNotExist as e:
-        print(row["HiSeqData/"].strip())
+        l.append(row["HiSeqData/"].strip())
+        # print(row["HiSeqData/"].strip())
+
     except MultipleObjectsReturned as e:
         pass
+    finally:
+        print(l)
 
 
 
