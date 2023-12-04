@@ -2222,12 +2222,22 @@ def uploads_baits(request):
     df[~df["Capture Panel"].isnull()].apply(lambda row: get_baits(row), axis=1)
 
 def get_file_tree(row):
-    if "==" in row["HiSeqData/"]:
-        print(row["HiSeqData/"])
-        name, checksum = row["HiSeqData/"].strip().split("==")
-        SequencingFile.objects.filter(name=name, checksum__isnull=True).update(
-            checksum=checksum
-        )
+    try:
+        if row["HiSeqData/"].strip().endswith(".fastq.gz"):
+            path, file = row["HiSeqData/"].strip().split("-->")
+            # print(path,file)
+            SequencingFile.objects.get(name=file)
+    except Exception as e:
+        print(e)
+
+
+
+    # if "==" in row["HiSeqData/"]:
+    #     print(row["HiSeqData/"])
+    #     name, checksum = row["HiSeqData/"].strip().split("==")
+    #     SequencingFile.objects.filter(name=name, checksum__isnull=True).update(
+    #         checksum=checksum
+    #     )
 
 
 def upload_file_tree(request):
