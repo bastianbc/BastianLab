@@ -2228,6 +2228,7 @@ def get_file_tree(row):
             # print(path,file)
             SequencingFile.objects.get(name=file)
     except Exception as e:
+        print(row["HiSeqData/"].strip())
         print(e)
 
 
