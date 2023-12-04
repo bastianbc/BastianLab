@@ -2220,6 +2220,22 @@ def uploads_baits(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view (3).csv")
     df = pd.read_csv(file)
     df[~df["Capture Panel"].isnull()].apply(lambda row: get_baits(row), axis=1)
+#
+# def create_file_(file, path):
+#     prefix = file.split("_L0")[0]
+#     set_ = get_or_create_set(
+#         prefix=prefix,
+#         path=path,
+#         sample_lib=SampleLib.objects.get(name="Undefined"),
+#         sequencing_run=get_or_create_seqrun(name=sequencing_run),
+#     )
+#     get_or_create_file(
+#         sequencing_file_set=set_,
+#         name=row["file"],
+#         checksum="",
+#         type="fastq"
+#     )
+
 
 def get_file_tree(row):
     try:
@@ -2229,7 +2245,8 @@ def get_file_tree(row):
             SequencingFile.objects.get(name=file)
     except ObjectDoesNotExist as e:
         print(row["HiSeqData/"].strip())
-        print(e)
+    except MultipleObjectsReturned as e:
+        pass
 
 
 
