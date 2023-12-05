@@ -2287,8 +2287,16 @@ def get_new_files(row):
         if "Boniva" in file:
             file = file.replace("Boniva", "Bivona")
             match = re.search("Bivona_L\d+", file)
+            match2 = re.search("^Bivona_L1_[ACTG]{6}", file)
             if match:
                 _sl = match.group(0)
+            if match2:
+                print("_Bivona_"*100)
+                _sl = "Bivona_L_1"
+        elif re.search("^Boniva_L1_", file):
+            match = re.search("^HW(\w+)_[ACTG]", file)
+            area = f"HW{match.group(1)}".replace("Dissect","")
+            _sl = SampleLib.objects.filter(na_sl_links__nucacid__area__name = area, name__startswith="N3_").first().name
         elif re.search("^HW", file):
             match = re.search("^HW(\w+)_[ACTG]", file)
             area = f"HW{match.group(1)}".replace("Dissect","")
