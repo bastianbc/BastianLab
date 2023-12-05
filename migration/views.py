@@ -2294,11 +2294,11 @@ def get_new_files(row):
             if match:
                 _sl = match.group(0)
         elif re.search("^2(\w+)_[ACTG]{6}", file):
-            _sl = re.search("^2(\w+)_[ACTG]{6}", file).group(1)
+            _sl = "2"+re.search("^2(\w+)_[ACTG]{6}", file).group(1)
+            _sl = _sl.replace("_", "-")
             print("sl:@@@ ", _sl)
         elif re.search("[ACTG]{6}", file):
-            _sl = "2"+re.search("(\w+)_[ACTG]{6}", file).group(1)
-            _sl = _sl.replace("_", "-")
+            _sl = re.search("(\w+)_[ACTG]{6}", file).group(1)
         else:
             _sl = file.split("_S")[0] if "_S" in file else file
         sl = SampleLib.objects.get(name=_sl)
