@@ -2281,22 +2281,21 @@ def get_new_files(row):
     try:
         _seq_run = path.split("/")[1]
         print(row["new"])
-
         _seq_run_ = _seq_run.split(" ")[0]+"_" if "Nimblegen" in _seq_run else _seq_run
-
         seq_run = "Nimblegen10_BB13" if "Nimblegen10_BB13" in _seq_run_ else _seq_run_
-
         sr = SequencingRun.objects.get(name__icontains=seq_run)
-
         if "Boniva" in file:
             file = file.replace("Boniva", "Bivona")
             match = re.search("Bivona_L\d+", file)
             if match:
                 _sl = match.group(0)
+        elif re.search("^CGH(\d+)_(\d+)_[ACTG]{6}", file):
+            match = re.search("^CGH(\d+)_(\d+)_[ACTG]{6}", file)
+            _sl = f"CGH{match.group(1)}-{match.group(2)}"
+            print(f"sl:@@@ CGH{match.group(1)}_{match.group(2)}")
         elif re.search("^2(\w+)_[ACTG]{6}", file):
             _sl = "2"+re.search("^2(\w+)_[ACTG]{6}", file).group(1)
             _sl = _sl.replace("_", "-")
-            print("sl:@@@ ", _sl)
         elif re.search("[ACTG]{6}", file):
             _sl = re.search("(\w+)_[ACTG]{6}", file).group(1)
         else:
