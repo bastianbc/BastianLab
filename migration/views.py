@@ -2283,7 +2283,7 @@ def get_new_files(row):
         # print(row["new"])
         _seq_run_ = _seq_run.split(" ")[0]+"_" if "Nimblegen" in _seq_run else _seq_run
         seq_run = "Nimblegen10_BB13" if "Nimblegen10_BB13" in _seq_run_ else _seq_run_
-        # sr = SequencingRun.objects.get(name__icontains=seq_run)
+        sr = SequencingRun.objects.get(name__icontains=seq_run)
         if "Boniva" in file:
             file = file.replace("Boniva", "Bivona")
             match = re.search("Bivona_L\d+", file)
@@ -2292,12 +2292,10 @@ def get_new_files(row):
         elif re.search("^HW", file):
             match = re.search("^HW(\w+)_[ACTG]", file)
             area = f"HW{match.group(1)}".replace("Dissect","")
-            print("area", area)
             _sl = SampleLib.objects.filter(na_sl_links__nucacid__area__name = area, name__startswith="N3_").first().name
         elif re.search("^Dog", file):
             match = re.search("^Dog(\w+)_[ACTG]", file)
             bl = f"Dog{match.group(1)}"
-            print("block", bl)
             _sl = SampleLib.objects.filter(na_sl_links__nucacid__area__block__name = bl).first().name
         elif re.search("^Kit_262", file):
             _sl = f"Kit 262"
@@ -2318,19 +2316,19 @@ def get_new_files(row):
         else:
             _sl = file.split("_S")[0] if "_S" in file else file
 
-        # sl = SampleLib.objects.get(name=_sl)
-        # set_ = get_or_create_set(
-        #     prefix=prefix,
-        #     path=path,
-        #     sample_lib=sl,
-        #     sequencing_run=sr,
-        # )
-        # get_or_create_file(
-        #     sequencing_file_set=set_,
-        #     name=file,
-        #     checksum="",
-        #     type="fastq"
-        # )
+        sl = SampleLib.objects.get(name=_sl)
+        set_ = get_or_create_set(
+            prefix=prefix,
+            path=path,
+            sample_lib=sl,
+            sequencing_run=sr,
+        )
+        get_or_create_file(
+            sequencing_file_set=set_,
+            name=file,
+            checksum="",
+            type="fastq"
+        )
     except Exception as e:
         print(row["new"])
         print(e)
