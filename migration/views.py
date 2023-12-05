@@ -2274,6 +2274,7 @@ def upload_file_tree(request):
 
 def get_new_files(row):
     path, file = row["new"].strip().split("-->")
+
     prefix = file.split("_L0")[0] if "_L0" in file else None
     if not prefix:
         return
@@ -2282,8 +2283,14 @@ def get_new_files(row):
         print(row["new"])
         seq_run = _seq_run.split(" ")[0]+"_" if "Nimblegen" in _seq_run else _seq_run
         sr = SequencingRun.objects.get(name__icontains=seq_run)
-        _file = file.split("_S")[0] if "_S" in file else file
-        sl = SampleLib.objects.get(name=_file)
+        if "Boniva" in file:
+            file = file.replace("Boniva", "Bivona")
+            match = re.search("Bivona_L\d+", file)
+            if match:
+                _sl = match.group(0)
+        else:
+            _sl = file.split("_S")[0] if "_S" in file else file
+        sl = SampleLib.objects.get(name=_sl)
         set_ = get_or_create_set(
             prefix=prefix,
             path=path,
