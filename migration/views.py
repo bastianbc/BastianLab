@@ -2243,7 +2243,7 @@ def get_file_tree(row):
         if row["HiSeqData/"].strip().endswith(".fastq.gz"):
             path, file = row["HiSeqData/"].strip().split("-->")
             prefix = file.split("_L0")[0] if "_L0" in file else None
-            row["set"] = SequencingFileSet.objects.filter(prefix=prefix).values("prefix")
+            # row["set"] = SequencingFileSet.objects.filter(prefix=prefix).values("prefix")
             # print(path,file)
             SequencingFile.objects.get(name=file)
             return
@@ -2270,5 +2270,38 @@ def upload_file_tree(request):
     df = pd.read_csv(file, index_col=False, encoding='iso-8859-1', on_bad_lines = 'warn')
     df["new"]=df.apply(lambda row: get_file_tree(row), axis=1)
     df.to_csv("fastq_files_new.csv", index=False)
+
+
+def get_new_files(row):
+    path, file = row["new"].strip().split("-->")
+    prefix = file.split("_L0")[0] if "_L0" in file else None
+    if not prefix:
+        return
+    try:
+        _seq_run = path.split("/")[1]
+        print(row["new"])
+        seq_run = _seq_run.split(" ")[0] if "Nimblegen" in _seq_run else _seq_run
+        sr = SequencingRun.objects.get(name__icontains=seq_run)
+        _file = file.split("_S")[0] if "_S" in file else file
+        sl = SampleLib.objects.get(name=_file)
+        set_ = get_or_create_set(
+            prefix=prefix,
+            path=path,
+            sample_lib=sl,
+            sequencing_run=sr,
+        )
+        get_or_create_file(
+            sequencing_file_set=set_,
+            name=file,
+            checksum="",
+            type="fastq"
+        )
+    except Exception as e:
+        print(e)
+
+def match_new_files(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "fastq_files_new.csv")
+    df = pd.read_csv(file, index_col=False, encoding='iso-8859-1', on_bad_lines = 'warn')
+    df[~df["new"].isnull()].apply(lambda row: get_new_files(row), axis=1)
 
 
