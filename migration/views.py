@@ -2248,7 +2248,7 @@ def get_file_tree(row):
             SequencingFile.objects.get(name=file)
             return
     except ObjectDoesNotExist as e:
-        l.append(row["HiSeqData/"].strip())
+        # l.append(row["HiSeqData/"].strip())
         # print(row["HiSeqData/"].strip())
         return row["HiSeqData/"].strip()
     except MultipleObjectsReturned as e:
@@ -2280,7 +2280,7 @@ def get_new_files(row):
     try:
         _seq_run = path.split("/")[1]
         print(row["new"])
-        seq_run = _seq_run.split(" ")[0] if "Nimblegen" in _seq_run else _seq_run
+        seq_run = _seq_run.split(" ")[0]+"_" if "Nimblegen" in _seq_run else _seq_run
         sr = SequencingRun.objects.get(name__icontains=seq_run)
         _file = file.split("_S")[0] if "_S" in file else file
         sl = SampleLib.objects.get(name=_file)
