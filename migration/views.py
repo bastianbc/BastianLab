@@ -2292,7 +2292,6 @@ def get_new_files(row):
         elif re.search("^CGH(\d+)_(\d+)_[ACTG]{6}", file):
             match = re.search("^CGH(\d+)_(\d+)_[ACTG]{6}", file)
             _sl = f"CGH{match.group(1)}-{match.group(2)}"
-            print(f"sl:@@@ CGH{match.group(1)}_{match.group(2)}")
         elif re.search("^2(\w+)_[ACTG]{6}", file):
             _sl = "2"+re.search("^2(\w+)_[ACTG]{6}", file).group(1)
             _sl = _sl.replace("_", "-")
@@ -2300,6 +2299,7 @@ def get_new_files(row):
             _sl = re.search("(\w+)_[ACTG]{6}", file).group(1)
         else:
             _sl = file.split("_S")[0] if "_S" in file else file
+            print(f"sl:@@@ ",_sl)
         sl = SampleLib.objects.get(name=_sl)
         set_ = get_or_create_set(
             prefix=prefix,
