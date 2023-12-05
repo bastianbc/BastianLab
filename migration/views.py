@@ -2280,7 +2280,7 @@ def get_new_files(row):
         return
     try:
         _seq_run = path.split("/")[1]
-        print(row["new"])
+        # print(row["new"])
         _seq_run_ = _seq_run.split(" ")[0]+"_" if "Nimblegen" in _seq_run else _seq_run
         seq_run = "Nimblegen10_BB13" if "Nimblegen10_BB13" in _seq_run_ else _seq_run_
         sr = SequencingRun.objects.get(name__icontains=seq_run)
@@ -2292,8 +2292,6 @@ def get_new_files(row):
         elif re.search("^DLP-", file):
             match = re.search("^DLP-(\d+)_(\w+)", file)
             _sl = f"DLP-{match.group(1)}"
-            print(f"sl:!!!! ", _sl)
-            print(f"prefix ", prefix)
         elif re.search("^CGH(\d+)_(\d+)_[ACTG]{6}", file):
             match = re.search("^CGH(\d+)_(\d+)_[ACTG]{6}", file)
             _sl = f"CGH{match.group(1)}-{match.group(2)}"
@@ -2319,6 +2317,7 @@ def get_new_files(row):
             type="fastq"
         )
     except Exception as e:
+        print(row["new"])
         print(e)
 
 def match_new_files(request):
