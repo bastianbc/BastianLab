@@ -2289,9 +2289,15 @@ def get_new_files(row):
             match = re.search("Bivona_L\d+", file)
             if match:
                 _sl = match.group(0)
+        elif re.search("^Kit_262", file):
+            _sl = f"Kit 262"
         elif re.search("^DLP-", file):
             match = re.search("^DLP-(\d+)_(\w+)", file)
             _sl = f"DLP-{match.group(1)}"
+        elif re.search("^CGH", file) and ("029" in file or "045" in file or "092" in file or "125" in file or "194" in file):
+            print(row["new"])
+            match = re.search("^CGH(\d+)_(\d+)_[ACTG]{6}", file)
+            _sl = f"BB09_CGH{match.group(1)}_{match.group(2)}"
         elif re.search("^CGH(\d+)_(\d+)_[ACTG]{6}", file):
             match = re.search("^CGH(\d+)_(\d+)_[ACTG]{6}", file)
             _sl = f"CGH{match.group(1)}-{match.group(2)}"
