@@ -2275,7 +2275,7 @@ def upload_file_tree(request):
 def get_new_files(row):
     path, file = row["new"].strip().split("-->")
 
-    prefix = file.split("_L0")[0] if "_L0" in file else None
+    prefix = file.split("_L0")[0] if "_L0" in file else file.split("_001")[0] if "_001" in file else None
     if not prefix:
         return
     try:
@@ -2289,10 +2289,11 @@ def get_new_files(row):
             match = re.search("Bivona_L\d+", file)
             if match:
                 _sl = match.group(0)
-        elif re.search("^DLP-(\d+)_(\w+)", file):
+        elif re.search("^DLP-", file):
             match = re.search("^DLP-(\d+)_(\w+)", file)
             _sl = f"DLP-{match.group(1)}"
             print(f"sl:!!!! ", _sl)
+            print(f"prefix ", prefix)
         elif re.search("^CGH(\d+)_(\d+)_[ACTG]{6}", file):
             match = re.search("^CGH(\d+)_(\d+)_[ACTG]{6}", file)
             _sl = f"CGH{match.group(1)}-{match.group(2)}"
