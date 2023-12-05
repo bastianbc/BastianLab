@@ -63,8 +63,8 @@ class SequencingFileSet(models.Model):
                 )
             elif search_value:
                 queryset = queryset.filter(
-                    Q(folder_prefix__icontains=search_value) |
-                    Q(read1_path__icontains=search_value)
+                    Q(prefix__icontains=search_value) |
+                    Q(path__icontains=search_value)
                 )
 
             count = queryset.count()
@@ -146,8 +146,7 @@ class SequencingFile(models.Model):
                 )
             elif search_value:
                 queryset = queryset.filter(
-                    Q(folder_name__icontains=search_value) |
-                    Q(read1_type__icontains=search_value)
+                    Q(name__icontains=search_value)
                 )
 
             count = queryset.count()
