@@ -2288,6 +2288,8 @@ def get_new_files(row):
             match = re.search("Bivona_L\d+", file)
             if match:
                 _sl = match.group(0)
+        elif re.search("[ACTG]{6}", file):
+            _sl = re.search("(\w+)_[ACTG]{6}", file).group(1)
         else:
             _sl = file.split("_S")[0] if "_S" in file else file
         sl = SampleLib.objects.get(name=_sl)
