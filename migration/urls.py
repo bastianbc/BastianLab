@@ -24,4 +24,5 @@ urlpatterns = [
     path("uploads_baits", views.uploads_baits, name="uploads_baits"),
     path("upload_file_tree", views.upload_file_tree, name="upload_file_tree"),
     path("match_new_files", views.match_new_files, name="match_new_files"),
+    path("block_scan_number", views.block_scan_number, name="block_scan_number"),
 ]

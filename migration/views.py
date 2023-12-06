@@ -2347,3 +2347,24 @@ def match_new_files(request):
     df[~df["new"].isnull()].apply(lambda row: get_new_files(row), axis=1)
 
 
+def match_unudentified_area(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "fastq_files_new.csv")
+    df = pd.read_csv(file, index_col=False, encoding='iso-8859-1', on_bad_lines = 'warn')
+    df[~df["new"].isnull()].apply(lambda row: get_new_files(row), axis=1)
+
+def get_block_scan(row):
+    try:
+        print(row["Block_ID"])
+        dir, scan = row["HE image"].split("=")
+        Blocks.objects.filter(name=row["Block_ID"]).update(scan_number=scan)
+        print("updated")
+    except Exception as e:
+        print(e)
+
+
+def block_scan_number(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "Blocks-Grid view-5.csv")
+    df = pd.read_csv(file)
+    df[~df["HE image"].isnull()].apply(lambda row: get_block_scan(row), axis=1)
+
+
