@@ -147,8 +147,8 @@ class SequencingFile(models.Model):
             elif search_value:
                 queryset = queryset.filter(
                     Q(name__icontains=search_value) |
-                    Q(sequencing_file_set__path=search_value) |
-                    Q(sequencing_file_set__prefix=search_value)
+                    Q(sequencing_file_set__path__icontains=search_value) |
+                    Q(sequencing_file_set__prefix__icontains=search_value)
                 )
 
             count = queryset.count()
