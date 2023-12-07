@@ -22,11 +22,15 @@ var KTDatatablesServerSide = function () {
             // searchDelay: 500,
             processing: true,
             serverSide: true,
-            responsive: true,
             order: [[0, 'desc']],
             stateSave: false,
             destroy: true,
             pageLength: 100,
+            responsive: {
+                details: {
+                    type: 'inline'
+                }
+            },
             select: {
                 style: 'multi',
                 selector: 'td:first-child input[type="checkbox"]',
