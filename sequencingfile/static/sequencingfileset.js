@@ -28,7 +28,7 @@ var KTDatatablesServerSide = function () {
             pageLength: 100,
             responsive: {
                 details: {
-                    type: 'column'
+                    type: 'inline'
                 }
             },
             select: {
