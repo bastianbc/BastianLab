@@ -25,7 +25,7 @@ var KTDatatablesServerSide = function () {
             order: [[0, 'desc']],
             stateSave: false,
             destroy: true,
-            pageLength: 100,
+            pageLength: 10,
             responsive: {
                 details: {
                     type: 'inline'
@@ -80,6 +80,10 @@ var KTDatatablesServerSide = function () {
                                 <input class="form-check-input" type="checkbox" value="${data}" />
                             </div>`;
                     }
+                },
+                {
+                    targets: 4,
+                    width: "20%"
                 },
                 {
                     targets: 5,
