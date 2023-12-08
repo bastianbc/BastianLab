@@ -2378,7 +2378,7 @@ def _files_from_file(row):
                 d[file.name]=file.checksum
         if bool(d):
             row["fastq_file"] = d
-            row["fastq_path"] = files.first().path
+            row["fastq_path"] = files.first().sequencing_file_set.path
             row["new_added"] = True
     return row
 
