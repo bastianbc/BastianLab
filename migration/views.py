@@ -2278,6 +2278,10 @@ def get_new_files(row):
 
     prefix = file.split("_L0")[0] if "_L0" in file else file.split("_001")[0] if "_001" in file else None
     print(prefix)
+    if re.search("^[T12|H12]", file):
+        last = "_" + prefix.split("_")[-1]
+        print(file.replace(last,""))
+        SampleLib.objects.get_or_create(name=file.replace(last,""))
     if not prefix:
         return
     try:
@@ -2300,11 +2304,7 @@ def get_new_files(row):
             _sl = SampleLib.objects.filter(na_sl_links__nucacid__area__name = area, name__startswith="N3_").first().name
 
         elif re.search("^[T12|H12]", file):
-
-            match = re.search("[T12|H12]_(\w+)_[ACTG]{6}", file)
-            # print("#"*10, match.group(1), match.groups)
-            # area = f"HW{match.group(1)}".replace("Dissect","")
-            # _sl = SampleLib.objects.filter(na_sl_links__nucacid__area__name = area, name__startswith="N3_").first().name
+            _sl = SampleLib.objects.get(name=file.replace(last, "")).name
         elif re.search("^HW", file):
             match = re.search("^HW(\w+)_[ACTG]", file)
             area = f"HW{match.group(1)}".replace("Dissect","")
