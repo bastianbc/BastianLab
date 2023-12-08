@@ -2274,7 +2274,7 @@ def upload_file_tree(request):
 
 
 def get_new_files(row):
-    path, file = row["new"].strip().split("-->")
+    path, file = row["HiSeqData/"].strip().split("-->")
     # prefix = file.split("_L0")[0] if "_L0" in file else file.split("_001")[0] if "_001" in file else None
     try:
         SequencingFile.objects.get(name=file.strip())
