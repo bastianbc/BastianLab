@@ -2468,10 +2468,12 @@ def get_unregistered(row):
             prefix=prefix.replace("Boniva","Bivona")
             match = re.search("Bivona_L(\d+)_[ACTG]{6}", prefix)
             _sl = "Bivona_L"+match.group(1)
+        if "T12_" in file:
+            match = re.search("T12_(\w+)_[ACTG]{6}", prefix)
+            _sl = "T12_"+match.group(1)
             print(_sl)
         sl = SampleLib.objects.get(name=_sl)
         sr = SequencingRun.objects.get(name=_sr)
-        print(sl)
         set_ = get_or_create_set(
             prefix=prefix,
             path=path,
