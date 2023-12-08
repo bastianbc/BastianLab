@@ -1884,6 +1884,7 @@ def airtable_consolidated_data(request):
 
 def get_or_cons(row):
     print(row["Sample"])
+    SampleLib.objects.get(name="")
     # print(row['Sample'],row['Input Conc.'])
     # try:
     #     SampleLib.objects.filter(name=row["Sample"]).update(qpcr_conc=10)
@@ -1897,7 +1898,7 @@ def qpcr_consolidated_data(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
     df = pd.read_csv(file)
     # df[~df["Input Conc."].isnull()].apply(lambda row: get_or_cons(row), axis=1)
-    df.iloc[:49].apply(lambda row: get_or_cons(row), axis=1)
+    df.iloc[:48].apply(lambda row: get_or_cons(row), axis=1)
 
 def get_at_na(row):
     print(row['NA_ID'], row['Shearing volume DNA input (ul)'])
@@ -2369,7 +2370,10 @@ def block_scan_number(request):
 
 
 def _files_from_file(row):
-    pass
+    try:
+        SampleLib.objects.get(name=row["Sample"])
+    except:
+        print(row["Sample"])
     # if not pd.isnull(row["fastq_file"]):
     #     return row
     # files = SequencingFile.objects.filter(sequencing_file_set__sample_lib__name=row["sample_lib"],
@@ -2408,5 +2412,5 @@ def create_fastq_from_file(request):
     df["bam_bai_file"] = df["bam_bai_file"].apply(lambda x: make_dict(x))
 
     df = df.apply(lambda row: _files_from_file(row), axis=1)
-    df=df[cols]
-    df.to_csv("report_matching_sample_lib_after_IWEI.csv", index=False)
+    # df=df[cols]
+    # df.to_csv("report_matching_sample_lib_after_IWEI.csv", index=False)
