@@ -1,52 +1,52 @@
 sample_lib,captured_lib,Bait,sequencing_lib,sequencing_run,fastq_file,fastq_path,bam_bai_file,bam_file,bam_bai_file_path,bam_file_path,matching_normal_sl,area_type
-12-6261A,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,Melanocytic Nevus
-12-6261B,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,Melanocytic Nevus
-12-12366,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,SCC
-12-12467,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,Melanocytic Nevus
-12-12470D,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,BCC
-12-562,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,Tumor
-12-12647,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,Melanocytic Nevus
-12-12626,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,Cellular Dermatofibroma 
-12-13587B2,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,SCC
-12-18438A,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,"SCC, in situ"
-12-13152,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,Melanocytic Nevus
-12-12750B,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,SCC
-12-19596,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,"SCC, in situ"
-12-19187A,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,Dermatofibroma
-12-22172,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,Normal
-12-22172,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,35,Tumor
-12-21726A,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,Tumor
-12-22901A,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,Normal
-12-22901A,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,39,Tumor
-12-22776B5,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,Normal
-BuffyCoat,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,Buffy Coat DNA
-12-13587B2,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,Buffy Coat DNA
-12-13587B2,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,SCC
-12-13587B2,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,SCC
-BuffyCoat,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,SCC
-12-22775,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,SCC
-12-22794A,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,Mel
-12-22573,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,Melanocytic Nevus
-12-22582A,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,Melanocytic Nevus
-12-22587,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,Melanocytic Nevus
-12-22592,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,Keratosis
-12-22597,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,BCC
-12-22602A,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,Melanocytic Nevus
-12-22602B,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,Melanocytic Nevus
-12-22603,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,"Pilomatricoma, cystic"
-12-22604,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,BCC
-12-22720A1,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,Leiomyoma
-12-22868,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,Melanocytic Nevus
-12-22884C,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,Melanocytic Nevus
-12-22884D,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,Melanocytic Nevus
-12-22886,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,Melanocytic Nevus
-12-22894B,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,Melanocytic Nevus
-12-22898,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,Melanocytic Nevus
-12-22900,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,SCC
-12-22597,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,BCC
-12-22597,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,BCC
-12-22597,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,BCC
-12-22597,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,BCC
+1,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,Melanocytic Nevus
+2,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,Melanocytic Nevus
+6,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,SCC
+7,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,Melanocytic Nevus
+11,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,BCC
+13,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,Tumor
+15,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,Melanocytic Nevus
+20,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,Cellular Dermatofibroma 
+23,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,SCC
+24,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,"SCC, in situ"
+27,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,Melanocytic Nevus
+28,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,SCC
+29,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,"SCC, in situ"
+31,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,Dermatofibroma
+35,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,Normal
+36,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,35,Tumor
+38,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,Tumor
+39,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,Normal
+40,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,39,Tumor
+41,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,Normal
+43,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,Buffy Coat DNA
+44,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,Buffy Coat DNA
+45,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,SCC
+46,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,SCC
+43,BB2_CL,Agilent?,BB2_SeqL,HiSeq1_BB2,,,,,,,,SCC
+47,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,SCC
+48,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,Mel
+49,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,Melanocytic Nevus
+51,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,Melanocytic Nevus
+55,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,Melanocytic Nevus
+56,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,Keratosis
+58,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,BCC
+59,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,Melanocytic Nevus
+60,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,Melanocytic Nevus
+61,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,"Pilomatricoma, cystic"
+62,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,BCC
+64,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,Leiomyoma
+65,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,Melanocytic Nevus
+66,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,Melanocytic Nevus
+67,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,Melanocytic Nevus
+68,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,Melanocytic Nevus
+70,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,Melanocytic Nevus
+71,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,Melanocytic Nevus
+72,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,SCC
+73,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,BCC
+74,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,BCC
+75,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,BCC
+76,BB3_CL,Agilent?,BB3_SeqL,HiSeq2_BB3,,,,,,,,BCC
 1212,BB71_CL,NimV2mix3,BB71_SeqL,BioSci19_BB71,"{'1212_CGATGT_L001_R1_001.fastq.gz': '06828e13c469a55acb646bfaf237484a', '1212_CGATGT_L001_R1_002.fastq.gz': '59057ad7adba9b01123360937d870db3', '1212_CGATGT_L001_R1_003.fastq.gz': '533316525ebafd3fe03424eec2f58505', '1212_CGATGT_L001_R1_004.fastq.gz': 'a6c609b6e239975bcdf29025c6e42638', '1212_CGATGT_L001_R2_001.fastq.gz': '37e87762c5f9ec69f176b9dee5c36a80', '1212_CGATGT_L001_R2_002.fastq.gz': '55b8d3dda101aa0cbb4f332548bf0d11', '1212_CGATGT_L001_R2_003.fastq.gz': 'dc50b0a2798d536572c067c61fac51a0', '1212_CGATGT_L001_R2_004.fastq.gz': 'c02d409bdaf41747cc18817dd909265c', '1212_CGATGT_L002_R1_001.fastq.gz': '69a1ec1ee7a5af238e89135037937b34', '1212_CGATGT_L002_R1_002.fastq.gz': '93920354693fc6d2d5658f8c0333ab20', '1212_CGATGT_L002_R1_003.fastq.gz': 'eb623964c57e343f44883d5fed505d24', '1212_CGATGT_L002_R1_004.fastq.gz': '3ef43652af77cfa02d8d39bc6f831dcc', '1212_CGATGT_L002_R2_001.fastq.gz': 'd9ec0b12d984b7578f0278de91c42faf', '1212_CGATGT_L002_R2_002.fastq.gz': '5f1f3d15b56827e63bd2f3985586d2aa', '1212_CGATGT_L002_R2_003.fastq.gz': 'd84d03dbdc4130f9c228c615668770f7', '1212_CGATGT_L002_R2_004.fastq.gz': '0682403005e3b7d6d512e31dab9523db'}",HiSeqData/BioSci19_BB71/Project_bastianb-BB71/Sample_1212,,,,,,Tumor
 1213,BB71_CL,NimV2mix3,BB71_SeqL,BioSci19_BB71,"{'1213_TGACCA_L001_R1_001.fastq.gz': 'b94ca7e20697e54bd05d74fc7b8c8bb7', '1213_TGACCA_L001_R1_002.fastq.gz': '0d0df2a504c02314fddcb1e650e9adf0', '1213_TGACCA_L001_R1_003.fastq.gz': 'f46b8e6067898c23cf455218b6e13c2a', '1213_TGACCA_L001_R1_004.fastq.gz': 'e7b817152207c3134a243e5b7eacfcad', '1213_TGACCA_L001_R2_001.fastq.gz': 'bb810eac122c6afe5b483ee636954125', '1213_TGACCA_L001_R2_002.fastq.gz': '0fb7761e23434a19e912abd0adaa6c9e', '1213_TGACCA_L001_R2_003.fastq.gz': '6e16734816f464d221d712522ffdb612', '1213_TGACCA_L001_R2_004.fastq.gz': 'e0c2f23873e12887631f40f2bc2395a5', '1213_TGACCA_L002_R1_001.fastq.gz': '390da10510e64f695611e606759743d3', '1213_TGACCA_L002_R1_002.fastq.gz': '0540d75809d21399b57e638fa6e672c3', '1213_TGACCA_L002_R1_003.fastq.gz': '2a142206b2dc1944d73c3a270ca5f48c', '1213_TGACCA_L002_R1_004.fastq.gz': '59962601b914f948888777d3c4f309dc', '1213_TGACCA_L002_R2_001.fastq.gz': '20a57cca34d3199d85fbe612f6e81b98', '1213_TGACCA_L002_R2_002.fastq.gz': '8b6b9f0b8181aebeedc8e8aaca15f4e7', '1213_TGACCA_L002_R2_003.fastq.gz': 'c9c68096ebd5d071e580311093495fc6', '1213_TGACCA_L002_R2_004.fastq.gz': '47d8eea188a431605214cd15c147e857'}",HiSeqData/BioSci19_BB71/Project_bastianb-BB71/Sample_1213,,,,,,Tumor
 1214,BB71_CL,NimV2mix3,BB71_SeqL,BioSci19_BB71,"{'1214_ACAGTG_L001_R1_001.fastq.gz': '479b3ae71de5f352ad96cafaab741d3c', '1214_ACAGTG_L001_R1_002.fastq.gz': '81111ead7c47065eb2d9e3f218447bcb', '1214_ACAGTG_L001_R1_003.fastq.gz': 'db94d8e42fcaf7c429bd8e7c67f1832d', '1214_ACAGTG_L001_R2_001.fastq.gz': '8543f7e7c2867c8ff52623477bdb9285', '1214_ACAGTG_L001_R2_002.fastq.gz': 'a1bfdb56fe5736c683d8423465fa30d3', '1214_ACAGTG_L001_R2_003.fastq.gz': '91f1ed32cb1aa11ab91c148a85ed4286', '1214_ACAGTG_L002_R1_001.fastq.gz': '4e6ec0eaccd19c4192d407873793f7e9', '1214_ACAGTG_L002_R1_002.fastq.gz': '4e404cf943c4a1b83e004d14e135fb8b', '1214_ACAGTG_L002_R1_003.fastq.gz': 'f9a85a0c6ca2e49ca7c5d18632e6b38f', '1214_ACAGTG_L002_R2_001.fastq.gz': '5098e2847006df2c8e766763e0637b3c', '1214_ACAGTG_L002_R2_002.fastq.gz': 'ec5371141bcc4d4fc42bfdc07429d636', '1214_ACAGTG_L002_R2_003.fastq.gz': '69e7e438e7582ed5cd28e32f34f9805a'}",HiSeqData/BioSci19_BB71/Project_bastianb-BB71/Sample_1214,,,,,,Tumor
@@ -1809,14 +1809,14 @@ EXLP-51,KAPAEX-27,KAPA HyperExome V1 Probes,KAPAEX-27_SeqL,,,,,,,,"EXLP-01, EXLP
 EXLP-52,KAPAEX-27,KAPA HyperExome V1 Probes,KAPAEX-27_SeqL,,,,,,,,"EXLP-01, EXLP-20",Met10
 EXLP-53,KAPAEX-27,KAPA HyperExome V1 Probes,KAPAEX-27_SeqL,,,,,,,,"EXLP-01, EXLP-20",Met6
 EXLP-54,KAPAEX-27,KAPA HyperExome V1 Probes,KAPAEX-27_SeqL,,,,,,,,"EXLP-01, EXLP-20",Met10
--FKP 1.00,SGPC-04,Whole Genome Sequencing,,SGPC-04,"{'FKP-01_S68_L001_R1_001.fastq.gz': '2aa4d974dbc42cbe92301711d98244c1', 'FKP-01_S68_L001_R2_001.fastq.gz': '0ad1f60970eee16abf3b4685fe468bc6', 'FKP-01_S68_L002_R1_001.fastq.gz': 'f632c6ca9741c3234b3214867546d784', 'FKP-01_S68_L002_R2_001.fastq.gz': 'cafc1059ef6f0b3295173f93712d78ef'}",HiSeqData/SGPC-04/180418_D00328_0761_BHC7JGBCX2/shaina-SGPC-004_dualindex,,,,,,Tumor
--FKP 10.00,SGPC-04,Whole Genome Sequencing,,SGPC-04,"{'FKP-10_S74_L001_R1_001.fastq.gz': 'c242b09aec962a3ae8cfa2a616acc37b', 'FKP-10_S74_L001_R2_001.fastq.gz': '988e59d93265dfd264de55e08462eb1a', 'FKP-10_S74_L002_R1_001.fastq.gz': '0358fef6f2ded27089094b0d5634507d', 'FKP-10_S74_L002_R2_001.fastq.gz': 'a7be10931f2293f1cc87ac836a091f29'}",HiSeqData/SGPC-04/180418_D00328_0761_BHC7JGBCX2/shaina-SGPC-004_dualindex,,,,,,Tumor
--FKP 11.00,SGPC-04,Whole Genome Sequencing,,SGPC-04,"{'FKP-11_S75_L001_R1_001.fastq.gz': '', 'FKP-11_S75_L001_R2_001.fastq.gz': '', 'FKP-11_S75_L002_R1_001.fastq.gz': '', 'FKP-11_S75_L002_R2_001.fastq.gz': ''}",HiSeqData/SGPC-04/180418_D00328_0761_BHC7JGBCX2/shaina-SGPC-004_dualindex,,,,,,Tumor
--FKP 2.00,SGPC-04,Whole Genome Sequencing,,SGPC-04,"{'FKP-02_S69_L001_R1_001.fastq.gz': '0dbeb4476255dd0563f9730b2d4895d0', 'FKP-02_S69_L001_R2_001.fastq.gz': '86716845ad965271e67ec60dca031db4', 'FKP-02_S69_L002_R1_001.fastq.gz': '92a7d0b688d57c6f0b16b6a840413ab4', 'FKP-02_S69_L002_R2_001.fastq.gz': '275b4a87ceb5f5b8e01adcef16b4a616'}",HiSeqData/SGPC-04/180418_D00328_0761_BHC7JGBCX2/shaina-SGPC-004_dualindex,,,,,,Tumor
--FKP 5.00,SGPC-04,Whole Genome Sequencing,,SGPC-04,"{'FKP-05_S70_L001_R1_001.fastq.gz': 'f222bd086c546606b36989134c33601b', 'FKP-05_S70_L001_R2_001.fastq.gz': '1fb9d1a548f70312515020e069473cd6', 'FKP-05_S70_L002_R1_001.fastq.gz': '273b455c1eeab4b3cc139dbf50e023bb', 'FKP-05_S70_L002_R2_001.fastq.gz': '87c0d538f2d6fbc81cf012ee83188679'}",HiSeqData/SGPC-04/180418_D00328_0761_BHC7JGBCX2/shaina-SGPC-004_dualindex,,,,,,Tumor
--FKP 6.00,SGPC-04,Whole Genome Sequencing,,SGPC-04,"{'FKP-06_S71_L001_R1_001.fastq.gz': '707d47f6546de7ac37884a7993bbab5b', 'FKP-06_S71_L001_R2_001.fastq.gz': '44cc0bbcfc1e2f8f9dbd3ff70e993f0d', 'FKP-06_S71_L002_R1_001.fastq.gz': '2c544f2bde8c34eec9b9f32fa1b36a90', 'FKP-06_S71_L002_R2_001.fastq.gz': '8a2368d9f439fa92dd1f2ad04eda9574'}",HiSeqData/SGPC-04/180418_D00328_0761_BHC7JGBCX2/shaina-SGPC-004_dualindex,,,,,,Tumor
--FKP 8.00,SGPC-04,Whole Genome Sequencing,,SGPC-04,"{'FKP-08_S72_L001_R1_001.fastq.gz': '1c0ea85f6ea24ccb6beca2bed68b4766', 'FKP-08_S72_L001_R2_001.fastq.gz': '276e9c2ce7c1cef26fdf5e97fb7f9200', 'FKP-08_S72_L002_R1_001.fastq.gz': '702f3d11e9d9706c96c2394e6420620d', 'FKP-08_S72_L002_R2_001.fastq.gz': '2a08b453ecf5a19601c9755f400e3b3d'}",HiSeqData/SGPC-04/180418_D00328_0761_BHC7JGBCX2/shaina-SGPC-004_dualindex,,,,,,Tumor
--FKP 9.00,SGPC-04,Whole Genome Sequencing,,SGPC-04,"{'FKP-09_S73_L001_R1_001.fastq.gz': '9c123f59db61dc977c4c6d5f69859bbe', 'FKP-09_S73_L001_R2_001.fastq.gz': 'c21ade5155973dc99c2101c704e0377d', 'FKP-09_S73_L002_R1_001.fastq.gz': 'cbac8cdb17dcb18a3032d5c760d5eaed', 'FKP-09_S73_L002_R2_001.fastq.gz': '01d22ec8f225f7a7ab78cf48f8d608fa'}",HiSeqData/SGPC-04/180418_D00328_0761_BHC7JGBCX2/shaina-SGPC-004_dualindex,,,,,,Tumor
+FKP-01,SGPC-04,Whole Genome Sequencing,,SGPC-04,"{'FKP-01_S68_L001_R1_001.fastq.gz': '2aa4d974dbc42cbe92301711d98244c1', 'FKP-01_S68_L001_R2_001.fastq.gz': '0ad1f60970eee16abf3b4685fe468bc6', 'FKP-01_S68_L002_R1_001.fastq.gz': 'f632c6ca9741c3234b3214867546d784', 'FKP-01_S68_L002_R2_001.fastq.gz': 'cafc1059ef6f0b3295173f93712d78ef'}",HiSeqData/SGPC-04/180418_D00328_0761_BHC7JGBCX2/shaina-SGPC-004_dualindex,,,,,,Tumor
+FKP-10,SGPC-04,Whole Genome Sequencing,,SGPC-04,"{'FKP-10_S74_L001_R1_001.fastq.gz': 'c242b09aec962a3ae8cfa2a616acc37b', 'FKP-10_S74_L001_R2_001.fastq.gz': '988e59d93265dfd264de55e08462eb1a', 'FKP-10_S74_L002_R1_001.fastq.gz': '0358fef6f2ded27089094b0d5634507d', 'FKP-10_S74_L002_R2_001.fastq.gz': 'a7be10931f2293f1cc87ac836a091f29'}",HiSeqData/SGPC-04/180418_D00328_0761_BHC7JGBCX2/shaina-SGPC-004_dualindex,,,,,,Tumor
+FKP-11,SGPC-04,Whole Genome Sequencing,,SGPC-04,"{'FKP-11_S75_L001_R1_001.fastq.gz': '', 'FKP-11_S75_L001_R2_001.fastq.gz': '', 'FKP-11_S75_L002_R1_001.fastq.gz': '', 'FKP-11_S75_L002_R2_001.fastq.gz': ''}",HiSeqData/SGPC-04/180418_D00328_0761_BHC7JGBCX2/shaina-SGPC-004_dualindex,,,,,,Tumor
+FKP-02,SGPC-04,Whole Genome Sequencing,,SGPC-04,"{'FKP-02_S69_L001_R1_001.fastq.gz': '0dbeb4476255dd0563f9730b2d4895d0', 'FKP-02_S69_L001_R2_001.fastq.gz': '86716845ad965271e67ec60dca031db4', 'FKP-02_S69_L002_R1_001.fastq.gz': '92a7d0b688d57c6f0b16b6a840413ab4', 'FKP-02_S69_L002_R2_001.fastq.gz': '275b4a87ceb5f5b8e01adcef16b4a616'}",HiSeqData/SGPC-04/180418_D00328_0761_BHC7JGBCX2/shaina-SGPC-004_dualindex,,,,,,Tumor
+FKP-05,SGPC-04,Whole Genome Sequencing,,SGPC-04,"{'FKP-05_S70_L001_R1_001.fastq.gz': 'f222bd086c546606b36989134c33601b', 'FKP-05_S70_L001_R2_001.fastq.gz': '1fb9d1a548f70312515020e069473cd6', 'FKP-05_S70_L002_R1_001.fastq.gz': '273b455c1eeab4b3cc139dbf50e023bb', 'FKP-05_S70_L002_R2_001.fastq.gz': '87c0d538f2d6fbc81cf012ee83188679'}",HiSeqData/SGPC-04/180418_D00328_0761_BHC7JGBCX2/shaina-SGPC-004_dualindex,,,,,,Tumor
+FKP-06,SGPC-04,Whole Genome Sequencing,,SGPC-04,"{'FKP-06_S71_L001_R1_001.fastq.gz': '707d47f6546de7ac37884a7993bbab5b', 'FKP-06_S71_L001_R2_001.fastq.gz': '44cc0bbcfc1e2f8f9dbd3ff70e993f0d', 'FKP-06_S71_L002_R1_001.fastq.gz': '2c544f2bde8c34eec9b9f32fa1b36a90', 'FKP-06_S71_L002_R2_001.fastq.gz': '8a2368d9f439fa92dd1f2ad04eda9574'}",HiSeqData/SGPC-04/180418_D00328_0761_BHC7JGBCX2/shaina-SGPC-004_dualindex,,,,,,Tumor
+FKP-08,SGPC-04,Whole Genome Sequencing,,SGPC-04,"{'FKP-08_S72_L001_R1_001.fastq.gz': '1c0ea85f6ea24ccb6beca2bed68b4766', 'FKP-08_S72_L001_R2_001.fastq.gz': '276e9c2ce7c1cef26fdf5e97fb7f9200', 'FKP-08_S72_L002_R1_001.fastq.gz': '702f3d11e9d9706c96c2394e6420620d', 'FKP-08_S72_L002_R2_001.fastq.gz': '2a08b453ecf5a19601c9755f400e3b3d'}",HiSeqData/SGPC-04/180418_D00328_0761_BHC7JGBCX2/shaina-SGPC-004_dualindex,,,,,,Tumor
+FKP-09,SGPC-04,Whole Genome Sequencing,,SGPC-04,"{'FKP-09_S73_L001_R1_001.fastq.gz': '9c123f59db61dc977c4c6d5f69859bbe', 'FKP-09_S73_L001_R2_001.fastq.gz': 'c21ade5155973dc99c2101c704e0377d', 'FKP-09_S73_L002_R1_001.fastq.gz': 'cbac8cdb17dcb18a3032d5c760d5eaed', 'FKP-09_S73_L002_R2_001.fastq.gz': '01d22ec8f225f7a7ab78cf48f8d608fa'}",HiSeqData/SGPC-04/180418_D00328_0761_BHC7JGBCX2/shaina-SGPC-004_dualindex,,,,,,Tumor
 G3 DP08-21965C Normal,BB35_CL,NimV2mix4,BB35_SeqL,Nimblegen30_BB35,"{'G3_DP08_21965C_Normal_TTCAGC_L002_R1_001.fastq.gz': 'a3b15bb6ea4e66e311feae05fd6e0bcf', 'G3_DP08_21965C_Normal_TTCAGC_L002_R1_002.fastq.gz': '4b205947a8a4e89747721f6e734d7c6b', 'G3_DP08_21965C_Normal_TTCAGC_L002_R1_003.fastq.gz': '29e330fe4cf57fd47dec882a348d9a4f', 'G3_DP08_21965C_Normal_TTCAGC_L002_R1_004.fastq.gz': 'bd8e036913a93882caeaeb109019099e', 'G3_DP08_21965C_Normal_TTCAGC_L002_R1_005.fastq.gz': 'c2fb8ce8cbd30a4784b52641cc2c4491', 'G3_DP08_21965C_Normal_TTCAGC_L002_R2_001.fastq.gz': 'b647ce01a00240b730c58f2ab5d69519', 'G3_DP08_21965C_Normal_TTCAGC_L002_R2_002.fastq.gz': '3c002c1fe6a0b10171b2c0e321c2d01b', 'G3_DP08_21965C_Normal_TTCAGC_L002_R2_003.fastq.gz': '455083980953047a350d0df9568c5aa5', 'G3_DP08_21965C_Normal_TTCAGC_L002_R2_004.fastq.gz': '4d0bd0c04da7124b6454ba96196c786f', 'G3_DP08_21965C_Normal_TTCAGC_L002_R2_005.fastq.gz': '10585cb5acfb32b788216101b022b81d'}",HiSeqData/Nimblegen30_BB35/Project_BastianLab-BB35/Sample_G3_DP08_21965C_Normal,,,,,,Normal
 G3 DP08-21965C Tumor,BB35_CL,NimV2mix4,BB35_SeqL,Nimblegen30_BB35,"{'G3_DP08_21965C_Tumor_GGACCC_L002_R1_001.fastq.gz': 'cff3eda8a357e4fee2b99ef07c25ebfa', 'G3_DP08_21965C_Tumor_GGACCC_L002_R1_002.fastq.gz': '54879887d7fb86745c8971b3a263c8bb', 'G3_DP08_21965C_Tumor_GGACCC_L002_R2_001.fastq.gz': '05d31550b846461c3d986e0f2358f275', 'G3_DP08_21965C_Tumor_GGACCC_L002_R2_002.fastq.gz': '2cc1ce202256eb8590517cc5644203ee'}",HiSeqData/Nimblegen30_BB35/Project_BastianLab-BB35/Sample_G3_DP08_21965C_Tumor,,,,,G3 DP08-21965C Normal,Tumor
 G3 DP08-21965C Tumor,BB35_CL,NimV2mix3,BB35_SeqL,Nimblegen30_BB35,"{'G3_DP08_21965C_Tumor_GGACCC_L002_R1_001.fastq.gz': 'cff3eda8a357e4fee2b99ef07c25ebfa', 'G3_DP08_21965C_Tumor_GGACCC_L002_R1_002.fastq.gz': '54879887d7fb86745c8971b3a263c8bb', 'G3_DP08_21965C_Tumor_GGACCC_L002_R2_001.fastq.gz': '05d31550b846461c3d986e0f2358f275', 'G3_DP08_21965C_Tumor_GGACCC_L002_R2_002.fastq.gz': '2cc1ce202256eb8590517cc5644203ee'}",HiSeqData/Nimblegen30_BB35/Project_BastianLab-BB35/Sample_G3_DP08_21965C_Tumor,,,,,G3 DP08-21965C Normal,Tumor
