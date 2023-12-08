@@ -2278,10 +2278,10 @@ def get_new_files(row):
 
     prefix = file.split("_L0")[0] if "_L0" in file else file.split("_001")[0] if "_001" in file else None
     print(prefix)
-    if re.search("^[T12|H12]", file):
-        last = "_" + prefix.split("_")[-1]
-        print(file.replace(last,""))
-        SampleLib.objects.get_or_create(name=file.replace(last,""))
+    # if re.search("^[T12|H12]", file):
+    #     last = "_" + prefix.split("_")[-1]
+    #     print(file.replace(last,""))
+    #     SampleLib.objects.get_or_create(name=file.replace(last,""))
     if not prefix:
         return
     try:
