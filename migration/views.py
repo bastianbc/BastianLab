@@ -2371,7 +2371,9 @@ def block_scan_number(request):
 
 def _files_from_file(row):
     try:
-        SampleLib.objects.get(name=row["sample_lib"])
+        b=Blocks.objects.filter(block_areas__nucacids__na_sl_links__sample_lib=row["sample_lib"])
+        print(b)
+        # SampleLib.objects.get(name=row["sample_lib"])
     except:
         print(row["sample_lib"])
     # if not pd.isnull(row["fastq_file"]):
@@ -2411,6 +2413,6 @@ def create_fastq_from_file(request):
     df["bam_bai_file"] = df["bam_bai_file"].astype('str')
     df["bam_bai_file"] = df["bam_bai_file"].apply(lambda x: make_dict(x))
 
-    df = df.apply(lambda row: _files_from_file(row), axis=1)
+    df.iloc[:48].apply(lambda row: _files_from_file(row), axis=1)
     # df=df[cols]
     # df.to_csv("report_matching_sample_lib_after_IWEI.csv", index=False)
