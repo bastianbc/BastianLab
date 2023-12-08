@@ -2279,7 +2279,7 @@ def get_new_files(row):
         path, file = row["HiSeqData/"].strip().split("-->")
         SequencingFile.objects.get(name=file.strip())
     except:
-        print(file)
+        print(row["HiSeqData/"])
     # print(prefix)
     # if re.search("^[T12|H12]", file):
     #     last = "_" + prefix.split("_")[-1]
