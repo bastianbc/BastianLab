@@ -2484,7 +2484,8 @@ def get_unregistered(row):
             # print(_sl)
         if re.match(r'^\d[20-29]', file):
             match = re.match(r'^(\d[20-29])_(\d)_([ACTG]{6})', file)
-            _sl = f"{match.group(1)}_{match.group(2)}_{match.group(3)}"
+            prefix = f"{match.group(1)}_{match.group(2)}_{match.group(3)}"
+            _sl = f"{match.group(1)}_{match.group(2)}"
             print(match.group(0))
         sl = SampleLib.objects.get(name=_sl)
         sr = SequencingRun.objects.get(name=_sr)
