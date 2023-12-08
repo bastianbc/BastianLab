@@ -2278,19 +2278,14 @@ def get_new_files(row):
 
     prefix = file.split("_L0")[0] if "_L0" in file else file.split("_001")[0] if "_001" in file else None
     print(prefix)
-    # if re.search("^[T12|H12]", file):
-    #     last = "_" + prefix.split("_")[-1]
-    #     print(file.replace(last,""))
-    #     SampleLib.objects.get_or_create(name=file.replace(last,""))
+    if re.search("^[T12|H12]", file):
+        last = "_" + prefix.split("_")[-1]
+        print(file.replace(last,""))
+        SampleLib.objects.get_or_create(name=prefix.replace(last,""))
     if not prefix:
         return
     try:
-        for i in SampleLib.objects.filter(name__endswith="fastq.gz"):
-            # name = i.name.split("_L")[0]
-            # i.name = name
-            i.delete()
         _seq_run = path.split("/")[1]
-        # print(row["new"])
         _seq_run_ = _seq_run.split(" ")[0]+"_" if "Nimblegen" in _seq_run else _seq_run
         seq_run = "Nimblegen10_BB13" if "Nimblegen10_BB13" in _seq_run_ else _seq_run_
         sr = SequencingRun.objects.get(name__icontains=seq_run)
@@ -2306,9 +2301,8 @@ def get_new_files(row):
             match = re.search("^HW(\w+)_[ACTG]", file)
             area = f"HW{match.group(1)}".replace("Dissect","")
             _sl = SampleLib.objects.filter(na_sl_links__nucacid__area__name = area, name__startswith="N3_").first().name
-
-        # elif re.search("^[T12|H12]", file):
-        #     _sl = SampleLib.objects.get(name=file.replace(last, "")).name
+        elif re.search("^[T12|H12]", file):
+            _sl = SampleLib.objects.get(name=file.replace(last, "")).name
         elif re.search("^HW", file):
             match = re.search("^HW(\w+)_[ACTG]", file)
             area = f"HW{match.group(1)}".replace("Dissect","")
