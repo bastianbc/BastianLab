@@ -2374,7 +2374,7 @@ def _files_from_file(row):
         print(files)
         d={}
         for file in files:
-            if file.endswith("fastq.gz"):
+            if file.name.endswith("fastq.gz"):
                 d[file.name]=file.checksum
         if bool(d):
             row["fastq_file"] = d
