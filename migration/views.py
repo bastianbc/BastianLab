@@ -2453,3 +2453,64 @@ def create_fastq_from_file(request):
     # df.apply(lambda row: _files_from_file(row), axis=1)
     # df=df[cols]
     # df.to_csv("report_matching_sample_lib_after_IWEI.csv", index=False)
+
+def get_unregistered(row):
+    # print(row)
+    path,_ = row["HiSeqData/"].split("-->")
+    file=row["unregistered"]
+    type = "fastq" if file.endswith("fastq.gz") else "bam" if file.endswith(".bam") else "bai"
+    prefix = file.split("_L0")[0] if "_L0" in file else file.split("_001")[0] if "_001" in file else None
+    try:
+        _seq_run = path.split("/")[1]
+        if "Nimblegen" in path:
+            _sr = re.sub(r'Nimblegen(\d+) \(BB0*([1-9]\d*)\)', r'Nimblegen\1_BB\2', _seq_run)
+        if "Boniva" in file:
+            prefix=prefix.replace("Boniva","Bivona")
+            match = re.search("Bivona_L(\d+)_[ACTG]{6}", prefix)
+            _sl = "Bivona_L"+match.group(1)
+            print(_sl)
+        sl = SampleLib.objects.get(name=_sl)
+        sr = SequencingRun.objects.get(name=_sr)
+        print(sl)
+        set_ = get_or_create_set(
+            prefix=prefix,
+            path=path,
+            sample_lib=sl,
+            sequencing_run=sr,
+        )
+        get_or_create_file(
+            sequencing_file_set=set_,
+            name=file,
+            checksum="",
+            type=type
+        )
+        print("created")
+    except Exception as e:
+        print(e)
+    #     print(output_string)
+    #     sr = SequencingRun.objects.get(name__icontains=seq_run)
+    #     if "Boniva" in file:
+    #         file = file.replace("Boniva", "Bivona")
+    #         match = re.search("Bivona_L\d+", file)
+    #         match2 = re.search("^Bivona_L1_[ACTG]{6}", file)
+    #         if match:
+    #             _sl = match.group(0)
+    #         if match2:
+    #             _sl = "Bivona_L_1"
+    #     elif re.search("^Boniva_L1_", file):
+    #         match = re.search("^HW(\w+)_[ACTG]", file)
+    #         area = f"HW{match.group(1)}".replace("Dissect","")
+    #         _sl = SampleLib.objects.filter(na_sl_links__nucacid__area__name = area, name__startswith="N3_").first().name
+    #     elif re.search("^[T12|H12]", file):
+    #         last = "_" + prefix.split("_")[-1]
+    #         _sl = SampleLib.objects.get(name=prefix.replace(last, "")).name
+    #
+    #
+
+
+def upload_unregistered(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "fastq_files_unregistered.csv")
+    df = pd.read_csv(file)
+    df[~df["unregistered"].isnull()].apply(lambda row: get_unregistered(row), axis=1)
+
+
