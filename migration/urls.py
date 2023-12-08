@@ -25,4 +25,5 @@ urlpatterns = [
     path("upload_file_tree", views.upload_file_tree, name="upload_file_tree"),
     path("match_new_files", views.match_new_files, name="match_new_files"),
     path("block_scan_number", views.block_scan_number, name="block_scan_number"),
+    path("create_fastq_from_file", views.create_fastq_from_file, name="create_fastq_from_file"),
 ]

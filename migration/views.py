@@ -2378,7 +2378,7 @@ def _files_from_file(row):
 
 
 
-def create_file_from_file(request):
+def create_fastq_from_file(request):
     file = Path(Path(
         __file__).parent.parent / "uploads" / "report_matching_sample_lib_with_bait_after_reducing_fastq_files.csv")
     df = pd.read_csv(file)
