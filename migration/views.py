@@ -2292,12 +2292,17 @@ def get_new_files(row):
             if match:
                 _sl = match.group(0)
             if match2:
-                print("_Bivona_"*100)
                 _sl = "Bivona_L_1"
         elif re.search("^Boniva_L1_", file):
             match = re.search("^HW(\w+)_[ACTG]", file)
             area = f"HW{match.group(1)}".replace("Dissect","")
             _sl = SampleLib.objects.filter(na_sl_links__nucacid__area__name = area, name__startswith="N3_").first().name
+
+        elif re.search("^[T12|H12]", file):
+            match = re.search("^[T12|H12]_(\w+)_[ACTG]", file)
+            print("#"*10, match.group(1), match.group(2), match.group(3))
+            # area = f"HW{match.group(1)}".replace("Dissect","")
+            # _sl = SampleLib.objects.filter(na_sl_links__nucacid__area__name = area, name__startswith="N3_").first().name
         elif re.search("^HW", file):
             match = re.search("^HW(\w+)_[ACTG]", file)
             area = f"HW{match.group(1)}".replace("Dissect","")
@@ -2348,11 +2353,6 @@ def match_new_files(request):
     df[~df["new"].isnull()].apply(lambda row: get_new_files(row), axis=1)
 
 
-def match_unudentified_area(request):
-    file = Path(Path(__file__).parent.parent / "uploads" / "fastq_files_new.csv")
-    df = pd.read_csv(file, index_col=False, encoding='iso-8859-1', on_bad_lines = 'warn')
-    df[~df["new"].isnull()].apply(lambda row: get_new_files(row), axis=1)
-
 def get_block_scan(row):
     try:
         print(row["Block_ID"])
@@ -2373,6 +2373,7 @@ def _files_from_file(row):
     # b=Blocks.objects.filter(block_areas__nucacids__na_sl_links__sample_lib__name=row["sample_lib"])
     try:
         bl = row['Block'].replace("-","_")
+        print(bl)
         q = SequencingFile.objects.filter(name__icontains=bl)
         print(set([i.sequencing_file_set.prefix for i in q]))
         # print([i.name for i in b], row["sample_lib"])
