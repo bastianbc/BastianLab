@@ -2244,9 +2244,17 @@ def get_file_tree(row):
         if row["HiSeqData/"].strip().endswith(".fastq.gz") | row["HiSeqData/"].strip().endswith(".bam") | row["HiSeqData/"].strip().endswith(".bai"):
             path, file = row["HiSeqData/"].strip().split("-->")
             SequencingFile.objects.get(name=file.strip())
-    except Exception as e:
-        print(e, row["HiSeqData/"])
+    except ObjectDoesNotExist as e:
+        return file
 
+
+    # except MultipleObjectsReturned as e:
+    #     p = ""
+    #     for i in SequencingFile.objects.filter(name=file.strip()):
+    #         if i.sequencing_file_set.path == p:
+    #             i.delete()
+    #             print("deleted")
+    #         p=i.sequencing_file_set.path
 
     # l=[]
     # try:
@@ -2278,8 +2286,8 @@ def get_file_tree(row):
 def upload_file_tree(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "file_tree_with_vivek.txt")
     df = pd.read_csv(file, index_col=False, encoding='iso-8859-1', on_bad_lines = 'warn')
-    df["new"]=df.apply(lambda row: get_file_tree(row), axis=1)
-    # df.to_csv("fastq_files_new.csv", index=False)
+    df["unregistered"] = df.apply(lambda row: get_file_tree(row), axis=1)
+    df.to_csv("fastq_files_unregistered.csv", index=False)
 
 
 def get_new_files(row):
