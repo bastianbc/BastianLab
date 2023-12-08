@@ -1883,7 +1883,7 @@ def airtable_consolidated_data(request):
     return render(request, "airtable.html", locals())
 
 def get_or_cons(row):
-    print(row["sample_lib"])
+    print(row["Sample"])
     # print(row['Sample'],row['Input Conc.'])
     # try:
     #     SampleLib.objects.filter(name=row["Sample"]).update(qpcr_conc=10)
