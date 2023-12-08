@@ -2242,7 +2242,6 @@ def get_file_tree(row):
 
     try:
         if row["HiSeqData/"].strip().endswith(".fastq.gz") | row["HiSeqData/"].strip().endswith(".bam") | row["HiSeqData/"].strip().endswith(".bai"):
-            print(row["HiSeqData/"])
             path, file = row["HiSeqData/"].strip().split("-->")
             SequencingFile.objects.get(name=file.strip())
     except:
