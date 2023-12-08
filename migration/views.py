@@ -2076,8 +2076,6 @@ def create_file_from_file(request):
     df["bam_bai_file"] = df["bam_bai_file"].apply(lambda x: make_dict(x))
 
     df[~df["fastq_file"].isnull()].apply(lambda row: get_or_create_files_from_file(row), axis=1)
-    # df[~df["fastq_file"].isnull()].apply(lambda row: get_or_create_files_from_file(row), axis=1)
-    # df.apply(lambda row: get_or(row), axis=1)
 
 
 def leftover(row):
@@ -2368,3 +2366,34 @@ def block_scan_number(request):
     df[~df["HE image"].isnull()].apply(lambda row: get_block_scan(row), axis=1)
 
 
+def _files_from_file(row):
+    print(f"sequencing_run: {row['sequencing_run']} / sample_lib: {row['sample_lib']}")
+    # files = SequencingFile.objects.filter(sequencing_file_set__sample_lib__name=row["sample_lib"],
+    #                               sequencing_file_set__sequencing_run__name=row["sequencing_run"])
+    # d={}
+    # for file in files:
+    #    d[file.name]=file.checksum
+    # row["fastq_file"] = d
+    # row["fastq_path"] = file.sequencing_file_set.path
+
+
+
+def create_file_from_file(request):
+    file = Path(Path(
+        __file__).parent.parent / "uploads" / "report_matching_sample_lib_with_bait_after_reducing_fastq_files.csv")
+    df = pd.read_csv(file)
+    print(df.columns)
+    df['fastq_file'] = df['fastq_file'].str.replace('"', "'").str.replace("'", '"')
+    df["fastq_file"] = df["fastq_file"].astype('str')
+    df["fastq_file"] = df["fastq_file"].apply(lambda x: make_dict(x))
+
+    df['bam_file'] = df['bam_file'].str.replace('"', "'").str.replace("'", '"')
+    df["bam_file"] = df["bam_file"].astype('str')
+    df["bam_file"] = df["bam_file"].apply(lambda x: make_dict(x))
+
+    df['bam_bai_file'] = df['bam_bai_file'].str.replace('"', "'").str.replace("'", '"')
+    df["bam_bai_file"] = df["bam_bai_file"].astype('str')
+    df["bam_bai_file"] = df["bam_bai_file"].apply(lambda x: make_dict(x))
+
+    df = df[~df["fastq_file"].isnull()].apply(lambda row: _files_from_file(row), axis=1)
+    # df.to_csv("report_matching_sample_lib_after_IWEI.csv", index=False)
