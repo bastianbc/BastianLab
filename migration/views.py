@@ -2246,6 +2246,8 @@ def get_file_tree(row):
             SequencingFile.objects.get(name=file.strip())
     except ObjectDoesNotExist as e:
         return file
+    except:
+        return
 
 
     # except MultipleObjectsReturned as e:
