@@ -1883,19 +1883,21 @@ def airtable_consolidated_data(request):
     return render(request, "airtable.html", locals())
 
 def get_or_cons(row):
-    print(row['Sample'],row['Input Conc.'])
-    try:
-        SampleLib.objects.filter(name=row["Sample"]).update(qpcr_conc=10)
-        SL_CL_LINK.objects.filter(captured_lib=CapturedLib.objects.get(name=row["CL"]),
-            sample_lib=SampleLib.objects.get(name=row["Sample"])).update(volume=float(row['Input Conc.'])/10)
-    except Exception as e:
-        print(e)
+    print(row["sample_lib"])
+    # print(row['Sample'],row['Input Conc.'])
+    # try:
+    #     SampleLib.objects.filter(name=row["Sample"]).update(qpcr_conc=10)
+    #     SL_CL_LINK.objects.filter(captured_lib=CapturedLib.objects.get(name=row["CL"]),
+    #         sample_lib=SampleLib.objects.get(name=row["Sample"])).update(volume=float(row['Input Conc.'])/10)
+    # except Exception as e:
+    #     print(e)
 
 
 def qpcr_consolidated_data(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
     df = pd.read_csv(file)
-    df[~df["Input Conc."].isnull()].apply(lambda row: get_or_cons(row), axis=1)
+    # df[~df["Input Conc."].isnull()].apply(lambda row: get_or_cons(row), axis=1)
+    df.iloc[:49].apply(lambda row: get_or_cons(row), axis=1)
 
 def get_at_na(row):
     print(row['NA_ID'], row['Shearing volume DNA input (ul)'])
@@ -2367,22 +2369,23 @@ def block_scan_number(request):
 
 
 def _files_from_file(row):
-    if not pd.isnull(row["fastq_file"]):
-        return row
-    files = SequencingFile.objects.filter(sequencing_file_set__sample_lib__name=row["sample_lib"],
-                                  sequencing_file_set__sequencing_run__name=row["sequencing_run"])
-    if files:
-        print(f"sequencing_run: {row['sequencing_run']} / sample_lib: {row['sample_lib']}")
-        print(files)
-        d={}
-        for file in files:
-            if file.name.endswith("fastq.gz"):
-                d[file.name]=file.checksum
-        if bool(d):
-            row["fastq_file"] = d
-            row["fastq_path"] = files.first().sequencing_file_set.path
-            row["new_added"] = True
-    return row
+    pass
+    # if not pd.isnull(row["fastq_file"]):
+    #     return row
+    # files = SequencingFile.objects.filter(sequencing_file_set__sample_lib__name=row["sample_lib"],
+    #                               sequencing_file_set__sequencing_run__name=row["sequencing_run"])
+    # if files:
+    #     print(f"sequencing_run: {row['sequencing_run']} / sample_lib: {row['sample_lib']}")
+    #     print(files)
+    #     d={}
+    #     for file in files:
+    #         if file.name.endswith("fastq.gz"):
+    #             d[file.name]=file.checksum
+    #     if bool(d):
+    #         row["fastq_file"] = d
+    #         row["fastq_path"] = files.first().sequencing_file_set.path
+    #         row["new_added"] = True
+    # return row
 
 
 
