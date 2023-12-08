@@ -2285,6 +2285,10 @@ def get_new_files(row):
     if not prefix:
         return
     try:
+        for i in SampleLib.objects.filter(name__endswith="fastq.gz"):
+            name = i.name.split("_L")[0]
+            i.name = name
+            i.save()
         _seq_run = path.split("/")[1]
         # print(row["new"])
         _seq_run_ = _seq_run.split(" ")[0]+"_" if "Nimblegen" in _seq_run else _seq_run
