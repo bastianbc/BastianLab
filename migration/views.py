@@ -2390,7 +2390,7 @@ def create_fastq_from_file(request):
     file = Path(Path(
         __file__).parent.parent / "uploads" / "report_matching_sample_lib_with_bait_after_reducing_fastq_files.csv")
     df = pd.read_csv(file)
-    print(df.columns)
+    cols = df.columns
     df['fastq_file'] = df['fastq_file'].str.replace('"', "'").str.replace("'", '"')
     df["fastq_file"] = df["fastq_file"].astype('str')
     df["fastq_file"] = df["fastq_file"].apply(lambda x: make_dict(x))
@@ -2404,4 +2404,5 @@ def create_fastq_from_file(request):
     df["bam_bai_file"] = df["bam_bai_file"].apply(lambda x: make_dict(x))
 
     df = df.apply(lambda row: _files_from_file(row), axis=1)
+    df=df[cols]
     df.to_csv("report_matching_sample_lib_after_IWEI.csv", index=False)
