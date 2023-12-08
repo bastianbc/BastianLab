@@ -239,10 +239,10 @@ sample_lib,captured_lib,Bait,sequencing_lib,sequencing_run,fastq_file,fastq_path
 2496_Normal,BI-082023,Somatic Human WES v6,,BCB060,,,{'2496_Normal.bai': ''},{'2496_Normal.bam': 'a25e554e90da69b03ce476647f918a9c'},HiSeqData/BCB060_BroadInstitute_WES_3/BCB060/Exome/2496_Normal/v2,HiSeqData/BCB060_BroadInstitute_WES_3/BCB060/Exome/2496_Normal/v2,,Normal
 2497_Invasive,BI-082023,Somatic Human WES v6,,BCB060,,,,,,,2499_Normal,Invasive
 2498_MIS,BI-082023,Somatic Human WES v6,,BCB060,,,,,,,2499_Normal,MIS
-2499_Normal,BI-082023,Somatic Human WES v6,,BCB060,,,,,,,,Normal
+2499_Normal_flag,BI-082023,Somatic Human WES v6,,BCB060,,,,,,,,Normal
 2500_Invasive,BI-082023,Somatic Human WES v6,,BCB060,,,,,,,2502_Normal,Invasive
 2501_MIS,BI-082023,Somatic Human WES v6,,BCB060,,,,,,,2502_Normal,MIS
-2502_Normal,BI-082023,Somatic Human WES v6,,BCB060,,,,,,,,Normal
+2502_Normal_flag,BI-082023,Somatic Human WES v6,,BCB060,,,,,,,,Normal
 2503_Invasive,BI-082023,Somatic Human WES v6,,BCB060,,,{'2503_Invasive.bai': ''},{'2503_Invasive.bam': 'ff51887da7eefcd5d84c5ebbb7e0b2fb'},HiSeqData/BCB060_BroadInstitute_WES_3/BCB060/Exome/2503_Invasive/v1,HiSeqData/BCB060_BroadInstitute_WES_3/BCB060/Exome/2503_Invasive/v1,2505_Normal,Invasive
 2504_MIS,BI-082023,Somatic Human WES v6,,BCB060,,,{'2504_MIS.bai': ''},{'2504_MIS.bam': '3350d73f9de572d49ca2e9fc266b538b'},HiSeqData/BCB060_BroadInstitute_WES_3/BCB060/Exome/2504_MIS/v1,HiSeqData/BCB060_BroadInstitute_WES_3/BCB060/Exome/2504_MIS/v1,2505_Normal,MIS
 2505_Normal,BI-082023,Somatic Human WES v6,,BCB060,,,{'2505_Normal.bai': ''},{'2505_Normal.bam': 'dce86c3cd6504164de11b48d7ec93847'},HiSeqData/BCB060_BroadInstitute_WES_3/BCB060/Exome/2505_Normal/v1,HiSeqData/BCB060_BroadInstitute_WES_3/BCB060/Exome/2505_Normal/v1,,Normal
