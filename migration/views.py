@@ -2391,6 +2391,7 @@ def create_fastq_from_file(request):
         __file__).parent.parent / "uploads" / "report_matching_sample_lib_with_bait_after_reducing_fastq_files.csv")
     df = pd.read_csv(file)
     cols = df.columns
+    cols = cols.insert(5, "new_added")
     df['fastq_file'] = df['fastq_file'].str.replace('"', "'").str.replace("'", '"')
     df["fastq_file"] = df["fastq_file"].astype('str')
     df["fastq_file"] = df["fastq_file"].apply(lambda x: make_dict(x))
