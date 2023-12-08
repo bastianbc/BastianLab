@@ -2368,8 +2368,10 @@ def block_scan_number(request):
 
 def _files_from_file(row):
     print(f"sequencing_run: {row['sequencing_run']} / sample_lib: {row['sample_lib']}")
-    # files = SequencingFile.objects.filter(sequencing_file_set__sample_lib__name=row["sample_lib"],
-    #                               sequencing_file_set__sequencing_run__name=row["sequencing_run"])
+    files = SequencingFile.objects.filter(sequencing_file_set__sample_lib__name=row["sample_lib"],
+                                  sequencing_file_set__sequencing_run__name=row["sequencing_run"])
+    if files:
+        print(files)
     # d={}
     # for file in files:
     #    d[file.name]=file.checksum
