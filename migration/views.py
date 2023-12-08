@@ -2239,21 +2239,31 @@ def uploads_baits(request):
 
 
 def get_file_tree(row):
-    l=[]
+
     try:
-        if row["HiSeqData/"].strip().endswith(".fastq.gz"):
+        if row["HiSeqData/"].strip().endswith(".fastq.gz") | row["HiSeqData/"].strip().endswith(".bam") | row["HiSeqData/"].strip().endswith(".bai"):
+            print(row["HiSeqData/"])
             path, file = row["HiSeqData/"].strip().split("-->")
-            prefix = file.split("_L0")[0] if "_L0" in file else None
-            # row["set"] = SequencingFileSet.objects.filter(prefix=prefix).values("prefix")
-            # print(path,file)
-            SequencingFile.objects.get(name=file)
-            return
-    except ObjectDoesNotExist as e:
-        # l.append(row["HiSeqData/"].strip())
-        # print(row["HiSeqData/"].strip())
-        return row["HiSeqData/"].strip()
-    except MultipleObjectsReturned as e:
-        return
+            SequencingFile.objects.get(name=file.strip())
+    except:
+        print(row["HiSeqData/"])
+
+
+    # l=[]
+    # try:
+    #     if row["HiSeqData/"].strip().endswith(".fastq.gz"):
+    #         path, file = row["HiSeqData/"].strip().split("-->")
+    #         prefix = file.split("_L0")[0] if "_L0" in file else None
+    #         # row["set"] = SequencingFileSet.objects.filter(prefix=prefix).values("prefix")
+    #         # print(path,file)
+    #         SequencingFile.objects.get(name=file)
+    #         return
+    # except ObjectDoesNotExist as e:
+    #     # l.append(row["HiSeqData/"].strip())
+    #     # print(row["HiSeqData/"].strip())
+    #     return row["HiSeqData/"].strip()
+    # except MultipleObjectsReturned as e:
+    #     return
 
 
 
@@ -2270,7 +2280,7 @@ def upload_file_tree(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "file_tree_with_vivek.txt")
     df = pd.read_csv(file, index_col=False, encoding='iso-8859-1', on_bad_lines = 'warn')
     df["new"]=df.apply(lambda row: get_file_tree(row), axis=1)
-    df.to_csv("fastq_files_new.csv", index=False)
+    # df.to_csv("fastq_files_new.csv", index=False)
 
 
 def get_new_files(row):
