@@ -2372,11 +2372,15 @@ def _files_from_file(row):
     if files:
         print(f"sequencing_run: {row['sequencing_run']} / sample_lib: {row['sample_lib']}")
         print(files)
-    # d={}
-    # for file in files:
-    #    d[file.name]=file.checksum
-    # row["fastq_file"] = d
-    # row["fastq_path"] = file.sequencing_file_set.path
+        d={}
+        for file in files:
+            if file.endswith("fastq.gz"):
+                d[file.name]=file.checksum
+        if bool(d):
+            row["fastq_file"] = d
+            row["fastq_path"] = files.first().path
+            row["new_added"] = True
+    return row
 
 
 
@@ -2398,4 +2402,4 @@ def create_fastq_from_file(request):
     df["bam_bai_file"] = df["bam_bai_file"].apply(lambda x: make_dict(x))
 
     df = df[df["fastq_file"].isnull()].apply(lambda row: _files_from_file(row), axis=1)
-    # df.to_csv("report_matching_sample_lib_after_IWEI.csv", index=False)
+    df.to_csv("report_matching_sample_lib_after_IWEI.csv", index=False)
