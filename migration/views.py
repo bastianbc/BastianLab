@@ -2278,6 +2278,7 @@ def get_new_files(row):
     if not row["HiSeqData/"].endswith("fastq.gz") or not row["HiSeqData/"].endswith(".bam") or not row["HiSeqData/"].endswith(".bai"):
         return
     try:
+        print(row["HiSeqData/"])
         path, file = row["HiSeqData/"].strip().split("-->")
         SequencingFile.objects.get(name=file.strip())
     except:
