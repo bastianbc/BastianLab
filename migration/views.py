@@ -2367,7 +2367,7 @@ def block_scan_number(request):
 
 
 def _files_from_file(row):
-    if row["fastq_file"].isnull():
+    if not pd.isnull(row["fastq_file"]):
         return row
     files = SequencingFile.objects.filter(sequencing_file_set__sample_lib__name=row["sample_lib"],
                                   sequencing_file_set__sequencing_run__name=row["sequencing_run"])
