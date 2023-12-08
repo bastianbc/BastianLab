@@ -2299,8 +2299,8 @@ def get_new_files(row):
             _sl = SampleLib.objects.filter(na_sl_links__nucacid__area__name = area, name__startswith="N3_").first().name
 
         elif re.search("^[T12|H12]", file):
-            match = re.search("^[T12|H12]_(\w+)_[ACTG]", file)
-            print("#"*10, match.group(1), match.group(2), match.group(3))
+            match = re.search("^[T12|H12]_(\w+)_[ACTG]{6}", file)
+            print("#"*10, match.group(1), match.groups)
             # area = f"HW{match.group(1)}".replace("Dissect","")
             # _sl = SampleLib.objects.filter(na_sl_links__nucacid__area__name = area, name__startswith="N3_").first().name
         elif re.search("^HW", file):
