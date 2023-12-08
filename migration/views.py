@@ -2461,7 +2461,7 @@ def get_unregistered(row):
     type = "fastq" if file.endswith("fastq.gz") else "bam" if file.endswith(".bam") else "bai"
     prefix = file.split("_L0")[0] if "_L0" in file else file.split("_001")[0] if "_001" in file else None
     try:
-        _seq_run = path.split("/")[1]
+        _sr = path.split("/")[1]
         if "Nimblegen" in path:
             _sr = re.sub(r'Nimblegen(\d+) \(BB0*([1-9]\d*)\)', r'Nimblegen\1_BB\2', _seq_run)
         if "Boniva" in file:
