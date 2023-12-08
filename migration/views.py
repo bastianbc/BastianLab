@@ -2463,7 +2463,7 @@ def get_unregistered(row):
     try:
         _sr = path.split("/")[1]
         if "Nimblegen" in path:
-            _sr = re.sub(r'Nimblegen(\d+) \(BB0*([1-9]\d*)\)', r'Nimblegen\1_BB\2', _seq_run)
+            _sr = re.sub(r'Nimblegen(\d+) \(BB0*([1-9]\d*)\)', r'Nimblegen\1_BB\2', _sr)
         if "Boniva" in file:
             prefix=prefix.replace("Boniva","Bivona")
             match = re.search("Bivona_L(\d+)_[ACTG]{6}", prefix)
