@@ -2397,5 +2397,5 @@ def create_fastq_from_file(request):
     df["bam_bai_file"] = df["bam_bai_file"].astype('str')
     df["bam_bai_file"] = df["bam_bai_file"].apply(lambda x: make_dict(x))
 
-    df = df[~df["fastq_file"].isnull()].apply(lambda row: _files_from_file(row), axis=1)
+    df = df[df["fastq_file"].isnull()].apply(lambda row: _files_from_file(row), axis=1)
     # df.to_csv("report_matching_sample_lib_after_IWEI.csv", index=False)
