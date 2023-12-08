@@ -2459,7 +2459,12 @@ def get_unregistered(row):
     path,_ = row["HiSeqData/"].split("-->")
     file=row["unregistered"]
     type = "fastq" if file.endswith("fastq.gz") else "bam" if file.endswith(".bam") else "bai"
-    prefix = file.split("_L0")[0] if "_L0" in file else file.split("_001")[0] if "_001" in file else None
+    if "fastq" in file:
+        prefix = file.split("_L0")[0] if "_L0" in file else file.split("_001")[0] if "_001" in file else None
+    elif file.endswith(".bai"):
+        prefix = file.split(".bai")[0]
+    elif file.endswith(".bam"):
+        prefix = file.split(".bam")[0]
     try:
         _sr = path.split("/")[1]
         if "Nimblegen" in path:
@@ -2471,6 +2476,11 @@ def get_unregistered(row):
         if "T12_" in file:
             match = re.search("T12_(\w+)_[ACTG]{6}", prefix)
             _sl = "T12_"+match.group(1)
+        if file.endswith(".bam"):
+            _sl = file.split(".bam")[0]
+            print(_sl)
+        if file.endswith(".bai"):
+            _sl = file.split(".bai")[0]
             print(_sl)
         sl = SampleLib.objects.get(name=_sl)
         sr = SequencingRun.objects.get(name=_sr)
