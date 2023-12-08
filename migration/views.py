@@ -2367,6 +2367,8 @@ def block_scan_number(request):
 
 
 def _files_from_file(row):
+    if row["fastq_file"].isnull():
+        return row
     files = SequencingFile.objects.filter(sequencing_file_set__sample_lib__name=row["sample_lib"],
                                   sequencing_file_set__sequencing_run__name=row["sequencing_run"])
     if files:
@@ -2401,5 +2403,5 @@ def create_fastq_from_file(request):
     df["bam_bai_file"] = df["bam_bai_file"].astype('str')
     df["bam_bai_file"] = df["bam_bai_file"].apply(lambda x: make_dict(x))
 
-    df = df[df["fastq_file"].isnull()].apply(lambda row: _files_from_file(row), axis=1)
+    df = df.apply(lambda row: _files_from_file(row), axis=1)
     df.to_csv("report_matching_sample_lib_after_IWEI.csv", index=False)
