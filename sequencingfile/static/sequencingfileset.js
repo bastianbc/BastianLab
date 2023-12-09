@@ -28,9 +28,10 @@ var KTDatatablesServerSide = function () {
             pageLength: 10,
             responsive: {
                 details: {
-                    type: 'inline'
+                    type: 'column'
                 }
             },
+
             select: {
                 style: 'multi',
                 selector: 'td:first-child input[type="checkbox"]',
@@ -81,9 +82,11 @@ var KTDatatablesServerSide = function () {
                             </div>`;
                     }
                 },
+
                 {
                     targets: 4,
-                    width: "20%"
+                    orderable: true,
+                    className: "ceylan",
                 },
                 {
                     targets: 5,
@@ -146,7 +149,6 @@ var KTDatatablesServerSide = function () {
         });
 
         table = dt.$;
-
         // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
         dt.on('draw', function () {
             initToggleToolbar();
