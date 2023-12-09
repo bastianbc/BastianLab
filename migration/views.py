@@ -2455,6 +2455,7 @@ def create_fastq_from_file(request):
     # df.to_csv("report_matching_sample_lib_after_IWEI.csv", index=False)
 
 def get_unregistered(row):
+
     path,_ = row["HiSeqData/"].split("-->")
     file=row["unregistered"]
     type = "fastq" if file.endswith("fastq.gz") else "bam" if file.endswith(".bam") else "bai"
@@ -2485,6 +2486,13 @@ def get_unregistered(row):
             type=type
         )
         print("created")
+    except MultipleObjectsReturned as e:
+        p = ""
+        for i in SequencingFileSet.objects.filter(prefix=prefix):
+            if i.path == p:
+                i.delete()
+                print("deleted")
+            p=i.path
     except Exception as e:
         print(e)
     # try:
