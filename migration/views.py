@@ -2495,7 +2495,7 @@ def get_unregistered(row):
             _sl = f"BB008_HW{match.group(1)}"
         if re.match(r'^SGLP', file):
             SequencingFileSet.objects.filter(prefix__icontains=".deduplicated.realign").delete()
-            match = re.match(r'^SGLP-(\d+)_(\w+)', file)
+            match = re.match(r'^SGLP-(\d+)', file)
             prefix = f"SGLP-{match.group(1)}"
             _sl = f"SGLP-{match.group(1)}"
             print(match.group(0))
