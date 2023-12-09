@@ -26,12 +26,6 @@ var KTDatatablesServerSide = function () {
             stateSave: false,
             destroy: true,
             pageLength: 10,
-            responsive: {
-                details: {
-                    type: 'column'
-                }
-            },
-
             select: {
                 style: 'multi',
                 selector: 'td:first-child input[type="checkbox"]',
@@ -63,13 +57,12 @@ var KTDatatablesServerSide = function () {
               }
             },
             columns: [
-              { data: 'set_id' },
-              { data: 'prefix' },
-              { data: 'sample_lib' },
-              { data: 'sequencing_run' },
-              { data: 'path' },
-              { data: 'num_sequencing_files'},
-
+              { data: 'set_id', "width": "25px"},
+              { data: 'prefix' , "width": "25px"},
+              { data: 'sample_lib' , "width": "25px"},
+              { data: 'sequencing_run' , "width": "25px"},
+              { data: 'path' , "width": "25px"},
+              { data: 'num_sequencing_files', "width": "25px"},
             ],
             columnDefs: [
                 {
