@@ -2478,14 +2478,16 @@ def get_unregistered(row):
             _sl = "T12_"+match.group(1)
         if file.endswith(".bam"):
             _sl = file.split(".bam")[0]
-            # print(_sl)
         if file.endswith(".bai"):
             _sl = file.split(".bai")[0]
-            # print(_sl)
         if re.match(r'^\d[20-29]', file):
             match = re.match(r'^(\d[20-29])_(\d)_([ACTG]{6})', file)
             prefix = f"{match.group(1)}_{match.group(2)}_{match.group(3)}"
             _sl = f"{match.group(1)}_{match.group(2)}"
+        if re.match(r'^CGH11', file):
+            match = re.match(r'^CGH11_(\d+)_([ACTG]{6})', file)
+            prefix = f"CGH11_{match.group(1)}_{match.group(2)}"
+            _sl = f"CGH11_{match.group(1)}"
             print(match.group(0))
         sl = SampleLib.objects.get(name=_sl)
         sr = SequencingRun.objects.get(name=_sr)
