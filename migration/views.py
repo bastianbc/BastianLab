@@ -2455,7 +2455,6 @@ def create_fastq_from_file(request):
     # df.to_csv("report_matching_sample_lib_after_IWEI.csv", index=False)
 
 def get_unregistered(row):
-    # print(row)
     path,_ = row["HiSeqData/"].split("-->")
     file=row["unregistered"]
     type = "fastq" if file.endswith("fastq.gz") else "bam" if file.endswith(".bam") else "bai"
@@ -2469,57 +2468,9 @@ def get_unregistered(row):
         _sr = path.split("/")[1]
         if "Nimblegen" in path:
             _sr = re.sub(r'Nimblegen(\d+) \(BB0*([1-9]\d*)\)', r'Nimblegen\1_BB\2', _sr)
-        if "Boniva" in file:
-            prefix=prefix.replace("Boniva","Bivona")
-            match = re.search("Bivona_L(\d+)_[ACTG]{6}", prefix)
-            _sl = "Bivona_L"+match.group(1)
-        if "T12_" in file:
-            match = re.search("T12_(\w+)_[ACTG]{6}", prefix)
-            _sl = "T12_"+match.group(1)
-        if file.endswith(".bam"):
-            _sl = file.split(".bam")[0]
-        if file.endswith(".bai"):
-            _sl = file.split(".bai")[0]
-        if re.match(r'^\d[20-29]', file):
-            match = re.match(r'^(\d[20-29])_(\d)_([ACTG]{6})', file)
-            prefix = f"{match.group(1)}_{match.group(2)}_{match.group(3)}"
-            _sl = f"{match.group(1)}_{match.group(2)}"
-        if re.match(r'^CGH11', file):
-            match = re.match(r'^CGH11_(\d+)_([ACTG]{6})', file)
-            prefix = f"CGH11_{match.group(1)}_{match.group(2)}"
-            _sl = f"BB09_CGH11_{match.group(1)}"
-        if re.match(r'^BB08_HW', file):
-            # file = file.replace("BB08_HW8NC", "BB008_HW8NC")
-            match = re.match(r'^BB08_HW(\w+)_([ACTG]{6})', file)
-            prefix = f"BB08_HW{match.group(1)}_{match.group(2)}"
-            _sl = f"BB008_HW{match.group(1)}"
-        if re.match(r'^Kit', file):
-            SequencingFileSet.objects.filter(prefix__icontains=".bam").delete()
-            prefix = file.replace("recal.bai","").replace("recal.bam","")
-            match = re.match(r'(\w+)_([ACTG]{6})', prefix)
-            _sl = match.group(1)
-            print(match.group(1))
-        if re.match(r'^SGLP', file):
-            match = re.match(r'^SGLP-(\d+)', file)
-            prefix = f"SGLP-{match.group(1)}"
-            _sl = f"SGLP-{match.group(1)}"
-            set_ = SequencingFileSet.objects.filter(prefix__icontains=prefix).first()
-        if re.match(r'^JJS', file):
-            match = re.match(r'^JJS(\d+)_(\w+)_', file)
-            prefix = file.split(".fastq")[0]
-            _sl = f"JJS{match.group(1)}_{match.group(2)}"
-            sl,_ = SampleLib.objects.get_or_create(name=_sl)
-            sr,_ = SequencingRun.objects.get_or_create(name=_sr)
-        if not re.match(r'^JJS', file):
-            sl = SampleLib.objects.get(name=_sl)
-            sr = SequencingRun.objects.get(name=_sr)
-        if not re.match(r'^SGLP', file):
-            set_ = get_or_create_set(
-                prefix=prefix,
-                path=path,
-                sample_lib=sl,
-                sequencing_run=sr,
-            )
+        if "deduplicated.realign.bam" in file:
+            _sl = file.split(".deduplicated.realign.bam")[0]
+            set_ = SequencingFileSet.objects.filter(prefix__icontains=_sl).first()
         get_or_create_file(
             sequencing_file_set=set_,
             name=file,
@@ -2529,6 +2480,69 @@ def get_unregistered(row):
         print("created")
     except Exception as e:
         print(e)
+    # try:
+    #     _sr = path.split("/")[1]
+    #     if "Nimblegen" in path:
+    #         _sr = re.sub(r'Nimblegen(\d+) \(BB0*([1-9]\d*)\)', r'Nimblegen\1_BB\2', _sr)
+    #     if "Boniva" in file:
+    #         prefix=prefix.replace("Boniva","Bivona")
+    #         match = re.search("Bivona_L(\d+)_[ACTG]{6}", prefix)
+    #         _sl = "Bivona_L"+match.group(1)
+    #     if "T12_" in file:
+    #         match = re.search("T12_(\w+)_[ACTG]{6}", prefix)
+    #         _sl = "T12_"+match.group(1)
+    #     if file.endswith(".bam"):
+    #         _sl = file.split(".bam")[0]
+    #     if file.endswith(".bai"):
+    #         _sl = file.split(".bai")[0]
+    #     if re.match(r'^\d[20-29]', file):
+    #         match = re.match(r'^(\d[20-29])_(\d)_([ACTG]{6})', file)
+    #         prefix = f"{match.group(1)}_{match.group(2)}_{match.group(3)}"
+    #         _sl = f"{match.group(1)}_{match.group(2)}"
+    #     if re.match(r'^CGH11', file):
+    #         match = re.match(r'^CGH11_(\d+)_([ACTG]{6})', file)
+    #         prefix = f"CGH11_{match.group(1)}_{match.group(2)}"
+    #         _sl = f"BB09_CGH11_{match.group(1)}"
+    #     if re.match(r'^BB08_HW', file):
+    #         # file = file.replace("BB08_HW8NC", "BB008_HW8NC")
+    #         match = re.match(r'^BB08_HW(\w+)_([ACTG]{6})', file)
+    #         prefix = f"BB08_HW{match.group(1)}_{match.group(2)}"
+    #         _sl = f"BB008_HW{match.group(1)}"
+    #     if re.match(r'^Kit', file):
+    #         prefix = file.replace("recal.bai","").replace("recal.bam","")
+    #         match = re.match(r'(\w+)_([ACTG]{6})', prefix)
+    #         _sl = match.group(1)
+    #         print(match.group(1))
+    #     if re.match(r'^SGLP', file):
+    #         match = re.match(r'^SGLP-(\d+)', file)
+    #         prefix = f"SGLP-{match.group(1)}"
+    #         _sl = f"SGLP-{match.group(1)}"
+    #         set_ = SequencingFileSet.objects.filter(prefix__icontains=prefix).first()
+    #     if re.match(r'^JJS', file):
+    #         match = re.match(r'^JJS(\d+)_(\w+)_', file)
+    #         prefix = file.split(".fastq")[0]
+    #         _sl = f"JJS{match.group(1)}_{match.group(2)}"
+    #         sl,_ = SampleLib.objects.get_or_create(name=_sl)
+    #         sr,_ = SequencingRun.objects.get_or_create(name=_sr)
+    #     if not re.match(r'^JJS', file):
+    #         sl = SampleLib.objects.get(name=_sl)
+    #         sr = SequencingRun.objects.get(name=_sr)
+    #     if not re.match(r'^SGLP', file):
+    #         set_ = get_or_create_set(
+    #             prefix=prefix,
+    #             path=path,
+    #             sample_lib=sl,
+    #             sequencing_run=sr,
+    #         )
+    #     get_or_create_file(
+    #         sequencing_file_set=set_,
+    #         name=file,
+    #         checksum="",
+    #         type=type
+    #     )
+    #     print("created")
+    # except Exception as e:
+    #     print(e)
     #     print(output_string)
     #     sr = SequencingRun.objects.get(name__icontains=seq_run)
     #     if "Boniva" in file:
