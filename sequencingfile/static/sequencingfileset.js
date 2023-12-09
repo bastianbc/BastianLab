@@ -25,7 +25,7 @@ var KTDatatablesServerSide = function () {
             order: [[0, 'desc']],
             stateSave: false,
             destroy: true,
-            pageLength: 10,
+            pageLength: 100,
             select: {
                 style: 'multi',
                 selector: 'td:first-child input[type="checkbox"]',
@@ -33,7 +33,7 @@ var KTDatatablesServerSide = function () {
             },
             keys: {
               columns: ':not(:first-child)',
-              keys: [ 7 ],
+              keys: [ 6 ],
               editor: editor,
               editOnFocus: true
             },
@@ -57,12 +57,11 @@ var KTDatatablesServerSide = function () {
               }
             },
             columns: [
-              { data: 'set_id', "width": "25px"},
-              { data: 'prefix' , "width": "25px"},
-              { data: 'sample_lib' , "width": "25px"},
-              { data: 'sequencing_run' , "width": "25px"},
-              { data: 'path' , "width": "25px"},
-              { data: 'num_sequencing_files', "width": "25px"},
+              { data: 'set_id'},
+              { data: 'prefix' },
+              { data: 'sample_lib' },
+              { data: 'sequencing_run' },
+              { data: 'num_sequencing_files'},
             ],
             columnDefs: [
                 {
@@ -76,13 +75,9 @@ var KTDatatablesServerSide = function () {
                     }
                 },
 
+
                 {
                     targets: 4,
-                    orderable: true,
-                    className: "ceylan",
-                },
-                {
-                    targets: 5,
                     orderable: false,
                     render: function (data, type, row) {
                         if (data > 0) {
@@ -94,7 +89,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 6,
+                    targets: 5,
                     data: null,
                     orderable: false,
                     className: 'text-end',
