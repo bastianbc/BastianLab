@@ -2464,6 +2464,7 @@ def get_unregistered(row):
         prefix = file.split(".bai")[0]
     elif file.endswith(".bam"):
         prefix = file.split(".bam")[0]
+    print(file)
     try:
         _sr = path.split("/")[1]
         if "Nimblegen" in path:
