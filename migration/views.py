@@ -2494,7 +2494,7 @@ def get_unregistered(row):
             prefix = f"BB08_HW{match.group(1)}_{match.group(2)}"
             _sl = f"BB008_HW{match.group(1)}"
         if re.match(r'^Kit', file):
-            prefix = file.replace("recal.bai")
+            prefix = file.replace("recal.bai","")
             match = re.match(r'(\w+)_([ACTG]{6})', prefix)
             _sl = match.group(1)
             print(match.group(1))
