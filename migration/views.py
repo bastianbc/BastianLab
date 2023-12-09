@@ -2505,8 +2505,8 @@ def get_unregistered(row):
             prefix = file.split(".fastq")[0]
             _sl = f"JJS{match.group(1)}_{match.group(2)}"
             print(match.group(0))
-            sl = SampleLib.objects.get_or_create(name=_sl)
-            sr = SequencingRun.objects.get_or_create(name=_sr)
+            sl,_ = SampleLib.objects.get_or_create(name=_sl)
+            sr,_ = SequencingRun.objects.get_or_create(name=_sr)
         if not re.match(r'^JJS', file):
             sl = SampleLib.objects.get(name=_sl)
             sr = SequencingRun.objects.get(name=_sr)
