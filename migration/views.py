@@ -2470,6 +2470,7 @@ def get_unregistered(row):
             _sr = re.sub(r'Nimblegen(\d+) \(BB0*([1-9]\d*)\)', r'Nimblegen\1_BB\2', _sr)
         if "deduplicated.realign.bam" in file:
             _sl = file.split(".deduplicated.realign.bam")[0]
+            print(_sl)
             set_ = SequencingFileSet.objects.filter(prefix__icontains=_sl).first()
         get_or_create_file(
             sequencing_file_set=set_,
