@@ -2488,6 +2488,11 @@ def get_unregistered(row):
             match = re.match(r'^CGH11_(\d+)_([ACTG]{6})', file)
             prefix = f"CGH11_{match.group(1)}_{match.group(2)}"
             _sl = f"BB09_CGH11_{match.group(1)}"
+        if re.match(r'^BB08_HW', file):
+            # file = file.replace("BB08_HW8NC", "BB008_HW8NC")
+            match = re.match(r'^BB08_HW(\w+)_([ACTG]{6})', file)
+            prefix = f"BB08_HW{match.group(1)}_{match.group(2)}"
+            _sl = f"BB08_HW{match.group(1)}"
             print(match.group(0))
         sl = SampleLib.objects.get(name=_sl)
         sr = SequencingRun.objects.get(name=_sr)
