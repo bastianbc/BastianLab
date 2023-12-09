@@ -1,10 +1,13 @@
 {% extends "master.html" %}
 
 {% block head %}
+
 {% endblock %}
 
 {% block content %}
-
+    <style>
+    .ceylan{width:300px!important;}
+    </style>
 <!--begin::Wrapper-->
 <div class="d-flex flex-stack flex-wrap mb-5">
   <!--begin::Search-->
@@ -160,7 +163,7 @@
 <!--end::Wrapper-->
 
 <!--begin::Datatable-->
-<table class="table align-middle table-row-dashed fs-6 gy-5" style="width:auto !important;">
+<table class="table align-middle table-row-dashed fs-6 gy-5" style="width:100%!important;">
     <thead>
     <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
         <th class="w-10px pe-2">
@@ -171,7 +174,7 @@
         <th>Prefix</th>
         <th>Sample Library</th>
         <th>Sequencing Run</th>
-        <th>Path</th>
+        <th style="width:300px!important;">Path</th>
         <th>Sequencing Files</th>
         <th class="text-end min-w-100px">Actions</th>
     </tr>
