@@ -2493,15 +2493,22 @@ def get_unregistered(row):
             match = re.match(r'^BB08_HW(\w+)_([ACTG]{6})', file)
             prefix = f"BB08_HW{match.group(1)}_{match.group(2)}"
             _sl = f"BB008_HW{match.group(1)}"
+        if re.match(r'^SGLP', file):
+            SequencingFileSet.objects.filter(prefix__icontains=".deduplicated.realign").delete()
+            match = re.match(r'^SGLP-(\d+)_(\w+)', file)
+            prefix = f"SGLP-{match.group(1)}"
+            _sl = f"SGLP-{match.group(1)}"
             print(match.group(0))
+            set_ = SequencingFileSet.objects.filter(prefix__icontains=prefix).first()
         sl = SampleLib.objects.get(name=_sl)
         sr = SequencingRun.objects.get(name=_sr)
-        set_ = get_or_create_set(
-            prefix=prefix,
-            path=path,
-            sample_lib=sl,
-            sequencing_run=sr,
-        )
+        if not re.match(r'^SGLP', file):
+            set_ = get_or_create_set(
+                prefix=prefix,
+                path=path,
+                sample_lib=sl,
+                sequencing_run=sr,
+            )
         get_or_create_file(
             sequencing_file_set=set_,
             name=file,
