@@ -2500,8 +2500,16 @@ def get_unregistered(row):
             _sl = f"SGLP-{match.group(1)}"
             print(match.group(0))
             set_ = SequencingFileSet.objects.filter(prefix__icontains=prefix).first()
-        sl = SampleLib.objects.get(name=_sl)
-        sr = SequencingRun.objects.get(name=_sr)
+        if re.match(r'^JJS', file):
+            match = re.match(r'^JJS(\d+)_(\w+)_', file)
+            prefix = file.split(".fastq")[0]
+            _sl = f"JJS{match.group(1)}_{match.group(2)}"
+            print(match.group(0))
+            sl = SampleLib.objects.get_or_create(name=_sl)
+            sr = SequencingRun.objects.get_or_create(name=_sr)
+        if not re.match(r'^JJS', file):
+            sl = SampleLib.objects.get(name=_sl)
+            sr = SequencingRun.objects.get(name=_sr)
         if not re.match(r'^SGLP', file):
             set_ = get_or_create_set(
                 prefix=prefix,
