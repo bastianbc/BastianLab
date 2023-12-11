@@ -2615,7 +2615,9 @@ def get_fastq_empty(row):
 
 def get_fastq_t12(row):
     sl=SampleLib.objects.filter(name=row["sample_lib"])
+    print(sl)
     files=SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl)
+    print(files)
     d={}
     for file in files:
         d[file.name] = file.checksum
@@ -2659,7 +2661,7 @@ def prepare_report(request):
     df["bam_bai_file"] = df["bam_bai_file"].astype('str')
     df["bam_bai_file"] = df["bam_bai_file"].apply(lambda x: make_dict(x))
 
-    df.loc[:48] = df.iloc[:48].apply(lambda row: get_fastq_t12(row), axis=1)
+    df.loc[:48, "fastq_file"] = df.iloc[:48].apply(lambda row: get_fastq_t12(row), axis=1)
     # df[~df["fastq_file"].isnull()].apply(lambda row: get_fastq_empty(row), axis=1)
     # df[~df["bam_file"].isnull()].apply(lambda row: get_bam_empty(row), axis=1)
     # df[~df["bam_bai_file"].isnull()].apply(lambda row: get_bam_bai_empty(row), axis=1)
