@@ -2634,7 +2634,7 @@ def get_fastq_t12(row):
         if files.count()>0:
             s={}
             for file in files:
-                d[file.name] = file.checksum
+                s[file.name] = file.checksum
             row["bam_file"] = s
             row["bam_file_path"] = file.sequencing_file_set.path
 
@@ -2643,7 +2643,7 @@ def get_fastq_t12(row):
         if files.count()>0:
             w={}
             for file in files:
-                d[file.name] = file.checksum
+                w[file.name] = file.checksum
             row["bam_bai_file"] = w
             row["bam_bai_file_path"] = file.sequencing_file_set.path
     return row
