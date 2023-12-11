@@ -2603,7 +2603,12 @@ def upload_unregistered(request):
 
 def get_fastq_empty(row):
     try:
-        SampleLib.objects.get(name=row["sample_lib"])
+        sl = SampleLib.objects.get(name=row["sample_lib"])
+        sr = SequencingRun.objects.get(name=row["sequencing_run"])
+        files = SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl, sequencing_file_set__sequencing_run=sr, type="fastq")
+        for file in files:
+            if file.name not in row["fastq_file"]:
+                print(sl.name, file, row["fastq_file"])
     except Exception as e:
         print(row["sample_lib"], e)
 
