@@ -2631,6 +2631,7 @@ def get_fastq_t12(row):
             return row
 
 def get_bam_empty(row):
+    print(row["sample_lib"])
     try:
         sl=SampleLib.objects.get(name=row["sample_lib"])
     except ObjectDoesNotExist as e:
