@@ -2621,7 +2621,7 @@ def get_fastq_t12(row):
             name=row["sample_lib"]
         )
     if pd.isnull(row["fastq_file"]):
-        files=SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl)
+        files=SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl, type="fastq")
         if files.count()>0:
             d={}
             for file in files:
@@ -2630,7 +2630,30 @@ def get_fastq_t12(row):
             row["fastq_path"] = file.sequencing_file_set.path
             return row
 
+def get_bam_empty(row):
+    sl = SampleLib.objects.get(name=row["sample_lib"])
+    if pd.isnull(row["bam_file"]):
+        files=SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl, type="bam")
+        if files.count()>0:
+            d={}
+            for file in files:
+                d[file.name] = file.checksum
+            row["bam_file"] = d
+            row["bam_file_path"] = file.sequencing_file_set.path
+            return row
 
+
+def get_bai_empty(row):
+    sl = SampleLib.objects.get(name=row["sample_lib"])
+    if pd.isnull(row["bam_bai_file"]):
+        files=SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl, type="bai")
+        if files.count()>0:
+            d={}
+            for file in files:
+                d[file.name] = file.checksum
+            row["bam_bai_file"] = d
+            row["bam_bai_file_path"] = file.sequencing_file_set.path
+            return row
 
 
 def refactor_samplelib(row):
@@ -2673,12 +2696,11 @@ def prepare_report(request):
     df["bam_bai_file"] = df["bam_bai_file"].apply(lambda x: make_dict(x))
 
     df = df.apply(lambda row: get_fastq_t12(row), axis=1)
-    print(df)
-    print(cols)
+    df = df.apply(lambda row: get_bam_empty(row), axis=1)
+    df = df.apply(lambda row: get_bai_empty(row), axis=1)
+
     df.to_csv("df.csv", index=False)
     # df[~df["fastq_file"].isnull()].apply(lambda row: get_fastq_empty(row), axis=1)
-    # df[~df["bam_file"].isnull()].apply(lambda row: get_bam_empty(row), axis=1)
-    # df[~df["bam_bai_file"].isnull()].apply(lambda row: get_bam_bai_empty(row), axis=1)
     # df.columns = df[cols]
     # df.to_csv("report_matching_sample_lib_after_IWEI.csv", index=False)
 
