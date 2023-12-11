@@ -2602,25 +2602,24 @@ def upload_unregistered(request):
     df[~df["unregistered"].isnull()].apply(lambda row: get_unregistered(row), axis=1)
 
 def get_fastq_empty(row):
-    print(row["sample_lib"], row["sequencing_run"])
-    SequencingRun.objects.filter(name=row["sequencing_run"])
-    # try:
-    #     sl = SampleLib.objects.get(name=row["sample_lib"])
-    #     sr = SequencingRun.objects.get(name=row["sequencing_run"])
-    #     files = SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl, sequencing_file_set__sequencing_run=sr, type="fastq")
-    #     for file in files:
-    #         if file.name not in row["fastq_file"]:
-    #             print(sl.name, file, row["fastq_file"])
-    # except Exception as e:
-    #     print(row["sample_lib"], row["sequencing_run"], e)
+    try:
+        sl = SampleLib.objects.get(name=row["sample_lib"])
+        sr = SequencingRun.objects.get(name=row["sequencing_run"])
+        files = SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl, sequencing_file_set__sequencing_run=sr, type="fastq")
+        for file in files:
+            if file.name not in row["fastq_file"]:
+                print(sl.name, file, row["fastq_file"])
+    except Exception as e:
+        print(row["sample_lib"], row["sequencing_run"], e)
 
 
 def get_fastq_t12(row):
     sl=SampleLib.objects.filter(name__icontains=row["Block"].replace("-","_"))
-    print(sl, row["sample_lib"], row["Block"])
+    if sl.count()==1:
+        print(sl, row["sample_lib"], row["Block"])
 
 def refactor_samplelib(row):
-    return ("T"+row["Block"]+"_"+row["sample_lib"]).replace("-","_")
+    return ("T"+str(row["Block"])+"_"+str(row["sample_lib"])).replace("-","_")
 
 def find_seq_run(row, df2):
     if not pd.isnull(row["sequencing_run"]):
@@ -2637,11 +2636,11 @@ def prepare_report(request):
     file = Path(Path(
         __file__).parent.parent / "uploads" / "report_matching_sample_lib_with_bait_after_reducing_fastq_files.csv")
     df = pd.read_csv(file)
-    file2 = Path(Path(__file__).parent.parent / "uploads" / "file_tree_with_vivek.txt")
-    df2 = pd.read_csv(file2, index_col=False, encoding='iso-8859-1', on_bad_lines='warn')
-
-    df.loc[:48, 'sample_lib'] = df.loc[:48].apply(lambda row: refactor_samplelib(row), axis=1)
-    df.to_csv(file, index=False)
+    # file2 = Path(Path(__file__).parent.parent / "uploads" / "file_tree_with_vivek.txt")
+    # df2 = pd.read_csv(file2, index_col=False, encoding='iso-8859-1', on_bad_lines='warn')
+    #
+    # df.loc[:48, 'sample_lib'] = df.loc[:48].apply(lambda row: refactor_samplelib(row), axis=1)
+    # df.to_csv(file, index=False)
 
     df['fastq_file'] = df['fastq_file'].str.replace('"', "'").str.replace("'", '"')
     df["fastq_file"] = df["fastq_file"].astype('str')
