@@ -2649,7 +2649,7 @@ def prepare_report(request):
     df["bam_bai_file"] = df["bam_bai_file"].astype('str')
     df["bam_bai_file"] = df["bam_bai_file"].apply(lambda x: make_dict(x))
 
-    df[~df["fastq_file"].isnull()].apply(lambda row: get_fastq_empty(row,df2), axis=1)
+    df[~df["fastq_file"].isnull()].apply(lambda row: get_fastq_empty(row), axis=1)
     df[~df["bam_file"].isnull()].apply(lambda row: get_bam_empty(row), axis=1)
     df[~df["bam_bai_file"].isnull()].apply(lambda row: get_bam_bai_empty(row), axis=1)
 
