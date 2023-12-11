@@ -2463,7 +2463,8 @@ def get_unregistered(row):
         # This query will get all records with the same 'age' and 'name'
         duplicate_records = SequencingFileSet.objects.filter(prefix=duplicate['prefix'], path=duplicate['path'])
         # This will keep the first record and delete the rest
-        duplicate_records[1:].delete()
+        for record in duplicate_records[1:]:
+            record.delete()
 
     path,_ = row["HiSeqData/"].split("-->")
     file=row["unregistered"]
