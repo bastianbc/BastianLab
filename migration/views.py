@@ -2628,6 +2628,11 @@ def get_fastq_t12(row):
                 d[file.name] = file.checksum
             row["fastq_file"] = d
             row["fastq_path"] = file.sequencing_file_set.path
+    else:
+        files=SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl, type="fastq")
+        for file in files:
+            if file.name not in row["fastq_file"]:
+                print(file.name)
 
     if pd.isnull(row["bam_file"]):
         files=SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl, type="bam")
@@ -2646,6 +2651,7 @@ def get_fastq_t12(row):
                 w[file.name] = file.checksum
             row["bam_bai_file"] = w
             row["bam_bai_file_path"] = file.sequencing_file_set.path
+
     return row
 
 def get_bam_empty(row):
