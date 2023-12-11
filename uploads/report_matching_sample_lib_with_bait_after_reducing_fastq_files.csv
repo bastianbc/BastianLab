@@ -778,7 +778,7 @@ AMLP-446,,,,,,,,,,,,,AMLP-527,Lung Met 1
 AMLP-447,,,,,,,,,,,,,,Mel1
 AMLP-448,,,,,,,,,,,,,,Mel3
 AMLP-449,,,,,,,,,,,,,AMLP-530,Met
-AMLP-45,,,AGEX-06,SureSelect XT2 Human All Exon V7,,BCB007,"{'AMLP-45_S59_L002_R1_001.fastq.gz': '5516e4c1450f75ed2b8e382f6d63834c', 'AMLP-45_S59_L002_R2_001.fastq.gz': '7ccad6269f10da4aed7cf34345dc5088'}",HiSeqData/BCB007/fastqs,,,,,"AMLP-43, AMLP-44",MIS1
+AMLP-45,,,AGEX-06,SureSelect XT2 Human All Exon V7,,BCB007,"{'AMLP-45_S59_L002_R1_001.fastq.gz': '5516e4c1450f75ed2b8e382f6d63834c', 'AMLP-45_S59_L002_R2_001.fastq.gz': '7ccad6269f10da4aed7cf34345dc5088'}",HiSeqData/BCB007/fastqs,,,,,"AMLP-43,AMLP-44",MIS1
 AMLP-450,,,KAPAEX-26,KAPA HyperExome V1 Probes,,BCB054,"{'AMLP-450_S4_L001_I1_001.fastq.gz': '', 'AMLP-450_S4_L001_I2_001.fastq.gz': '', 'AMLP-450_S4_L001_R1_001.fastq.gz': '', 'AMLP-450_S4_L001_R2_001.fastq.gz': ''}",HiSeqData/BCB054/BCB054,,,,,AMLP-245,Mel1
 AMLP-451,,,KAPAEX-26,KAPA HyperExome V1 Probes,,BCB054,"{'AMLP-451_S5_L001_I1_001.fastq.gz': '', 'AMLP-451_S5_L001_I2_001.fastq.gz': '', 'AMLP-451_S5_L001_R1_001.fastq.gz': '', 'AMLP-451_S5_L001_R2_001.fastq.gz': ''}",HiSeqData/BCB054/BCB054,,,,,AMLP-245,Mel2
 AMLP-452,,,,,,,,,,,,,AMLP-245,Mel3
