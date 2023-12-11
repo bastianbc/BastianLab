@@ -2601,7 +2601,7 @@ def upload_unregistered(request):
     df = pd.read_csv(file)
     df[~df["unregistered"].isnull()].apply(lambda row: get_unregistered(row), axis=1)
 
-def get_fastq_empty(row):
+def get_fastq_empty(row,df2):
     try:
         sl = SampleLib.objects.get(name=row["sample_lib"])
         sr = SequencingRun.objects.get(name=row["sequencing_run"])
@@ -2619,11 +2619,24 @@ def get_bam_empty(row):
 def get_bam_bai_empty(row):
     pass
 
+def find_seq_run(row, df2):
+    sl = SampleLib.objects.get(name=row["sample_lib"])
+    match = df2[df2["HiSeqData/"].str.contains(sl.name, regex=False)]["HiSeqData/"].values
+    if len(match)>1:
+        seq_run = match[0].strip().split("-->")[0].split("/")[1]
+        print(seq_run)
+        return seq_run
 
 def prepare_report(request):
     file = Path(Path(
         __file__).parent.parent / "uploads" / "report_matching_sample_lib_with_bait_after_reducing_fastq_files.csv")
     df = pd.read_csv(file)
+    file2 = Path(Path(__file__).parent.parent / "uploads" / "file_tree_with_vivek.txt")
+    df2 = pd.read_csv(file2, index_col=False, encoding='iso-8859-1', on_bad_lines='warn')
+
+    df['sequencing_run'] = df[df["sequencing_run"].isnull()].apply(lambda row: find_seq_run(row, df2), axis=1)
+    df.to_csv(file, index=False)
+
     df['fastq_file'] = df['fastq_file'].str.replace('"', "'").str.replace("'", '"')
     df["fastq_file"] = df["fastq_file"].astype('str')
     df["fastq_file"] = df["fastq_file"].apply(lambda x: make_dict(x))
@@ -2636,7 +2649,7 @@ def prepare_report(request):
     df["bam_bai_file"] = df["bam_bai_file"].astype('str')
     df["bam_bai_file"] = df["bam_bai_file"].apply(lambda x: make_dict(x))
 
-    df[~df["fastq_file"].isnull()].apply(lambda row: get_fastq_empty(row), axis=1)
+    df[~df["fastq_file"].isnull()].apply(lambda row: get_fastq_empty(row,df2), axis=1)
     df[~df["bam_file"].isnull()].apply(lambda row: get_bam_empty(row), axis=1)
     df[~df["bam_bai_file"].isnull()].apply(lambda row: get_bam_bai_empty(row), axis=1)
 
