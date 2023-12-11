@@ -2616,7 +2616,7 @@ def get_fastq_empty(row):
 
 
 def get_fastq_t12(row):
-    sl=SampleLib.objects.filter(name__icontains=row["Block"])
+    sl=SampleLib.objects.filter(name__icontains=row["Block"].replace("-","_"))
     print(sl, row["sample_lib"], row["Block"])
 
 def get_bam_bai_empty(row):
