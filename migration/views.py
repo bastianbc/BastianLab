@@ -2620,7 +2620,7 @@ def get_fastq_t12(row):
     #     sl, created = SampleLib.objects.get_or_create(
     #         name=row["sample_lib"]
     #     )
-    if row["fastq_file"].isnull():
+    if pd.isnull(row["fastq_file"]):
         files=SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl)
         if files.count()>0:
             d={}
