@@ -2614,12 +2614,12 @@ def get_fastq_empty(row):
 
 
 def get_fastq_t12(row):
-    # try:
-    #     sl=SampleLib.objects.get(name=row["sample_lib"])
-    # except ObjectDoesNotExist as e:
-    #     sl, created = SampleLib.objects.get_or_create(
-    #         name=row["sample_lib"]
-    #     )
+    try:
+        sl=SampleLib.objects.get(name=row["sample_lib"])
+    except ObjectDoesNotExist as e:
+        sl, created = SampleLib.objects.get_or_create(
+            name=row["sample_lib"]
+        )
     if pd.isnull(row["fastq_file"]):
         files=SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl)
         if files.count()>0:
