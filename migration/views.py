@@ -2620,16 +2620,14 @@ def get_fastq_t12(row):
         sl, created = SampleLib.objects.get_or_create(
             name=row["sample_lib"]
         )
-    print(sl)
     files=SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl)
-    print(files)
     if files.count()>0:
         d={}
         for file in files:
             d[file.name] = file.checksum
         print(d)
         row["fastq_file"] = d
-        row["path"] = files.first().sequencing_file_set.path
+        row["fastq_file_path"] = files.first().sequencing_file_set.path
     return row
 
 
@@ -2672,7 +2670,7 @@ def prepare_report(request):
     df["bam_bai_file"] = df["bam_bai_file"].astype('str')
     df["bam_bai_file"] = df["bam_bai_file"].apply(lambda x: make_dict(x))
 
-    df.iloc[:48] = df.iloc[:48].apply(lambda row: get_fastq_t12(row), axis=1)
+    df = df.apply(lambda row: get_fastq_t12(row), axis=1)
     # df[~df["fastq_file"].isnull()].apply(lambda row: get_fastq_empty(row), axis=1)
     # df[~df["bam_file"].isnull()].apply(lambda row: get_bam_empty(row), axis=1)
     # df[~df["bam_bai_file"].isnull()].apply(lambda row: get_bam_bai_empty(row), axis=1)
