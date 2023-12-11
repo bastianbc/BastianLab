@@ -2601,4 +2601,40 @@ def upload_unregistered(request):
     df = pd.read_csv(file)
     df[~df["unregistered"].isnull()].apply(lambda row: get_unregistered(row), axis=1)
 
+def get_fastq_empty(row):
+    try:
+        SampleLib.objects.get(name=row["sample_lib"])
+    except Exception as e:
+        print(row["sample_lib"], e)
+
+
+def get_bam_empty(row):
+    pass
+
+def get_bam_bai_empty(row):
+    pass
+
+
+def prepare_report(request):
+    file = Path(Path(
+        __file__).parent.parent / "uploads" / "report_matching_sample_lib_with_bait_after_reducing_fastq_files.csv")
+    df = pd.read_csv(file)
+    df['fastq_file'] = df['fastq_file'].str.replace('"', "'").str.replace("'", '"')
+    df["fastq_file"] = df["fastq_file"].astype('str')
+    df["fastq_file"] = df["fastq_file"].apply(lambda x: make_dict(x))
+
+    df['bam_file'] = df['bam_file'].str.replace('"', "'").str.replace("'", '"')
+    df["bam_file"] = df["bam_file"].astype('str')
+    df["bam_file"] = df["bam_file"].apply(lambda x: make_dict(x))
+
+    df['bam_bai_file'] = df['bam_bai_file'].str.replace('"', "'").str.replace("'", '"')
+    df["bam_bai_file"] = df["bam_bai_file"].astype('str')
+    df["bam_bai_file"] = df["bam_bai_file"].apply(lambda x: make_dict(x))
+
+    df[~df["fastq_file"].isnull()].apply(lambda row: get_fastq_empty(row), axis=1)
+    df[~df["bam_file"].isnull()].apply(lambda row: get_bam_empty(row), axis=1)
+    df[~df["bam_bai_file"].isnull()].apply(lambda row: get_bam_bai_empty(row), axis=1)
+
+
+
 
