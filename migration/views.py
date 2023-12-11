@@ -2602,15 +2602,17 @@ def upload_unregistered(request):
     df[~df["unregistered"].isnull()].apply(lambda row: get_unregistered(row), axis=1)
 
 def get_fastq_empty(row):
-    try:
-        sl = SampleLib.objects.get(name=row["sample_lib"])
-        sr = SequencingRun.objects.get(name=row["sequencing_run"])
-        files = SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl, sequencing_file_set__sequencing_run=sr, type="fastq")
-        for file in files:
-            if file.name not in row["fastq_file"]:
-                print(sl.name, file, row["fastq_file"])
-    except Exception as e:
-        print(row["sample_lib"], row["sequencing_run"], e)
+    print(row["sample_lib"], row["sequencing_run"])
+    SequencingRun.objects.filter(name=row["sequencing_run"])
+    # try:
+    #     sl = SampleLib.objects.get(name=row["sample_lib"])
+    #     sr = SequencingRun.objects.get(name=row["sequencing_run"])
+    #     files = SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl, sequencing_file_set__sequencing_run=sr, type="fastq")
+    #     for file in files:
+    #         if file.name not in row["fastq_file"]:
+    #             print(sl.name, file, row["fastq_file"])
+    # except Exception as e:
+    #     print(row["sample_lib"], row["sequencing_run"], e)
 
 
 def get_bam_empty(row):
@@ -2632,11 +2634,11 @@ def prepare_report(request):
     file = Path(Path(
         __file__).parent.parent / "uploads" / "report_matching_sample_lib_with_bait_after_reducing_fastq_files.csv")
     df = pd.read_csv(file)
-    file2 = Path(Path(__file__).parent.parent / "uploads" / "file_tree_with_vivek.txt")
-    df2 = pd.read_csv(file2, index_col=False, encoding='iso-8859-1', on_bad_lines='warn')
-
-    df['sequencing_run'] = df[df["sequencing_run"].isnull()].apply(lambda row: find_seq_run(row, df2), axis=1)
-    df.to_csv(file, index=False)
+    # file2 = Path(Path(__file__).parent.parent / "uploads" / "file_tree_with_vivek.txt")
+    # df2 = pd.read_csv(file2, index_col=False, encoding='iso-8859-1', on_bad_lines='warn')
+    #
+    # df['sequencing_run'] = df[df["sequencing_run"].isnull()].apply(lambda row: find_seq_run(row, df2), axis=1)
+    # df.to_csv(file, index=False)
 
     df['fastq_file'] = df['fastq_file'].str.replace('"', "'").str.replace("'", '"')
     df["fastq_file"] = df["fastq_file"].astype('str')
