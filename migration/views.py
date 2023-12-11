@@ -2623,12 +2623,13 @@ def get_fastq_t12(row):
     print(sl)
     files=SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl)
     print(files)
-    d={}
-    for file in files:
-        d[file.name] = file.checksum
-    print(d)
-    row["fastq_file"] = d
-    row["path"] = files.first().sequencing_file_set.path
+    if files.count()>0:
+        d={}
+        for file in files:
+            d[file.name] = file.checksum
+        print(d)
+        row["fastq_file"] = d
+        row["path"] = files.first().sequencing_file_set.path
     return row
 
 
