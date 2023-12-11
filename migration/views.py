@@ -2453,8 +2453,15 @@ def create_fastq_from_file(request):
     # df.apply(lambda row: _files_from_file(row), axis=1)
     # df=df[cols]
     # df.to_csv("report_matching_sample_lib_after_IWEI.csv", index=False)
-
+from django.db.models import Q, Count
 def get_unregistered(row):
+    for i in SequencingFileSet.all():
+        i.path = i.path.strip()
+        i.save()
+    duplicates = SequencingFileSet.objects.values('prefix', 'path') \
+        .annotate(prefix_count=Count('prefix'), path_count=Count('path')) \
+        .filter(prefix_count__gt=1, path_count__gt=1)
+    print(duplicates)
 
     path,_ = row["HiSeqData/"].split("-->")
     file=row["unregistered"]
@@ -2465,7 +2472,9 @@ def get_unregistered(row):
         prefix = file.split(".bai")[0]
     elif file.endswith(".bam"):
         prefix = file.split(".bam")[0]
-    print(file)
+    prefix = file.split("_L0")[0] if "_L0" in file else prefix
+
+    print(prefix, file)
     try:
         _sr = path.split("/")[1]
         if "Nimblegen" in path:
@@ -2476,9 +2485,21 @@ def get_unregistered(row):
             _prefix = f"{match.group(1)}_{match.group(2)}"
             prefix = ((re.sub(r'_\s*\d+ng\s*', ' ', _prefix)).strip()).replace(" _","_")
             _sl = ((re.sub(r'_\s*\d+ng\s*', ' ', _sl)).strip())
+        if re.match(r'^H12', file):
+            _sl = "H12_22776_B5_Norm"
             print(_sl, prefix)
-
-        set_ = SequencingFileSet.objects.get(prefix=prefix)
+        if re.match(r'^CGH11', file):
+            match = re.match(r'CGH11_(\w+).', file)
+            _sl = "CGH11_"+match.group(1)
+            print(_sl, prefix)
+        sr = SequencingRun.objects.get(name=_sr)
+        sl = SampleLib.objects.get(name=_sl)
+        set_ = get_or_create_set(
+                prefix=prefix,
+                path=path,
+                sample_lib=sl,
+                sequencing_run=sr,
+            )
         get_or_create_file(
             sequencing_file_set=set_,
             name=file,
