@@ -2614,7 +2614,7 @@ def get_fastq_empty(row):
 
 
 def get_fastq_t12(row):
-    sl=SampleLib.objects.filter(name=row["sample_lib"])
+    sl=SampleLib.objects.get(name=row["sample_lib"])
     print(sl)
     files=SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl)
     print(files)
