@@ -27,4 +27,5 @@ urlpatterns = [
     path("block_scan_number", views.block_scan_number, name="block_scan_number"),
     path("create_fastq_from_file", views.create_fastq_from_file, name="create_fastq_from_file"),
     path("upload_unregistered", views.upload_unregistered, name="upload_unregistered"),
+    path("prepare_report", views.prepare_report, name="prepare_report"),
 ]
