@@ -2618,7 +2618,7 @@ def get_fastq_t12(row):
     files=SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl)
     d={}
     for file in files:
-        d[file.name]=file.checksum
+        d[file.name] = file.checksum
     print(d)
 
 
