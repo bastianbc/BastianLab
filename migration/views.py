@@ -2626,10 +2626,7 @@ def get_fastq_t12(row):
             d={}
             for file in files:
                 d[file.name] = file.checksum
-            print(d)
-            row["fastq_file"] = d
-            row["fastq_file_path"] = files.first().sequencing_file_set.path
-    return row
+        return d
 
 
 
