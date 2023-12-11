@@ -2455,17 +2455,6 @@ def create_fastq_from_file(request):
     # df.to_csv("report_matching_sample_lib_after_IWEI.csv", index=False)
 from django.db.models import Q, Count
 def get_unregistered(row):
-    duplicates = SequencingFileSet.objects.values('prefix', 'path') \
-        .annotate(prefix_count=Count('prefix'), path_count=Count('path')) \
-        .filter(prefix_count__gt=1, path_count__gt=1)
-    print(duplicates)
-    for duplicate in duplicates:
-        # This query will get all records with the same 'age' and 'name'
-        duplicate_records = SequencingFileSet.objects.filter(prefix=duplicate['prefix'], path=duplicate['path'])
-        # This will keep the first record and delete the rest
-        for record in duplicate_records[1:]:
-            record.delete()
-
     path,_ = row["HiSeqData/"].split("-->")
     file=row["unregistered"]
     type = "fastq" if file.endswith("fastq.gz") else "bam" if file.endswith(".bam") else "bai"
