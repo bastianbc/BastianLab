@@ -2617,8 +2617,9 @@ def get_fastq_t12(row):
     sl=SampleLib.objects.filter(name__icontains=row["Block"].replace("-","_"))
     if sl.count()==1:
         print(sl, row["sample_lib"], row["Block"])
-        sl.first().name = row["sample_lib"]
-        sl.save()
+        sl_f = sl.first()
+        sl_f.name = row["sample_lib"]
+        sl_f.save()
 
 def refactor_samplelib(row):
     return ("T"+str(row["Block"])+"_"+str(row["sample_lib"])).replace("-","_")
