@@ -2461,7 +2461,10 @@ def get_unregistered(row):
     duplicates = SequencingFileSet.objects.values('prefix', 'path') \
         .annotate(prefix_count=Count('prefix'), path_count=Count('path')) \
         .filter(prefix_count__gt=1, path_count__gt=1)
-    print(duplicates)
+    for duplicate in duplicates:
+        # This query will get all records with the same 'age' and 'name'
+        count_sequencing_files = SequencingFileSet.objects.filter(file_count=Count('sequencing_files'))
+        print(duplicate, count_sequencing_files)
 
     path,_ = row["HiSeqData/"].split("-->")
     file=row["unregistered"]
@@ -2492,20 +2495,20 @@ def get_unregistered(row):
             match = re.match(r'CGH11_(\w+).', file)
             _sl = "CGH11_"+match.group(1)
             print(_sl, prefix)
-        sr = SequencingRun.objects.get(name=_sr)
-        sl = SampleLib.objects.get(name=_sl)
-        set_ = get_or_create_set(
-                prefix=prefix,
-                path=path,
-                sample_lib=sl,
-                sequencing_run=sr,
-            )
-        get_or_create_file(
-            sequencing_file_set=set_,
-            name=file,
-            checksum="",
-            type=type
-        )
+        # sr = SequencingRun.objects.get(name=_sr)
+        # sl = SampleLib.objects.get(name=_sl)
+        # set_ = get_or_create_set(
+        #         prefix=prefix,
+        #         path=path,
+        #         sample_lib=sl,
+        #         sequencing_run=sr,
+        #     )
+        # get_or_create_file(
+        #     sequencing_file_set=set_,
+        #     name=file,
+        #     checksum="",
+        #     type=type
+        # )
         print("created")
     except MultipleObjectsReturned as e:
         p = ""
