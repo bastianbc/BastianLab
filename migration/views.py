@@ -2455,7 +2455,7 @@ def create_fastq_from_file(request):
     # df.to_csv("report_matching_sample_lib_after_IWEI.csv", index=False)
 from django.db.models import Q, Count
 def get_unregistered(row):
-    for i in SequencingFileSet.all():
+    for i in SequencingFileSet.objects.all():
         i.path = i.path.strip()
         i.save()
     duplicates = SequencingFileSet.objects.values('prefix', 'path') \
