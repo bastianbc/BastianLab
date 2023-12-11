@@ -2622,6 +2622,10 @@ def get_fastq_t12(row):
     for file in files:
         d[file.name] = file.checksum
     print(d)
+    row["fastq_file"] = d
+    row["path"] = files.first().sequencing_file_set.path
+    return row
+
 
 
 
@@ -2661,10 +2665,11 @@ def prepare_report(request):
     df["bam_bai_file"] = df["bam_bai_file"].astype('str')
     df["bam_bai_file"] = df["bam_bai_file"].apply(lambda x: make_dict(x))
 
-    df.loc[:48, "fastq_file"] = df.iloc[:48].apply(lambda row: get_fastq_t12(row), axis=1)
+    df.iloc[:48] = df.iloc[:48].apply(lambda row: get_fastq_t12(row), axis=1)
     # df[~df["fastq_file"].isnull()].apply(lambda row: get_fastq_empty(row), axis=1)
     # df[~df["bam_file"].isnull()].apply(lambda row: get_bam_empty(row), axis=1)
     # df[~df["bam_bai_file"].isnull()].apply(lambda row: get_bam_bai_empty(row), axis=1)
+    df.to_csv(file, index=False)
 
 
 
