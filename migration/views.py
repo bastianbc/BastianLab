@@ -2620,6 +2620,11 @@ def get_fastq_t12(row):
         sl, created = SampleLib.objects.get_or_create(
             name=row["sample_lib"]
         )
+    try:
+        sr=SequencingRun.objects.get(name=row["sequencing_run"])
+    except ObjectDoesNotExist as e:
+        sr=SequencingRun.objects.get(name="Undefined")
+
     if pd.isnull(row["fastq_file"]):
         files=SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl, type="fastq")
         if files.count()>0:
@@ -2629,7 +2634,9 @@ def get_fastq_t12(row):
             row["fastq_file"] = d
             row["fastq_path"] = file.sequencing_file_set.path
     else:
-        files=SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl, type="fastq")
+        files=SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl,
+                                            sequencing_file_set__sequencing_run=sr,
+                                            type="fastq")
         for file in files:
             if file.name not in row["fastq_file"]:
                 print(file.name)
