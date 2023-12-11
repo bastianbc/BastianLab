@@ -2626,7 +2626,7 @@ def get_fastq_t12(row):
             d={}
             for file in files:
                 d[file.name] = file.checksum
-        return d
+            return d
 
 
 
