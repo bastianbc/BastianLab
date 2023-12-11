@@ -2673,6 +2673,7 @@ def prepare_report(request):
     df['fastq_file'] = df.apply(lambda row: get_fastq_t12(row), axis=1)
     print(df)
     print(cols)
+    df.to_csv("df.csv", index=False)
     # df[~df["fastq_file"].isnull()].apply(lambda row: get_fastq_empty(row), axis=1)
     # df[~df["bam_file"].isnull()].apply(lambda row: get_bam_empty(row), axis=1)
     # df[~df["bam_bai_file"].isnull()].apply(lambda row: get_bam_bai_empty(row), axis=1)
