@@ -2610,7 +2610,7 @@ def get_fastq_empty(row,df2):
             if file.name not in row["fastq_file"]:
                 print(sl.name, file, row["fastq_file"])
     except Exception as e:
-        print(row["sequencing_run"], e)
+        print(row["sample_lib"], row["sequencing_run"], e)
 
 
 def get_bam_empty(row):
