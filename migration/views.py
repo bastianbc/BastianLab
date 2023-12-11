@@ -2601,7 +2601,7 @@ def upload_unregistered(request):
     df = pd.read_csv(file)
     df[~df["unregistered"].isnull()].apply(lambda row: get_unregistered(row), axis=1)
 
-def get_fastq_empty(row,df2):
+def get_fastq_empty(row):
     try:
         sl = SampleLib.objects.get(name=row["sample_lib"])
         sr = SequencingRun.objects.get(name=row["sequencing_run"])
