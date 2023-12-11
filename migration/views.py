@@ -2632,19 +2632,19 @@ def get_fastq_t12(row):
     if pd.isnull(row["bam_file"]):
         files=SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl, type="bam")
         if files.count()>0:
-            d={}
+            s={}
             for file in files:
                 d[file.name] = file.checksum
-            row["bam_file"] = d
+            row["bam_file"] = s
             row["bam_file_path"] = file.sequencing_file_set.path
 
     if pd.isnull(row["bam_bai_file"]):
         files=SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl, type="bai")
         if files.count()>0:
-            d={}
+            w={}
             for file in files:
                 d[file.name] = file.checksum
-            row["bam_bai_file"] = d
+            row["bam_bai_file"] = w
             row["bam_bai_file_path"] = file.sequencing_file_set.path
     return row
 
