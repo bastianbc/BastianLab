@@ -2628,7 +2628,25 @@ def get_fastq_t12(row):
                 d[file.name] = file.checksum
             row["fastq_file"] = d
             row["fastq_path"] = file.sequencing_file_set.path
-            return row
+
+    if pd.isnull(row["bam_file"]):
+        files=SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl, type="bam")
+        if files.count()>0:
+            d={}
+            for file in files:
+                d[file.name] = file.checksum
+            row["bam_file"] = d
+            row["bam_file_path"] = file.sequencing_file_set.path
+
+    if pd.isnull(row["bam_bai_file"]):
+        files=SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl, type="bai")
+        if files.count()>0:
+            d={}
+            for file in files:
+                d[file.name] = file.checksum
+            row["bam_bai_file"] = d
+            row["bam_bai_file_path"] = file.sequencing_file_set.path
+    return row
 
 def get_bam_empty(row):
     print(row["sample_lib"])
@@ -2686,8 +2704,6 @@ def prepare_report(request):
         __file__).parent.parent / "uploads" / "report_matching_sample_lib_with_bait_after_reducing_fastq_files.csv")
     df = pd.read_csv(file)
     cols = df.columns
-    print(df)
-    print(cols)
     # file2 = Path(Path(__file__).parent.parent / "uploads" / "file_tree_with_vivek.txt")
     # df2 = pd.read_csv(file2, index_col=False, encoding='iso-8859-1', on_bad_lines='warn')
     #
@@ -2707,8 +2723,8 @@ def prepare_report(request):
     df["bam_bai_file"] = df["bam_bai_file"].apply(lambda x: make_dict(x))
 
     df = df.apply(lambda row: get_fastq_t12(row), axis=1)
-    df = df.apply(lambda row: get_bam_empty(row), axis=1)
-    df = df.apply(lambda row: get_bai_empty(row), axis=1)
+    # df = df.apply(lambda row: get_bam_empty(row), axis=1)
+    # df = df.apply(lambda row: get_bai_empty(row), axis=1)
 
     df.to_csv("df.csv", index=False)
     # df[~df["fastq_file"].isnull()].apply(lambda row: get_fastq_empty(row), axis=1)
