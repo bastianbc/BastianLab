@@ -2650,6 +2650,8 @@ def prepare_report(request):
         __file__).parent.parent / "uploads" / "report_matching_sample_lib_with_bait_after_reducing_fastq_files.csv")
     df = pd.read_csv(file)
     cols = df.columns
+    print(df)
+    print(cols)
     # file2 = Path(Path(__file__).parent.parent / "uploads" / "file_tree_with_vivek.txt")
     # df2 = pd.read_csv(file2, index_col=False, encoding='iso-8859-1', on_bad_lines='warn')
     #
