@@ -2460,8 +2460,12 @@ def get_unregistered(row):
         .filter(prefix_count__gt=1, path_count__gt=1)
     for duplicate in duplicates:
         # This query will get all records with the same 'age' and 'name'
-        count_sequencing_files = SequencingFileSet.objects.annotate(file_count=Count('sequencing_files'))
-        print(duplicate, count_sequencing_files)
+        count_sequencing_files = SequencingFileSet.objects.filter(prefix=duplicate["prefix"]).annotate(file_count=Count('sequencing_files'))
+        for i in count_sequencing_files:
+            # print(i.file_count)
+            if i.file_count==0:
+                i.delete()
+        # print(count_sequencing_files)
 
     path,_ = row["HiSeqData/"].split("-->")
     file=row["unregistered"]
