@@ -2674,7 +2674,7 @@ def prepare_report(request):
     # df[~df["bam_file"].isnull()].apply(lambda row: get_bam_empty(row), axis=1)
     # df[~df["bam_bai_file"].isnull()].apply(lambda row: get_bam_bai_empty(row), axis=1)
     df.columns = df[cols]
-    df.to_csv(file, index=False)
+    df.to_csv("report_matching_sample_lib_after_IWEI.csv", index=False)
 
 
 
