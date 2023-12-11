@@ -2484,6 +2484,10 @@ def get_unregistered(row):
             match = re.match(r'CGH11_(\w+).', file)
             _sl = "CGH11_"+match.group(1)
             print(_sl, prefix)
+        if re.match(r'^T12', file):
+            match = re.match(r'T12_22597_(\w+)_([ACTG]{6})', file)
+            _sl = "T12_22597_"+match.group(1)
+            prefix = "T12_22597_"+match.group(1) + "_" + match.group(2)
         sr = SequencingRun.objects.get(name=_sr)
         sl = SampleLib.objects.get(name=_sl)
         set_ = get_or_create_set(
