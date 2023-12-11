@@ -2453,10 +2453,20 @@ def create_fastq_from_file(request):
     # df.apply(lambda row: _files_from_file(row), axis=1)
     # df=df[cols]
     # df.to_csv("report_matching_sample_lib_after_IWEI.csv", index=False)
-
+from django.db.models import Q, Count
 def get_unregistered(row):
+    duplicates = SequencingFileSet.objects.values('prefix', 'path') \
+        .annotate(prefix_count=Count('prefix'), path_count=Count('path')) \
+        .filter(prefix_count__gt=1, path_count__gt=1)
+    print(duplicates)
+    for duplicate in duplicates:
+        # This query will get all records with the same 'age' and 'name'
+        duplicate_records = SequencingFileSet.objects.filter(prefix=duplicate['prefix'], path=duplicate['path'])
+        # This will keep the first record and delete the rest
+        duplicate_records[1:].delete()
+
     path,_ = row["HiSeqData/"].split("-->")
-    file = row["unregistered"]
+    file=row["unregistered"]
     type = "fastq" if file.endswith("fastq.gz") else "bam" if file.endswith(".bam") else "bai"
     if "fastq" in file:
         prefix = file.split("_L0")[0] if "_L0" in file else file.split("_001")[0] if "_001" in file else None
@@ -2471,6 +2481,12 @@ def get_unregistered(row):
         _sr = path.split("/")[1]
         if "Nimblegen" in path:
             _sr = re.sub(r'Nimblegen(\d+) \(BB0*([1-9]\d*)\)', r'Nimblegen\1_BB\2', _sr)
+        if "recal" in file:
+            match = re.match(r'(\w+)_([ACTG]{6})recal.', file)
+            _sl = match.group(1)
+            _prefix = f"{match.group(1)}_{match.group(2)}"
+            prefix = ((re.sub(r'_\s*\d+ng\s*', ' ', _prefix)).strip()).replace(" _","_")
+            _sl = ((re.sub(r'_\s*\d+ng\s*', ' ', _sl)).strip())
         if re.match(r'^H12', file):
             _sl = "H12_22776_B5_Norm"
             print(_sl, prefix)
