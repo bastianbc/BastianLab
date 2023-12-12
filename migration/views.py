@@ -2791,7 +2791,7 @@ def blocks(row):
 def check_block(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "patients_done.csv")
     df = pd.read_csv(file)
-    df.apply(lambda row: blocks(row), axis=1)
+    df[~df["Area_ID"].isnull()].apply(lambda row: blocks(row), axis=1)
 
 
 def patients(row):
