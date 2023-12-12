@@ -2789,7 +2789,6 @@ def get_area_type(value):
     return None
 
 def blocks(row):
-    print(row["Area_ID"], row["Block"])
     try:
         area = Areas.objects.get(name=row["Area_ID"])
         if not area.block:
@@ -2797,12 +2796,11 @@ def blocks(row):
                 block = Blocks.objects.get(name=row["Block"])
                 area.block = block
                 area.save()
-                print("saved")
+
             except ObjectDoesNotExist:
                 block = Blocks.objects.get(name="UndefinedBlock")
                 area.block = block
                 area.save()
-                print("saved")
     except ObjectDoesNotExist:
         try:
             block = Blocks.objects.get(name=row["Block"])
@@ -2811,14 +2809,14 @@ def blocks(row):
         Areas.objects.get_or_create(
             name=row["Area_ID"], block=block
         )
-        print("created")
-
 
 
 def check_block(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "patients_done.csv")
     df = pd.read_csv(file)
-    df[~df["Area_ID"].isnull()].apply(lambda row: blocks(row), axis=1)
+    for area in Areas.objects.filter(Q(Q(block__isnull=True)|Q(block__name="UndefinedBlock"))):
+        print(area)
+    # df[~df["Area_ID"].isnull()].apply(lambda row: blocks(row), axis=1)
 
 
 def patients(row):
