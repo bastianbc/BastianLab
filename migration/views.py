@@ -2793,28 +2793,19 @@ def check_block(request):
     df = pd.read_csv(file)
     df.apply(lambda row: blocks(row), axis=1)
 
+
 def patients(row):
     try:
         blocks = Blocks.objects.filter(patient__isnull=True)
         for block in blocks:
-            patient_id = str(uuid.uuid4()).split("-")[0]+"_G"
+            patient_id = "_G"
             patient, created = Patients.objects.get_or_create(pat_id=patient_id)
             block.patient = patient
             block.save()
             print("created")
     except Exception as e:
         print(row["block"],e)
-    # try:
-    #     patient = Patients.objects.get(pat_id=row["pat_id"])
-    # except Exception as e:
-    #     patient, created = Patients.objects.get_or_create(pat_id=row["pat_id"])
-    #
-    # if not pd.isnull(row["Block"]):
-    #     block = Blocks.objects.get(name=row["Block"])
-    # else:
-    #     block = Blocks.objects.get(name="UndefinedBlock")
-    # block.patient = patient
-    # block.save()
+
 
 
 
