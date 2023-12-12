@@ -2812,9 +2812,12 @@ def check_block(request):
 
 def patients(row):
     try:
-        Blocks.objects.get(name=row["block"])
+        block = Blocks.objects.get(name=row["block"])
+        if block.patient == None:
+            block.patient = Patients.objects.get(pat_id=row["pat_id_airtable"])
+            block.save()
     except Exception as e:
-        print(row["block"])
+        print(row["block"],e)
     # try:
     #     patient = Patients.objects.get(pat_id=row["pat_id"])
     # except Exception as e:
