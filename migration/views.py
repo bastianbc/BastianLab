@@ -2783,7 +2783,7 @@ def get_or_create_patient(**kwargs):
 
 def blocks(row):
     try:
-        Blocks.objects.get(name=row["name"])
+        Blocks.objects.get(name=row["Block_ID"])
     except Exception as e:
         print(row["name"], e)
         # try:
@@ -2806,16 +2806,20 @@ def blocks(row):
 
 
 def check_block(request):
-    file = Path(Path(__file__).parent.parent / "uploads" / "report-block.csv")
+    file = Path(Path(__file__).parent.parent / "uploads" / "Blocks-Grid view-5.csv")
     df = pd.read_csv(file)
     df.apply(lambda row: blocks(row), axis=1)
 
+import uuid
 def patients(row):
     try:
-        block = Blocks.objects.get(name=row["block"])
-        if block.patient == None:
-            block.patient = Patients.objects.get(pat_id=row["pat_id_intelipath"])
+        blocks = Blocks.objects.filter(patient__isnull=True)
+        for block in blocks:
+            patient_id = str(uuid.uuid4()).split("-")[0]+"_G"
+            patient, created = Patients.objects.get_or_create(pat_id=patient_id)
+            block.patient = patient
             block.save()
+            print("created")
     except Exception as e:
         print(row["block"],e)
     # try:
