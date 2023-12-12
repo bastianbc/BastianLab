@@ -2783,8 +2783,8 @@ def get_or_create_patient(**kwargs):
 
 def blocks(row):
     try:
-        print(Areas.objects.filter(block=Blocks.objects.get(name="UndefinedBlock")))
-        print(Areas.objects.filter(block__isnull=True))
+        pass
+
 
     except Exception as e:
         print(row["Area_id"], e)
@@ -2810,7 +2810,9 @@ def blocks(row):
 def check_block(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
     df = pd.read_csv(file)
-    df.apply(lambda row: blocks(row), axis=1)
+    for area in Areas.objects.filter((Q(block__isnull=True) | Q(block=Blocks.objects.get(name="UndefinedBlock")))):
+        print(area)
+    # df.apply(lambda row: blocks(row), axis=1)
 
 import uuid
 def patients(row):
