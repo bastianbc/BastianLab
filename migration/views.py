@@ -2783,9 +2783,9 @@ def get_or_create_patient(**kwargs):
 
 def blocks(row):
     try:
-        Blocks.objects.get(name=row["Block_ID"])
+        Blocks.objects.get(name=row["Block"])
     except Exception as e:
-        print(row["Block_ID"], e)
+        print(row["Block"], e)
         # try:
         #     print(row["name"])
         #     obj, created = Blocks.objects.get_or_create(
@@ -2806,7 +2806,7 @@ def blocks(row):
 
 
 def check_block(request):
-    file = Path(Path(__file__).parent.parent / "uploads" / "Blocks-Grid view-5.csv")
+    file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
     df = pd.read_csv(file)
     df.apply(lambda row: blocks(row), axis=1)
 
