@@ -2785,7 +2785,7 @@ def blocks(row):
     try:
         Blocks.objects.get(name=row["Block_ID"])
     except Exception as e:
-        print(row["name"], e)
+        print(row["Block_ID"], e)
         # try:
         #     print(row["name"])
         #     obj, created = Blocks.objects.get_or_create(
