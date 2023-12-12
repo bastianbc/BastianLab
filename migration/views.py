@@ -2783,38 +2783,16 @@ def get_or_create_patient(**kwargs):
 
 def blocks(row):
     try:
-        pass
-
-
+        Areas.objects.get(name=row["Area_ID"])
     except Exception as e:
         print(row["Area_id"], e)
-        # try:
-        #     print(row["name"])
-        #     obj, created = Blocks.objects.get_or_create(
-        #         name = row["name"],
-        #         patient = get_or_create_patient(pat_id=int(row["pat_id"])) if not pd.isnull(row["pat_id"]) else None,
-        #         age = float(row["pat_age"]) if not pd.isnull(row["pat_age"]) else None,
-        #         thickness = float(row["thickness"]) if not pd.isnull(row["thickness"]) else None,
-        #         mitoses = float(row["mitoses"]) if not pd.isnull(row["mitoses"]) else None,
-        #         p_stage = str(row["p_stage"]) if not pd.isnull(row["p_stage"]) else "",
-        #         prim = str(row["prim"]).lower() if not pd.isnull(row["prim"]) else "",
-        #         subtype = str(row["subtype"]) if not pd.isnull(row["subtype"]) else "",
-        #         notes = str(row["note"]) if not pd.isnull(row["note"]) else "",
-        #         micro = str(row["micro"]) if not pd.isnull(row["micro"]) else "",
-        #         path_note = str(row["Path Number"]) if not pd.isnull(row["Path Number"]) else "",
-        #     )
-        # except Exception as e:
-        #     print(row["name"],e)
 
 
 def check_block(request):
-    file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
+    file = Path(Path(__file__).parent.parent / "uploads" / "Areas-Grid view (1).csv")
     df = pd.read_csv(file)
-    for area in Areas.objects.filter((Q(block__isnull=True) | Q(block=Blocks.objects.get(name="UndefinedBlock")))):
-        print(area)
-    # df.apply(lambda row: blocks(row), axis=1)
+    df.apply(lambda row: blocks(row), axis=1)
 
-import uuid
 def patients(row):
     try:
         blocks = Blocks.objects.filter(patient__isnull=True)
