@@ -2791,7 +2791,7 @@ def get_area_type(value):
 def blocks(row):
     try:
         area, created = Areas.objects.get_or_create(
-            name=row["Area_ID"]
+            name=row["Area_ID"], block=Blocks.objects.get(row["Block"])
         )
     except Exception as e:
         print(row["Area_ID"], e)
