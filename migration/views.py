@@ -2764,11 +2764,44 @@ def prepare_report(request):
     # df.columns = df[cols]
     # df.to_csv("report_matching_sample_lib_after_IWEI.csv", index=False)
 
+
+def get_sex(value):
+    return value.lower() if value and len(value) == 1 else None
+
+
+def get_race(value):
+    for x in Patients.RACE_TYPES:
+        if value.lower() == x[1].lower():
+            return x[0]
+    return 7
+
+def get_or_create_patient(**kwargs):
+    try:
+        return Patients.objects.get(pat_id=kwargs["pat_id"])
+    except ObjectDoesNotExist as e:
+        return Patients.objects.create(**kwargs)
+
 def blocks(row):
     try:
         Blocks.objects.name(name=row["name"])
     except Exception as e:
-        print(row["name"])
+        try:
+            print(row["name"])
+            obj, created = Blocks.objects.get_or_create(
+                name = row["name"],
+                patient = get_or_create_patient(pat_id=int(row["pat_id"])) if not pd.isnull(row["pat_id"]) else None,
+                age = float(row["pat_age"]) if not pd.isnull(row["pat_age"]) else None,
+                thickness = float(row["thickness"]) if not pd.isnull(row["thickness"]) else None,
+                mitoses = float(row["mitoses"]) if not pd.isnull(row["mitoses"]) else None,
+                p_stage = str(row["p_stage"]) if not pd.isnull(row["p_stage"]) else "",
+                prim = str(row["prim"]).lower() if not pd.isnull(row["prim"]) else "",
+                subtype = str(row["subtype"]) if not pd.isnull(row["subtype"]) else "",
+                notes = str(row["note"]) if not pd.isnull(row["note"]) else "",
+                micro = str(row["micro"]) if not pd.isnull(row["micro"]) else "",
+                path_note = str(row["Path Number"]) if not pd.isnull(row["Path Number"]) else "",
+            )
+        except Exception as e:
+            print(row["name"],e)
 
 
 def check_block(request):
