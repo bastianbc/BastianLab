@@ -2783,11 +2783,8 @@ def get_or_create_patient(**kwargs):
 
 def blocks(row):
     try:
-        for area in Areas.objects.filter(block=Blocks.objects.get(name="UndefinedBlock")):
-            print(area)
-
-        for area in Areas.objects.filter(block__isnull=True):
-            print(area)
+        print(Areas.objects.filter(block=Blocks.objects.get(name="UndefinedBlock")))
+        print(Areas.objects.filter(block__isnull=True))
 
     except Exception as e:
         print(row["Area_id"], e)
