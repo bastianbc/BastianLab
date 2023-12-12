@@ -2785,11 +2785,11 @@ def blocks(row):
     try:
         Areas.objects.get(name=row["Area_ID"])
     except Exception as e:
-        print(row["Area_id"], e)
+        print(row["Area_ID"], e)
 
 
 def check_block(request):
-    file = Path(Path(__file__).parent.parent / "uploads" / "Areas-Grid view (1).csv")
+    file = Path(Path(__file__).parent.parent / "uploads" / "patients_done.csv")
     df = pd.read_csv(file)
     df.apply(lambda row: blocks(row), axis=1)
 
