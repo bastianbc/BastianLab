@@ -2764,6 +2764,17 @@ def prepare_report(request):
     # df.columns = df[cols]
     # df.to_csv("report_matching_sample_lib_after_IWEI.csv", index=False)
 
+def blocks(row):
+    try:
+        Blocks.objects.name(name=row["name"])
+    except Exception as e:
+        print(row["name"])
+
+
+def check_block(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "report-block.csv")
+    df = pd.read_csv(file)
+    df.apply(lambda row: blocks(row), axis=1)
 
 
 
