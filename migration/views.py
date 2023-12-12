@@ -2814,7 +2814,7 @@ def patients(row):
     try:
         block = Blocks.objects.get(name=row["block"])
         if block.patient == None:
-            block.patient = Patients.objects.get(pat_id=row["pat_id_airtable"])
+            block.patient = Patients.objects.get(pat_id=row["pat_id_intelipath"])
             block.save()
     except Exception as e:
         print(row["block"],e)
