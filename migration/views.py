@@ -2781,9 +2781,18 @@ def get_or_create_patient(**kwargs):
     except ObjectDoesNotExist as e:
         return Patients.objects.create(**kwargs)
 
+
+def get_area_type(value):
+    for x in Areas.AREA_TYPE_TYPES:
+        if value.lower() == x[1].lower():
+            return x[0]
+    return None
+
 def blocks(row):
     try:
-        Areas.objects.get(name=row["Area_ID"])
+        area, created = Areas.objects.get_or_create(
+            name=row["Area_ID"]
+        )
     except Exception as e:
         print(row["Area_ID"], e)
 
