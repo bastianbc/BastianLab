@@ -42,6 +42,7 @@ class Areas(models.Model):
         ("local-recurrent-metastasis","Local Recurrent Metastasis"),
         ("cells","Cells"),
         ("cell-line","Cell Line"),
+        ("dn","DN"),
         ("other","Other"),
     ]
 
