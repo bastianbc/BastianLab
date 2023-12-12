@@ -29,4 +29,5 @@ urlpatterns = [
     path("upload_unregistered", views.upload_unregistered, name="upload_unregistered"),
     path("prepare_report", views.prepare_report, name="prepare_report"),
     path("check_block", views.check_block, name="check_block"),
+    path("check_patient", views.check_patient, name="check_patient"),
 ]

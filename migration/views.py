@@ -2810,5 +2810,26 @@ def check_block(request):
     df = pd.read_csv(file)
     df.apply(lambda row: blocks(row), axis=1)
 
+def patients(row):
+    print(row["pat_id"])
+    try:
+        patient = Patients.objects.get(pat_id=row["pat_id"])
+    except Exception as e:
+        patient, created = Patients.objects.get_or_create(pat_id=row["pat_id"])
+
+    if not pd.isnull(row["Block"]):
+        block = Blocks.objects.get(name=row["Block"])
+    else:
+        block = Blocks.objects.get(name="UndefinedBlock")
+    block.patient = patient
+    block.save()
+
+
+
+def check_patient(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "patients_done.csv")
+    df = pd.read_csv(file)
+    df.apply(lambda row: patients(row), axis=1)
+
 
 
