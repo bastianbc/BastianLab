@@ -2811,7 +2811,6 @@ def check_block(request):
     df.apply(lambda row: blocks(row), axis=1)
 
 def patients(row):
-    print(row["block"])
     try:
         Blocks.objects.get(name=row["block"])
     except Exception as e:
