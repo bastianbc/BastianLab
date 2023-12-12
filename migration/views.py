@@ -2789,12 +2789,30 @@ def get_area_type(value):
     return None
 
 def blocks(row):
+    print(row["Area_ID"], row["Block"])
     try:
-        area, created = Areas.objects.get_or_create(
-            name=row["Area_ID"], block=Blocks.objects.get(row["Block"])
+        area = Areas.objects.get(name=row["Area_ID"])
+        if not area.block:
+            try:
+                block = Blocks.objects.get(name=row["Block"])
+                area.block = block
+                area.save()
+                print("saved")
+            except ObjectDoesNotExist:
+                block = Blocks.objects.get(name="UndefinedBlock")
+                area.block = block
+                area.save()
+                print("saved")
+    except ObjectDoesNotExist:
+        try:
+            block = Blocks.objects.get(name=row["Block"])
+        except ObjectDoesNotExist:
+            block = Blocks.objects.get(name="UndefinedBlock")
+        Areas.objects.get_or_create(
+            name=row["Area_ID"], block=block
         )
-    except Exception as e:
-        print(row["Area_ID"], e)
+        print("created")
+
 
 
 def check_block(request):
