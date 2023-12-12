@@ -2785,23 +2785,24 @@ def blocks(row):
     try:
         Blocks.objects.name(name=row["name"])
     except Exception as e:
-        try:
-            print(row["name"])
-            obj, created = Blocks.objects.get_or_create(
-                name = row["name"],
-                patient = get_or_create_patient(pat_id=int(row["pat_id"])) if not pd.isnull(row["pat_id"]) else None,
-                age = float(row["pat_age"]) if not pd.isnull(row["pat_age"]) else None,
-                thickness = float(row["thickness"]) if not pd.isnull(row["thickness"]) else None,
-                mitoses = float(row["mitoses"]) if not pd.isnull(row["mitoses"]) else None,
-                p_stage = str(row["p_stage"]) if not pd.isnull(row["p_stage"]) else "",
-                prim = str(row["prim"]).lower() if not pd.isnull(row["prim"]) else "",
-                subtype = str(row["subtype"]) if not pd.isnull(row["subtype"]) else "",
-                notes = str(row["note"]) if not pd.isnull(row["note"]) else "",
-                micro = str(row["micro"]) if not pd.isnull(row["micro"]) else "",
-                path_note = str(row["Path Number"]) if not pd.isnull(row["Path Number"]) else "",
-            )
-        except Exception as e:
-            print(row["name"],e)
+        print(row["name"], e)
+        # try:
+        #     print(row["name"])
+        #     obj, created = Blocks.objects.get_or_create(
+        #         name = row["name"],
+        #         patient = get_or_create_patient(pat_id=int(row["pat_id"])) if not pd.isnull(row["pat_id"]) else None,
+        #         age = float(row["pat_age"]) if not pd.isnull(row["pat_age"]) else None,
+        #         thickness = float(row["thickness"]) if not pd.isnull(row["thickness"]) else None,
+        #         mitoses = float(row["mitoses"]) if not pd.isnull(row["mitoses"]) else None,
+        #         p_stage = str(row["p_stage"]) if not pd.isnull(row["p_stage"]) else "",
+        #         prim = str(row["prim"]).lower() if not pd.isnull(row["prim"]) else "",
+        #         subtype = str(row["subtype"]) if not pd.isnull(row["subtype"]) else "",
+        #         notes = str(row["note"]) if not pd.isnull(row["note"]) else "",
+        #         micro = str(row["micro"]) if not pd.isnull(row["micro"]) else "",
+        #         path_note = str(row["Path Number"]) if not pd.isnull(row["Path Number"]) else "",
+        #     )
+        # except Exception as e:
+        #     print(row["name"],e)
 
 
 def check_block(request):
