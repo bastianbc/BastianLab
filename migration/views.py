@@ -2783,9 +2783,9 @@ def get_or_create_patient(**kwargs):
 
 def blocks(row):
     try:
-        Blocks.objects.get(name=row["Block"])
+        Areas.objects.get(name=row["Area_id"])
     except Exception as e:
-        print(row["Block"], e)
+        print(row["Area_id"], e)
         # try:
         #     print(row["name"])
         #     obj, created = Blocks.objects.get_or_create(
