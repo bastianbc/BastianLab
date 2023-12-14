@@ -2791,31 +2791,18 @@ def get_area_type(value):
 def nas(row):
     try:
         na = NucAcids.objects.get(name=row["NA_id"])
-        # if not area.block:
-        #     try:
-        #         block = Blocks.objects.get(name=row["Block"])
-        #         area.block = block
-        #         area.save()
-        #     except ObjectDoesNotExist:
-        #         block = Blocks.objects.get(name="UndefinedBlock")
-        #         area.block = block
-        #         area.save()
+        if na.area.name == "UnidentifiedArea" or na.area == None:
+            print(na)
     except Exception as e:
-        print(e, row["NA_id"])
-        # try:
-        #     block = Blocks.objects.get(name=row["Block"])
-        # except ObjectDoesNotExist:
-        #     block = Blocks.objects.get(name="UndefinedBlock")
-        # Areas.objects.get_or_create(
-        #     name=row["Area_ID"], block=block
-        # )
+        print(e,row["NA_id"])
+
 
 
 def check_na(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
     df = pd.read_csv(file)
-    # for area in Areas.objects.filter(Q(Q(block__isnull=True)|Q(block__name="UndefinedBlock"))):
-    #     print(area)
+    # for na in NucAcids.objects.filter(Q(Q(area__isnull=True)|Q(area__name="UndefinedArea"))):
+    #     print(na)
     df[~df["NA_id"].isnull()].apply(lambda row: nas(row), axis=1)
 
 
