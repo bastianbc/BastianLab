@@ -2788,35 +2788,35 @@ def get_area_type(value):
             return x[0]
     return None
 
-def blocks(row):
+def nas(row):
     try:
-        area = Areas.objects.get(name=row["Area_ID"])
-        if not area.block:
-            try:
-                block = Blocks.objects.get(name=row["Block"])
-                area.block = block
-                area.save()
+        na = NucAcids.objects.get(name=row["NA_id"])
+        # if not area.block:
+        #     try:
+        #         block = Blocks.objects.get(name=row["Block"])
+        #         area.block = block
+        #         area.save()
+        #     except ObjectDoesNotExist:
+        #         block = Blocks.objects.get(name="UndefinedBlock")
+        #         area.block = block
+        #         area.save()
+    except Exception as e:
+        print(e, row["NA_id"])
+        # try:
+        #     block = Blocks.objects.get(name=row["Block"])
+        # except ObjectDoesNotExist:
+        #     block = Blocks.objects.get(name="UndefinedBlock")
+        # Areas.objects.get_or_create(
+        #     name=row["Area_ID"], block=block
+        # )
 
-            except ObjectDoesNotExist:
-                block = Blocks.objects.get(name="UndefinedBlock")
-                area.block = block
-                area.save()
-    except ObjectDoesNotExist:
-        try:
-            block = Blocks.objects.get(name=row["Block"])
-        except ObjectDoesNotExist:
-            block = Blocks.objects.get(name="UndefinedBlock")
-        Areas.objects.get_or_create(
-            name=row["Area_ID"], block=block
-        )
 
-
-def check_block(request):
-    file = Path(Path(__file__).parent.parent / "uploads" / "patients_done.csv")
+def check_na(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
     df = pd.read_csv(file)
-    for area in Areas.objects.filter(Q(Q(block__isnull=True)|Q(block__name="UndefinedBlock"))):
-        print(area)
-    # df[~df["Area_ID"].isnull()].apply(lambda row: blocks(row), axis=1)
+    # for area in Areas.objects.filter(Q(Q(block__isnull=True)|Q(block__name="UndefinedBlock"))):
+    #     print(area)
+    df[~df["NA_id"].isnull()].apply(lambda row: nas(row), axis=1)
 
 
 def patients(row):
@@ -2830,8 +2830,6 @@ def patients(row):
             print("created")
     except Exception as e:
         print(row["block"],e)
-
-
 
 
 def check_patient(request):

@@ -28,6 +28,6 @@ urlpatterns = [
     path("create_fastq_from_file", views.create_fastq_from_file, name="create_fastq_from_file"),
     path("upload_unregistered", views.upload_unregistered, name="upload_unregistered"),
     path("prepare_report", views.prepare_report, name="prepare_report"),
-    path("check_block", views.check_block, name="check_block"),
+    path("check_na", views.check_na, name="check_na"),
     path("check_patient", views.check_patient, name="check_patient"),
 ]
