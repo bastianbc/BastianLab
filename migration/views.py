@@ -2794,7 +2794,7 @@ def nas(row):
         if na.area.name == "UndefinedArea" or not na.area:
             print(na)
     except Exception as e:
-        print(e,row["NA_ID"])
+        print(e,row["NA_ID"], row["Area ID"])
 
 
 
@@ -2803,7 +2803,7 @@ def check_na(request):
     df = pd.read_csv(file)
     # for na in NucAcids.objects.filter(Q(Q(area__isnull=True)|Q(area__name="UndefinedArea"))):
     #     print(na)
-    df[~df["NA_ID"].isnull() & ~df["Area_ID"].isnull()].apply(lambda row: nas(row), axis=1)
+    df[~df["NA_ID"].isnull() & ~df["Area ID"].isnull()].apply(lambda row: nas(row), axis=1)
 
 
 def patients(row):
