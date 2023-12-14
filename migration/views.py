@@ -2792,7 +2792,7 @@ def nas(row):
     try:
         na = NucAcids.objects.get(name=row["NA_ID"])
         if na.area.name == "UndefinedArea" or not na.area:
-            print(na, row["Area ID"])
+            print(f'nuc acid:{na}, area:{row["Area ID"]}')
     except Exception as e:
         print(e,row["NA_ID"], row["Area ID"])
 
