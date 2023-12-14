@@ -2790,20 +2790,20 @@ def get_area_type(value):
 
 def nas(row):
     try:
-        na = NucAcids.objects.get(name=row["NA_id"])
+        na = NucAcids.objects.get(name=row["NA_ID"])
         if na.area.name == "UndefinedArea" or not na.area:
             print(na)
     except Exception as e:
-        print(e,row["NA_id"])
+        print(e,row["NA_ID"])
 
 
 
 def check_na(request):
-    file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
+    file = Path(Path(__file__).parent.parent / "uploads" / "Nucleic Acids-Grid view (1).csv")
     df = pd.read_csv(file)
     # for na in NucAcids.objects.filter(Q(Q(area__isnull=True)|Q(area__name="UndefinedArea"))):
     #     print(na)
-    df[~df["NA_id"].isnull()].apply(lambda row: nas(row), axis=1)
+    df[~df["NA_ID"].isnull()].apply(lambda row: nas(row), axis=1)
 
 
 def patients(row):
