@@ -1,4 +1,4 @@
-﻿NA_ID,Area ID,NA_TYPE,Date extracted,Method,Qubit Concentration (ng/ul),Volumn (ul),Amount (ng),Re-extraction amount,Total extracted NA amount (ng),NA sheared/used (ng),Shearing volume DNA input (ul),Volume of TE buffer (ul)  for shearing,SL_ID,Notes,Assigned Projects
+NA_ID,Area ID,NA_TYPE,Date extracted,Method,Qubit Concentration (ng/ul),Volumn (ul),Amount (ng),Re-extraction amount,Total extracted NA amount (ng),NA sheared/used (ng),Shearing volume DNA input (ul),Volume of TE buffer (ul)  for shearing,SL_ID,Notes,Assigned Projects
 ,,,,,,,0.0,,0.0,,NaN,NaN,,,
 ,,,,,,,0.0,,0.0,,NaN,NaN,,,
 ,,,,,,,0.0,,0.0,,NaN,NaN,,,
@@ -15,9 +15,9 @@
 7_NA,2403 Melanocytic Nevus,DNA,4/11/2012,,20.00,50,1000.0,,1000.0,1000.0,50,0,7,,2010-2017
 11_NA,2404 BCC,DNA,4/11/2012,,9.60,50,480.0,,480.0,480.0,50,0,11,,2010-2017
 12_M_NA,,,,,,,0.0,,0.0,75.7,Infinity,-Infinity,12_M,,2010-2017
-13_NA,2405 ,DNA,4/11/2012,,20.00,50,1000.0,,1000.0,1000.0,50,0,13,,2010-2017
+13_NA,2405,DNA,4/11/2012,,20.00,50,1000.0,,1000.0,1000.0,50,0,13,,2010-2017
 15_NA,2406 Melanocytic Nevus,DNA,4/11/2012,,6.60,50,330.0,,330.0,330.0,50,0,15,,2010-2017
-20_NA,2407 Cellular Dermatofibroma ,DNA,4/24/2012,,20.00,50,1000.0,,1000.0,1000.0,50,0,20,,2010-2017
+20_NA,2407 Cellular Dermatofibroma,DNA,4/24/2012,,20.00,50,1000.0,,1000.0,1000.0,50,0,20,,2010-2017
 21-1_NA,,DNA,8/23/2012,,1.38,100,138.0,,138.0,100.0,72,-22,21-1,,2010-2017
 21-2_NA,,DNA,8/23/2012,,0.94,100,94.0,,94.0,100.0,106,-56,21-2,,2010-2017
 21-3_NA,,DNA,8/23/2012,,1.35,100,135.0,,135.0,100.0,74,-24,21-3,,2010-2017
@@ -35,10 +35,10 @@
 22-104389A4-RNA,,RNA,6/5/2023,Qiagen AllPrep DNA/RNA Mini Kit,0.00,46,0.0,0.00,0.0,,NaN,NaN,,,Clinical Cases
 22-104389C-DNA,2457 Tumor,DNA,5/19/2023,Qiagen AllPrep DNA/RNA Mini Kit,0.74,160,118.4,76.00,194.4,,0,50,2457_Tumor,,Clinical Cases
 22-104389C-RNA,2457 Tumor,RNA,5/19/2023,Qiagen AllPrep DNA/RNA Mini Kit,2.53,40,101.2,123.00,224.2,200.0,79,-29,"IYEH-02,IYEH-08",-80 BOX3,Clinical Cases
-22-125373-DNA,2247 ,DNA,2/8/2023,DNAstorm FFPE,12.20,352,4294.4,,4294.4,,0,50,,,Clinical Cases
-22-125373-RNA,2247 ,RNA,2/8/2023,RNAstorm FFPE,34.80,160,5568.0,,5568.0,100.0,3,47,IYEH-03,-80 BOX3,Clinical Cases
+22-125373-DNA,2247,DNA,2/8/2023,DNAstorm FFPE,12.20,352,4294.4,,4294.4,,0,50,,,Clinical Cases
+22-125373-RNA,2247,RNA,2/8/2023,RNAstorm FFPE,34.80,160,5568.0,,5568.0,100.0,3,47,IYEH-03,-80 BOX3,Clinical Cases
 23_NA,2408 SCC,DNA,4/24/2012,,20.00,50,1000.0,,1000.0,1000.0,50,0,23,,2010-2017
-24_NA,"""2409 SCC, in situ""",DNA,4/24/2012,,8.00,50,400.0,,400.0,400.0,50,0,24,,2010-2017
+24_NA,"2409 SCC, in situ",DNA,4/24/2012,,8.00,50,400.0,,400.0,400.0,50,0,24,,2010-2017
 24-1_NA,,DNA,8/23/2012,,38.33,100,3833.0,,3833.0,100.0,3,47,24-1,,2010-2017
 24-2_NA,,DNA,8/23/2012,,11.27,100,1127.0,,1127.0,100.0,9,41,24-2,,2010-2017
 24-3_NA,,DNA,8/23/2012,,1.89,100,189.0,,189.0,100.0,53,-3,24-3,,2010-2017
@@ -52,7 +52,7 @@
 28-3_NA,,DNA,8/23/2012,,0.31,100,30.8,,30.8,37.0,120,-70,28-3,,2010-2017
 28-4_NA,,DNA,8/23/2012,,1.17,100,117.0,,117.0,100.0,85,-35,28-4,,2010-2017
 28-5_NA,,DNA,8/23/2012,,1.03,100,103.0,,103.0,100.0,97,-47,28-5,,2010-2017
-29_NA,"""2412 SCC, in situ""",DNA,4/24/2012,,20.00,50,1000.0,,1000.0,1000.0,50,0,29,,2010-2017
+29_NA,"2412 SCC, in situ",DNA,4/24/2012,,20.00,50,1000.0,,1000.0,1000.0,50,0,29,,2010-2017
 31_NA,2413 Dermatofibroma,DNA,4/24/2012,,20.00,50,1000.0,,1000.0,1000.0,50,0,31,,2010-2017
 35_M_NA,,,,,,,0.0,,0.0,100.0,Infinity,-Infinity,35_M,,2010-2017
 35_NA,2414 Normal,DNA,4/25/2012,,7.42,50,371.0,,371.0,371.0,50,0,35,,2010-2017
@@ -75,7 +75,7 @@
 56_NA,2430 BCC,DNA,7/31/2015,,10.30,65,669.5,,669.5,1000.0,97,-47,58,,2010-2017
 58_NA,2431 Melanocytic Nevus,DNA,7/31/2015,,48.70,65,3165.5,,3165.5,1000.0,21,29,59,,2010-2017
 59_NA,2432 Melanocytic Nevus,DNA,7/31/2015,,39.00,65,2535.0,,2535.0,1000.0,26,24,60,,2010-2017
-60_NA,"""2433 Pilomatricoma, cystic""",DNA,7/31/2015,,85.20,65,5538.0,,5538.0,1000.0,12,38,61,,2010-2017
+60_NA,"2433 Pilomatricoma, cystic",DNA,7/31/2015,,85.20,65,5538.0,,5538.0,1000.0,12,38,61,,2010-2017
 61_NA,2434 BCC,DNA,7/31/2015,,41.60,65,2704.0,,2704.0,278.0,7,43,62,,2010-2017
 62_NA,2435 Leiomyoma,DNA,7/31/2015,,4.28,65,278.2,,278.2,370.0,86,-36,64,,2010-2017
 64_NA,2436 Melanocytic Nevus,DNA,7/31/2015,,5.68,65,369.2,,369.2,1000.0,176,-126,65,,2010-2017
@@ -444,7 +444,7 @@ AM2 D-354,1574 LN Met 1,DNA,3/8/2021,DNAstorm FFPE,0.74,95,70.3,,70.3,,0,50,,,Ac
 AM2 D-355,1516 Mel2,DNA,2/22/2021,DNAstorm FFPE,0.23,95,21.9,,21.9,22.0,96,-46,AMLP-335,,Acral Melanoma
 AM2 D-356,1517 Mel3,DNA,2/22/2021,DNAstorm FFPE,0.26,95,24.7,,24.7,,0,50,AMLP-416,,Acral Melanoma
 AM2 D-357,1518 Mel4,DNA,2/22/2021,DNAstorm FFPE,0.41,95,38.9,,38.9,,0,50,,,Acral Melanoma
-AM2 D-358,1575 ,DNA,2/22/2021,DNAstorm FFPE,1.21,95,115.0,,115.0,115.0,95,-45,AMLP-294,DO NOT USE,Acral Melanoma
+AM2 D-358,1575,DNA,2/22/2021,DNAstorm FFPE,1.21,95,115.0,,115.0,115.0,95,-45,AMLP-294,DO NOT USE,Acral Melanoma
 AM2 D-360,1613 Normal,DNA,3/9/2021,DNAstorm FFPE,1.20,95,114.0,,114.0,114.0,95,-45,AMLP-245,45 min incubation at 72oC,Acral Melanoma
 AM2 D-361,1540 MIS2,DNA,3/9/2021,DNAstorm FFPE,0.77,95,73.2,,73.2,73.2,95,-45,AMLP-248,45 min incubation at 72oC,Acral Melanoma
 AM2 D-362,1541 Normal,DNA,3/9/2021,DNAstorm FFPE,1.22,95,115.9,,115.9,115.9,95,-45,AMLP-249,45 min incubation at 72oC,Acral Melanoma
@@ -525,7 +525,7 @@ AM2 D-454,1623 Invasive Mel 1,DNA,5/6/2021,DNAstorm FFPE,2.40,95,228.0,,228.0,22
 AM2 D-455,1515 Mel1,DNA,5/18/2021,DNAstorm FFPE,1.68,95,159.6,,159.6,159.0,95,-45,AMLP-310,45 min incubation at 72oC,Acral Melanoma
 AM2 D-456,1518 Mel4,DNA,5/18/2021,DNAstorm FFPE,2.95,95,280.3,,280.3,280.0,95,-45,AMLP-311,45 min incubation at 72oC,Acral Melanoma
 AM2 D-457,1529 Mel1,DNA,5/18/2021,DNAstorm FFPE,10.20,95,969.0,,969.0,333.0,33,17,"AMLP-312,AMLP-402",45 min incubation at 72oC,Acral Melanoma
-AM2 D-458,1532 Mel4,DNA,5/18/2021,DNAstorm FFPE,6.65,95,631.8,,631.8,333.0,50,-0,AMLP-313,45 min incubation at 72oC,Acral Melanoma
+AM2 D-458,1532 Mel4,DNA,5/18/2021,DNAstorm FFPE,6.65,95,631.8,,631.8,333.0,50,0,AMLP-313,45 min incubation at 72oC,Acral Melanoma
 AM2 D-459,1534 Skin Met1,DNA,5/18/2021,DNAstorm FFPE,19.00,95,1805.0,,1805.0,333.0,18,32,"AMLP-314,AMLP-403",45 min incubation at 72oC,Acral Melanoma
 AM2 D-460,1548 Mel1,DNA,5/18/2021,DNAstorm FFPE,9.94,95,944.3,,944.3,333.0,34,16,AMLP-315,45 min incubation at 72oC,Acral Melanoma
 AM2 D-461,1549 Mel2,DNA,5/18/2021,DNAstorm FFPE,7.76,95,737.2,,737.2,333.0,43,7,AMLP-316,45 min incubation at 72oC,Acral Melanoma
@@ -729,7 +729,7 @@ AM2 R-354,1574 LN Met 1,RNA,3/9/2021,RNAstorm FFPE,9.56,48,458.9,,458.9,,0,50,,,
 AM2 R-355,1516 Mel2,RNA,2/22/2021,RNAstorm FFPE,5.83,48,279.8,,279.8,,0,50,,,Acral Melanoma
 AM2 R-356,1517 Mel3,RNA,2/22/2021,RNAstorm FFPE,3.52,48,169.0,,169.0,70.4,20,30,AMLP-466,,Acral Melanoma
 AM2 R-357,1518 Mel4,RNA,2/22/2021,RNAstorm FFPE,7.59,48,364.3,,364.3,,0,50,,,Acral Melanoma
-AM2 R-358,1575 ,RNA,2/22/2021,RNAstorm FFPE,4.29,48,205.9,,205.9,,0,50,,DO NOT USE,Acral Melanoma
+AM2 R-358,1575,RNA,2/22/2021,RNAstorm FFPE,4.29,48,205.9,,205.9,,0,50,,DO NOT USE,Acral Melanoma
 AM2 R-361,1540 MIS2,RNA,3/9/2021,RNAstorm FFPE,7.28,48,349.4,,349.4,,0,50,,45 min incubation at 72oC,Acral Melanoma
 AM2 R-363,1475 Mel1,RNA,3/9/2021,RNAstorm FFPE,9.31,48,446.9,,446.9,300.0,32,18,"AMLP-467,AMLP-512,AMLP-513",45 min incubation at 72oC,Acral Melanoma
 AM2 R-370,1582 Invasive Mel 1,RNA,2/27/2021,RNAstorm FFPE,18.50,48,888.0,,888.0,100.0,5,45,AMLP-468,45 min incubation at 72oC,Acral Melanoma
@@ -875,7 +875,7 @@ BB008_HW8NC_NA,,DNA,,,,,0.0,,0.0,100.0,Infinity,-Infinity,BB008_HW8NC, FFPE extr
 BB008_HW8TC_NA,,DNA,,,,,0.0,,0.0,100.0,Infinity,-Infinity,BB008_HW8TC, FFPE extracted DNA sample received from Hong Wu at the FCCC (Boris has diagnosis),2010-2017
 BB008_HW9-NB_NA,,DNA,,,,,0.0,,0.0,100.0,Infinity,-Infinity,BB008_HW9-NB, FFPE extracted DNA sample received from Hong Wu at the FCCC (Boris has diagnosis),2010-2017
 BB008_HW9TC_NA,,DNA,,,,,0.0,,0.0,100.0,Infinity,-Infinity,BB008_HW9TC, FFPE extracted DNA sample received from Hong Wu at the FCCC (Boris has diagnosis),2010-2017
-BB008_Kit 227 Acral WT_NA,,DNA,,,,,0.0,,0.0,100.0,Infinity,-Infinity,BB008_Kit 227 Acral WT,"Alyssa Kit mutations.  Same template was used to go into BB007, BB004. Understanding run to run variation.  Influence of LM-PCR cycle reduction ",2010-2017
+BB008_Kit 227 Acral WT_NA,,DNA,,,,,0.0,,0.0,100.0,Infinity,-Infinity,BB008_Kit 227 Acral WT,"Alyssa Kit mutations.  Same template was used to go into BB007, BB004. Understanding run to run variation.  Influence of LM-PCR cycle reduction",2010-2017
 BB008_LAL-L1_NA,,DNA,,,,,0.0,,0.0,100.0,Infinity,-Infinity,BB008_LAL-L1,N5_15 and N5_16 are the exact same template done in duplicate with two different barcodes,2010-2017
 BB008_LAL-L2_NA,,DNA,,,,,0.0,,0.0,100.0,Infinity,-Infinity,BB008_LAL-L2,N5_15 and N5_16 are the exact same template done in duplicate with two different barcodes,2010-2017
 BB008_NB2107_NA,,DNA,,,,,0.0,,0.0,100.0,Infinity,-Infinity,BB008_NB2107,"Cell Line DNA received from Patricia Brafford, Wistar Institute",2010-2017
@@ -896,10 +896,10 @@ BB09_HW4_N_NA,,DNA,,,,,0.0,,0.0,,NaN,NaN,BB09_HW4_N,,2010-2017
 BB09_HW4_T_NA,,DNA,,,,,0.0,,0.0,,NaN,NaN,BB09_HW4_T,,2010-2017
 BB09_HW6_ND_NA,,DNA,,,,,0.0,,0.0,,NaN,NaN,BB09_HW6_ND,,2010-2017
 BB09_HW6_TD_NA,,DNA,,,,,0.0,,0.0,,NaN,NaN,BB09_HW6_TD,,2010-2017
-Bivona__L_17_NA,,DNA,,,,,0.0,,0.0,100.0,Infinity,-Infinity,Bivona__L_17, Patient Treated with EGFR TK1,2010-2017
+Bivona__L_17_NA,,DNA,,,,,0.0,,0.0,100.0,Infinity,-Infinity,Bivona__L_17,Patient Treated with EGFR TK1,2010-2017
 Bivona_L_1_NA,,DNA,,,,,0.0,,0.0,100.0,Infinity,-Infinity,Bivona_L_1,,2010-2017
-Bivona_L_18_NA,,DNA,,,,,0.0,,0.0,62.7,Infinity,-Infinity,Bivona_L_18, Patient Treated with EGFR TK1,2010-2017
-Bivona_L_19_NA,,DNA,,,,,0.0,,0.0,9.1,Infinity,-Infinity,Bivona_L_19, Patient Treated with EGFR TK1,2010-2017
+Bivona_L_18_NA,,DNA,,,,,0.0,,0.0,62.7,Infinity,-Infinity,Bivona_L_18,Patient Treated with EGFR TK1,2010-2017
+Bivona_L_19_NA,,DNA,,,,,0.0,,0.0,9.1,Infinity,-Infinity,Bivona_L_19,Patient Treated with EGFR TK1,2010-2017
 Bivona_L2_NA,,DNA,,,,,0.0,,0.0,100.0,Infinity,-Infinity,Bivona_L2,,2010-2017
 Bivona_L3_NA,,DNA,,,,,0.0,,0.0,100.0,Infinity,-Infinity,Bivona_L3,,2010-2017
 Bivona_L4_NA,,DNA,,,,,0.0,,0.0,100.0,Infinity,-Infinity,Bivona_L4,,2010-2017
@@ -910,18 +910,18 @@ BN_M1_NA,,,,,,,0.0,,0.0,100.0,Infinity,-Infinity,BN_M1,,2010-2017
 BN_M2_NA,,,,,,,0.0,,0.0,100.0,Infinity,-Infinity,BN_M2,,2010-2017
 BN_N1_NA,,,,,,,0.0,,0.0,100.0,Infinity,-Infinity,BN_N1,,2010-2017
 BN_N2_NA,,,,,,,0.0,,0.0,100.0,Infinity,-Infinity,BN_N2,,2010-2017
-BND-001,463 cellular blue nevus,DNA,2/20/2019,Qiagen FFPE DNA columns,2.20,48,105.6,,105.6,105.6,48,2,SGLP-0381,,Nevus Library
-BND-002,464 cellular blue nevus,DNA,2/20/2019,Qiagen FFPE DNA columns,2.80,48,134.4,,134.4,134.9,48,2,SGLP-0382,,Nevus Library
-BND-003,465 cellular blue nevus,DNA,2/20/2019,Qiagen FFPE DNA columns,3.90,48,187.2,,187.2,184.8,47,3,SGLP-0383,,Nevus Library
-BND-004,466 cellular blue nevus,DNA,2/20/2019,Qiagen FFPE DNA columns,1.10,48,52.8,,52.8,54.7,50,0,SGLP-0384,,Nevus Library
-BND-005,467 cellular blue nevus,DNA,2/20/2019,Qiagen FFPE DNA columns,0.60,48,28.8,,28.8,26.7,45,6,SGLP-0385,,Nevus Library
-BND-006,468 cellular blue nevus,DNA,2/20/2019,Qiagen FFPE DNA columns,1.10,48,52.8,,52.8,54.2,49,1,SGLP-0386,,Nevus Library
-BND-007,469 cellular blue nevus,DNA,2/20/2019,Qiagen FFPE DNA columns,1.10,48,52.8,,52.8,53.8,49,1,SGLP-0387,,Nevus Library
-BND-008,470 cellular blue nevus,DNA,2/20/2019,Qiagen FFPE DNA columns,0.80,48,38.4,,38.4,37.6,47,3,SGLP-0388,,Nevus Library
-BND-009,471 cellular blue nevus,DNA,2/20/2019,Qiagen FFPE DNA columns,2.00,48,96.0,,96.0,94.1,47,3,SGLP-0389,,Nevus Library
-BND-010,472 cellular blue nevus,DNA,2/20/2019,Qiagen FFPE DNA columns,0.20,48,9.5,,9.5,0.0,0,50,,,Nevus Library
-BND-011,473 cellular blue nevus,DNA,2/20/2019,Qiagen FFPE DNA columns,13.20,48,633.6,,633.6,250.0,19,31,SGLP-0390,,Nevus Library
-BND-012,474 cellular blue nevus,DNA,2/20/2019,Qiagen FFPE DNA columns,1.60,48,76.8,,76.8,76.3,48,2,SGLP-0391,,Nevus Library
+-BND 1.00,463 cellular blue nevus,DNA,2/20/2019,Qiagen FFPE DNA columns,2.20,48,105.6,,105.6,105.6,48,2,SGLP-0381,,Nevus Library
+-BND 2.00,464 cellular blue nevus,DNA,2/20/2019,Qiagen FFPE DNA columns,2.80,48,134.4,,134.4,134.9,48,2,SGLP-0382,,Nevus Library
+-BND 3.00,465 cellular blue nevus,DNA,2/20/2019,Qiagen FFPE DNA columns,3.90,48,187.2,,187.2,184.8,47,3,SGLP-0383,,Nevus Library
+-BND 4.00,466 cellular blue nevus,DNA,2/20/2019,Qiagen FFPE DNA columns,1.10,48,52.8,,52.8,54.7,50,0,SGLP-0384,,Nevus Library
+-BND 5.00,467 cellular blue nevus,DNA,2/20/2019,Qiagen FFPE DNA columns,0.60,48,28.8,,28.8,26.7,45,6,SGLP-0385,,Nevus Library
+-BND 6.00,468 cellular blue nevus,DNA,2/20/2019,Qiagen FFPE DNA columns,1.10,48,52.8,,52.8,54.2,49,1,SGLP-0386,,Nevus Library
+-BND 7.00,469 cellular blue nevus,DNA,2/20/2019,Qiagen FFPE DNA columns,1.10,48,52.8,,52.8,53.8,49,1,SGLP-0387,,Nevus Library
+-BND 8.00,470 cellular blue nevus,DNA,2/20/2019,Qiagen FFPE DNA columns,0.80,48,38.4,,38.4,37.6,47,3,SGLP-0388,,Nevus Library
+-BND 9.00,471 cellular blue nevus,DNA,2/20/2019,Qiagen FFPE DNA columns,2.00,48,96.0,,96.0,94.1,47,3,SGLP-0389,,Nevus Library
+-BND 10.00,472 cellular blue nevus,DNA,2/20/2019,Qiagen FFPE DNA columns,0.20,48,9.5,,9.5,0.0,0,50,,,Nevus Library
+-BND 11.00,473 cellular blue nevus,DNA,2/20/2019,Qiagen FFPE DNA columns,13.20,48,633.6,,633.6,250.0,19,31,SGLP-0390,,Nevus Library
+-BND 12.00,474 cellular blue nevus,DNA,2/20/2019,Qiagen FFPE DNA columns,1.60,48,76.8,,76.8,76.3,48,2,SGLP-0391,,Nevus Library
 BTK01,,DNA,2/22/2023,Qiagen DNeasy Blood & Tissue Kit,0.41,140,57.7,,57.7,,0,50,,3mm punch biopsy,"Mutation Burden in Normal Skin,Willed Body Program"
 BTK03,,DNA,2/22/2023,Qiagen DNeasy Blood & Tissue Kit,17.20,140,2408.0,,2408.0,,0,50,,3mm punch biopsy,"Mutation Burden in Normal Skin,Willed Body Program"
 BTK05,,DNA,2/22/2023,Qiagen DNeasy Blood & Tissue Kit,16.40,140,2296.0,,2296.0,,0,50,,3mm punch biopsy,"Mutation Burden in Normal Skin,Willed Body Program"
@@ -1004,7 +1004,7 @@ CGH12_317_NA,,DNA,,,,,0.0,,0.0,100.0,Infinity,-Infinity,CGH12_317,NTRK3 | Barcod
 CGH12_343_NA,,DNA,,,,,0.0,,0.0,74.6,Infinity,-Infinity,CGH12_343,NTRK3,2010-2017
 CGH12-039-D,620 Nevus?,DNA,,,7.34,50,367.0,,367.0,250.0,34,16,SGLP-0349,DNA from Dermpath/Swapna,Possible TERT Fusion
 CGH12-043_NA,,,,,,,0.0,,0.0,100.0,Infinity,-Infinity,CGH12-043,,2010-2017
-CGH12-055,1344 Tumor,DNA,6/27/2017,,4.39,50,219.5,,219.5,219.5,50,-0,SGLP-0009,,CGH Validation
+CGH12-055,1344 Tumor,DNA,6/27/2017,,4.39,50,219.5,,219.5,219.5,50,0,SGLP-0009,,CGH Validation
 CGH12-056-D,619 Nevus?,DNA,,,6.14,50,307.0,,307.0,250.0,41,9,SGLP-0348,DNA from Dermpath/Swapna,Possible TERT Fusion
 CGH12-058,997 Tumor,DNA,,,41.60,10,416.0,,416.0,250.0,6,44,SGLP-0600,DNA from Dermpath/Swapna,PRKC Fused Cases
 CGH12-067,1002 Tumor,DNA,,,29.52,10,295.2,,295.2,250.0,8,42,SGLP-0605,DNA from Dermpath/Swapna,NRAS Amplified
@@ -1047,12 +1047,12 @@ CGH14-348,493 nevus or nevus like,DNA,,Qiagen FFPE DNA columns,25.00,10,250.0,,2
 CGH15-043,1357 Tumor,DNA,7/10/2017,,4.80,50,240.0,,240.0,238.0,50,0,SGLP-0050,,CGH Validation
 CGH15-064,1358 Tumor,DNA,7/10/2017,,6.80,50,340.0,,340.0,250.0,37,13,SGLP-0051,,CGH Validation
 CGH15-081,1359 Tumor,DNA,7/10/2017,,5.50,50,275.0,,275.0,250.0,45,5,SGLP-0052,,CGH Validation
-CGH15-082,1360 Tumor,DNA,7/10/2017,,4.80,50,240.0,,240.0,242.0,50,-0,SGLP-0053,,CGH Validation
+CGH15-082,1360 Tumor,DNA,7/10/2017,,4.80,50,240.0,,240.0,242.0,50,0,SGLP-0053,,CGH Validation
 CGH15-090,1361 Tumor,DNA,7/10/2017,,6.40,50,320.0,,320.0,250.0,39,11,SGLP-0054,,CGH Validation
 CGH15-109-D,625 Nevus?,DNA,,,7.88,50,394.0,,394.0,250.0,32,18,SGLP-0354,DNA from Dermpath/Swapna,Possible TERT Fusion
 CGH15-115,1362 Tumor,DNA,7/10/2017,,7.60,50,380.0,,380.0,250.0,33,17,SGLP-0055,,CGH Validation
 CGH15-139,1363 Tumor,DNA,7/10/2017,,3.70,50,185.0,,185.0,185.0,50,0,SGLP-0056,,CGH Validation
-CGH15-151,1364 Tumor,DNA,7/10/2017,,3.70,50,185.0,,185.0,185.5,50,-0,SGLP-0057,,CGH Validation
+CGH15-151,1364 Tumor,DNA,7/10/2017,,3.70,50,185.0,,185.0,185.5,50,0,SGLP-0057,,CGH Validation
 CGH15-163,1365 Tumor,DNA,7/10/2017,,6.10,50,305.0,,305.0,250.0,41,9,SGLP-0058,,CGH Validation
 CGH15-176,1366 Tumor,DNA,7/10/2017,,10.80,50,540.0,,540.0,250.0,23,27,SGLP-0059,,CGH Validation
 CGH15-206,1367 Tumor,DNA,7/10/2017,,5.00,50,250.0,,250.0,248.0,50,0,SGLP-0060,,CGH Validation
@@ -1060,7 +1060,7 @@ CGH15-210,1368 Tumor,DNA,7/10/2017,,5.70,50,285.0,,285.0,250.0,44,6,SGLP-0061,,C
 CGH15-211,1369 Tumor,DNA,7/10/2017,,17.60,50,880.0,,880.0,250.0,14,36,SGLP-0062,,CGH Validation
 CGH15-246,1370 Tumor,DNA,7/10/2017,,4.30,50,215.0,,215.0,213.0,50,0,SGLP-0063,,CGH Validation
 CGH15-249,1000 Tumor,DNA,,,28.96,10,289.6,,289.6,250.0,9,41,SGLP-0603,DNA from Dermpath/Swapna,NRAS Amplified
-CGH15-253,1371 Tumor,DNA,7/10/2017,,4.60,50,230.0,,230.0,232.0,50,-0,SGLP-0064,,CGH Validation
+CGH15-253,1371 Tumor,DNA,7/10/2017,,4.60,50,230.0,,230.0,232.0,50,0,SGLP-0064,,CGH Validation
 CGH15-263,1372 Tumor,DNA,7/10/2017,,5.90,50,295.0,,295.0,250.0,42,8,SGLP-0065,,CGH Validation
 CGH16-002,1373 Tumor,DNA,7/10/2017,,29.20,50,1460.0,,1460.0,250.0,9,41,SGLP-0066,,CGH Validation
 CGH16-023,1374 Tumor,DNA,7/10/2017,,7.50,50,375.0,,375.0,250.0,33,17,SGLP-0067,,CGH Validation
@@ -1073,7 +1073,7 @@ CGH16-054,1380 Tumor,DNA,7/10/2017,,6.10,50,305.0,,305.0,250.0,41,9,SGLP-0073,,C
 CGH16-062,1381 Tumor,DNA,7/10/2017,,4.90,50,245.0,,245.0,245.0,50,0,SGLP-0074,,CGH Validation
 CGH16-071,1382 Tumor,DNA,7/10/2017,,4.70,50,235.0,,235.0,233.0,50,0,SGLP-0075,,CGH Validation
 CGH16-087,1383 Tumor,DNA,7/10/2017,,8.60,50,430.0,,430.0,250.0,29,21,SGLP-0076,,CGH Validation
-CGH16-089,1384 Tumor,DNA,7/10/2017,,3.90,50,195.0,,195.0,195.5,50,-0,SGLP-0077,,CGH Validation
+CGH16-089,1384 Tumor,DNA,7/10/2017,,3.90,50,195.0,,195.0,195.5,50,0,SGLP-0077,,CGH Validation
 CGH16-093,1385 Tumor,DNA,7/10/2017,,6.20,50,310.0,,310.0,250.0,40,10,SGLP-0078,,CGH Validation
 CGH16-097,1386 Tumor,DNA,7/10/2017,,8.10,50,405.0,,405.0,250.0,31,19,SGLP-0079,,CGH Validation
 CGH16-105,1387 Tumor,DNA,7/10/2017,,12.10,50,605.0,,605.0,250.0,21,29,SGLP-0080,,CGH Validation
@@ -1093,7 +1093,7 @@ CGH16-254,1399 Tumor,DNA,7/10/2017,,3.20,50,160.0,,160.0,162.0,51,-1,SGLP-0092,,
 CGH17-001,1400 Tumor,DNA,7/10/2017,,3.90,50,195.0,,195.0,197.0,51,-1,SGLP-0093,,CGH Validation
 CGH17-003,1401 Tumor,DNA,7/10/2017,,7.10,50,355.0,,355.0,250.0,35,15,SGLP-0094,,CGH Validation
 CGH17-008,1402 Tumor,DNA,7/10/2017,,6.60,50,330.0,,330.0,250.0,38,12,SGLP-0095,,CGH Validation
-CGH17-015,1403 Tumor,DNA,7/10/2017,,2.10,50,105.0,,105.0,106.0,50,-0,SGLP-0096,,CGH Validation
+CGH17-015,1403 Tumor,DNA,7/10/2017,,2.10,50,105.0,,105.0,106.0,50,0,SGLP-0096,,CGH Validation
 CGH17-017,1404 Tumor,DNA,7/10/2017,,2.40,50,120.0,,120.0,119.0,50,0,SGLP-0185,,CGH Validation
 CGH17-021,1405 Tumor,DNA,7/10/2017,,4.00,50,200.0,,200.0,199.0,50,0,SGLP-0186,,CGH Validation
 CGH17-024,1406 Tumor,DNA,7/10/2017,,4.20,50,210.0,,210.0,208.0,50,0,SGLP-0187,,CGH Validation
@@ -1104,9 +1104,9 @@ CGH17-039,1410 Tumor,DNA,7/10/2017,,3.00,50,150.0,,150.0,150.0,50,0,SGLP-0191,,C
 CGH17-052,1411 Tumor,DNA,7/10/2017,,2.60,50,130.0,,130.0,129.0,50,0,SGLP-0192,,CGH Validation
 CGH17-058,1412 Tumor,DNA,7/10/2017,,4.30,50,215.0,,215.0,215.0,50,0,SGLP-0193,,CGH Validation
 CGH17-076,1413 Tumor,DNA,7/10/2017,,4.70,50,235.0,,235.0,235.0,50,0,SGLP-0194,,CGH Validation
-CGH17-083,1414 Tumor,DNA,7/10/2017,,4.00,50,200.0,,200.0,201.0,50,-0,SGLP-0195,,CGH Validation
+CGH17-083,1414 Tumor,DNA,7/10/2017,,4.00,50,200.0,,200.0,201.0,50,0,SGLP-0195,,CGH Validation
 CGH17-095,1415 Tumor,DNA,7/10/2017,,2.90,50,145.0,,145.0,143.0,49,1,SGLP-0196,,CGH Validation
-CGH17-097,1416 Tumor,DNA,7/10/2017,,2.10,50,105.0,,105.0,106.0,50,-0,SGLP-0197,,CGH Validation
+CGH17-097,1416 Tumor,DNA,7/10/2017,,2.10,50,105.0,,105.0,106.0,50,0,SGLP-0197,,CGH Validation
 CGH17-104,1417 Tumor,DNA,7/10/2017,,4.40,50,220.0,,220.0,220.0,50,0,SGLP-0198,,CGH Validation
 CGH17-135,495 nevus or nevus like,DNA,,Qiagen FFPE DNA columns,25.00,10,250.0,,250.0,250.0,10,40,SGLP-0409,,Nevus Library
 CGH17-240,497 nevus or nevus like,DNA,,Qiagen FFPE DNA columns,25.00,10,250.0,,250.0,250.0,10,40,SGLP-0411,,Nevus Library
@@ -2002,9 +2002,9 @@ KIT-09,1142 Tumor,DNA,11/15/2017,PCI,1.36,30,40.8,,40.8,40.8,30,20,SGLP-0207,,Ki
 KIT-10,1143 Tumor,DNA,11/15/2017,PCI,3.26,30,97.8,,97.8,97.8,30,20,SGLP-0208,,Kit mutants
 KIT-11,1144 Tumor,DNA,11/7/2017,Qiagen FFPE DNA columns,3.86,15,57.9,,57.9,57.9,15,35,SGLP-0209,,Kit mutants
 KIT-12,1329 Tumor,DNA,11/7/2017,Qiagen FFPE DNA columns,2.46,25,61.5,,61.5,62.0,25,25,SGLP-0210,,Kit mutants
-KIT-13,1330 Tumor,DNA,1/26/2018,PCI,1.69,50,84.5,,84.5,85.0,50,-0,SGLP-0211,,Kit mutants
+KIT-13,1330 Tumor,DNA,1/26/2018,PCI,1.69,50,84.5,,84.5,85.0,50,0,SGLP-0211,,Kit mutants
 KIT-14,1331 Tumor,DNA,1/26/2018,PCI,3.98,50,199.0,,199.0,199.0,50,0,SGLP-0212,,Kit mutants
-KIT-15,1332 Tumor,DNA,1/26/2018,PCI,1.85,50,92.5,,92.5,93.0,50,-0,SGLP-0213,,Kit mutants
+KIT-15,1332 Tumor,DNA,1/26/2018,PCI,1.85,50,92.5,,92.5,93.0,50,0,SGLP-0213,,Kit mutants
 KIT-16,1333 Tumor,DNA,1/26/2018,PCI,2.58,50,129.0,,129.0,129.0,50,0,SGLP-0214,,Kit mutants
 KIT-17,1334 Tumor,DNA,1/26/2018,PCI,3.98,50,199.0,,199.0,199.0,50,0,SGLP-0215,,Kit mutants
 KIT-18,1335 Tumor,DNA,1/26/2018,PCI,4.46,50,223.0,,223.0,223.0,50,0,SGLP-0216,,Kit mutants
@@ -2984,18 +2984,13 @@ MMD-351,1862 Normal,DNA,9/23/2021,DNAstorm FFPE,0.34,88,29.9,,29.9,,0,50,,DNA ON
 MMD-352,1863 Mel,DNA,9/23/2021,DNAstorm FFPE,9.99,88,879.1,,879.1,,0,50,,,California Cancer Registry
 MMD-353,1864 Normal,DNA,9/23/2021,DNAstorm FFPE,0.65,88,57.2,,57.2,,0,50,,DNA ONLY,California Cancer Registry
 MMD-354,1678 Mel,DNA,9/23/2021,DNAstorm FFPE,0.68,88,59.8,,59.8,,0,50,,,California Cancer Registry
-MMD-355 (P041_01A),1679 Normal,DNA,7/29/2021,Purigen Ionic® FFPE Complete - RNA + DNA,0.39,50,19.5,,19.5,,0,50,,"DIN:4.2, 5 x (1-48 mm^2; 10 um)
-",California Cancer Registry
-MMD-356 (P041_01B),1731 Mel,DNA,7/29/2021,Purigen Ionic® FFPE Complete - RNA + DNA,0.00,50,0.0,,0.0,,NaN,NaN,,"DIN:5.2, 5 x (1-48 mm^2; 10 um)
-",California Cancer Registry
-MMD-357 (P041_01C),1732 Normal,DNA,7/29/2021,Purigen Ionic® FFPE Complete - RNA + DNA,0.48,50,24.0,,24.0,,0,50,,"DIN:5.6, 5 x (1-48 mm^2; 10 um)
-",California Cancer Registry
+MMD-355 (P041_01A),1679 Normal,DNA,7/29/2021,Purigen Ionic® FFPE Complete - RNA + DNA,0.39,50,19.5,,19.5,,0,50,,"DIN:4.2, 5 x (1-48 mm^2; 10 um)",California Cancer Registry
+MMD-356 (P041_01B),1731 Mel,DNA,7/29/2021,Purigen Ionic® FFPE Complete - RNA + DNA,0.00,50,0.0,,0.0,,NaN,NaN,,"DIN:5.2, 5 x (1-48 mm^2; 10 um)",California Cancer Registry
+MMD-357 (P041_01C),1732 Normal,DNA,7/29/2021,Purigen Ionic® FFPE Complete - RNA + DNA,0.48,50,24.0,,24.0,,0,50,,"DIN:5.6, 5 x (1-48 mm^2; 10 um)",California Cancer Registry
 MMD-358,1736 Mel,DNA,9/23/2021,DNAstorm FFPE,0.47,88,41.4,,41.4,,0,50,,,California Cancer Registry
-MMD-359 (P041_01D),1737 MIS,DNA,7/29/2021,Purigen Ionic® FFPE Complete - RNA + DNA,0.97,50,48.5,,48.5,,0,50,,"DIN:UND, 5 x (1-48 mm^2; 10 um)
-",California Cancer Registry
+MMD-359 (P041_01D),1737 MIS,DNA,7/29/2021,Purigen Ionic® FFPE Complete - RNA + DNA,0.97,50,48.5,,48.5,,0,50,,"DIN:UND, 5 x (1-48 mm^2; 10 um)",California Cancer Registry
 MMD-360,1745 Normal,DNA,9/23/2021,DNAstorm FFPE,0.88,88,77.4,,77.4,,0,50,,,California Cancer Registry
-MMD-361 (P041_03A),1746 MIS,DNA,7/29/2021,Purigen Ionic® FFPE Complete - RNA + DNA,1.00,50,50.0,,50.0,,0,50,,"DIN:4.8, 5 x (1-48 mm^2; 10 um)
-",California Cancer Registry
+MMD-361 (P041_03A),1746 MIS,DNA,7/29/2021,Purigen Ionic® FFPE Complete - RNA + DNA,1.00,50,50.0,,50.0,,0,50,,"DIN:4.8, 5 x (1-48 mm^2; 10 um)",California Cancer Registry
 MMR-01,1626 Mel,RNA,,Qiagen AllPrep DNA/RNA Mini Kit,570.00,25,14250.0,,14250.0,,0,50,,,California Cancer Registry
 MMR-02,1627 Mel,RNA,,Qiagen AllPrep DNA/RNA Mini Kit,381.00,25,9525.0,,9525.0,,0,50,,,California Cancer Registry
 MMR-03,1628 Mel,RNA,,Qiagen AllPrep DNA/RNA Mini Kit,0.00,25,0.0,,0.0,,NaN,NaN,,,California Cancer Registry
@@ -3891,9 +3886,9 @@ SKMEL 1121B,1318 Acral Melanoma Cells,DNA,,,114.00,10,1140.0,,1140.0,250.0,2,48,
 SKMel 1121B Dec2019 (MC-03),1247 Acral Melanoma Cells,DNA,,,26.40,33,871.2,,871.2,250.0,9,41,SGLP-0766,,Acral Melanoma Cell Line
 SM D-01,424 Blue + spitz,DNA,12/12/2018,Qiagen FFPE DNA columns,1.36,48,65.3,,65.3,65.3,48,2,SGLP-0356,,Nevus Library
 SM D-02,425 Blue + spitz,DNA,12/12/2018,Qiagen FFPE DNA columns,2.10,48,100.8,,100.8,100.8,48,2,SGLP-0357,,Nevus Library
-SM D-03,"""426 blue nevus, cellular,  DF like""",DNA,12/12/2018,Qiagen FFPE DNA columns,8.67,48,416.2,,416.2,250.0,29,21,SGLP-0358,,Nevus Library
-SM D-04,"""427 blue nevus, cellular,  DF like""",DNA,12/12/2018,Qiagen FFPE DNA columns,3.02,48,145.0,,145.0,145.0,48,2,SGLP-0359,,Nevus Library
-SM D-05,"""428 blue nevus, cellular,  DF like""",DNA,12/12/2018,Qiagen FFPE DNA columns,2.60,48,124.8,,124.8,124.8,48,2,SGLP-0360,,Nevus Library
+SM D-03,"426 blue nevus, cellular,  DF like",DNA,12/12/2018,Qiagen FFPE DNA columns,8.67,48,416.2,,416.2,250.0,29,21,SGLP-0358,,Nevus Library
+SM D-04,"427 blue nevus, cellular,  DF like",DNA,12/12/2018,Qiagen FFPE DNA columns,3.02,48,145.0,,145.0,145.0,48,2,SGLP-0359,,Nevus Library
+SM D-05,"428 blue nevus, cellular,  DF like",DNA,12/12/2018,Qiagen FFPE DNA columns,2.60,48,124.8,,124.8,124.8,48,2,SGLP-0360,,Nevus Library
 SM D-06,429 common + blue,DNA,12/12/2018,Qiagen FFPE DNA columns,0.37,48,17.6,,17.6,17.6,48,2,SGLP-0361,,Nevus Library
 SM D-07,430 common + blue,DNA,12/12/2018,Qiagen FFPE DNA columns,2.08,48,99.8,,99.8,99.8,48,2,SGLP-0362,,Nevus Library
 SM D-08,431 common + blue,DNA,12/12/2018,Qiagen FFPE DNA columns,4.14,48,198.7,,198.7,198.7,48,2,SGLP-0363,,Nevus Library
@@ -3901,17 +3896,17 @@ SM D-09,432 common + blue,DNA,12/12/2018,Qiagen FFPE DNA columns,0.92,48,44.0,,4
 SM D-10,433 common + blue,DNA,12/12/2018,Qiagen FFPE DNA columns,4.36,48,209.3,,209.3,209.3,48,2,SGLP-0365,,Nevus Library
 SM D-11,434 common + blue,DNA,12/12/2018,Qiagen FFPE DNA columns,1.40,48,67.2,,67.2,67.2,48,2,SGLP-0366,,Nevus Library
 SM D-12,435 common + blue,DNA,12/12/2018,Qiagen FFPE DNA columns,14.40,48,691.2,,691.2,250.0,17,33,SGLP-0367,,Nevus Library
-SM D-13,"""436 common, sclerotic dermal component """,DNA,12/12/2018,Qiagen FFPE DNA columns,9.44,48,453.1,,453.1,250.0,26,24,SGLP-0368,,Nevus Library
-SM D-14,"""437 common, sclerotic dermal component """,DNA,12/12/2018,Qiagen FFPE DNA columns,3.30,48,158.4,,158.4,159.8,48,2,SGLP-0369,,Nevus Library
-SM D-15,"""438 common, sclerotic dermal component """,DNA,12/12/2018,Qiagen FFPE DNA columns,8.61,48,413.3,,413.3,250.0,29,21,SGLP-0370,,Nevus Library
-SM D-16,"""439 common, sclerotic dermal component """,DNA,12/12/2018,Qiagen FFPE DNA columns,2.27,48,109.0,,109.0,109.0,48,2,SGLP-0371,,Nevus Library
-SM D-17,"""440 common, sclerotic dermal component """,DNA,12/12/2018,Qiagen FFPE DNA columns,6.84,48,328.3,,328.3,250.0,37,13,SGLP-0372,,Nevus Library
-SM D-18,"""441 common, sclerotic dermal component """,DNA,12/12/2018,Qiagen FFPE DNA columns,6.75,48,324.0,,324.0,250.0,37,13,SGLP-0373,,Nevus Library
-SM D-19,442 compound meloncytic nevus ,DNA,12/12/2018,Qiagen FFPE DNA columns,1.22,48,58.6,,58.6,58.6,48,2,SGLP-0374,,Nevus Library
-SM D-20,"""443 common, sclerotic dermal component """,DNA,12/12/2018,Qiagen FFPE DNA columns,5.97,48,286.6,,286.6,250.0,42,8,SGLP-0375,,Nevus Library
-SM D-21,"""444 blue nevus, cellular """,DNA,12/12/2018,Qiagen FFPE DNA columns,0.77,48,36.9,,36.9,36.9,48,2,SGLP-0376,,Nevus Library
-SM D-22,"""445 common, sclerotic dermal component """,DNA,12/12/2018,Qiagen FFPE DNA columns,1.87,48,89.8,,89.8,89.8,48,2,SGLP-0377,,Nevus Library
-SM D-23,"""446 DPN, pure""",DNA,12/12/2018,Qiagen FFPE DNA columns,0.83,48,39.7,,39.7,39.7,48,2,SGLP-0378,,Nevus Library
+SM D-13,"436 common, sclerotic dermal component ",DNA,12/12/2018,Qiagen FFPE DNA columns,9.44,48,453.1,,453.1,250.0,26,24,SGLP-0368,,Nevus Library
+SM D-14,"437 common, sclerotic dermal component ",DNA,12/12/2018,Qiagen FFPE DNA columns,3.30,48,158.4,,158.4,159.8,48,2,SGLP-0369,,Nevus Library
+SM D-15,"438 common, sclerotic dermal component ",DNA,12/12/2018,Qiagen FFPE DNA columns,8.61,48,413.3,,413.3,250.0,29,21,SGLP-0370,,Nevus Library
+SM D-16,"439 common, sclerotic dermal component ",DNA,12/12/2018,Qiagen FFPE DNA columns,2.27,48,109.0,,109.0,109.0,48,2,SGLP-0371,,Nevus Library
+SM D-17,"440 common, sclerotic dermal component ",DNA,12/12/2018,Qiagen FFPE DNA columns,6.84,48,328.3,,328.3,250.0,37,13,SGLP-0372,,Nevus Library
+SM D-18,"441 common, sclerotic dermal component ",DNA,12/12/2018,Qiagen FFPE DNA columns,6.75,48,324.0,,324.0,250.0,37,13,SGLP-0373,,Nevus Library
+SM D-19,442 compound meloncytic nevus,DNA,12/12/2018,Qiagen FFPE DNA columns,1.22,48,58.6,,58.6,58.6,48,2,SGLP-0374,,Nevus Library
+SM D-20,"443 common, sclerotic dermal component ",DNA,12/12/2018,Qiagen FFPE DNA columns,5.97,48,286.6,,286.6,250.0,42,8,SGLP-0375,,Nevus Library
+SM D-21,"444 blue nevus, cellular ",DNA,12/12/2018,Qiagen FFPE DNA columns,0.77,48,36.9,,36.9,36.9,48,2,SGLP-0376,,Nevus Library
+SM D-22,"445 common, sclerotic dermal component ",DNA,12/12/2018,Qiagen FFPE DNA columns,1.87,48,89.8,,89.8,89.8,48,2,SGLP-0377,,Nevus Library
+SM D-23,"446 DPN, pure",DNA,12/12/2018,Qiagen FFPE DNA columns,0.83,48,39.7,,39.7,39.7,48,2,SGLP-0378,,Nevus Library
 SM D-24,447 balloon cell nevus,DNA,12/12/2018,Qiagen FFPE DNA columns,1.54,48,73.9,,73.9,73.9,48,2,SGLP-0379,,Nevus Library
 SM D-25,448 common & balloon,DNA,12/12/2018,Qiagen FFPE DNA columns,2.36,48,113.3,,113.3,113.3,48,2,SGLP-0380,,Nevus Library
 SM_1_Tumor_NA,2779 Tumor,DNA,,,,,0.0,,0.0,100.0,Infinity,-Infinity,SM_1_Tumor,,Spitzoid Melanoma
@@ -4482,7 +4477,7 @@ MucM D-012,2675 Normal,DNA,10/10/2023,DNAstorm FFPE,37.30,88,3282.4,,3282.4,,0,5
 MucM D-015,2678 Normal,DNA,10/10/2023,DNAstorm FFPE,10.60,88,932.8,,932.8,,0,50,,,Mucosal Melanoma
 MucM D-019,2682 Normal,DNA,10/10/2023,DNAstorm FFPE,0.70,116,81.2,,81.2,,0,50,,,Mucosal Melanoma
 MucM D-020,2683 Normal,DNA,10/10/2023,DNAstorm FFPE,1.06,430,455.8,,455.8,,0,50,,,Mucosal Melanoma
-DPN 49,2696 ,DNA,,,6.89,48,330.7,,330.7,,0,50,"DPN-49-Graz,DPN49-Tumor","Sent from Dr. Helmut Kerl, University of Graz, 'Cerebral meta'",
+DPN 49,2696,DNA,,,6.89,48,330.7,,330.7,,0,50,"DPN-49-Graz,DPN49-Tumor","Sent from Dr. Helmut Kerl, University of Graz, 'Cerebral meta'",
 AM-15-Tumor,2697 Tumor,DNA,2/25/2015,,4.31,48,206.9,,206.9,,0,50,AM-15-Tumor,,Acral Melanoma
 AM-16-Tumor,2698 Tumor,DNA,2/25/2015,,45.30,48,2174.4,,2174.4,,0,50,AM-16-Tumor,,Acral Melanoma
 AM-17-Tumor,2699 Tumor,DNA,2/25/2015,,43.60,48,2092.8,,2092.8,,0,50,AM-17-Tumor,,Acral Melanoma
@@ -4556,13 +4551,13 @@ KAM95-T-B1,2744 Tumor,DNA,11/6/2014,,5.20,50,260.0,,260.0,,0,50,KAM95-T-B1,,Acra
 KAM99-N,2746 Normal,DNA,9/10/2014,,2.80,55,154.0,,154.0,250.0,89,-39,"KAM99-normal,KAM99-normal_kapa-NGv3-PE100-NGv3-ready",,Acral Melanoma
 KAM99-T,2745 Tumor,DNA,9/10/2014,,27.60,50,1380.0,,1380.0,250.0,9,41,"KAM99-tumor,KAM99-tumor_kapa-NGv3-PE100-NGv3-ready",,Acral Melanoma
 JBU10-Norm,2751 Normal,DNA,,,53.00,50,2650.0,,2650.0,,0,50,JBU10-Norm,,
-JBU10-MVP,2752 MVP,DNA,,,31.20,50,1560.0,,1560.0,,0,50,JBU10-MVP,,
-JBU11-MVP,2754 MVP,DNA,,,35.40,50,1770.0,,1770.0,,0,50,JBU11-MVP,,
+JBU10-MVP,MVP 2752.00,DNA,,,31.20,50,1560.0,,1560.0,,0,50,JBU10-MVP,,
+JBU11-MVP,MVP 2754.00,DNA,,,35.40,50,1770.0,,1770.0,,0,50,JBU11-MVP,,
 JBU11-Norm,2753 Normal,DNA,,,13.90,50,695.0,,695.0,,0,50,JBU11-Norm,,
 JBU7-Norm,2755 Normal,DNA,,,27.00,50,1350.0,,1350.0,,0,50,JBU7-Norm,,
-JBU7-MVP,2756 MVP,DNA,,,41.50,50,2075.0,,2075.0,,0,50,JBU7-MVP,,
+JBU7-MVP,MVP 2756.00,DNA,,,41.50,50,2075.0,,2075.0,,0,50,JBU7-MVP,,
 JBU8-Norm,2757 Normal,DNA,,,0.48,50,24.0,,24.0,,0,50,JBU8-Norm,,
-JBU8-MVP,2758 MVP,DNA,,,33.40,50,1670.0,,1670.0,,0,50,JBU8-MVP,,
+JBU8-MVP,MVP 2758.00,DNA,,,33.40,50,1670.0,,1670.0,,0,50,JBU8-MVP,,
 Thomas_SK_Mel23,2759 Cell Line,DNA,7/2/2013,,147.00,50,7350.0,,7350.0,,0,50,Sk-Mel-23,,Melanoma Cell Line
 UM38-Normal_NA,2694 Normal,DNA,12/10/2014,,14.30,45,643.5,,643.5,,0,50,UM38-Normal,,Uveal Melanoma
 UM38-Tumor_NA,2695 Tumor,DNA,12/10/2014,,68.00,45,3060.0,,3060.0,,0,50,UM38-Tumor,,Uveal Melanoma
