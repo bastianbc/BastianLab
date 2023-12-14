@@ -2791,7 +2791,7 @@ def get_area_type(value):
 def nas(row):
     try:
         na = NucAcids.objects.get(name=row["NA_id"])
-        if na.area.name == "UnidentifiedArea" or na.area == None:
+        if na.area.name == "UndefinedArea" or not na.area:
             print(na)
     except Exception as e:
         print(e,row["NA_id"])
