@@ -9,7 +9,7 @@ from blocks.models import Blocks
 from projects.models import Projects
 from account.models import User
 from areas.models import Areas
-from libprep.models import NucAcids
+from libprep.models import NucAcids, AREA_NA_LINK
 from method.models import Method
 from samplelib.models import SampleLib, NA_SL_LINK
 from capturedlib.models import CapturedLib, SL_CL_LINK
@@ -2790,15 +2790,16 @@ def get_area_type(value):
 
 def nas(row):
     try:
-        na = NucAcids.objects.get(name=row["NA_ID"])
-        if na.area.name == "UndefinedArea" or not na.area:
-            # print(f'nuc acid:{na}, area:{row["Area ID"]}')
-            if "," in row["Area ID"]:
-                for area in row["Area ID"].split(","):
-                    a = Areas.objects.get(name=area.strip())
-                    print(area)
+        na = NucAcids.objects.filter(name=row["NA_ID"])
+        project = Projects.objects.get(name=row["Assigned Projects"])
+        # print(project)
+        # if na.area.name == "UndefinedArea" or not na.area:
+        #     if "," in row["Area ID"]:
+        #         for area in row["Area ID"].split(","):
+        #             a = Areas.objects.get(name=area.strip())
+        #             print(area)
     except Exception as e:
-        print(e,row["NA_ID"], row["Area ID"])
+        print(e,row["NA_ID"], row["Assigned Projects"])
 
 
 
@@ -2824,9 +2825,14 @@ def patients(row):
 
 
 def check_patient(request):
-    file = Path(Path(__file__).parent.parent / "uploads" / "report_patients_not_matched.csv")
-    df = pd.read_csv(file)
-    df.apply(lambda row: patients(row), axis=1)
+    for na in NucAcids.objects.all():
+        print(na)
+        obj, created = AREA_NA_LINK.objects.get_or_create(nucacid=na,area=na.area)
+    # file = Path(Path(__file__).parent.parent / "uploads" / "report_patients_not_matched.csv")
+    # df = pd.read_csv(file)
+    # df.apply(lambda row: patients(row), axis=1)
+
+
 
 
 

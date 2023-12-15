@@ -198,3 +198,13 @@ class NucAcids(models.Model):
         '''
         self.vol_remain = round(self.vol_remain - (amount / self.conc),2)
         self.save()
+
+
+class AREA_NA_LINK(models.Model):
+    nucacid = models.ForeignKey("libprep.NucAcids",on_delete=models.CASCADE, related_name="area_na_links", verbose_name="Nucleic Acid")
+    area = models.ForeignKey("areas.Areas", on_delete=models.CASCADE, related_name="area_na_links", verbose_name="Area")
+    input_vol = models.FloatField(blank=True, null=True, verbose_name="Volume")
+    input_amount = models.FloatField(blank=True, null=True, verbose_name="Amount")
+
+    class Meta:
+        db_table = "area_na_link"
