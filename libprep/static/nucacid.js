@@ -63,7 +63,7 @@ var KTDatatablesServerSide = function () {
             columns: [
                 { data: 'nu_id' },
                 { data: 'name' },
-                { data: 'area_name' },
+                { data: 'area_na_links'},
                 { data: 'na_type',
                   render: function (val, type, row) {
                     return row["na_type_label"];
@@ -99,11 +99,19 @@ var KTDatatablesServerSide = function () {
                 {
                     targets: 2,
                     orderable: true,
+                    className: "text-center",
                     render: function (data, type, row) {
-                        if (data) {
-                          return `<a href="/areas/edit/${row["area_id"]}">${data}</a>`;
+                        var area_na_links = row['area_na_links'];
+                        var html_atag = ``;
+                        if (area_na_links.length > 0) {
+                            for (let i = 0; i < area_na_links.length; i++) {
+                              var area = area_na_links[i]['area'];
+                              let nu_id = row["nu_id"];
+                              html_atag += `<a href="/areas?initial=${nu_id}">${area[1]}</a>`
+                            }
+                            return html_atag;
                         }
-                        return "";
+                        return data;
                     }
                 },
                 {
@@ -128,7 +136,7 @@ var KTDatatablesServerSide = function () {
                 },
                 {
                     targets: 10,
-                    orderable: false,
+                    orderable: true,
                     className: "text-center",
                     render: function (data, type, row) {
                         if (data > 0) {

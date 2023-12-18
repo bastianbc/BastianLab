@@ -849,11 +849,6 @@ var KTDatatablesServerSide = function () {
 
           v = data[i].volume;
           p = v / totalVolume || 0;
-          console.log("aa");
-          console.log("volume:"+data[i].volume);
-          console.log("totalVolume:"+totalVolume);
-          console.log("p:");
-          console.log(p);
 
           var row = `<div class="row mb-1 detail-row">
               <div class="col-2 align-self-center" data-id="${ data[i].captured_lib }"><a href="/capturedlib/edit/${ data[i].captured_lib }">${ data[i].name }</a></div>

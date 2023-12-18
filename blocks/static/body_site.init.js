@@ -118,12 +118,10 @@ function setBodySite() {
     var element = document.getElementById("id_mock_body_site_" + i);
 
     if (element) {
-      console.log(element);
       document.getElementById("id_body_site").value = element.value;
 
     }
 
   }
-  console.log("val:" + document.getElementById("id_body_site").value);
 
 }
