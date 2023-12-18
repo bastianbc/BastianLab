@@ -2813,6 +2813,7 @@ def check_na(request):
 
 def patients(row):
     try:
+
         blocks = Blocks.objects.filter(patient__isnull=True)
         for block in blocks:
             patient_id = "_G"
@@ -2831,6 +2832,30 @@ def check_patient(request):
     # file = Path(Path(__file__).parent.parent / "uploads" / "report_patients_not_matched.csv")
     # df = pd.read_csv(file)
     # df.apply(lambda row: patients(row), axis=1)
+
+
+
+def check_blocks(row):
+    try:
+        print(row["name"])
+        b = Blocks.objects.get(name=row["name"])
+        b.age=row["pat_age"] if not pd.isnull(row["pat_age"]) else b.age
+        b.thickness=row["thickness"] if not pd.isnull(row["thickness"]) else b.thickness
+        b.mitoses=row["mitoses"] if not pd.isnull(row["mitoses"]) else b.mitoses
+        b.p_stage=row["p_stage"] if not pd.isnull(row["p_stage"]) else b.p_stage
+        b.prim=row["prim"] if not pd.isnull(row["prim"]) else b.prim
+        b.subtype=row["subtype"] if not pd.isnull(row["subtype"]) else b.subtype
+        b.notes=row["note"] if not pd.isnull(row["note"]) else b.notes
+        b.micro=row["micro"] if not pd.isnull(row["micro"]) else b.micro
+        b.save()
+    except Exception as e:
+        print(row["name"],e)
+
+
+def check_block(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "report-block.csv")
+    df = pd.read_csv(file)
+    df.apply(lambda row: check_blocks(row), axis=1)
 
 
 
