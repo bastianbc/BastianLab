@@ -30,4 +30,5 @@ urlpatterns = [
     path("prepare_report", views.prepare_report, name="prepare_report"),
     path("check_na", views.check_na, name="check_na"),
     path("check_patient", views.check_patient, name="check_patient"),
+    path("check_block", views.check_block, name="check_block"),
 ]
