@@ -13,7 +13,6 @@ var KTDatatablesServerSide = function () {
    * @param  {String} initialValue  If it comes from another page, it is initialized with this value.
    */
     var initDatatable = function ( initialValue ) {
-
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
 
         dt = $(".table").DataTable({
@@ -105,7 +104,7 @@ var KTDatatablesServerSide = function () {
                 },
                 {
                     targets: 7,
-                    orderable: false,
+                    orderable: true,
                     className: "text-center",
                     render: function (data, type, row) {
                         if (data > 0) {
@@ -118,7 +117,7 @@ var KTDatatablesServerSide = function () {
                 },
                 {
                     targets: 8,
-                    orderable: false,
+                    orderable: true,
                     className: "text-center",
                     render: function (data, type, row) {
                         if (data > 0) {

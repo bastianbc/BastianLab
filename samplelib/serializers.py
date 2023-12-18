@@ -1,7 +1,28 @@
 from rest_framework import serializers
 from .models import *
+from libprep.serializers import AreaLinksSerializer, NucacidsSerializer
+from libprep.models import NucAcids
+
+class NaSlLinkSerializer(serializers.ModelSerializer):
+    area_na_link = serializers.SerializerMethodField()
+    class Meta:
+        model = NA_SL_LINK
+        fields = ('nucacid','area_na_link',)
+
+    def get_area_na_link(self, obj):
+        return (obj.nucacid.area_na_links.all()) if obj.nucacid else None
+
+    def get_area_na_link(self, obj):
+        # Assuming obj.nucacid.area_na_links.all() returns a QuerySet of AREA_NA_LINK instances
+        area_na_links = obj.nucacid.area_na_links.all() if obj.nucacid else None
+        if area_na_links is not None:
+            # Use the serializer to serialize the QuerySet
+            serializer = AreaLinksSerializer(area_na_links, many=True)
+            return serializer.data
+        return None
 
 class SampleLibSerializer(serializers.ModelSerializer):
+    na_sl_links = NaSlLinkSerializer(read_only=True, many=True)
     DT_RowId = serializers.SerializerMethodField()
     method_label = serializers.SerializerMethodField()
     amount_in = serializers.SerializerMethodField()
@@ -15,7 +36,11 @@ class SampleLibSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SampleLib
-        fields = ("id", "name", "barcode", "area_id", "area_name","date", "method", "method_label", "amount_final", "qpcr_conc", "amount_in", "vol_init", "vol_remain", "pcr_cycles", "qubit", "num_blocks", "num_nucacids", "num_capturedlibs", "DT_RowId",)
+        fields = ("id", "name", "barcode", "area_id",
+                  "area_name","date", "method", "method_label",
+                  "amount_final", "qpcr_conc", "amount_in", "vol_init",
+                  "vol_remain", "pcr_cycles", "qubit", "num_blocks",
+                  "num_nucacids", "num_capturedlibs", "DT_RowId", "na_sl_links",)
 
     def get_DT_RowId(self, obj):
        return getattr(obj, 'id')
@@ -31,11 +56,14 @@ class SampleLibSerializer(serializers.ModelSerializer):
 
     def get_area_id(self, obj):
         # Nuclecic Acids have to be from the SAME Area (never many areas) to be combined into one SL.
-        return obj.na_sl_links.first().nucacid.area.ar_id if obj.na_sl_links.count() > 0 and obj.na_sl_links.first().nucacid.area else None
+        # return obj.na_sl_links.first().nucacid.name if obj.na_sl_links.count() > 0 else None
+        # return obj.na_sl_links.all().nucacid.area.ar_id if obj.na_sl_links.count() > 0 and obj.na_sl_links.first().nucacid.area else None
+        return None
 
     def get_area_name(self,obj):
         # Nuclecic Acids have to be from the SAME Area (never many areas) to be combined into one SL.
-        return obj.na_sl_links.first().nucacid.area.name if obj.na_sl_links.count() > 0 and obj.na_sl_links.first().nucacid.area else None
+        # return obj.na_sl_links.first().nucacid.area.name if obj.na_sl_links.count() > 0 and obj.na_sl_links.first().nucacid.area else None
+        return None
 
     def get_method_label(self,obj):
         return obj.method.name if obj.method else None

@@ -323,7 +323,6 @@ var KTDatatablesServerSide = function () {
             // Checkbox on click event
             c.addEventListener('click', function () {
                 setTimeout(function () {
-                    console.log("111");
                     toggleToolbars();
                 }, 50);
             });

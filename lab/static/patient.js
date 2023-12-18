@@ -339,7 +339,6 @@ var KTDatatablesServerSide = function () {
             "selected_ids":JSON.stringify(selectedIds),
           },
         }).done(function(result) {
-          console.log("result.success:"+result.success);
           if (result.success) {
             Swal.fire({
                 text: "Block(s) created succesfully.",

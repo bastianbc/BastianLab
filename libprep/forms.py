@@ -10,7 +10,7 @@ class NucAcidForm(BaseForm, forms.ModelForm):
 
     class Meta:
         model = NucAcids
-        fields = ("area", "name", "date", "method", "na_type", "conc", "vol_init", "vol_remain", "notes", )
+        fields = ("name", "date", "method", "na_type", "conc", "vol_init", "vol_remain", "notes", )
 
     def __init__(self, *args, **kwargs):
         super(NucAcidForm, self).__init__(*args, **kwargs)

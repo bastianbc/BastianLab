@@ -8,7 +8,6 @@ var KTDatatablesServerSide = function () {
     var filterPayment;
     var editor;
 
-
     // Private functions
     var initDatatable = function ( initialValue ) {
 
@@ -105,7 +104,7 @@ var KTDatatablesServerSide = function () {
                     orderable: true,
                     render: function (data, type, row) {
                       if (data) {
-                        return `<a href="`+ row["block_url"]["url"] + row["scan_number"] +`"><i class="fa-solid fa-image fa-xl" style="color: #00f900;"></i></a>`;
+                        return `<a href="`+ row["block_url"]["url"] + row["scan_number"] +`" ><i class="fa-solid fa-image fa-xl" style="color: #00f900;"></i></a>`;
                       }
                       return "";
                     }
@@ -199,11 +198,9 @@ var KTDatatablesServerSide = function () {
 
         // Add event listener for opening and closing details
         dt.on('click', 'td.dt-control', function (e) {
-        console.log("123", this);
         var tr = event.target.closest('tr');
         var row = dt.row(tr);
 
-        console.log("123", row.data()["bl_id"]);
 
         $('#block_details').modal('toggle');
         var html = (key, value) => `<div class="col-3" id="d_details">
@@ -519,7 +516,6 @@ var KTDatatablesServerSide = function () {
       // var modal = new bootstrap.Modal(document.getElementById("block_details"));
     document.getElementById("block_details").addEventListener('show.bs.modal', function(e){
         var selectedItem = {};
-        console.log("123");
         selectedItem = {
               "id": e.relatedTarget.getAttribute("data-block_id"),
               "name": e.relatedTarget.getAttribute("data-block_name")

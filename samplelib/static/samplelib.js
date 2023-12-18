@@ -10,7 +10,6 @@ var KTDatatablesServerSide = function () {
 
     // Private functions
     var initDatatable = function ( initialValue, filterSequencingRun, filterPatient, filterBarcode, filterI5, filterI7, filterAreaType, filterBait ) {
-        console.log("initialValue: " + initialValue);
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
 
         dt = $(".table").DataTable({
@@ -20,6 +19,7 @@ var KTDatatablesServerSide = function () {
             order: [[0, 'desc']],
             stateSave: false,
             destroy: true,
+            pageLength: 100,
             select: {
                 style: 'multi',
                 selector: 'td:first-child input[type="checkbox"]',
@@ -62,7 +62,7 @@ var KTDatatablesServerSide = function () {
             columns: [
                 { data: 'id' },
                 { data: 'name' },
-                { data: 'area_name' },
+                { data: 'na_sl_links' },
                 { data: 'date',
                   render: function (data) {
                     return moment(data).format('MM/DD/YYYY');
@@ -98,12 +98,25 @@ var KTDatatablesServerSide = function () {
                 },
                 {
                     targets: 2,
-                    orderable: false,
+                    orderable: true,
+                    className: "text-center",
                     render: function (data, type, row) {
-                        if (data) {
-                          return `<a href="/areas/edit/${row["area_id"]}">${data}</a>`;
+                        var na_sl_links = row['na_sl_links'];
+                        var html_atag = ``;
+                        if (na_sl_links.length > 0) {
+                            for (let i = 0; i < na_sl_links.length; i++) {
+                                  var area_na_link = na_sl_links[i]['area_na_link'];
+                                  if (area_na_link.length > 0) {
+                                  for (let i = 0; i < area_na_link.length; i++) {
+                                    var area = area_na_link[i]['area'];
+                                    let nu_id = na_sl_links[i]["nucacid"];
+                                    html_atag += `<a href="/areas?initial=${nu_id}">${area[1]}</a><br>`
+                                  }
+                              }
+                            }
+                            return html_atag;
                         }
-                        return "";
+                        return data;
                     }
                 },
                 {
@@ -705,7 +718,6 @@ var KTDatatablesServerSide = function () {
             });
           }
           else {
-              console.log(result.error);
             Swal.fire({
                 text: "Captured Library(s) could not be created.",
                 icon: "error",

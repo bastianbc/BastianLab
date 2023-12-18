@@ -94,17 +94,10 @@ class Areas(models.Model):
             Users can access to some entities depend on their authorize. While the user having admin role can access to all things,
             technicians or researchers can access own projects and other entities related to it.
             '''
-            from samplelib.models import NA_SL_LINK
 
             queryset = Areas.objects.all().annotate(
-                num_nucacids=Count('nucacids'),
-                num_samplelibs=Coalesce(Subquery(
-                    NA_SL_LINK.objects.filter(
-                        nucacid__area=OuterRef("pk")
-                    ).values("nucacid__area").annotate(
-                        cnt=Count("nucacid__area")
-                    ).values("cnt")
-                ),Value(0))
+                num_nucacids=Count('area_na_links'),
+                num_samplelibs=Count('area_na_links__nucacid__na_sl_links__sample_lib')
             )
 
             if not user.is_superuser:
@@ -145,6 +138,8 @@ class Areas(models.Model):
                 "4":"area_type",
                 "5":"completion_date",
                 "6":"investigator",
+                "7":"num_nucacids",
+                "8":"num_samplelibs",
             }
             draw = int(kwargs.get('draw', None)[0])
             length = int(kwargs.get('length', None)[0])
@@ -167,7 +162,8 @@ class Areas(models.Model):
 
             if is_initial:
                 queryset = queryset.filter(
-                        Q(block__bl_id=search_value)
+                        Q(block__bl_id=search_value) |
+                        Q(area_na_links__nucacid__nu_id=search_value)
                     )
             elif search_value:
                 queryset = queryset.filter(

@@ -1,6 +1,11 @@
 from django.db import models
 from datetime import date, datetime
 from django.db.models import Q, Count
+from areas.models import Areas
+from django.db.models import Count, Subquery, OuterRef, Value
+from django.db.models.functions import Coalesce
+from samplelib.models import NA_SL_LINK
+
 
 class NucAcids(models.Model):
     DNA = "dna"
@@ -13,7 +18,6 @@ class NucAcids(models.Model):
     ]
 
     nu_id = models.AutoField(primary_key=True, verbose_name="NA ID")
-    area = models.ForeignKey("areas.Areas", on_delete=models.CASCADE, db_column="area", blank=True, null=True, related_name="nucacids", verbose_name="Area")
     name = models.CharField(max_length=50, unique=True, verbose_name="Name")
     date = models.DateTimeField(default=datetime.now, verbose_name="Extraction Date")
     method = models.ForeignKey("method.Method",related_name="nuc_acids",on_delete=models.CASCADE, blank=True, null=True, verbose_name="Method")
@@ -44,9 +48,18 @@ class NucAcids(models.Model):
             Users can access to some entities depend on their authorize. While the user having admin role can access to all things,
             technicians or researchers can access own projects and other entities related to it.
             '''
-            queryset = NucAcids.objects.all().annotate(num_samplelibs=Count('na_sl_links'))
+            queryset = NucAcids.objects.all().annotate(
+                num_areas=Count('area_na_links__area'),
+                num_samplelibs=Coalesce(Subquery(
+                    NA_SL_LINK.objects.filter(
+                        nucacid=OuterRef("pk")
+                    ).values("nucacid").annotate(
+                        cnt=Count("sample_lib", distinct=True)
+                    ).values("cnt")[:1],  # Limit to 1 to ensure correct subquery usage
+                ), Value(0))
+            )
             if not user.is_superuser:
-                return queryset.filter(Q(area__block__project__technician=user) | Q(area__block__project__researcher=user))
+                return queryset.filter(Q(area_na_links__area__block__project__technician=user) | Q(area_na_links__area__block__project__researcher=user))
             return queryset
 
         def _parse_value(search_value):
@@ -78,13 +91,14 @@ class NucAcids(models.Model):
             ORDER_COLUMN_CHOICES = {
                 "0": "nu_id",
                 "1": "name",
-                "2": "area",
+                "2": "num_areas",
                 "3": "na_type",
                 "4": "date",
                 "5": "method",
                 "6": "conc",
                 "7": "vol_init",
                 "8": "vol_remain",
+                "10": "num_samplelibs",
             }
 
             draw = int(kwargs.get('draw', None)[0])
@@ -123,7 +137,7 @@ class NucAcids(models.Model):
 
             if is_initial:
                 queryset = queryset.filter(
-                        Q(area__ar_id=search_value)
+                        Q(area_na_links__area__ar_id=search_value)
                     )
             elif search_value:
                 queryset = queryset.filter(
@@ -146,14 +160,6 @@ class NucAcids(models.Model):
             print(str(e))
             raise
 
-    def _generate_unique_name(self):
-        '''
-        Generates a unique name during new record creation.
-        Notation: First character of NA_TYPE - Area Name - Increasing number from the same type
-        '''
-        if not self.name:
-            na_count = self.area.nucacids.filter(area=self.area,na_type=self.na_type).count() # count of existing nucleic acid
-            self.name = "%s-%s-%d" % (self.na_type[0].upper(),self.area.name, na_count + 1)
 
     def _set_init_volume(self):
         '''
@@ -175,7 +181,6 @@ class NucAcids(models.Model):
         '''
         Overrides the model's save method.
         '''
-        self._generate_unique_name()
 
         self._check_changeability()
 
@@ -198,3 +203,13 @@ class NucAcids(models.Model):
         '''
         self.vol_remain = round(self.vol_remain - (amount / self.conc),2)
         self.save()
+
+
+class AREA_NA_LINK(models.Model):
+    nucacid = models.ForeignKey("libprep.NucAcids",on_delete=models.CASCADE, related_name="area_na_links", verbose_name="Nucleic Acid")
+    area = models.ForeignKey("areas.Areas", on_delete=models.CASCADE, related_name="area_na_links", verbose_name="Area")
+    input_vol = models.FloatField(blank=True, null=True, verbose_name="Volume")
+    input_amount = models.FloatField(blank=True, null=True, verbose_name="Amount")
+
+    class Meta:
+        db_table = "area_na_link"
