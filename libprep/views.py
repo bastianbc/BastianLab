@@ -24,7 +24,6 @@ def filter_nucacids(request):
     serializer = NucacidsSerializer(nucacids['items'], many=True)
     result = dict()
     result['data'] = serializer.data
-    print(result['data'])
     result['draw'] = nucacids['draw']
     result['recordsTotal'] = nucacids['total']
     result['recordsFiltered'] = nucacids['count']

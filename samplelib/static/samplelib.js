@@ -101,6 +101,7 @@ var KTDatatablesServerSide = function () {
                     orderable: true,
                     className: "text-center",
                     render: function (data, type, row) {
+                        let areas = [];
                         var na_sl_links = row['na_sl_links'];
                         var html_atag = ``;
                         if (na_sl_links.length > 0) {
@@ -110,6 +111,8 @@ var KTDatatablesServerSide = function () {
                                   for (let i = 0; i < area_na_link.length; i++) {
                                     var area = area_na_link[i]['area'];
                                     let nu_id = na_sl_links[i]["nucacid"];
+                                    if (areas.includes(area[1])) { continue; }
+                                    areas.push(area[1]);
                                     html_atag += `<a href="/areas?initial=${nu_id}">${area[1]}</a><br>`
                                   }
                               }
