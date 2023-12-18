@@ -38,7 +38,6 @@ class Blocks(models.Model):
 
     bl_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50, blank=True, null=False, unique=True)
-    # pat_id = models.CharField(max_length=12, blank=True, null=True)
     patient = models.ForeignKey('lab.Patients', on_delete=models.CASCADE, db_column='patient', blank=True, null=True, related_name="patient_blocks")
     project = models.ForeignKey('projects.Projects', on_delete=models.DO_NOTHING, blank=True, null=True, related_name="project_blocks")
     age = models.FloatField(blank=True, null=True, validators=[
@@ -55,8 +54,6 @@ class Blocks(models.Model):
     slides = models.IntegerField(blank=True, null=True)
     slides_left = models.IntegerField(blank=True, null=True)
     fixation = models.CharField(max_length=100, blank=True, null=True)
-    # area_id = models.CharField(max_length=100, blank=True, null=True)
-    # old_project = models.CharField(max_length=50, blank=True, null=True)
     storage = models.CharField(max_length=50, blank=True, null=True)
     scan_number = models.CharField(max_length=200,blank=True, null=True)
     icd10 = models.TextField(blank=True, null=True)
@@ -65,7 +62,6 @@ class Blocks(models.Model):
     micro = models.TextField(blank=True, null=True)
     gross = models.TextField(blank=True, null=True)
     clinical = models.TextField(blank=True, null=True)
-    # site_code = models.TextField(blank=True, null=True)
     date_added = models.DateTimeField(blank=True, null=True, auto_now_add=True)
     old_body_site = models.CharField(max_length=600,blank=True, null=True)
     collection = models.CharField(max_length=2, choices=COLLECTION_CHOICES, default=SCRAPE)

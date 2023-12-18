@@ -2858,6 +2858,72 @@ def check_block(request):
     df.apply(lambda row: check_blocks(row), axis=1)
 
 
+def get_collection(value):
+    for x in Blocks.COLLECTION_CHOICES:
+        if value.lower() == x[1].lower():
+            return x[0]
+    return Blocks.SCRAPE
+
+
+def check_blocks2(row):
+    try:
+        mapping_ulcreation={
+            'negative':False,
+            'Present':True,
+        }
+        print(row["Block_ID"])
+        s= "HE image	Specimen site	"
+        b = Blocks.objects.get(name=row["Block_ID"])
+        notes=b.notes
+        _notes=f"Description: {row['Description']} / Block storage location: {row['Block storage location']} / Specimen site: {row['Specimen site']}"
+        b.notes=str(row["Notes"]) + str(_notes) + str(notes)
+        b.diagnosis=row["Diagnosis/Type"] if not pd.isnull(row["Diagnosis/Type"]) else b.diagnosis
+        b.collection=get_collection(row["Collection Method"]) if not pd.isnull(row["Collection Method"]) else b.collection
+        b.fixation=row["Fixation"] if not pd.isnull(row["Fixation"]) else b.fixation
+        b.slides=row["Slides"] if not pd.isnull(row["Slides"]) else b.slides
+        b.slides_left=row["Slides left"] if not pd.isnull(row["Slides left"]) else b.slides_left
+        b.ulceration=mapping_ulcreation[row["Ulceration"]] if not pd.isnull(row["Ulceration"]) else b.ulceration
+        b.save()
+    except Exception as e:
+        print(row["Block_ID"],e)
+
+
+def check_block2(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "Blocks-Grid view-5.csv")
+    df = pd.read_csv(file)
+    df.apply(lambda row: check_blocks2(row), axis=1)
+
+
+def check_blocks3(row):
+    try:
+        mapping_ulcreation={
+            'negative':False,
+            'Present':True,
+        }
+        print(row["Block"])
+        b = Blocks.objects.get(name=row["Block"])
+        notes=b.notes
+        _notes=f"SITE_CODE: {row['site_code']} / icd9: {row['icd9']} / DEPT_NUMBER: {row['dept_number']} / SPECIMEN: {row['specimen']} / DX_TEXT: {row['dx_text']}"
+        b.age = row["pat_age"] if not pd.isnull(row["pat_age"]) else b.age
+        b.notes=str(row["Notes/Other"]) + str(row["note"]) + str(_notes) + str(notes)
+        b.micro = row["micro"] if not pd.isnull(row["micro"]) else b.micro
+        b.diagnosis=row["Diagnosis"] if not pd.isnull(row["Diagnosis"]) else b.diagnosis
+        b.thickness = row["thickness"] if not pd.isnull(row["thickness"]) else b.thickness
+        b.mitoses = row["mitoses"] if not pd.isnull(row["mitoses"]) else b.mitoses
+        b.p_stage = row["p_stage"] if not pd.isnull(row["p_stage"]) else b.p_stage
+        b.prim = row["prim"] if not pd.isnull(row["prim"]) else b.prim
+        b.subtype = row["subtype"] if not pd.isnull(row["subtype"]) else b.subtype
+        b.save()
+    except Exception as e:
+        print(row["Block"],e)
+
+
+def check_block3(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
+    df = pd.read_csv(file)
+    df[~df["Block"].isnull()].apply(lambda row: check_blocks3(row), axis=1)
+
+
 
 
 
