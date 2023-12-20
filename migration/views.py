@@ -2788,26 +2788,57 @@ def get_area_type(value):
             return x[0]
     return None
 
+
+def we(row):
+    match = re.search(r'-BND\s+(\d+)\.00', row["NA_ID"])
+
+    def replace_with_formatted_number(match):
+        numeric_value = int(match.group(1))
+        formatted_value = f"{numeric_value:03}"
+        return f'BND-{formatted_value}'
+
+    if match:
+        # print(row["sample_lib"])
+        value = re.sub(r'-BND\s+(\d+)\.00', replace_with_formatted_number, row["NA_ID"])
+        print(f"value: {value}")
+        return value
+
+
 def nas(row):
     try:
-        na = NucAcids.objects.filter(name=row["NA_ID"])
-        project = Projects.objects.get(name=row["Assigned Projects"])
-        # print(project)
-        # if na.area.name == "UndefinedArea" or not na.area:
-        #     if "," in row["Area ID"]:
-        #         for area in row["Area ID"].split(","):
-        #             a = Areas.objects.get(name=area.strip())
-        #             print(area)
+        if "BND" in row["NA_ID"]:
+            na=NucAcids.objects.get(name=we(row))
+        else:
+            na = NucAcids.objects.get(name=row["NA_ID"])
+        if "," in row["Area ID"]:
+            if "2409 SCC, in situ" in row["Area ID"]:
+                a = Areas.objects.get(name="2409 SCC, in situ")
+                AREA_NA_LINK.objects.get_or_create(nucacid=na, area=a)
+                return
+            if "426 blue nevus, cellular,  DF like" in row["Area ID"]:
+                a = Areas.objects.get(name="426 blue nevus, cellular,  DF like")
+                AREA_NA_LINK.objects.get_or_create(nucacid=na, area=a)
+                return
+            if "436 common, sclerotic dermal component" in row["Area ID"]:
+                a = Areas.objects.get(name="436 common, sclerotic dermal component")
+                AREA_NA_LINK.objects.get_or_create(nucacid=na, area=a)
+                return
+            for area in row["Area ID"].split(","):
+                print(na, area)
+                a = Areas.objects.get(name=area.strip())
+                AREA_NA_LINK.objects.get_or_create(nucacid=na, area=a)
     except Exception as e:
-        print(e,row["NA_ID"], row["Assigned Projects"])
+        print(e,row["NA_ID"], row["Area ID"])
 
 
 
 def check_na(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "Nucleic Acids-Grid view (1).csv")
     df = pd.read_csv(file)
-    # for na in NucAcids.objects.filter(Q(Q(area__isnull=True)|Q(area__name="UndefinedArea"))):
-    #     print(na)
+    for na in NucAcids.objects.filter(Q(area_na_links__area__name="UndefinedArea")):
+        if na.area_na_links.count() > 1:
+            oldest_child = na.area_na_links.filter(area__name="UndefinedArea").first()
+            oldest_child.delete()
     df[~df["NA_ID"].isnull() & ~df["Area ID"].isnull()].apply(lambda row: nas(row), axis=1)
 
 
