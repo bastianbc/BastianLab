@@ -107,7 +107,7 @@ var KTDatatablesServerSide = function () {
                             for (let i = 0; i < area_na_links.length; i++) {
                               var area = area_na_links[i]['area'];
                               let nu_id = row["nu_id"];
-                              html_atag += `<a href="/areas?initial=${nu_id}">${area[1]}</a>`
+                              html_atag += `<a href="/areas?initial=${nu_id}">${area[1]}</a><br>`
                             }
                             return html_atag;
                         }
