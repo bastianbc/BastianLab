@@ -143,7 +143,8 @@ class NucAcids(models.Model):
                 queryset = queryset.filter(
                     Q(name__icontains=search_value) |
                     Q(na_type__icontains=search_value) |
-                    Q(date__icontains=search_value)
+                    Q(area_na_links__area__name__icontains=search_value)|
+                    Q(na_sl_links__sample_lib__name__icontains=search_value)
                 )
 
             count = queryset.count()
