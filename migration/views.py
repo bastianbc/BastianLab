@@ -2831,7 +2831,6 @@ def nas(row):
         print(e,row["NA_ID"], row["Area ID"])
 
 
-
 def check_na(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "Nucleic Acids-Grid view (1).csv")
     df = pd.read_csv(file)
@@ -2840,6 +2839,54 @@ def check_na(request):
             oldest_child = na.area_na_links.filter(area__name="UndefinedArea").first()
             oldest_child.delete()
     df[~df["NA_ID"].isnull() & ~df["Area ID"].isnull()].apply(lambda row: nas(row), axis=1)
+
+
+def nas2(row):
+    try:
+        na=NucAcids.objects.get(name=row['NA_id'])
+        area=Areas.objects.get(name=row["Area_id"])
+        link=AREA_NA_LINK.objects.get_or_create(area=area,nucacid=na)
+    except Exception as e:
+        print(e,row["NA_id"])
+
+
+def check_na2(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
+    df = pd.read_csv(file)
+    df[~df["NA_id"].isnull()].apply(lambda row: nas2(row), axis=1)
+    # df[~df["NA_id"].isnull() & ~df["Area_id"].isnull()].apply(lambda row: nas2(row), axis=1)
+
+
+def nas3(row):
+
+    try:
+        if not pd.isnull(row['NA_ID_x']):
+            if "," in row['NA_ID_x'].replace(";",","):
+                for na in row['NA_ID_x'].replace(";", ",").split(","):
+                    NucAcids.objects.get(name=na)
+        if not pd.isnull(row['NA_ID_y']):
+            if "," in row['NA_ID_y'].replace(";",","):
+                for na in row['NA_ID_y'].replace(";", ",").split(","):
+                    NucAcids.objects.get(name=na)
+        if not pd.isnull(row['NA_id']):
+            if "," in row['NA_id'].replace(";",","):
+                for na in row['NA_id'].replace(";", ",").split(","):
+                    NucAcids.objects.get(name=na)
+        if not pd.isnull(row['Area_id']):
+            area=Areas.objects.get(name=row["Area_id"])
+        if not pd.isnull(row['Area_ID']):
+            area=Areas.objects.get(name=row["Area_ID"])
+        # link=AREA_NA_LINK.objects.get_or_create(area=area,nucacid=na)
+    except Exception as e:
+        print(e)
+        print(row['NA_ID_x'], row['NA_ID_y'], row['NA_id'])
+
+
+def check_na3(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "patients_done.csv")
+    df = pd.read_csv(file)
+    df[~df["NA_ID_x"].isnull()].apply(lambda row: nas3(row), axis=1)
+    # df[~df["NA_id"].isnull() & ~df["Area_id"].isnull()].apply(lambda row: nas2(row), axis=1)
 
 
 def patients(row):
