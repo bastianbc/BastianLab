@@ -2883,9 +2883,17 @@ def nas3(row):
 
 
 def check_na3(request):
+    for na in NucAcids.objects.filter(area_na_links__area__name="UndefinedArea"):
+        b = Blocks.objects.filter(name__icontains=na.name.replace("_NA",""))
+        if len(b)==1:
+            print(na.name, b.first().block_areas.all(),sep="------")
+            if len(b.first().block_areas.all())==1:
+                AREA_NA_LINK.objects.filter(area__name="UndefinedArea", nucacid=na).delete()
+                AREA_NA_LINK.objects.get_or_create(area=b.first().block_areas.first(), nucacid=na)
+    # print(NucAcids.objects.filter(area_na_links__area__name="UndefinedArea").count())
     file = Path(Path(__file__).parent.parent / "uploads" / "patients_done.csv")
     df = pd.read_csv(file)
-    df[~df["NA_ID_x"].isnull()].apply(lambda row: nas3(row), axis=1)
+    # df[~df["NA_ID_x"].isnull()].apply(lambda row: nas3(row), axis=1)
     # df[~df["NA_id"].isnull() & ~df["Area_id"].isnull()].apply(lambda row: nas2(row), axis=1)
 
 
