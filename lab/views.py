@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Patients
-from .forms import PatientForm
+from .forms import PatientForm, FilterForm
 import json
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required,permission_required
@@ -25,7 +25,8 @@ def filter_patients(request):
 
 @permission_required("lab.view_patients",raise_exception=True)
 def patients(request):
-    return render(request,"patient_list.html")
+    filter = FilterForm()
+    return render(request,"patient_list.html", locals())
 
 @permission_required("lab.add_patients",raise_exception=True)
 def new_patient(request):

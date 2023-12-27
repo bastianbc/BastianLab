@@ -11,12 +11,8 @@ User = get_user_model()
 class ProjectForm(BaseForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        # self.fields["pi"].widget.attrs['class'] = 'form-control'
-
         self.fields["technician"].queryset = User.objects.filter(groups__name=settings.TECHNICIAN_GROUP_NAME)
         self.fields['technician'].label_from_instance = lambda obj: "%s" % obj.get_full_name()
-
         self.fields["researcher"].queryset = User.objects.filter(groups__name=settings.RESEARCHER_GROUP_NAME)
         self.fields['researcher'].label_from_instance = lambda obj: "%s" % obj.get_full_name()
 
@@ -26,3 +22,31 @@ class ProjectForm(BaseForm):
             'pr_id', 'name', 'abbreviation', 'description', 'speedtype', 'pi', 'date_start', 'technician', 'researcher',
         ]
         widgets = {'description': forms.Textarea(attrs={'rows': 4, 'cols': 40})}
+
+
+class FilterForm(forms.Form):
+    date_range = forms.DateField(label="Start Date")
+    pi = forms.ChoiceField(choices=[('','---------' )] + Projects.PI_CHOICES, label="Private Investigator", required=False)
+    technician = forms.ModelChoiceField(queryset=User.objects.filter(
+            groups__name='Technicians',
+            technician_projects__isnull=False
+            ).distinct()
+        )
+    researcher = forms.ModelChoiceField(queryset=User.objects.filter(
+            groups__name='Researchers',
+            researcher_projects__isnull=False
+            ).distinct()
+        )
+
+
+    def __init__(self, *args, **kwargs):
+        super(FilterForm, self).__init__(*args, **kwargs)
+        self.fields["date_range"].widget.attrs.update({'class':'form-control-sm'})
+        self.fields["pi"].widget.attrs.update({'class':'form-control-sm'})
+        self.fields["technician"].widget.attrs.update({'class':'form-control-sm'})
+        self.fields["technician"].widget.attrs["data-control"] = "select2"
+        self.fields['technician'].label_from_instance = lambda obj: f"{obj.first_name} {obj.last_name}"
+        self.fields["researcher"].widget.attrs.update({'class':'form-control-sm'})
+        self.fields["researcher"].widget.attrs["data-control"] = "select2"
+        self.fields['researcher'].label_from_instance = lambda obj: f"{obj.first_name} {obj.last_name}"
+

@@ -9,7 +9,7 @@ var KTDatatablesServerSide = function () {
     var editor;
 
     // Private functions
-    var initDatatable = function () {
+    var initDatatable = function (race, sex, dob) {
 
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
 
@@ -34,6 +34,11 @@ var KTDatatablesServerSide = function () {
             ajax: {
               url: '/lab/filter_patients',
               type: 'GET',
+              data:{
+                "race": race,
+                "sex": sex,
+                "dob": dob,
+              },
               error: function (xhr, ajaxOptions, thrownError) {
                   if (xhr.status == 403) {
 
@@ -170,30 +175,20 @@ var KTDatatablesServerSide = function () {
     // Filter Datatable
     var handleFilterDatatable = () => {
         // Select filter options
-        filterPayment = document.querySelectorAll('[data-kt-docs-table-filter="payment_type"] [name="payment_type"]');
         const filterButton = document.querySelector('[data-kt-docs-table-filter="filter"]');
 
         // Filter datatable on submit
         filterButton.addEventListener('click', function () {
-            // Get filter values
-            let paymentValue = '';
 
-            // Get payment value
-            filterPayment.forEach(r => {
-                if (r.checked) {
-                    paymentValue = r.value;
-                }
+          var race = document.getElementById("id_race").value;
+          var sex = document.getElementById("id_sex").value;
+          var dob = document.getElementById("id_dob").value;
 
-                // Reset payment value if "All" is selected
-                if (paymentValue === 'all') {
-                    paymentValue = '';
-                }
-            });
+          initDatatable(race, sex, dob);
 
-            // Filter datatable --- official docs reference: https://datatables.net/reference/api/search()
-            dt.search(paymentValue).draw();
         });
-    }
+    };
+
 
     // Delete customer
     var handleDeleteRows = () => {
@@ -283,11 +278,13 @@ var KTDatatablesServerSide = function () {
 
         // Reset datatable
         resetButton.addEventListener('click', function () {
-            // Reset payment type
-            filterPayment[0].checked = true;
 
-            // Reset datatable --- official docs reference: https://datatables.net/reference/api/search()
-            dt.search('').draw();
+          document.getElementById("id_race").value = "";
+          document.getElementById("id_sex").value = "";
+          document.getElementById("id_dob").value = "";
+
+          initDatatable(null, null, null);
+
         });
     }
 
@@ -530,7 +527,7 @@ var KTDatatablesServerSide = function () {
     // Public methods
     return {
         init: function () {
-            initDatatable();
+            initDatatable(null,null,null);
             handleSearchDatatable();
             initToggleToolbar();
             handleFilterDatatable();
