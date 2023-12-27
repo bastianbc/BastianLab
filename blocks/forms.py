@@ -39,3 +39,19 @@ class BlockUrlForm(forms.ModelForm):
         if not data.endswith("/"):
             raise ValidationError("URL needs to be ended with /")
         return data
+
+
+class FilterForm(forms.Form):
+    p_stage = forms.ChoiceField(choices=[('','---------' )] + list(Blocks.P_STAGE_TYPES), label="P_STAGE", required=False)
+    prim = forms.ChoiceField(choices=[('','---------' )] + list(Blocks.PRIM_TYPES), label="PRIM", required=False)
+    collection = forms.ChoiceField(choices=[('','---------' )] + list(Blocks.COLLECTION_CHOICES), label="COLLECTION", required=False)
+    body_site = forms.ModelChoiceField(queryset=Body.objects.all())
+
+
+    def __init__(self, *args, **kwargs):
+        super(FilterForm, self).__init__(*args, **kwargs)
+        self.fields["p_stage"].widget.attrs.update({'class':'form-control-sm'})
+        self.fields["prim"].widget.attrs.update({'class':'form-control-sm'})
+        self.fields["collection"].widget.attrs.update({'class':'form-control-sm'})
+        self.fields["body_site"].widget.attrs.update({'class':'form-control-sm'})
+        self.fields["body_site"].widget.attrs["data-control"] = "select2"

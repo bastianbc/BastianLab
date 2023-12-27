@@ -32,7 +32,7 @@ def filter_blocks(request):
 def blocks(request):
     id = request.GET.get("id")
     model = request.GET.get("model")
-
+    filter = FilterForm()
     form = AreaCreationForm()
 
     if model=="project" and id:

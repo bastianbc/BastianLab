@@ -153,6 +153,10 @@ class Blocks(models.Model):
             length = int(kwargs.get('length', None)[0])
             start = int(kwargs.get('start', None)[0])
             search_value = kwargs.get('search[value]', None)[0]
+            p_stage = kwargs.get('p_stage', None)[0]
+            prim = kwargs.get('prim', None)[0]
+            collection = kwargs.get('collection', None)[0]
+            body_site = kwargs.get('body_site', None)[0]
             order_column = kwargs.get('order[0][column]', None)[0]
             order = kwargs.get('order[0][dir]', None)[0]
 
@@ -167,6 +171,23 @@ class Blocks(models.Model):
 
             is_initial = _is_initial_value(search_value)
             search_value = _parse_value(search_value)
+
+            if p_stage:
+                queryset = queryset.filter(
+                    Q(p_stage=p_stage)
+                )
+            if prim:
+                queryset = queryset.filter(
+                    Q(prim=prim)
+                )
+            if collection:
+                queryset = queryset.filter(
+                    Q(collection=collection)
+                )
+            if body_site:
+                queryset = queryset.filter(
+                    Q(body_site__id=body_site)
+                )
             if is_initial:
                 if search_value["model"] == "project":
                     queryset = _filter_by_project(search_value["id"])
