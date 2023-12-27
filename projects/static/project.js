@@ -12,8 +12,9 @@ var KTDatatablesServerSide = function () {
    * Initializes the datatable.
    * @param  {String} initialValue  If it comes from another page, it is initialized with this value.
    */
-    var initDatatable = function ( initialValue ) {
-
+    var initDatatable = function ( filterDateRange, pi , technician , researcher ) {
+        console.log("filterDateRange", filterDateRange);
+        console.log("pi", pi);
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
 
         dt = $(".table").DataTable({
@@ -38,6 +39,12 @@ var KTDatatablesServerSide = function () {
             ajax: {
               url: '/projects/filter_projects',
               type: 'GET',
+              data:{
+                "date_range": filterDateRange,
+                "pi": pi,
+                "technician": technician,
+                "researcher": researcher,
+              },
               error: function (xhr, ajaxOptions, thrownError) {
                   if (xhr.status == 403) {
 
@@ -187,28 +194,18 @@ var KTDatatablesServerSide = function () {
     // Filter Datatable
     var handleFilterDatatable = () => {
         // Select filter options
-        filterPayment = document.querySelectorAll('[data-kt-docs-table-filter="payment_type"] [name="payment_type"]');
         const filterButton = document.querySelector('[data-kt-docs-table-filter="filter"]');
 
         // Filter datatable on submit
         filterButton.addEventListener('click', function () {
-            // Get filter values
-            let paymentValue = '';
 
-            // Get payment value
-            filterPayment.forEach(r => {
-                if (r.checked) {
-                    paymentValue = r.value;
-                }
+          var dateRange = document.getElementById("id_date_range").value;
+          var pi = document.getElementById("id_pi").value;
+          var technician = document.getElementById("id_technician").value;
+          var researcher = document.getElementById("id_researcher").value;
 
-                // Reset payment value if "All" is selected
-                if (paymentValue === 'all') {
-                    paymentValue = '';
-                }
-            });
+          initDatatable(dateRange, pi, technician, researcher);
 
-            // Filter datatable --- official docs reference: https://datatables.net/reference/api/search()
-            dt.search(paymentValue).draw();
         });
     };
 
@@ -300,13 +297,17 @@ var KTDatatablesServerSide = function () {
 
         // Reset datatable
         resetButton.addEventListener('click', function () {
-            // Reset payment type
-            filterPayment[0].checked = true;
 
-            // Reset datatable --- official docs reference: https://datatables.net/reference/api/search()
-            dt.search('').draw();
+          document.getElementById("id_date_range").value = "";
+          document.getElementById("id_pi").value = "";
+          document.getElementById("id_technician").value = "";
+          document.getElementById("id_researcher").value = "";
+
+
+          initDatatable(null, null, null, null);
+
         });
-    };
+    }
 
     // Init toggle toolbar
     var initToggleToolbar = function () {
@@ -561,7 +562,7 @@ var KTDatatablesServerSide = function () {
     // Public methods
     return {
         init: function () {
-            initDatatable();
+            initDatatable(null, null, null, null);
             handleSearchDatatable();
             initToggleToolbar();
             handleFilterDatatable();

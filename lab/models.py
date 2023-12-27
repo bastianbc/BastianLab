@@ -32,14 +32,11 @@ class Patients(models.Model):
 
     pat_id = models.CharField(max_length=12, blank=False, null=False, unique=True, verbose_name="Patient ID", help_text="Requires a unique identifier for each patient.")
     sex = models.CharField(max_length=1, choices=SEX_TYPES, blank=True, null=True, verbose_name="Sex")
-    # age = models.FloatField(blank=True, null=True)
     dob = models.IntegerField(blank=True, null=True, verbose_name="Birthyear")
     race = models.SmallIntegerField(choices=RACE_TYPES, default=7, blank=True, null=True)
-    # race = models.CharField(max_length=200,blank=True, null=True, verbose_name="Race")
     source = models.CharField(max_length=20, blank=True, null=True, verbose_name="Source")
     blocks_temp = models.CharField(max_length=100, blank=True, null=True, verbose_name="Blocks")
     notes = models.TextField(blank=True, null=True, verbose_name="Notes")
-    # project = models.CharField(max_length=50, blank=True, null=True, verbose_name="Project")
     pa_id = models.AutoField(primary_key=True)
     date_added = models.DateTimeField(auto_now_add=True)
 
@@ -69,6 +66,9 @@ class Patients(models.Model):
             length = int(kwargs.get('length', None)[0])
             start = int(kwargs.get('start', None)[0])
             search_value = kwargs.get('search[value]', None)[0]
+            race = kwargs.get('race', None)[0]
+            sex = kwargs.get('sex', None)[0]
+            dob = kwargs.get('dob', None)[0]
             order_column = kwargs.get('order[0][column]', None)[0]
             order = kwargs.get('order[0][dir]', None)[0]
 
@@ -80,6 +80,18 @@ class Patients(models.Model):
             queryset = Patients.objects.all().annotate(num_blocks=Count('patient_blocks'))
             total = queryset.count()
 
+            if race:
+                queryset = queryset.filter(
+                    Q(race=race)
+                )
+            if sex:
+                queryset = queryset.filter(
+                    Q(sex=sex)
+                )
+            if dob:
+                queryset = queryset.filter(
+                    Q(dob=dob)
+                )
             if search_value:
                 queryset = queryset.filter(
                     Q(pat_id__icontains=search_value) |

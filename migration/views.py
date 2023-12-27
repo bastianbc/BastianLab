@@ -2731,14 +2731,53 @@ def find_seq_run(row, df2):
         print(seq_run)
         return seq_run
 
+def split_and_extract(s):
+    match = re.search("[ATGC]{6}", s)
+    if match:
+        return s.split('_' + match.group() + '_')[0]
+    else:
+        return s  # Or return None if you want to filter out non-matching strings
+
+
+def ngs(df2):
+    s = df2[df2["HiSeqData/"].str.contains("NGS")]["HiSeqData/"].str.split("-->").str[-1].str.strip()
+    f = s.apply(split_and_extract)
+    print(type(f))
+    print(f.unique())
+    return f.unique()
+
+def ngs2(df2, row):
+    if not row['sample_lib'].startswith('NGS'):
+        return row
+    s = df2[df2["HiSeqData/"].str.contains(row["sample_lib"])]["HiSeqData/"].str.split("-->", expand=True)
+    if row["sample_lib"] == "NGS-2-1" or row["sample_lib"] == "NGS_1_1":
+        s = df2[df2["HiSeqData/"].str.contains(row["sample_lib"]+"_")]["HiSeqData/"].str.split("-->", expand=True)
+
+    seqr = s[0].tolist()[0].split("/")[1]
+    row["captured_lib"] = seqr.split("_")[1]
+    row["Bait"] = "NimV2mix3"
+    row["sequencing_lib"] = seqr.split("_")[1]
+    row["sequencing_run"] = seqr
+    row["fastq_file"] = {i: "" for i in s[1].tolist()}
+    row["fastq_path"] = s[0].tolist()[0]
+    row["area_type"] = "tumor"
+    return row
+
 
 def prepare_report(request):
     file = Path(Path(
         __file__).parent.parent / "uploads" / "report_matching_sample_lib_with_bait_after_reducing_fastq_files.csv")
     df = pd.read_csv(file)
-    cols = df.columns
-    # file2 = Path(Path(__file__).parent.parent / "uploads" / "file_tree_with_vivek.txt")
-    # df2 = pd.read_csv(file2, index_col=False, encoding='iso-8859-1', on_bad_lines='warn')
+    df = df.drop(['Input Conc.'], axis=1)
+
+    file2 = Path(Path(__file__).parent.parent / "uploads" / "file_tree_with_vivek.txt")
+    df2 = pd.read_csv(file2, index_col=False, encoding='iso-8859-1', on_bad_lines='warn')
+    df2 = df2[df2['HiSeqData/'].str.strip().str.endswith('.fastq.gz')]
+
+    df3 = pd.DataFrame(columns=list(df.columns))
+    df3["sample_lib"] = ngs(df2)
+    df = pd.concat([df, df3], ignore_index=True)
+    # print(df)
     #
     # df.loc[:48, 'sample_lib'] = df.loc[:48].apply(lambda row: refactor_samplelib(row), axis=1)
     # df.to_csv(file, index=False)
@@ -2754,15 +2793,22 @@ def prepare_report(request):
     df['bam_bai_file'] = df['bam_bai_file'].str.replace('"', "'").str.replace("'", '"')
     df["bam_bai_file"] = df["bam_bai_file"].astype('str')
     df["bam_bai_file"] = df["bam_bai_file"].apply(lambda x: make_dict(x))
+    print(df[df['sample_lib'].str.startswith('CP-')].index)
+    print(df[df['sample_lib'].str.startswith('NGS')].index)
 
-    df = df.apply(lambda row: get_fastq_t12(row), axis=1)
+    df = df.apply(lambda row: ngs2(df2, row), axis=1)
+    # df = df.apply(lambda row: get_fastq_t12(row), axis=1)
     # df = df.apply(lambda row: get_bam_empty(row), axis=1)
     # df = df.apply(lambda row: get_bai_empty(row), axis=1)
 
-    df.to_csv("df.csv", index=False)
+    # df.to_csv("df.csv", index=False)
     # df[~df["fastq_file"].isnull()].apply(lambda row: get_fastq_empty(row), axis=1)
     # df.columns = df[cols]
-    # df.to_csv("report_matching_sample_lib_after_IWEI.csv", index=False)
+    df_1 = df.iloc[:1331]
+    df_2 = df.iloc[1343:]
+    df_3 = df.iloc[4343:]
+    df = pd.concat([df_1, df_3, df_2]).reset_index(drop=True)
+    df.to_csv("df.csv", index=False)
 
 
 def get_sex(value):
@@ -2883,13 +2929,20 @@ def nas3(row):
 
 
 def check_na3(request):
-    for na in NucAcids.objects.filter(area_na_links__area__name="UndefinedArea"):
-        b = Blocks.objects.filter(name__icontains=na.name.replace("_NA",""))
-        if len(b)==1:
-            print(na.name, b.first().block_areas.all(),sep="------")
-            if len(b.first().block_areas.all())==1:
-                AREA_NA_LINK.objects.filter(area__name="UndefinedArea", nucacid=na).delete()
-                AREA_NA_LINK.objects.get_or_create(area=b.first().block_areas.first(), nucacid=na)
+    for na in NucAcids.objects.filter(name__endswith="_NA"):
+        # print(na)
+        name = "NA_"+na.name.replace("_NA","")
+        # print(name)
+        c = NucAcids.objects.filter(name=name).count()
+        if c==1:
+            print([na.name for na in NucAcids.objects.filter(name__icontains=na.name.replace("_NA",""))])
+    # for na in NucAcids.objects.filter(area_na_links__area__name="UndefinedArea"):
+    #     b = Blocks.objects.filter(name__icontains=na.name.replace("_NA",""))
+    #     if len(b)==1:
+    #         print(na.name, b.first().block_areas.all(),sep="------")
+    #         if len(b.first().block_areas.all())==1:
+    #             AREA_NA_LINK.objects.filter(area__name="UndefinedArea", nucacid=na).delete()
+    #             AREA_NA_LINK.objects.get_or_create(area=b.first().block_areas.first(), nucacid=na)
     # print(NucAcids.objects.filter(area_na_links__area__name="UndefinedArea").count())
     file = Path(Path(__file__).parent.parent / "uploads" / "patients_done.csv")
     df = pd.read_csv(file)

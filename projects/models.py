@@ -58,7 +58,10 @@ class Projects(models.Model):
             search_value = kwargs.get('search[value]', None)[0]
             order_column = kwargs.get('order[0][column]', None)[0]
             order = kwargs.get('order[0][dir]', None)[0]
-
+            date_range = kwargs.get('date_range', None)[0]
+            pi = kwargs.get('pi', None)[0]
+            technician = kwargs.get('technician', None)[0]
+            researcher = kwargs.get('researcher', None)[0]
             order_column = ORDER_COLUMN_CHOICES[order_column]
             # django orm '-' -> desc
             if order == 'desc':
@@ -67,6 +70,29 @@ class Projects(models.Model):
             queryset = _get_authorizated_queryset()
 
             total = queryset.count()
+
+            if pi:
+                queryset = queryset.filter(
+                    Q(pi=pi)
+                )
+
+            if technician:
+                queryset = queryset.filter(
+                    Q(technician__id=technician)
+                )
+
+            if researcher:
+                queryset = queryset.filter(
+                    Q(researcher__id=researcher)
+                )
+
+            if date_range:
+                arr = date_range.split(" to ")
+                start_date = datetime.strptime(arr[0],'%Y-%m-%d').date()
+                end_date = datetime.strptime(arr[1],'%Y-%m-%d').date()
+                queryset = queryset.filter(
+                    Q(date_start__gte=start_date) & Q(date_start__lte=end_date)
+                )
 
             if search_value:
                 queryset = queryset.filter(
