@@ -209,10 +209,12 @@ var KTDatatablesServerSide = function () {
 
 
         $('#block_details').modal('toggle');
-        var html = (key, value) => `<div class="col-3" id="d_details">
-                    <p><h3 class="text-active-dark bold">${key}</h3>${value}</p>
+        var html = (key, value) => `
+                <div class="card col-6 p-1" id="d_details">
+                    <h3 class="text-active-dark">${key}</h3><p>${value}</p>
                 </div>`
         var contentDiv = $('#d_details');
+        contentDiv.empty();
           $.ajax({
               type: "GET",
               url: "/blocks/get_block_async",
@@ -224,7 +226,12 @@ var KTDatatablesServerSide = function () {
                   for (var key in data) {
                     if (data.hasOwnProperty(key)) {
                         var value = data[key];
-                        contentDiv.append(html(key,value));
+                        if (value !== null && value !== '') {
+                            if (key == "date_added") {
+                                var value = moment(value).format('MM/DD/YYYY');
+                            }
+                            contentDiv.append(html(key.toLocaleUpperCase(), value));
+                        }
                     }
                  }
             }
@@ -513,37 +520,28 @@ var KTDatatablesServerSide = function () {
     }
 
     var handleBlockDetails = (function (e) {
-      // var modal = new bootstrap.Modal(document.getElementById("block_details"));
-    document.getElementById("block_details").addEventListener('show.bs.modal', function(e){
-        var selectedItem = {};
-        selectedItem = {
-              "id": e.relatedTarget.getAttribute("data-block_id"),
-              "name": e.relatedTarget.getAttribute("data-block_name")
-          };
-
-        var html = (key, value) => `<div class="col-3" id="d_details">
+        var html = (key, value) => `
+                <div class="col-3" id="d_details">
                     <p><h3 class="text-active-dark bold">${key}</h3>${value}</p>
                 </div>`
-        var contentDiv = $('#d_details');
       $.ajax({
           type: "GET",
           url: "/blocks/get_block_async",
           data: {
-            id: selectedItem["id"],
+            id: e.relatedTarget.getAttribute("data-block_id"),
           },
           dataType: 'json',
           success: function (data) {
-              contentDiv.empty();
               for (var key in data) {
                 if (data.hasOwnProperty(key)) {
                     var value = data[key];
-                    contentDiv.append(html(key,value));
+                    $('#d_details').append(html(key,value));
                 }
              }
         }
         });
 
-    });
+
 
 
 
