@@ -9,8 +9,8 @@ var KTDatatablesServerSide = function () {
     var editor;
 
     // Private functions
-    var initDatatable = function ( initialValue ) {
-
+    var initDatatable = function ( initialValue, p_stage, prim, collection , body_site ) {
+        console.log(p_stage, prim, collection, body_site);
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
 
         dt = $(".table").DataTable({
@@ -34,6 +34,12 @@ var KTDatatablesServerSide = function () {
             ajax: {
               url: '/blocks/filter_blocks',
               type: 'GET',
+              data:{
+                "p_stage": p_stage,
+                "prim": prim,
+                "collection": collection,
+                "body_site": body_site,
+              },
               error: function (xhr, ajaxOptions, thrownError) {
                   if (xhr.status == 403) {
 
@@ -203,10 +209,12 @@ var KTDatatablesServerSide = function () {
 
 
         $('#block_details').modal('toggle');
-        var html = (key, value) => `<div class="col-3" id="d_details">
-                    <p><h3 class="text-active-dark bold">${key}</h3>${value}</p>
+        var html = (key, value) => `
+                <div class="card col-6 p-1" id="d_details">
+                    <h3 class="text-active-dark">${key}</h3><p>${value}</p>
                 </div>`
         var contentDiv = $('#d_details');
+        contentDiv.empty();
           $.ajax({
               type: "GET",
               url: "/blocks/get_block_async",
@@ -218,7 +226,12 @@ var KTDatatablesServerSide = function () {
                   for (var key in data) {
                     if (data.hasOwnProperty(key)) {
                         var value = data[key];
-                        contentDiv.append(html(key,value));
+                        if (value !== null && value !== '') {
+                            if (key == "date_added") {
+                                var value = moment(value).format('MM/DD/YYYY');
+                            }
+                            contentDiv.append(html(key.toLocaleUpperCase(), value));
+                        }
                     }
                  }
             }
@@ -236,33 +249,24 @@ var KTDatatablesServerSide = function () {
         });
     }
 
+
     // Filter Datatable
     var handleFilterDatatable = () => {
         // Select filter options
-        filterPayment = document.querySelectorAll('[data-kt-docs-table-filter="payment_type"] [name="payment_type"]');
         const filterButton = document.querySelector('[data-kt-docs-table-filter="filter"]');
 
         // Filter datatable on submit
         filterButton.addEventListener('click', function () {
-            // Get filter values
-            let paymentValue = '';
 
-            // Get payment value
-            filterPayment.forEach(r => {
-                if (r.checked) {
-                    paymentValue = r.value;
-                }
+          var p_stage = document.getElementById("id_p_stage").value;
+          var prim = document.getElementById("id_prim").value;
+          var collection = document.getElementById("id_collection").value;
+          var body_site = document.getElementById("id_body_site").value;
 
-                // Reset payment value if "All" is selected
-                if (paymentValue === 'all') {
-                    paymentValue = '';
-                }
-            });
+          initDatatable(null, p_stage, prim, collection, body_site);
 
-            // Filter datatable --- official docs reference: https://datatables.net/reference/api/search()
-            dt.search(paymentValue).draw();
         });
-    }
+    };
 
     // Delete customer
     var handleDeleteRows = () => {
@@ -383,18 +387,21 @@ var KTDatatablesServerSide = function () {
         });
     }
 
-    // Reset Filter
+   // Reset Filter
     var handleResetForm = () => {
         // Select reset button
         const resetButton = document.querySelector('[data-kt-docs-table-filter="reset"]');
 
         // Reset datatable
         resetButton.addEventListener('click', function () {
-            // Reset payment type
-            filterPayment[0].checked = true;
 
-            // Reset datatable --- official docs reference: https://datatables.net/reference/api/search()
-            dt.search('').draw();
+          document.getElementById("id_p_stage").value = "";
+          document.getElementById("id_prim").value = "";
+          document.getElementById("id_collection").value = "";
+          document.getElementById("id_body_site").value = "";
+
+          initDatatable(null, null, null, null, null);
+
         });
     }
 
@@ -513,37 +520,28 @@ var KTDatatablesServerSide = function () {
     }
 
     var handleBlockDetails = (function (e) {
-      // var modal = new bootstrap.Modal(document.getElementById("block_details"));
-    document.getElementById("block_details").addEventListener('show.bs.modal', function(e){
-        var selectedItem = {};
-        selectedItem = {
-              "id": e.relatedTarget.getAttribute("data-block_id"),
-              "name": e.relatedTarget.getAttribute("data-block_name")
-          };
-
-        var html = (key, value) => `<div class="col-3" id="d_details">
+        var html = (key, value) => `
+                <div class="col-3" id="d_details">
                     <p><h3 class="text-active-dark bold">${key}</h3>${value}</p>
                 </div>`
-        var contentDiv = $('#d_details');
       $.ajax({
           type: "GET",
           url: "/blocks/get_block_async",
           data: {
-            id: selectedItem["id"],
+            id: e.relatedTarget.getAttribute("data-block_id"),
           },
           dataType: 'json',
           success: function (data) {
-              contentDiv.empty();
               for (var key in data) {
                 if (data.hasOwnProperty(key)) {
                     var value = data[key];
-                    contentDiv.append(html(key,value));
+                    $('#d_details').append(html(key,value));
                 }
              }
         }
         });
 
-    });
+
 
 
 
@@ -970,7 +968,7 @@ var KTDatatablesServerSide = function () {
     // Public methods
     return {
         init: function () {
-            initDatatable( handleInitialValue() );
+            initDatatable( handleInitialValue(), null, null, null, null );
             handleSearchDatatable();
             initToggleToolbar();
             handleFilterDatatable();
