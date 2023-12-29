@@ -35,4 +35,5 @@ urlpatterns = [
     path("check_block", views.check_block, name="check_block"),
     path("check_block2", views.check_block2, name="check_block2"),
     path("check_block3", views.check_block3, name="check_block3"),
+    path("upload_file_tree_all_md5", views.upload_file_tree_all_md5, name="upload_file_tree_all_md5"),
 ]

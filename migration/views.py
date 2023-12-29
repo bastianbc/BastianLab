@@ -3063,6 +3063,32 @@ def check_block3(request):
     df[~df["Block"].isnull()].apply(lambda row: check_blocks3(row), axis=1)
 
 
+def get_all_md5(row):
+    # print(row)
+    try:
+        if "==" in row["md5"]:
+            _file, md5 = row["md5"].split("==")
+            file = _file.replace(".md5", "")
+        elif "coldstorage" in row["md5"]:
+            md5, _file = (','.join(row["md5"].split())).split(",")
+            file = _file.split("/")[-1]
+        else:
+            md5, _file = (','.join(row["md5"].split())).split(",")
+            file = _file.replace("./", "").replace("*", "").replace("R_SGLP", "SGLP")
+        checksum = SequencingFile.objects.get(name=file).checksum
+        if checksum == None or checksum == "":
+            f = SequencingFile.objects.get(name=file)
+            f.checksum = md5
+            f.save()
+            print("saved")
+    except Exception as e:
+        print("===", e, row["md5"])
+
+def upload_file_tree_all_md5(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "all_md5.txt")
+    df = pd.read_csv(file, index_col=False, encoding='iso-8859-1', on_bad_lines = 'warn')
+    # print(df)
+    df[~df["md5"].isnull()].apply(lambda row: get_all_md5(row), axis=1)
 
 
 

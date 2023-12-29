@@ -79,7 +79,7 @@ class SampleLib(models.Model):
             order_column = kwargs.get('order[0][column]', None)[0]
             order = kwargs.get('order[0][dir]', None)[0]
             sequencing_run_filter = kwargs.get('sequencing_run', None)[0]
-            patient_filter = kwargs.get('patient', None)[0]
+            # patient_filter = kwargs.get('patient', None)[0]
             barcode_filter = kwargs.get('barcode', None)[0]
             i5_filter = kwargs.get('i5', None)[0]
             i7_filter = kwargs.get('i7', None)[0]
@@ -114,9 +114,9 @@ class SampleLib(models.Model):
 
                 queryset = queryset.filter(Q(name__in=filter))
 
-            if patient_filter:
-                filter = [na_sl_link.sample_lib.name for na_sl_link in NA_SL_LINK.objects.filter(nucacid__area__block__patient__pat_id=patient_filter)]
-                queryset = queryset.filter(Q(name__in=filter))
+            # if patient_filter:
+            #     filter = [na_sl_link.sample_lib.name for na_sl_link in NA_SL_LINK.objects.filter(nucacid__area__block__patient__pat_id=patient_filter)]
+            #     queryset = queryset.filter(Q(name__in=filter))
 
             if barcode_filter:
                 queryset = queryset.filter(Q(barcode__id=barcode_filter))
