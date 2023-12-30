@@ -3091,4 +3091,25 @@ def upload_file_tree_all_md5(request):
     df[~df["md5"].isnull()].apply(lambda row: get_all_md5(row), axis=1)
 
 
+def get_sample_library(row):
+    try:
+        if pd.isnull(row["Sample"]) or pd.isnull(row["Area_id"]) or pd.isnull(row["NA_id"]):
+            return
+        sl=SampleLib.objects.get(name=row["Sample"])
+        area,_ = Areas.objects.get_or_create(name=row['Area_id'])
+        na,_ = NucAcids.objects.get_or_create(name=row['NA_id'])
+        AREA_NA_LINK.objects.get_or_create(area=area, nucacid=na)
+        NA_SL_LINK.objects.get_or_create(sample_lib=sl, nucacid=na)
+    except ObjectDoesNotExist as e:
+        print(e, row['Sample'], row['NA_id'])
+    except MultipleObjectsReturned as e:
+        pass
+
+
+def check_sample_library(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
+    df = pd.read_csv(file)
+    df.apply(lambda row: get_sample_library(row), axis=1)
+
+
 

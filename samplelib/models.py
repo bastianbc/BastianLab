@@ -103,7 +103,7 @@ class SampleLib(models.Model):
 
                 filter = []
                 try:
-                    seq_r = SequencingRun.objects.get(name=sequencing_run_filter)
+                    seq_r = SequencingRun.objects.get(id=sequencing_run_filter)
                     for seq_l in seq_r.sequencing_libs.all():
                         for cl_seql_link in seq_l.cl_seql_links.all():
                             for sl_cl_link in cl_seql_link.captured_lib.sl_cl_links.all():
