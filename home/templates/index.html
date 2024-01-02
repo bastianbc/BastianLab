@@ -1,5 +1,10 @@
 {% extends "master.html" %}
 
 {% block content %}
-
+<h1>Directory Listing</h1>
+    <ul>
+        {% for item in contents %}
+            <li>{{ item }}</li>
+        {% endfor %}
+    </ul>
 {% endblock %}

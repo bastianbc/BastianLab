@@ -9,7 +9,7 @@ var KTDatatablesServerSide = function () {
     var editor;
 
     // Private functions
-    var initDatatable = function ( initialValue, filterSequencingRun, filterPatient, filterBarcode, filterI5, filterI7, filterAreaType, filterBait ) {
+    var initDatatable = function ( initialValue, filterSequencingRun, filterBarcode, filterI5, filterI7, filterAreaType, filterBait ) {
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
 
         dt = $(".table").DataTable({
@@ -36,7 +36,6 @@ var KTDatatablesServerSide = function () {
               type: 'GET',
               data :{
                 "sequencing_run": filterSequencingRun,
-                "patient": filterPatient,
                 "barcode": filterBarcode,
                 "i5": filterI5,
                 "i7": filterI7,
@@ -247,14 +246,13 @@ var KTDatatablesServerSide = function () {
         filterButton.addEventListener('click', function () {
 
           var sequencingRun = document.getElementById("id_sequencing_run").value;
-          var patient = document.getElementById("id_patient").value;
           var barcode = document.getElementById("id_barcode").value;
           var i5 = document.getElementById("id_i5").value;
           var i7 = document.getElementById("id_i7").value;
           var areaType = document.getElementById("id_area_type").value;
           var bait = document.getElementById("id_bait").value;
 
-          initDatatable(null,sequencingRun,patient,barcode,i5,i7,areaType,bait);
+          initDatatable(null,sequencingRun,barcode,i5,i7,areaType,bait);
 
         });
 
@@ -388,14 +386,13 @@ var KTDatatablesServerSide = function () {
         resetButton.addEventListener('click', function () {
 
           document.getElementById("id_sequencing_run").value="";
-          document.getElementById("id_patient").value="";
           document.getElementById("id_barcode").value="";
           document.getElementById("id_i5").value="";
           document.getElementById("id_i7").value="";
           document.getElementById("id_area_type").value="";
           document.getElementById("id_bait").value="";
 
-          initDatatable(null, null, null, null, null, null, null, null);
+          initDatatable(null, null, null, null, null, null, null);
 
         });
     }
@@ -920,7 +917,7 @@ var KTDatatablesServerSide = function () {
     // Public methods
     return {
         init: function () {
-            initDatatable( handleInitialValue(), null, null, null, null, null, null, null );
+            initDatatable( handleInitialValue(), null, null, null, null, null, null );
             handleSearchDatatable();
             initToggleToolbar();
             handleFilterDatatable();
