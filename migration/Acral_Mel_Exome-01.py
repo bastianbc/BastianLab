@@ -76,7 +76,13 @@ def read_rows(row):
         df.loc[len(df)] = d
         print(e)
 
-df2.apply(lambda row: read_rows(row), axis=1)
-print(df)
-# grouped_df = df.groupby('Sample Library')['File'].agg(merge_dicts).reset_index()
-df.to_csv("Acral_Mel_Exome-01.csv", index=False)
+
+def create_file():
+    df2.apply(lambda row: read_rows(row), axis=1)
+    # print(df)
+    # grouped_df = df.groupby('Sample Library')['File'].agg(merge_dicts).reset_index()
+    df.to_csv("Acral_Mel_Exome-01.csv", index=False)
+
+
+# if __name__ == "__main__":
+#     create_file()
