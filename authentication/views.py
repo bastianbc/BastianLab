@@ -12,6 +12,7 @@ def log_in(request):
             username = request.POST.get("username")
             password = request.POST.get("password")
             next = request.GET.get('next')
+            print("@@@", next)
             user = authenticate(username=username, password=password)
             if user:
                 login(request, user)
