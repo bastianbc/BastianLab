@@ -15,7 +15,6 @@ def log_in(request):
             username = request.POST.get("username")
             password = request.POST.get("password")
             next = request.GET.get('next')
-            logger.info("@@@", next)
             user = authenticate(username=username, password=password)
             if user:
                 login(request, user)
@@ -23,6 +22,7 @@ def log_in(request):
                 if next:
                     return redirect(next)
                 else:
+                    raise ValueError("@"*100)
                     return redirect(settings.LOGIN_REDIRECT_URL)
             else:
                 user = User.objects.filter(username=username,last_login__isnull=True)
