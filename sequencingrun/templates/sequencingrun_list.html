@@ -248,7 +248,10 @@
 
 {% endblock %}
 
+{% load static %}
+
 {% block scripts %}
-<script src="static/sequencingrun.js"></script>
-<script src="static/init.dateinput.sequencingrun.js"></script>
+<script src="{% static 'sequencingrun.js' %}"></script>
+<script src="{% static 'init.dateinput.sequencingrun.js' %}"></script>
 {% endblock %}
+
