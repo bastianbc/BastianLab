@@ -5,6 +5,9 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required,permission_required
 from account.models import User
 from django.contrib.auth.forms import SetPasswordForm,PasswordChangeForm
+import logging
+
+logger = logging.getLogger(__name__)
 
 def log_in(request):
     if request.method == "POST":
@@ -12,7 +15,7 @@ def log_in(request):
             username = request.POST.get("username")
             password = request.POST.get("password")
             next = request.GET.get('next')
-            print("@@@", next)
+            logger.info("@@@", next)
             user = authenticate(username=username, password=password)
             if user:
                 login(request, user)
