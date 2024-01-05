@@ -347,7 +347,10 @@
 
 {% endblock %}
 
+{% load static %}
+
 {% block scripts %}
-<script src="static/sequencinglib.js"></script>
-<script src="static/init.dateinput.sequencinglib.js"></script>
+<script src="{% static 'sequencinglib.js' %}"></script>
+<script src="{% static 'init.dateinput.sequencinglib.js' %}"></script>
 {% endblock %}
+
