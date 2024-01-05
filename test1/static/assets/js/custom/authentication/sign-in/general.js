@@ -60,7 +60,7 @@ var KTSigninGeneral = (function () {
                                 }
                             }).then(function (t) {
                                 if (t.isConfirmed) {
-                                    e.querySelector('[name="email"]').value = "";
+                                    e.querySelector('[name="username"]').value = "";
                                     e.querySelector('[name="password"]').value = "";
 
                                     var i = e.getAttribute("data-kt-redirect-url");
