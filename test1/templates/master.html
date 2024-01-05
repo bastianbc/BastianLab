@@ -3733,40 +3733,20 @@ License: For each use you must have a valid license purchased only from above li
 		<!--begin::Javascript-->
 		<script>var hostUrl = "assets/";</script>
 		<!--begin::Global Javascript Bundle(used by all pages)-->
-		<script src="/static/assets/plugins/global/plugins.bundle.js"></script>
-		<script src="/static/assets/js/scripts.bundle.js"></script>
-		<!--end::Global Javascript Bundle-->
-		<!--begin::Vendors Javascript(used by this page)-->
-		<!-- <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
-		<script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
-		<script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
-		<script src="https://cdn.amcharts.com/lib/5/radar.js"></script>
-		<script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
-		<script src="https://cdn.amcharts.com/lib/5/map.js"></script>
-		<script src="https://cdn.amcharts.com/lib/5/geodata/worldLow.js"></script>
-		<script src="https://cdn.amcharts.com/lib/5/geodata/continentsLow.js"></script>
-		<script src="https://cdn.amcharts.com/lib/5/geodata/usaLow.js"></script>
-		<script src="https://cdn.amcharts.com/lib/5/geodata/worldTimeZonesLow.js"></script>
-		<script src="https://cdn.amcharts.com/lib/5/geodata/worldTimeZoneAreasLow.js"></script> -->
-		<!-- <script src="https://code.jquery.com/jquery-3.5.1.js" charset="utf-8"></script> -->
-		<!-- <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js" charset="utf-8"></script> -->
-		<script src="/static/assets/plugins/custom/prismjs/prismjs.bundle.js"></script>
-		<script src="/static/assets/plugins/custom/datatables/datatables.bundle.js"></script>
-		<script src="/static/assets/plugins/custom/datatables/keytable/2.7.0/js/datatbles.keyTable.min.js"></script>
-		<script src="/static/assets/plugins/custom/datatables/Editor-2.0.9/js/dataTables.editor.min.js"></script>
-		<script src="/static/assets/plugins/custom/moment/moment.min.js"></script>
-		<script src="/static/assets/plugins/custom/datatables/datetime-moment.js"></script>
-		<script src="/static/assets/plugins/custom/datatables/dataTables.dateTime.min.js"></script>
-		<script src="/static/assets/plugins/custom/datatables/dataTables.select.min.js"></script>
-		<!-- <script src="/static/assets/plugins/custom/datatables/datetime/dataTables.dateTime.min.js"></script> -->
-		<!--end::Vendors Javascript-->
-		<!--begin::Custom Javascript(used by this page)-->
-		<script src="/static/assets/js/widgets.bundle.js"></script>
-		<script src="/static/assets/js/custom/widgets.js"></script>
-		<script src="/static/assets/js/custom/apps/chat/chat.js"></script>
-		<script src="/static/assets/js/custom/utilities/modals/users-search.js"></script>
-		<!--end::Custom Javascript-->
-		<!--end::Javascript-->
+		<script src="{% static 'assets/plugins/global/plugins.bundle.js' %}"></script>
+        <script src="{% static 'assets/js/scripts.bundle.js' %}"></script>
+        <script src="{% static 'assets/plugins/custom/prismjs/prismjs.bundle.js' %}"></script>
+        <script src="{% static 'assets/plugins/custom/datatables/datatables.bundle.js' %}"></script>
+        <script src="{% static 'assets/plugins/custom/datatables/keytable/2.7.0/js/datatables.keyTable.min.js' %}"></script>
+        <script src="{% static 'assets/plugins/custom/datatables/Editor-2.0.9/js/dataTables.editor.min.js' %}"></script>
+        <script src="{% static 'assets/plugins/custom/moment/moment.min.js' %}"></script>
+        <script src="{% static 'assets/plugins/custom/datatables/datetime-moment.js' %}"></script>
+        <script src="{% static 'assets/plugins/custom/datatables/dataTables.dateTime.min.js' %}"></script>
+        <script src="{% static 'assets/plugins/custom/datatables/dataTables.select.min.js' %}"></script>
+        <script src="{% static 'assets/js/widgets.bundle.js' %}"></script>
+        <script src="{% static 'assets/js/custom/widgets.js' %}"></script>
+        <script src="{% static 'assets/js/custom/apps/chat/chat.js' %}"></script>
+        <script src="{% static 'assets/js/custom/utilities/modals/users-search.js' %}"></script>
 		<script type="text/javascript">
 			{% for message in messages %}
 
