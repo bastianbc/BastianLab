@@ -15,6 +15,9 @@ import os
 from django.contrib.messages import constants as message_constants
 
 from django.contrib.messages import constants as messages
+import mimetypes
+
+mimetypes.add_type("text/css", ".css", True)
 
 MESSAGE_TAGS = {
     messages.DEBUG: 'alert-info',
