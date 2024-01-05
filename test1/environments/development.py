@@ -204,3 +204,19 @@ LOGIN_REDIRECT_URL = '/projects'
 TECHNICIAN_GROUP_NAME = "Technicians"
 RESEARCHER_GROUP_NAME = "Researchers"
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        '': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
