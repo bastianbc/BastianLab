@@ -302,7 +302,10 @@
 
 {% endblock %}
 
+{% load static %}
+
 {% block scripts %}
-<script src="static/nucacid.js"></script>
-<script src="/libprep/static/init.dateinput.libprep.js"></script>
+<script src="{% static 'nucacid.js' %}"></script>
+<script src="{% static 'libprep/init.dateinput.libprep.js' %}"></script>
 {% endblock %}
+
