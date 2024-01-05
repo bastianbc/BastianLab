@@ -34,7 +34,10 @@
 </form>
 {% endblock %}
 
+{% load static %}
+
 {% block scripts %}
-<script src="/static/assets/js/custom/documentation/forms/flatpickr.js"></script>
-<script src="/capturedlib/static/init.dateinput.libprep.js"></script>
+<script src="{% static 'assets/js/custom/documentation/forms/flatpickr.js' %}"></script>
+<script src="{% static 'init.dateinput.libprep.js' %}"></script>
 {% endblock %}
+
