@@ -18,7 +18,6 @@ def log_in(request):
             user = authenticate(username=username, password=password)
             if user:
                 login(request, user)
-
                 if next:
                     return redirect(next)
                 else:
