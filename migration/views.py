@@ -3107,9 +3107,11 @@ def get_sample_library(row):
 
 
 def check_sample_library(request):
-    file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
-    df = pd.read_csv(file)
-    df.apply(lambda row: get_sample_library(row), axis=1)
+    from .Acral_melanoma_lines_mRNA_Seq_AL1806051_R1 import create_file
+    create_file()
+    # file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
+    # df = pd.read_csv(file)
+    # df.apply(lambda row: get_sample_library(row), axis=1)
 
 
 
