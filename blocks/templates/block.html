@@ -97,6 +97,8 @@
 </form>
 {% endblock %}
 
+{% load static %}
+
 {% block scripts %}
-<script src="/static/body_site.init.js" charset="utf-8"></script>
+<script src="{% static 'body_site.init.js' %}" charset="utf-8"></script>
 {% endblock %}
