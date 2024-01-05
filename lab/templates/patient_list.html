@@ -119,6 +119,8 @@
 <!--end::Datatable-->
 {% endblock %}
 
+{% load static %}
+
 {% block scripts %}
-<script src="static/patient.js" charset="utf-8"></script>
+<script src="{% static 'patient.js' %}" charset="utf-8"></script>
 {% endblock %}
