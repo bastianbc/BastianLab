@@ -8,7 +8,7 @@ from django.contrib.auth.forms import SetPasswordForm,PasswordChangeForm
 import logging
 
 logger = logging.getLogger(__name__)
-logger.info("@@@ test", logger)
+logger.debug("@@@ test", logger)
 def log_in(request):
     if request.method == "POST":
         try:
