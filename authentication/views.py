@@ -23,27 +23,27 @@ def log_in(request):
                 login(request, user)
                 print("3" * 30, user)
                 if next:
-                    print("4" * 30, user)
+                    print("4" * 30)
                     return redirect(next)
                 else:
-                    print("5" * 30, user)
+                    print("5" * 30)
                     return redirect(settings.LOGIN_REDIRECT_URL)
             else:
                 user = User.objects.filter(username=username,last_login__isnull=True)
-                print("6" * 30, user)
+                print("6" * 30)
                 if user.exists():
                     request.session["username"] = username
                     return redirect("/auth/set_password")
                 else:
                     messages.error(request, "Invalid username or password!")
-                print("7" * 30, user)
+                print("7" * 30)
                 messages.error(request, "Authentication Error!")
                 print("Authentication Error!")
         except Exception as e:
             messages.error(request, "Unexpected Error!")
             print("Unexpected Error!")
             print(e)
-    print("8" * 30, user)
+    print("8" * 30)
     return render(request, "sign-in.html", locals())
 
 def log_out(request):
