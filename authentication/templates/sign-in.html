@@ -24,13 +24,13 @@ License: For each use you must have a valid license purchased only from above li
 		<meta property="og:url" content="https://keenthemes.com/metronic" />
 		<meta property="og:site_name" content="Keenthemes | Metronic" />
 		<link rel="canonical" href="https://preview.keenthemes.com/metronic8" />
+		<link rel="shortcut icon" href="/static/assets/media/logos/bastianlab.png" />
 		<!--begin::Fonts-->
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700" />
 		<!--end::Fonts-->
 		<!--begin::Global Stylesheets Bundle(used by all pages)-->
-        <link rel="shortcut icon" href="{% static 'assets/media/logos/bastianlab.png' %}" />
-        <link href="{% static 'assets/plugins/global/plugins.bundle.css' %}" rel="stylesheet" type="text/css" />
-        <link href="{% static 'assets/css/style.bundle.css' %}" rel="stylesheet" type="text/css" />
+		<link href="/static/assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
+		<link href="/static/assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
 		<!--end::Global Stylesheets Bundle-->
 	</head>
 	<!--end::Head-->
@@ -143,12 +143,11 @@ License: For each use you must have a valid license purchased only from above li
 		<!--begin::Javascript-->
 		<script>var hostUrl = "assets/";</script>
 		<!--begin::Global Javascript Bundle(used by all pages)-->
-        {% load static %}
-
-		<script src="{% static 'assets/plugins/global/plugins.bundle.js' %}"></script>
-        <script src="{% static 'assets/js/scripts.bundle.js' %}"></script>
-        <script src="{% static 'assets/js/custom/authentication/sign-in/general.js' %}"></script>
-
+		<script src="assets/plugins/global/plugins.bundle.js"></script>
+		<script src="assets/js/scripts.bundle.js"></script>
+		<!--end::Global Javascript Bundle-->
+		<!--begin::Custom Javascript(used by this page)-->
+		<script src="assets/js/custom/authentication/sign-in/general.js"></script>
 		<!--end::Custom Javascript-->
 		<!--end::Javascript-->
 	</body>
