@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 urlpatterns = [
     path("", views.bodys, name="bodys"),
@@ -9,4 +10,4 @@ urlpatterns = [
     path("filter_bodys", views.filter_bodys, name="filter-bodys"),
     path("get_bodies/", views.get_bodies, name="get-bodies"),
     path("get_bodies/<int:parent_id>", views.get_bodies, name="get-bodies"),
-]
+] + staticfiles_urlpatterns()
