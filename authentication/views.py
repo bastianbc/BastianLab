@@ -11,32 +11,39 @@ logger = logging.getLogger(__name__)
 
 def log_in(request):
     if request.method == "POST":
+        print("1"*30, request.POST.get("username"))
+        print("1"*30, request.POST.get("password"))
         try:
             username = request.POST.get("username")
             password = request.POST.get("password")
             next = request.GET.get('next')
             user = authenticate(username=username, password=password)
+            print("2" * 30, user)
             if user:
                 login(request, user)
+                print("3" * 30, user)
                 if next:
+                    print("4" * 30, user)
                     return redirect(next)
                 else:
+                    print("5" * 30, user)
                     return redirect(settings.LOGIN_REDIRECT_URL)
             else:
                 user = User.objects.filter(username=username,last_login__isnull=True)
+                print("6" * 30, user)
                 if user.exists():
                     request.session["username"] = username
                     return redirect("/auth/set_password")
                 else:
                     messages.error(request, "Invalid username or password!")
-
+                print("7" * 30, user)
                 messages.error(request, "Authentication Error!")
                 print("Authentication Error!")
         except Exception as e:
             messages.error(request, "Unexpected Error!")
             print("Unexpected Error!")
             print(e)
-
+    print("8" * 30, user)
     return render(request, "sign-in.html", locals())
 
 def log_out(request):
