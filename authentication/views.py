@@ -8,8 +8,6 @@ from django.contrib.auth.forms import SetPasswordForm,PasswordChangeForm
 import logging
 
 logger = logging.getLogger(__name__)
-logger.debug("@@@ test", logger)
-
 
 def log_in(request):
     if request.method == "POST":
@@ -23,7 +21,6 @@ def log_in(request):
                 if next:
                     return redirect(next)
                 else:
-                    raise ValueError("@"*100)
                     return redirect(settings.LOGIN_REDIRECT_URL)
             else:
                 user = User.objects.filter(username=username,last_login__isnull=True)
