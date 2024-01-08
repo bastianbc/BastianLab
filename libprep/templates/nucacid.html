@@ -31,11 +31,8 @@
 </form>
 {% endblock %}
 
-{% load static %}
-
 {% block scripts %}
-<script src="{% static 'assets/js/custom/documentation/forms/flatpickr.js' %}"></script>
-<script src="{% static 'init.dateinput.libprep.js' %}"></script>
-<script src="{% static 'form.js' %}"></script>
+<script src="/static/assets/js/custom/documentation/forms/flatpickr.js"></script>
+<script src="/libprep/static/init.dateinput.libprep.js"></script>
+<script src="/libprep/static/form.js"></script>
 {% endblock %}
-
