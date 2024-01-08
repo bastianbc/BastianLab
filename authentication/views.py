@@ -16,6 +16,7 @@ def log_in(request):
             password = request.POST.get("password")
             next = request.GET.get('next')
             user = authenticate(username=username, password=password)
+            print("$"*100, user)
             if user:
                 login(request, user)
                 if next:
