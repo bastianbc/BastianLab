@@ -10,6 +10,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 def log_in(request):
+    print("0" * 30, request)
     if request.method == "POST":
         print("1"*30, request.POST.get("username"))
         print("1"*30, request.POST.get("password"))
