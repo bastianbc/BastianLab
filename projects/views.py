@@ -13,6 +13,7 @@ from django.core.exceptions import MultipleObjectsReturned
 
 @login_required
 def filter_projects(request):
+    print("$" * 100, request.user)
     projects = Projects().query_by_args(request.user,**request.GET)
     serializer = ProjectsSerializer(projects['items'], many=True)
     result = dict()
@@ -24,6 +25,7 @@ def filter_projects(request):
 
 @permission_required("projects.view_projects",raise_exception=True)
 def projects(request):
+    print("$" * 100, request.user)
     filter = FilterForm()
     return render(request,"project_list.html", locals())
 
