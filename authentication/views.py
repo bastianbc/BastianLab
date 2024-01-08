@@ -9,6 +9,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 logger.debug("@@@ test", logger)
+
+
 def log_in(request):
     if request.method == "POST":
         try:
