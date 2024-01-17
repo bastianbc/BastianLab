@@ -2597,9 +2597,16 @@ def check_na(request):
 
 def nas2(row):
     try:
-        sl = SampleLib.objects.get(name=row["Sample"])
+        if row["Sample"].startswith("12-"):
+            sl = SampleLib.objects.get(name="T"+row["Sample"])
+        elif row["Sample"].startswith("BuffyCo"):
+            sl = SampleLib.objects.get(name="BuffyCoat_43")
+        else:
+            sl = SampleLib.objects.get(name=row["Sample"])
         if not pd.isnull(row["Barcode ID"]):
             barcode = Barcode.objects.get(name=row["Barcode ID"].strip())
+            sl.barcode = barcode
+            sl.save()
         na, _ = NucAcids.objects.get_or_create(name=row['NA_id'])
         b = Blocks.objects.get(name=row["Block"])
         # print(b.patient)
@@ -2623,7 +2630,7 @@ def nas2(row):
         area.area_type = get_area_type(row['Area'])
         area.save()
         link_area, _ =AREA_NA_LINK.objects.get_or_create(area=area,nucacid=na)
-        link_sl_na, _ = NA_SL_LINK.objects.get_or_create(sample_lib=sl,nucacid=na)
+        link_sl_na, _ = NA_SL_LINK.objects.get_or_create(sample_lib=sl, nucacid=na)
     except Exception as e:
         print(e)
         print(f'SAMPLE: {row["Sample"]}, Barcode: {row["Barcode ID"]}, i5: {row["Barcode"]}')
