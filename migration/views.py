@@ -2890,9 +2890,9 @@ def check_na(request):
 def nas2(row):
     try:
         print(row["NA_id"])
-        na=NucAcids.objects.get(name=row['NA_id'])
-        # area=Areas.objects.get(name=row["Area_id"])
-        # link=AREA_NA_LINK.objects.get_or_create(area=area,nucacid=na)
+        na, _ = NucAcids.objects.get_or_create(name=row['NA_id'])
+        area = Areas.objects.get(name=row["Area_id"])
+        link=AREA_NA_LINK.objects.get_or_create(area=area,nucacid=na)
     except Exception as e:
         print(e,row["NA_id"])
 
