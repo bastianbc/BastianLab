@@ -2612,7 +2612,7 @@ def nas2(row):
         # b.prim = row["prim"] if not pd.isnull(row["prim"]) else b.prim
         # b.subtype = row["subtype"] if not pd.isnull(row["subtype"]) else b.subtype
         # b.save()
-        area = Areas.objects.get(name=row["Area_id"])
+        area, _ = Areas.objects.get_or_create(name=row["Area_id"], block=b)
         print(area, row["NA_id"])
         area.block = b
         area.area_type = get_area_type(row['Area'])
