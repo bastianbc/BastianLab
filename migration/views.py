@@ -2599,7 +2599,7 @@ def nas2(row):
     try:
         na, _ = NucAcids.objects.get_or_create(name=row['NA_id'])
         b = Blocks.objects.get(name=row["Block"])
-        patient, created = Patients.objects.get_or_create(pat_id=row["pat_id"])
+        patient, created = Patients.objects.get(pat_id=row["pat_id"].replace(".0", ""))
         if b.patient:
             print(patient, b.patient.pat_id)
         else:
@@ -2627,7 +2627,11 @@ def nas2(row):
 def check_na2(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
     df = pd.read_csv(file)
-    (NucAcids.objects.filter(name__startswith="NA_"))
+    patients = Patients.objects.filter(pa_id__endswith=".0")
+    for patient in patients:
+        if patient.pa_id.endswith('.0'):
+            patient.pa_id = patient.pa_id[:-2]  # Remove the last two characters (".0")
+            patient.save()
     df[~df["NA_id"].isnull()].apply(lambda row: nas2(row), axis=1)
     # df[~df["NA_id"].isnull() & ~df["Area_id"].isnull()].apply(lambda row: nas2(row), axis=1)
 
