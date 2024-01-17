@@ -1885,13 +1885,6 @@ def airtable_consolidated_data(request):
 def get_or_cons(row):
     print(row["Sample"])
     SampleLib.objects.get(name="")
-    # print(row['Sample'],row['Input Conc.'])
-    # try:
-    #     SampleLib.objects.filter(name=row["Sample"]).update(qpcr_conc=10)
-    #     SL_CL_LINK.objects.filter(captured_lib=CapturedLib.objects.get(name=row["CL"]),
-    #         sample_lib=SampleLib.objects.get(name=row["Sample"])).update(volume=float(row['Input Conc.'])/10)
-    # except Exception as e:
-    #     print(e)
 
 
 def qpcr_consolidated_data(request):
@@ -1974,7 +1967,6 @@ def create_seq_run(row):
         get_or_create_seqrun(name=row["Sequencing Run_ID"])
 
 
-
 def qpcr_at_seqrun(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view (3).csv")
     df = pd.read_csv(file)
@@ -2032,15 +2024,6 @@ def get_or_create_seql(cl, name):
         )
         return obj
     return None
-
-# def get_or_create_seqrun(cl, name):
-#     if name:
-#         obj, created = SequencingLib.objects.get_or_create(
-#             name=name,
-#             captured_lib=cl
-#         )
-#         return obj
-#     return None
 
 def get_or_create_files_from_file(row):
     prefix = next(iter(row['fastq_file'])).split("_L0")[0]
@@ -2132,57 +2115,6 @@ def remove_NAN(request):
             print(model, field.name)
             qs = Q(**{field.name: "NaN"})
             print(model.objects.filter(qs))
-            # try:
-            #     model.objects.filter(qs).update(**{field.name:None})
-            #     print("updated")
-            # except Exception as e:
-            #     model.objects.filter(qs).update(**{field.name:0})
-            # queries = [Q(**{field.name: SEARCH_TERM}) for f in fields]
-
-    # qs = Q()
-    # for query in queries:
-    #     qs = qs | query
-    #
-    # table.objects.filter(qs)
-
-# def get_barcodes(row):
-    # print(row["Barcode_ID"], row["Barcode_Name"].split(" ")[0])
-    # obj, created = Barcodeset.objects.get_or_create(name=row["Barcode_Name"].split(" ")[0])
-    # print(obj)
-    # Barcode.objects.create(
-    #     barcode_set=obj,
-    #     name=row["Barcode_ID"],
-    #     i5=row["Index-i5"],
-    #     i7=row["Index-i7"]
-    # )
-    # print("created")
-#
-# def get_barcodes(row):
-#     file = Path(Path(__file__).parent.parent / "uploads" / "Old Barcodes-Grid view (1).csv")
-#     df2 = pd.read_csv(file)
-#
-#     try:
-#         # print(row["Sample"], row["Barcode ID"])
-#         match = re.search(r'\b\d{3}\b', row["Barcode ID"])
-#
-#         if match:
-#             name = df2[df2["Barcode_Name"].str.contains(match.group(1))]["Barcode_ID"].to_list()[0]
-#             SampleLib.objects.filter(
-#                 name=row["Sample"]).update(barcode=Barcode.objects.get(name=name))
-#             return
-#         SampleLib.objects.filter(
-#             name=row["Sample"]).update(barcode=Barcode.objects.get(name=row["Barcode ID"].strip())
-#                                        )
-#     except Exception as e:
-#         print(row["Sample"], row["Barcode ID"])
-#
-#         print(e)
-
-#
-# def uploads_barcodes(request):
-#     file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
-#     df = pd.read_csv(file)
-#     df[~df["Barcode ID"].isnull()].apply(lambda row: get_barcodes(row), axis=1)
 
 def get_barcodes(row):
     try:
@@ -2221,21 +2153,6 @@ def uploads_baits(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view (3).csv")
     df = pd.read_csv(file)
     df[~df["Capture Panel"].isnull()].apply(lambda row: get_baits(row), axis=1)
-#
-# def create_file_(file, path):
-#     prefix = file.split("_L0")[0]
-#     set_ = get_or_create_set(
-#         prefix=prefix,
-#         path=path,
-#         sample_lib=SampleLib.objects.get(name="Undefined"),
-#         sequencing_run=get_or_create_seqrun(name=sequencing_run),
-#     )
-#     get_or_create_file(
-#         sequencing_file_set=set_,
-#         name=row["file"],
-#         checksum="",
-#         type="fastq"
-#     )
 
 
 def get_file_tree(row):
@@ -2248,41 +2165,6 @@ def get_file_tree(row):
         return file
     except:
         return
-
-
-    # except MultipleObjectsReturned as e:
-    #     p = ""
-    #     for i in SequencingFile.objects.filter(name=file.strip()):
-    #         if i.sequencing_file_set.path == p:
-    #             i.delete()
-    #             print("deleted")
-    #         p=i.sequencing_file_set.path
-
-    # l=[]
-    # try:
-    #     if row["HiSeqData/"].strip().endswith(".fastq.gz"):
-    #         path, file = row["HiSeqData/"].strip().split("-->")
-    #         prefix = file.split("_L0")[0] if "_L0" in file else None
-    #         # row["set"] = SequencingFileSet.objects.filter(prefix=prefix).values("prefix")
-    #         # print(path,file)
-    #         SequencingFile.objects.get(name=file)
-    #         return
-    # except ObjectDoesNotExist as e:
-    #     # l.append(row["HiSeqData/"].strip())
-    #     # print(row["HiSeqData/"].strip())
-    #     return row["HiSeqData/"].strip()
-    # except MultipleObjectsReturned as e:
-    #     return
-
-
-
-
-    # if "==" in row["HiSeqData/"]:
-    #     print(row["HiSeqData/"])
-    #     name, checksum = row["HiSeqData/"].strip().split("==")
-    #     SequencingFile.objects.filter(name=name, checksum__isnull=True).update(
-    #         checksum=checksum
-    #     )
 
 
 def upload_file_tree(request):
@@ -2302,80 +2184,6 @@ def get_new_files(row):
         SequencingFile.objects.get(name=file.strip())
     except:
         print(row["HiSeqData/"])
-    # print(prefix)
-    # if re.search("^[T12|H12]", file):
-    #     last = "_" + prefix.split("_")[-1]
-    #     print(file.replace(last,""))
-    #     SampleLib.objects.get_or_create(name=prefix.replace(last,""))
-    # if not prefix:
-    #     return
-    # try:
-    #     _seq_run = path.split("/")[1]
-    #     _seq_run_ = _seq_run.split(" ")[0]+"_" if "Nimblegen" in _seq_run else _seq_run
-    #     seq_run = "Nimblegen10_BB13" if "Nimblegen10_BB13" in _seq_run_ else _seq_run_
-    #     sr = SequencingRun.objects.get(name__icontains=seq_run)
-    #     if "Boniva" in file:
-    #         file = file.replace("Boniva", "Bivona")
-    #         match = re.search("Bivona_L\d+", file)
-    #         match2 = re.search("^Bivona_L1_[ACTG]{6}", file)
-    #         if match:
-    #             _sl = match.group(0)
-    #         if match2:
-    #             _sl = "Bivona_L_1"
-    #     elif re.search("^Boniva_L1_", file):
-    #         match = re.search("^HW(\w+)_[ACTG]", file)
-    #         area = f"HW{match.group(1)}".replace("Dissect","")
-    #         _sl = SampleLib.objects.filter(na_sl_links__nucacid__area__name = area, name__startswith="N3_").first().name
-    #     elif re.search("^[T12|H12]", file):
-    #         last = "_" + prefix.split("_")[-1]
-    #         _sl = SampleLib.objects.get(name=prefix.replace(last, "")).name
-    #     elif re.search("^HW", file):
-    #         match = re.search("^HW(\w+)_[ACTG]", file)
-    #         area = f"HW{match.group(1)}".replace("Dissect","")
-    #         _sl = SampleLib.objects.filter(na_sl_links__nucacid__area__name = area, name__startswith="N3_").first().name
-    #     elif re.search("^Dog", file):
-    #         match = re.search("^Dog(\w+)_[ACTG]", file)
-    #         bl = f"Dog{match.group(1)}"
-    #         _sl = SampleLib.objects.filter(na_sl_links__nucacid__area__block__name = bl).first().name
-    #     elif re.search("^lane", file):
-    #         match = re.search("^Dog(\w+)_[ACTG]", file)
-    #         bl = f"Dog{match.group(1)}"
-    #         _sl = SampleLib.objects.filter(na_sl_links__nucacid__area__block__name = bl).first().name
-    #     elif re.search("^Kit_262", file):
-    #         _sl = f"Kit 262"
-    #     elif re.search("^DLP-", file):
-    #         match = re.search("^DLP-(\d+)_(\w+)", file)
-    #         _sl = f"DLP-{match.group(1)}"
-    #     elif re.search("^CGH", file) and ("029" in file or "045" in file or "092" in file or "125" in file or "194" in file):
-    #         match = re.search("^CGH(\d+)_(\d+)_[ACTG]{6}", file)
-    #         _sl = f"BB09_CGH{match.group(1)}_{match.group(2)}"
-    #     elif re.search("^CGH(\d+)_(\d+)_[ACTG]{6}", file):
-    #         match = re.search("^CGH(\d+)_(\d+)_[ACTG]{6}", file)
-    #         _sl = f"CGH{match.group(1)}-{match.group(2)}"
-    #     elif re.search("^2(\w+)_[ACTG]{6}", file):
-    #         _sl = "2"+re.search("^2(\w+)_[ACTG]{6}", file).group(1)
-    #         _sl = _sl.replace("_", "-")
-    #     elif re.search("[ACTG]{6}", file):
-    #         _sl = re.search("(\w+)_[ACTG]{6}", file).group(1)
-    #     else:
-    #         _sl = file.split("_S")[0] if "_S" in file else file
-    #
-    #     sl = SampleLib.objects.get(name=_sl)
-    #     set_ = get_or_create_set(
-    #         prefix=prefix,
-    #         path=path,
-    #         sample_lib=sl,
-    #         sequencing_run=sr,
-    #     )
-    #     get_or_create_file(
-    #         sequencing_file_set=set_,
-    #         name=file,
-    #         checksum="",
-    #         type="fastq"
-    #     )
-    # except Exception as e:
-    #     print(row["new"])
-    #     print(e)
 
 def match_new_files(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "fastq_files_new.csv")
@@ -2412,23 +2220,6 @@ def _files_from_file(row):
 
     except:
         print(row["sample_lib"])
-    # if not pd.isnull(row["fastq_file"]):
-    #     return row
-    # files = SequencingFile.objects.filter(sequencing_file_set__sample_lib__name=row["sample_lib"],
-    #                               sequencing_file_set__sequencing_run__name=row["sequencing_run"])
-    # if files:
-    #     print(f"sequencing_run: {row['sequencing_run']} / sample_lib: {row['sample_lib']}")
-    #     print(files)
-    #     d={}
-    #     for file in files:
-    #         if file.name.endswith("fastq.gz"):
-    #             d[file.name]=file.checksum
-    #     if bool(d):
-    #         row["fastq_file"] = d
-    #         row["fastq_path"] = files.first().sequencing_file_set.path
-    #         row["new_added"] = True
-    # return row
-
 
 
 def create_fastq_from_file(request):
@@ -2512,89 +2303,6 @@ def get_unregistered(row):
             p=i.path
     except Exception as e:
         print(e)
-    # try:
-    #     _sr = path.split("/")[1]
-    #     if "Nimblegen" in path:
-    #         _sr = re.sub(r'Nimblegen(\d+) \(BB0*([1-9]\d*)\)', r'Nimblegen\1_BB\2', _sr)
-    #     if "Boniva" in file:
-    #         prefix=prefix.replace("Boniva","Bivona")
-    #         match = re.search("Bivona_L(\d+)_[ACTG]{6}", prefix)
-    #         _sl = "Bivona_L"+match.group(1)
-    #     if "T12_" in file:
-    #         match = re.search("T12_(\w+)_[ACTG]{6}", prefix)
-    #         _sl = "T12_"+match.group(1)
-    #     if file.endswith(".bam"):
-    #         _sl = file.split(".bam")[0]
-    #     if file.endswith(".bai"):
-    #         _sl = file.split(".bai")[0]
-    #     if re.match(r'^\d[20-29]', file):
-    #         match = re.match(r'^(\d[20-29])_(\d)_([ACTG]{6})', file)
-    #         prefix = f"{match.group(1)}_{match.group(2)}_{match.group(3)}"
-    #         _sl = f"{match.group(1)}_{match.group(2)}"
-    #     if re.match(r'^CGH11', file):
-    #         match = re.match(r'^CGH11_(\d+)_([ACTG]{6})', file)
-    #         prefix = f"CGH11_{match.group(1)}_{match.group(2)}"
-    #         _sl = f"BB09_CGH11_{match.group(1)}"
-    #     if re.match(r'^BB08_HW', file):
-    #         # file = file.replace("BB08_HW8NC", "BB008_HW8NC")
-    #         match = re.match(r'^BB08_HW(\w+)_([ACTG]{6})', file)
-    #         prefix = f"BB08_HW{match.group(1)}_{match.group(2)}"
-    #         _sl = f"BB008_HW{match.group(1)}"
-    #     if re.match(r'^Kit', file):
-    #         prefix = file.replace("recal.bai","").replace("recal.bam","")
-    #         match = re.match(r'(\w+)_([ACTG]{6})', prefix)
-    #         _sl = match.group(1)
-    #         print(match.group(1))
-    #     if re.match(r'^SGLP', file):
-    #         match = re.match(r'^SGLP-(\d+)', file)
-    #         prefix = f"SGLP-{match.group(1)}"
-    #         _sl = f"SGLP-{match.group(1)}"
-    #         set_ = SequencingFileSet.objects.filter(prefix__icontains=prefix).first()
-    #     if re.match(r'^JJS', file):
-    #         match = re.match(r'^JJS(\d+)_(\w+)_', file)
-    #         prefix = file.split(".fastq")[0]
-    #         _sl = f"JJS{match.group(1)}_{match.group(2)}"
-    #         sl,_ = SampleLib.objects.get_or_create(name=_sl)
-    #         sr,_ = SequencingRun.objects.get_or_create(name=_sr)
-    #     if not re.match(r'^JJS', file):
-    #         sl = SampleLib.objects.get(name=_sl)
-    #         sr = SequencingRun.objects.get(name=_sr)
-    #     if not re.match(r'^SGLP', file):
-    #         set_ = get_or_create_set(
-    #             prefix=prefix,
-    #             path=path,
-    #             sample_lib=sl,
-    #             sequencing_run=sr,
-    #         )
-    #     get_or_create_file(
-    #         sequencing_file_set=set_,
-    #         name=file,
-    #         checksum="",
-    #         type=type
-    #     )
-    #     print("created")
-    # except Exception as e:
-    #     print(e)
-    #     print(output_string)
-    #     sr = SequencingRun.objects.get(name__icontains=seq_run)
-    #     if "Boniva" in file:
-    #         file = file.replace("Boniva", "Bivona")
-    #         match = re.search("Bivona_L\d+", file)
-    #         match2 = re.search("^Bivona_L1_[ACTG]{6}", file)
-    #         if match:
-    #             _sl = match.group(0)
-    #         if match2:
-    #             _sl = "Bivona_L_1"
-    #     elif re.search("^Boniva_L1_", file):
-    #         match = re.search("^HW(\w+)_[ACTG]", file)
-    #         area = f"HW{match.group(1)}".replace("Dissect","")
-    #         _sl = SampleLib.objects.filter(na_sl_links__nucacid__area__name = area, name__startswith="N3_").first().name
-    #     elif re.search("^[T12|H12]", file):
-    #         last = "_" + prefix.split("_")[-1]
-    #         _sl = SampleLib.objects.get(name=prefix.replace(last, "")).name
-    #
-    #
-
 
 def upload_unregistered(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "fastq_files_unregistered.csv")
@@ -2891,10 +2599,24 @@ def nas2(row):
     try:
         print(row["NA_id"])
         na, _ = NucAcids.objects.get_or_create(name=row['NA_id'])
-        block = Blocks.objects.get(name=row["Block"])
+        b, cb = Blocks.objects.get_or_create(name=row["Block"])
+        patient, cb = Patients.objects.get(pat_id=row["pat_id"])
+        if cb:
+            b.patient = patient
+            _notes = f"SITE_CODE: {row['site_code']} / icd9: {row['icd9']} / DEPT_NUMBER: {row['dept_number']} / SPECIMEN: {row['specimen']} / DX_TEXT: {row['dx_text']}"
+            b.age = row["pat_age"] if not pd.isnull(row["pat_age"]) else b.age
+            b.notes = str(row["Notes/Other"]) + str(row["note"]) + str(_notes)
+            b.micro = row["micro"] if not pd.isnull(row["micro"]) else b.micro
+            b.diagnosis = row["Diagnosis"] if not pd.isnull(row["Diagnosis"]) else b.diagnosis
+            b.thickness = row["thickness"] if not pd.isnull(row["thickness"]) else b.thickness
+            b.mitoses = row["mitoses"] if not pd.isnull(row["mitoses"]) else b.mitoses
+            b.p_stage = row["p_stage"] if not pd.isnull(row["p_stage"]) else b.p_stage
+            b.prim = row["prim"] if not pd.isnull(row["prim"]) else b.prim
+            b.subtype = row["subtype"] if not pd.isnull(row["subtype"]) else b.subtype
+            b.save()
         area, cr = Areas.objects.get_or_create(name=row["Area_id"])
         if cr:
-            area.block = block
+            area.block = b
             area.area_type = get_area_type(row['Area'])
             area.save()
         link=AREA_NA_LINK.objects.get_or_create(area=area,nucacid=na)
