@@ -2599,7 +2599,7 @@ def nas2(row):
     try:
         na, _ = NucAcids.objects.get_or_create(name=row['NA_id'])
         b = Blocks.objects.get(name=row["Block"])
-        patient, created = Patients.objects.get(pat_id=row["pat_id"].replace(".0", ""))
+        patient, created = Patients.objects.get(pat_id=str(row["pat_id"]).replace(".0", ""))
         if b.patient:
             print(patient, b.patient.pat_id)
         else:
