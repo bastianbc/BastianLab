@@ -2624,7 +2624,7 @@ def nas2(row):
         link_area, _ =AREA_NA_LINK.objects.get_or_create(area=area,nucacid=na)
         link_sl_na, _ = NA_SL_LINK.objects.get_or_create(sample_lib=sl,nucacid=na)
     except Exception as e:
-        print(e,row["Sample"])
+        print(e,row["Sample"], row["Barcode ID"])
 
 
 def check_na2(request):
