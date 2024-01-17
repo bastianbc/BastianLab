@@ -18,7 +18,6 @@ from method.models import Method
 @permission_required_for_async("blocks.view_blocks")
 def filter_blocks(request):
     from .serializers import BlocksSerializer
-    # _create_blocks_consolidated_data()
     blocks = Blocks.query_by_args(request.user,**request.GET)
     serializer = BlocksSerializer(blocks['items'], many=True)
     result = dict()

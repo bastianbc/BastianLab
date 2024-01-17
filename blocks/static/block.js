@@ -10,7 +10,7 @@ var KTDatatablesServerSide = function () {
 
     // Private functions
     var initDatatable = function ( initialValue, p_stage, prim, collection , body_site ) {
-        console.log(p_stage, prim, collection, body_site);
+
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
 
         dt = $(".table").DataTable({
@@ -57,15 +57,14 @@ var KTDatatablesServerSide = function () {
               }
             },
             columns: [
-                {
-                    class: 'dt-control',
-                    orderable: false,
-                    data: null,
-                    defaultContent: ''
-                },
+              {
+                class: 'dt-control',
+                orderable: false,
+                data: null,
+                defaultContent: ''
+              },
               { data: 'bl_id' },
               { data: 'name'},
-
               { data: 'project_name'},
               { data: 'patient_name' },
               { data: 'diagnosis' },
@@ -110,7 +109,7 @@ var KTDatatablesServerSide = function () {
                     orderable: true,
                     render: function (data, type, row) {
                       if (data) {
-                        return `<a href="`+ row["block_url"]["url"] + row["scan_number"] +`" ><i class="fa-solid fa-image fa-xl" style="color: #00f900;"></i></a>`;
+                        return `<a href="`+ row["block_url"]["url"] + row["scan_number"] +`" ><i class="fa-solid fa-image fa-xl" style="color: #40f900;"></i></a>`;
                       }
                       return "";
                     }
@@ -280,9 +279,11 @@ var KTDatatablesServerSide = function () {
 
                 // Select parent row
                 const parent = e.target.closest('tr');
-
-                const name = parent.querySelectorAll('td')[1].innerText;
-                const id = parent.querySelectorAll('td')[0].querySelector(".form-check-input").value;
+                console.log(parent);
+                console.log(parent.querySelectorAll('td')[2].innerText);
+                console.log(parent.querySelectorAll('td')[1].querySelector(".form-check-input").value);
+                const name = parent.querySelectorAll('td')[2].innerText;
+                const id = parent.querySelectorAll('td')[1].querySelector(".form-check-input").value;
 
                 $.ajax({
                     url: "/blocks/check_can_deleted_async",

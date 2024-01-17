@@ -2889,9 +2889,10 @@ def check_na(request):
 
 def nas2(row):
     try:
+        print(row["NA_id"])
         na=NucAcids.objects.get(name=row['NA_id'])
-        area=Areas.objects.get(name=row["Area_id"])
-        link=AREA_NA_LINK.objects.get_or_create(area=area,nucacid=na)
+        # area=Areas.objects.get(name=row["Area_id"])
+        # link=AREA_NA_LINK.objects.get_or_create(area=area,nucacid=na)
     except Exception as e:
         print(e,row["NA_id"])
 
@@ -2899,6 +2900,7 @@ def nas2(row):
 def check_na2(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
     df = pd.read_csv(file)
+    (NucAcids.objects.filter(name__startswith="NA_"))
     df[~df["NA_id"].isnull()].apply(lambda row: nas2(row), axis=1)
     # df[~df["NA_id"].isnull() & ~df["Area_id"].isnull()].apply(lambda row: nas2(row), axis=1)
 
@@ -3105,13 +3107,70 @@ def get_sample_library(row):
     except MultipleObjectsReturned as e:
         pass
 
+def check_sl_bait(row):
+    if row['sequencing_run']=='BCB036':
+        row["Bait"] = 'Small Gene Panel'
 
 def check_sample_library(request):
-    from .Acral_melanoma_lines_mRNA_Seq_AL1806051_R1 import create_file
-    create_file()
-    # file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
-    # df = pd.read_csv(file)
-    # df.apply(lambda row: get_sample_library(row), axis=1)
+    file = Path(Path(__file__).parent.parent / "uploads" / "report_matching_sample_lib_with_bait_after_reducing_fastq_files.csv")
+    df = pd.read_csv(file)
+    df.apply(lambda row: check_sl_bait(row), axis=1)
+    # from .Acral_melanoma_lines_mRNA_Seq_AL1806051_R1 import create_file
+    # create_file()
+    df.to_csv("uploads/report_matching_sample_lib_with_bait_after_reducing_fastq_files2.csv", index=False)
+
+
+def check_seq_run_2(row):
+    # print(row)
+    try:
+        SequencingRun.objects.get(name=row["seq_runs"])
+    except Exception as e:
+        print(row["seq_runs"], e)
+
+
+def check_seq_run(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "seq_runs.txt")
+    df = pd.read_csv(file)
+    for i in SequencingRun.objects.all():
+        name = i.name
+        i.name = name.strip()
+        i.save()
+    # df = pd.read_csv(file, index_col=False, encoding='iso-8859-1', on_bad_lines='warn')
+    df.apply(lambda row: check_seq_run_2(row), axis=1)
+    print(df.count())
+    # from .Acral_melanoma_lines_mRNA_Seq_AL1806051_R1 import create_file
+    # create_file()
+    # df.to_csv("uploads/report_matching_sample_lib_with_bait_after_reducing_fastq_files2.csv", index=False)
+
+
+def get_check_dna_rna(row):
+    try:
+        sl = SampleLib.objects.get(name=row["sample_lib"])
+        na = NA_SL_LINK.objects.filter(sample_lib=sl, nucacid__na_type__isnull=False)
+        # print(row["sample_lib"], na.name, na.na_type)
+        if na:
+            row["RNA/DNA"] = na[0].nucacid.na_type.upper()
+        else:
+            row["RNA/DNA"] = ""
+        return row
+    except Exception as e:
+        print(e, row["sample_lib"])
+
+
+def check_dna_rna(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "SequencingSampleSheet-01102024.xlsx")
+    file = "/Users/cbagci/Library/Containers/com.apple.mail/Data/Library/Mail Downloads/0B0A3920-A69F-4FFD-9560-AB728F303574/SequencingSampleSheet-01102024.xlsx"
+    file = Path(Path(__file__).parent.parent / "uploads" / "RNA_libraries.csv")
+    df = pd.read_csv(file)
+    print(df)
+    df = df.apply(lambda row: get_check_dna_rna(row), axis=1)
+    df.to_csv("SequencingSampleSheet-01102024_v3.csv")
+
+    # df = pd.read_excel(file,sheet_name=0)
+    # df = df.dropna(subset=['sample_lib'])
+    # df = df.dropna(subset=['sample_lib'])
+
+
 
 
 
