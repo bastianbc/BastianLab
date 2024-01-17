@@ -2891,7 +2891,12 @@ def nas2(row):
     try:
         print(row["NA_id"])
         na, _ = NucAcids.objects.get_or_create(name=row['NA_id'])
-        area = Areas.objects.get(name=row["Area_id"])
+        block = Blocks.objects.get(name=row["Block"])
+        area, cr = Areas.objects.get_or_create(name=row["Area_id"])
+        if cr:
+            area.block = block
+            area.area_type = get_area_type(row['Area'])
+            area.save()
         link=AREA_NA_LINK.objects.get_or_create(area=area,nucacid=na)
     except Exception as e:
         print(e,row["NA_id"])
