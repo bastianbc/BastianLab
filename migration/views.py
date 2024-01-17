@@ -2599,21 +2599,20 @@ def nas2(row):
     try:
         na, _ = NucAcids.objects.get_or_create(name=row['NA_id'])
         b = Blocks.objects.get(name=row["Block"])
-        # patient, cb = Patients.objects.get(pat_id=row["pat_id"])
-        print("block:", b)
-        # _notes = f"SITE_CODE: {row['site_code']} / icd9: {row['icd9']} / DEPT_NUMBER: {row['dept_number']} / SPECIMEN: {row['specimen']} / DX_TEXT: {row['dx_text']}"
-        # b.age = row["pat_age"] if not pd.isnull(row["pat_age"]) else b.age
-        # b.notes = str(row["Notes/Other"]) + str(row["note"]) + str(_notes)
-        # b.micro = row["micro"] if not pd.isnull(row["micro"]) else b.micro
-        # b.diagnosis = row["Diagnosis"] if not pd.isnull(row["Diagnosis"]) else b.diagnosis
-        # b.thickness = row["thickness"] if not pd.isnull(row["thickness"]) else b.thickness
-        # b.mitoses = row["mitoses"] if not pd.isnull(row["mitoses"]) else b.mitoses
-        # b.p_stage = row["p_stage"] if not pd.isnull(row["p_stage"]) else b.p_stage
-        # b.prim = row["prim"] if not pd.isnull(row["prim"]) else b.prim
-        # b.subtype = row["subtype"] if not pd.isnull(row["subtype"]) else b.subtype
-        # b.save()
+        patient, created = Patients.objects.get_or_create(pat_id=row["pat_id"])
+        print(patient, b.patient)
+        _notes = f"SITE_CODE: {row['site_code']} / icd9: {row['icd9']} / DEPT_NUMBER: {row['dept_number']} / SPECIMEN: {row['specimen']} / DX_TEXT: {row['dx_text']}"
+        b.age = row["pat_age"] if not pd.isnull(row["pat_age"]) else b.age
+        b.notes = str(row["Notes/Other"]) + str(row["note"]) + str(_notes)
+        b.micro = row["micro"] if not pd.isnull(row["micro"]) else b.micro
+        b.diagnosis = row["Diagnosis"] if not pd.isnull(row["Diagnosis"]) else b.diagnosis
+        b.thickness = row["thickness"] if not pd.isnull(row["thickness"]) else b.thickness
+        b.mitoses = row["mitoses"] if not pd.isnull(row["mitoses"]) else b.mitoses
+        b.p_stage = row["p_stage"] if not pd.isnull(row["p_stage"]) else b.p_stage
+        b.prim = row["prim"] if not pd.isnull(row["prim"]) else b.prim
+        b.subtype = row["subtype"] if not pd.isnull(row["subtype"]) else b.subtype
+        b.save()
         area, _ = Areas.objects.get_or_create(name=row["Area_id"], block=b)
-        print(area, row["NA_id"])
         area.block = b
         area.area_type = get_area_type(row['Area'])
         area.save()
