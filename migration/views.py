@@ -2597,12 +2597,13 @@ def check_na(request):
 
 def nas2(row):
     try:
+        sl = SampleLib.objects.filter(name=row["Sample"])
         na, _ = NucAcids.objects.get_or_create(name=row['NA_id'])
         b = Blocks.objects.get(name=row["Block"])
-        print(b.patient)
+        # print(b.patient)
         if not pd.isnull(row["pat_id"]):
             patient = Patients.objects.get(pat_id=str(row["pat_id"]).replace(".0", ""))
-            print(patient)
+            # print(patient)
             b.patient = patient
         _notes = f"SITE_CODE: {row['site_code']} / icd9: {row['icd9']} / DEPT_NUMBER: {row['dept_number']} / SPECIMEN: {row['specimen']} / DX_TEXT: {row['dx_text']}"
         b.age = row["pat_age"] if not pd.isnull(row["pat_age"]) else b.age
@@ -2621,7 +2622,7 @@ def nas2(row):
         area.save()
         # link, _=AREA_NA_LINK.objects.get_or_create(area=area,nucacid=na)
     except Exception as e:
-        print(e,row["NA_id"])
+        print(e,row["Sample"])
 
 
 def check_na2(request):
