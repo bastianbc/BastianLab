@@ -211,6 +211,7 @@ class AREA_NA_LINK(models.Model):
     area = models.ForeignKey("areas.Areas", on_delete=models.CASCADE, related_name="area_na_links", verbose_name="Area")
     input_vol = models.FloatField(blank=True, null=True, verbose_name="Volume")
     input_amount = models.FloatField(blank=True, null=True, verbose_name="Amount")
+    date = models.DateTimeField(default=datetime.now, verbose_name="Date")
 
     class Meta:
         db_table = "area_na_link"
