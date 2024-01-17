@@ -2597,7 +2597,6 @@ def check_na(request):
 
 def nas2(row):
     try:
-        print(row["NA_id"])
         na, _ = NucAcids.objects.get_or_create(name=row['NA_id'])
         b, cb = Blocks.objects.get_or_create(name=row["Block"])
         # patient, cb = Patients.objects.get(pat_id=row["pat_id"])
@@ -2615,11 +2614,11 @@ def nas2(row):
             b.subtype = row["subtype"] if not pd.isnull(row["subtype"]) else b.subtype
             b.save()
         area, cr = Areas.objects.get_or_create(name=row["Area_id"])
-
+        print(b, area, row["NA_id"])
         area.block = b
         area.area_type = get_area_type(row['Area'])
         area.save()
-        link=AREA_NA_LINK.objects.get_or_create(area=area,nucacid=na)
+        link, _=AREA_NA_LINK.objects.get_or_create(area=area,nucacid=na)
     except Exception as e:
         print(e,row["NA_id"])
 
