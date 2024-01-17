@@ -2597,7 +2597,8 @@ def check_na(request):
 
 def nas2(row):
     try:
-        sl, _ = SampleLib.objects.get_or_create(name=row["Sample"])
+        sl, created = SampleLib.objects.get_or_create(name=row["Sample"])
+        print(sl, created)
         if not pd.isnull(row["Barcode ID"]):
             barcode = Barcode.objects.filter(name=row["Barcode ID"].strip()).first()
             if barcode:
