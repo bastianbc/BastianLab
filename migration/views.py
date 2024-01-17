@@ -2597,12 +2597,7 @@ def check_na(request):
 
 def nas2(row):
     try:
-        if row["Sample"].startswith("12-"):
-            sl = SampleLib.objects.get(name="T"+row["Sample"])
-        elif row["Sample"].startswith("BuffyCo"):
-            sl = SampleLib.objects.get(name="BuffyCoat_43")
-        else:
-            sl = SampleLib.objects.get(name=row["Sample"])
+        sl, _ = SampleLib.objects.get_or_create(name=row["Sample"])
         if not pd.isnull(row["Barcode ID"]):
             barcode = Barcode.objects.get(name=row["Barcode ID"].strip())
             sl.barcode = barcode
