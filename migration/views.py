@@ -2600,10 +2600,7 @@ def nas2(row):
         na, _ = NucAcids.objects.get_or_create(name=row['NA_id'])
         b = Blocks.objects.get(name=row["Block"])
         patient = Patients.objects.get(pat_id=str(row["pat_id"]).replace(".0", ""))
-        if b.patient:
-            print(patient, b.patient.pat_id)
-        else:
-            print(patient)
+        print(patient, b.patient)
         _notes = f"SITE_CODE: {row['site_code']} / icd9: {row['icd9']} / DEPT_NUMBER: {row['dept_number']} / SPECIMEN: {row['specimen']} / DX_TEXT: {row['dx_text']}"
         b.age = row["pat_age"] if not pd.isnull(row["pat_age"]) else b.age
         b.notes = str(row["Notes/Other"]) + str(row["note"]) + str(_notes)
@@ -2627,13 +2624,7 @@ def nas2(row):
 def check_na2(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
     df = pd.read_csv(file)
-    patients = Patients.objects.filter(pa_id__endswith=".0")
-    for patient in patients:
-        if patient.pa_id.endswith('.0'):
-            patient.pa_id = patient.pa_id[:-2]  # Remove the last two characters (".0")
-            patient.save()
     df[~df["NA_id"].isnull()].apply(lambda row: nas2(row), axis=1)
-    # df[~df["NA_id"].isnull() & ~df["Area_id"].isnull()].apply(lambda row: nas2(row), axis=1)
 
 
 def nas3(row):
