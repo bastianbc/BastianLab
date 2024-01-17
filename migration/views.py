@@ -2598,7 +2598,7 @@ def check_na(request):
 def nas2(row):
     try:
         na, _ = NucAcids.objects.get_or_create(name=row['NA_id'])
-        b, cb = Blocks.objects.get_or_create(name=row["Block"])
+        b = Blocks.objects.get(name=row["Block"])
         # patient, cb = Patients.objects.get(pat_id=row["pat_id"])
         print("block:", b)
         # _notes = f"SITE_CODE: {row['site_code']} / icd9: {row['icd9']} / DEPT_NUMBER: {row['dept_number']} / SPECIMEN: {row['specimen']} / DX_TEXT: {row['dx_text']}"
@@ -2612,7 +2612,7 @@ def nas2(row):
         # b.prim = row["prim"] if not pd.isnull(row["prim"]) else b.prim
         # b.subtype = row["subtype"] if not pd.isnull(row["subtype"]) else b.subtype
         # b.save()
-        area, cr = Areas.objects.get_or_create(name=row["Area_id"])
+        area = Areas.objects.get(name=row["Area_id"])
         print(area, row["NA_id"])
         area.block = b
         area.area_type = get_area_type(row['Area'])
