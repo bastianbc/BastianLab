@@ -2599,9 +2599,10 @@ def nas2(row):
     try:
         sl, _ = SampleLib.objects.get_or_create(name=row["Sample"])
         if not pd.isnull(row["Barcode ID"]):
-            barcode = Barcode.objects.get(name=row["Barcode ID"].strip())
-            sl.barcode = barcode
-            sl.save()
+            barcode = Barcode.objects.filter(name=row["Barcode ID"].strip()).first()
+            if barcode:
+                sl.barcode = barcode
+                sl.save()
         na, _ = NucAcids.objects.get_or_create(name=row['NA_id'])
         b = Blocks.objects.get(name=row["Block"])
         # print(b.patient)
