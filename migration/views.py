@@ -2656,7 +2656,7 @@ def check_na2(request):
     end_of_today = timezone.make_aware(timezone.datetime.combine(today, timezone.datetime.max.time()))
 
     # Filter and delete the records
-    SampleLib.objects.filter(created_at__range=(start_of_today, end_of_today)).delete()
+    SampleLib.objects.filter(date__range=(start_of_today, end_of_today)).delete()
 
     df[~df["NA_id"].isnull()].apply(lambda row: nas2(row), axis=1)
 
