@@ -2615,10 +2615,10 @@ def nas2(row):
             b.subtype = row["subtype"] if not pd.isnull(row["subtype"]) else b.subtype
             b.save()
         area, cr = Areas.objects.get_or_create(name=row["Area_id"])
-        if cr:
-            area.block = b
-            area.area_type = get_area_type(row['Area'])
-            area.save()
+
+        area.block = b
+        area.area_type = get_area_type(row['Area'])
+        area.save()
         link=AREA_NA_LINK.objects.get_or_create(area=area,nucacid=na)
     except Exception as e:
         print(e,row["NA_id"])
