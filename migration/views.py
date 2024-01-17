@@ -2626,7 +2626,7 @@ def nas2(row):
         link_sl_na, _ = NA_SL_LINK.objects.get_or_create(sample_lib=sl,nucacid=na)
     except Exception as e:
         print(e)
-        print(f'Barcode: {row["Barcode ID"]}, i5: {row["Barcode"]}')
+        print(f'SAMPLE: {row["Sample"]}, Barcode: {row["Barcode ID"]}, i5: {row["Barcode"]}')
 
 
 def check_na2(request):
