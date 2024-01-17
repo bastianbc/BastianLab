@@ -2599,8 +2599,10 @@ def nas2(row):
     try:
         na, _ = NucAcids.objects.get_or_create(name=row['NA_id'])
         b = Blocks.objects.get(name=row["Block"])
-        patient = Patients.objects.get(pat_id=str(row["pat_id"]).replace(".0", ""))
-        print(patient, b.patient)
+        print(b.patient)
+        if not pd.isnull(row["pat_id"]):
+            patient = Patients.objects.get(pat_id=str(row["pat_id"]).replace(".0", ""))
+            print(patient)
         _notes = f"SITE_CODE: {row['site_code']} / icd9: {row['icd9']} / DEPT_NUMBER: {row['dept_number']} / SPECIMEN: {row['specimen']} / DX_TEXT: {row['dx_text']}"
         b.age = row["pat_age"] if not pd.isnull(row["pat_age"]) else b.age
         b.notes = str(row["Notes/Other"]) + str(row["note"]) + str(_notes)
