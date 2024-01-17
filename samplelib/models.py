@@ -180,6 +180,8 @@ class NA_SL_LINK(models.Model):
     sample_lib = models.ForeignKey(SampleLib, on_delete=models.CASCADE, related_name="na_sl_links", verbose_name="Sample Library")
     input_vol = models.FloatField(default=0, verbose_name="Te Volume")
     input_amount = models.FloatField(default=0, verbose_name="Input Amount")
+    date = models.DateTimeField(default=datetime.now, verbose_name="Date")
+
 
     class Meta:
         db_table = "na_sl_link"
