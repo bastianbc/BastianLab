@@ -2617,7 +2617,7 @@ def nas2(row):
         area.block = b
         area.area_type = get_area_type(row['Area'])
         area.save()
-        link, _=AREA_NA_LINK.objects.get_or_create(area=area,nucacid=na)
+        # link, _=AREA_NA_LINK.objects.get_or_create(area=area,nucacid=na)
     except Exception as e:
         print(e,row["NA_id"])
 
