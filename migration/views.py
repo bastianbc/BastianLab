@@ -2627,6 +2627,17 @@ def nas2(row):
     except Exception as e:
         print(e)
         print(f'SAMPLE: {row["Sample"]}, Barcode: {row["Barcode ID"]}, i5: {row["Barcode"]}')
+        if row["Barcode ID"].startswith("AD"):
+            barcode_set, _ = Barcodeset.objects.get_or_create(name="AD")
+            barcode, _ = Barcode.objects.get_or_create(barcode_set=barcode_set,
+                                                    name=row["Barcode ID"].strip(),
+                                                    i5=row["Barcode"])
+        if row["Barcode ID"].startswith("Dual_"):
+            barcode_set, _ = Barcodeset.objects.get_or_create(name="Dual Duplex")
+            barcode, _ = Barcode.objects.get_or_create(barcode_set=barcode_set,
+                                                    name=row["Barcode ID"].strip(),
+                                                    i5=row["Barcode"])
+
 
 
 def check_na2(request):
