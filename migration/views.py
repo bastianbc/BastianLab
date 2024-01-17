@@ -2598,7 +2598,8 @@ def check_na(request):
 def nas2(row):
     try:
         sl = SampleLib.objects.get(name=row["Sample"])
-        barcode = Barcode.objects.get(name=row["Barcode ID"])
+        if not pd.isnull(row["Barcode ID"]):
+            barcode = Barcode.objects.get(name=row["Barcode ID"].strip())
         na, _ = NucAcids.objects.get_or_create(name=row['NA_id'])
         b = Blocks.objects.get(name=row["Block"])
         # print(b.patient)
