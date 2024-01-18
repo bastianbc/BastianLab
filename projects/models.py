@@ -13,7 +13,7 @@ class Projects(models.Model):
         (BORIS, 'Boris Bastian'),
         (IWEI, 'Iwei Yeh'),
     ]
-    name = models.CharField(max_length=100, blank=False, null=False,verbose_name="Name")
+    name = models.CharField(max_length=100, blank=False, null=False, unique=True, verbose_name="Name")
     abbreviation = models.CharField(max_length=7, blank=False, null=False, unique=True, default='XY', verbose_name="Abbreviation", help_text="Requires a unique identifier for each Project.")
     pi = models.CharField(max_length=2, choices=PI_CHOICES, default=BORIS, blank=True, null=True, verbose_name="Principal Investigator")
     speedtype = models.CharField(max_length=50, blank=True, null=True, verbose_name="Speed Type")
@@ -22,6 +22,8 @@ class Projects(models.Model):
     pr_id = models.AutoField(primary_key=True, verbose_name="Project ID")
     technician = models.ManyToManyField(User, null=True, blank=True, related_name="technician_projects", verbose_name="Technician")
     researcher = models.ManyToManyField(User, null=True, blank=True, related_name="researcher_projects", verbose_name="Researcher")
+    date = models.DateTimeField(default=datetime.now, verbose_name="Date")
+
 
     class Meta:
         managed = True
