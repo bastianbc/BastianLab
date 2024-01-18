@@ -2940,9 +2940,14 @@ def check_dna_rna(request):
     # df = df.dropna(subset=['sample_lib'])
 
 def check_areas_airtable_get(row):
-    print(row['Area_ID'], row['Block_ID'])
-    Areas.objects.get(name=row['Area_ID'])
-
+    try:
+        print(row['Area_ID'], row['Block_ID'])
+        area, created = Areas.objects.get_or_create(name=row['Area_ID'], block=row["Block_ID"])
+        if created:
+            area.area_type = get_area_type(row['Area type'])
+            area.save()
+    except Exception as e:
+        print(e, row['Area_ID'])
 
 def check_areas_airtable(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "Areas-Grid view (2).csv")
