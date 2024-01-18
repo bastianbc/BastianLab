@@ -2951,10 +2951,11 @@ def check_dna_rna(request):
 
 def check_areas_airtable_get(row):
     try:
-        project = Projects.objects.get(name=row['Assigned projects'])
-        block = Blocks.objects.get(name=row['Block_ID'])
-        block.project = project
-        block.save()
+        if not pd.isnull(row['Assigned projects']):
+            project = Projects.objects.get(name=row['Assigned projects'])
+            block = Blocks.objects.get(name=row['Block_ID'])
+            block.project = project
+            block.save()
         # area = Areas.objects.get(name=row['Area_ID'])
         # if area:
         #     area.area_type = get_area_type(row['Area type'])
