@@ -2135,8 +2135,33 @@ def get_barcodes(row):
 
 def get_baits(row):
     try:
+        l=[
+            "00-001103-B7",
+            "00-001103-B7",
+            "02-012396-A",
+            "02-012396-A",
+            "04-003736-A",
+            "06-14812-E",
+            "07-012236-B1",
+            "13-10776-A1",
+            "13-17202-A11",
+            "13-17202-C4",
+            "13-24372-B",
+            "14-4989-D3",
+            "14-4989-D3",
+            "90-012097-B",
+            "92-003527-H",
+        ]
+        f = ["10-008371-A1, 99-012800-2",
+            "10-008371-A1, 99-012800-2",
+            "86541-2a, 2b",
+            "H2007.4636/9, B07.15494/1"]
         block_name = row['Block_ID'].replace(";",",").strip()
-        if "," in block_name:
+        if block_name in l:
+            match = re.match(r'\d{2}-(\d+)-(\w+)', row["Block_ID"])
+            if match:
+                block = Blocks.objects.get(name=row["Block_ID"].split("-")[0]+"-"+match.group(1)+match.group(2))
+        elif "," in block_name:
             for bname in block_name.split(","):
                 block = Blocks.objects.get(name=bname.strip())
         else:
