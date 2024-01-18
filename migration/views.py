@@ -2178,36 +2178,60 @@ def get_baits(row):
                 project = Projects.objects.get(name=row['Assigned Projects'])
                 block.project = project
                 block.save()
-        # l = ["436 common, sclerotic dermal component",
-        #      "437 common, sclerotic dermal component",
-        #      "438 common, sclerotic dermal component",
-        #      "439 common, sclerotic dermal component",
-        #      "440 common, sclerotic dermal component",
-        #      "441 common, sclerotic dermal component",
-        #      "443 common, sclerotic dermal component",
-        #      "444 blue nevus, cellular",
-        #      "445 common, sclerotic dermal component",
-        #      "2409 SCC, in situ",
-        #      "2412 SCC, in situ",
-        #      "2414 SCC, in situ",
-        #      "2415 SCC, in situ",
-        #      "2433 Pilomatricoma, cystic",
-        #      "426 blue nevus, cellular,  DF like",
-        #      "427 blue nevus, cellular,  DF like",
-        #      "428 blue nevus, cellular,  DF like",
-        #      "446 DPN, pure"]
-        # if not pd.isnull(row["Area_ID"]):
-        #     area_name = row['Area_ID'].replace('"', '').replace(';', ',').strip()
-        #     if "," in area_name:
-        #         if area_name in l:
-        #             area = Areas.objects.get(name=area_name.strip())
-        #         else:
-        #             for area in area_name.split(","):
-        #                 area = Areas.objects.get(name=area.strip())
-        #     elif area_name.endswith("_NA"):
-        #         area = Areas.objects.get(name=area_name.strip().replace("_NA",""))
-        #     else:
-        #         area = Areas.objects.get(name=area_name.strip())
+        l = ["436 common, sclerotic dermal component",
+             "437 common, sclerotic dermal component",
+             "438 common, sclerotic dermal component",
+             "439 common, sclerotic dermal component",
+             "440 common, sclerotic dermal component",
+             "441 common, sclerotic dermal component",
+             "443 common, sclerotic dermal component",
+             "444 blue nevus, cellular",
+             "445 common, sclerotic dermal component",
+             "2409 SCC, in situ",
+             "2412 SCC, in situ",
+             "2414 SCC, in situ",
+             "2415 SCC, in situ",
+             "2433 Pilomatricoma, cystic",
+             "426 blue nevus, cellular,  DF like",
+             "427 blue nevus, cellular,  DF like",
+             "428 blue nevus, cellular,  DF like",
+             "446 DPN, pure"]
+        if not pd.isnull(row["Area_ID"]):
+            area_name = row['Area_ID'].replace('"', '').replace(';', ',').strip()
+            if "," in area_name:
+                if area_name in l:
+                    area = Areas.objects.get(name=area_name.strip())
+                    block = area.block
+                    if not pd.isnull(row["Assigned Projects"]):
+                        project = Projects.objects.get(name=row['Assigned Projects'])
+                        if block:
+                            block.project = project
+                            block.save()
+                else:
+                    for area in area_name.split(","):
+                        area = Areas.objects.get(name=area.strip())
+                        block = area.block
+                        if not pd.isnull(row["Assigned Projects"]):
+                            project = Projects.objects.get(name=row['Assigned Projects'])
+                            if block:
+                                block.project = project
+                                block.save()
+            elif area_name.endswith("_NA"):
+                area = Areas.objects.get(name=area_name.strip().replace("_NA",""))
+                block = area.block
+                if not pd.isnull(row["Assigned Projects"]):
+                    project = Projects.objects.get(name=row['Assigned Projects'])
+                    if block:
+                        block.project = project
+                        block.save()
+            else:
+                area = Areas.objects.get(name=area_name.strip())
+                block = area.block
+                if not pd.isnull(row["Assigned Projects"]):
+                    project = Projects.objects.get(name=row['Assigned Projects'])
+                    if block:
+                        block.project = project
+                        block.save()
         #     block = area.block
         # if not pd.isnull(row["Assigned Projects"]):
         #     project = Projects.objects.get(name=row['Assigned Projects'])
