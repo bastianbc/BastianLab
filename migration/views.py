@@ -2136,6 +2136,9 @@ def get_barcodes(row):
 def get_baits(row):
     try:
         block_name = row['Block_ID'].replace(";",",").strip()
+        match = re.match(r'\d{2}-(\d+)-(\w+)', block_name)
+        if match:
+            print(match.group(1),match.group(2),match.group(3))
         if "," in block_name:
             for bname in block_name.split(","):
                 block = Blocks.objects.get(name=bname.strip())
