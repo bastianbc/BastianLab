@@ -2590,6 +2590,9 @@ def nas(row):
             block = area.block
         if not pd.isnull(row["Assigned Projects"]):
             project = Projects.objects.get(name=row['Assigned Projects'])
+            if block:
+                block.project = project
+                block.save()
         # if "BND" in row["NA_ID"]:
         #     na=NucAcids.objects.get(name=we(row))
         # else:
