@@ -2988,19 +2988,20 @@ def create_abbreviation(value):
 
 def check_projects_airtable_get(row):
     try:
-        if not Projects.objects.filter(name=row["Assigned project"]):
+        if not Projects.objects.filter(name=row["Assigned projects"]):
             project, _ = Projects.objects.get_or_create(
-                name=row["Assigned project"],
-                abbreviation=create_abbreviation(row["Assigned project"]))
+                name=row["Assigned projects"],
+                abbreviation=create_abbreviation(row["Assigned projects"]))
     except Exception as e:
-        print(e, row["Assigned project"])
+        print(e, row["Assigned projects"])
 
 
 def check_projects_airtable(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "Patients-Grid view (1).csv")
     file = Path(Path(__file__).parent.parent / "uploads" / "Blocks-Grid view (2).csv")
+    file = Path(Path(__file__).parent.parent / "uploads" / "Areas-Grid view (3).csv")
     df = pd.read_csv(file)
-    df[~df["Assigned project"].isnull()].apply(lambda row: check_projects_airtable_get(row), axis=1)
+    df[~df["Assigned projects"].isnull()].apply(lambda row: check_projects_airtable_get(row), axis=1)
 
 
 
