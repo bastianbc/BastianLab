@@ -2621,7 +2621,7 @@ def nas(row):
 def check_na(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "Nucleic Acids-Grid view (2).csv")
     df = pd.read_csv(file)
-    df[~df["NA_ID"].isnull()].apply(lambda row: nas(row), axis=1)
+    df[~df["Area ID"].isnull()].apply(lambda row: nas(row), axis=1)
 
 
 def nas2(row):
