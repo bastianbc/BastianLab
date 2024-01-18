@@ -2196,7 +2196,8 @@ def get_baits(row):
         if match:
             print(row["Block_ID"], row["Block_ID"].split("-")[0]+"-"+match.group(1)+match.group(2))
             if ";" not in row["Block_ID"]:
-                Blocks.objects.filter(name=row["Block_ID"].split("-")[0]+"-"+match.group(1)+match.group(2))
+                b = Blocks.objects.filter(name=row["Block_ID"].split("-")[0]+"-"+match.group(1)+match.group(2))
+                print(b)
         # block = Blocks.objects.get(name=row['Block_ID'])
         # Areas.objects.create(name=row["Area_ID"].replace("_NA",""),
         #                      area_type="normal" if "normal" in row["Area_ID"] else 'tumor',
