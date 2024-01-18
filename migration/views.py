@@ -2629,6 +2629,7 @@ def nas2(row):
         area.save()
         link_area, _ =AREA_NA_LINK.objects.get_or_create(area=area,nucacid=na)
         link_sl_na, _ = NA_SL_LINK.objects.get_or_create(sample_lib=sl, nucacid=na)
+        link_sl_cl, _ = SL_CL_LINK.objects.get_or_create(sample_lib=sl, captured_lib=cl)
     except Exception as e:
         print(e, row['CL'])
         # if row["Barcode ID"].startswith("AD"):
