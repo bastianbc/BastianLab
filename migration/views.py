@@ -2654,21 +2654,12 @@ def nas2(row):
 
 
 def check_na2(request):
-    from datetime import timedelta
-    from django.utils import timezone
-
     file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
     df = pd.read_csv(file)
-    # Get the current date
-    today = timezone.now().date()
-
-    # Calculate start and end of the day
-    start_of_today = timezone.make_aware(timezone.datetime.combine(today, timezone.datetime.min.time()))
-    end_of_today = timezone.make_aware(timezone.datetime.combine(today, timezone.datetime.max.time()))
-
-    # Filter and delete the records
-    SampleLib.objects.filter(date__range=(start_of_today, end_of_today)).delete()
-
+    nuc_acids_without_areas = NucAcids.objects.annotate(
+        num_areas=Count('area_na_links')
+    ).filter(num_areas=0)
+    print(nuc_acids_without_areas)
     df[~df["NA_id"].isnull()].apply(lambda row: nas2(row), axis=1)
 
 
