@@ -2597,6 +2597,7 @@ def check_na(request):
 
 def nas2(row):
     try:
+        seq_lib = SequencingLib.objects.get(name=row['SeqL'])
         cl = CapturedLib.objects.get(name=row['CL'])
         sl, created = SampleLib.objects.get_or_create(name=row["Sample"])
         # print(sl, created)
