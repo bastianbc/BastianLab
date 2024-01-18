@@ -2570,6 +2570,12 @@ def nas(row):
             "443 common, sclerotic dermal component",
             "444 blue nevus, cellular",
             "445 common, sclerotic dermal component",
+            "2409 SCC, in situ",
+            "2412 SCC, in situ",
+            "2433 Pilomatricoma, cystic",
+            "426 blue nevus, cellular,  DF like",
+            "427 blue nevus, cellular,  DF like",
+            "428 blue nevus, cellular,  DF like",
             "446 DPN, pure"]
         if not pd.isnull(row["Area ID"]):
             area_name = row['Area ID'].replace('"','').strip()
