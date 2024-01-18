@@ -2161,11 +2161,23 @@ def get_baits(row):
             match = re.match(r'\d{2}-(\d+)-(\w+)', row["Block_ID"])
             if match:
                 block = Blocks.objects.get(name=row["Block_ID"].split("-")[0]+"-"+match.group(1)+match.group(2))
+                if not pd.isnull(row["Assigned Projects"]):
+                    project = Projects.objects.get(name=row['Assigned Projects'])
+                    block.project = project
+                    block.save()
         elif "," in block_name:
             for bname in block_name.split(","):
                 block = Blocks.objects.get(name=bname.strip())
+                if not pd.isnull(row["Assigned Projects"]):
+                    project = Projects.objects.get(name=row['Assigned Projects'])
+                    block.project = project
+                    block.save()
         else:
             block = Blocks.objects.get(name=block_name)
+            if not pd.isnull(row["Assigned Projects"]):
+                project = Projects.objects.get(name=row['Assigned Projects'])
+                block.project = project
+                block.save()
         # l = ["436 common, sclerotic dermal component",
         #      "437 common, sclerotic dermal component",
         #      "438 common, sclerotic dermal component",
