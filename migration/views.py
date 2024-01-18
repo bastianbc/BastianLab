@@ -2942,13 +2942,17 @@ def check_dna_rna(request):
 def check_areas_airtable_get(row):
     try:
         if not pd.isnull(row['Assigned projects']):
-            project = Projects.objects.get(name=row['Assigned projects'])
-        block = Blocks.objects.get(name=row['Block_ID'])
+            project, _ = Projects.objects.get_or_create(name=row['Assigned projects'])
+        if "," not in row['Block_ID'] or ";" not in row['Block_ID']:
+            block, _ = Blocks.objects.get_or_create(name=row['Block_ID'])
+        if project:
+            block.project = project
+            block.save()
+        area, created = Areas.objects.get_or_create(name=row['Area_ID'], block=block)
+        if created:
+            area.area_type = get_area_type(row['Area type'])
+            area.save()
 
-        # area, created = Areas.objects.get_or_create(name=row['Area_ID'], block=block)
-        # if created:
-        #     area.area_type = get_area_type(row['Area type'])
-        #     area.save()
     except Exception as e:
         print(f"{e}, area: {row['Area_ID']}, block: {row['Block_ID']}, project: {row['Assigned projects']}")
 
