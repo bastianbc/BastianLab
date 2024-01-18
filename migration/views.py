@@ -2941,8 +2941,12 @@ def check_dna_rna(request):
 
 def check_areas_airtable_get(row):
     try:
+        words = row['Assigned projects'].split()
+        result = ''.join(word[0] for word in words)
+        result_upper = result.upper()
+
         if not pd.isnull(row['Assigned projects']):
-            project, _ = Projects.objects.get_or_create(name=row['Assigned projects'])
+            project, _ = Projects.objects.get_or_create(name=row['Assigned projects'], abbreviation=result_upper)
         if "," not in row['Block_ID'] or ";" not in row['Block_ID']:
             block, _ = Blocks.objects.get_or_create(name=row['Block_ID'])
         if not pd.isnull(row['Assigned projects']):
