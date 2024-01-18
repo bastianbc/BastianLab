@@ -2168,9 +2168,9 @@ def get_baits(row):
             block = area.block
         if not pd.isnull(row["Assigned Projects"]):
             project = Projects.objects.get(name=row['Assigned Projects'])
-            # if block:
-            #     block.project = project
-            #     block.save()
+            if block:
+                block.project = project
+                block.save()
         # print(row["CL_ID"], row["Capture Panel"])
         # if "," in row["CL_ID"]:
         #     for cl in row["CL_ID"].split(","):
@@ -2185,10 +2185,10 @@ def get_baits(row):
         # CapturedLib.objects.filter(name=row["CL_ID"]).update(bait=obj)
     except Exception as e:
         print(e, row["Area_ID"])
-        block = Blocks.objects.get(name=row['Block_ID'])
-        Areas.objects.create(name=row["Area_ID"].replace("_NA",""),
-                             area_type="normal" if "normal" in row["Area_ID"] else 'tumor',
-                             block=block)
+        # block = Blocks.objects.get(name=row['Block_ID'])
+        # Areas.objects.create(name=row["Area_ID"].replace("_NA",""),
+        #                      area_type="normal" if "normal" in row["Area_ID"] else 'tumor',
+        #                      block=block)
 
 def uploads_baits(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view (5).csv")
