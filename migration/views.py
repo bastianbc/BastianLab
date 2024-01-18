@@ -2978,10 +2978,12 @@ def create_abbreviation(value):
     words = value.split()
     result = ''.join(word[0] for word in words)
     result_upper = result.upper()
-    if Projects.objects.filter(abbreviation=result_upper):
+    projects = Projects.objects.filter(abbreviation=result_upper)
+    if projects:
         words = value.split()
-        result = ''.join(word[0:1] for word in words)
+        result = ''.join(word[:2] for word in words)
         result_upper = result.upper()
+    print(value, result_upper)
     return result_upper
 
 def check_projects_airtable_get(row):
