@@ -2574,7 +2574,7 @@ def nas(row):
         if not pd.isnull(row["Area ID"]):
             area_name = row['Area ID'].replace('"','').strip()
             if "," in area_name:
-                if area_name not in l:
+                if area_name in l:
                     area = Areas.objects.get(name=area_name.strip())
                 else:
                     for area in area_name.split(","):
