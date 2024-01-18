@@ -2663,8 +2663,10 @@ def check_na2(request):
 
     areas_without_nucleic_acid = Areas.objects.annotate(
         num_nucleic_acids=Count('area_na_links')
-    ).filter(num_nucleic_acids=0).values("name")
+    ).filter(num_nucleic_acids=0).order_by("name").values("name")
     print(areas_without_nucleic_acid)
+    for i in areas_without_nucleic_acid:
+        print(i['name'])
     print(areas_without_nucleic_acid.count())
     df[~df["NA_id"].isnull()].apply(lambda row: nas2(row), axis=1)
 
