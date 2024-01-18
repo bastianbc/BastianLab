@@ -2194,7 +2194,7 @@ def get_baits(row):
         print(e, row["Block_ID"])
         match = re.match(r'\d{2}-(\d+)-(\w+)', row["Block_ID"])
         if match:
-            print(match.group(1))
+            print(match.group(0),match.group(1),match.group(2))
         # block = Blocks.objects.get(name=row['Block_ID'])
         # Areas.objects.create(name=row["Area_ID"].replace("_NA",""),
         #                      area_type="normal" if "normal" in row["Area_ID"] else 'tumor',
