@@ -2988,9 +2988,10 @@ def create_abbreviation(value):
 
 def check_projects_airtable_get(row):
     try:
-        if not Projects.objects.filter(name=row['Assigned projects']):
-            project, _ = Projects.objects.get_or_create(name=row["Assigned Projects"],
-                                                abbreviation=create_abbreviation(row["Assigned Projects"]))
+        if not Projects.objects.filter(name=row["Assigned Projects"]):
+            project, _ = Projects.objects.get_or_create(
+                name=row["Assigned Projects"],
+                abbreviation=create_abbreviation(row["Assigned Projects"]))
     except Exception as e:
         print(e, row["Assigned Projects"])
 
