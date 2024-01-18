@@ -2953,12 +2953,12 @@ def check_areas_airtable_get(row):
             if not project:
                 Projects.objects.create(name=row['Assigned projects'], abbreviation=result_upper)
 
-        if "," not in row['Block_ID'] or ";" not in row['Block_ID']:
-            block, _ = Blocks.objects.get_or_create(name=row['Block_ID'])
-        if not pd.isnull(row['Assigned projects']):
-            block.project = project
-            block.save()
-        area = Areas.objects.get(name=row['Area_ID'])
+        # if "," not in row['Block_ID'] or ";" not in row['Block_ID']:
+        #     block, _ = Blocks.objects.get_or_create(name=row['Block_ID'])
+        # if not pd.isnull(row['Assigned projects']):
+        #     block.project = project
+        #     block.save()
+        # area = Areas.objects.get(name=row['Area_ID'])
         # if area:
         #     area.area_type = get_area_type(row['Area type'])
         #     area.save()
