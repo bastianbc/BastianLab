@@ -2146,6 +2146,8 @@ def get_baits(row):
              "445 common, sclerotic dermal component",
              "2409 SCC, in situ",
              "2412 SCC, in situ",
+             "2414 SCC, in situ",
+             "2415 SCC, in situ",
              "2433 Pilomatricoma, cystic",
              "426 blue nevus, cellular,  DF like",
              "427 blue nevus, cellular,  DF like",
@@ -2159,6 +2161,8 @@ def get_baits(row):
                 else:
                     for area in area_name.split(","):
                         area = Areas.objects.get(name=area.strip())
+            elif area_name.endswith("_NA"):
+                area = Areas.objects.get(name=area_name.strip().replace("_NA",""))
             else:
                 area = Areas.objects.get(name=area_name.strip())
             block = area.block
