@@ -2135,12 +2135,12 @@ def get_barcodes(row):
 
 def get_baits(row):
     try:
-        block_name = row['Block_ID'].replace(";",",")
+        block_name = row['Block_ID'].replace(";",",").strip()
         if "," in block_name:
             for bname in block_name.split(","):
-                block = Blocks.objects.get(name=bname.split())
+                block = Blocks.objects.get(name=bname.strip())
         else:
-            block = Blocks.objects.get(name=row['Block_ID'])
+            block = Blocks.objects.get(name=block_name)
         # l = ["436 common, sclerotic dermal component",
         #      "437 common, sclerotic dermal component",
         #      "438 common, sclerotic dermal component",
