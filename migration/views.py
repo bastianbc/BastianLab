@@ -2191,13 +2191,13 @@ def get_baits(row):
         # )
         # CapturedLib.objects.filter(name=row["CL_ID"]).update(bait=obj)
     except Exception as e:
-        # print(e, row["Block_ID"])
-        match = re.match(r'\d{2}-(\d+)-(\w+)', row["Block_ID"])
-        if match:
-            print(row["Block_ID"], row["Block_ID"].split("-")[0]+"-"+match.group(1)+match.group(2))
-            if ";" not in row["Block_ID"]:
-                b = Blocks.objects.filter(name=row["Block_ID"].split("-")[0]+"-"+match.group(1)+match.group(2))
-                print(b)
+        print(f'"{row["Block_ID"]}"')
+        #             match = re.match(r'\d{2}-(\d+)-(\w+)', row["Block_ID"])
+        #             if match:
+        #                 print(row["Block_ID"], row["Block_ID"].split("-")[0]+"-"+match.group(1)+match.group(2))
+        #                 if ";" not in row["Block_ID"]:
+        #                     b = Blocks.objects.filter(name=row["Block_ID"].split("-")[0]+"-"+match.group(1)+match.group(2))
+        #                     print(b)
         # block = Blocks.objects.get(name=row['Block_ID'])
         # Areas.objects.create(name=row["Area_ID"].replace("_NA",""),
         #                      area_type="normal" if "normal" in row["Area_ID"] else 'tumor',
