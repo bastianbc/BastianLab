@@ -2942,10 +2942,10 @@ def check_dna_rna(request):
 def check_areas_airtable_get(row):
     try:
         block = Blocks.objects.get(name=row['Block_ID'])
-        area, created = Areas.objects.get_or_create(name=row['Area_ID'], block=block)
-        if created:
-            area.area_type = get_area_type(row['Area type'])
-            area.save()
+        # area, created = Areas.objects.get_or_create(name=row['Area_ID'], block=block)
+        # if created:
+        #     area.area_type = get_area_type(row['Area type'])
+        #     area.save()
     except Exception as e:
         print(f"{e}, area: {row['Area_ID']}, block: {row['Block_ID']}")
 
