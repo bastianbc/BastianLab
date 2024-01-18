@@ -2781,9 +2781,13 @@ def check_blocks2(row):
             'negative':False,
             'Present':True,
         }
-        print(row["Block_ID"])
         s= "HE image	Specimen site	"
         b = Blocks.objects.get(name=row["Block_ID"])
+        project = Projects.objects.get(name=row['Assigned project'])
+        b.project = project
+        patient = Patients.objects.get(pat_id=row['Pat_ID'])
+        if not b.patient:
+            b.patient = patient
         notes=b.notes
         _notes=f"Description: {row['Description']} / Block storage location: {row['Block storage location']} / Specimen site: {row['Specimen site']}"
         b.notes=str(row["Notes"]) + str(_notes) + str(notes)
@@ -2799,7 +2803,7 @@ def check_blocks2(row):
 
 
 def check_block2(request):
-    file = Path(Path(__file__).parent.parent / "uploads" / "Blocks-Grid view-5.csv")
+    file = Path(Path(__file__).parent.parent / "uploads" / "Blocks-Grid view (2).csv")
     df = pd.read_csv(file)
     df.apply(lambda row: check_blocks2(row), axis=1)
 
