@@ -2135,42 +2135,49 @@ def get_barcodes(row):
 
 def get_baits(row):
     try:
-        l = ["436 common, sclerotic dermal component",
-             "437 common, sclerotic dermal component",
-             "438 common, sclerotic dermal component",
-             "439 common, sclerotic dermal component",
-             "440 common, sclerotic dermal component",
-             "441 common, sclerotic dermal component",
-             "443 common, sclerotic dermal component",
-             "444 blue nevus, cellular",
-             "445 common, sclerotic dermal component",
-             "2409 SCC, in situ",
-             "2412 SCC, in situ",
-             "2414 SCC, in situ",
-             "2415 SCC, in situ",
-             "2433 Pilomatricoma, cystic",
-             "426 blue nevus, cellular,  DF like",
-             "427 blue nevus, cellular,  DF like",
-             "428 blue nevus, cellular,  DF like",
-             "446 DPN, pure"]
-        if not pd.isnull(row["Area_ID"]):
-            area_name = row['Area_ID'].replace('"', '').replace(';', ',').strip()
-            if "," in area_name:
-                if area_name in l:
-                    area = Areas.objects.get(name=area_name.strip())
-                else:
-                    for area in area_name.split(","):
-                        area = Areas.objects.get(name=area.strip())
-            elif area_name.endswith("_NA"):
-                area = Areas.objects.get(name=area_name.strip().replace("_NA",""))
-            else:
-                area = Areas.objects.get(name=area_name.strip())
-            block = area.block
-        if not pd.isnull(row["Assigned Projects"]):
-            project = Projects.objects.get(name=row['Assigned Projects'])
-            if block:
-                block.project = project
-                block.save()
+        block_name = row['Block_ID'].replace(";",",")
+        if "," in block_name:
+            for bname in block_name.split(","):
+                block = Blocks.objects.get(name=bname.split())
+        else:
+            block = Blocks.objects.get(name=row['Block_ID'])
+        # l = ["436 common, sclerotic dermal component",
+        #      "437 common, sclerotic dermal component",
+        #      "438 common, sclerotic dermal component",
+        #      "439 common, sclerotic dermal component",
+        #      "440 common, sclerotic dermal component",
+        #      "441 common, sclerotic dermal component",
+        #      "443 common, sclerotic dermal component",
+        #      "444 blue nevus, cellular",
+        #      "445 common, sclerotic dermal component",
+        #      "2409 SCC, in situ",
+        #      "2412 SCC, in situ",
+        #      "2414 SCC, in situ",
+        #      "2415 SCC, in situ",
+        #      "2433 Pilomatricoma, cystic",
+        #      "426 blue nevus, cellular,  DF like",
+        #      "427 blue nevus, cellular,  DF like",
+        #      "428 blue nevus, cellular,  DF like",
+        #      "446 DPN, pure"]
+        # if not pd.isnull(row["Area_ID"]):
+        #     area_name = row['Area_ID'].replace('"', '').replace(';', ',').strip()
+        #     if "," in area_name:
+        #         if area_name in l:
+        #             area = Areas.objects.get(name=area_name.strip())
+        #         else:
+        #             for area in area_name.split(","):
+        #                 area = Areas.objects.get(name=area.strip())
+        #     elif area_name.endswith("_NA"):
+        #         area = Areas.objects.get(name=area_name.strip().replace("_NA",""))
+        #     else:
+        #         area = Areas.objects.get(name=area_name.strip())
+        #     block = area.block
+        # if not pd.isnull(row["Assigned Projects"]):
+        #     project = Projects.objects.get(name=row['Assigned Projects'])
+        #     if block:
+        #         block.project = project
+        #         block.save()
+        #
         # print(row["CL_ID"], row["Capture Panel"])
         # if "," in row["CL_ID"]:
         #     for cl in row["CL_ID"].split(","):
@@ -2184,7 +2191,7 @@ def get_baits(row):
         # )
         # CapturedLib.objects.filter(name=row["CL_ID"]).update(bait=obj)
     except Exception as e:
-        print(e, row["Area_ID"])
+        print(e, row["Block_ID"])
         # block = Blocks.objects.get(name=row['Block_ID'])
         # Areas.objects.create(name=row["Area_ID"].replace("_NA",""),
         #                      area_type="normal" if "normal" in row["Area_ID"] else 'tumor',
@@ -2193,7 +2200,7 @@ def get_baits(row):
 def uploads_baits(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view (5).csv")
     df = pd.read_csv(file)
-    df[~df["Area_ID"].isnull()].apply(lambda row: get_baits(row), axis=1)
+    df[~df["Block_ID"].isnull()].apply(lambda row: get_baits(row), axis=1)
 
 
 def get_file_tree(row):
