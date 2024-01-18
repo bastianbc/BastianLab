@@ -93,6 +93,7 @@ class CL_SEQL_LINK(models.Model):
     sequencing_lib = models.ForeignKey(SequencingLib,on_delete=models.CASCADE, verbose_name="Sequencing Library", related_name="cl_seql_links")
     captured_lib = models.ForeignKey("capturedlib.CapturedLib", on_delete=models.CASCADE, verbose_name="Captured Library", related_name="cl_seql_links")
     volume = models.FloatField(default=0, verbose_name="Volume")
+    date = models.DateTimeField(default=datetime.now, verbose_name="Date")
 
     class Meta:
         db_table = "cl_seql_link"

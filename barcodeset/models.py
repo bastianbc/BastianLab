@@ -4,6 +4,7 @@ from django.db.models import Q, Count
 class Barcodeset(models.Model):
     name = models.CharField(max_length=20)
     active = models.BooleanField(default=False)
+    date = models.DateTimeField(default=datetime.now, verbose_name="Date")
 
     class Meta:
         db_table = "barcode_set"
@@ -59,6 +60,7 @@ class Barcode(models.Model):
     name = models.CharField(max_length=50, verbose_name="Name")
     i5 = models.CharField(max_length=10, verbose_name="I5")
     i7 = models.CharField(max_length=10, verbose_name="I7")
+    date = models.DateTimeField(default=datetime.now, verbose_name="Date")
 
     class Meta:
         db_table = "barcode"
