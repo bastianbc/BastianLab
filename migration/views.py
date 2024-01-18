@@ -2597,7 +2597,7 @@ def check_na(request):
 
 def nas2(row):
     try:
-        seq_run = SequencingRun.objects.get(name=row['Sequencing Run'])
+        sequencing_run = SequencingRun.objects.get(name=row['Sequencing Run'])
         seq_lib = SequencingLib.objects.get(name=row['SeqL'])
         cl = CapturedLib.objects.get(name=row['CL'])
         sl, created = SampleLib.objects.get_or_create(name=row["Sample"])
@@ -2633,6 +2633,11 @@ def nas2(row):
         link_sl_na, _ = NA_SL_LINK.objects.get_or_create(sample_lib=sl, nucacid=na)
         link_sl_cl, _ = SL_CL_LINK.objects.get_or_create(sample_lib=sl, captured_lib=cl)
         link_cl_seql, _ = CL_SEQL_LINK.objects.get_or_create(sequencing_lib=seq_lib, captured_lib=cl)
+        if not sequencing_run.sequencing_libs.filter(id=seq_lib.id).exists():
+            # Add the sequencing_lib to the sequencing_run
+            sequencing_run.sequencing_libs.add(seq_lib)
+            sequencing_run.save()
+
     except Exception as e:
         print(e, row['CL'])
         # if row["Barcode ID"].startswith("AD"):
