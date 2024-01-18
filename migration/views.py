@@ -2944,7 +2944,10 @@ def check_areas_airtable_get(row):
         words = row['Assigned projects'].split()
         result = ''.join(word[0] for word in words)
         result_upper = result.upper()
-
+        if Projects.objects.filter(abbreviation=result_upper):
+            words = row['Assigned projects'].split()
+            result = '_'.join(word[0:2] for word in words)
+            result_upper = result.upper()
         if not pd.isnull(row['Assigned projects']):
             project, _ = Projects.objects.get_or_create(name=row['Assigned projects'], abbreviation=result_upper)
         if "," not in row['Block_ID'] or ";" not in row['Block_ID']:
