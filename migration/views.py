@@ -31,6 +31,7 @@ import re
 import ast
 from pathlib import Path
 import pandas as pd
+import uuid
 
 
 def migrate(request):
@@ -2781,7 +2782,9 @@ def check_blocks2(row):
             'negative':False,
             'Present':True,
         }
-        b = Blocks.objects.get(name=row["Block_ID"])
+        b = Blocks.objects.filter(name=row["Block_ID"])
+        if not b:
+            b = Blocks.objects.create(name=row["Block_ID"])
         if not pd.isnull(row['Assigned project']):
             project = Projects.objects.get(name=row['Assigned project'])
             b.project = project
@@ -2789,6 +2792,8 @@ def check_blocks2(row):
             patient = Patients.objects.get(pat_id=row['Pat_ID'])
             if not b.patient:
                 b.patient = patient
+        # else:
+        #     print(str(uuid.uuid4()).split("-")[0] + "_G")
         notes=b.notes
         _notes=f"Description: {row['Description']} / Block storage location: {row['Block storage location']} / Specimen site: {row['Specimen site']}"
         b.notes=str(row["Notes"]) + str(_notes) + str(notes)
@@ -2806,7 +2811,7 @@ def check_blocks2(row):
 def check_block2(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "Blocks-Grid view (2).csv")
     df = pd.read_csv(file)
-    df.apply(lambda row: check_blocks2(row), axis=1)
+    df[~df["Block_ID"].isnull()].apply(lambda row: check_blocks2(row), axis=1)
 
 
 def check_blocks3(row):
