@@ -2136,9 +2136,6 @@ def get_barcodes(row):
 def get_baits(row):
     try:
         block_name = row['Block_ID'].replace(";",",").strip()
-        match = re.match(r'\d{2}-(\d+)-(\w+)', block_name)
-        if match:
-            print(match.group(1),match.group(2))
         if "," in block_name:
             for bname in block_name.split(","):
                 block = Blocks.objects.get(name=bname.strip())
@@ -2195,6 +2192,9 @@ def get_baits(row):
         # CapturedLib.objects.filter(name=row["CL_ID"]).update(bait=obj)
     except Exception as e:
         print(e, row["Block_ID"])
+        match = re.match(r'\d{2}-(\d+)-(\w+)', row["Block_ID"])
+        if match:
+            print(match.group(1))
         # block = Blocks.objects.get(name=row['Block_ID'])
         # Areas.objects.create(name=row["Area_ID"].replace("_NA",""),
         #                      area_type="normal" if "normal" in row["Area_ID"] else 'tumor',
