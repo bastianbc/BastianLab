@@ -2950,7 +2950,7 @@ def check_areas_airtable_get(row):
         #     area.area_type = get_area_type(row['Area type'])
         #     area.save()
     except Exception as e:
-        print(f"{e}, area: {row['Area_ID']}, block: {row['Block_ID']}")
+        print(f"{e}, area: {row['Area_ID']}, block: {row['Block_ID']}, project: {row['Assigned projects']}")
 
 def check_areas_airtable(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "Areas-Grid view (2).csv")
