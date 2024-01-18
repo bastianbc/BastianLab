@@ -2588,7 +2588,7 @@ def nas(row):
         #         a = Areas.objects.get(name=area.strip())
         #         AREA_NA_LINK.objects.get_or_create(nucacid=na, area=a)
     except Exception as e:
-        print(e,row["NA_ID"], row["Area ID"], row["Assigned Projects"])
+        print(e, row["Area ID"])
 
 
 def check_na(request):
