@@ -2597,8 +2597,9 @@ def check_na(request):
 
 def nas2(row):
     try:
+        cl = CapturedLib.objects.get(name=row['CL'])
         sl, created = SampleLib.objects.get_or_create(name=row["Sample"])
-        print(sl, created)
+        # print(sl, created)
         if not pd.isnull(row["Barcode ID"]):
             barcode = Barcode.objects.filter(name=row["Barcode ID"].strip()).first()
             if barcode:
@@ -2629,8 +2630,7 @@ def nas2(row):
         link_area, _ =AREA_NA_LINK.objects.get_or_create(area=area,nucacid=na)
         link_sl_na, _ = NA_SL_LINK.objects.get_or_create(sample_lib=sl, nucacid=na)
     except Exception as e:
-        print(e)
-        print(f'SAMPLE: {row["Sample"]}, Barcode: {row["Barcode ID"]}, i5: {row["Barcode"]}')
+        print(e, row['CL'])
         # if row["Barcode ID"].startswith("AD"):
         #     barcode_set, _ = Barcodeset.objects.get_or_create(name="AD")
         #     barcode, _ = Barcode.objects.get_or_create(barcode_set=barcode_set,
