@@ -2561,16 +2561,22 @@ def we(row):
 
 def nas(row):
     try:
+        l = ["436 common, sclerotic dermal component",
+            "437 common, sclerotic dermal component",
+            "438 common, sclerotic dermal component",
+            "439 common, sclerotic dermal component",
+            "440 common, sclerotic dermal component",
+            "441 common, sclerotic dermal component",
+            "443 common, sclerotic dermal component",
+            "444 blue nevus, cellular",
+            "445 common, sclerotic dermal component",
+            "446 DPN, pure"]
         if not pd.isnull(row["Area ID"]):
-            area_name = row['Area ID'].replace('"','')
+            area_name = row['Area ID'].replace('"','').strip()
             if "," in area_name:
-                # if "2409 SCC, in situ" in area_name:
-                #     area = Areas.objects.get(name="2409 SCC, in situ")
-                # elif "426 blue nevus, cellular,  DF like" in area_name:
-                #     area = Areas.objects.get(name="426 blue nevus, cellular,  DF like")
-                # elif "436 common, sclerotic dermal component" in area_name:
-                #     area = Areas.objects.get(name="436 common, sclerotic dermal component")
-                # else:
+                if area_name not in l:
+                    area = Areas.objects.get(name=area_name.strip())
+                else:
                     for area in area_name.split(","):
                         area = Areas.objects.get(name=area.strip())
             else:
