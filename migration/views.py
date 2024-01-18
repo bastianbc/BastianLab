@@ -2574,7 +2574,7 @@ def nas(row):
                     for area in area_name.split(","):
                         area = Areas.objects.get(name=area.strip())
             else:
-                area = Areas.objects.get(name=area_name)
+                area = Areas.objects.get(name=area_name.strip())
             block = area.block
         if not pd.isnull(row["Assigned Projects"]):
             project = Projects.objects.get(name=row['Assigned Projects'])
