@@ -39,4 +39,5 @@ urlpatterns = [
     path("check_sample_library", views.check_sample_library, name="check_sample_library"),
     path("check_seq_run", views.check_seq_run, name="check_seq_run"),
     path("check_dna_rna", views.check_dna_rna, name="check_dna_rna"),
+    path("check_areas_airtable", views.check_areas_airtable, name="check_areas_airtable"),
 ]
