@@ -2939,7 +2939,15 @@ def check_dna_rna(request):
     # df = df.dropna(subset=['sample_lib'])
     # df = df.dropna(subset=['sample_lib'])
 
+def check_areas_airtable_get(row):
+    print(row['Area_ID'], row['Block_ID'])
+    Areas.objects.get(name=row['Area_ID'])
 
+
+def check_areas_airtable(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "Areas-Grid view (2).csv")
+    df = pd.read_csv(file)
+    df.apply(lambda row: check_areas_airtable_get(row), axis=1)
 
 
 
