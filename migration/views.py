@@ -2949,9 +2949,9 @@ def check_areas_airtable_get(row):
                 words = row['Assigned projects'].split()
                 result = '_'.join(word[0:1] for word in words)
                 result_upper = result.upper()
-            project = Projects.objects.filter(name=row['Assigned projects'])
-            if not project:
-                Projects.objects.create(name=row['Assigned projects'], abbreviation=result_upper)
+            project = Projects.objects.get(name=row['Assigned projects'])
+            # if not project:
+            #     Projects.objects.create(name=row['Assigned projects'], abbreviation=result_upper)
             block = Blocks.objects.get(name=row['Block_ID'])
             block.project = project
             block.save()
