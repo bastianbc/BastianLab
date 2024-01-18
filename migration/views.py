@@ -2974,5 +2974,28 @@ def check_areas_airtable(request):
     df = pd.read_csv(file)
     df.apply(lambda row: check_areas_airtable_get(row), axis=1)
 
+def create_abbreviation(value):
+    words = value.split()
+    result = ''.join(word[0] for word in words)
+    result_upper = result.upper()
+    if Projects.objects.filter(abbreviation=result_upper):
+        words = value.split()
+        result = ''.join(word[0:1] for word in words)
+        result_upper = result.upper()
+    return result_upper
+
+def check_projects_airtable_get(row):
+    try:
+        project, _ = Projects.objects.get_or_create(name=row["Assigned Projects"],
+                                                abbreviation=create_abbreviation(row["Assigned Projects"]))
+    except Exception as e:
+        print(e, row["Assigned Projects"])
+
+
+def check_projects_airtable(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "Patients-Grid view (1).csv")
+    df = pd.read_csv(file)
+    df[~df["Assigned Projects"].isnull()].apply(lambda row: check_projects_airtable_get(row), axis=1)
+
 
 
