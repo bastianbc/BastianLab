@@ -2990,7 +2990,7 @@ def check_projects_airtable_get(row):
     try:
         if not Projects.objects.filter(name=row["Assigned project"]):
             project, _ = Projects.objects.get_or_create(
-                name=row["Assigned Projects"],
+                name=row["Assigned project"],
                 abbreviation=create_abbreviation(row["Assigned project"]))
     except Exception as e:
         print(e, row["Assigned project"])
