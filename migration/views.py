@@ -2563,18 +2563,18 @@ def nas(row):
     try:
         if not pd.isnull(row["Area ID"]):
             area_name = row['Area ID'].replace('"','')
-            if "," in row["Area ID"]:
-                if "2409 SCC, in situ" in row["Area ID"]:
+            if "," in area_name:
+                if "2409 SCC, in situ" in area_name:
                     area = Areas.objects.get(name="2409 SCC, in situ")
-                elif "426 blue nevus, cellular,  DF like" in row["Area ID"]:
+                elif "426 blue nevus, cellular,  DF like" in area_name:
                     area = Areas.objects.get(name="426 blue nevus, cellular,  DF like")
-                elif "436 common, sclerotic dermal component" in row["Area ID"]:
+                elif "436 common, sclerotic dermal component" in area_name:
                     area = Areas.objects.get(name="436 common, sclerotic dermal component")
                 else:
-                    for area in row["Area ID"].split(","):
+                    for area in area_name.split(","):
                         area = Areas.objects.get(name=area.strip())
             else:
-                area = Areas.objects.get(name=area_name)
+                area = Areas.objects.get(name=area_name.strip())
             block = area.block
         if not pd.isnull(row["Assigned Projects"]):
             project = Projects.objects.get(name=row['Assigned Projects'])
