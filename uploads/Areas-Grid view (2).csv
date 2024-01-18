@@ -1,9 +1,9 @@
-﻿Area_ID,Area,Block_ID,Collection method,Area type,HE image,NA_ID,Completion date,People in charge,Notes,Assigned projects
-491 nevus or nevus like,491, 12-67286,,nevus or nevus like,,CGH12-280,,Noel/Chenxu,,Nevus Library
-1539 MIS1,1539, 14-51352,Scraping,MIS1,,"AM2 D-319,AM2 R-319,AM2 D-473,AM2 R-473",,Noel/Chenxu,,Acral Melanoma
-1540 MIS2,1540, 14-51352,Scraping,MIS2,,"AM2 D-320,AM2 R-320,AM2 D-361,AM2 R-361,AM2 D-474,AM2 R-474,AM2 R-507,AM2 D-507",,Noel/Chenxu,,Acral Melanoma
-1625 MIS2 In situ,1625, 14-51352,Scraping,MIS2 In situ,,"AM2 D-474,AM2 R-474",,Noel/Chenxu,,Acral Melanoma
-2021 Lentiginous Juntional Melanocytic Nevus,2021, 18-00192,Scraping,Lentiginous Juntional Melanocytic Nevus,,"OM-22D,OM-22D-2",,Noel/Chenxu,,Oral Mucosal Melanoma
+Area_ID,Area,Block_ID,Collection method,Area type,HE image,NA_ID,Completion date,People in charge,Notes,Assigned projects
+491 nevus or nevus like,491,12-67286,,nevus or nevus like,,CGH12-280,,Noel/Chenxu,,Nevus Library
+1539 MIS1,1539,14-51352,Scraping,MIS1,,"AM2 D-319,AM2 R-319,AM2 D-473,AM2 R-473",,Noel/Chenxu,,Acral Melanoma
+1540 MIS2,1540,14-51352,Scraping,MIS2,,"AM2 D-320,AM2 R-320,AM2 D-361,AM2 R-361,AM2 D-474,AM2 R-474,AM2 R-507,AM2 D-507",,Noel/Chenxu,,Acral Melanoma
+1625 MIS2 In situ,1625,14-51352,Scraping,MIS2 In situ,,"AM2 D-474,AM2 R-474",,Noel/Chenxu,,Acral Melanoma
+2021 Lentiginous Juntional Melanocytic Nevus,2021,18-00192,Scraping,Lentiginous Juntional Melanocytic Nevus,,"OM-22D,OM-22D-2",,Noel/Chenxu,,Oral Mucosal Melanoma
 1856 Normal,1856,00-556A,Scraping,Normal,,"MMR-345,MMD-345",,Noel/Chenxu,,California Cancer Registry
 1855 Mel,1855,00-556B,Scraping,Mel,,"MMR-344,MMD-344",,Noel/Chenxu,,California Cancer Registry
 1857 MIS,1857,00-556B,Scraping,MIS,,"MMR-346,MMD-346",,Noel/Chenxu,,California Cancer Registry
@@ -53,15 +53,13 @@
 2732 Tumor,2732,02-000540,,Tumor,,KAM3-T-A,,,,Acral Melanoma
 974 Mel,974,02-00594-E M1,,Mel,,MDD-104,,,,Melanoma Prognosis
 2254 Tumor,2254,02-1274B1,,Tumor,,MM-4,7/19/2019,,Metastatic,Hockemeyer Melanoma Project
-2756 MVP,2756,02-5203B2,,MVP,,JBU7-MVP,,,,
+MVP 2756.00,2756,02-5203B2,,MVP,,JBU7-MVP,,,,
 2755 Normal,2755,02-5203G2,,Normal,,JBU7-Norm,,,,
 1652 Mel,1652,02-5600A,Scraping,Mel,,"MMD-32,MMR-32,MMD-61",,Noel/Chenxu,,California Cancer Registry
 1023 Mel,1023,02-05776-D T1,,Mel,,MDD-111,,Noel/Chenxu,,Melanoma Prognosis
 636 Mel,636,02-05776T1,,Mel,,MDD-05,,,,Melanoma Prognosis
-1641 Mel,1641,02-7356,Scraping,Mel,,"MMR-16,MMD-16,MMD-24,MMR-24,DNA-199,DNA-242,RNA-242,RNA-199",,Noel/Chenxu,"Blue: melanoma; Green: normal: Yellow: Nevus. http://64.54.108.147/eSlideTray.php?ImageIds=22989,22990,22991,22992  http://64.54.108.147/eSlideTray.php?ImageIds=21403
-",California Cancer Registry
-1642 Nevus,1642,02-7356,Scraping,Nevus,,"MMR-17,MMD-17,DNA-200,DNA-243,RNA-243,RNA-200,DNA-254,RNA-254",,Noel/Chenxu,"Blue: melanoma; Green: normal: Yellow: Nevus. http://64.54.108.147/eSlideTray.php?ImageIds=22989,22990,22991,22992  http://64.54.108.147/eSlideTray.php?ImageIds=21403
-",California Cancer Registry
+1641 Mel,1641,02-7356,Scraping,Mel,,"MMR-16,MMD-16,MMD-24,MMR-24,DNA-199,DNA-242,RNA-242,RNA-199",,Noel/Chenxu,"Blue: melanoma; Green: normal: Yellow: Nevus. http://64.54.108.147/eSlideTray.php?ImageIds=22989,22990,22991,22992  http://64.54.108.147/eSlideTray.php?ImageIds=21403",California Cancer Registry
+1642 Nevus,1642,02-7356,Scraping,Nevus,,"MMR-17,MMD-17,DNA-200,DNA-243,RNA-243,RNA-200,DNA-254,RNA-254",,Noel/Chenxu,"Blue: melanoma; Green: normal: Yellow: Nevus. http://64.54.108.147/eSlideTray.php?ImageIds=22989,22990,22991,22992  http://64.54.108.147/eSlideTray.php?ImageIds=21403",California Cancer Registry
 1956 Normal,1956,02-7356,,Normal,,"DNA-201,DNA-244,RNA-244,DNA-255",,Noel/Chenxu,Blue: melanoma; Green: normal: Yellow: Nevus.,Melanoma Epigenetics
 2723 Tumor,2723,02-008514,,Tumor,,KAM123-T,,,,Acral Melanoma
 1646 Mel,1646,02-8746A,Scraping,Mel,,"MMD-21,MMD-26,MMR-21,MMR-26",,Noel/Chenxu,,California Cancer Registry
@@ -86,7 +84,7 @@
 2774 Tumor,2774,02-42436,,Tumor,,AM_14_Tumor_NA,,,,Acral Melanoma
 1660 Mel,1660,02-49261,Scraping,Mel,,"MMD-40,MMD-56,MMR-56,MMR-40",,Noel/Chenxu,,California Cancer Registry
 2255 Tumor,2255,02-49261,,Tumor,,PM-1,7/19/2019,,Primary Tumor,Hockemeyer Melanoma Project
-2754 MVP,2754,03-197 B2,,MVP,,JBU11-MVP,,,,
+MVP 2754.00,2754,03-197 B2,,MVP,,JBU11-MVP,,,,
 2753 Normal,2753,03-1978B3,,Normal,,JBU11-Norm,,,,
 1770 Mel,1770,03-3075A,Scraping,Mel,,"MMD-178,MMR-178",,Noel/Chenxu,,California Cancer Registry
 1773 Normal,1773,03-3075A,Scraping,Normal,,MMD-180,,Noel/Chenxu,,California Cancer Registry
@@ -222,11 +220,11 @@
 1048 Mel,1048,05-29322-B T3,,Mel,,MDD-136,,Noel/Chenxu,,Melanoma Prognosis
 643 Mel,643,05-29322T3,,Mel,,MDD-12,,,,Melanoma Prognosis
 1957 Normal,1957,05-29484A,,Normal,,"DNA-261,DNA-262",,Noel/Chenxu,,Melanoma Epigenetics
-2140 ,2140,05-29484B,,,,,,,,California Cancer Registry
-2142 ,2142,05-29484C,,,,,,,,California Cancer Registry
-2143 ,2143,05-29484D,,,,,,,,California Cancer Registry
-2144 ,2144,05-29484E,,,,,,,,California Cancer Registry
-2145 ,2145,05-29484F,,,,,,,,California Cancer Registry
+2140,2140,05-29484B,,,,,,,,California Cancer Registry
+2142,2142,05-29484C,,,,,,,,California Cancer Registry
+2143,2143,05-29484D,,,,,,,,California Cancer Registry
+2144,2144,05-29484E,,,,,,,,California Cancer Registry
+2145,2145,05-29484F,,,,,,,,California Cancer Registry
 1930 Normal,1930,05-37586A1,,Normal,,"DNA-173,RNA-173,DNA-216",,Noel/Chenxu,,Melanoma Epigenetics
 1814 Mel,1814,05-37586A3,Scraping,Mel,,"MMD-234,MMD-285,MMR-234",,Noel/Chenxu,,California Cancer Registry
 1815 Normal,1815,05-37586A3,Scraping,Normal,,"MMD-235,MMD-286",,Noel/Chenxu,"http://64.54.108.147/eSlideTray.php?ImageIds=1003 , 05-37586A1, 05-37586A3",California Cancer Registry
@@ -257,7 +255,7 @@
 644 Mel,644,06-05518T4,,Mel,,MDD-13,,,,Melanoma Prognosis
 1045 Mel,1045,06-06053-B T1,,Mel,,MDD-133,,Noel/Chenxu,,Melanoma Prognosis
 915 Mel,915,06-06325,,Mel,,MDD-45,,,,Melanoma Prognosis
-2752 MVP,2752,06-6624A7,,MVP,,JBU10-MVP,,,,
+MVP 2752.00,2752,06-6624A7,,MVP,,JBU10-MVP,,,,
 2751 Normal,2751,06-6624D1,,Normal,,JBU10-Norm,,,,
 2872 Tumor,2872,06-08042,,Tumor,,,,,,
 629 Mel,629,06-08092T3,,Mel,,MDD-39,,,,Melanoma Prognosis
@@ -320,9 +318,9 @@
 1311 Normal,1311,07-2104,,Normal,,"PROG D-01,PROG R-01,PROG D-15,PROG R-15",,Noel/Chenxu,,Werner Syndrome
 1312 Met1,1312,07-2104,,Met1,,"PROG D-02,PROG R-02,PROG D-16,PROG R-16",,Noel/Chenxu,,Werner Syndrome
 1313 Met2,1313,07-2104,,Met2,,"PROG D-03,PROG R-03,PROG D-16,PROG R-16",,Noel/Chenxu,,Werner Syndrome
-2305 Met5,2305,07-2479-1 ,,Met5,,"PROG D-21,PROG R-21",,,,Werner Syndrome
+2305 Met5,2305,07-2479-1,,Met5,,"PROG D-21,PROG R-21",,,,Werner Syndrome
 2306 Met6,2306,07-2479-2,,Met6,,"PROG D-22,PROG R-22",,,,Werner Syndrome
-2307 Met7,2307,07-2889-1 ,,Met7,,"PROG D-23,PROG R-23",,,,Werner Syndrome
+2307 Met7,2307,07-2889-1,,Met7,,"PROG D-23,PROG R-23",,,,Werner Syndrome
 2308 Met8,2308,07-2889-2,,Met8,,"PROG D-24,PROG R-24",,,,Werner Syndrome
 1314 Met3,1314,07-3001,,Met3,,"PROG D-04,PROG R-04,PROG D-17,PROG R-17",,Noel/Chenxu,,Werner Syndrome
 1426 Met4,1426,07-3001,,Met4,,"PROG D-05,PROG R-05",,Noel/Chenxu,,Werner Syndrome
@@ -331,7 +329,7 @@
 1786 Mel,1786,07-7626,Scraping,Mel,,"MMR-200,MMD-200",,Noel/Chenxu,,California Cancer Registry
 2813 Normal,2813,07-011660-2,,Normal,,K2_4,,,,Long-Triple Negative Metastatic Melanoma
 2744 Tumor,2744,07-012236B1,,Tumor,,KAM95-T-B1,,,,Acral Melanoma
-2139 ,2139,07-13061,,,,,,,,
+2139,2139,07-13061,,,,,,,,
 2792 Tumor,2792,07-14044A,,Tumor,,,,,,Spitzoid Melanoma
 2793 Normal,2793,07-14044A,,Normal,,SM_9_Normal_NA,,,,Spitzoid Melanoma
 2804 Tumor,2804,07-20501,,Tumor,,Kit_53_Acral_NRAS_NA,,,,
@@ -349,7 +347,7 @@
 2042 Nevus,2042,07-37378,,Nevus,,"DNA-272,RNA-272",,,Blue: melanoma; Green: normal: Yellow: Nevus.,Melanoma Epigenetics
 1782 Mel,1782,07-40241A,Scraping,Mel,,"MMD-196,MMR-196,MMD-276",,Noel/Chenxu,,California Cancer Registry
 2037 Normal,2037,07-41091A,,Normal,,"DNA-260,DNA-265",,Noel/Chenxu,,Melanoma Epigenetics
-2146 ,2146,07-41091B,,,,,,,,
+2146,2146,07-41091B,,,,,,,,
 1750 Mel,1750,07-42908,Scraping,Mel,,"MMD-158,MMR-158",,Noel/Chenxu,,California Cancer Registry
 1751 MIS,1751,07-42908,Scraping,MIS,,"MMD-159,MMR-159,MMR-275,MMD-275",,Noel/Chenxu,,California Cancer Registry
 1764 Mel,1764,07-55149,Scraping,Mel,,"MMR-172,MMD-172",,Noel/Chenxu,,California Cancer Registry
@@ -396,7 +394,7 @@
 1653 Mel,1653,08-51663,Scraping,Mel,,"MMD-33,MMR-33,MMD-62,MMD-106",,Noel/Chenxu,,California Cancer Registry
 1654 Normal,1654,08-51663,Scraping,Normal,,"MMD-34,MMR-34,MMD-107,MMD-193",,Noel/Chenxu,,California Cancer Registry
 1958 Normal,1958,08-65412A,,Normal,,"DNA-258,DNA-263",,Noel/Chenxu,,Melanoma Epigenetics
-2138 ,2138,08-65412B,,,,,,,,California Cancer Registry
+2138,2138,08-65412B,,,,,,,,California Cancer Registry
 2772 Tumor,2772,08-70283a,,Tumor,,AM_11_Tumor_NA,,,,Acral Melanoma
 561 Nodular Mel,561,08B8345 (eppendorf),,Nodular Mel,,NM D-11,,,,Nodular Melanoma
 560 Nodular Mel,560,08B9531 (eppendorf),,Nodular Mel,,NM D-10,,,,Nodular Melanoma
@@ -410,14 +408,14 @@
 1754 Mel,1754,09-16836,Scraping,Mel,,"MMD-162,MMR-162",,Noel/Chenxu,,California Cancer Registry
 954 Mel,954,09-21320-A3 N1-M1,,Mel,,MDD-84,,,,Melanoma Prognosis
 656 Mel,656,09-21320T2,,Mel,,MDD-25,,,,Melanoma Prognosis
-2147 ,2147,09-22513A,,,,,,,,
+2147,2147,09-22513A,,,,,,,,
 1672 Mel,1672,09-23922A,Scraping,Mel,,"MMD-51,MMR-51,MMD-102",,Noel/Chenxu,,California Cancer Registry
 1673 Normal,1673,09-23922A,Scraping,Normal,,"MMD-52,MMD-103",,Noel/Chenxu,,California Cancer Registry
 1674 MIS,1674,09-23922B,Scraping,MIS,,"MMD-101,MMR-101",,Noel/Chenxu,,California Cancer Registry
 1675 Mel,1675,09-23922B,Scraping,Mel,,MMD-102,,Noel/Chenxu,,California Cancer Registry
 1676 Normal,1676,09-23922B,Scraping,Normal,,MMD-103,,Noel/Chenxu,,California Cancer Registry
 1680 Mel,1680,09-31608,Scraping,Mel,,MMD-72,,Noel/Chenxu,,California Cancer Registry
-2134 ,2134,09-36483,,,,,,,,
+2134,2134,09-36483,,,,,,,,
 2800 Tumor,2800,09-37302,,Tumor,,SM_18_Tumor_NA,,,,Spitzoid Melanoma
 1626 Mel,1626,09-48136A,Scraping,Mel,,"MMD-01,MMR-01",,Noel/Chenxu,,California Cancer Registry
 2868 Tumor,2868,09-72944,,Tumor,,,,,,
@@ -429,25 +427,25 @@
 2820 Normal,2820,10-972C2,,Normal,,K1_19,,,,Long-Triple Negative Metastatic Melanoma
 2826 Met,2826,10-1843A4,,Met,,JBP-9Met_NA,,,,
 2822 Normal,2822,10-1843A5,,Normal,,K1_22,,,,Long-Triple Negative Metastatic Melanoma
-2824 MM,2824,"""10-3560A3
-"",10-3560A4,10-3560A10",,MM,,,,,,
-2900 MM,2900,"""10-3560A3
-"",10-3560A4,10-3560A10",,MM,,JBP-11MM,,,,
-2823 Met,2823,"""10-3560C1
-""",,Met,,,,,,
-2899 Met,2899,"""10-3560C1
-""",,Met,,JBP-11Met,,,,
+2824 MM,2824,"10-3560A3
+,10-3560A4,10-3560A10",,MM,,,,,,
+2900 MM,2900,"10-3560A3
+,10-3560A4,10-3560A10",,MM,,JBP-11MM,,,,
+2823 Met,2823,"10-3560C1
+",,Met,,,,,,
+2899 Met,2899,"10-3560C1
+",,Met,,JBP-11Met,,,,
 2825 Normal,2825,10-3560F1,,Normal,,,,,,
 2901 Normal,2901,10-3560F1,,Normal,,JBP-11Norm,,,,
-2148 ,2148,10-4769A,,,,,,,,
+2148,2148,10-4769A,,,,,,,,
 2733 Tumor,2733,10-006275,,Tumor,,KAM34-T,,,,Acral Melanoma
 2748 Tumor,2748,10-008371A1,,Tumor,,KAM111-T-A1,,,,Acral Melanoma
 2827 MM,2827,10-8439A4,,MM,,JBP-9MM_NA,,,,
 955 Mel,955,10-10275-D13 M1,,Mel,,MDD-85,,,,Melanoma Prognosis
 657 Mel,657,10-10275T2,,Mel,,MDD-26,,,,Melanoma Prognosis
 2829 MM,2829,10-10558A10,,MM,,JBP-6-MM_NA,,,,
-2828 Normal,2828,"""10-10558B1
-""",,Normal,,JBP-6-Norm_NA,,,,
+2828 Normal,2828,"10-10558B1
+",,Normal,,JBP-6-Norm_NA,,,,
 2830 Met,2830,10-10558C1,,Met,,JBP-6-Met_NA,,,,
 917 Mel,917,10-10942-A2 M1,,Mel,,MDD-47,,,,Melanoma Prognosis
 2886 Tumor,2886,10-11930B12,,Tumor,,AGL14-Bastian6-Tumor_NA,,,,
@@ -467,8 +465,8 @@
 1737 MIS,1737,10-23548,Scraping,MIS,,"MMD-144,MMR-144,MMD-359 (P041_01D),MMR-359",,Noel/Chenxu,,California Cancer Registry
 1738 Normal,1738,10-23548,Scraping,Normal,,MMD-259,,Noel/Chenxu,,California Cancer Registry
 2866 Tumor,2866,10-23569A,,Tumor,,,,,,
-2769 Normal,2769,10-23569A ,,Normal,,DPN_8_Normal_NA,,,,
-2770 Tumor,2770,10-23569A ,,Tumor,,DPN_8_Tumor_NA,,,,
+2769 Normal,2769,10-23569A,,Normal,,DPN_8_Normal_NA,,,,
+2770 Tumor,2770,10-23569A,,Tumor,,DPN_8_Tumor_NA,,,,
 1739 Normal,1739,10-25517A,Scraping,Normal,,"MMD-145,MMD-146",,Noel/Chenxu,,California Cancer Registry
 1740 Normal,1740,10-25517E,Scraping,Normal,,"MMD-147,MMD-148",,Noel/Chenxu,,California Cancer Registry
 958 Mel,958,10-30525-4 M1,,Mel,,MDD-88,,,,Melanoma Prognosis
@@ -484,7 +482,7 @@
 1235 NEVUS,1235,10-57426,,NEVUS,,DNPD-09,,Noel/Chenxu,,Deep Penetrating Melanoma
 2766 Tumor,2766,10-73024,,Tumor,,"Ivanka_23_1_NA,Ivanka_23_2_NA,Ivanka_23_3_NA,Ivanka_23_4_NA,Ivanka_23_5_NA",,,,
 1002 Tumor,1002,10-75211,,Tumor,,CGH12-067,,Iwei,NRAS sequencing,NRAS Amplified
-472 cellular blue nevus,472,10-83193,,cellular blue nevus,,BND-010,,Noel/Chenxu,,Nevus Library
+472 cellular blue nevus,472,10-83193,,cellular blue nevus,,-BND 10.00,,Noel/Chenxu,,Nevus Library
 2864 Tumor,2864,10-83193,,Tumor,,,,,,
 2870 Tumor,2870,10-83613A,,Tumor,,,,,,
 1980 Typical Melanotic Macule,1980,10-86269,Scraping,Typical Melanotic Macule,,OM D-48,,Noel/Chenxu,,Oral Mucosal Melanoma
@@ -512,7 +510,7 @@
 1336 Tumor,1336,11-12273,,Tumor,,CGH11-045_NA,,,,CGH Validation
 617 Tumor,617,11-13665,,Tumor,,CGH11-098-D,,Iwei,,Possible TERT Fusion
 2154 Capture Area A1,2154,11-14908C,,Capture Area A1,,,,,,Spatial Gene Expression
-473 cellular blue nevus,473,11-19048,,cellular blue nevus,,BND-011,,Noel/Chenxu,,Nevus Library
+473 cellular blue nevus,473,11-19048,,cellular blue nevus,,-BND 11.00,,Noel/Chenxu,,Nevus Library
 2253 Tumor,2253,11-19653B2,,Tumor,,MM-3,7/19/2019,,Metastatic,Hockemeyer Melanoma Project
 2768 Tumor,2768,11-21178,,Tumor,,CGH11_109_NA,,,,
 2150 Normal,2150,11-23681A,,Normal,,24-5_NA,,,Progression Cases,Melanoma Evolution
@@ -526,7 +524,7 @@
 961 Mel,961,11-27846-2 N1,,Mel,,MDD-91,,,,Melanoma Prognosis
 659 Mel,659,11-27846T3,,Mel,,MDD-28,,,,Melanoma Prognosis
 2861 Tumor,2861,11-28912B,,Tumor,,,,,,
-2152 ,2152,11-29719,,,,,,,Progression Cases.,Melanoma Evolution
+2152,2152,11-29719,,,,,,,Progression Cases.,Melanoma Evolution
 1320 Tumor,1320,11-31904,,Tumor,,Fusion-02,,,,Fusion RNA
 1494 Mel1,1494,11-36301A1,Scraping,Mel1,,"AM2 D-272,AM2 R-272,AM2 D-533",,Noel/Chenxu,,Acral Melanoma
 1495 Mel2,1495,11-36301A1,Scraping,Mel2,,"AM2 D-273,AM2 R-273,AM2 D-534",,Noel/Chenxu,,Acral Melanoma
@@ -538,41 +536,39 @@
 1501 Met3,1501,11-36301C1,Scraping,Met3,,"AM2 D-279,AM2 R-279",,Noel/Chenxu,,Acral Melanoma
 1733 Mel,1733,11-37100B,Scraping,Mel,,"MMR-140,MMD-140,MMR-255,MMD-255",,Noel/Chenxu,,California Cancer Registry
 2059 Nevus,2059,11-37533B,Scraping,Nevus,,D-621,,,Progression Cases. Hunter has already sequenced this case before. 	bastianlab2\HiSeqData_Hunter\AperioScansForEvaluation\22_2. bastianlab2\HiSeqData_Hunter\JJS_T\AperioScans\JJS\JJS3\H&E,Melanoma Evolution
-2058 Normal,2058,11-37533B,Scraping,Normal,,D-620,,,"Progression Cases. Comments:  normal sample has granulation tissue and fat necrosis, copy number data for all samples looks dirty. Hunter has already sequenced this case before. 	bastianlab2\HiSeqData_Hunter\AperioScansForEvaluation\22_2. bastianlab2\HiSeqData_Hunter\JJS_T\AperioScans\JJS\JJS3\H&E
-",Melanoma Evolution
+2058 Normal,2058,11-37533B,Scraping,Normal,,D-620,,,"Progression Cases. Comments:  normal sample has granulation tissue and fat necrosis, copy number data for all samples looks dirty. Hunter has already sequenced this case before. 	bastianlab2\HiSeqData_Hunter\AperioScansForEvaluation\22_2. bastianlab2\HiSeqData_Hunter\JJS_T\AperioScans\JJS\JJS3\H&E",Melanoma Evolution
 2060 Mel1,2060,11-37533B,Scraping,Mel1,,D-622,,,Progression Cases. Hunter has already sequenced this case before. 	bastianlab2\HiSeqData_Hunter\AperioScansForEvaluation\22_2. bastianlab2\HiSeqData_Hunter\JJS_T\AperioScans\JJS\JJS3\H&E,Melanoma Evolution
 2061 Mel2,2061,11-37533B,Scraping,Mel2,,D-623,,,Progression Cases. Hunter has already sequenced this case before. 	bastianlab2\HiSeqData_Hunter\AperioScansForEvaluation\22_2. bastianlab2\HiSeqData_Hunter\JJS_T\AperioScans\JJS\JJS3\H&E,Melanoma Evolution
 2777 Normal,2777,11-38149,,Normal,,DPN_5_Normal_NA,,,,
 2862 Normal,2862,11-38149,,Normal,,,,,,
-474 cellular blue nevus,474,11-43354,,cellular blue nevus,,BND-012,,Noel/Chenxu,,Nevus Library
+474 cellular blue nevus,474,11-43354,,cellular blue nevus,,-BND 12.00,,Noel/Chenxu,,Nevus Library
 2811 Tumor,2811,11-44609F,,Tumor,,WTMM-23-Tumor_NA,,,,Wild Type Melanoma
-469 cellular blue nevus,469,11-47908,,cellular blue nevus,,BND-007,,Noel/Chenxu,,Nevus Library
+469 cellular blue nevus,469,11-47908,,cellular blue nevus,,-BND 7.00,,Noel/Chenxu,,Nevus Library
 1959 Typical Melanotic Macule,1959,11-48013,Scraping,Typical Melanotic Macule,,OM D-30,,Noel/Chenxu,,Oral Mucosal Melanoma
-2163 ,2163,11-49127,,,,,,,Progression Cases.,Melanoma Evolution
+2163,2163,11-49127,,,,,,,Progression Cases.,Melanoma Evolution
 425 Blue + spitz,425,11-53065,,Blue + spitz,,SM D-02,,Noel/Chenxu,,Nevus Library
-470 cellular blue nevus,470,11-59209,,cellular blue nevus,,BND-008,,Noel/Chenxu,,Nevus Library
+470 cellular blue nevus,470,11-59209,,cellular blue nevus,,-BND 8.00,,Noel/Chenxu,,Nevus Library
 1322 Tumor,1322,11-61046,,Tumor,,Fusion-06,,,,Fusion RNA
 1338 Tumor,1338,11-63724,,Tumor,,CGH11-268,,,,CGH Validation
 1339 Tumor,1339,11-65284,,Tumor,,CGH11-282,,,,CGH Validation
 1340 Tumor,1340,11-66564,,Tumor,,CGH11-294,,,,CGH Validation
 2859 Tumor,2859,11-71241,,Tumor,,,,,,
-2877 ,2877,11-73238A,,,,,,,,
-2878 ,2878,11-73999,,,,,,,,
+2877,2877,11-73238A,,,,,,,,
+2878,2878,11-73999,,,,,,,,
 1731 Mel,1731,11-80898,Scraping,Mel,,"MMD-136,MMR-136,MMD-253,MMR-253,MMD-356 (P041_01B),MMR-356",,Noel/Chenxu,,California Cancer Registry
 1732 Normal,1732,11-80898,Scraping,Normal,,"MMD-137,MMD-254,MMD-357 (P041_01C),MMR-357",,Noel/Chenxu,,California Cancer Registry
 2765 Tumor,2765,11-81851,,Tumor,,"Ivanka_20_1_NA,Ivanka_20_2_NA,Ivanka_20_3_NA,Ivanka_20_4_NA,Ivanka_20_5_NA",,,,
 1341 Tumor,1341,11-84681,,Tumor,,CGH11-386,,,,CGH Validation
-471 cellular blue nevus,471,11-85008,,cellular blue nevus,,BND-009,,Noel/Chenxu,,Nevus Library
+471 cellular blue nevus,471,11-85008,,cellular blue nevus,,-BND 9.00,,Noel/Chenxu,,Nevus Library
 1342 Tumor,1342,11-87412,,Tumor,,"CGH11-399,CGH11-399",,,,CGH Validation
 1343 Tumor,1343,11-88431,,Tumor,,"CGH11-402,CGH11-402",,,,CGH Validation
 2036 Normal,2036,11-89154A6,,Normal,,"DNA-259,DNA-264",,Noel/Chenxu,,Melanoma Epigenetics
-2149 ,2149,11-89154A7,,,,,,,,
-2062 Normal,2062,11-94204,Scraping,Normal,,D-585,,,"Comments:  good normal, copy number data looks dirty. Hunter has already sequenced this case before. bastianlab2\HiSeqData_Hunter\JJS_T\AperioScans\JJS\JJS5
-",Melanoma Evolution
+2149,2149,11-89154A7,,,,,,,,
+2062 Normal,2062,11-94204,Scraping,Normal,,D-585,,,"Comments:  good normal, copy number data looks dirty. Hunter has already sequenced this case before. bastianlab2\HiSeqData_Hunter\JJS_T\AperioScans\JJS\JJS5",Melanoma Evolution
 2063 Nevus,2063,11-94204,Scraping,Nevus,,D-586,,,Hunter has already sequenced this case before. bastianlab2\HiSeqData_Hunter\JJS_T\AperioScans\JJS\JJS5,Melanoma Evolution
 2064 Mel,2064,11-94204,Scraping,Mel,,D-587,,,Hunter has already sequenced this case before. bastianlab2\HiSeqData_Hunter\JJS_T\AperioScans\JJS\JJS5,Melanoma Evolution
 2865 Tumor,2865,11-95856,,Tumor,,,,,,
-2778 Tumor,2778,11-95856 ,,Tumor,,DPN_7_Tumor_NA,,,,
+2778 Tumor,2778,11-95856,,Tumor,,DPN_7_Tumor_NA,,,,
 568 Nodular Mel,568,11B2562 (eppendorf),,Nodular Mel,,NM D-18,,,,Nodular Melanoma
 567 Nodular Mel,567,11B9724 (eppendorf),,Nodular Mel,,NM D-17,,,,Nodular Melanoma
 1141 Tumor,1141,12-073,,Tumor,,KIT-08,,,,Kit mutants
@@ -581,7 +577,7 @@
 2848 Tumor,2848,12-146,,Tumor,,NGS 1-1_NA,,,,
 1144 Tumor,1144,12-169,,Tumor,,KIT-11,,,,Kit mutants
 1329 Tumor,1329,12-200,,Tumor,,KIT-12,,,,Kit mutants
-2405 ,2405,12-562,,,,13_NA,7/31/2015,,,
+2405,2405,12-562,,,,13_NA,7/31/2015,,,
 620 Nevus?,620,12-1782,,Nevus?,,CGH12-039-D,,Iwei,,Possible TERT Fusion
 1438 Normal,1438,12-3277,,Normal,,"PROG D-11,PROG R-11,PROG D-14,PROG R-14,PROG D-19,PROG R-19",,Noel/Chenxu,,Werner Syndrome
 1439 Invasive 5,1439,12-3277,,Invasive 5,,"PROG D-12,PROG R-12,PROG D-18,PROG R-18",,Noel/Chenxu,,Werner Syndrome
@@ -598,7 +594,7 @@
 660 Mel,660,12-05858T3,,Mel,,MDD-29,,,,Melanoma Prognosis
 2400 Melanocytic Nevus,2400,12-6261A,,Melanocytic Nevus,,1_NA,7/31/2015,,,
 2401 Melanocytic Nevus,2401,12-6261B,,Melanocytic Nevus,,2_NA,7/31/2015,,,
-466 cellular blue nevus,466,12-6550,,cellular blue nevus,,BND-004,,Noel/Chenxu,,Nevus Library
+466 cellular blue nevus,466,12-6550,,cellular blue nevus,,-BND 4.00,,Noel/Chenxu,,Nevus Library
 1344 Tumor,1344,12-9397B,,Tumor,,CGH12-055,,,,CGH Validation
 2834 Met,2834,12-9606A2,,Met,,K1_18,,,,
 2831 Normal,2831,12-9606C4,,Normal,,K1_16,,,,
@@ -612,7 +608,7 @@
 2402 SCC,2402,12-12366,,SCC,,6_NA,7/31/2015,,,
 2403 Melanocytic Nevus,2403,12-12467,,Melanocytic Nevus,,7_NA,7/31/2015,,,
 2404 BCC,2404,12-12470D,,BCC,,11_NA,7/31/2015,,,
-2407 Cellular Dermatofibroma ,2407,12-12626,,Cellular Dermatofibroma ,,20_NA,7/31/2015,,,
+2407 Cellular Dermatofibroma,2407,12-12626,,Cellular Dermatofibroma ,,20_NA,7/31/2015,,,
 2406 Melanocytic Nevus,2406,12-12647,,Melanocytic Nevus,,15_NA,7/31/2015,,,
 2096 Normal,2096,12-12684,,Normal,,D-545,,,,Melanoma Evolution
 2097 Nevus,2097,12-12684,,Nevus,,D-546,,,,Melanoma Evolution
@@ -629,9 +625,9 @@
 2764 Tumor,2764,12-19018B,,Tumor,,26_NA,,,,
 2413 Dermatofibroma,2413,12-19187A,,Dermatofibroma,,31_NA,7/31/2015,,,
 "2412 SCC, in situ",2412,12-19596,,"SCC, in situ",,29_NA,7/31/2015,,,
-467 cellular blue nevus,467,12-20144,,cellular blue nevus,,BND-005,,Noel/Chenxu,,Nevus Library
+467 cellular blue nevus,467,12-20144,,cellular blue nevus,,-BND 5.00,,Noel/Chenxu,,Nevus Library
 2416 Tumor,2416,12-21726A,,Tumor,,38_NA,7/31/2015,,,
-2164 ,2164,12-21933I,,,,,,,Progression Cases.,Melanoma Evolution
+2164,2164,12-21933I,,,,,,,Progression Cases.,Melanoma Evolution
 2099 Normal,2099,"12-21993C,12-21993I",,Normal,,D-548,,,"12-21993C, 12-21993I",Melanoma Evolution
 2100 Nevus,2100,"12-21993C,12-21993I",,Nevus,,D-549,,,"12-21993C, 12-21993I",Melanoma Evolution
 2101 Mel,2101,"12-21993C,12-21993I",,Mel,,D-550,,,"12-21993C, 12-21993I",Melanoma Evolution
@@ -666,18 +662,18 @@
 621 Nevus?,621,12-24226,,Nevus?,,CGH12-092-D,,Iwei,,Possible TERT Fusion
 1493 Lung Met 1,1493,12-24455,Scraping,Lung Met 1,,"AM2 D-271,AM2 R-271",,Noel/Chenxu,,Acral Melanoma
 490 nevus or nevus like,490,12-26470,,nevus or nevus like,,CGH12-109,,Noel/Chenxu,,Nevus Library
-468 cellular blue nevus,468,12-32138,,cellular blue nevus,,BND-006,,Noel/Chenxu,,Nevus Library
-463 cellular blue nevus,463,12-37217,,cellular blue nevus,,BND-001,,Noel/Chenxu,,Nevus Library
+468 cellular blue nevus,468,12-32138,,cellular blue nevus,,-BND 6.00,,Noel/Chenxu,,Nevus Library
+463 cellular blue nevus,463,12-37217,,cellular blue nevus,,-BND 1.00,,Noel/Chenxu,,Nevus Library
 1345 Tumor,1345,12-48249,,Tumor,,CGH12-191,,,,CGH Validation
 880 DPN-mm,880,12-051311,,DPN-mm,,DNPD-08,,Noel/Chenxu,,Deep Penetrating Melanoma
 881 MM,881,12-051311,,MM,,DNPD-07,,Noel/Chenxu,,Deep Penetrating Melanoma
 429 common + blue,429,12-51532,,common + blue,,SM D-06,,Noel/Chenxu,,Nevus Library
-464 cellular blue nevus,464,12-52736,,cellular blue nevus,,BND-002,,Noel/Chenxu,,Nevus Library
+464 cellular blue nevus,464,12-52736,,cellular blue nevus,,-BND 2.00,,Noel/Chenxu,,Nevus Library
 2105 Normal,2105,"12-57349C,12-57349E",,Normal,,D-624,,,"Progression Cases. bastianlab2\HiSeqData_Hunter\JJS_T\AperioScans\JJS\JJS11w , 12-57349C, 12-57349E",Melanoma Evolution
 2106 Nevus,2106,"12-57349C,12-57349E",,Nevus,,D-625,,,"Progression Cases. bastianlab2\HiSeqData_Hunter\JJS_T\AperioScans\JJS\JJS11w , 12-57349C, 12-57349E",Melanoma Evolution
 2107 Mel1,2107,"12-57349C,12-57349E",,Mel1,,D-626,,,"Progression Cases. bastianlab2\HiSeqData_Hunter\JJS_T\AperioScans\JJS\JJS11w , 12-57349C, 12-57349E",Melanoma Evolution
 2108 Mel2,2108,"12-57349C,12-57349E",,Mel2,,D-627,,,"Progression Cases. bastianlab2\HiSeqData_Hunter\JJS_T\AperioScans\JJS\JJS11w , 12-57349C, 12-57349E",Melanoma Evolution
-2165 ,2165,12-57797,,,,,,,Progression Cases.,Melanoma Evolution
+2165,2165,12-57797,,,,,,,Progression Cases.,Melanoma Evolution
 1346 Tumor,1346,12-64897,,Tumor,,CGH12-273,,,,CGH Validation
 2093 Normal,2093,"12-67568A,12-67568B",,Normal,,D-539,,,"Progression Cases, 12-67568A, 12-67568B",Melanoma Evolution
 2094 Nevus,2094,"12-67568A,12-67568B",,Nevus,,D-540,,,"Progression Cases, 12-67568A, 12-67568B",Melanoma Evolution
@@ -691,7 +687,7 @@
 2065 Normal,2065,12-93589A,Scraping,Normal,,D-588,,,"Progression Cases. 	bastianlab2\HiSeqData_Hunter\JJS_T\AperioScans\JJS\JJS12. Comments:  good normal, copy number data looks dirty",Melanoma Evolution
 2066 Nevus,2066,12-93589A,Scraping,Nevus,,D-589,,,Progression Cases. 	bastianlab2\HiSeqData_Hunter\JJS_T\AperioScans\JJS\JJS12.,Melanoma Evolution
 2067 Mel,2067,12-93589A,Scraping,Mel,,D-590,,,Progression Cases. 	bastianlab2\HiSeqData_Hunter\JJS_T\AperioScans\JJS\JJS12.,Melanoma Evolution
-465 cellular blue nevus,465,12-97918,,cellular blue nevus,,BND-003,,Noel/Chenxu,,Nevus Library
+465 cellular blue nevus,465,12-97918,,cellular blue nevus,,-BND 3.00,,Noel/Chenxu,,Nevus Library
 2812 Tumor,2812,12-98575A1,,Tumor,,WTMM-24-Tumor_NA,,,,Wild Type Melanoma
 2851 Tumor,2851,13-014,,Tumor,,NGS 1-5_NA,,,,
 2850 Tumor,2850,13-026,,Tumor,,NGS 1-4_NA,,,,
@@ -708,7 +704,7 @@
 2069 Nevus,2069,13-2138C,Scraping,Nevus,,D-629,,,Progression Cases. bastianlab2\HiSeqData_Hunter\JJS_T\AperioScans\JJS\JJS13,Melanoma Evolution
 2070 AMB,2070,13-2138C,Scraping,AMB,,D-630,,,Progression Cases. bastianlab2\HiSeqData_Hunter\JJS_T\AperioScans\JJS\JJS13,Melanoma Evolution
 2071 Mel,2071,13-2138C,Scraping,Mel,,D-631,,,Progression Cases. bastianlab2\HiSeqData_Hunter\JJS_T\AperioScans\JJS\JJS13,Melanoma Evolution
-2880 ,2880,13-2939B,,,,,,,,
+2880,2880,13-2939B,,,,,,,,
 2816 Tumor,2816,13-006535-C,,Tumor,,K2_7,,,,Long-Triple Negative Metastatic Melanoma
 2852 Tumor,2852,13-9682,,Tumor,,NGS 1-6_NA,,,,
 2810 Tumor,2810,13-9916,,Tumor,,WTMM-22-Tumor_NA,,,,Wild Type Melanoma
@@ -745,13 +741,13 @@
 2809 Tumor,2809,13-32982A,,Tumor,,WTMM-21-Tumor_NA,,,,Wild Type Melanoma
 2805 Tumor,2805,13-35959,,Tumor,,WTMM-17-Tumor_NA,,,,Wild Type Melanoma
 2712 Tumor,2712,13-46194,,Tumor,,"AM-30-Tumor,AM-30-Tumor",,,,Acral Melanoma
-2881 ,2881,13-48798,,,,,,,,
-2882 ,2882,13-51115A,,,,,,,,
+2881,2881,13-48798,,,,,,,,
+2882,2882,13-51115A,,,,,,,,
 1963 Typical Melanotic Macule,1963,13-51506A,Scraping,Typical Melanotic Macule,,OM D-33A,,Noel/Chenxu,,Oral Mucosal Melanoma
 1962 Typical Melanotic Macule,1962,13-51506B,Scraping,Typical Melanotic Macule,,"OM D-33,OM R-33",,Noel/Chenxu,,Oral Mucosal Melanoma
 1981 Typical Melanotic Macule,1981,13-55769,Scraping,Typical Melanotic Macule,,OM D-49,,Noel/Chenxu,,Oral Mucosal Melanoma
-2879 ,2879,13-59840,,,,,,,,
-2876 ,2876,13-59840,,,,,,,,
+2879,2879,13-59840,,,,,,,,
+2876,2876,13-59840,,,,,,,,
 2699 Tumor,2699,13-61266A,,Tumor,,"AM-17-Tumor,AM-17-Tumor",,,,Acral Melanoma
 2714 Tumor,2714,13-62943,,Tumor,,"AM-32-Tumor,AM-32-Tumor",,,,Acral Melanoma
 2030 Atypical Melanocytic Proliferation,2030,13-68674,Scraping,Atypical Melanocytic Proliferation,,"OM-4D-2,OM-4D-3",,Noel/Chenxu,,Oral Mucosal Melanoma
@@ -771,7 +767,7 @@
 1328 Tumor,1328,14-077,,Tumor,,KIT-01,,,,Kit mutants
 2727 Tumor,2727,14-159-A2,,Tumor,,KAM130-T,,,,Acral Melanoma
 2005 Typical Melanotic Macule,2005,14-01007,Scraping,Typical Melanotic Macule,,OM D-67,,Noel/Chenxu,,Oral Mucosal Melanoma
-2151 ,2151,14-2508,,,,,,,Progression Cases.,Melanoma Evolution
+2151,2151,14-2508,,,,,,,Progression Cases.,Melanoma Evolution
 664 Mel,664,14-03473T3,,Mel,,MDD-33,,,,Melanoma Prognosis
 2701 Tumor,2701,14-3598,,Tumor,,"AM-19-Tumor,AM-19-Tumor",,,,Acral Melanoma
 964 Mel,964,14-04359-A2 N1,,Mel,,MDD-94,,,,Melanoma Prognosis
@@ -804,7 +800,7 @@
 452 Spitz mel,452,14-39393,,Spitz mel,,SMPR2,,Noel/Chenxu,,Spitz Melanoma
 1351 Tumor,1351,14-42631,,Tumor,,CGH14-119,,,,CGH Validation
 1001 Tumor,1001,14-43805,,Tumor,,CGH14-147,,Iwei,NRAS sequencing,NRAS Amplified
-2171 ,2171,14-44611,,,,,,,,
+2171,2171,14-44611,,,,,,,,
 1352 Tumor,1352,14-46549,,Tumor,,CGH14-144,,,,CGH Validation
 2081 Normal,2081,14-47962,Punch,Normal,,D-645,,,Progression Cases. bastianlab2\HiSeqData_Hunter\JJS_T\AperioScans\JJS\JJS18,Melanoma Evolution
 2083 Mel,2083,14-47962,Scraping,Mel,,D-647,,,Progression Cases. bastianlab2\HiSeqData_Hunter\JJS_T\AperioScans\JJS\JJS18,Melanoma Evolution
@@ -813,15 +809,15 @@
 2125 Nevus,2125,14-50051,,Nevus,,"DNA-289,RNA-289",,,,Melanoma Epigenetics
 2124 Mel,2124,14-50051,,Mel,,"DNA-288,RNA-288",,,,Melanoma Epigenetics
 2126 Normal,2126,14-50051,,Normal,,DNA-290,,,,Melanoma Epigenetics
-2168 ,2168,14-53094	,,,,,,,,Melanoma Evolution
-2172 ,2172,14-53375,,,,,,,,
-2176 ,2176,14-53894B,,,,,,,Progression Cases. bastianlab2\HiSeqData_Hunter\JJS_T\AperioScans\T\T3,
+2168,2168,14-53094,,,,,,,,Melanoma Evolution
+2172,2172,14-53375,,,,,,,,
+2176,2176,14-53894B,,,,,,,Progression Cases. bastianlab2\HiSeqData_Hunter\JJS_T\AperioScans\T\T3,
 1353 Tumor,1353,14-57552,,Tumor,,CGH14-181,,,,CGH Validation
-2177 ,2177,14-58579,,,,,,,Progression Cases. bastianlab2\HiSeqData_Hunter\JJS_T\AperioScans\T\T5,
-2173 ,2173,14-58586,,,,,,,,
+2177,2177,14-58579,,,,,,,Progression Cases. bastianlab2\HiSeqData_Hunter\JJS_T\AperioScans\T\T5,
+2173,2173,14-58586,,,,,,,,
 454 Spitz mel,454,14-59414,,Spitz mel,,SMPR4,,Noel/Chenxu,,Spitz Melanoma
-2174 ,2174,14-61297,,,,,,,,
-2175 ,2175,14-61299,,,,,,,,
+2174,2174,14-61297,,,,,,,,
+2175,2175,14-61299,,,,,,,,
 2075 Normal,2075,14-64047,Scraping,Normal,,D-554,,,Progression Cases.	bastianlab2\HiSeqData_Hunter\JJS_T\AperioScans\JJS\JJS16,Melanoma Evolution
 2076 Nevus,2076,14-64047,Scraping,Nevus,,D-555,,,Progression Cases. 	bastianlab2\HiSeqData_Hunter\JJS_T\AperioScans\JJS\JJS16,Melanoma Evolution
 2077 Mel,2077,14-64047,Scraping,Mel,,D-556,,,Progression Cases. 	bastianlab2\HiSeqData_Hunter\JJS_T\AperioScans\JJS\JJS16,Melanoma Evolution
@@ -879,7 +875,7 @@
 2166 Normal,2166,"15-14665B,15-14665C",,Normal,,,,,Progression Cases.,Melanoma Evolution
 2279 Mel,2279,"15-14665B,15-14665C",,Mel,,,,,,Melanoma Evolution
 2280 Nevus,2280,"15-14665B,15-14665C",,Nevus,,,,,,Melanoma Evolution
-"436 common, sclerotic dermal component ",436,15-16261,,"common, sclerotic dermal component ",,SM D-13,,Noel/Chenxu,,Nevus Library
+"436 common, sclerotic dermal component",436,15-16261,,"common, sclerotic dermal component ",,SM D-13,,Noel/Chenxu,,Nevus Library
 2711 Tumor,2711,15-16543B,,Tumor,,"AM-29-Tumor,AM-29-Tumor",,,,Acral Melanoma
 1358 Tumor,1358,15-16907A,,Tumor,,CGH15-064,,,,CGH Validation
 1476 Mel2,1476,15-17010A1,Scraping,Mel2,,"AM2 D-262,AM2 R-262,AM2 D-482 (P041_03C)",,Noel/Chenxu,,Acral Melanoma
@@ -947,7 +943,7 @@
 1370 Tumor,1370,15-110181,,Tumor,,CGH15-246,,,,CGH Validation
 1371 Tumor,1371,15-116253,,Tumor,,CGH15-253,,,,CGH Validation
 1372 Tumor,1372,15-117186,,Tumor,,CGH15-263,,,,CGH Validation
-"437 common, sclerotic dermal component ",437,15-118245A,,"common, sclerotic dermal component ",,SM D-14,,Noel/Chenxu,,Nevus Library
+"437 common, sclerotic dermal component",437,15-118245A,,"common, sclerotic dermal component ",,SM D-14,,Noel/Chenxu,,Nevus Library
 1969 Typical Melanotic Macule,1969,15-122774,Scraping,Typical Melanotic Macule,,"OM D-39,OM R-39",,Noel/Chenxu,,Oral Mucosal Melanoma
 2009 Typical Melanotic Macule,2009,15-122795,Scraping,Typical Melanotic Macule,,OM D-69,,Noel/Chenxu,,Oral Mucosal Melanoma
 1373 Tumor,1373,15-123058,,Tumor,,CGH16-002,,,,CGH Validation
@@ -1147,7 +1143,7 @@
 1561 LN Met 4,1561,17-9337A2,Scraping,LN Met 4,,"AM2 D-341,AM2 R-341",,Noel/Chenxu,,Acral Melanoma
 1408 Tumor,1408,17-9550,,Tumor,,CGH17-031,,,,CGH Validation
 1409 Tumor,1409,17-10585,,Tumor,,CGH17-033,,,,CGH Validation
-"438 common, sclerotic dermal component ",438,17-10753,,"common, sclerotic dermal component ",,SM D-15,,Noel/Chenxu,,Nevus Library
+"438 common, sclerotic dermal component",438,17-10753,,"common, sclerotic dermal component ",,SM D-15,,Noel/Chenxu,,Nevus Library
 293 Mel,293,17-12444,,Mel,http://64.54.108.121/eSlideTray.php?ImageIds=22142,"RNA-14,DNA-108,RNA-108",,Vivek Mishra,,Melanoma Epigenetics
 292 Nevus,292,17-12444,,Nevus,http://64.54.108.121/eSlideTray.php?ImageIds=22142,"RNA-13,DNA-109,RNA-109",,Vivek Mishra,,Melanoma Epigenetics
 1413 Tumor,1413,17-13205,,Tumor,,CGH17-076,,,,CGH Validation
@@ -1178,7 +1174,7 @@
 194 DN,194,17-21285,,DN,http://64.54.108.121/eSlideTray.php?ImageIds=10845,TPP 2_3,,Raagini Suresh,,Dysplastic Nevus
 124 DN,124,17-21476,,DN,http://64.54.108.121/eSlideTray.php?ImageIds=10846,TPP_3-15,,Boris Bastian,,Dysplastic Nevus
 196 DN,196,17-21476,,DN,http://64.54.108.121/eSlideTray.php?ImageIds=10846,TPP 2_5,,Raagini Suresh,,Dysplastic Nevus
-"439 common, sclerotic dermal component ",439,17-21788B,,"common, sclerotic dermal component ",,SM D-16,,Noel/Chenxu,,Nevus Library
+"439 common, sclerotic dermal component",439,17-21788B,,"common, sclerotic dermal component ",,SM D-16,,Noel/Chenxu,,Nevus Library
 1543 Brain Met2,1543,17-21835A3,Scraping,Brain Met2,,"AM2 D-323,AM2 R-323,AM2 D-532,AM2 R-532",,Noel/Chenxu,,Acral Melanoma
 2122 MIS,2122,17-23681,,MIS,,"DNA-286,RNA-286",,,,Melanoma Epigenetics
 2121 Nevus,2121,17-23681,,Nevus,,"DNA-285,RNA-285,DNA-318,RNA-318",,,,Melanoma Epigenetics
@@ -1267,7 +1263,7 @@
 781 Mel,781,17-43703,,Mel,,"DNA-61,RNA-61,DNA-306,RNA-306",,Vivek Mishra,Blue: melanoma; Green: normal: Yellow: Nevus. ,Melanoma Epigenetics
 782 Nevus,782,17-43703,,Nevus,,"DNA-62,RNA-62,DNA-307,RNA-307",,Vivek Mishra,Blue: melanoma; Green: normal: Yellow: Nevus. ,Melanoma Epigenetics
 783 Normal,783,17-43703,,Normal,,"DNA-73,RNA-73,DNA-128,RNA-128",,Vivek Mishra,Blue: melanoma; Green: normal: Yellow: Nevus. ,Melanoma Epigenetics
-2135 ,2135,17-43707,,,,,,,,
+2135,2135,17-43707,,,,,,,,
 801 Nevus,801,17-43712,,Nevus,,"DNA-79,RNA-64",,Vivek Mishra,,Melanoma Epigenetics
 802 Mel,802,17-43712,,Mel,,"DNA-80,RNA-63",,Vivek Mishra,,Melanoma Epigenetics
 1415 Tumor,1415,17-48219,,Tumor,,CGH17-095,,,,CGH Validation
@@ -1276,7 +1272,7 @@
 1416 Tumor,1416,17-49361,,Tumor,,CGH17-097,,,,CGH Validation
 724 DN,724,17-49739B,,DN,,MR-047,,Maisha Rashid,,Dysplastic Nevus
 1417 Tumor,1417,17-50829,,Tumor,,CGH17-104,,,,CGH Validation
-"440 common, sclerotic dermal component ",440,17-52720,,"common, sclerotic dermal component ",,SM D-17,,Noel/Chenxu,,Nevus Library
+"440 common, sclerotic dermal component",440,17-52720,,"common, sclerotic dermal component ",,SM D-17,,Noel/Chenxu,,Nevus Library
 1434 Normal,1434,17-55182C,,Normal,,"DNA-97,RNA-97,RNA-135,DNA-135",,Noel/Chenxu,,Melanoma Epigenetics
 803 Nevus,803,17-55182D,,Nevus,,"DNA-82,RNA-60,DNA-117,RNA-117",,Vivek Mishra,,Melanoma Epigenetics
 805 Mel,805,17-55182D,,Mel,,"DNA-59,RNA-59,DNA-59_REPEAT",,Vivek Mishra,,Melanoma Epigenetics
@@ -1438,7 +1434,7 @@
 677 Junctional,677,17-120049C,,Junctional,,LN D-04 (LN-04),,Noel/Chenxu,LENTIGINOUS JUNCTIONAL MELANOCYTIC NEVUS,Lentiginous Nevi
 1869 Compound,1869,17-120276,,Compound,,LN D-13 (LN-13),,Noel/Chenxu,LENTIGINOUS JUNCTIONAL MELANOCYTIC NEVUS,Lentiginous Nevi
 1868 Compound,1868,17-120280,,Compound,,LN D-12 (LN-12),,Noel/Chenxu,LENTIGINOUS COMPOUND MELANOCYTIC NEVUS,Lentiginous Nevi
-"441 common, sclerotic dermal component ",441,17-120487A,,"common, sclerotic dermal component ",,SM D-18,,Noel/Chenxu,,Nevus Library
+"441 common, sclerotic dermal component",441,17-120487A,,"common, sclerotic dermal component ",,SM D-18,,Noel/Chenxu,,Nevus Library
 682 Junctional,682,17-120790,,Junctional,,LN D-09 (LN-09),,Noel/Chenxu,LENTIGINOUS JUNCTIONAL MELANOCYTIC NEVUS,Lentiginous Nevi
 1867 Compound,1867,17-120839,,Compound,,LN D-11 (LN-11),,Noel/Chenxu,LENTIGINOUS JUNCTIONAL MELANOCYTIC NEVUS,Lentiginous Nevi
 "428 blue nevus, cellular,  DF like",428,17-120984,,"blue nevus, cellular,  DF like",,SM D-05,,Noel/Chenxu,,Nevus Library
@@ -1468,7 +1464,7 @@
 1582 Invasive Mel 1,1582,18-22781A1,Scraping,Invasive Mel 1,,"AM2 D-370,AM2 R-370",,Noel/Chenxu,,Acral Melanoma
 1581 Normal,1581,18-22781A1,Scraping,Normal,,AM2 D-369,,Noel/Chenxu,,Acral Melanoma
 1583 Invasive Mel 2,1583,18-22781A1,Scraping,Invasive Mel 2,,"AM2 D-371,AM2 R-371",,Noel/Chenxu,,Acral Melanoma
-442 compound meloncytic nevus ,442,18-24908,,compound meloncytic nevus ,,SM D-19,,Noel/Chenxu,,Nevus Library
+442 compound meloncytic nevus,442,18-24908,,compound meloncytic nevus ,,SM D-19,,Noel/Chenxu,,Nevus Library
 530 Compound,530,18-27178A,,Compound,,LN D-050 (LN-050),,Noel/Chenxu,,Lentiginous Nevi
 523 Congenital superficial,523,18-27178B,,Congenital superficial,,LN D-043 (LN-043),,Noel/Chenxu,,Lentiginous Nevi
 730 Tumor,730,18-28169,,Tumor,,D-8692,,,,Clinical Cases-BCC
@@ -1491,7 +1487,7 @@
 715 DN,715,18-52908,,DN,,MR-038,,Maisha Rashid,,Dysplastic Nevus
 711 DN,711,18-54612,,DN,,MR-034,,Maisha Rashid,,Dysplastic Nevus
 538 Compound,538,18-57977B,,Compound,,LN D-058 (LN-058),,Noel/Chenxu,,Lentiginous Nevi
-"443 common, sclerotic dermal component ",443,18-59376,,"common, sclerotic dermal component ",,SM D-20,,Noel/Chenxu,,Nevus Library
+"443 common, sclerotic dermal component",443,18-59376,,"common, sclerotic dermal component ",,SM D-20,,Noel/Chenxu,,Nevus Library
 511 Junctional,511,18-61924A,,Junctional,,LN D-031 (LN-031),,Noel/Chenxu,,Lentiginous Nevi
 727 DN,727,18-65038B,,DN,,MR-050,,Maisha Rashid,,Dysplastic Nevus
 539 Compound,539,18-65460,,Compound,,LN D-059 (LN-059),,Noel/Chenxu,,Lentiginous Nevi
@@ -1503,7 +1499,7 @@
 2190 Mel,2190,18-75585B,,Mel,,"DNA-340,RNA-340",,,,Melanoma Epigenetics
 2191 Nevus,2191,18-75585B,,Nevus,,"DNA-341,RNA-341",,,,Melanoma Epigenetics
 2192 Normal,2192,18-75585B,,Normal,,DNA-342,,,,Melanoma Epigenetics
-"444 blue nevus, cellular ",444,18-76281,,"blue nevus, cellular ",,SM D-21,,Noel/Chenxu,,Nevus Library
+"444 blue nevus, cellular",444,18-76281,,"blue nevus, cellular ",,SM D-21,,Noel/Chenxu,,Nevus Library
 547 Compound,547,18-76615,,Compound,,LN D-067 (LN-067),,Noel/Chenxu,,Lentiginous Nevi
 527 Congenital superficial,527,18-81165B,,Congenital superficial,,LN D-047 (LN-047),,Noel/Chenxu,,Lentiginous Nevi
 2510 MIS,2510,18-83370A,Scraping,MIS,,"LMM R-029,LMM D-029",,,,Lentigo Maligna Melanoma
@@ -1516,8 +1512,8 @@
 496 nevus or nevus like,496,18-95537,,nevus or nevus like,,CGH18-139,,Noel/Chenxu,,Nevus Library
 696 DN,696,18-96108,,DN,,MR-011,,Maisha Rashid,,Dysplastic Nevus
 687 DN,687,18-96989,,DN,,MR-001,,Maisha Rashid,,Dysplastic Nevus
-2136 ,2136,18-97419C,,,,,,,,
-"445 common, sclerotic dermal component ",445,18-113402B,,"common, sclerotic dermal component ",,SM D-22,,Noel/Chenxu,,Nevus Library
+2136,2136,18-97419C,,,,,,,,
+"445 common, sclerotic dermal component",445,18-113402B,,"common, sclerotic dermal component ",,SM D-22,,Noel/Chenxu,,Nevus Library
 694 DN,694,18-119366A,,DN,,MR-009,,Maisha Rashid,,Dysplastic Nevus
 698 DN,698,18-119369B,,DN,,MR-015,,Maisha Rashid,,Dysplastic Nevus
 717 DN,717,18-120470,,DN,,MR-040,,Maisha Rashid,,Dysplastic Nevus
@@ -1807,8 +1803,8 @@
 2212 MIS,2212,20-79197A,,MIS,,"DNA-372,RNA-372",,,,Melanoma Epigenetics
 2214 Normal,2214,20-79197A,,Normal,,DNA-374,,,,Melanoma Epigenetics
 2213 Nevus,2213,20-79197A,,Nevus,,"DNA-373,RNA-373",,,,Melanoma Epigenetics
-2493 Normal,2493,"""20-81257A
-""",Scraping,Normal,,"LMM D-003,LMM R-003",,,,Lentigo Maligna Melanoma
+2493 Normal,2493,"20-81257A
+",Scraping,Normal,,"LMM D-003,LMM R-003",,,,Lentigo Maligna Melanoma
 2491 Invasive,2491,20-81257B,Scraping,Invasive,,"LMM D-001,LMM R-001",,,,Lentigo Maligna Melanoma
 2492 MIS,2492,20-81257B,Scraping,MIS,,"LMM D-002,LMM R-002",,,,Lentigo Maligna Melanoma
 2543 Normal,2543,20-82651A,Scraping,Normal,,KA D-17,,,,Keratoacanthoma
@@ -2025,7 +2021,7 @@
 2686 Capture Area C1,2686,22-119466,,Capture Area C1,,,,,,Spatial Gene Expression
 2572 Blue Nevus,2572,22-122015,Scraping,Blue Nevus,,DMS-008,,,,Superficial Congenital Nevi
 2685 Capture Area B1,2685,22-124532-2,,Capture Area B1,,,,,,Spatial Gene Expression
-2247 ,2247,22-125373,,,,"22-125373-RNA,22-125373-DNA",,,,
+2247,2247,22-125373,,,,"22-125373-RNA,22-125373-DNA",,,,
 2577 Blue Nevus,2577,22-127365,Scraping,Blue Nevus,,DMS-013,,,,Superficial Congenital Nevi
 2578 Blue Nevus,2578,22-127490,Scraping,Blue Nevus,,DMS-014,,,,Superficial Congenital Nevi
 2579 Blue Nevus,2579,22-128532,Scraping,Blue Nevus,,DMS-015,,,,Superficial Congenital Nevi
@@ -2045,7 +2041,7 @@
 2570 Congenital Nevus,2570,23-4742,Scraping,Congenital Nevus,,DMS-006,,,,Superficial Congenital Nevi
 2575 Blue Nevus,2575,23-5230,Scraping,Blue Nevus,,DMS-011,,,,Superficial Congenital Nevi
 2568 Congenital Nevus,2568,23-5236,Scraping,Congenital Nevus,,DMS-004,,,,Superficial Congenital Nevi
-2563 Congenital Nevus,2563,23-7246A ,Scraping,Congenital Nevus,,"DMS-001A,RMS-001A",,,,Superficial Congenital Nevi
+2563 Congenital Nevus,2563,23-7246A,Scraping,Congenital Nevus,,"DMS-001A,RMS-001A",,,,Superficial Congenital Nevi
 2564 Congenital Nevus,2564,23-7246B,Scraping,Congenital Nevus,,"DMS-001B,RMS-001B",,,,Superficial Congenital Nevi
 2565 Congenital Nevus,2565,23-7246C,Scraping,Congenital Nevus,,"DMS-001C,RMS-001C",,,,Superficial Congenital Nevi
 2612 Spitz Nevus,2612,23-7509,Scraping,Spitz Nevus,,"DMS-043,RMS-043",,,,Superficial Congenital Nevi
@@ -2156,7 +2152,7 @@
 1862 Normal,1862,97-23367,Scraping,Normal,,"MMD-351,MMR-351",,Noel/Chenxu,,California Cancer Registry
 2740 Tumor,2740,98-001046,,Tumor,,KAM75-T,,,,Acral Melanoma
 2757 Normal,2757,98-1056,,Normal,,JBU8-Norm,,,,
-2758 MVP,2758,98-1056A9,,MVP,,JBU8-MVP,,,,
+MVP 2758.00,2758,98-1056A9,,MVP,,JBU8-MVP,,,,
 1808 Mel,1808,98-1556,Scraping,Mel,,"MMD-228,MMR-228,MMD-324,MMR-324",,Noel/Chenxu,,California Cancer Registry
 1809 Normal,1809,98-1556,Scraping,Normal,,"MMD-229,MMD-325,MMR-325",,Noel/Chenxu,,California Cancer Registry
 931 Mel,931,98-02267-5 M1,,Mel,,MDD-61,,,,Melanoma Prognosis
@@ -2291,7 +2287,7 @@
 96 Mel2,96,38637-16.1,,Mel2,\HiSeqData_Shanshan\Acral Melanoma project 2\HE_Images,AM2 D-85,,Shanshan Liu,,Acral Melanoma
 1285 Met1,1285,38637-16.2,,Met1,,AM2 D-196,,,,Acral Melanoma
 1008 Nodular Mel,1008,46976 B,,Nodular Mel,,NM D-070,,,,Nodular Melanoma
-2696 ,2696,61000/00 (LN),,,,DPN 49,,,,Dysplastic Nevus
+2696,2696,61000/00 (LN),,,,DPN 49,,,,Dysplastic Nevus
 15 Normal,15,78821-1c,,Normal,\HiSeqData_Shanshan\Acral Melanoma project 2\HE_Images,AM2 D-40,,Shanshan Liu,,Acral Melanoma
 16 MIS1,16,78821-1c,,MIS1,\HiSeqData_Shanshan\Acral Melanoma project 2\HE_Images,AM2 D-41,,Shanshan Liu,,Acral Melanoma
 17 Mel1,17,78821-1c,,Mel1,\HiSeqData_Shanshan\Acral Melanoma project 2\HE_Images,AM2 D-42,,Shanshan Liu,,Acral Melanoma
@@ -2435,10 +2431,10 @@
 2328 Tumor,2328,CGH12-058,,Tumor,,,,,,
 2333 Tumor,2333,CGH12-067,,Tumor,,,,,,
 2323 Tumor,2323,CGH12-092,,Tumor,,,,,,
-2855 ,2855,CGH13-008,,,,,,,,
-2856 ,2856,CGH13-010,,,,,,,,
-2857 ,2857,CGH13-026,,,,,,,,
-2858 ,2858,CGH13-094,,,,,,,,
+2855,2855,CGH13-008,,,,,,,,
+2856,2856,CGH13-010,,,,,,,,
+2857,2857,CGH13-026,,,,,,,,
+2858,2858,CGH13-094,,,,,,,,
 2330 Tumor,2330,CGH14-050,,Tumor,,,,,,
 2324 Tumor,2324,CGH14-083,,Tumor,,,,,,
 2332 Tumor,2332,CGH14-147,,Tumor,,,,,,
@@ -2460,7 +2456,7 @@
 1149 Mel3,1149,H09.22183/1,,Mel3,,AM2 D-180,,Noel/Chenxu,,Acral Melanoma
 1302 Normal,1302,H12.27716/7,,Normal,,AM2 D-217,,,,Acral Melanoma
 1303 Mel1,1303,H12.27716/7,,Mel1,,AM2 D-218,,,,Acral Melanoma
-1309 Mel1,1309,H13.3143 ,,Mel1,,AM2 D-224,,,,Acral Melanoma
+1309 Mel1,1309,H13.3143,,Mel1,,AM2 D-224,,,,Acral Melanoma
 3 Met1,3,H13.5620/1,,Met1,\HiSeqData_Shanshan\Acral Melanoma project 2\HE_Images,AM2 D-102,7/23/2018,Chenxu Shi,,Acral Melanoma
 1150 Normal3,1150,H13.5620/1,Scraping,Normal3,,AM2 D-181,,Noel/Chenxu,,Acral Melanoma
 1151 Met2,1151,H13.5620/1,,Met2,,AM2 D-182,,Noel/Chenxu,,Acral Melanoma
@@ -2547,7 +2543,7 @@
 372 Normal1,372,K8-A,,Normal1,\HiSeqData_Noel_Chenxu\HE Images\Acral Melanoma Project 2_HE_Images\September_2018,AM2 D-123,,Noel/Chenxu,,Acral Melanoma
 373 MIS1,373,K8-B,,MIS1,\HiSeqData_Noel_Chenxu\HE Images\Acral Melanoma Project 2_HE_Images\September_2018,"AM2 D-124,AM2 D-447,AM2 R-447",,Noel/Chenxu,,Acral Melanoma
 375 Mel1,375,K8-B,,Mel1,\HiSeqData_Noel_Chenxu\HE Images\Acral Melanoma Project 2_HE_Images\September_2018,"AM2 D-126,AM2 D-484,AM2 R-484,AM2 D-487,AM2 R-487",,Noel/Chenxu,,Acral Melanoma
-1575 ,1575,K8-B,Scraping,,,"AM2 D-358,AM2 R-358",,Noel/Chenxu,"Do NOT use these nucleic acids, Mel1 and Mel2 were pooled by error.",Acral Melanoma
+1575,1575,K8-B,Scraping,,,"AM2 D-358,AM2 R-358",,Noel/Chenxu,"Do NOT use these nucleic acids, Mel1 and Mel2 were pooled by error.",Acral Melanoma
 1622 Mel2,1622,K8-B,Scraping,Mel2,,"AM2 D-453,AM2 R-453",,Noel/Chenxu,,Acral Melanoma
 378 Mel1,378,K9-A-B,,Mel1,\HiSeqData_Noel_Chenxu\HE Images\Acral Melanoma Project 2_HE_Images\September_2018,AM2 D-129,,Noel/Chenxu,,Acral Melanoma
 377 MIS1,377,K9-A-B,,MIS1,\HiSeqData_Noel_Chenxu\HE Images\Acral Melanoma Project 2_HE_Images\September_2018,AM2 D-128,,Noel/Chenxu,,Acral Melanoma
