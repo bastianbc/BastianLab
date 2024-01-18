@@ -2951,31 +2951,14 @@ def check_dna_rna(request):
 
 def check_areas_airtable_get(row):
     try:
-        if not pd.isnull(row['Assigned projects']):
-            words = row['Assigned projects'].split()
-            result = ''.join(word[0] for word in words)
-            result_upper = result.upper()
-            if Projects.objects.filter(abbreviation=result_upper):
-                words = row['Assigned projects'].split()
-                result = '_'.join(word[0:1] for word in words)
-                result_upper = result.upper()
-            project = Projects.objects.get(name=row['Assigned projects'])
-            # if not project:
-            #     Projects.objects.create(name=row['Assigned projects'], abbreviation=result_upper)
-            block = Blocks.objects.get(name=row['Block_ID'])
-            block.project = project
-            block.save()
-
-        # if "," not in row['Block_ID'] or ";" not in row['Block_ID']:
-        #     block, _ = Blocks.objects.get_or_create(name=row['Block_ID'])
-        # if not pd.isnull(row['Assigned projects']):
-        #     block.project = project
-        #     block.save()
+        project = Projects.objects.get(name=row['Assigned projects'])
+        block = Blocks.objects.get(name=row['Block_ID'])
+        block.project = project
+        block.save()
         # area = Areas.objects.get(name=row['Area_ID'])
         # if area:
         #     area.area_type = get_area_type(row['Area type'])
         #     area.save()
-
     except Exception as e:
         print(f"{e}, area: {row['Area_ID']}, block: {row['Block_ID']}, project: {row['Assigned projects']}")
 
