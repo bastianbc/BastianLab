@@ -2952,6 +2952,9 @@ def check_areas_airtable_get(row):
             project = Projects.objects.filter(name=row['Assigned projects'])
             if not project:
                 Projects.objects.create(name=row['Assigned projects'], abbreviation=result_upper)
+            block = Blocks.objects.get(name=row['Block_ID'])
+            block.project = project
+            block.save()
 
         # if "," not in row['Block_ID'] or ";" not in row['Block_ID']:
         #     block, _ = Blocks.objects.get_or_create(name=row['Block_ID'])
