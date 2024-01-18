@@ -2656,18 +2656,18 @@ def nas2(row):
 def check_na2(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
     df = pd.read_csv(file)
-    nuc_acids_without_areas = NucAcids.objects.annotate(
-        num_areas=Count('area_na_links')
-    ).filter(num_areas=0).values("name")
-    print(nuc_acids_without_areas)
-
-    areas_without_nucleic_acid = Areas.objects.annotate(
-        num_nucleic_acids=Count('area_na_links')
-    ).filter(num_nucleic_acids=0).order_by("name").values("name")
-    print(areas_without_nucleic_acid)
-    for i in areas_without_nucleic_acid:
-        print(i['name'])
-    print(areas_without_nucleic_acid.count())
+    # nuc_acids_without_areas = NucAcids.objects.annotate(
+    #     num_areas=Count('area_na_links')
+    # ).filter(num_areas=0).values("name")
+    # print(nuc_acids_without_areas)
+    #
+    # areas_without_nucleic_acid = Areas.objects.annotate(
+    #     num_nucleic_acids=Count('area_na_links')
+    # ).filter(num_nucleic_acids=0).order_by("name").values("name")
+    # print(areas_without_nucleic_acid)
+    # for i in areas_without_nucleic_acid:
+    #     print(i['name'])
+    # print(areas_without_nucleic_acid.count())
     df[~df["NA_id"].isnull()].apply(lambda row: nas2(row), axis=1)
 
 
