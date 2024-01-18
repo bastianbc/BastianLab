@@ -2982,9 +2982,9 @@ def create_abbreviation(value):
     if projects:
         words = value.split()
         result = ''.join(word[:2] for word in words)
-        result_upper = result.upper()
+        result_upper = result.upper()[::-1]
     print(value, result_upper)
-    return result_upper
+    return result_upper[:6]
 
 def check_projects_airtable_get(row):
     try:
