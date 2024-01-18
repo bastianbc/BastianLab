@@ -2941,14 +2941,13 @@ def check_dna_rna(request):
 
 def check_areas_airtable_get(row):
     try:
-        print(row['Area_ID'], row['Block_ID'])
         block = Blocks.objects.get(name=row['Block_ID'])
         area, created = Areas.objects.get_or_create(name=row['Area_ID'], block=block)
         if created:
             area.area_type = get_area_type(row['Area type'])
             area.save()
     except Exception as e:
-        print(e, row['Area_ID'])
+        print(f"{e}, area: {row['Area_ID']}, block: {row['Block_ID']}")
 
 def check_areas_airtable(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "Areas-Grid view (2).csv")
