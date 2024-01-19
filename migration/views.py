@@ -3168,7 +3168,7 @@ def check_patients_airtable_get(row):
         # print(row['Blocks _ID'])
         if not pd.isnull(row['Blocks _ID']):
             for block in str(row['Blocks _ID']).replace('"','').split(","):
-                print(block.strip())
+                # print(block.strip())
                 Blocks.objects.get(name=block.strip())
     except Exception as e:
         print(e, row["Pat_ID"], row['Blocks _ID'])
