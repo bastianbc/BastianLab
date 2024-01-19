@@ -3170,6 +3170,13 @@ def check_patients_airtable_get(row):
                 block = Blocks.objects.get(name=b.strip())
                 block.patient = patient
                 block.save()
+        else:
+            for a in row['Area_ID'].replace(";", ",").split(","):
+                area = Areas.objects.get(name=a.strip())
+                block = area.block
+                if block.name != "UndefinedBlock":
+                    block.patient = patient
+                    block.save()
         # block = Blocks.objects.get(name=row['Block_ID'].strip())
         # if not pd.isnull(row['Pat_ID']):
         #     patient = Patients.objects.get(pat_id=str(row["Pat_ID"]))
