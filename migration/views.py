@@ -3153,10 +3153,10 @@ def check_projects_airtable_get(row):
 
 def check_projects_airtable(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "Patients-Grid view (1).csv")
-    file = Path(Path(__file__).parent.parent / "uploads" / "Blocks-Grid view (2).csv")
     file = Path(Path(__file__).parent.parent / "uploads" / "Areas-Grid view (3).csv")
     file = Path(Path(__file__).parent.parent / "uploads" / "Nucleic Acids-Grid view (2).csv")
     file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view (5).csv")
+    file = Path(Path(__file__).parent.parent / "uploads" / "Blocks-Grid view (3).csv")
     df = pd.read_csv(file)
     df[~df["Assigned Projects"].isnull()].apply(lambda row: check_projects_airtable_get(row), axis=1)
 
