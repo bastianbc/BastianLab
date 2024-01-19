@@ -2696,9 +2696,21 @@ def nas(row):
             if "," in area_name:
                 if area_name in l:
                     area = Areas.objects.get(name=area_name.strip())
+                    block = area.block
+                    if not pd.isnull(row["Assigned Projects"]):
+                        project = Projects.objects.get(name=row['Assigned Projects'])
+                        if block:
+                            block.project = project
+                            block.save()
                 else:
                     for area in area_name.split(","):
                         area = Areas.objects.get(name=area.strip())
+                        block = area.block
+                        if not pd.isnull(row["Assigned Projects"]):
+                            project = Projects.objects.get(name=row['Assigned Projects'])
+                            if block:
+                                block.project = project
+                                block.save()
             else:
                 area = Areas.objects.get(name=area_name.strip())
             block = area.block
@@ -2930,10 +2942,12 @@ def check_blocks2(row):
         if not pd.isnull(row['Assigned project']):
             project = Projects.objects.get(name=row['Assigned project'])
             b.project = project
+            b.save()
         if not pd.isnull(row['Pat_ID']):
             patient = Patients.objects.get(pat_id=row['Pat_ID'])
             if not b.patient:
                 b.patient = patient
+                b.save()
         # else:
         #     print(str(uuid.uuid4()).split("-")[0] + "_G")
         notes=b.notes
