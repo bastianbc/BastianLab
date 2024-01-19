@@ -3164,16 +3164,14 @@ def check_projects_airtable(request):
 
 def check_patients_airtable_get(row):
     try:
-        patient = Patients.objects.get(pat_id=row["Pat_ID"])
-        # print(row['Blocks _ID'])
-        if not pd.isnull(row['Blocks _ID']):
-            for block in str(row['Blocks _ID']).replace('"','').split(","):
-                # print(block.strip())
-                b = Blocks.objects.get(name=str(block.strip()))
-                b.patient = patient
-                b.save()
+        block = Blocks.objects.get(name=row['Block'].strip())
+        if not pd.isnull(row['pat_id']):
+            patient = Patients.objects.get(pat_id=str(row["pat_id"]).replace(".0",""))
+            # print(block.strip())
+            block.patient = patient
+            block.save()
     except Exception as e:
-        print(e, row["Pat_ID"], row['Blocks _ID'])
+        print(e, row["pat_id"], row['Block'])
 
 
 def check_patients_airtable(request):
@@ -3183,9 +3181,10 @@ def check_patients_airtable(request):
     # file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view (5).csv")
     # file = Path(Path(__file__).parent.parent / "uploads" / "Blocks-Grid view (3).csv")
     file = Path(Path(__file__).parent.parent / "uploads" / "Patients-Grid view (2).csv")
+    file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
 
     df = pd.read_csv(file)
-    df[~df["Pat_ID"].isnull()].apply(lambda row: check_patients_airtable_get(row), axis=1)
+    df[~df["Block"].isnull()].apply(lambda row: check_patients_airtable_get(row), axis=1)
 
 
 
