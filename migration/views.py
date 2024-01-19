@@ -3164,23 +3164,20 @@ def check_projects_airtable(request):
 
 def check_patients_airtable_get(row):
     try:
-        if not Projects.objects.filter(name=row["Assigned Projects"]):
-            project, _ = Projects.objects.get_or_create(
-                name=row["Assigned Projects"],
-                abbreviation=create_abbreviation(row["Assigned Projects"]))
+        Patients.objects.get(pat_id=row["Pat_ID"])
     except Exception as e:
-        print(e, row["Assigned Projects"])
+        print(e, row["Pat_ID"])
 
 
 def check_patients_airtable(request):
-    file = Path(Path(__file__).parent.parent / "uploads" / "Patients-Grid view (1).csv")
-    file = Path(Path(__file__).parent.parent / "uploads" / "Areas-Grid view (3).csv")
-    file = Path(Path(__file__).parent.parent / "uploads" / "Nucleic Acids-Grid view (2).csv")
-    file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view (5).csv")
-    file = Path(Path(__file__).parent.parent / "uploads" / "Blocks-Grid view (3).csv")
+    # file = Path(Path(__file__).parent.parent / "uploads" / "Patients-Grid view (1).csv")
+    # file = Path(Path(__file__).parent.parent / "uploads" / "Areas-Grid view (3).csv")
+    # file = Path(Path(__file__).parent.parent / "uploads" / "Nucleic Acids-Grid view (2).csv")
+    # file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view (5).csv")
+    # file = Path(Path(__file__).parent.parent / "uploads" / "Blocks-Grid view (3).csv")
     file = Path(Path(__file__).parent.parent / "uploads" / "Patients-Grid view (2).csv")
     df = pd.read_csv(file)
-    df[~df["Assigned Projects"].isnull()].apply(lambda row: check_patients_airtable_get(row), axis=1)
+    df[~df["Pat_ID"].isnull()].apply(lambda row: check_patients_airtable_get(row), axis=1)
 
 
 
