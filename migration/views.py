@@ -3165,8 +3165,13 @@ def check_projects_airtable(request):
 def check_patients_airtable_get(row):
     try:
         Patients.objects.get(pat_id=row["Pat_ID"])
+        # print(row['Blocks _ID'])
+        if not pd.isnull(row['Blocks _ID']):
+            for block in str(row['Blocks _ID']).replace('"','').split(","):
+                print(block.strip())
+                Blocks.objects.get(name=block.strip())
     except Exception as e:
-        print(e, row["Pat_ID"])
+        print(e, row["Pat_ID"], row['Blocks _ID'])
 
 
 def check_patients_airtable(request):
