@@ -2937,8 +2937,6 @@ def check_blocks2(row):
             'Present':True,
         }
         b = Blocks.objects.get(name=row["Block_ID"])
-        # if not b:
-        #     b = Blocks.objects.create(name=row["Block_ID"])
         if not pd.isnull(row['Assigned project']):
             project = Projects.objects.get(name=row['Assigned project'])
             b.project = project
@@ -2959,6 +2957,10 @@ def check_blocks2(row):
         b.slides=row["Slides"] if not pd.isnull(row["Slides"]) else b.slides
         b.slides_left=row["Slides left"] if not pd.isnull(row["Slides left"]) else b.slides_left
         b.ulceration=mapping_ulcreation[row["Ulceration"]] if not pd.isnull(row["Ulceration"]) else b.ulceration
+
+        project = Projects.objects.get(name=row['Assigned project'])
+        b.project = project
+
         b.save()
     except Exception as e:
         print(e, row["Block_ID"], row['Assigned project'], row['Pat_ID'])
