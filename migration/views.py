@@ -3168,8 +3168,8 @@ def check_patients_airtable_get(row):
         if not pd.isnull(row['Pat_ID']):
             patient = Patients.objects.get(pat_id=str(row["Pat_ID"]))
             # print(block.strip())
-            # block.patient = patient
-            # block.save()
+            block.patient = patient
+            block.save()
     except Exception as e:
         print(e, row["Pat_ID"], row['Block_ID'])
 
