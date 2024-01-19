@@ -2941,11 +2941,13 @@ def check_blocks2(row):
             project = Projects.objects.get(name=row['Assigned project'])
             b.project = project
             b.save()
+            print(row["Block_ID"], "saved_1")
         if not pd.isnull(row['Pat_ID']):
             patient = Patients.objects.get(pat_id=row['Pat_ID'])
             if not b.patient:
                 b.patient = patient
                 b.save()
+                print(row["Block_ID"], "saved_2")
         # else:
         #     print(str(uuid.uuid4()).split("-")[0] + "_G")
         notes=b.notes
@@ -2962,6 +2964,7 @@ def check_blocks2(row):
         b.project = project
 
         b.save()
+        print(row["Block_ID"], "saved_3")
     except Exception as e:
         print(e, row["Block_ID"], row['Assigned project'], row['Pat_ID'])
 
