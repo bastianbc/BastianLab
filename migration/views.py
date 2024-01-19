@@ -3184,7 +3184,7 @@ def check_patients_airtable_get(row):
         #     block.patient = patient
         #     block.save()
     except Exception as e:
-        print(e, row["Pat_ID"], row['Block_ID'])
+        print(e, row["Pat_ID"], row['Block_ID'], row['Area_ID'])
 
 
 def check_patients_airtable(request):
