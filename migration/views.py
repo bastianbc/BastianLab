@@ -2970,7 +2970,7 @@ def check_blocks2(row):
 
 
 def check_block2(request):
-    file = Path(Path(__file__).parent.parent / "uploads" / "Blocks-Grid view (2).csv")
+    file = Path(Path(__file__).parent.parent / "uploads" / "Blocks-Grid view (3).csv")
     df = pd.read_csv(file)
     df[~df["Block_ID"].isnull()].apply(lambda row: check_blocks2(row), axis=1)
 
