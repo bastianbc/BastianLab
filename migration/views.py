@@ -3164,12 +3164,13 @@ def check_projects_airtable(request):
 
 def check_patients_airtable_get(row):
     try:
-        Patients.objects.get(pat_id=row["Pat_ID"])
+        patient = Patients.objects.get(pat_id=row["Pat_ID"])
         # print(row['Blocks _ID'])
         if not pd.isnull(row['Blocks _ID']):
             for block in str(row['Blocks _ID']).replace('"','').split(","):
                 # print(block.strip())
-                Blocks.objects.get(name=str(block.strip()))
+                b = Blocks.objects.get(name=str(block.strip()))
+                b.patient = patient
     except Exception as e:
         print(e, row["Pat_ID"], row['Blocks _ID'])
 
@@ -3181,14 +3182,6 @@ def check_patients_airtable(request):
     # file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view (5).csv")
     # file = Path(Path(__file__).parent.parent / "uploads" / "Blocks-Grid view (3).csv")
     file = Path(Path(__file__).parent.parent / "uploads" / "Patients-Grid view (2).csv")
-    for i in Blocks.objects.all().order_by("name"):
-        try:
-            name = i.name.strip()
-            i.name = name
-            i.save()
-        except Exception as e:
-            print(e)
-
     df = pd.read_csv(file)
     df[~df["Pat_ID"].isnull()].apply(lambda row: check_patients_airtable_get(row), axis=1)
 
