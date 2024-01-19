@@ -3164,14 +3164,20 @@ def check_projects_airtable(request):
 
 def check_patients_airtable_get(row):
     try:
-        block = Blocks.objects.get(name=row['Block_ID'].strip())
-        if not pd.isnull(row['Pat_ID']):
-            patient = Patients.objects.get(pat_id=str(row["Pat_ID"]))
-            # print(block.strip())
-            block.patient = patient
-            block.save()
+        patient = Patients.objects.get(pat_id=str(row["Pat_ID"]))
+        if not pd.isnull(row['Blocks _ID']):
+            for b in row['Blocks _ID'].split(","):
+                block = Blocks.objects.get(name=b.strip())
+                block.patient = patient
+                block.save()
+        # block = Blocks.objects.get(name=row['Block_ID'].strip())
+        # if not pd.isnull(row['Pat_ID']):
+        #     patient = Patients.objects.get(pat_id=str(row["Pat_ID"]))
+        #     # print(block.strip())
+        #     block.patient = patient
+        #     block.save()
     except Exception as e:
-        print(e, row["Pat_ID"], row['Block_ID'])
+        print(e, row["Pat_ID"], row['Blocks _ID'])
 
 
 def check_patients_airtable(request):
@@ -3179,12 +3185,12 @@ def check_patients_airtable(request):
     # file = Path(Path(__file__).parent.parent / "uploads" / "Areas-Grid view (3).csv")
     # file = Path(Path(__file__).parent.parent / "uploads" / "Nucleic Acids-Grid view (2).csv")
     # file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view (5).csv")
-    file = Path(Path(__file__).parent.parent / "uploads" / "Blocks-Grid view (3).csv")
-    # file = Path(Path(__file__).parent.parent / "uploads" / "Patients-Grid view (2).csv")
+    # file = Path(Path(__file__).parent.parent / "uploads" / "Blocks-Grid view (3).csv")
+    file = Path(Path(__file__).parent.parent / "uploads" / "Patients-Grid view (2).csv")
     # file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
 
     df = pd.read_csv(file)
-    df[~df["Block_ID"].isnull()].apply(lambda row: check_patients_airtable_get(row), axis=1)
+    df[~df["Pat_ID"].isnull()].apply(lambda row: check_patients_airtable_get(row), axis=1)
 
 
 
