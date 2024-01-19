@@ -2937,8 +2937,6 @@ def check_blocks2(row):
             'Present':True,
         }
         b = Blocks.objects.get(name=row["Block_ID"])
-        # if not b:
-        #     b = Blocks.objects.create(name=row["Block_ID"])
         if not pd.isnull(row['Assigned project']):
             project = Projects.objects.get(name=row['Assigned project'])
             b.project = project
