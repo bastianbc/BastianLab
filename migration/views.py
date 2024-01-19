@@ -3171,6 +3171,7 @@ def check_patients_airtable_get(row):
                 # print(block.strip())
                 b = Blocks.objects.get(name=str(block.strip()))
                 b.patient = patient
+                b.save()
     except Exception as e:
         print(e, row["Pat_ID"], row['Blocks _ID'])
 
@@ -3182,6 +3183,7 @@ def check_patients_airtable(request):
     # file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view (5).csv")
     # file = Path(Path(__file__).parent.parent / "uploads" / "Blocks-Grid view (3).csv")
     file = Path(Path(__file__).parent.parent / "uploads" / "Patients-Grid view (2).csv")
+
     df = pd.read_csv(file)
     df[~df["Pat_ID"].isnull()].apply(lambda row: check_patients_airtable_get(row), axis=1)
 
