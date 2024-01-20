@@ -3164,6 +3164,45 @@ def check_projects_airtable(request):
 
 def check_patients_airtable_get(row):
     try:
+        patient, _ = Patients.objects.get_or_create(pat_id=str(row["pat_id"]))
+        block = Blocks.objects.get(name=row['name'])
+        print(block, patient)
+        # if not pd.isnull(row['Block_ID']):
+        #     for b in row['Block_ID'].replace(";",",").split(","):
+        #         block = Blocks.objects.get(name=b.strip())
+        #         block.patient = patient
+        #         block.save()
+        # else:
+        #     for a in row['Area_ID'].replace(";", ",").split(","):
+        #         area = Areas.objects.get(name=a.strip())
+        #         block = area.block
+        #         if block.name != "UndefinedBlock":
+        #             block.patient = patient
+        #             block.save()
+        # block = Blocks.objects.get(name=row['Block_ID'].strip())
+        # if not pd.isnull(row['Pat_ID']):
+        #     patient = Patients.objects.get(pat_id=str(row["Pat_ID"]))
+        #     # print(block.strip())
+        #     block.patient = patient
+        #     block.save()
+    except Exception as e:
+        print(e, row["pat_id"], row['name'])
+
+
+def check_patients_airtable(request):
+    # file = Path(Path(__file__).parent.parent / "uploads" / "Patients-Grid view (1).csv")
+    # file = Path(Path(__file__).parent.parent / "uploads" / "Areas-Grid view (3).csv")
+    # file = Path(Path(__file__).parent.parent / "uploads" / "Nucleic Acids-Grid view (2).csv")
+    # file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view (5).csv")
+    # file = Path(Path(__file__).parent.parent / "uploads" / "Blocks-Grid view (3).csv")
+    # file = Path(Path(__file__).parent.parent / "uploads" / "Patients-Grid view (2).csv")
+    # file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
+    file = Path(Path(__file__).parent.parent / "uploads" / "Block_Patients_done.csv")
+    df = pd.read_csv(file)
+    df.apply(lambda row: check_patients_airtable_get(row), axis=1)
+
+def blocks_sl_at_get(row):
+    try:
         patient = Patients.objects.get(pat_id=str(row["Pat_ID"]))
         if not pd.isnull(row['Block_ID']):
             for b in row['Block_ID'].replace(";",",").split(","):
@@ -3187,17 +3226,14 @@ def check_patients_airtable_get(row):
         print(e, row["Pat_ID"], row['Block_ID'], row['Area_ID'])
 
 
-def check_patients_airtable(request):
-    # file = Path(Path(__file__).parent.parent / "uploads" / "Patients-Grid view (1).csv")
-    # file = Path(Path(__file__).parent.parent / "uploads" / "Areas-Grid view (3).csv")
-    # file = Path(Path(__file__).parent.parent / "uploads" / "Nucleic Acids-Grid view (2).csv")
+def blocks_sl_at(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view (5).csv")
-    # file = Path(Path(__file__).parent.parent / "uploads" / "Blocks-Grid view (3).csv")
-    # file = Path(Path(__file__).parent.parent / "uploads" / "Patients-Grid view (2).csv")
-    # file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
+    file2 = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
 
     df = pd.read_csv(file)
-    df[~df["Pat_ID"].isnull()].apply(lambda row: check_patients_airtable_get(row), axis=1)
+    df2 = pd.read_csv(file)
+
+    df.apply(lambda row: blocks_sl_at_get(row), axis=1)
 
 
 
