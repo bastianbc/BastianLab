@@ -3166,7 +3166,9 @@ def check_patients_airtable_get(row):
     try:
         patient, _ = Patients.objects.get_or_create(pat_id=str(row["pat_id"]))
         block = Blocks.objects.get(name=row['name'])
-        print(block, patient)
+        block.patient = patient
+        block.save()
+        # print(block, patient)
         # if not pd.isnull(row['Block_ID']):
         #     for b in row['Block_ID'].replace(";",",").split(","):
         #         block = Blocks.objects.get(name=b.strip())
