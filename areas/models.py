@@ -3,6 +3,7 @@ from django.db.models import Q, Count, OuterRef, Subquery, Sum, Value
 from datetime import datetime
 from django.utils.crypto import get_random_string
 from django.db.models.functions import Coalesce
+import json
 
 class Areas(models.Model):
     AREA_TYPE_TYPES = [
@@ -116,8 +117,7 @@ class Areas(models.Model):
                 search_value (str): Parsed value
             '''
             if "_initial:" in search_value:
-                v = search_value.split("_initial:")[1]
-                return None if v == "null" or not v.isnumeric() else v
+                return json.loads(search_value.split("_initial:")[1])
             return search_value
 
         def _is_initial_value(search_value):
@@ -161,9 +161,11 @@ class Areas(models.Model):
 
             is_initial = _is_initial_value(search_value)
             search_value = _parse_value(search_value)
-
             if is_initial:
-                queryset = queryset.filter(
+                if search_value["model"] == "nuc_acid":
+                    queryset = queryset.filter(Q(area_na_links__nucacid__nu_id=search_value["id"]))
+                else:
+                    queryset = queryset.filter(
                         Q(block__bl_id=search_value) |
                         Q(area_na_links__nucacid__nu_id=search_value)
                     )

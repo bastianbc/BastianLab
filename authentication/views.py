@@ -32,7 +32,6 @@ def log_in(request):
                 messages.error(request, "Authentication Error!")
         except Exception as e:
             messages.error(request, "Unexpected Error!")
-            print("Unexpected Error!")
             print(e)
     return render(request, "sign-in.html", locals())
 

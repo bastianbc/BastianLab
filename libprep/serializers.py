@@ -16,7 +16,7 @@ class NucacidsSerializer(serializers.ModelSerializer):
     area_na_links = AreaLinksSerializer(read_only=True, many=True)
     DT_RowId = serializers.SerializerMethodField()
     area_id = serializers.SerializerMethodField()
-    area_name = serializers.SerializerMethodField()
+    num_areas = serializers.IntegerField()
     method_label = serializers.SerializerMethodField()
     na_type_label = serializers.SerializerMethodField()
     vol_remain = serializers.SerializerMethodField()
@@ -26,7 +26,7 @@ class NucacidsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = NucAcids
-        fields = ("nu_id", "name", "area_id", "area_na_links", "area_name", "na_type", "na_type_label", "date", "method", "method_label", "conc", "vol_init", "vol_remain", "amount", "num_areas", "num_samplelibs", "DT_RowId",)
+        fields = ("nu_id", "name", "area_id", "area_na_links", "num_areas", "na_type", "na_type_label", "date", "method", "method_label", "conc", "vol_init", "vol_remain", "amount", "num_areas", "num_samplelibs", "DT_RowId",)
 
     def get_DT_RowId(self, obj):
        return getattr(obj, 'nu_id')
