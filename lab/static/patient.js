@@ -9,7 +9,7 @@ var KTDatatablesServerSide = function () {
     var editor;
 
     // Private functions
-    var initDatatable = function (race, sex, dob) {
+    var initDatatable = function (initialValue, race, sex, dob) {
 
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
 
@@ -149,7 +149,8 @@ var KTDatatablesServerSide = function () {
             // Add data-filter attribute
             createdRow: function (row, data, dataIndex) {
                 $(row).find('td:eq(4)').attr('data-filter', data.CreditCardType);
-            }
+            },
+            oSearch: {sSearch: "_initial:" + initialValue}
         });
 
         table = dt.$;
@@ -524,10 +525,38 @@ var KTDatatablesServerSide = function () {
 
     }
 
+    // Redirects from other pages
+    var handleInitialValue = () => {
+
+      // Remove parameters in URL
+      function cleanUrl() {
+        window.history.replaceState(null, null, window.location.pathname);
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const model = params.get('model');
+      const id = params.get('id');
+      const initial = params.get('initial');
+
+      cleanUrl();
+
+      if (initial =="true" && model != null && id !=null) {
+
+        return JSON.stringify({
+          "model": model,
+          "id": id
+        });
+
+      }
+
+      return null;
+
+    }
+
     // Public methods
     return {
         init: function () {
-            initDatatable(null,null,null);
+            initDatatable(handleInitialValue(), null,null,null);
             handleSearchDatatable();
             initToggleToolbar();
             handleFilterDatatable();

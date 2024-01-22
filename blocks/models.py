@@ -98,7 +98,9 @@ class Blocks(models.Model):
             Users can access to some entities depend on their authorize. While the user having admin role can access to all things,
             technicians or researchers can access own projects and other entities related to it.
             '''
-            queryset = Blocks.objects.all().annotate(num_areas=Count('block_areas'))
+            queryset = Blocks.objects.all().annotate(num_areas=Count('block_areas'),
+                                                     project_num=Count("project"),
+                                                     patient_num=Count('patient'))
             if not user.is_superuser:
                 return queryset.filter(Q(project__technician=user) | Q(project__researcher=user))
             return queryset

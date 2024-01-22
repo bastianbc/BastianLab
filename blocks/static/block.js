@@ -64,8 +64,8 @@ var KTDatatablesServerSide = function () {
               },
               { data: 'bl_id' },
               { data: 'name'},
-              { data: 'project_name'},
-              { data: 'patient_name' },
+              { data: 'project_num'},
+              { data: 'patient_num' },
               { data: 'diagnosis' },
               { data: 'body_site' },
               { data: 'scan_number'},
@@ -82,25 +82,26 @@ var KTDatatablesServerSide = function () {
                             </div>`;
                     }
                 },
-
                 {
                     targets: 3,
-                    orderable: false,
+                    orderable: true,
                     render: function (data, type, row) {
-                      if (data) {
-                        return `<a href="/projects/edit/${row["project_id"]}">${data}</a>`;
-                      }
-                      return "";
+                        if (data > 0) {
+                          let bl_id = row["bl_id"];
+                          return `<a href="/projects?model=block&id=${bl_id}&initial=true">${data}</a>`;
+                        }
+                        return data;
                     }
                 },
                 {
                     targets: 4,
-                    orderable: false,
+                    orderable: true,
                     render: function (data, type, row) {
-                      if (data) {
-                        return `<a href="/lab/edit/${row["patient_id"]}">${data}</a>`;
-                      }
-                      return "";
+                        if (data > 0) {
+                          let bl_id = row["bl_id"];
+                          return `<a href="/lab?model=block&id=${bl_id}&initial=true">${data}</a>`;
+                        }
+                        return data;
                     }
                 },
                 {
