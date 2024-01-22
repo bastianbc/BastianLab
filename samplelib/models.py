@@ -154,7 +154,7 @@ class SampleLib(models.Model):
                     filter = [na_sl_link.sample_lib.id for na_sl_link in NA_SL_LINK.objects.filter(nucacid=search_value["id"])]
                     queryset = queryset.filter(Q(id__in=filter))
                 if search_value["model"] == "area":
-                    filter = [na_sl_link.sample_lib.id for na_sl_link in NA_SL_LINK.objects.filter(nucacid__area=search_value["id"])]
+                    filter = [na_sl_link.sample_lib.id for na_sl_link in NA_SL_LINK.objects.filter(nucacid__area_na_links__area=search_value["id"])]
                     queryset = queryset.filter(Q(id__in=filter))
             elif search_value:
                 queryset = queryset.filter(

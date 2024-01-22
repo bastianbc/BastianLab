@@ -5,17 +5,15 @@ from lab.models import Patients
 class AreasSerializer(serializers.ModelSerializer):
     num_nucacids = serializers.IntegerField()
     DT_RowId = serializers.SerializerMethodField()
-    block_id = serializers.SerializerMethodField()
-    block_name = serializers.SerializerMethodField()
-    project_id = serializers.SerializerMethodField()
-    project_name = serializers.SerializerMethodField()
+    num_blocks = serializers.IntegerField()
+    num_projects = serializers.IntegerField()
     area_type_label = serializers.SerializerMethodField()
     investigator = serializers.SerializerMethodField()
     num_samplelibs = serializers.IntegerField()
 
     class Meta:
         model = Areas
-        fields = ("ar_id", "name", "block_id", "block_name", "project_id", "project_name", "area_type", "area_type_label", "completion_date", "investigator","num_nucacids", "num_samplelibs", "DT_RowId",)
+        fields = ("ar_id", "name", "num_blocks", "num_projects", "area_type", "area_type_label", "completion_date", "investigator","num_nucacids", "num_samplelibs", "DT_RowId",)
 
     def get_DT_RowId(self, obj):
         return getattr(obj, 'ar_id')

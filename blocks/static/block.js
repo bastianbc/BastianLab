@@ -10,7 +10,6 @@ var KTDatatablesServerSide = function () {
 
     // Private functions
     var initDatatable = function ( initialValue, p_stage, prim, collection , body_site ) {
-
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
 
         dt = $(".table").DataTable({
@@ -279,9 +278,6 @@ var KTDatatablesServerSide = function () {
 
                 // Select parent row
                 const parent = e.target.closest('tr');
-                console.log(parent);
-                console.log(parent.querySelectorAll('td')[2].innerText);
-                console.log(parent.querySelectorAll('td')[1].querySelector(".form-check-input").value);
                 const name = parent.querySelectorAll('td')[2].innerText;
                 const id = parent.querySelectorAll('td')[1].querySelector(".form-check-input").value;
 

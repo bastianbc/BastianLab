@@ -261,7 +261,6 @@ def get_or_create_files_from_file(row):
                 checksum=checksum,
                 type="fastq"
             )
-        print("created")
     except Exception as e:
         print(e)
 
@@ -289,7 +288,6 @@ def get_or_create_files_from_file(row):
                 checksum=checksum_,
                 type="bai"
             )
-        print("created")
     except Exception as e:
         print(e)
 

@@ -97,7 +97,9 @@ class Areas(models.Model):
 
             queryset = Areas.objects.all().annotate(
                 num_nucacids=Count('area_na_links'),
-                num_samplelibs=Count('area_na_links__nucacid__na_sl_links__sample_lib')
+                num_samplelibs=Count('area_na_links__nucacid__na_sl_links__sample_lib'),
+                num_blocks=Count("block"),
+                num_projects=Count("block__project")
             )
 
             if not user.is_superuser:

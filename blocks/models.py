@@ -133,6 +133,9 @@ class Blocks(models.Model):
         def _filter_by_patient(value):
             return queryset.filter(Q(patient__pat_id=value))
 
+        def _filter_by_area(value):
+            return queryset.filter(Q(block_areas__ar_id=value))
+
         def _filter_by_samplelib(value):
             from samplelib.models import SampleLib
             sample_lib = SampleLib.objects.get(id=value)
@@ -171,7 +174,6 @@ class Blocks(models.Model):
 
             is_initial = _is_initial_value(search_value)
             search_value = _parse_value(search_value)
-
             if p_stage:
                 queryset = queryset.filter(
                     Q(p_stage=p_stage)
@@ -195,6 +197,8 @@ class Blocks(models.Model):
                     queryset = _filter_by_patient(search_value["id"])
                 elif search_value["model"] == "samplelib":
                     queryset = _filter_by_samplelib(search_value["id"])
+                elif search_value["model"] == "area":
+                    queryset = _filter_by_area(search_value["id"])
             elif search_value:
                 queryset = queryset.filter(
                         Q(name__icontains=search_value) |
