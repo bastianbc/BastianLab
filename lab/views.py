@@ -167,7 +167,6 @@ def _pat_get_or_create_consolidated(row):
 
 def _pat_done_import(row):
     try:
-        print(row["pat_id"], row["Block"])
         if not pd.isnull(row["Block"]):
             try:
                 Blocks.objects.get(name=row["Block"])
@@ -176,7 +175,6 @@ def _pat_done_import(row):
                 patient = _patient_get_or_create(row["pat_id"])
                 b.patient = patient
                 b.save()
-                print("saved")
     except Exception as e:
         print(e)
 

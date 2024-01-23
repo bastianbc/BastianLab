@@ -47,15 +47,11 @@ var KTSigninGeneral = (function () {
             });
 
             t.addEventListener("click", function (n) {
-                console.log("1");
                 n.preventDefault();
                 i.validate().then(function (i) {
-                    console.log("2");
                     if ("Valid" == i) {
-                        console.log("3");
                         t.setAttribute("data-kt-indicator", "on");
                         t.disabled = !0;
-                        console.log("4");
                         setTimeout(function () {
                             t.removeAttribute("data-kt-indicator");
                             t.disabled = !1;
@@ -68,17 +64,13 @@ var KTSigninGeneral = (function () {
                                     confirmButton: "btn btn-primary"
                                 }
                             }).then(function (t) {
-                                console.log("5");
                                 wait(3000);
                                 if (t.isConfirmed) {
                                     e.querySelector('[name="username"]').value = "";
                                     e.querySelector('[name="password"]').value = "";
-                                    console.log(e.querySelector('[name="username"]').value);
-                                    console.log(e.querySelector('[name="password"]').value);
                                     wait(3000);
                                     var i = e.getAttribute("data-kt-redirect-url");
 
-                                    console.log(i);
                                     wait(3000);
                                     if (i) {
                                         wait(3000);

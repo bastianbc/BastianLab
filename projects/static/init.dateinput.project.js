@@ -1,5 +1,4 @@
 $( document ).ready(function() {
-  console.log("dattime init");
   $("#id_date_start").flatpickr({
     altInput: true,
     altFormat: "m/d/Y",

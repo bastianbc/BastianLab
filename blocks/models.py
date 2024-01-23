@@ -98,7 +98,9 @@ class Blocks(models.Model):
             Users can access to some entities depend on their authorize. While the user having admin role can access to all things,
             technicians or researchers can access own projects and other entities related to it.
             '''
-            queryset = Blocks.objects.all().annotate(num_areas=Count('block_areas'))
+            queryset = Blocks.objects.all().annotate(num_areas=Count('block_areas'),
+                                                     project_num=Count("project"),
+                                                     patient_num=Count('patient'))
             if not user.is_superuser:
                 return queryset.filter(Q(project__technician=user) | Q(project__researcher=user))
             return queryset
@@ -132,6 +134,9 @@ class Blocks(models.Model):
 
         def _filter_by_patient(value):
             return queryset.filter(Q(patient__pat_id=value))
+
+        def _filter_by_area(value):
+            return queryset.filter(Q(block_areas__ar_id=value))
 
         def _filter_by_samplelib(value):
             from samplelib.models import SampleLib
@@ -171,7 +176,6 @@ class Blocks(models.Model):
 
             is_initial = _is_initial_value(search_value)
             search_value = _parse_value(search_value)
-
             if p_stage:
                 queryset = queryset.filter(
                     Q(p_stage=p_stage)
@@ -195,6 +199,8 @@ class Blocks(models.Model):
                     queryset = _filter_by_patient(search_value["id"])
                 elif search_value["model"] == "samplelib":
                     queryset = _filter_by_samplelib(search_value["id"])
+                elif search_value["model"] == "area":
+                    queryset = _filter_by_area(search_value["id"])
             elif search_value:
                 queryset = queryset.filter(
                         Q(name__icontains=search_value) |

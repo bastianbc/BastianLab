@@ -3,6 +3,8 @@ from django.db.models import Q, Count, OuterRef, Subquery, Sum, Value
 from datetime import datetime
 from django.utils.crypto import get_random_string
 from django.db.models.functions import Coalesce
+from samplelib.models import NA_SL_LINK
+import json
 
 class Areas(models.Model):
     AREA_TYPE_TYPES = [
@@ -97,7 +99,9 @@ class Areas(models.Model):
 
             queryset = Areas.objects.all().annotate(
                 num_nucacids=Count('area_na_links'),
-                num_samplelibs=Count('area_na_links__nucacid__na_sl_links__sample_lib')
+                num_samplelibs=Count('area_na_links__nucacid__na_sl_links__sample_lib'),
+                num_blocks=Count("block"),
+                num_projects=Count("block__project")
             )
 
             if not user.is_superuser:
@@ -114,8 +118,7 @@ class Areas(models.Model):
                 search_value (str): Parsed value
             '''
             if "_initial:" in search_value:
-                v = search_value.split("_initial:")[1]
-                return None if v == "null" or not v.isnumeric() else v
+                return json.loads(search_value.split("_initial:")[1])
             return search_value
 
         def _is_initial_value(search_value):
@@ -159,9 +162,16 @@ class Areas(models.Model):
 
             is_initial = _is_initial_value(search_value)
             search_value = _parse_value(search_value)
-
             if is_initial:
-                queryset = queryset.filter(
+                if search_value["model"] == "nuc_acid":
+                    queryset = queryset.filter(Q(area_na_links__nucacid__nu_id=search_value["id"]))
+                if search_value["model"] == "sample_lib":
+                    # filter = [na_sl_link.nucacid.area_na_links.area.id for na_sl_link in
+                    #           NA_SL_LINK.objects.filter(sample_lib__id=search_value["id"])]
+                    # queryset = queryset.filter(Q(id__in=filter))
+                    queryset = queryset.filter(Q(area_na_links__nucacid__na_sl_links__sample_lib__id=search_value["id"]))
+                else:
+                    queryset = queryset.filter(
                         Q(block__bl_id=search_value) |
                         Q(area_na_links__nucacid__nu_id=search_value)
                     )

@@ -49,7 +49,7 @@ class NucAcids(models.Model):
             technicians or researchers can access own projects and other entities related to it.
             '''
             queryset = NucAcids.objects.all().annotate(
-                num_areas=Count('area_na_links__area'),
+                num_areas=Count('area_na_links__area', distinct=True),
                 num_samplelibs=Coalesce(Subquery(
                     NA_SL_LINK.objects.filter(
                         nucacid=OuterRef("pk")
@@ -136,9 +136,12 @@ class NucAcids(models.Model):
                 )
 
             if is_initial:
-                queryset = queryset.filter(
-                        Q(area_na_links__area__ar_id=search_value)
-                    )
+                if search_value["model"] == "area":
+                    queryset = queryset.filter(Q(area_na_links__area__ar_id=search_value["id"]))
+                else:
+                    queryset = queryset.filter(
+                            Q(area_na_links__area__ar_id=search_value)
+                        )
             elif search_value:
                 queryset = queryset.filter(
                     Q(name__icontains=search_value) |

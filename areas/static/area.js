@@ -55,8 +55,8 @@ var KTDatatablesServerSide = function () {
             columns: [
               { data: 'ar_id' },
               { data: 'name' },
-              { data: 'block_name' },
-              { data: 'project_name' },
+              { data: 'num_blocks' },
+              { data: 'num_projects' },
               { data: 'area_type',
                 render: function (val, type, row) {
                   return row["area_type_label"];
@@ -84,22 +84,26 @@ var KTDatatablesServerSide = function () {
                 },
                 {
                     targets: 2,
-                    orderable: true,
+                    orderable: false,
                     render: function (data, type, row) {
-                        if (data) {
-                          return `<a href="/blocks/edit/${row["block_id"]}">${data}</a>`;
+                        if (data > 0) {
+                          let ar_id = row["ar_id"];
+                          return `
+                              <a href="/blocks?model=area&id=${ar_id}&initial=true">${data}</a>`;
                         }
-                        return "";
+                        return data;
                     }
                 },
                 {
                     targets: 3,
                     orderable: true,
                     render: function (data, type, row) {
-                        if (data) {
-                          return `<a href="/projects/edit/${row["project_id"]}">${data}</a>`;
+                        if (data > 0) {
+                          let ar_id = row["ar_id"];
+                          return `
+                              <a href="/projects?model=area&id=${ar_id}&initial=true">${data}</a>`;
                         }
-                        return "";
+                        return data;
                     }
                 },
                 {
@@ -110,7 +114,7 @@ var KTDatatablesServerSide = function () {
                         if (data > 0) {
                           let ar_id = row["ar_id"];
                           return `
-                              <a href="/libprep?initial=${ar_id}">${data}</a>`;
+                              <a href="/libprep?model=area&id=${ar_id}&initial=true">${data}</a>`;
                         }
                         return data;
                     }
@@ -730,11 +734,22 @@ var KTDatatablesServerSide = function () {
       }
 
       const params = new URLSearchParams(window.location.search);
-      const x = params.get('initial');
+      const model = params.get('model');
+      const id = params.get('id');
+      const initial = params.get('initial');
 
       cleanUrl();
 
-      return x;
+      if (initial =="true" && model != null && id !=null) {
+
+        return JSON.stringify({
+          "model": model,
+          "id": id
+        });
+
+      }
+
+      return null;
 
     }
 

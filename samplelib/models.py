@@ -47,7 +47,8 @@ class SampleLib(models.Model):
             return SampleLib.objects.all().annotate(
                 num_nucacids=Count('na_sl_links',distinct=True),
                 num_blocks=Count('na_sl_links', distinct=True),
-                num_capturedlibs=Count('sl_cl_links'),
+                num_capturedlibs=Count('sl_cl_links', distinct=True),
+                area_num=Count("na_sl_links__nucacid__area_na_links__area", distinct=True)
             )
 
         def _parse_value(search_value):
@@ -154,7 +155,7 @@ class SampleLib(models.Model):
                     filter = [na_sl_link.sample_lib.id for na_sl_link in NA_SL_LINK.objects.filter(nucacid=search_value["id"])]
                     queryset = queryset.filter(Q(id__in=filter))
                 if search_value["model"] == "area":
-                    filter = [na_sl_link.sample_lib.id for na_sl_link in NA_SL_LINK.objects.filter(nucacid__area=search_value["id"])]
+                    filter = [na_sl_link.sample_lib.id for na_sl_link in NA_SL_LINK.objects.filter(nucacid__area_na_links__area=search_value["id"])]
                     queryset = queryset.filter(Q(id__in=filter))
             elif search_value:
                 queryset = queryset.filter(

@@ -2,6 +2,7 @@ from django.db import models
 from datetime import datetime
 from django.db.models import Q, Count
 from django.contrib.auth import get_user_model
+import json
 
 User = get_user_model()
 
@@ -36,12 +37,35 @@ class Projects(models.Model):
 
 
     def query_by_args(self, user, **kwargs):
-
         def _get_authorizated_queryset():
             queryset = Projects.objects.all().annotate(num_blocks=Count('project_blocks'))
             if not user.is_superuser:
                 return queryset.filter(Q(technician=user) | Q(researcher=user))
             return queryset
+
+        def _is_initial_value(search_value):
+            '''
+            When the datatables are to be filled with a certain data, the search function of datatables is used.
+            The incoming parameter is parsed ve returned. If there is a initial value, the "search_value" has "_initial" prefix.
+            Parameters:
+                search_value (str): A string
+            Returns:
+                is_initial (boolean): If there is a initial value, it is True
+            '''
+            return "_initial:" in search_value and search_value.split("_initial:")[1] != "null"
+
+        def _parse_value(search_value):
+            '''
+            When the datatables are to be filled with a certain data, the search function of datatables is used.
+            The incoming parameter is parsed ve returned. If there is a initial value, the "search_value" has "_initial" prefix.
+            Parameters:
+                search_value (str): A string
+            Returns:
+                search_value (str): Parsed value
+            '''
+            if "_initial:" in search_value:
+                return json.loads(search_value.split("_initial:")[1])
+            return search_value
 
         try:
             ORDER_COLUMN_CHOICES = {
@@ -72,12 +96,12 @@ class Projects(models.Model):
             queryset = _get_authorizated_queryset()
 
             total = queryset.count()
-
+            is_initial = _is_initial_value(search_value)
+            search_value = _parse_value(search_value)
             if pi:
                 queryset = queryset.filter(
                     Q(pi=pi)
                 )
-
             if technician:
                 queryset = queryset.filter(
                     Q(technician__id=technician)
@@ -95,8 +119,12 @@ class Projects(models.Model):
                 queryset = queryset.filter(
                     Q(date_start__gte=start_date) & Q(date_start__lte=end_date)
                 )
-
-            if search_value:
+            if is_initial:
+                if search_value["model"] == "area":
+                    queryset = queryset.filter(Q(project_blocks__block_areas__ar_id=search_value["id"]))
+                if search_value["model"] == "block":
+                    queryset = queryset.filter(Q(project_blocks__bl_id=search_value["id"]))
+            elif search_value:
                 queryset = queryset.filter(
                     Q(pr_id__icontains=search_value) |
                     Q(name__icontains=search_value) |
@@ -107,7 +135,6 @@ class Projects(models.Model):
 
             count = queryset.count()
             queryset = queryset.order_by(order_column)[start:start + length]
-            # queryset = queryset[start:start + length]
             return {
                 'items': queryset,
                 'count': count,

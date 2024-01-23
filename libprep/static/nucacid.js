@@ -25,7 +25,7 @@ var KTDatatablesServerSide = function () {
             order: [[0, 'desc']],
             stateSave: false,
             destroy: true,
-            pageLength: 100,
+            pageLength: 10,
             select: {
                 style: 'multi',
                 selector: 'td:first-child input[type="checkbox"]',
@@ -63,7 +63,7 @@ var KTDatatablesServerSide = function () {
             columns: [
                 { data: 'nu_id' },
                 { data: 'name' },
-                { data: 'area_na_links'},
+                { data: 'num_areas'},
                 { data: 'na_type',
                   render: function (val, type, row) {
                     return row["na_type_label"];
@@ -99,17 +99,11 @@ var KTDatatablesServerSide = function () {
                 {
                     targets: 2,
                     orderable: true,
-                    className: "text-center",
                     render: function (data, type, row) {
-                        var area_na_links = row['area_na_links'];
-                        var html_atag = ``;
-                        if (area_na_links.length > 0) {
-                            for (let i = 0; i < area_na_links.length; i++) {
-                              var area = area_na_links[i]['area'];
-                              let nu_id = row["nu_id"];
-                              html_atag += `<a href="/areas?initial=${nu_id}">${area[1]}</a><br>`
-                            }
-                            return html_atag;
+                        if (data > 0) {
+                          let nu_id = row["nu_id"];
+                          return `
+                              <a href="/areas?model=nuc_acid&id=${nu_id}&initial=true">${data}</a>`;
                         }
                         return data;
                     }
@@ -1153,11 +1147,22 @@ var KTDatatablesServerSide = function () {
       }
 
       const params = new URLSearchParams(window.location.search);
-      const x = params.get('initial');
+      const model = params.get('model');
+      const id = params.get('id');
+      const initial = params.get('initial');
 
       cleanUrl();
 
-      return x;
+      if (initial =="true" && model != null && id !=null) {
+
+        return JSON.stringify({
+          "model": model,
+          "id": id
+        });
+
+      }
+
+      return null;
 
     }
 

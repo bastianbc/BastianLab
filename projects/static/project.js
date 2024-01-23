@@ -12,9 +12,7 @@ var KTDatatablesServerSide = function () {
    * Initializes the datatable.
    * @param  {String} initialValue  If it comes from another page, it is initialized with this value.
    */
-    var initDatatable = function ( filterDateRange, pi , technician , researcher ) {
-        console.log("filterDateRange", filterDateRange);
-        console.log("pi", pi);
+    var initDatatable = function (initialValue, filterDateRange, pi , technician , researcher ) {
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
 
         dt = $(".table").DataTable({
@@ -168,7 +166,8 @@ var KTDatatablesServerSide = function () {
             // Add data-filter attribute
             createdRow: function (row, data, dataIndex) {
                 $(row).find('td:eq(4)').attr('data-filter', data.CreditCardType);
-            }
+            },
+            oSearch: {sSearch: "_initial:" + initialValue}
         });
 
         table = dt.$;
@@ -559,10 +558,55 @@ var KTDatatablesServerSide = function () {
 
     };
 
+    // Redirects from other pages
+    var handleInitialValue = () => {
+
+      // Remove parameters in URL
+      function cleanUrl() {
+        window.history.replaceState(null, null, window.location.pathname);
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const x = params.get('initial');
+
+      cleanUrl();
+
+      return x;
+
+    }
+
+    // Redirects from other pages
+    var handleInitialValue = () => {
+
+      // Remove parameters in URL
+      function cleanUrl() {
+        window.history.replaceState(null, null, window.location.pathname);
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const model = params.get('model');
+      const id = params.get('id');
+      const initial = params.get('initial');
+
+      cleanUrl();
+
+      if (initial =="true" && model != null && id !=null) {
+
+        return JSON.stringify({
+          "model": model,
+          "id": id
+        });
+
+      }
+
+      return null;
+
+    }
+
     // Public methods
     return {
         init: function () {
-            initDatatable(null, null, null, null);
+            initDatatable(handleInitialValue(), null, null, null, null);
             handleSearchDatatable();
             initToggleToolbar();
             handleFilterDatatable();
