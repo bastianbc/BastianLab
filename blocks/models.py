@@ -139,10 +139,13 @@ class Blocks(models.Model):
             return queryset.filter(Q(block_areas__ar_id=value))
 
         def _filter_by_samplelib(value):
-            from samplelib.models import SampleLib
-            sample_lib = SampleLib.objects.get(id=value)
-            filter = [na_sl_link.nucacid.area.block.name for na_sl_link in sample_lib.na_sl_links.all()]
-            return queryset.filter(Q(name__in=filter))
+            # from samplelib.models import SampleLib
+            # sample_lib = SampleLib.objects.get(id=value)
+            # filter = [na_sl_link.nucacid.area.block.name for na_sl_link in sample_lib.na_sl_links.all()]
+            # queryset = queryset.filter(Q(block_areas__area_na_links__nucacid__na_sl_links__sample_lib__id=search_value["id"]))
+
+            return queryset.filter(Q(block_areas__area_na_links__nucacid__na_sl_links__sample_lib__id=value))
+            # return queryset.filter(Q(name__in=filter))
 
         try:
             ORDER_COLUMN_CHOICES = {

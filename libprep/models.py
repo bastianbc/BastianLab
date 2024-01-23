@@ -5,7 +5,7 @@ from areas.models import Areas
 from django.db.models import Count, Subquery, OuterRef, Value
 from django.db.models.functions import Coalesce
 from samplelib.models import NA_SL_LINK
-
+import json
 
 class NucAcids(models.Model):
     DNA = "dna"
@@ -72,8 +72,7 @@ class NucAcids(models.Model):
                 search_value (str): Parsed value
             '''
             if "_initial:" in search_value:
-                v = search_value.split("_initial:")[1]
-                return None if v == "null" or not v.isnumeric() else v
+                return json.loads(search_value.split("_initial:")[1])
             return search_value
 
         def _is_initial_value(search_value):
@@ -118,10 +117,8 @@ class NucAcids(models.Model):
             queryset = _get_authorizated_queryset()
 
             total = queryset.count()
-
             is_initial = _is_initial_value(search_value)
             search_value = _parse_value(search_value)
-
             if date_range:
                 arr = date_range.split(" to ")
                 start_date = datetime.strptime(arr[0],'%Y-%m-%d').date()
@@ -138,6 +135,8 @@ class NucAcids(models.Model):
             if is_initial:
                 if search_value["model"] == "area":
                     queryset = queryset.filter(Q(area_na_links__area__ar_id=search_value["id"]))
+                elif search_value["model"] == "sample_lib":
+                    queryset = queryset.filter(Q(na_sl_links__sample_lib__id=search_value["id"]))
                 else:
                     queryset = queryset.filter(
                             Q(area_na_links__area__ar_id=search_value)

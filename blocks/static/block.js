@@ -121,7 +121,7 @@ var KTDatatablesServerSide = function () {
                         if (data > 0) {
                           let bl_id = row["bl_id"];
                           return `
-                              <a href="/areas?initial=${bl_id}">${data}</a>`;
+                              <a href="/areas?model=block&id=${bl_id}&initial=true">${data}</a>`;
                         }
                         return data;
                     }
