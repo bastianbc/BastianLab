@@ -114,7 +114,7 @@ var KTDatatablesServerSide = function () {
                         if (data > 0) {
                           let ar_id = row["ar_id"];
                           return `
-                              <a href="/libprep?initial=${ar_id}">${data}</a>`;
+                              <a href="/libprep?model=area&id=${ar_id}&initial=true">${data}</a>`;
                         }
                         return data;
                     }

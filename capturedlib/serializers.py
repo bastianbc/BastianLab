@@ -46,4 +46,5 @@ class UsedSampleLibSerializer(serializers.ModelSerializer):
         return obj.sample_lib.vol_remain
 
     def get_barcode(self, obj):
-        return obj.sample_lib.barcode.name
+        barcode = obj.sample_lib.barcode
+        return barcode.name if barcode else None

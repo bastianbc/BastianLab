@@ -30,14 +30,14 @@ class SampleLibSerializer(serializers.ModelSerializer):
     num_nucacids = serializers.IntegerField()
     barcode = serializers.StringRelatedField()
     area_id = serializers.SerializerMethodField()
-    area_name = serializers.SerializerMethodField()
+    area_num = serializers.IntegerField()
     num_blocks = serializers.IntegerField()
     num_capturedlibs = serializers.IntegerField()
 
     class Meta:
         model = SampleLib
         fields = ("id", "name", "barcode", "area_id",
-                  "area_name","date", "method", "method_label",
+                  "area_num","date", "method", "method_label",
                   "amount_final", "qpcr_conc", "amount_in", "vol_init",
                   "vol_remain", "pcr_cycles", "qubit", "num_blocks",
                   "num_nucacids", "num_capturedlibs", "DT_RowId", "na_sl_links",)

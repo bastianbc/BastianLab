@@ -19,7 +19,7 @@ var KTDatatablesServerSide = function () {
             order: [[0, 'desc']],
             stateSave: false,
             destroy: true,
-            pageLength: 100,
+            pageLength: 10,
             select: {
                 style: 'multi',
                 selector: 'td:first-child input[type="checkbox"]',
@@ -61,7 +61,7 @@ var KTDatatablesServerSide = function () {
             columns: [
                 { data: 'id' },
                 { data: 'name' },
-                { data: 'na_sl_links' },
+                { data: 'area_num' },
                 { data: 'date',
                   render: function (data) {
                     return moment(data).format('MM/DD/YYYY');
@@ -98,25 +98,11 @@ var KTDatatablesServerSide = function () {
                 {
                     targets: 2,
                     orderable: true,
-                    className: "text-center",
                     render: function (data, type, row) {
-                        let areas = [];
-                        var na_sl_links = row['na_sl_links'];
-                        var html_atag = ``;
-                        if (na_sl_links.length > 0) {
-                            for (let i = 0; i < na_sl_links.length; i++) {
-                                  var area_na_link = na_sl_links[i]['area_na_link'];
-                                  if (area_na_link.length > 0) {
-                                  for (let i = 0; i < area_na_link.length; i++) {
-                                    var area = area_na_link[i]['area'];
-                                    let nu_id = na_sl_links[i]["nucacid"];
-                                    if (areas.includes(area[1])) { continue; }
-                                    areas.push(area[1]);
-                                    html_atag += `<a href="/areas?initial=${nu_id}">${area[1]}</a><br>`
-                                  }
-                              }
-                            }
-                            return html_atag;
+                        if (data > 0) {
+                          let sl_id = row["id"];
+                          return `
+                              <a href="/areas?model=sample_lib&id=${sl_id}&initial=true">${data}</a>`;
                         }
                         return data;
                     }
