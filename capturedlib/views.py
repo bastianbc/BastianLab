@@ -147,7 +147,6 @@ def delete_batch_capturedlibs(request):
 @permission_required("samplelib.view_samplelib",raise_exception=True)
 def get_used_samplelibs(request,id):
     used_samplelibs = SL_CL_LINK.objects.filter(captured_lib__id=id)
-    print(used_samplelibs)
     serializer = UsedSampleLibSerializer(used_samplelibs, many=True)
     return JsonResponse(serializer.data, safe=False)
 
