@@ -737,7 +737,6 @@ var KTDatatablesServerSide = function () {
       const model = params.get('model');
       const id = params.get('id');
       const initial = params.get('initial');
-
       cleanUrl();
 
       if (initial =="true" && model != null && id !=null) {
@@ -752,7 +751,6 @@ var KTDatatablesServerSide = function () {
       return null;
 
     }
-
     // Public methods
     return {
         init: function () {

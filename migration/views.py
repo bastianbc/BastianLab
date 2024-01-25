@@ -3205,22 +3205,22 @@ def check_patients_airtable(request):
     blocks = list(blocks)
     blocks.sort()
     l = []
-    for bl in blocks:
-        # match = re.compile(r'-(\d+)(?=[A-Z]*\+?[A-Z]*$)').findall(bl)
-        match = re.compile(r'-(\d{3,})').findall(bl)
-        if match:
-            ma = [m for m in match]
-            # print(bl, ma)
-            for number in ma:
-                counts = Blocks.objects.filter(name__icontains=number).values_list('name', flat=True)
-                if len(counts)>1:
-                    d={
-                        'Block_ID':bl,
-                        'Substring': ",".join(ma),
-                        'Substring Matches': ",".join(list(counts)),
-                    }
-                    print(bl, ma, list(counts))
-                    l.append(d)
+    # for bl in blocks:
+    #     # match = re.compile(r'-(\d+)(?=[A-Z]*\+?[A-Z]*$)').findall(bl)
+    #     match = re.compile(r'-(\d{3,})').findall(bl)
+    #     if match:
+    #         ma = [m for m in match]
+    #         # print(bl, ma)
+    #         for number in ma:
+    #             counts = Blocks.objects.filter(name__icontains=number).values_list('name', flat=True)
+    #             if len(counts)>1:
+    #                 d={
+    #                     'Block_ID':bl,
+    #                     'Substring': ",".join(ma),
+    #                     'Substring Matches': ",".join(list(counts)),
+    #                 }
+    #                 print(bl, ma, list(counts))
+    #                 l.append(d)
     df = pd.DataFrame(l)
     df.to_csv("duplicates.csv", index=False)
     # blocks = [re.sub(r'[^a-zA-Z0-9]', '', name).upper() for name in blocks]

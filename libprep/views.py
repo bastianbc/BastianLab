@@ -11,6 +11,7 @@ from django.contrib.auth.decorators import login_required,permission_required
 from core.decorators import *
 from core.utils import custom_update
 from .serializers import NucacidsSerializer
+from django.core import serializers
 
 @permission_required("libprep.view_nucacids",raise_exception=True)
 def nucacids(request):
@@ -173,3 +174,4 @@ def check_can_deleted_async(request):
             })
 
     return JsonResponse({"related_objects":related_objects})
+

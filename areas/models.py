@@ -62,6 +62,7 @@ class Areas(models.Model):
     def __str__(self):
         return self.name
 
+
     def _generate_unique_name(self):
         '''
         Generates unique name for new area. An area belongs to a block. An area's unique name is derived from block name.
