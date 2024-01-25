@@ -62,6 +62,7 @@ class Areas(models.Model):
     def __str__(self):
         return self.name
 
+
     def _generate_unique_name(self):
         '''
         Generates unique name for new area. An area belongs to a block. An area's unique name is derived from block name.
@@ -163,12 +164,11 @@ class Areas(models.Model):
             is_initial = _is_initial_value(search_value)
             search_value = _parse_value(search_value)
             if is_initial:
-                if search_value["model"] == "nuc_acid":
+                if search_value["model"] == "block":
+                    queryset = queryset.filter(Q(block__bl_id=search_value["id"]))
+                elif search_value["model"] == "nuc_acid":
                     queryset = queryset.filter(Q(area_na_links__nucacid__nu_id=search_value["id"]))
-                if search_value["model"] == "sample_lib":
-                    # filter = [na_sl_link.nucacid.area_na_links.area.id for na_sl_link in
-                    #           NA_SL_LINK.objects.filter(sample_lib__id=search_value["id"])]
-                    # queryset = queryset.filter(Q(id__in=filter))
+                elif search_value["model"] == "sample_lib":
                     queryset = queryset.filter(Q(area_na_links__nucacid__na_sl_links__sample_lib__id=search_value["id"]))
                 else:
                     queryset = queryset.filter(
