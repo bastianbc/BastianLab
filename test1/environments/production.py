@@ -83,6 +83,7 @@ INSTALLED_APPS = [
     'sequencingfile',
     'variant',
     'gene',
+    'sheet',
 
 ]
 CRISPY_TEMPLATE_PACK = 'bootstrap4'

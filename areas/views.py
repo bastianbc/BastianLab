@@ -14,7 +14,7 @@ from pathlib import Path
 @permission_required_for_async("areas.view_areas")
 def filter_areas(request):
     from .serializers import AreasSerializer
-    areas = Areas().query_by_args(request.user,**request.GET)
+    areas = Areas().query_by_args(request.user, **request.GET)
     serializer = AreasSerializer(areas['items'], many=True)
     result = dict()
     result['data'] = serializer.data

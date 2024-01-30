@@ -40,6 +40,7 @@ class SampleLib(models.Model):
         self.vol_remain = 0 if volume > self.vol_remain else self.vol_remain - volume
         self.save()
 
+    @staticmethod
     def query_by_args(user, **kwargs):
 
         def _get_authorizated_queryset():
@@ -86,7 +87,6 @@ class SampleLib(models.Model):
             i7_filter = kwargs.get('i7', None)[0]
             area_type_filter = kwargs.get('area_type', None)[0]
             bait_filter = kwargs.get('bait', None)[0]
-
             order_column = ORDER_COLUMN_CHOICES[order_column]
             # django orm '-' -> desc
             if order == 'desc':
@@ -164,7 +164,6 @@ class SampleLib(models.Model):
 
             count = queryset.count()
             queryset = queryset.order_by(order_column)[start:start + length]
-            # queryset = queryset[start:start + length]
 
             return {
                 'items': queryset,
