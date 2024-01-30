@@ -1,0 +1,8 @@
+Sequencing Run,Sequencing Library,Captured Library,Sample Library,File,Nucleic Acid,Area,Block,Patient
+Acral_Mel_Exome-01,,,AGLP-01,{'AGLP-01_S1_L001_R2_001.fastq.gz': '9eb8f6e74c237cd839887ece1f568efe'},,,,
+Acral_Mel_Exome-01,,,AGLP-01,{'AGLP-01_S1_L002_R1_001.fastq.gz': '0071b38c00be8bdee15e27184103a0e7'},,,,
+Acral_Mel_Exome-01,,,AGLP-01,{'AGLP-01_S1_L002_R2_001.fastq.gz': '970dc0227f2cc6a4acad7ad2b7fadfa2'},,,,
+Acral_Mel_Exome-01,,,AGLP-02,{'AGLP-02_S2_L001_R1_001.fastq.gz': 'b612e065429a20b12778295ad9959a95'},,,,
+Acral_Mel_Exome-01,,,AGLP-02,{'AGLP-02_S2_L001_R2_001.fastq.gz': '7bcb4b8ef041c55eccf35bad1712af0b'},,,,
+Acral_Mel_Exome-01,,,AGLP-02,{'AGLP-02_S2_L002_R1_001.fastq.gz': '676044d103b9abe7544aec7b3569288c'},,,,
+Acral_Mel_Exome-01,,,AGLP-02,{'AGLP-02_S2_L002_R2_001.fastq.gz': '347a76edbae07ec3c11abb4c1187a12d'},,,,
