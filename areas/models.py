@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Q, Count, OuterRef, Subquery, Sum, Value
+from django.db.models import Q, Count, OuterRef, Subquery, Sum, Value, Case, When, IntegerField
 from datetime import datetime
 from django.utils.crypto import get_random_string
 from django.db.models.functions import Coalesce
@@ -99,10 +99,18 @@ class Areas(models.Model):
             '''
 
             queryset = Areas.objects.all().annotate(
-                num_nucacids=Count('area_na_links'),
-                num_samplelibs=Count('area_na_links__nucacid__na_sl_links__sample_lib'),
-                num_blocks=Count("block"),
-                num_projects=Count("block__project")
+                num_nucacids=Count('area_na_links', distinct=True),
+                num_samplelibs=Count('area_na_links__nucacid__na_sl_links__sample_lib', distinct=True),
+                num_blocks=Case(
+                    When(block__isnull=False, then=1),
+                    default=0,
+                    output_field=IntegerField()
+                ),
+                num_projects=Case(
+                    When(block__project__isnull=False, then=1),
+                    default=0,
+                    output_field=IntegerField()
+                ),
             )
 
             if not user.is_superuser:

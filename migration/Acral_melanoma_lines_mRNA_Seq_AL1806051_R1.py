@@ -77,6 +77,7 @@ def read_rows(row):
         df.loc[len(df)] = d
         print(e)
 
+# def create_file():
 df2.apply(lambda row: read_rows(row), axis=1)
 print(df)
 # grouped_df = df.groupby('Sample Library')['File'].agg(merge_dicts).reset_index()
