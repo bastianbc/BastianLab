@@ -1,0 +1,67 @@
+Sequencing Run,Sequencing Library,Captured Library,Sample Library,File,Nucleic Acid,Area,Block,Patient
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,[],1205LU-3,{'1205LU-3_R1_001.fastq.gz': '095d42a1b07fd983c4bbb73a12d4d969'},[],[],[],[]
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,[],1205LU-3,{'1205LU-3_R2_001.fastq.gz': 'bd6f24d1660122fe8aca67830dab93e3'},[],[],[],[]
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,[],1205lu-1,{'1205lu-1_R1_001.fastq.gz': '018720d891d49d4196a8be1a178cf031'},[],[],[],[]
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,[],1205lu-1,{'1205lu-1_R2_001.fastq.gz': '93d5089270c77a3d051fb82f02f2097b'},[],[],[],[]
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,[],1205lu-2,{'1205lu-2_R1_001.fastq.gz': '1aa730b858c1fe21704d6542e0c6092b'},[],[],[],[]
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,[],1205lu-2,{'1205lu-2_R2_001.fastq.gz': 'b397d3c3646c0ac8c42a5478677c2cea'},[],[],[],[]
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,144a-1,{'144a-1_R1_001.fastq.gz': '4fae74ce8e03621cda2f91fb726b956e'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,144a-1,{'144a-1_R2_001.fastq.gz': '8f50adbcfee575fd11e979e8bc84d2d2'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,144a-2,{'144a-2_R1_001.fastq.gz': '9b8442d8a4fdc40d16b5641af554ee9b'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,144a-2,{'144a-2_R2_001.fastq.gz': '08c1419c2e04fdd00b304f6e6236f786'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,144a-3,{'144a-3_R1_001.fastq.gz': '30c8cd786388008d0b049f451cbeed9d'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,144a-3,{'144a-3_R2_001.fastq.gz': '492d7c6411ab58e063b3ad4a62f19439'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,27a-1,{'27a-1_R1_001.fastq.gz': '9f609bc275d3fcab23607398e3ece234'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,27a-1,{'27a-1_R2_001.fastq.gz': '15c47700b584cc744311200abe2dd53b'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,27a-2,{'27a-2_R1_001.fastq.gz': '3a0154fccdf2f5c59ea222f9ab601bdf'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,27a-2,{'27a-2_R2_001.fastq.gz': '02b4fc19f6981b4a2a3f0f8b885ef9dc'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,27a-3,{'27a-3_R1_001.fastq.gz': 'd3efaf882456448ca6367d71999bee77'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,27a-3,{'27a-3_R2_001.fastq.gz': '0d3d4911bca7f8fc15cae6bfef677868'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,30I-1,{'30I-1_R1_001.fastq.gz': '92294ee1f5aa41bfef641ad89ee31a54'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,30I-1,{'30I-1_R2_001.fastq.gz': 'e7d8899cbff17029f429f297ebe5f379'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,30I-2,{'30I-2_R1_001.fastq.gz': '8e691be0ebc47e7f316a0a1d62a4ad68'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,30I-2,{'30I-2_R2_001.fastq.gz': '929450bf4163e14afcc9eaf84f779df8'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,30I-3,{'30I-3_R1_001.fastq.gz': 'ce7d5968be6792d3654b2ee4f34c1cf1'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,30I-3,{'30I-3_R2_001.fastq.gz': 'c5fe398edfb6fd62c71313c4e963ddfb'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,71a-1,{'71a-1_R1_001.fastq.gz': 'ddab2400cf84b02907828e477873cecd'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,71a-1,{'71a-1_R2_001.fastq.gz': '4665f023347351c520a7c0aaff8e7ebd'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,71a-2,{'71a-2_R1_001.fastq.gz': '33e5abe8b866d235bc47b8f7e60ee93a'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,71a-2,{'71a-2_R2_001.fastq.gz': 'f2625d5e9da1aba083b4317462a6e6bf'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,71a-3,{'71a-3_R1_001.fastq.gz': '184c2795b99f99b77a6d4b0767b178af'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,71a-3,{'71a-3_R2_001.fastq.gz': '0afc1ee1d11ab441d4701407daaeb078'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,73a-1,{'73a-1_R1_001.fastq.gz': 'bf8ee737ce4f192d768edc2b89f40df3'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,73a-1,{'73a-1_R2_001.fastq.gz': 'f96d783f1bb783775ea42bfd96cddde7'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,73a-2,{'73a-2_R1_001.fastq.gz': '64f2fb250e7eb585ae6b9b24576623a5'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,73a-2,{'73a-2_R2_001.fastq.gz': 'eab14db83aa70dc8ecab43a836b0ab41'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,73a-3,{'73a-3_R1_001.fastq.gz': '494b90706f8f66f413387c350dcba51d'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,73a-3,{'73a-3_R2_001.fastq.gz': '05597817f2a57e7b2ed82a8c1ce7e33e'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,9243-1,{'9243-1_R1_001.fastq.gz': 'c9cb01a035b36536867be37c629b6b18'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,9243-1,{'9243-1_R2_001.fastq.gz': 'a4b3c1848b3a4b963525fd00ddeadfd3'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,9243-2,{'9243-2_R1_001.fastq.gz': 'f82c8693c7e640532fbd030860fd81ab'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,9243-2,{'9243-2_R2_001.fastq.gz': 'dc475ae9850ed004c0b63dbd45e1b744'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,9243-3,{'9243-3_R1_001.fastq.gz': 'e135f4c0db559183e1005ad2b3a5a34f'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,9243-3,{'9243-3_R2_001.fastq.gz': '0d97f14e649b8575dda4391c83b6c311'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,CAPAN1-1,{'CAPAN1-1_R1_001.fastq.gz': 'f28e5963151bf0221fac6427a842d8d1'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,CAPAN1-1,{'CAPAN1-1_R2_001.fastq.gz': '0ad89ddd2a579fd0ad32913bfbb86619'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,CAPAN1-2,{'CAPAN1-2_R1_001.fastq.gz': 'c595ede34b2455a6bedd80a7f387183f'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,CAPAN1-2,{'CAPAN1-2_R2_001.fastq.gz': 'b92f1128ca37011e3bf8d8065a23f7d5'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,CAPAN1-3,{'CAPAN1-3_R1_001.fastq.gz': '79400bf4b9ed004d986b0af358f154fa'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,CAPAN1-3,{'CAPAN1-3_R2_001.fastq.gz': '2df7b2fb54e84ecfd3861b7cd7be373b'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,MA9254-1,{'MA9254-1_R1_001.fastq.gz': '6a409fbe584293ded354cc399e45943e'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,MA9254-1,{'MA9254-1_R2_001.fastq.gz': '459334d10e3403295b03a8db8fb54356'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,MA9254-2,{'MA9254-2_R1_001.fastq.gz': 'a46e4d58c1db31973b6ad3e3c21b7d70'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,MA9254-2,{'MA9254-2_R2_001.fastq.gz': '2b6f2a2d1fd5cf5e6f254aa131aa4d77'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,MA9254-3,{'MA9254-3_R1_001.fastq.gz': '4e68d56e9b9d6594a990a5d8a69c62b7'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,,MA9254-3,{'MA9254-3_R2_001.fastq.gz': '22aca5202f8904c15052af9ed4d9e2f4'},,,,
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,[],SKMEL28-1,{'SKMEL28-1_R1_001.fastq.gz': '6805b0c306991c2c920a6a19f0f62bcf'},['SKMEL28-1_NA'],['2842 Cell Line'],['SKMEL28-1'],['f1c876ac_G']
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,[],SKMEL28-1,{'SKMEL28-1_R2_001.fastq.gz': '247c2d92c410079a00ec0baa87ea892b'},['SKMEL28-1_NA'],['2842 Cell Line'],['SKMEL28-1'],['f1c876ac_G']
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,[],SKMEL28-2,{'SKMEL28-2_R1_001.fastq.gz': '96199f2463afe81495a692ea4737c40b'},['SKMEL28-2_NA'],['2843 Cell Line'],['SKMEL28-2'],['c115d24d_G']
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,[],SKMEL28-2,{'SKMEL28-2_R2_001.fastq.gz': '595079b07e4b03b119844d89df04d01a'},['SKMEL28-2_NA'],['2843 Cell Line'],['SKMEL28-2'],['c115d24d_G']
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,[],SKMEL28-3,{'SKMEL28-3_R1_001.fastq.gz': '58f0d22fc2d27afc8b1badb795bab826'},['SKMEL28-3_NA'],['2844 Cell Line'],['SKMEL28-3'],['27ea3981_G']
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,[],SKMEL28-3,{'SKMEL28-3_R2_001.fastq.gz': '560a3707904ec9341bbff42e5fa702ae'},['SKMEL28-3_NA'],['2844 Cell Line'],['SKMEL28-3'],['27ea3981_G']
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,[],SKMEL5-1,{'SKMEL5-1_R1_001.fastq.gz': '8e50e5cf2a8808e39cf9859b898d81f8'},['SKMEL5-1_NA'],['2845 Cell Line'],['SKMEL5-1'],['cae2501d_G']
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,[],SKMEL5-1,{'SKMEL5-1_R2_001.fastq.gz': '644ea82506244afea259b2480de5c5a8'},['SKMEL5-1_NA'],['2845 Cell Line'],['SKMEL5-1'],['cae2501d_G']
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,[],SKMEL5-2,{'SKMEL5-2_R1_001.fastq.gz': '38ecfffb5e8628e922e8a573216f4caa'},['SKMEL5-2_NA'],['2846 Cell Line'],['SKMEL5-2'],['8854e432_G']
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,[],SKMEL5-2,{'SKMEL5-2_R2_001.fastq.gz': '98a2deb326c5ab7c64d53c390657f80c'},['SKMEL5-2_NA'],['2846 Cell Line'],['SKMEL5-2'],['8854e432_G']
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,[],SKMEL5-3,{'SKMEL5-3_R1_001.fastq.gz': '63cd21e4f1d7a64fe650f4db0f57294b'},['SKMEL5-3_NA'],['2847 Cell Line'],['SKMEL5-3'],['e8231892_G']
+Acral melanoma lines_mRNA_Seq_AL1806051_R1,,[],SKMEL5-3,{'SKMEL5-3_R2_001.fastq.gz': 'ede48d63571aaf2163e0925145b88992'},['SKMEL5-3_NA'],['2847 Cell Line'],['SKMEL5-3'],['e8231892_G']
