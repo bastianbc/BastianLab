@@ -19,4 +19,5 @@ urlpatterns = [
     path('get_facilities', views.get_facilities, name='get-facilities'),
     path('get_sequencers', views.get_sequencers, name='get-sequencers'),
     path('get_pes', views.get_pes, name='get-pes'),
+    path('add_async', views.add_async, name="add_async"),
 ] + staticfiles_urlpatterns()

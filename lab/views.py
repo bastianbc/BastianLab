@@ -157,7 +157,6 @@ def _block_get_or_create(value):
 
 def _pat_get_or_create_consolidated(row):
     try:
-        print(row["pat_id"], row["Block"])
         b = Blocks.objects.get(name=row["Block"])
         b.patient = Patients.objects.get(pat_id=str(row["pat_id"]).replace(".0",""))
         b.save()

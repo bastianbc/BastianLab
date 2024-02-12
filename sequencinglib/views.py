@@ -14,6 +14,7 @@ from core.decorators import permission_required_for_async
 @permission_required("sequencinglib.view_sequencinglib",raise_exception=True)
 def sequencinglibs(request):
     form = SequencingRunCreationForm()
+    form_seq_run_add = SequencingLibAddForm()
     return render(request, "sequencinglib_list.html", locals())
 
 @permission_required_for_async("sequencinglib.view_sequencinglib")

@@ -168,7 +168,6 @@ class Areas(models.Model):
             queryset = _get_authorizated_queryset()
 
             total = queryset.count()
-
             is_initial = _is_initial_value(search_value)
             search_value = _parse_value(search_value)
             if is_initial:
