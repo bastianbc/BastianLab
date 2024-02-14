@@ -296,18 +296,18 @@ def get_or_create_files_from_file(row):
 def temp_directory(request):
     smb_directory = "/mnt/smb_volume"  # Replace with the actual directory path
 
-    # Using pathlib:
-    smb_path = Path(Path(smb_directory) / "TEMP").mkdir(parents=True, exist_ok=True)
-    temp_directory = Path(Path(smb_directory) / "BastianRaid-02" / "HiSeqData"/ "TEMP").mkdir(parents=True, exist_ok=True)
+    sudoPassword = 'Today@234'
+    command = f'mkdir {smb_directory}/TEMP'
+    p = os.system('echo %s|sudo -S %s' % (sudoPassword, command))
+
+    # # Using pathlib:
+    smb_path = Path(smb_directory)
+    # temp_directory = Path(Path(smb_directory) / "BastianRaid-02" / "HiSeqData"/ "TEMP").mkdir(parents=True, exist_ok=True)
 
     # Example usages:
     print(smb_path.exists())  # Check if the directory exists
     print(smb_path.is_dir())  # Check if it's a directory
     print(smb_path.iterdir())  # List its contents (files and directories)
-    # Example usages:
-    print(temp_directory.exists())  # Check if the directory exists
-    print(temp_directory.is_dir())  # Check if it's a directory
-    print(temp_directory.iterdir())  # List its contents (files and directories)
 
     # for root, dirs, files in os.walk(smb_path):
     #     for name in files:
