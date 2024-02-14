@@ -293,7 +293,12 @@ def get_or_create_files_from_file(row):
     except Exception as e:
         print(e)
 
-def temp_directory(request):
+
+def tempfiles(request):
+    return render(request, "temp_file_list.html", locals())
+
+
+def filter_temp_directory(request):
     smb_directory = "/mnt/smb_volume"  # Replace with the actual directory path
 
     '''
@@ -302,16 +307,12 @@ def temp_directory(request):
     p = os.system('echo %s|sudo -S %s' % (sudoPassword, command))
     '''
 
-    smb_path = Path(smb_directory)
     temp_directory = Path(Path(smb_directory) / "BastianRaid-02" / "HiSeqData"/ "TEMP")
 
     for root, dirs, files in os.walk(temp_directory):
         d = dict([("name", files)])
 
     return JsonResponse(d)
-
-
-
 
 
 
