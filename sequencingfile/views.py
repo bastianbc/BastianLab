@@ -297,7 +297,7 @@ def temp_directory(request):
     smb_directory = "/mnt/smb_volume"  # Replace with the actual directory path
 
     # Using pathlib:
-    smb_path = Path(smb_directory)
+    smb_path = Path(Path(smb_directory) / "TEMP").mkdir(parents=True, exist_ok=True)
     temp_directory = Path(Path(smb_directory) / "BastianRaid-02" / "HiSeqData"/ "TEMP").mkdir(parents=True, exist_ok=True)
 
     # Example usages:
