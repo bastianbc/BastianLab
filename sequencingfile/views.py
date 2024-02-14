@@ -367,7 +367,7 @@ def get_or_create_files_from_file(row):
         print(e)
 
 def temp_directory(request):
-    smb_directory = "/etc/fstab"  # Replace with the actual directory path
+    smb_directory = "/etc"  # Replace with the actual directory path
 
     # Using pathlib:
     smb_path = Path(smb_directory)
