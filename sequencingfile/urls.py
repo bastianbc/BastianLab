@@ -21,4 +21,6 @@ urlpatterns = [
     path('sequencingfileset/delete/<str:id>', views.delete_sequencingfileset, name='delete-sequencingfileset'),
     path('sequencingfileset/batch_delete', views.delete_batch_sequencingfilesets, name='delete-batch-sequencingfilesets'),
     path('check_can_deleted_async_set', views.check_can_deleted_async_set, name='checkcan-deleted-async-set'),
+
+    path('temp_directory', views.temp_directory, name='temp_directory'),
 ] + staticfiles_urlpatterns()

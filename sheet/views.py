@@ -72,8 +72,9 @@ def get_sheet(request):
 
 def create_csv_sheet(request):
     try:
-        serializer = CustomSampleLibSerializer(SampleLib.objects.all(), many=True)
-        return generate_file(request, serializer, "all_seq_runs")
+        seq_runs = SequencingRun.objects.filter()
+        query_set = _get_queryset(seq_runs)
+        return generate_file(data=query_set, file_name="all_seq_runs")
     except Exception as e:
         print(e)
         return JsonResponse({'error': str(e)}, status=500)

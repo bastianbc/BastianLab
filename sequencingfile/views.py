@@ -291,7 +291,22 @@ def get_or_create_files_from_file(row):
     except Exception as e:
         print(e)
 
+def temp_directory(request):
+    smb_directory = "/mnt/smb_mount"  # Replace with the actual directory path
 
+    # Using pathlib:
+    smb_path = Path(smb_directory)
+
+    # Example usages:
+    print(smb_path.exists())  # Check if the directory exists
+    print(smb_path.is_dir())  # Check if it's a directory
+    print(smb_path.iterdir())  # List its contents (files and directories)
+
+    # Handle potential errors:
+    if not smb_path.exists():
+        print("Error: Directory does not exist")
+    if not smb_path.is_dir():
+        print("Error: Path is not a directory")
 
 
 
