@@ -1,19 +1,21 @@
+import os
+import json
+import pandas as pd
+from pathlib import Path
+
 from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required,permission_required
+from django.http import JsonResponse
+from django.contrib import messages
 from core.decorators import permission_required_for_async
 from .models import SequencingFile, SequencingFileSet
 from .serializers import SequencingFileSerializer, SequencingFileSetSerializer
-from django.http import JsonResponse
 from .forms import SequencingFileForm, SequencingFileSetForm
-from django.contrib import messages
-import json
 from samplelib.models import *
 from sequencingrun.models import *
 from capturedlib.models import CapturedLib
 from sequencinglib.models import SequencingLib
-from pathlib import Path
-import pandas as pd
-from blocks.models import Blocks
+
 
 @permission_required("sequencingfile.view_sequencingfile",raise_exception=True)
 def sequencingfiles(request):
@@ -292,19 +294,24 @@ def get_or_create_files_from_file(row):
         print(e)
 
 def temp_directory(request):
-    smb_directory = "/mnt"  # Replace with the actual directory path
+    smb_directory = "/mnt/smb_volume"  # Replace with the actual directory path
 
     # Using pathlib:
     smb_path = Path(smb_directory)
+    temp_directory = Path(Path(smb_directory) / "BastianRaid-02" / "HiSeqData"/ "TEMP").mkdir(parents=True, exist_ok=True)
 
     # Example usages:
     print(smb_path.exists())  # Check if the directory exists
     print(smb_path.is_dir())  # Check if it's a directory
     print(smb_path.iterdir())  # List its contents (files and directories)
-    import os
-    for root, dirs, files in os.walk(smb_path):
-        for name in files:
-            print(os.path.join(root, name))
+    # Example usages:
+    print(temp_directory.exists())  # Check if the directory exists
+    print(temp_directory.is_dir())  # Check if it's a directory
+    print(temp_directory.iterdir())  # List its contents (files and directories)
+
+    # for root, dirs, files in os.walk(smb_path):
+    #     for name in files:
+    #         print(os.path.join(root, name))
     # Handle potential errors:
     if not smb_path.exists():
         print("Error: Directory does not exist")
