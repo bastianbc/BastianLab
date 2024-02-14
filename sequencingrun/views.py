@@ -100,7 +100,7 @@ def new_sequencingrun_async(request):
         print(str(e))
         return JsonResponse({"success":False})
 
-    return JsonResponse({"success":True})
+    return JsonResponse({"success":True, "id":sequencing_run.id})
 
 @permission_required("sequencingrun.change_sequencingrun",raise_exception=True)
 def edit_sequencingrun(request,id):
@@ -173,17 +173,14 @@ def get_sequencers(request):
 def get_pes(request):
     return JsonResponse([{"label":"---------","value":""}] + [{ "label":c[1], "value":c[0] } for c in SequencingRun.PE_TYPES], safe=False)
 
-def get_or_create_files_from_file(row):
-    print()
-
-
-def _create_file_from_file():
-    file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view-7.csv")
-    df = pd.read_csv(file)
-    # print(df.columns)
-    # df['fastq_file'] = df['fastq_file'].str.replace('"', "'").str.replace("'", '"')
-    # df["fastq_file"] = df["fastq_file"].astype('str')
-    # df["fastq_file"] = df["fastq_file"].apply(lambda x: make_dict(x))
-
-    df[~df["fastq_file"].isnull()].apply(lambda row: get_or_create_files_from_file(row), axis=1)
-
+def add_async(request):
+    try:
+        seq_run_id = request.GET["id"]
+        selected_ids = json.loads(request.GET.get("selected_ids"))
+        sequencing_run = SequencingRun.objects.get(id=seq_run_id)
+        sequencinglibs = SequencingLib.objects.filter(id__in=selected_ids)
+        for sequencing_lib in sequencinglibs:
+            sequencing_run.sequencing_libs.add(sequencing_lib)
+        return JsonResponse({"success":True})
+    except Exception as e:
+        return JsonResponse({"success":False, "message": str(e)})

@@ -53,6 +53,7 @@ var KTDatatablesServerSide = function () {
                 { data: 'shear_volume' },
                 { data: 'qpcr_conc' },
                 { data: 'matching_normal_sl' },
+                { data: 'seq_run' },
                 { data: null },
             ],
             columnDefs: [
@@ -69,6 +70,19 @@ var KTDatatablesServerSide = function () {
 
                 {
                     targets: -2,
+                    render: function (data, type, row) {
+                        let namesList = [];
+                        if (Array.isArray(row["seq_run"])) {
+                            row["seq_run"].forEach(sqr => {
+                                namesList.push(sqr.name);
+                            });
+                        }
+                        // This will return the names list. Adjust based on your requirements
+                        return namesList.join(", ");
+                    }
+                },
+                {
+                    targets: -3,
                     render: function (data, type, row) {
                         let namesList = [];
                         if (Array.isArray(row["matching_normal_sl"])) {
@@ -387,21 +401,22 @@ var KTDatatablesServerSide = function () {
                 xhrFields: {
                     responseType: 'blob' // Important for handling binary data
                 },
-                success: function(blob) {
-                    // Handle success
-                    // Create a Blob from the PDF Stream
-                    const fileURL = window.URL.createObjectURL(blob);
+                success: function(data, status, xhr) {
+                    var filename = "";
+                    var disposition = xhr.getResponseHeader('Content-Disposition');
+                    if (disposition && disposition.indexOf('attachment') !== -1) {
+                        var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+                        var matches = filenameRegex.exec(disposition);
+                        if (matches != null && matches[1]) filename = matches[1].replace(/['"]/g, '');
+                    }
+                    var blob = new Blob([data], { type: 'text/csv' });
 
-                    // Create a link and set the URL as the href
-                    const tempLink = document.createElement('a');
-                    tempLink.href = fileURL;
-                    tempLink.download = 'lab_sheet.csv'; // Provide the file name and extension
-                    document.body.appendChild(tempLink); // Append to the DOM
-                    tempLink.click(); // Programmatically click the link to trigger the download
-
-                    // Clean up by revoking the Object URL and removing the temporary link
-                    window.URL.revokeObjectURL(fileURL);
-                    tempLink.remove();
+                    var link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = filename || "seq_run_sheet.csv";
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
                     loadingEl.remove();
                     Swal.fire({
                         text: "Your file is downloaded!.",
