@@ -376,7 +376,10 @@ def temp_directory(request):
     print(smb_path.exists())  # Check if the directory exists
     print(smb_path.is_dir())  # Check if it's a directory
     print(smb_path.iterdir())  # List its contents (files and directories)
-
+    import os
+    for root, dirs, files in os.walk(smb_path):
+        for name in files:
+            print(os.path.join(root, name))
     # Handle potential errors:
     if not smb_path.exists():
         print("Error: Directory does not exist")
