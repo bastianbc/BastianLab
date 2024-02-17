@@ -15,7 +15,7 @@ var KTDatatablesServerSide = function () {
    * @param  {String} filterNAType A parameter of custom filter.
    */
     var initDatatable = function (initialValue) {
-
+        console.log("data enters");
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
 
         dt = $(".table").DataTable({
@@ -57,10 +57,13 @@ var KTDatatablesServerSide = function () {
               }
             },
             columns: [
+
+              { data: 'id'},
               { data: 'seq_run'},
               { data: 'file_name' },
               { data: 'number_of_files' },
               { data: 'sample_lib' },
+
             ],
             columnDefs: [
                 {
@@ -74,7 +77,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: -1,
+                    targets: 5,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -95,7 +98,7 @@ var KTDatatablesServerSide = function () {
                             <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4" data-kt-menu="true">
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/sequencingfile/sequencingfileset/edit/` + row["set_id"] + `" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
+                                    <a href="/sequencingfile/edit/` + row["file_id"] + `" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
                                         Edit
                                     </a>
                                 </div>
@@ -103,7 +106,7 @@ var KTDatatablesServerSide = function () {
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/sequencingfile/sequencingfileset/delete/` + row["set_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
+                                    <a href="/sequencingfile/delete/` + row["file_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
                                         Delete
                                     </a>
                                 </div>
