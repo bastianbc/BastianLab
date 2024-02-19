@@ -9,7 +9,7 @@ class SampleLib(models.Model):
     date = models.DateTimeField(default=datetime.now, verbose_name="Date")
     method = models.ForeignKey("method.Method",related_name="sample_libs",on_delete=models.CASCADE, blank=True, null=True, verbose_name="Method")
     qubit = models.FloatField(default=0, verbose_name="Qubit")
-    shear_volume  = models.FloatField(default=0, verbose_name="Shear Volume")
+    shear_volume = models.FloatField(default=0, verbose_name="Shear Volume")
     qpcr_conc = models.FloatField(default=0, verbose_name="qPCR Concentration")
     pcr_cycles = models.FloatField(default=0, verbose_name="PCR Cycles")
     amount_in = models.FloatField(default=0, verbose_name="Input Amount")
@@ -40,6 +40,7 @@ class SampleLib(models.Model):
         self.vol_remain = 0 if volume > self.vol_remain else self.vol_remain - volume
         self.save()
 
+    @staticmethod
     def query_by_args(user, **kwargs):
 
         def _get_authorizated_queryset():
@@ -47,7 +48,8 @@ class SampleLib(models.Model):
             return SampleLib.objects.all().annotate(
                 num_nucacids=Count('na_sl_links',distinct=True),
                 num_blocks=Count('na_sl_links', distinct=True),
-                num_capturedlibs=Count('sl_cl_links'),
+                num_capturedlibs=Count('sl_cl_links', distinct=True),
+                area_num=Count("na_sl_links__nucacid__area_na_links__area", distinct=True)
             )
 
         def _parse_value(search_value):
@@ -79,13 +81,12 @@ class SampleLib(models.Model):
             order_column = kwargs.get('order[0][column]', None)[0]
             order = kwargs.get('order[0][dir]', None)[0]
             sequencing_run_filter = kwargs.get('sequencing_run', None)[0]
-            patient_filter = kwargs.get('patient', None)[0]
+            # patient_filter = kwargs.get('patient', None)[0]
             barcode_filter = kwargs.get('barcode', None)[0]
             i5_filter = kwargs.get('i5', None)[0]
             i7_filter = kwargs.get('i7', None)[0]
             area_type_filter = kwargs.get('area_type', None)[0]
             bait_filter = kwargs.get('bait', None)[0]
-
             order_column = ORDER_COLUMN_CHOICES[order_column]
             # django orm '-' -> desc
             if order == 'desc':
@@ -103,7 +104,7 @@ class SampleLib(models.Model):
 
                 filter = []
                 try:
-                    seq_r = SequencingRun.objects.get(name=sequencing_run_filter)
+                    seq_r = SequencingRun.objects.get(id=sequencing_run_filter)
                     for seq_l in seq_r.sequencing_libs.all():
                         for cl_seql_link in seq_l.cl_seql_links.all():
                             for sl_cl_link in cl_seql_link.captured_lib.sl_cl_links.all():
@@ -114,9 +115,9 @@ class SampleLib(models.Model):
 
                 queryset = queryset.filter(Q(name__in=filter))
 
-            if patient_filter:
-                filter = [na_sl_link.sample_lib.name for na_sl_link in NA_SL_LINK.objects.filter(nucacid__area__block__patient__pat_id=patient_filter)]
-                queryset = queryset.filter(Q(name__in=filter))
+            # if patient_filter:
+            #     filter = [na_sl_link.sample_lib.name for na_sl_link in NA_SL_LINK.objects.filter(nucacid__area__block__patient__pat_id=patient_filter)]
+            #     queryset = queryset.filter(Q(name__in=filter))
 
             if barcode_filter:
                 queryset = queryset.filter(Q(barcode__id=barcode_filter))
@@ -154,7 +155,7 @@ class SampleLib(models.Model):
                     filter = [na_sl_link.sample_lib.id for na_sl_link in NA_SL_LINK.objects.filter(nucacid=search_value["id"])]
                     queryset = queryset.filter(Q(id__in=filter))
                 if search_value["model"] == "area":
-                    filter = [na_sl_link.sample_lib.id for na_sl_link in NA_SL_LINK.objects.filter(nucacid__area=search_value["id"])]
+                    filter = [na_sl_link.sample_lib.id for na_sl_link in NA_SL_LINK.objects.filter(nucacid__area_na_links__area=search_value["id"])]
                     queryset = queryset.filter(Q(id__in=filter))
             elif search_value:
                 queryset = queryset.filter(
@@ -163,7 +164,6 @@ class SampleLib(models.Model):
 
             count = queryset.count()
             queryset = queryset.order_by(order_column)[start:start + length]
-            # queryset = queryset[start:start + length]
 
             return {
                 'items': queryset,
@@ -180,6 +180,8 @@ class NA_SL_LINK(models.Model):
     sample_lib = models.ForeignKey(SampleLib, on_delete=models.CASCADE, related_name="na_sl_links", verbose_name="Sample Library")
     input_vol = models.FloatField(default=0, verbose_name="Te Volume")
     input_amount = models.FloatField(default=0, verbose_name="Input Amount")
+    date = models.DateTimeField(default=datetime.now, verbose_name="Date")
+
 
     class Meta:
         db_table = "na_sl_link"

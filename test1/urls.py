@@ -32,6 +32,7 @@ urlpatterns = [
     path('sequencingfile/', include('sequencingfile.urls')),
     path('variant/', include('variant.urls')),
     path('gene/', include('gene.urls')),
+    path('sheet/', include('sheet.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 handler404 = "core.views.error_404"

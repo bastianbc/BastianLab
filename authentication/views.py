@@ -5,6 +5,9 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required,permission_required
 from account.models import User
 from django.contrib.auth.forms import SetPasswordForm,PasswordChangeForm
+import logging
+
+logger = logging.getLogger(__name__)
 
 def log_in(request):
     if request.method == "POST":
@@ -15,7 +18,6 @@ def log_in(request):
             user = authenticate(username=username, password=password)
             if user:
                 login(request, user)
-
                 if next:
                     return redirect(next)
                 else:
@@ -27,14 +29,10 @@ def log_in(request):
                     return redirect("/auth/set_password")
                 else:
                     messages.error(request, "Invalid username or password!")
-
                 messages.error(request, "Authentication Error!")
-                print("Authentication Error!")
         except Exception as e:
             messages.error(request, "Unexpected Error!")
-            print("Unexpected Error!")
             print(e)
-
     return render(request, "sign-in.html", locals())
 
 def log_out(request):

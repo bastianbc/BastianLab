@@ -1,9 +1,11 @@
 from django.db import models
 from django.db.models import Q, Count
+from datetime import datetime
 
 class Barcodeset(models.Model):
     name = models.CharField(max_length=20)
     active = models.BooleanField(default=False)
+    date = models.DateTimeField(default=datetime.now, verbose_name="Date")
 
     class Meta:
         db_table = "barcode_set"
@@ -56,9 +58,10 @@ class Barcodeset(models.Model):
 
 class Barcode(models.Model):
     barcode_set = models.ForeignKey("barcodeset.Barcodeset", on_delete=models.CASCADE, related_name="barcodes")
-    name = models.CharField(max_length=50, unique=True, verbose_name="Name")
-    i5 = models.CharField(max_length=10, unique=True, verbose_name="I5")
-    i7 = models.CharField(max_length=10, unique=True, verbose_name="I7")
+    name = models.CharField(max_length=50, verbose_name="Name")
+    i5 = models.CharField(max_length=10, verbose_name="I5")
+    i7 = models.CharField(max_length=10, verbose_name="I7")
+    date = models.DateTimeField(default=datetime.now, verbose_name="Date")
 
     class Meta:
         db_table = "barcode"

@@ -9,7 +9,7 @@ from blocks.models import Blocks
 from projects.models import Projects
 from account.models import User
 from areas.models import Areas
-from libprep.models import NucAcids
+from libprep.models import NucAcids, AREA_NA_LINK
 from method.models import Method
 from samplelib.models import SampleLib, NA_SL_LINK
 from capturedlib.models import CapturedLib, SL_CL_LINK
@@ -17,11 +17,11 @@ from bait.models import Bait
 from barcodeset.models import Barcodeset,Barcode
 from sequencingrun.models import SequencingRun
 from sequencinglib.models import SequencingLib,CL_SEQL_LINK
-from sequencingfile.models import SequencingFile
+from sequencingfile.models import SequencingFile, SequencingFileSet
 from variant.models import *
 from gene.models import *
 from body.models import *
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 import json
 import xlrd
 import string
@@ -29,6 +29,10 @@ import random
 from itertools import groupby,chain
 import re
 import ast
+from pathlib import Path
+import pandas as pd
+import uuid
+
 
 def migrate(request):
 
@@ -1647,9 +1651,12 @@ def import_body_sites(request):
             for row in data:
                 parent = None
                 for i in range(len(row)-1,-1,-1):
+                    num = 10 - (i + 6)
+                    name = str(num) + "-" + row[i]
+                    print(name)
                     parent, created = Body.objects.get_or_create(
-                        name = row[i],
-                        parent = parent
+                        name=name,
+                        parent=parent
                     )
     else:
         form = BodySitesForm()
@@ -1875,3 +1882,1393 @@ def airtable_consolidated_data(request):
     else:
         form = AirtableConsolidatedDataForm()
     return render(request, "airtable.html", locals())
+
+def get_or_cons(row):
+    print(row["Sample"])
+    SampleLib.objects.get(name="")
+
+
+def qpcr_consolidated_data(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
+    df = pd.read_csv(file)
+    # df[~df["Input Conc."].isnull()].apply(lambda row: get_or_cons(row), axis=1)
+    df.iloc[:48].apply(lambda row: get_or_cons(row), axis=1)
+
+def get_at_na(row):
+    print(row['NA_ID'], row['Shearing volume DNA input (ul)'])
+    try:
+        if not pd.isnull(row['Shearing volume DNA input (ul)']):
+            for sl in row["SL_ID"].split(","):
+                SampleLib.objects.filter(name=sl.strip()).update(shear_volume=float(row['Shearing volume DNA input (ul)']),
+                                                                 amount_in=float(row['NA sheared/used (ng)']))
+    except Exception as e:
+        print(e)
+
+
+def qpcr_at_na(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "Nucleic Acids-Grid view (1).csv")
+    df = pd.read_csv(file)
+    df[~df["NA_ID"].isnull()].apply(lambda row: get_at_na(row), axis=1)
+
+
+def get_at_sl(row):
+    print(row['SL_ID'])
+    try:
+        SampleLib.objects.filter(name=row['SL_ID']).update(
+            qubit=float(row['Post-lib Qubit (ng/ul)']),
+            qpcr_conc=float(row['Post-lib qPCR (ng/ul)']),
+            pcr_cycles=float(row['Pre-hyb PCR cycles']),
+            amount_final=float(row['Total LP DNA for capture (ng)']),
+            vol_init=float(row['Volume of library (ul)']),
+            notes=row['Notes'],
+        )
+
+    except Exception as e:
+        print(e)
+    if pd.isnull(row['Post-hyb PCR cycles']):
+        return
+    try:
+        print(row["CL_ID"])
+        if "," in row["CL_ID"]:
+            for cl in row["CL_ID"].split(","):
+                print(row["CL_ID"])
+                CapturedLib.objects.filter(name=cl.strip()).update(
+                    amp_cycle=float(row['Post-hyb PCR cycles']),
+                    notes=row['Notes']
+                )
+        else:
+            CapturedLib.objects.filter(name=row["CL_ID"]).update(
+                amp_cycle=float(row['Post-hyb PCR cycles'])
+            )
+    except Exception as e:
+        print(e)
+
+
+
+def qpcr_at_sl(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view (2).csv")
+    df = pd.read_csv(file)
+    df[~df["SL_ID"].isnull()].apply(lambda row: get_at_sl(row), axis=1)
+
+
+def get_or_create_seqrun(name):
+    if name:
+        obj, created = SequencingRun.objects.get_or_create(
+            name=name
+        )
+        return obj
+    return None
+
+def create_seq_run(row):
+    print(row["Sequencing Run_ID"])
+    if "," in row["Sequencing Run_ID"]:
+        for seqrun in row["Sequencing Run_ID"].split(','):
+            get_or_create_seqrun(name=seqrun)
+    else:
+        get_or_create_seqrun(name=row["Sequencing Run_ID"])
+
+
+def qpcr_at_seqrun(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view (3).csv")
+    df = pd.read_csv(file)
+    df[~df["Sequencing Run_ID"].isnull()].apply(lambda row: create_seq_run(row), axis=1)
+
+
+def checkfiles(row):
+    try:
+        SequencingFileSet.objects.get(prefix=next(iter(row['fastq_file'])).split("_L0")[0])
+    except Exception as e:
+        print(e, row['sample_lib'])
+
+def make_dict(d):
+    try:
+        return json.loads(d)
+    except:
+        return None
+
+def get_or_create_set(prefix, path, sample_lib, sequencing_run):
+    if prefix:
+        obj, created = SequencingFileSet.objects.get_or_create(
+            prefix=prefix,
+            path=path,
+            sample_lib=sample_lib,
+            sequencing_run=sequencing_run
+        )
+        return obj
+    return None
+
+def get_or_create_file(sequencing_file_set, name, checksum, type):
+    if sequencing_file_set:
+        obj, created = SequencingFile.objects.get_or_create(
+            sequencing_file_set=sequencing_file_set,
+            name=name,
+            checksum=checksum,
+            type=type
+        )
+        return obj
+    return None
+
+def get_or_create_cl(sl, name):
+    if name:
+        obj, created = CapturedLib.objects.get_or_create(
+            name=name,
+            samplelib=sl
+        )
+        return obj
+    return None
+
+def get_or_create_seql(cl, name):
+    if name:
+        obj, created = SequencingLib.objects.get_or_create(
+            name=name,
+            captured_lib=cl
+        )
+        return obj
+    return None
+
+def get_or_create_files_from_file(row):
+    prefix = next(iter(row['fastq_file'])).split("_L0")[0]
+    try:
+        set_ = get_or_create_set(
+            prefix=prefix,
+            path=row['fastq_path'],
+            sample_lib=SampleLib.objects.get(name=row["sample_lib"]),
+            sequencing_run=SequencingRun.objects.get(name=row["sequencing_run"]),
+        )
+        for file, checksum in row["fastq_file"].items():
+            get_or_create_file(
+                sequencing_file_set=set_,
+                name=file,
+                checksum=checksum,
+                type="fastq"
+            )
+    except Exception as e:
+        print(e, row["sample_lib"], row["sequencing_run"])
+
+def create_file_from_file(request):
+    file = Path(Path(
+        __file__).parent.parent / "uploads" / "report_matching_sample_lib_with_bait_after_reducing_fastq_files.csv")
+    df = pd.read_csv(file)
+    print(df.columns)
+    df['fastq_file'] = df['fastq_file'].str.replace('"', "'").str.replace("'", '"')
+    df["fastq_file"] = df["fastq_file"].astype('str')
+    df["fastq_file"] = df["fastq_file"].apply(lambda x: make_dict(x))
+
+    df['bam_file'] = df['bam_file'].str.replace('"', "'").str.replace("'", '"')
+    df["bam_file"] = df["bam_file"].astype('str')
+    df["bam_file"] = df["bam_file"].apply(lambda x: make_dict(x))
+
+    df['bam_bai_file'] = df['bam_bai_file'].str.replace('"', "'").str.replace("'", '"')
+    df["bam_bai_file"] = df["bam_bai_file"].astype('str')
+    df["bam_bai_file"] = df["bam_bai_file"].apply(lambda x: make_dict(x))
+
+    df[~df["fastq_file"].isnull()].apply(lambda row: get_or_create_files_from_file(row), axis=1)
+
+
+def leftover(row):
+
+    try:
+        SequencingFile.objects.get(name=row["file"])
+
+    except MultipleObjectsReturned:
+        # Handle the case where multiple objects were returned
+        print("Multiple objects returned. Handle this case appropriately.")
+
+    except ObjectDoesNotExist as e:
+        try:
+            prefix = row['file'].split("_L0")[0]
+            print(prefix, row["file"])
+            sequencing_run = row["path"].split("/")[-1] if "HiSeqData_Vivek" in row["path"] else row["path"].split("/")[1]
+            set_ = get_or_create_set(
+                prefix=prefix,
+                path=row['path'],
+                sample_lib=SampleLib.objects.get(name="Undefined"),
+                sequencing_run=get_or_create_seqrun(name=sequencing_run),
+            )
+            get_or_create_file(
+                sequencing_file_set=set_,
+                name=row["file"],
+                checksum="",
+                type="fastq"
+            )
+            print("created")
+        except Exception as e:
+            print(e)
+
+
+def qpcr_at_leftover(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "df_fq.csv")
+    df = pd.read_csv(file)
+    df[~df["file"].isnull()].apply(lambda row: leftover(row), axis=1)
+
+
+def remove_NAN(request):
+    from django.db.models import CharField, BooleanField, DateTimeField, DateField, FloatField, TextField
+    from django.db.models import Q
+    import django.apps
+    apps = django.apps.apps.get_models()
+
+    # print(apps)
+    for model in apps:
+        fields = [f for f in model._meta.fields if isinstance(f, FloatField) or isinstance(f, CharField) or isinstance(f, TextField)]
+        # print(fields)
+        for field in fields:
+            print(model, field.name)
+            qs = Q(**{field.name: "NaN"})
+            print(model.objects.filter(qs))
+
+def get_barcodes(row):
+    try:
+        print(row["SL_ID"], row["Old Barcode"], row["New Barcode"])
+        if not pd.isnull(row["Old Barcode"]):
+            SampleLib.objects.filter(
+                    name=row["SL_ID"]).update(barcode=Barcode.objects.get(name=row["Old Barcode"].strip())
+                                           )
+            return
+        if not pd.isnull(row["New Barcode"]):
+            SampleLib.objects.filter(
+                    name=row["SL_ID"]).update(barcode=Barcode.objects.get(name=row["New Barcode"].strip())
+                                           )
+            return
+    except Exception as e:
+        print(e)
+
+def get_baits(row):
+    try:
+        l=[
+            "00-001103-B7",
+            "00-001103-B7",
+            "02-012396-A",
+            "02-012396-A",
+            "04-003736-A",
+            "06-14812-E",
+            "07-012236-B1",
+            "13-10776-A1",
+            "13-17202-A11",
+            "13-17202-C4",
+            "13-24372-B",
+            "14-4989-D3",
+            "14-4989-D3",
+            "90-012097-B",
+            "92-003527-H",
+        ]
+        f = ["10-008371-A1, 99-012800-2",
+            "10-008371-A1, 99-012800-2",
+            "86541-2a, 2b",
+            "H2007.4636/9, B07.15494/1"]
+        block_name = row['Block_ID'].replace(";",",").strip()
+        if block_name in l:
+            match = re.match(r'\d{2}-(\d+)-(\w+)', row["Block_ID"])
+            if match:
+                block = Blocks.objects.get(name=row["Block_ID"].split("-")[0]+"-"+match.group(1)+match.group(2))
+                if not pd.isnull(row["Assigned Projects"]):
+                    project = Projects.objects.get(name=row['Assigned Projects'])
+                    block.project = project
+                    block.save()
+        elif "," in block_name:
+            for bname in block_name.split(","):
+                block = Blocks.objects.get(name=bname.strip())
+                if not pd.isnull(row["Assigned Projects"]):
+                    project = Projects.objects.get(name=row['Assigned Projects'])
+                    block.project = project
+                    block.save()
+        else:
+            block = Blocks.objects.get(name=block_name)
+            if not pd.isnull(row["Assigned Projects"]):
+                project = Projects.objects.get(name=row['Assigned Projects'])
+                block.project = project
+                block.save()
+        l = ["436 common, sclerotic dermal component",
+             "437 common, sclerotic dermal component",
+             "438 common, sclerotic dermal component",
+             "439 common, sclerotic dermal component",
+             "440 common, sclerotic dermal component",
+             "441 common, sclerotic dermal component",
+             "443 common, sclerotic dermal component",
+             "444 blue nevus, cellular",
+             "445 common, sclerotic dermal component",
+             "2409 SCC, in situ",
+             "2412 SCC, in situ",
+             "2414 SCC, in situ",
+             "2415 SCC, in situ",
+             "2433 Pilomatricoma, cystic",
+             "426 blue nevus, cellular,  DF like",
+             "427 blue nevus, cellular,  DF like",
+             "428 blue nevus, cellular,  DF like",
+             "446 DPN, pure"]
+        if not pd.isnull(row["Area_ID"]):
+            area_name = row['Area_ID'].replace('"', '').replace(';', ',').strip()
+            if "," in area_name:
+                if area_name in l:
+                    area = Areas.objects.get(name=area_name.strip())
+                    block = area.block
+                    if not pd.isnull(row["Assigned Projects"]):
+                        project = Projects.objects.get(name=row['Assigned Projects'])
+                        if block:
+                            block.project = project
+                            block.save()
+                else:
+                    for area in area_name.split(","):
+                        area = Areas.objects.get(name=area.strip())
+                        block = area.block
+                        if not pd.isnull(row["Assigned Projects"]):
+                            project = Projects.objects.get(name=row['Assigned Projects'])
+                            if block:
+                                block.project = project
+                                block.save()
+            elif area_name.endswith("_NA"):
+                area = Areas.objects.get(name=area_name.strip().replace("_NA",""))
+                block = area.block
+                if not pd.isnull(row["Assigned Projects"]):
+                    project = Projects.objects.get(name=row['Assigned Projects'])
+                    if block:
+                        block.project = project
+                        block.save()
+            else:
+                area = Areas.objects.get(name=area_name.strip())
+                block = area.block
+                if not pd.isnull(row["Assigned Projects"]):
+                    project = Projects.objects.get(name=row['Assigned Projects'])
+                    if block:
+                        block.project = project
+                        block.save()
+        #     block = area.block
+        # if not pd.isnull(row["Assigned Projects"]):
+        #     project = Projects.objects.get(name=row['Assigned Projects'])
+        #     if block:
+        #         block.project = project
+        #         block.save()
+        #
+        # print(row["CL_ID"], row["Capture Panel"])
+        # if "," in row["CL_ID"]:
+        #     for cl in row["CL_ID"].split(","):
+        #         obj = Bait.objects.get(
+        #             name=row["Capture Panel"].strip()
+        #         )
+        #         CapturedLib.objects.filter(name=cl).update(bait=obj)
+        #     return
+        # obj = Bait.objects.get(
+        #     name=row["Capture Panel"].strip()
+        # )
+        # CapturedLib.objects.filter(name=row["CL_ID"]).update(bait=obj)
+    except Exception as e:
+        print(f'"{row["Block_ID"]}"')
+        #             match = re.match(r'\d{2}-(\d+)-(\w+)', row["Block_ID"])
+        #             if match:
+        #                 print(row["Block_ID"], row["Block_ID"].split("-")[0]+"-"+match.group(1)+match.group(2))
+        #                 if ";" not in row["Block_ID"]:
+        #                     b = Blocks.objects.filter(name=row["Block_ID"].split("-")[0]+"-"+match.group(1)+match.group(2))
+        #                     print(b)
+        # block = Blocks.objects.get(name=row['Block_ID'])
+        # Areas.objects.create(name=row["Area_ID"].replace("_NA",""),
+        #                      area_type="normal" if "normal" in row["Area_ID"] else 'tumor',
+        #                      block=block)
+
+def uploads_baits(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view (5).csv")
+    df = pd.read_csv(file)
+    df[~df["Block_ID"].isnull()].apply(lambda row: get_baits(row), axis=1)
+
+
+def get_file_tree(row):
+
+    try:
+        if row["HiSeqData/"].strip().endswith(".fastq.gz") | row["HiSeqData/"].strip().endswith(".bam") | row["HiSeqData/"].strip().endswith(".bai"):
+            path, file = row["HiSeqData/"].strip().split("-->")
+            SequencingFile.objects.get(name=file.strip())
+    except ObjectDoesNotExist as e:
+        return file
+    except:
+        return
+
+
+def upload_file_tree(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "file_tree_with_vivek.txt")
+    df = pd.read_csv(file, index_col=False, encoding='iso-8859-1', on_bad_lines = 'warn')
+    df["unregistered"] = df.apply(lambda row: get_file_tree(row), axis=1)
+    df.to_csv("fastq_files_unregistered.csv", index=False)
+
+
+def get_new_files(row):
+    # prefix = file.split("_L0")[0] if "_L0" in file else file.split("_001")[0] if "_001" in file else None
+    if not row["HiSeqData/"].endswith("fastq.gz") or not row["HiSeqData/"].endswith(".bam") or not row["HiSeqData/"].endswith(".bai"):
+        return
+    try:
+        print(row["HiSeqData/"])
+        path, file = row["HiSeqData/"].strip().split("-->")
+        SequencingFile.objects.get(name=file.strip())
+    except:
+        print(row["HiSeqData/"])
+
+def match_new_files(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "fastq_files_new.csv")
+    df = pd.read_csv(file, index_col=False, encoding='iso-8859-1', on_bad_lines = 'warn')
+    # df[~df["new"].isnull()].apply(lambda row: get_new_files(row), axis=1)
+    df.apply(lambda row: get_new_files(row), axis=1)
+
+
+def get_block_scan(row):
+    try:
+        print(row["Block_ID"])
+        dir, scan = row["HE image"].split("=")
+        Blocks.objects.filter(name=row["Block_ID"]).update(scan_number=scan)
+        print("updated")
+    except Exception as e:
+        print(e)
+
+
+def block_scan_number(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "Blocks-Grid view-5.csv")
+    df = pd.read_csv(file)
+    df[~df["HE image"].isnull()].apply(lambda row: get_block_scan(row), axis=1)
+
+
+def _files_from_file(row):
+    # b=Blocks.objects.filter(block_areas__nucacids__na_sl_links__sample_lib__name=row["sample_lib"])
+    try:
+        bl = row['Block'].replace("-","_")
+        print(bl)
+        q = SequencingFile.objects.filter(name__icontains=bl)
+        print(set([i.sequencing_file_set.prefix for i in q]))
+        # print([i.name for i in b], row["sample_lib"])
+        # SampleLib.objects.get(name=row["sample_lib"])
+
+    except:
+        print(row["sample_lib"])
+
+
+def create_fastq_from_file(request):
+    file = Path(Path(
+        __file__).parent.parent / "uploads" / "report_matching_sample_lib_with_bait_after_reducing_fastq_files.csv")
+    df = pd.read_csv(file)
+    cols = df.columns
+    cols = cols.insert(5, "new_added")
+    df['fastq_file'] = df['fastq_file'].str.replace('"', "'").str.replace("'", '"')
+    df["fastq_file"] = df["fastq_file"].astype('str')
+    df["fastq_file"] = df["fastq_file"].apply(lambda x: make_dict(x))
+
+    df['bam_file'] = df['bam_file'].str.replace('"', "'").str.replace("'", '"')
+    df["bam_file"] = df["bam_file"].astype('str')
+    df["bam_file"] = df["bam_file"].apply(lambda x: make_dict(x))
+
+    df['bam_bai_file'] = df['bam_bai_file'].str.replace('"', "'").str.replace("'", '"')
+    df["bam_bai_file"] = df["bam_bai_file"].astype('str')
+    df["bam_bai_file"] = df["bam_bai_file"].apply(lambda x: make_dict(x))
+
+    df.iloc[:48].apply(lambda row: _files_from_file(row), axis=1)
+    # df.apply(lambda row: _files_from_file(row), axis=1)
+    # df=df[cols]
+    # df.to_csv("report_matching_sample_lib_after_IWEI.csv", index=False)
+from django.db.models import Q, Count
+def get_unregistered(row):
+    path,_ = row["HiSeqData/"].split("-->")
+    file=row["unregistered"]
+    type = "fastq" if file.endswith("fastq.gz") else "bam" if file.endswith(".bam") else "bai"
+    if "fastq" in file:
+        prefix = file.split("_L0")[0] if "_L0" in file else file.split("_001")[0] if "_001" in file else None
+    elif file.endswith(".bai"):
+        prefix = file.split(".bai")[0]
+    elif file.endswith(".bam"):
+        prefix = file.split(".bam")[0]
+    prefix = file.split("_L0")[0] if "_L0" in file else prefix
+
+    print(prefix, file)
+    try:
+        _sr = path.split("/")[1]
+        if "Nimblegen" in path:
+            _sr = re.sub(r'Nimblegen(\d+) \(BB0*([1-9]\d*)\)', r'Nimblegen\1_BB\2', _sr)
+        if "recal" in file:
+            match = re.match(r'(\w+)_([ACTG]{6})recal.', file)
+            _sl = match.group(1)
+            _prefix = f"{match.group(1)}_{match.group(2)}"
+            prefix = ((re.sub(r'_\s*\d+ng\s*', ' ', _prefix)).strip()).replace(" _","_")
+            _sl = ((re.sub(r'_\s*\d+ng\s*', ' ', _sl)).strip())
+        if re.match(r'^H12', file):
+            _sl = "H12_22776_B5_Norm"
+            print(_sl, prefix)
+        if re.match(r'^CGH11', file):
+            match = re.match(r'CGH11_(\w+).', file)
+            _sl = "CGH11_"+match.group(1)
+            print(_sl, prefix)
+        if re.match(r'^T12', file):
+            match = re.match(r'T12_22597_(\w+)_([ACTG]{6})', file)
+            _sl = "T12_22597_"+match.group(1)
+            prefix = "T12_22597_"+match.group(1) + "_" + match.group(2)
+        sr = SequencingRun.objects.get(name=_sr)
+        sl = SampleLib.objects.get(name=_sl)
+        set_ = get_or_create_set(
+                prefix=prefix,
+                path=path,
+                sample_lib=sl,
+                sequencing_run=sr,
+            )
+        get_or_create_file(
+            sequencing_file_set=set_,
+            name=file,
+            checksum="",
+            type=type
+        )
+        print("created")
+    except MultipleObjectsReturned as e:
+        p = ""
+        for i in SequencingFileSet.objects.filter(prefix=prefix):
+            if i.path == p:
+                i.delete()
+                print("deleted")
+            p=i.path
+    except Exception as e:
+        print(e)
+
+def upload_unregistered(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "fastq_files_unregistered.csv")
+    df = pd.read_csv(file)
+    df[~df["unregistered"].isnull()].apply(lambda row: get_unregistered(row), axis=1)
+
+def get_fastq_empty(row):
+    try:
+        sl = SampleLib.objects.get(name=row["sample_lib"])
+        sr = SequencingRun.objects.get(name=row["sequencing_run"])
+        files = SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl, sequencing_file_set__sequencing_run=sr, type="fastq")
+        for file in files:
+            if file.name not in row["fastq_file"]:
+                print(sl.name, file, row["fastq_file"])
+    except Exception as e:
+        print(row["sample_lib"], row["sequencing_run"], e)
+
+
+def get_fastq_t12(row):
+    try:
+        sl=SampleLib.objects.get(name=row["sample_lib"])
+    except ObjectDoesNotExist as e:
+        sl, created = SampleLib.objects.get_or_create(
+            name=row["sample_lib"]
+        )
+    try:
+        sr=SequencingRun.objects.get(name=row["sequencing_run"])
+    except ObjectDoesNotExist as e:
+        sr=SequencingRun.objects.get(name="Undefined")
+
+    if pd.isnull(row["fastq_file"]):
+        files=SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl, type="fastq")
+        if files.count()>0:
+            d={}
+            for file in files:
+                d[file.name] = file.checksum
+            row["fastq_file"] = d
+            row["fastq_path"] = file.sequencing_file_set.path
+    else:
+        files=SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl,
+                                            sequencing_file_set__sequencing_run=sr,
+                                            type="fastq")
+        for file in files:
+            if file.name not in row["fastq_file"]:
+                d=row["fastq_file"]
+                d[file.name]=file.checksum
+                row["fastq_file"]=d
+
+    if pd.isnull(row["bam_file"]):
+        files=SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl, type="bam")
+        if files.count()>0:
+            s={}
+            for file in files:
+                s[file.name] = file.checksum
+            row["bam_file"] = s
+            row["bam_file_path"] = file.sequencing_file_set.path
+    else:
+        files=SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl,
+                                            sequencing_file_set__sequencing_run=sr,
+                                            type="bam")
+        for file in files:
+            if file.name not in row["bam_file"]:
+                d=row["bam_file"]
+                d[file.name]=file.checksum
+                row["bam_file"]=d
+
+    if pd.isnull(row["bam_bai_file"]):
+        files=SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl, type="bai")
+        if files.count()>0:
+            w={}
+            for file in files:
+                w[file.name] = file.checksum
+            row["bam_bai_file"] = w
+            row["bam_bai_file_path"] = file.sequencing_file_set.path
+    else:
+        files=SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl,
+                                            sequencing_file_set__sequencing_run=sr,
+                                            type="bai")
+        for file in files:
+            if file.name not in row["bam_bai_file"]:
+                d=row["bam_bai_file"]
+                d[file.name]=file.checksum
+                row["bam_bai_file"]=d
+
+    return row
+
+def get_bam_empty(row):
+    print(row["sample_lib"])
+    try:
+        sl=SampleLib.objects.get(name=row["sample_lib"])
+    except ObjectDoesNotExist as e:
+        sl, created = SampleLib.objects.get_or_create(
+            name=row["sample_lib"]
+        )
+    if pd.isnull(row["bam_file"]):
+        files=SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl, type="bam")
+        if files.count()>0:
+            d={}
+            for file in files:
+                d[file.name] = file.checksum
+            row["bam_file"] = d
+            row["bam_file_path"] = file.sequencing_file_set.path
+            return row
+
+
+def get_bai_empty(row):
+    try:
+        sl = SampleLib.objects.get(name=row["sample_lib"])
+    except ObjectDoesNotExist as e:
+        sl, created = SampleLib.objects.get_or_create(
+            name=row["sample_lib"]
+        )
+    if pd.isnull(row["bam_bai_file"]):
+        files=SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl, type="bai")
+        if files.count()>0:
+            d={}
+            for file in files:
+                d[file.name] = file.checksum
+            row["bam_bai_file"] = d
+            row["bam_bai_file_path"] = file.sequencing_file_set.path
+            return row
+
+
+def refactor_samplelib(row):
+    return ("T"+str(row["Block"])+"_"+str(row["sample_lib"])).replace("-","_")
+
+def find_seq_run(row, df2):
+    if not pd.isnull(row["sequencing_run"]):
+        return row["sequencing_run"]
+    sl = SampleLib.objects.get(name=row["sample_lib"])
+    match = df2[df2["HiSeqData/"].str.contains(sl.name, regex=False)]["HiSeqData/"].values
+    if len(match)>1:
+        seq_run = match[0].strip().split("-->")[0].split("/")[1]
+        print(seq_run)
+        return seq_run
+
+def split_and_extract(s):
+    match = re.search("[ATGC]{6}", s)
+    if match:
+        return s.split('_' + match.group() + '_')[0]
+    else:
+        return s  # Or return None if you want to filter out non-matching strings
+
+
+def ngs(df2):
+    s = df2[df2["HiSeqData/"].str.contains("NGS")]["HiSeqData/"].str.split("-->").str[-1].str.strip()
+    f = s.apply(split_and_extract)
+    print(type(f))
+    print(f.unique())
+    return f.unique()
+
+def ngs2(df2, row):
+    if not row['sample_lib'].startswith('NGS'):
+        return row
+    s = df2[df2["HiSeqData/"].str.contains(row["sample_lib"])]["HiSeqData/"].str.split("-->", expand=True)
+    if row["sample_lib"] == "NGS-2-1" or row["sample_lib"] == "NGS_1_1":
+        s = df2[df2["HiSeqData/"].str.contains(row["sample_lib"]+"_")]["HiSeqData/"].str.split("-->", expand=True)
+
+    seqr = s[0].tolist()[0].split("/")[1]
+    row["captured_lib"] = seqr.split("_")[1]
+    row["Bait"] = "NimV2mix3"
+    row["sequencing_lib"] = seqr.split("_")[1]
+    row["sequencing_run"] = seqr
+    row["fastq_file"] = {i: "" for i in s[1].tolist()}
+    row["fastq_path"] = s[0].tolist()[0]
+    row["area_type"] = "tumor"
+    return row
+
+
+def prepare_report(request):
+    file = Path(Path(
+        __file__).parent.parent / "uploads" / "report_matching_sample_lib_with_bait_after_reducing_fastq_files.csv")
+    df = pd.read_csv(file)
+    df = df.drop(['Input Conc.'], axis=1)
+
+    file2 = Path(Path(__file__).parent.parent / "uploads" / "file_tree_with_vivek.txt")
+    df2 = pd.read_csv(file2, index_col=False, encoding='iso-8859-1', on_bad_lines='warn')
+    df2 = df2[df2['HiSeqData/'].str.strip().str.endswith('.fastq.gz')]
+
+    df3 = pd.DataFrame(columns=list(df.columns))
+    df3["sample_lib"] = ngs(df2)
+    df = pd.concat([df, df3], ignore_index=True)
+    # print(df)
+    #
+    # df.loc[:48, 'sample_lib'] = df.loc[:48].apply(lambda row: refactor_samplelib(row), axis=1)
+    # df.to_csv(file, index=False)
+
+    df['fastq_file'] = df['fastq_file'].str.replace('"', "'").str.replace("'", '"')
+    df["fastq_file"] = df["fastq_file"].astype('str')
+    df["fastq_file"] = df["fastq_file"].apply(lambda x: make_dict(x))
+
+    df['bam_file'] = df['bam_file'].str.replace('"', "'").str.replace("'", '"')
+    df["bam_file"] = df["bam_file"].astype('str')
+    df["bam_file"] = df["bam_file"].apply(lambda x: make_dict(x))
+
+    df['bam_bai_file'] = df['bam_bai_file'].str.replace('"', "'").str.replace("'", '"')
+    df["bam_bai_file"] = df["bam_bai_file"].astype('str')
+    df["bam_bai_file"] = df["bam_bai_file"].apply(lambda x: make_dict(x))
+    print(df[df['sample_lib'].str.startswith('CP-')].index)
+    print(df[df['sample_lib'].str.startswith('NGS')].index)
+
+    df = df.apply(lambda row: ngs2(df2, row), axis=1)
+    # df = df.apply(lambda row: get_fastq_t12(row), axis=1)
+    # df = df.apply(lambda row: get_bam_empty(row), axis=1)
+    # df = df.apply(lambda row: get_bai_empty(row), axis=1)
+
+    # df.to_csv("df.csv", index=False)
+    # df[~df["fastq_file"].isnull()].apply(lambda row: get_fastq_empty(row), axis=1)
+    # df.columns = df[cols]
+    df_1 = df.iloc[:1331]
+    df_2 = df.iloc[1343:]
+    df_3 = df.iloc[4343:]
+    df = pd.concat([df_1, df_3, df_2]).reset_index(drop=True)
+    df.to_csv("df.csv", index=False)
+
+
+def get_sex(value):
+    return value.lower() if value and len(value) == 1 else None
+
+
+def get_race(value):
+    for x in Patients.RACE_TYPES:
+        if value.lower() == x[1].lower():
+            return x[0]
+    return 7
+
+def get_or_create_patient(**kwargs):
+    try:
+        return Patients.objects.get(pat_id=kwargs["pat_id"])
+    except ObjectDoesNotExist as e:
+        return Patients.objects.create(**kwargs)
+
+
+def get_area_type(value):
+    for x in Areas.AREA_TYPE_TYPES:
+        if value.lower() == x[1].lower():
+            return x[0]
+    return None
+
+
+def we(row):
+    match = re.search(r'-BND\s+(\d+)\.00', row["NA_ID"])
+
+    def replace_with_formatted_number(match):
+        numeric_value = int(match.group(1))
+        formatted_value = f"{numeric_value:03}"
+        return f'BND-{formatted_value}'
+
+    if match:
+        # print(row["sample_lib"])
+        value = re.sub(r'-BND\s+(\d+)\.00', replace_with_formatted_number, row["NA_ID"])
+        print(f"value: {value}")
+        return value
+
+
+def nas(row):
+    try:
+        l = ["436 common, sclerotic dermal component",
+            "437 common, sclerotic dermal component",
+            "438 common, sclerotic dermal component",
+            "439 common, sclerotic dermal component",
+            "440 common, sclerotic dermal component",
+            "441 common, sclerotic dermal component",
+            "443 common, sclerotic dermal component",
+            "444 blue nevus, cellular",
+            "445 common, sclerotic dermal component",
+            "2409 SCC, in situ",
+            "2412 SCC, in situ",
+            "2433 Pilomatricoma, cystic",
+            "426 blue nevus, cellular,  DF like",
+            "427 blue nevus, cellular,  DF like",
+            "428 blue nevus, cellular,  DF like",
+            "446 DPN, pure"]
+        if not pd.isnull(row["Area ID"]):
+            area_name = row['Area ID'].replace('"','').strip()
+            if "," in area_name:
+                if area_name in l:
+                    area = Areas.objects.get(name=area_name.strip())
+                    block = area.block
+                    if not pd.isnull(row["Assigned Projects"]):
+                        project = Projects.objects.get(name=row['Assigned Projects'])
+                        if block:
+                            block.project = project
+                            block.save()
+                else:
+                    for area in area_name.split(","):
+                        area = Areas.objects.get(name=area.strip())
+                        block = area.block
+                        if not pd.isnull(row["Assigned Projects"]):
+                            project = Projects.objects.get(name=row['Assigned Projects'])
+                            if block:
+                                block.project = project
+                                block.save()
+            else:
+                area = Areas.objects.get(name=area_name.strip())
+            block = area.block
+        if not pd.isnull(row["Assigned Projects"]):
+            project = Projects.objects.get(name=row['Assigned Projects'])
+            if block:
+                block.project = project
+                block.save()
+        # if "BND" in row["NA_ID"]:
+        #     na=NucAcids.objects.get(name=we(row))
+        # else:
+        #     na = NucAcids.objects.get(name=row["NA_ID"])
+        # if "," in row["Area ID"]:
+        #     if "2409 SCC, in situ" in row["Area ID"]:
+        #         a = Areas.objects.get(name="2409 SCC, in situ")
+        #         AREA_NA_LINK.objects.get_or_create(nucacid=na, area=a)
+        #         return
+        #     if "426 blue nevus, cellular,  DF like" in row["Area ID"]:
+        #         a = Areas.objects.get(name="426 blue nevus, cellular,  DF like")
+        #         AREA_NA_LINK.objects.get_or_create(nucacid=na, area=a)
+        #         return
+        #     if "436 common, sclerotic dermal component" in row["Area ID"]:
+        #         a = Areas.objects.get(name="436 common, sclerotic dermal component")
+        #         AREA_NA_LINK.objects.get_or_create(nucacid=na, area=a)
+        #         return
+        #     for area in row["Area ID"].split(","):
+        #         print(na, area)
+        #         a = Areas.objects.get(name=area.strip())
+        #         AREA_NA_LINK.objects.get_or_create(nucacid=na, area=a)
+    except Exception as e:
+        print(e, row["Area ID"])
+
+
+def check_na(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "Nucleic Acids-Grid view (2).csv")
+    df = pd.read_csv(file)
+    df[~df["Area ID"].isnull()].apply(lambda row: nas(row), axis=1)
+
+
+def nas2(row):
+    try:
+        sequencing_run = SequencingRun.objects.get(name=row['Sequencing Run'])
+        seq_lib = SequencingLib.objects.get(name=row['SeqL'])
+        cl = CapturedLib.objects.get(name=row['CL'])
+        sl, created = SampleLib.objects.get_or_create(name=row["Sample"])
+        # print(sl, created)
+        if not pd.isnull(row["Barcode ID"]):
+            barcode = Barcode.objects.filter(name=row["Barcode ID"].strip()).first()
+            if barcode:
+                sl.barcode = barcode
+                sl.save()
+        na, _ = NucAcids.objects.get_or_create(name=row['NA_id'])
+        b = Blocks.objects.get(name=row["Block"])
+        # print(b.patient)
+        if not pd.isnull(row["pat_id"]):
+            patient = Patients.objects.get(pat_id=str(row["pat_id"]).replace(".0", ""))
+            # print(patient)
+            b.patient = patient
+        _notes = f"SITE_CODE: {row['site_code']} / icd9: {row['icd9']} / DEPT_NUMBER: {row['dept_number']} / SPECIMEN: {row['specimen']} / DX_TEXT: {row['dx_text']}"
+        b.age = row["pat_age"] if not pd.isnull(row["pat_age"]) else b.age
+        b.notes = str(row["Notes/Other"]) + str(row["note"]) + str(_notes)
+        b.micro = row["micro"] if not pd.isnull(row["micro"]) else b.micro
+        b.diagnosis = row["Diagnosis"] if not pd.isnull(row["Diagnosis"]) else b.diagnosis
+        b.thickness = row["thickness"] if not pd.isnull(row["thickness"]) else b.thickness
+        b.mitoses = row["mitoses"] if not pd.isnull(row["mitoses"]) else b.mitoses
+        b.p_stage = row["p_stage"] if not pd.isnull(row["p_stage"]) else b.p_stage
+        b.prim = row["prim"] if not pd.isnull(row["prim"]) else b.prim
+        b.subtype = row["subtype"] if not pd.isnull(row["subtype"]) else b.subtype
+        b.save()
+        area, _ = Areas.objects.get_or_create(name=row["Area_id"], block=b)
+        area.block = b
+        area.area_type = get_area_type(row['Area'])
+        area.save()
+        link_area, _ =AREA_NA_LINK.objects.get_or_create(area=area,nucacid=na)
+        link_sl_na, _ = NA_SL_LINK.objects.get_or_create(sample_lib=sl, nucacid=na)
+        link_sl_cl, _ = SL_CL_LINK.objects.get_or_create(sample_lib=sl, captured_lib=cl)
+        link_cl_seql, _ = CL_SEQL_LINK.objects.get_or_create(sequencing_lib=seq_lib, captured_lib=cl)
+        if not sequencing_run.sequencing_libs.filter(id=seq_lib.id).exists():
+            # Add the sequencing_lib to the sequencing_run
+            sequencing_run.sequencing_libs.add(seq_lib)
+            sequencing_run.save()
+
+    except Exception as e:
+        print(e, row['CL'])
+        # if row["Barcode ID"].startswith("AD"):
+        #     barcode_set, _ = Barcodeset.objects.get_or_create(name="AD")
+        #     barcode, _ = Barcode.objects.get_or_create(barcode_set=barcode_set,
+        #                                             name=row["Barcode ID"].strip(),
+        #                                             i5=row["Barcode"])
+        # if row["Barcode ID"].startswith("Dual_"):
+        #     barcode_set, _ = Barcodeset.objects.get_or_create(name="Dual Duplex")
+        #     barcode, _ = Barcode.objects.get_or_create(barcode_set=barcode_set,
+        #                                             name=row["Barcode ID"].strip(),
+        #                                             i5=row["Barcode"])
+
+
+
+def check_na2(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
+    df = pd.read_csv(file)
+    nuc_acids_without_areas = NucAcids.objects.annotate(
+        num_areas=Count('area_na_links')
+    ).filter(num_areas=0).values("name")
+    print(nuc_acids_without_areas)
+
+    areas_without_nucleic_acid = Areas.objects.annotate(
+        num_nucleic_acids=Count('area_na_links')
+    ).filter(num_nucleic_acids=0).order_by("name").values("name")
+    # print(areas_without_nucleic_acid)
+    # for i in areas_without_nucleic_acid:
+    #     print(i['name'])
+    # print(areas_without_nucleic_acid.count())
+    areas = Areas.objects.filter(block__name="UndefinedBlock")
+    for i in areas:
+        print(i.name)
+    df[~df["NA_id"].isnull()].apply(lambda row: nas2(row), axis=1)
+
+
+def nas3(row):
+
+    try:
+        if not pd.isnull(row['NA_ID_x']):
+            if "," in row['NA_ID_x'].replace(";",","):
+                for na in row['NA_ID_x'].replace(";", ",").split(","):
+                    NucAcids.objects.get(name=na)
+        if not pd.isnull(row['NA_ID_y']):
+            if "," in row['NA_ID_y'].replace(";",","):
+                for na in row['NA_ID_y'].replace(";", ",").split(","):
+                    NucAcids.objects.get(name=na)
+        if not pd.isnull(row['NA_id']):
+            if "," in row['NA_id'].replace(";",","):
+                for na in row['NA_id'].replace(";", ",").split(","):
+                    NucAcids.objects.get(name=na)
+        if not pd.isnull(row['Area_id']):
+            area=Areas.objects.get(name=row["Area_id"])
+        if not pd.isnull(row['Area_ID']):
+            area=Areas.objects.get(name=row["Area_ID"])
+        # link=AREA_NA_LINK.objects.get_or_create(area=area,nucacid=na)
+    except Exception as e:
+        print(e)
+        print(row['NA_ID_x'], row['NA_ID_y'], row['NA_id'])
+
+
+def check_na3(request):
+    for na in NucAcids.objects.filter(name__endswith="_NA"):
+        # print(na)
+        name = "NA_"+na.name.replace("_NA","")
+        # print(name)
+        c = NucAcids.objects.filter(name=name).count()
+        if c==1:
+            print([na.name for na in NucAcids.objects.filter(name__icontains=na.name.replace("_NA",""))])
+    # for na in NucAcids.objects.filter(area_na_links__area__name="UndefinedArea"):
+    #     b = Blocks.objects.filter(name__icontains=na.name.replace("_NA",""))
+    #     if len(b)==1:
+    #         print(na.name, b.first().block_areas.all(),sep="------")
+    #         if len(b.first().block_areas.all())==1:
+    #             AREA_NA_LINK.objects.filter(area__name="UndefinedArea", nucacid=na).delete()
+    #             AREA_NA_LINK.objects.get_or_create(area=b.first().block_areas.first(), nucacid=na)
+    # print(NucAcids.objects.filter(area_na_links__area__name="UndefinedArea").count())
+    file = Path(Path(__file__).parent.parent / "uploads" / "patients_done.csv")
+    df = pd.read_csv(file)
+    # df[~df["NA_ID_x"].isnull()].apply(lambda row: nas3(row), axis=1)
+    # df[~df["NA_id"].isnull() & ~df["Area_id"].isnull()].apply(lambda row: nas2(row), axis=1)
+
+
+def patients(row):
+    try:
+
+        blocks = Blocks.objects.filter(patient__isnull=True)
+        for block in blocks:
+            patient_id = "_G"
+            patient, created = Patients.objects.get_or_create(pat_id=patient_id)
+            block.patient = patient
+            block.save()
+            print("created")
+    except Exception as e:
+        print(row["block"],e)
+
+
+def check_patient(request):
+    for na in NucAcids.objects.all():
+        print(na)
+        obj, created = AREA_NA_LINK.objects.get_or_create(nucacid=na,area=na.area)
+    # file = Path(Path(__file__).parent.parent / "uploads" / "report_patients_not_matched.csv")
+    # df = pd.read_csv(file)
+    # df.apply(lambda row: patients(row), axis=1)
+
+
+
+def check_blocks(row):
+    try:
+        print(row["name"])
+        b = Blocks.objects.get(name=row["name"])
+        b.age=row["pat_age"] if not pd.isnull(row["pat_age"]) else b.age
+        b.thickness=row["thickness"] if not pd.isnull(row["thickness"]) else b.thickness
+        b.mitoses=row["mitoses"] if not pd.isnull(row["mitoses"]) else b.mitoses
+        b.p_stage=row["p_stage"] if not pd.isnull(row["p_stage"]) else b.p_stage
+        b.prim=row["prim"] if not pd.isnull(row["prim"]) else b.prim
+        b.subtype=row["subtype"] if not pd.isnull(row["subtype"]) else b.subtype
+        b.notes=row["note"] if not pd.isnull(row["note"]) else b.notes
+        b.micro=row["micro"] if not pd.isnull(row["micro"]) else b.micro
+        b.save()
+    except Exception as e:
+        print(row["name"],e)
+
+
+def check_block(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "report-block.csv")
+    df = pd.read_csv(file)
+    df.apply(lambda row: check_blocks(row), axis=1)
+
+
+def get_collection(value):
+    for x in Blocks.COLLECTION_CHOICES:
+        if value.lower() == x[1].lower():
+            return x[0]
+    return Blocks.SCRAPE
+
+
+def check_blocks2(row):
+    try:
+        mapping_ulcreation={
+            'negative':False,
+            'Present':True,
+        }
+        b = Blocks.objects.get(name=row["Block_ID"])
+        if not pd.isnull(row['Assigned project']):
+            project = Projects.objects.get(name=row['Assigned project'])
+            b.project = project
+            b.save()
+            print(row["Block_ID"], "saved_1")
+        if not pd.isnull(row['Pat_ID']):
+            patient = Patients.objects.get(pat_id=row['Pat_ID'])
+            if not b.patient:
+                b.patient = patient
+                b.save()
+                print(row["Block_ID"], "saved_2")
+        # else:
+        #     print(str(uuid.uuid4()).split("-")[0] + "_G")
+        notes=b.notes
+        _notes=f"Description: {row['Description']} / Block storage location: {row['Block storage location']} / Specimen site: {row['Specimen site']}"
+        b.notes=str(row["Notes"]) + str(_notes) + str(notes)
+        b.diagnosis=row["Diagnosis/Type"] if not pd.isnull(row["Diagnosis/Type"]) else b.diagnosis
+        b.collection=get_collection(row["Collection Method"]) if not pd.isnull(row["Collection Method"]) else b.collection
+        b.fixation=row["Fixation"] if not pd.isnull(row["Fixation"]) else b.fixation
+        b.slides=row["Slides"] if not pd.isnull(row["Slides"]) else b.slides
+        b.slides_left=row["Slides left"] if not pd.isnull(row["Slides left"]) else b.slides_left
+        b.ulceration=mapping_ulcreation[row["Ulceration"]] if not pd.isnull(row["Ulceration"]) else b.ulceration
+
+        project = Projects.objects.get(name=row['Assigned project'])
+        b.project = project
+
+        b.save()
+        print(row["Block_ID"], "saved_3")
+    except Exception as e:
+        print(e, row["Block_ID"], row['Assigned project'], row['Pat_ID'])
+
+
+def check_block2(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "Blocks-Grid view (3).csv")
+    df = pd.read_csv(file)
+    df[~df["Block_ID"].isnull()].apply(lambda row: check_blocks2(row), axis=1)
+
+
+def check_blocks3(row):
+    try:
+        mapping_ulcreation={
+            'negative':False,
+            'Present':True,
+        }
+        print(row["Block"])
+        b = Blocks.objects.get(name=row["Block"])
+        notes=b.notes
+        _notes=f"SITE_CODE: {row['site_code']} / icd9: {row['icd9']} / DEPT_NUMBER: {row['dept_number']} / SPECIMEN: {row['specimen']} / DX_TEXT: {row['dx_text']}"
+        b.age = row["pat_age"] if not pd.isnull(row["pat_age"]) else b.age
+        b.notes=str(row["Notes/Other"]) + str(row["note"]) + str(_notes) + str(notes)
+        b.micro = row["micro"] if not pd.isnull(row["micro"]) else b.micro
+        b.diagnosis=row["Diagnosis"] if not pd.isnull(row["Diagnosis"]) else b.diagnosis
+        b.thickness = row["thickness"] if not pd.isnull(row["thickness"]) else b.thickness
+        b.mitoses = row["mitoses"] if not pd.isnull(row["mitoses"]) else b.mitoses
+        b.p_stage = row["p_stage"] if not pd.isnull(row["p_stage"]) else b.p_stage
+        b.prim = row["prim"] if not pd.isnull(row["prim"]) else b.prim
+        b.subtype = row["subtype"] if not pd.isnull(row["subtype"]) else b.subtype
+        b.save()
+    except Exception as e:
+        print(row["Block"],e)
+
+
+def check_block3(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
+    df = pd.read_csv(file)
+    df[~df["Block"].isnull()].apply(lambda row: check_blocks3(row), axis=1)
+
+
+def get_all_md5(row):
+    # print(row)
+    try:
+        if "==" in row["md5"]:
+            _file, md5 = row["md5"].split("==")
+            file = _file.replace(".md5", "")
+        elif "coldstorage" in row["md5"]:
+            md5, _file = (','.join(row["md5"].split())).split(",")
+            file = _file.split("/")[-1]
+        else:
+            md5, _file = (','.join(row["md5"].split())).split(",")
+            file = _file.replace("./", "").replace("*", "").replace("R_SGLP", "SGLP")
+        checksum = SequencingFile.objects.get(name=file).checksum
+        if checksum == None or checksum == "":
+            f = SequencingFile.objects.get(name=file)
+            f.checksum = md5
+            f.save()
+            print("saved")
+    except Exception as e:
+        print("===", e, row["md5"])
+
+def upload_file_tree_all_md5(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "all_md5.txt")
+    df = pd.read_csv(file, index_col=False, encoding='iso-8859-1', on_bad_lines = 'warn')
+    # print(df)
+    df[~df["md5"].isnull()].apply(lambda row: get_all_md5(row), axis=1)
+
+
+def get_sample_library(row):
+    try:
+        if pd.isnull(row["Sample"]) or pd.isnull(row["Area_id"]) or pd.isnull(row["NA_id"]):
+            return
+        sl=SampleLib.objects.get(name=row["Sample"])
+        area,_ = Areas.objects.get_or_create(name=row['Area_id'])
+        na,_ = NucAcids.objects.get_or_create(name=row['NA_id'])
+        AREA_NA_LINK.objects.get_or_create(area=area, nucacid=na)
+        NA_SL_LINK.objects.get_or_create(sample_lib=sl, nucacid=na)
+    except ObjectDoesNotExist as e:
+        print(e, row['Sample'], row['NA_id'])
+    except MultipleObjectsReturned as e:
+        pass
+
+def check_sl_bait(row):
+    if row['sequencing_run']=='BCB036':
+        row["Bait"] = 'Small Gene Panel'
+
+def check_sample_library(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "report_matching_sample_lib_with_bait_after_reducing_fastq_files.csv")
+    df = pd.read_csv(file)
+    df.apply(lambda row: check_sl_bait(row), axis=1)
+    # from .Acral_melanoma_lines_mRNA_Seq_AL1806051_R1 import create_file
+    # create_file()
+    df.to_csv("uploads/report_matching_sample_lib_with_bait_after_reducing_fastq_files2.csv", index=False)
+
+
+def check_seq_run_2(row):
+    # print(row)
+    try:
+        SequencingRun.objects.get(name=row["seq_runs"])
+    except Exception as e:
+        print(row["seq_runs"], e)
+
+
+def check_seq_run(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "seq_runs.txt")
+    df = pd.read_csv(file)
+    for i in SequencingRun.objects.all():
+        name = i.name
+        i.name = name.strip()
+        i.save()
+    # df = pd.read_csv(file, index_col=False, encoding='iso-8859-1', on_bad_lines='warn')
+    df.apply(lambda row: check_seq_run_2(row), axis=1)
+    print(df.count())
+    # from .Acral_melanoma_lines_mRNA_Seq_AL1806051_R1 import create_file
+    # create_file()
+    # df.to_csv("uploads/report_matching_sample_lib_with_bait_after_reducing_fastq_files2.csv", index=False)
+
+
+def get_check_dna_rna(row):
+    try:
+        sl = SampleLib.objects.get(name=row["sample_lib"])
+        na = NA_SL_LINK.objects.filter(sample_lib=sl, nucacid__na_type__isnull=False)
+        # print(row["sample_lib"], na.name, na.na_type)
+        if na:
+            row["RNA/DNA"] = na[0].nucacid.na_type.upper()
+        else:
+            row["RNA/DNA"] = ""
+        return row
+    except Exception as e:
+        print(e, row["sample_lib"])
+
+
+def check_dna_rna(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "SequencingSampleSheet-01102024.xlsx")
+    file = "/Users/cbagci/Library/Containers/com.apple.mail/Data/Library/Mail Downloads/0B0A3920-A69F-4FFD-9560-AB728F303574/SequencingSampleSheet-01102024.xlsx"
+    file = Path(Path(__file__).parent.parent / "uploads" / "RNA_libraries.csv")
+    df = pd.read_csv(file)
+    print(df)
+    df = df.apply(lambda row: get_check_dna_rna(row), axis=1)
+    df.to_csv("SequencingSampleSheet-01102024_v3.csv")
+
+    # df = pd.read_excel(file,sheet_name=0)
+    # df = df.dropna(subset=['sample_lib'])
+    # df = df.dropna(subset=['sample_lib'])
+
+def check_areas_airtable_get(row):
+    try:
+        if not pd.isnull(row['Assigned projects']):
+            project = Projects.objects.get(name=row['Assigned projects'])
+            block = Blocks.objects.get(name=row['Block_ID'])
+            block.project = project
+            block.save()
+        # area = Areas.objects.get(name=row['Area_ID'])
+        # if area:
+        #     area.area_type = get_area_type(row['Area type'])
+        #     area.save()
+    except Exception as e:
+        print(f"{e}, area: {row['Area_ID']}, block: {row['Block_ID']}, project: {row['Assigned projects']}")
+
+def check_areas_airtable(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "Areas-Grid view (2).csv")
+    df = pd.read_csv(file)
+    df.apply(lambda row: check_areas_airtable_get(row), axis=1)
+
+def create_abbreviation(value):
+    words = value.split()
+    result = ''.join(word[0] for word in words)
+    result_upper = result.upper()
+    projects = Projects.objects.filter(abbreviation=result_upper)
+    if projects:
+        words = value.split()
+        result = ''.join(word[:2] for word in words)
+        result_upper = result.upper()[::-1]
+    # print(value, result_upper)
+    return result_upper[:6]
+
+def check_projects_airtable_get(row):
+    try:
+        if not Projects.objects.filter(name=row["Assigned project"]):
+            project, _ = Projects.objects.get_or_create(
+                name=row["Assigned project"],
+                abbreviation=create_abbreviation(row["Assigned project"]))
+    except Exception as e:
+        print(e, row["Assigned project"])
+
+
+def check_projects_airtable(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "Patients-Grid view (1).csv")
+    file = Path(Path(__file__).parent.parent / "uploads" / "Areas-Grid view (3).csv")
+    file = Path(Path(__file__).parent.parent / "uploads" / "Nucleic Acids-Grid view (2).csv")
+    file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view (5).csv")
+    file = Path(Path(__file__).parent.parent / "uploads" / "Blocks-Grid view (3).csv")
+    file = Path(Path(__file__).parent.parent / "uploads" / "Patients-Grid view (2).csv")
+    df = pd.read_csv(file)
+    df[~df["Assigned project"].isnull()].apply(lambda row: check_projects_airtable_get(row), axis=1)
+
+
+def check_patients_airtable_get(row):
+    try:
+        patient, _ = Patients.objects.get_or_create(pat_id=str(row["pat_id"]))
+        block = Blocks.objects.get(name=row['name'])
+        block.patient = patient
+        block.save()
+        # print(block, patient)
+        # if not pd.isnull(row['Block_ID']):
+        #     for b in row['Block_ID'].replace(";",",").split(","):
+        #         block = Blocks.objects.get(name=b.strip())
+        #         block.patient = patient
+        #         block.save()
+        # else:
+        #     for a in row['Area_ID'].replace(";", ",").split(","):
+        #         area = Areas.objects.get(name=a.strip())
+        #         block = area.block
+        #         if block.name != "UndefinedBlock":
+        #             block.patient = patient
+        #             block.save()
+        # block = Blocks.objects.get(name=row['Block_ID'].strip())
+        # if not pd.isnull(row['Pat_ID']):
+        #     patient = Patients.objects.get(pat_id=str(row["Pat_ID"]))
+        #     # print(block.strip())
+        #     block.patient = patient
+        #     block.save()
+    except Exception as e:
+        print(e, row["pat_id"], row['name'])
+
+
+def check_patients_airtable(request):
+    # file = Path(Path(__file__).parent.parent / "uploads" / "Patients-Grid view (1).csv")
+    # file = Path(Path(__file__).parent.parent / "uploads" / "Areas-Grid view (3).csv")
+    # file = Path(Path(__file__).parent.parent / "uploads" / "Nucleic Acids-Grid view (2).csv")
+    # file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view (5).csv")
+    # file = Path(Path(__file__).parent.parent / "uploads" / "Blocks-Grid view (3).csv")
+    # file = Path(Path(__file__).parent.parent / "uploads" / "Patients-Grid view (2).csv")
+    # file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
+    file = Path(Path(__file__).parent.parent / "uploads" / "Block_Patients_done.csv")
+    df = pd.read_csv(file)
+    blocks = Blocks.objects.values_list('name', flat=True)
+    blocks = list(blocks)
+    blocks.sort()
+    l = []
+    # for bl in blocks:
+    #     # match = re.compile(r'-(\d+)(?=[A-Z]*\+?[A-Z]*$)').findall(bl)
+    #     match = re.compile(r'-(\d{3,})').findall(bl)
+    #     if match:
+    #         ma = [m for m in match]
+    #         # print(bl, ma)
+    #         for number in ma:
+    #             counts = Blocks.objects.filter(name__icontains=number).values_list('name', flat=True)
+    #             if len(counts)>1:
+    #                 d={
+    #                     'Block_ID':bl,
+    #                     'Substring': ",".join(ma),
+    #                     'Substring Matches': ",".join(list(counts)),
+    #                 }
+    #                 print(bl, ma, list(counts))
+    #                 l.append(d)
+    df = pd.DataFrame(l)
+    df.to_csv("duplicates.csv", index=False)
+    # blocks = [re.sub(r'[^a-zA-Z0-9]', '', name).upper() for name in blocks]
+    #
+    # duplicates = []
+    # for name in blocks:
+    #     if blocks.count(name) > 1:
+    #         duplicates.append(name)
+    # duplicates.sort()
+    # print(duplicates)
+    # for i in duplicates:
+    #     print(i)
+    # clean_string_no_underscore = re.sub(r'[^a-zA-Z0-9]', '', my_string)
+    # df.apply(lambda row: check_patients_airtable_get(row), axis=1)
+
+def blocks_sl_at_get(row):
+    try:
+        patient = Patients.objects.get(pat_id=str(row["Pat_ID"]))
+        if not pd.isnull(row['Block_ID']):
+            for b in row['Block_ID'].replace(";",",").split(","):
+                block = Blocks.objects.get(name=b.strip())
+                block.patient = patient
+                block.save()
+        else:
+            for a in row['Area_ID'].replace(";", ",").split(","):
+                area = Areas.objects.get(name=a.strip())
+                block = area.block
+                if block.name != "UndefinedBlock":
+                    block.patient = patient
+                    block.save()
+        # block = Blocks.objects.get(name=row['Block_ID'].strip())
+        # if not pd.isnull(row['Pat_ID']):
+        #     patient = Patients.objects.get(pat_id=str(row["Pat_ID"]))
+        #     # print(block.strip())
+        #     block.patient = patient
+        #     block.save()
+    except Exception as e:
+        print(e, row["Pat_ID"], row['Block_ID'], row['Area_ID'])
+
+
+def blocks_sl_at(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view (5).csv")
+    file2 = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
+
+    df = pd.read_csv(file)
+    df2 = pd.read_csv(file)
+
+    df.apply(lambda row: blocks_sl_at_get(row), axis=1)
+
+
+

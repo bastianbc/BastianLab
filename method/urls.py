@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 urlpatterns = [
     path("", views.methods, name="methods"),
@@ -8,4 +9,4 @@ urlpatterns = [
     path("delete/<int:id>", views.delete_method, name="delete-method"),
     path("filter_methods", views.filter_methods, name="filter-methods"),
     path("get_methods", views.get_methods, name="get-methods"),
-]
+] + staticfiles_urlpatterns()

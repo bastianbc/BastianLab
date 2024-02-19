@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .models import NucAcids
+from .models import NucAcids, AREA_NA_LINK
 from .forms import *
 from areas.models import Areas
 from method.models import Method
@@ -11,6 +11,7 @@ from django.contrib.auth.decorators import login_required,permission_required
 from core.decorators import *
 from core.utils import custom_update
 from .serializers import NucacidsSerializer
+from django.core import serializers
 
 @permission_required("libprep.view_nucacids",raise_exception=True)
 def nucacids(request):
@@ -67,6 +68,16 @@ def new_nucacid(request):
 
     return render(request,"nucacid.html",locals())
 
+def _generate_unique_name(area, nucleic_acid):
+    '''
+    Generates a unique name during new record creation.
+    Notation: First character of NA_TYPE - Area Name - Increasing number from the same type
+    '''
+    count = AREA_NA_LINK.objects.filter(area=area, nucacid__name__icontains=nucleic_acid.name).count()
+    na_count = count if count>0 else 0
+    nucleic_acid.name = "%s-%s-%d" % (area.name, nucleic_acid.na_type[0].upper(), na_count + 1)
+    nucleic_acid.save()
+
 @permission_required_for_async("libprep.add_nucacids")
 def new_nucacid_async(request):
     selected_ids = json.loads(request.GET.get("selected_ids"))
@@ -76,19 +87,27 @@ def new_nucacid_async(request):
         for id in selected_ids:
             area = Areas.objects.get(ar_id=id)
             method = Method.objects.get(id=options["extraction_method"])
-
             if options["na_type"] == NucAcids.BOTH:
                 for na_type in [NucAcids.DNA,NucAcids.RNA]:
-                    NucAcids.objects.create(
-                        area=area,
+                    na = NucAcids.objects.create(
                         na_type=na_type,
-                        method=method
+                        method=method,
                     )
+                    _generate_unique_name(area=area, nucleic_acid=na)
+                    AREA_NA_LINK.objects.create(
+                        area=area,
+                        nucacid=na
+                    )
+
             else:
-                NucAcids.objects.create(
-                    area=area,
+                na = NucAcids.objects.create(
                     na_type=options["na_type"],
                     method=method
+                )
+                _generate_unique_name(area=area, nucleic_acid=na)
+                AREA_NA_LINK.objects.create(
+                    area=area,
+                    nucacid=na,
                 )
 
     except Exception as e:
@@ -155,3 +174,4 @@ def check_can_deleted_async(request):
             })
 
     return JsonResponse({"related_objects":related_objects})
+

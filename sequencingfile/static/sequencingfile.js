@@ -25,6 +25,7 @@ var KTDatatablesServerSide = function () {
             order: [[0, 'desc']],
             stateSave: false,
             destroy: true,
+            pageLength: 100,
             select: {
                 style: 'multi',
                 selector: 'td:first-child input[type="checkbox"]',
@@ -56,26 +57,11 @@ var KTDatatablesServerSide = function () {
               }
             },
             columns: [
-              { data: 'id' },
-              { data: 'folder_name' },
-              { data: 'sample_lib' },
-              { data: 'read1_file' },
-              // { data: 'read1_checksum' },
-              // { data: 'read1_count' },
-              { data: 'read2_file' },
-              // { data: 'read2_checksum' },
-              // { data: 'read2_count' },
-              { data: 'is_read_count_equal',
-                render: function (val, type, row) {
-                  if (val == true) {
-                    return "Yes";
-                  }
-                  else {
-                    return "No";
-                  }
-                }
-              },
-              { data: 'path' },
+              { data: 'file_id' },
+              { data: 'name'},
+              { data: 'path'},
+              { data: 'checksum'},
+              { data: 'sequencing_file_set'},
             ],
             columnDefs: [
                 {
@@ -89,7 +75,19 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 7,
+                    targets: 4,
+                    orderable: false,
+                    render: function (data, type, row) {
+
+                          let file_id = row["file_id"];
+                          return `
+                              <a href="/sequencingfile/sequencingfilesets?initial=${file_id}">${data}</a>`;
+
+
+                    }
+                },
+                {
+                    targets: 5,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -110,7 +108,7 @@ var KTDatatablesServerSide = function () {
                             <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4" data-kt-menu="true">
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/sequencingfile/edit/` + row["id"] + `" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
+                                    <a href="/sequencingfile/edit/` + row["file_id"] + `" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
                                         Edit
                                     </a>
                                 </div>
@@ -118,7 +116,7 @@ var KTDatatablesServerSide = function () {
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/sequencingfile/delete/` + row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
+                                    <a href="/sequencingfile/delete/` + row["file_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
                                         Delete
                                     </a>
                                 </div>

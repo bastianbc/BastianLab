@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Projects
-from .forms import ProjectForm
+from .forms import ProjectForm, FilterForm
 from django.http import JsonResponse
 import json
 from .serializers import ProjectsSerializer
@@ -24,7 +24,8 @@ def filter_projects(request):
 
 @permission_required("projects.view_projects",raise_exception=True)
 def projects(request):
-    return render(request,"project_list.html")
+    filter = FilterForm()
+    return render(request,"project_list.html", locals())
 
 @permission_required("projects.add_projects",raise_exception=True)
 def new_project(request):

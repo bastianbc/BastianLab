@@ -7,12 +7,14 @@ from django.contrib import messages
 from blocks.models import *
 from django.contrib.auth.decorators import login_required,permission_required
 from core.decorators import permission_required_for_async
+import pandas as pd
+from pathlib import Path
+
 
 @permission_required_for_async("areas.view_areas")
 def filter_areas(request):
     from .serializers import AreasSerializer
-    # _create_areas_from_consolidated_data()
-    areas = Areas().query_by_args(request.user,**request.GET)
+    areas = Areas().query_by_args(request.user, **request.GET)
     serializer = AreasSerializer(areas['items'], many=True)
     result = dict()
     result['data'] = serializer.data

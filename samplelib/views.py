@@ -22,11 +22,8 @@ def samplelibs(request):
 
 @permission_required_for_async("samplelib.view_samplelib")
 def filter_samplelibs(request):
-    # _cerate_na_from_at()
-    # barcodes()
     samplelibs = SampleLib.query_by_args(request.user,**request.GET)
     serializer = SampleLibSerializer(samplelibs['items'], many=True)
-
     result = dict()
     result['data'] = serializer.data
     result['draw'] = samplelibs['draw']

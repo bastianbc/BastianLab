@@ -14,6 +14,7 @@ from core.decorators import permission_required_for_async
 @permission_required("sequencinglib.view_sequencinglib",raise_exception=True)
 def sequencinglibs(request):
     form = SequencingRunCreationForm()
+    form_seq_run_add = SequencingLibAddForm()
     return render(request, "sequencinglib_list.html", locals())
 
 @permission_required_for_async("sequencinglib.view_sequencinglib")
@@ -233,9 +234,9 @@ def create_ilab_sheet(request):
         report.nmol = seq_link.sequencing_lib.nmol
         report.buffer = seq_link.sequencing_lib.get_buffer_display()
         for sl_link in seq_link.captured_lib.sl_cl_links.all():
-                report.sample_lib = sl_link.sample_lib.id
-                report.i5 = sl_link.sample_lib.barcode.i5
-                report.i7 = sl_link.sample_lib.barcode.i7
+            report.sample_lib = sl_link.sample_lib.id
+            report.i5 = sl_link.sample_lib.barcode.i5 if sl_link.sample_lib.barcode else None
+            report.i7 = sl_link.sample_lib.barcode.i7 if sl_link.sample_lib.barcode else None
         result.append(report)
 
     response = HttpResponse(

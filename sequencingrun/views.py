@@ -9,6 +9,9 @@ from .forms import *
 from django.contrib import messages
 from capturedlib.models import *
 from core.decorators import permission_required_for_async
+from pathlib import Path
+import pandas as pd
+
 
 @permission_required("sequencingrun.view_sequencingrun",raise_exception=True)
 def sequencingruns(request):
@@ -97,7 +100,7 @@ def new_sequencingrun_async(request):
         print(str(e))
         return JsonResponse({"success":False})
 
-    return JsonResponse({"success":True})
+    return JsonResponse({"success":True, "id":sequencing_run.id})
 
 @permission_required("sequencingrun.change_sequencingrun",raise_exception=True)
 def edit_sequencingrun(request,id):
@@ -169,3 +172,54 @@ def get_sequencers(request):
 
 def get_pes(request):
     return JsonResponse([{"label":"---------","value":""}] + [{ "label":c[1], "value":c[0] } for c in SequencingRun.PE_TYPES], safe=False)
+
+def add_async(request):
+    try:
+        seq_run_id = request.GET["id"]
+        selected_ids = json.loads(request.GET.get("selected_ids"))
+        sequencing_run = SequencingRun.objects.get(id=seq_run_id)
+        sequencinglibs = SequencingLib.objects.filter(id__in=selected_ids)
+        for sequencing_lib in sequencinglibs:
+            sequencing_run.sequencing_libs.add(sequencing_lib)
+        return JsonResponse({"success":True})
+    except Exception as e:
+        return JsonResponse({"success":False, "message": str(e)})
+
+def get_sequencing_files(request,id):
+    import os
+    from django.conf import settings
+    from django.core.serializers import serialize
+
+    sequencing_run = SequencingRun.objects.get(id=id)
+
+    sample_libs = SL_CL_LINK.objects.filter(
+        captured_lib__in=CL_SEQL_LINK.objects.filter(sequencing_lib__in=sequencing_run.sequencing_libs.all()).values("captured_lib")
+    ).values("sample_lib")
+
+    files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
+
+    return JsonResponse({
+        "sequencing_run":SingleSequencingRunSerializer(sequencing_run).data,
+        "sample_libs":serialize('json', list(sample_libs)),
+        "files":files
+    })
+
+def save_sequencing_files(request):
+    import os
+    import shutil
+
+    try:
+        seq_run_id = request.GET["id"]
+        file_names = json.loads(request.GET.get("file_names"))
+        sequencing_run = SequencingRun.objects.get(id=seq_run_id)
+
+        source_path = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, 'sequencingrun')
+        destination_path = os.makedirs(os.path.join(settings.SEQUENCING_FILES_DIRECTORY, 'new_folder_name'))
+
+        for file_name in file_names:
+            shutil.copy(f"{source_path}/{file_name}", f"{destination_path}/{file_name}")
+
+        success = True
+    except Exception as e:
+        success = False
+    return JsonResponse({"result":success})

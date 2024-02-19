@@ -3,7 +3,6 @@
 {% load crispy_forms_tags %}
 
 {% block head %}
-
 {% endblock %}
 
 {% block content %}
@@ -134,6 +133,13 @@
 
             <!--begin::Menu item-->
             <div class="menu-item px-3">
+                <a href="javascript:;" class="menu-link px-3" data-kt-docs-table-select="generate_sample_sheet">
+                    Generate Sample Sheet
+                </a>
+            </div>
+            <!--end::Menu item-->
+            <!--begin::Menu item-->
+            <div class="menu-item px-3">
                 <a href="javascript:;" class="menu-link px-3" data-kt-docs-table-select="delete_selected">
                     Delete Selection(s)
                 </a>
@@ -191,7 +197,7 @@
 <!--begin::Modal -->
 <div class="modal fade" id="modal_used_sequencinglibs" tabindex="-1" aria-hidden="true">
   <!--begin::Modal dialog-->
-  <div class="modal-dialog modal-dialog-centered mw-600px">
+  <div class="modal-dialog modal-dialog-centered mw-800px">
     <!--begin::Modal content-->
     <div class="modal-content">
       <!--begin::Modal header-->
@@ -222,9 +228,68 @@
             <div class="d-flex flex-column gap-5">
               <div class="list-header">
                 <div class="row text-light-dark bg-primary">
-                  <div class="col-6">Sequencing Library</div>
+                  <div class="col-4">Sequencing Library</div>
                   <div class="col-3">Buffer</div>
                   <div class="col-3 text-center">nMol</div>
+                  <div class="col-2 text-center">Remove</div>
+                </div>
+              </div>
+              <div class="list-body">
+
+              </div>
+            </div>
+            <!--end::Contact groups-->
+          </div>
+          <!--end::Card body-->
+        </div>
+
+
+      </div>
+      <!--end::Modal body-->
+    </div>
+    <!--end::Modal content-->
+  </div>
+  <!--end::Modal dialog-->
+</div>
+<!--end::Modal -->
+
+<!--begin::Modal -->
+<div class="modal fade" id="modal_sequencing_files" tabindex="-1" aria-hidden="true">
+  <!--begin::Modal dialog-->
+  <div class="modal-dialog modal-dialog-centered mw-800px">
+    <!--begin::Modal content-->
+    <div class="modal-content">
+      <!--begin::Modal header-->
+      <div class="modal-header">
+        <!--begin::Modal title-->
+        <h2>Sequencing Files</h2>
+        <!--end::Modal title-->
+        <!--begin::Close-->
+        <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
+          <!--begin::Svg Icon | path: icons/duotune/arrows/arr061.svg-->
+          <span class="svg-icon svg-icon-1">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor" />
+              <rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor" />
+            </svg>
+          </span>
+          <!--end::Svg Icon-->
+        </div>
+        <!--end::Close-->
+      </div>
+      <!--end::Modal header-->
+      <!--begin::Modal body-->
+      <div class="modal-body py-lg-10 px-lg-10">
+        <div class="card card-flush">
+          <!--begin::Card body-->
+          <div class="card-body pt-5">
+            <!--begin::Contact groups-->
+            <div class="d-flex flex-column gap-5">
+              <div class="list-header">
+                <div class="row text-light-dark bg-primary">
+                  <div class="col-4">Sample Library</div>
+                  <div class="col-3">File Set Name</div>
+                  <div class="col-3 text-center">Number of Files</div>
                 </div>
               </div>
               <div class="list-body">

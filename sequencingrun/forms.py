@@ -1,8 +1,9 @@
 from django import forms
 from .models import *
 from datetime import date
+from core.forms import BaseForm
 
-class SequencingRunForm(forms.ModelForm):
+class SequencingRunForm(BaseForm):
     class Meta:
         model = SequencingRun
         fields = "__all__"

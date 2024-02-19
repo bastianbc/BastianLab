@@ -11,7 +11,6 @@ def custom_update(model,pk,parameters):
 
     for key in parameters:
         if not key == "pk":
-            print("key:%s, value:%s" % (key,parameters[key]))
             if type(obj._meta.get_field(key)) == FloatField:
                 parameters[key] = float(parameters[key])
 

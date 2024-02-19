@@ -12,8 +12,7 @@ var KTDatatablesServerSide = function () {
    * Initializes the datatable.
    * @param  {String} initialValue  If it comes from another page, it is initialized with this value.
    */
-    var initDatatable = function ( initialValue ) {
-
+    var initDatatable = function (initialValue, filterDateRange, pi , technician , researcher ) {
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
 
         dt = $(".table").DataTable({
@@ -38,6 +37,12 @@ var KTDatatablesServerSide = function () {
             ajax: {
               url: '/projects/filter_projects',
               type: 'GET',
+              data:{
+                "date_range": filterDateRange,
+                "pi": pi,
+                "technician": technician,
+                "researcher": researcher,
+              },
               error: function (xhr, ajaxOptions, thrownError) {
                   if (xhr.status == 403) {
 
@@ -161,7 +166,8 @@ var KTDatatablesServerSide = function () {
             // Add data-filter attribute
             createdRow: function (row, data, dataIndex) {
                 $(row).find('td:eq(4)').attr('data-filter', data.CreditCardType);
-            }
+            },
+            oSearch: {sSearch: "_initial:" + initialValue}
         });
 
         table = dt.$;
@@ -187,28 +193,18 @@ var KTDatatablesServerSide = function () {
     // Filter Datatable
     var handleFilterDatatable = () => {
         // Select filter options
-        filterPayment = document.querySelectorAll('[data-kt-docs-table-filter="payment_type"] [name="payment_type"]');
         const filterButton = document.querySelector('[data-kt-docs-table-filter="filter"]');
 
         // Filter datatable on submit
         filterButton.addEventListener('click', function () {
-            // Get filter values
-            let paymentValue = '';
 
-            // Get payment value
-            filterPayment.forEach(r => {
-                if (r.checked) {
-                    paymentValue = r.value;
-                }
+          var dateRange = document.getElementById("id_date_range").value;
+          var pi = document.getElementById("id_pi").value;
+          var technician = document.getElementById("id_technician").value;
+          var researcher = document.getElementById("id_researcher").value;
 
-                // Reset payment value if "All" is selected
-                if (paymentValue === 'all') {
-                    paymentValue = '';
-                }
-            });
+          initDatatable(dateRange, pi, technician, researcher);
 
-            // Filter datatable --- official docs reference: https://datatables.net/reference/api/search()
-            dt.search(paymentValue).draw();
         });
     };
 
@@ -300,13 +296,17 @@ var KTDatatablesServerSide = function () {
 
         // Reset datatable
         resetButton.addEventListener('click', function () {
-            // Reset payment type
-            filterPayment[0].checked = true;
 
-            // Reset datatable --- official docs reference: https://datatables.net/reference/api/search()
-            dt.search('').draw();
+          document.getElementById("id_date_range").value = "";
+          document.getElementById("id_pi").value = "";
+          document.getElementById("id_technician").value = "";
+          document.getElementById("id_researcher").value = "";
+
+
+          initDatatable(null, null, null, null);
+
         });
-    };
+    }
 
     // Init toggle toolbar
     var initToggleToolbar = function () {
@@ -323,7 +323,6 @@ var KTDatatablesServerSide = function () {
             // Checkbox on click event
             c.addEventListener('click', function () {
                 setTimeout(function () {
-                    console.log("111");
                     toggleToolbars();
                 }, 50);
             });
@@ -559,10 +558,55 @@ var KTDatatablesServerSide = function () {
 
     };
 
+    // Redirects from other pages
+    var handleInitialValue = () => {
+
+      // Remove parameters in URL
+      function cleanUrl() {
+        window.history.replaceState(null, null, window.location.pathname);
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const x = params.get('initial');
+
+      cleanUrl();
+
+      return x;
+
+    }
+
+    // Redirects from other pages
+    var handleInitialValue = () => {
+
+      // Remove parameters in URL
+      function cleanUrl() {
+        window.history.replaceState(null, null, window.location.pathname);
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const model = params.get('model');
+      const id = params.get('id');
+      const initial = params.get('initial');
+
+      cleanUrl();
+
+      if (initial =="true" && model != null && id !=null) {
+
+        return JSON.stringify({
+          "model": model,
+          "id": id
+        });
+
+      }
+
+      return null;
+
+    }
+
     // Public methods
     return {
         init: function () {
-            initDatatable();
+            initDatatable(handleInitialValue(), null, null, null, null);
             handleSearchDatatable();
             initToggleToolbar();
             handleFilterDatatable();

@@ -7,10 +7,8 @@ var KTDatatablesServerSide = function () {
     var dt;
     var filterPayment;
     var editor;
-
     // Private functions
     var initDatatable = function ( initialValue ) {
-
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
 
         dt = $(".table").DataTable({
@@ -118,7 +116,7 @@ var KTDatatablesServerSide = function () {
                         if (data > 0) {
                           let id = row["id"];
                           return `
-                              <a href="/sequencingrun?initial=${id}">${data}</a>`;
+                              <a href="/sequencingrun?model=seqlib&id=${id}&initial=true">${data}</a>`;
                         }
                         return data;
                     }
@@ -144,7 +142,7 @@ var KTDatatablesServerSide = function () {
                             <!--begin::Menu-->
                             <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4" data-kt-menu="true">
                                 <!--begin::Menu item-->
-                                <div class="menu-item px-3">
+                                <div class="menu-item">
                                     <a href="/sequencinglib/edit/`+ row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
                                         Edit
                                     </a>
@@ -152,7 +150,7 @@ var KTDatatablesServerSide = function () {
                                 <!--end::Menu item-->
 
                                 <!--begin::Menu item-->
-                                <div class="menu-item px-2">
+                                <div class="menu-item">
                                     <a href="javascript:;" class="menu-link px-3 detail-link" data-kt-docs-table-filter="detail_row">
                                         Used Library(s)
                                     </a>
@@ -160,7 +158,7 @@ var KTDatatablesServerSide = function () {
                                 <!--end::Menu item-->
 
                                 <!--begin::Menu item-->
-                                <div class="menu-item px-3">
+                                <div class="menu-item">
                                     <a href="/sequencinglib/delete/` + row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
                                         Delete
                                     </a>
@@ -177,6 +175,7 @@ var KTDatatablesServerSide = function () {
                 $(row).find('td:eq(4)').attr('data-filter', data.CreditCardType);
             },
             oSearch: {sSearch: "_initial:" + initialValue}
+
         });
 
         table = dt.$;
@@ -528,11 +527,21 @@ var KTDatatablesServerSide = function () {
       }
 
       const params = new URLSearchParams(window.location.search);
-      const x = params.get('initial');
-
+      const model = params.get('model');
+      const id = params.get('id');
+      const initial = params.get('initial');
       cleanUrl();
 
-      return x;
+      if (initial =="true" && model != null && id !=null) {
+
+        return JSON.stringify({
+          "model": model,
+          "id": id
+        });
+
+      }
+
+      return null;
 
     }
 
@@ -541,6 +550,7 @@ var KTDatatablesServerSide = function () {
       const container = document.querySelector('.table');
 
       var modal = new bootstrap.Modal(document.getElementById("modal_sequencingrun_options"));
+      // var modal_2 = new bootstrap.Modal(document.getElementById("add_to_seq_run"));
 
       function initModal() {
 
@@ -594,10 +604,7 @@ var KTDatatablesServerSide = function () {
                       confirmButton: "btn fw-bold btn-success",
                   }
               }).then(function(){
-
-                modal.hide();
-
-                dt.draw();
+                generate_sheet(result.id);
               });
             }
             else {
@@ -757,10 +764,164 @@ var KTDatatablesServerSide = function () {
 
       }
 
+      function wait(ms){
+           var start = new Date().getTime();
+           var end = start;
+           while(end < start + ms) {
+             end = new Date().getTime();
+          }
+        }
+
+      function generate_sheet(id){
+          $.ajax({
+                url: '/sheet/sheet_seq_run/' + id,
+                type: 'GET',
+                xhrFields: {
+                    responseType: 'blob'
+                },
+                success: function(data, status, xhr) {
+                    console.log(data, status, xhr);
+                    var filename = "";
+                    var disposition = xhr.getResponseHeader('Content-Disposition');
+                    if (disposition && disposition.indexOf('attachment') !== -1) {
+                        var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+                        var matches = filenameRegex.exec(disposition);
+                        if (matches != null && matches[1]) filename = matches[1].replace(/['"]/g, '');
+                    }
+
+                    // Create a new Blob object using the response data of the xhr request
+                    var blob = new Blob([data], { type: 'text/csv' });
+
+                    // Create a link element, use it to download the blob, and remove it
+                    var link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = filename || "seq_run_sheet.csv"; // Provide a default filename if none is found
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    Swal.fire({
+                        text: "Your file is downloaded!.",
+                        icon: "success",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn fw-bold btn-primary",
+                        }
+                    }).then(function(){
+                  wait(1500);
+                  location.reload();
+              });
+                },
+                error: function(response) {
+                    loadingEl.remove();
+                     Swal.fire({
+                        text: "Your file can not created",
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn fw-bold btn-primary",
+                        }
+                    });
+
+                }
+            });
+      }
+
+      //create_sequencing_run
+      function initCreateSequencingRun(){
+
+        document.getElementById("btn_add_continue").addEventListener('click', function () {
+            var selectElement = document.getElementById("id_seq_run").value;
+            const modalElement = document.getElementById("add_to_seq_run"); // Replace "currentlyOpenModalID" with the ID of the modal that might be open
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+          $.ajax({
+            url: "/sequencingrun/add_async",
+            type: "GET",
+            data: {
+              "id": selectElement,
+              "selected_ids": getSelectedRows(),
+              "options": getCreationOptions()
+            },
+          }).done(function(result) {
+
+            if (result.success) {
+              Swal.fire({
+                  text: "Sequencing Library(s) added succesfully.",
+                  icon: "info",
+                  buttonsStyling: false,
+                  confirmButtonText: "Ok, got it!",
+                  customClass: {
+                      confirmButton: "btn fw-bold btn-success",
+                  }
+              }).then(function(){
+                  generate_sheet(selectElement);
+              });
+            }
+            else {
+              Swal.fire({
+                  text: `Sequencing Library(s) could not added ${result.message}`,
+                  icon: "error",
+                  buttonsStyling: false,
+                  confirmButtonText: "Ok, got it!",
+                  customClass: {
+                      confirmButton: "btn fw-bold btn-danger",
+                  }
+              }).then(function(){
+                  modal.show();
+                  modal.hide();
+                  dt.draw();
+              });
+            }
+          });
+
+        });
+
+
+        document.getElementById("create_sequencing_run").addEventListener('click', function (e) {
+        const container = document.querySelector('.table');
+        const selectedRows = container.querySelectorAll('[type="checkbox"]:checked');
+        const selectedIds = [];
+        selectedRows.forEach((p) => {
+          const parent = p.closest('tr');
+          const id = parent.querySelector('input[type=checkbox]').value;
+          selectedIds.push(id)
+        });
+        Swal.fire({
+              title: "<h3 style='color:dodgerblue'>" + "Add to an existing Sequencing Run?" + "</h3>",
+              showDenyButton: true,
+              confirmButtonText: "Yes Add!",
+              denyButtonText: "No, Create New One",
+              icon: "question",
+              buttonsStyling: true,
+              customClass: {
+                  confirmButton: "btn fw-bold btn-success",
+                  denyButton: "btn fw-bold btn-primary",
+                  title: "text-light"
+              }
+          }).then((result) => {
+              /* Read more about isConfirmed, isDenied below */
+              if (result.isConfirmed) {
+
+                var modal = new bootstrap.Modal(document.getElementById("add_to_seq_run"));
+                modal.show();
+                // location.reload()
+              } else if (result.isDenied){
+                  console.log("clicked no");
+                  var modal = new bootstrap.Modal(document.getElementById("modal_sequencingrun_options"));
+                  modal.show();
+                  modal.hide();
+              }
+            });
+        });
+
+    }
+
       return {
         init: function () {
-          initModal(), handleBatchDelete(), uncheckedFirstCheckBox();
-        }
+          initModal(), handleBatchDelete(), uncheckedFirstCheckBox(), initCreateSequencingRun();
+        },
       }
 
     })();
@@ -849,11 +1010,6 @@ var KTDatatablesServerSide = function () {
 
           v = data[i].volume;
           p = v / totalVolume || 0;
-          console.log("aa");
-          console.log("volume:"+data[i].volume);
-          console.log("totalVolume:"+totalVolume);
-          console.log("p:");
-          console.log(p);
 
           var row = `<div class="row mb-1 detail-row">
               <div class="col-2 align-self-center" data-id="${ data[i].captured_lib }"><a href="/capturedlib/edit/${ data[i].captured_lib }">${ data[i].name }</a></div>
@@ -1044,6 +1200,7 @@ var KTDatatablesServerSide = function () {
       }
 
     }
+
 
     // Public methods
     return {

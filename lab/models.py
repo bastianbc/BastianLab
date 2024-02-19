@@ -12,6 +12,7 @@ from django.urls import reverse
 from datetime import date
 from django.contrib.auth.models import User
 from django.db.models import Q, Count
+import json
 
 class Patients(models.Model):
 
@@ -32,14 +33,11 @@ class Patients(models.Model):
 
     pat_id = models.CharField(max_length=12, blank=False, null=False, unique=True, verbose_name="Patient ID", help_text="Requires a unique identifier for each patient.")
     sex = models.CharField(max_length=1, choices=SEX_TYPES, blank=True, null=True, verbose_name="Sex")
-    # age = models.FloatField(blank=True, null=True)
     dob = models.IntegerField(blank=True, null=True, verbose_name="Birthyear")
     race = models.SmallIntegerField(choices=RACE_TYPES, default=7, blank=True, null=True)
-    # race = models.CharField(max_length=200,blank=True, null=True, verbose_name="Race")
     source = models.CharField(max_length=20, blank=True, null=True, verbose_name="Source")
     blocks_temp = models.CharField(max_length=100, blank=True, null=True, verbose_name="Blocks")
     notes = models.TextField(blank=True, null=True, verbose_name="Notes")
-    # project = models.CharField(max_length=50, blank=True, null=True, verbose_name="Project")
     pa_id = models.AutoField(primary_key=True)
     date_added = models.DateTimeField(auto_now_add=True)
 
@@ -56,6 +54,31 @@ class Patients(models.Model):
         return self.pat_id
 
     def query_by_args(self, **kwargs):
+
+        def _is_initial_value(search_value):
+            '''
+            When the datatables are to be filled with a certain data, the search function of datatables is used.
+            The incoming parameter is parsed ve returned. If there is a initial value, the "search_value" has "_initial" prefix.
+            Parameters:
+                search_value (str): A string
+            Returns:
+                is_initial (boolean): If there is a initial value, it is True
+            '''
+            return "_initial:" in search_value and search_value.split("_initial:")[1] != "null"
+
+        def _parse_value(search_value):
+            '''
+            When the datatables are to be filled with a certain data, the search function of datatables is used.
+            The incoming parameter is parsed ve returned. If there is a initial value, the "search_value" has "_initial" prefix.
+            Parameters:
+                search_value (str): A string
+            Returns:
+                search_value (str): Parsed value
+            '''
+            if "_initial:" in search_value:
+                return json.loads(search_value.split("_initial:")[1])
+            return search_value
+
         try:
             ORDER_COLUMN_CHOICES = {
                 '0': 'pa_id',
@@ -69,6 +92,9 @@ class Patients(models.Model):
             length = int(kwargs.get('length', None)[0])
             start = int(kwargs.get('start', None)[0])
             search_value = kwargs.get('search[value]', None)[0]
+            race = kwargs.get('race', None)[0]
+            sex = kwargs.get('sex', None)[0]
+            dob = kwargs.get('dob', None)[0]
             order_column = kwargs.get('order[0][column]', None)[0]
             order = kwargs.get('order[0][dir]', None)[0]
 
@@ -79,8 +105,24 @@ class Patients(models.Model):
 
             queryset = Patients.objects.all().annotate(num_blocks=Count('patient_blocks'))
             total = queryset.count()
-
-            if search_value:
+            is_initial = _is_initial_value(search_value)
+            search_value = _parse_value(search_value)
+            if race:
+                queryset = queryset.filter(
+                    Q(race=race)
+                )
+            if sex:
+                queryset = queryset.filter(
+                    Q(sex=sex)
+                )
+            if dob:
+                queryset = queryset.filter(
+                    Q(dob=dob)
+                )
+            if is_initial:
+                if search_value["model"] == "block":
+                    queryset = queryset.filter(Q(patient_blocks__bl_id=search_value["id"]))
+            elif search_value:
                 queryset = queryset.filter(
                     Q(pat_id__icontains=search_value) |
                     Q(race__icontains=search_value) |

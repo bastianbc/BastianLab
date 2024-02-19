@@ -1,15 +1,20 @@
 from django.db import models
-from django.db.models import Q, Count, OuterRef, Subquery, Sum, Value
+from django.db.models import Q, Count, OuterRef, Subquery, Sum, Value, Case, When, IntegerField
 from datetime import datetime
 from django.utils.crypto import get_random_string
 from django.db.models.functions import Coalesce
+from samplelib.models import NA_SL_LINK
+import json
 
 class Areas(models.Model):
     AREA_TYPE_TYPES = [
+        ("tumor","Tumor"),
         ("normal","Normal"),
-        ("normal2","Normal1"),
-        ("normal3","Normal2"),
+        ("normal1","Normal1"),
+        ("normal2","Normal2"),
+        ("normal3","Normal3"),
         ("melanoma","Melanoma"),
+        ("mel","Mel"),
         ("mel1","Mel1"),
         ("mel2","Mel2"),
         ("mel3","Mel3"),
@@ -19,6 +24,7 @@ class Areas(models.Model):
         ("mis2","MIS2"),
         ("mis3","MIS3"),
         ("metastasis","Metastasis"),
+        ("met","Met"),
         ("met1","Met1"),
         ("met2","Met2"),
         ("met3","Met3"),
@@ -37,6 +43,8 @@ class Areas(models.Model):
         ("salivary-metastasis","Salivary Metastasis"),
         ("local-recurrent-metastasis","Local Recurrent Metastasis"),
         ("cells","Cells"),
+        ("cell-line","Cell Line"),
+        ("dn","DN"),
         ("other","Other"),
     ]
 
@@ -53,6 +61,7 @@ class Areas(models.Model):
 
     def __str__(self):
         return self.name
+
 
     def _generate_unique_name(self):
         '''
@@ -88,17 +97,20 @@ class Areas(models.Model):
             Users can access to some entities depend on their authorize. While the user having admin role can access to all things,
             technicians or researchers can access own projects and other entities related to it.
             '''
-            from samplelib.models import NA_SL_LINK
 
             queryset = Areas.objects.all().annotate(
-                num_nucacids=Count('nucacids'),
-                num_samplelibs=Coalesce(Subquery(
-                    NA_SL_LINK.objects.filter(
-                        nucacid__area=OuterRef("pk")
-                    ).values("nucacid__area").annotate(
-                        cnt=Count("nucacid__area")
-                    ).values("cnt")
-                ),Value(0))
+                num_nucacids=Count('area_na_links', distinct=True),
+                num_samplelibs=Count('area_na_links__nucacid__na_sl_links__sample_lib', distinct=True),
+                num_blocks=Case(
+                    When(block__isnull=False, then=1),
+                    default=0,
+                    output_field=IntegerField()
+                ),
+                num_projects=Case(
+                    When(block__project__isnull=False, then=1),
+                    default=0,
+                    output_field=IntegerField()
+                ),
             )
 
             if not user.is_superuser:
@@ -115,8 +127,7 @@ class Areas(models.Model):
                 search_value (str): Parsed value
             '''
             if "_initial:" in search_value:
-                v = search_value.split("_initial:")[1]
-                return None if v == "null" or not v.isnumeric() else v
+                return json.loads(search_value.split("_initial:")[1])
             return search_value
 
         def _is_initial_value(search_value):
@@ -139,6 +150,8 @@ class Areas(models.Model):
                 "4":"area_type",
                 "5":"completion_date",
                 "6":"investigator",
+                "7":"num_nucacids",
+                "8":"num_samplelibs",
             }
             draw = int(kwargs.get('draw', None)[0])
             length = int(kwargs.get('length', None)[0])
@@ -155,18 +168,25 @@ class Areas(models.Model):
             queryset = _get_authorizated_queryset()
 
             total = queryset.count()
-
             is_initial = _is_initial_value(search_value)
             search_value = _parse_value(search_value)
-
             if is_initial:
-                queryset = queryset.filter(
-                        Q(block__bl_id=search_value)
+                if search_value["model"] == "block":
+                    queryset = queryset.filter(Q(block__bl_id=search_value["id"]))
+                elif search_value["model"] == "nuc_acid":
+                    queryset = queryset.filter(Q(area_na_links__nucacid__nu_id=search_value["id"]))
+                elif search_value["model"] == "sample_lib":
+                    queryset = queryset.filter(Q(area_na_links__nucacid__na_sl_links__sample_lib__id=search_value["id"]))
+                else:
+                    queryset = queryset.filter(
+                        Q(block__bl_id=search_value) |
+                        Q(area_na_links__nucacid__nu_id=search_value)
                     )
             elif search_value:
                 queryset = queryset.filter(
                         Q(name__icontains=search_value) |
                         Q(block__name__icontains=search_value) |
+                        Q(block__project__name__icontains=search_value) |
                         Q(area_type__icontains=search_value) |
                         Q(notes__icontains=search_value)
                     )

@@ -9,8 +9,7 @@ var KTDatatablesServerSide = function () {
     var editor;
 
     // Private functions
-    var initDatatable = function ( initialValue, filterSequencingRun, filterPatient, filterBarcode, filterI5, filterI7, filterAreaType, filterBait ) {
-        console.log("initialValue: " + initialValue);
+    var initDatatable = function ( initialValue, filterSequencingRun, filterBarcode, filterI5, filterI7, filterAreaType, filterBait ) {
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
 
         dt = $(".table").DataTable({
@@ -20,6 +19,7 @@ var KTDatatablesServerSide = function () {
             order: [[0, 'desc']],
             stateSave: false,
             destroy: true,
+            pageLength: 10,
             select: {
                 style: 'multi',
                 selector: 'td:first-child input[type="checkbox"]',
@@ -36,7 +36,6 @@ var KTDatatablesServerSide = function () {
               type: 'GET',
               data :{
                 "sequencing_run": filterSequencingRun,
-                "patient": filterPatient,
                 "barcode": filterBarcode,
                 "i5": filterI5,
                 "i7": filterI7,
@@ -62,7 +61,7 @@ var KTDatatablesServerSide = function () {
             columns: [
                 { data: 'id' },
                 { data: 'name' },
-                { data: 'area_name' },
+                { data: 'area_num' },
                 { data: 'date',
                   render: function (data) {
                     return moment(data).format('MM/DD/YYYY');
@@ -98,12 +97,14 @@ var KTDatatablesServerSide = function () {
                 },
                 {
                     targets: 2,
-                    orderable: false,
+                    orderable: true,
                     render: function (data, type, row) {
-                        if (data) {
-                          return `<a href="/areas/edit/${row["area_id"]}">${data}</a>`;
+                        if (data > 0) {
+                          let sl_id = row["id"];
+                          return `
+                              <a href="/areas?model=sample_lib&id=${sl_id}&initial=true">${data}</a>`;
                         }
-                        return "";
+                        return data;
                     }
                 },
                 {
@@ -125,7 +126,7 @@ var KTDatatablesServerSide = function () {
                         if (data > 0) {
                           let id = row["id"];
                           return `
-                              <a href="javascript:;" class="detail-link">${data}</a>`;
+                              <a href="/libprep?model=sample_lib&id=${id}&initial=true">${data}</a>`;
                         }
                         return data;
                     }
@@ -231,14 +232,13 @@ var KTDatatablesServerSide = function () {
         filterButton.addEventListener('click', function () {
 
           var sequencingRun = document.getElementById("id_sequencing_run").value;
-          var patient = document.getElementById("id_patient").value;
           var barcode = document.getElementById("id_barcode").value;
           var i5 = document.getElementById("id_i5").value;
           var i7 = document.getElementById("id_i7").value;
           var areaType = document.getElementById("id_area_type").value;
           var bait = document.getElementById("id_bait").value;
 
-          initDatatable(null,sequencingRun,patient,barcode,i5,i7,areaType,bait);
+          initDatatable(null,sequencingRun,barcode,i5,i7,areaType,bait);
 
         });
 
@@ -372,14 +372,13 @@ var KTDatatablesServerSide = function () {
         resetButton.addEventListener('click', function () {
 
           document.getElementById("id_sequencing_run").value="";
-          document.getElementById("id_patient").value="";
           document.getElementById("id_barcode").value="";
           document.getElementById("id_i5").value="";
           document.getElementById("id_i7").value="";
           document.getElementById("id_area_type").value="";
           document.getElementById("id_bait").value="";
 
-          initDatatable(null, null, null, null, null, null, null, null);
+          initDatatable(null, null, null, null, null, null, null);
 
         });
     }
@@ -705,7 +704,6 @@ var KTDatatablesServerSide = function () {
             });
           }
           else {
-              console.log(result.error);
             Swal.fire({
                 text: "Captured Library(s) could not be created.",
                 icon: "error",
@@ -905,7 +903,7 @@ var KTDatatablesServerSide = function () {
     // Public methods
     return {
         init: function () {
-            initDatatable( handleInitialValue(), null, null, null, null, null, null, null );
+            initDatatable( handleInitialValue(), null, null, null, null, null, null );
             handleSearchDatatable();
             initToggleToolbar();
             handleFilterDatatable();

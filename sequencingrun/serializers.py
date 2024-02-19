@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import *
 from sequencinglib.models import *
+from sequencinglib.serializers import SingleSequencingLibSerializer
 
 class SequencingRunSerializer(serializers.ModelSerializer):
     DT_RowId = serializers.SerializerMethodField()
@@ -34,3 +35,10 @@ class UsedSequencingLibSerializer(serializers.ModelSerializer):
 
     def get_buffer(self,obj):
         return obj.get_buffer_display()
+
+class SingleSequencingRunSerializer(serializers.ModelSerializer):
+    sequencing_libs = SingleSequencingLibSerializer(many=True)
+
+    class Meta:
+        model = SequencingRun
+        fields = "__all__"

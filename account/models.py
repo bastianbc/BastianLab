@@ -10,6 +10,10 @@ class User(User):
     def __unicode__(self):
         return self.get_full_name()
 
+    @property
+    def full_name(self):
+        return self.get_full_name()
+
     def query_by_args(self, **kwargs):
         try:
             ORDER_COLUMN_CHOICES = {

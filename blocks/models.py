@@ -38,7 +38,6 @@ class Blocks(models.Model):
 
     bl_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50, blank=True, null=False, unique=True)
-    # pat_id = models.CharField(max_length=12, blank=True, null=True)
     patient = models.ForeignKey('lab.Patients', on_delete=models.CASCADE, db_column='patient', blank=True, null=True, related_name="patient_blocks")
     project = models.ForeignKey('projects.Projects', on_delete=models.DO_NOTHING, blank=True, null=True, related_name="project_blocks")
     age = models.FloatField(blank=True, null=True, validators=[
@@ -55,8 +54,6 @@ class Blocks(models.Model):
     slides = models.IntegerField(blank=True, null=True)
     slides_left = models.IntegerField(blank=True, null=True)
     fixation = models.CharField(max_length=100, blank=True, null=True)
-    # area_id = models.CharField(max_length=100, blank=True, null=True)
-    # old_project = models.CharField(max_length=50, blank=True, null=True)
     storage = models.CharField(max_length=50, blank=True, null=True)
     scan_number = models.CharField(max_length=200,blank=True, null=True)
     icd10 = models.TextField(blank=True, null=True)
@@ -65,7 +62,6 @@ class Blocks(models.Model):
     micro = models.TextField(blank=True, null=True)
     gross = models.TextField(blank=True, null=True)
     clinical = models.TextField(blank=True, null=True)
-    # site_code = models.TextField(blank=True, null=True)
     date_added = models.DateTimeField(blank=True, null=True, auto_now_add=True)
     old_body_site = models.CharField(max_length=600,blank=True, null=True)
     collection = models.CharField(max_length=2, choices=COLLECTION_CHOICES, default=SCRAPE)
@@ -102,7 +98,9 @@ class Blocks(models.Model):
             Users can access to some entities depend on their authorize. While the user having admin role can access to all things,
             technicians or researchers can access own projects and other entities related to it.
             '''
-            queryset = Blocks.objects.all().annotate(num_areas=Count('block_areas'))
+            queryset = Blocks.objects.all().annotate(num_areas=Count('block_areas'),
+                                                     project_num=Count("project"),
+                                                     patient_num=Count('patient'))
             if not user.is_superuser:
                 return queryset.filter(Q(project__technician=user) | Q(project__researcher=user))
             return queryset
@@ -137,27 +135,36 @@ class Blocks(models.Model):
         def _filter_by_patient(value):
             return queryset.filter(Q(patient__pat_id=value))
 
+        def _filter_by_area(value):
+            return queryset.filter(Q(block_areas__ar_id=value))
+
         def _filter_by_samplelib(value):
-            from samplelib.models import SampleLib
-            sample_lib = SampleLib.objects.get(id=value)
-            filter = [na_sl_link.nucacid.area.block.name for na_sl_link in sample_lib.na_sl_links.all()]
-            return queryset.filter(Q(name__in=filter))
+            # from samplelib.models import SampleLib
+            # sample_lib = SampleLib.objects.get(id=value)
+            # filter = [na_sl_link.nucacid.area.block.name for na_sl_link in sample_lib.na_sl_links.all()]
+            # queryset = queryset.filter(Q(block_areas__area_na_links__nucacid__na_sl_links__sample_lib__id=search_value["id"]))
+
+            return queryset.filter(Q(block_areas__area_na_links__nucacid__na_sl_links__sample_lib__id=value))
+            # return queryset.filter(Q(name__in=filter))
 
         try:
             ORDER_COLUMN_CHOICES = {
-                "0":"bl_id",
-                "1":"name",
-                "2":"project",
-                "3":"patient",
-                "4":"diagnosis",
-                "5":"body_site",
-                "6":"thickness",
-                "7":"date_added"
+                "1":"bl_id",
+                "2":"name",
+                "3":"project",
+                "4":"patient",
+                "5":"diagnosis",
+                "6":"body_site",
+                "7":"scan_number",
             }
             draw = int(kwargs.get('draw', None)[0])
             length = int(kwargs.get('length', None)[0])
             start = int(kwargs.get('start', None)[0])
             search_value = kwargs.get('search[value]', None)[0]
+            p_stage = kwargs.get('p_stage', None)[0]
+            prim = kwargs.get('prim', None)[0]
+            collection = kwargs.get('collection', None)[0]
+            body_site = kwargs.get('body_site', None)[0]
             order_column = kwargs.get('order[0][column]', None)[0]
             order = kwargs.get('order[0][dir]', None)[0]
 
@@ -172,6 +179,22 @@ class Blocks(models.Model):
 
             is_initial = _is_initial_value(search_value)
             search_value = _parse_value(search_value)
+            if p_stage:
+                queryset = queryset.filter(
+                    Q(p_stage=p_stage)
+                )
+            if prim:
+                queryset = queryset.filter(
+                    Q(prim=prim)
+                )
+            if collection:
+                queryset = queryset.filter(
+                    Q(collection=collection)
+                )
+            if body_site:
+                queryset = queryset.filter(
+                    Q(body_site__id=body_site)
+                )
             if is_initial:
                 if search_value["model"] == "project":
                     queryset = _filter_by_project(search_value["id"])
@@ -179,6 +202,8 @@ class Blocks(models.Model):
                     queryset = _filter_by_patient(search_value["id"])
                 elif search_value["model"] == "samplelib":
                     queryset = _filter_by_samplelib(search_value["id"])
+                elif search_value["model"] == "area":
+                    queryset = _filter_by_area(search_value["id"])
             elif search_value:
                 queryset = queryset.filter(
                         Q(name__icontains=search_value) |
@@ -206,6 +231,10 @@ class Blocks(models.Model):
         '''
         return [{"label":"---------","value":""}] + [{ "label":c[1], "value":c[0] } for c in Blocks.COLLECTION_CHOICES]
 
+
+    @staticmethod
+    def get_block_url():
+        return BlockUrl.objects.values("url").first()
 
 class BlockUrl(models.Model):
     url = models.CharField(max_length=1000, blank=True, null=True, verbose_name="")

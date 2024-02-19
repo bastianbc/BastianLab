@@ -6,7 +6,8 @@ import json
 from django.contrib import messages
 from lab.models import Patients
 from projects.models import Projects
-from .serializers import BlocksSerializer
+from .serializers import BlocksSerializer, BlocksSerializerObj
+from rest_framework.response import Response
 from django.contrib.auth.decorators import login_required,permission_required
 from core.decorators import permission_required_for_async
 from method.models import Method
@@ -20,14 +21,14 @@ def filter_blocks(request):
     result['draw'] = blocks['draw']
     result['recordsTotal'] = blocks['total']
     result['recordsFiltered'] = blocks['count']
-    
+
     return JsonResponse(result)
 
 @permission_required("blocks.view_blocks",raise_exception=True)
 def blocks(request):
     id = request.GET.get("id")
     model = request.GET.get("model")
-
+    filter = FilterForm()
     form = AreaCreationForm()
 
     if model=="project" and id:
@@ -180,6 +181,11 @@ def check_can_deleted_async(request):
 
 def get_collections(request):
     return JsonResponse(Blocks.get_collections(), safe=False)
+
+def get_block_async(request):
+    block = Blocks.objects.get(bl_id=request.GET["id"])
+    serializer = BlocksSerializerObj(block)
+    return JsonResponse(serializer.data)
 
 def export_csv_all_data(request):
     import csv

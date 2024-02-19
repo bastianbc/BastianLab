@@ -9,7 +9,7 @@ var KTDatatablesServerSide = function () {
     var editor;
 
     // Private functions
-    var initDatatable = function () {
+    var initDatatable = function (initialValue, race, sex, dob) {
 
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
 
@@ -34,6 +34,11 @@ var KTDatatablesServerSide = function () {
             ajax: {
               url: '/lab/filter_patients',
               type: 'GET',
+              data:{
+                "race": race,
+                "sex": sex,
+                "dob": dob,
+              },
               error: function (xhr, ajaxOptions, thrownError) {
                   if (xhr.status == 403) {
 
@@ -144,7 +149,8 @@ var KTDatatablesServerSide = function () {
             // Add data-filter attribute
             createdRow: function (row, data, dataIndex) {
                 $(row).find('td:eq(4)').attr('data-filter', data.CreditCardType);
-            }
+            },
+            oSearch: {sSearch: "_initial:" + initialValue}
         });
 
         table = dt.$;
@@ -170,30 +176,20 @@ var KTDatatablesServerSide = function () {
     // Filter Datatable
     var handleFilterDatatable = () => {
         // Select filter options
-        filterPayment = document.querySelectorAll('[data-kt-docs-table-filter="payment_type"] [name="payment_type"]');
         const filterButton = document.querySelector('[data-kt-docs-table-filter="filter"]');
 
         // Filter datatable on submit
         filterButton.addEventListener('click', function () {
-            // Get filter values
-            let paymentValue = '';
 
-            // Get payment value
-            filterPayment.forEach(r => {
-                if (r.checked) {
-                    paymentValue = r.value;
-                }
+          var race = document.getElementById("id_race").value;
+          var sex = document.getElementById("id_sex").value;
+          var dob = document.getElementById("id_dob").value;
 
-                // Reset payment value if "All" is selected
-                if (paymentValue === 'all') {
-                    paymentValue = '';
-                }
-            });
+          initDatatable(race, sex, dob);
 
-            // Filter datatable --- official docs reference: https://datatables.net/reference/api/search()
-            dt.search(paymentValue).draw();
         });
-    }
+    };
+
 
     // Delete customer
     var handleDeleteRows = () => {
@@ -283,11 +279,13 @@ var KTDatatablesServerSide = function () {
 
         // Reset datatable
         resetButton.addEventListener('click', function () {
-            // Reset payment type
-            filterPayment[0].checked = true;
 
-            // Reset datatable --- official docs reference: https://datatables.net/reference/api/search()
-            dt.search('').draw();
+          document.getElementById("id_race").value = "";
+          document.getElementById("id_sex").value = "";
+          document.getElementById("id_dob").value = "";
+
+          initDatatable(null, null, null);
+
         });
     }
 
@@ -339,7 +337,6 @@ var KTDatatablesServerSide = function () {
             "selected_ids":JSON.stringify(selectedIds),
           },
         }).done(function(result) {
-          console.log("result.success:"+result.success);
           if (result.success) {
             Swal.fire({
                 text: "Block(s) created succesfully.",
@@ -528,10 +525,38 @@ var KTDatatablesServerSide = function () {
 
     }
 
+    // Redirects from other pages
+    var handleInitialValue = () => {
+
+      // Remove parameters in URL
+      function cleanUrl() {
+        window.history.replaceState(null, null, window.location.pathname);
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const model = params.get('model');
+      const id = params.get('id');
+      const initial = params.get('initial');
+
+      cleanUrl();
+
+      if (initial =="true" && model != null && id !=null) {
+
+        return JSON.stringify({
+          "model": model,
+          "id": id
+        });
+
+      }
+
+      return null;
+
+    }
+
     // Public methods
     return {
         init: function () {
-            initDatatable();
+            initDatatable(handleInitialValue(), null,null,null);
             handleSearchDatatable();
             initToggleToolbar();
             handleFilterDatatable();

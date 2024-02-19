@@ -96,9 +96,7 @@ class CapturedLib(models.Model):
             search_value = _parse_value(search_value)
 
             if is_initial:
-                print(search_value)
                 filter = [sl_cl_link.captured_lib.id for sl_cl_link in SL_CL_LINK.objects.filter(sample_lib__id=search_value)]
-                print(filter)
                 queryset = queryset.filter(Q(id__in=filter))
             elif search_value:
                 queryset = queryset.filter(
@@ -135,6 +133,7 @@ class SL_CL_LINK(models.Model):
     sample_lib = models.ForeignKey("samplelib.SampleLib", on_delete=models.CASCADE, verbose_name="Sample Library", related_name="sl_cl_links")
     volume = models.FloatField(default=0, verbose_name="Volume")
     amount = models.FloatField(default=0, verbose_name="Amount")
+    date = models.DateTimeField(default=datetime.now, verbose_name="Date")
 
     class Meta:
         db_table = "sl_cl_link"
