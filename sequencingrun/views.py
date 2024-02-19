@@ -184,3 +184,42 @@ def add_async(request):
         return JsonResponse({"success":True})
     except Exception as e:
         return JsonResponse({"success":False, "message": str(e)})
+
+def get_sequencing_files(request,id):
+    import os
+    from django.conf import settings
+    from django.core.serializers import serialize
+
+    sequencing_run = SequencingRun.objects.get(id=id)
+
+    sample_libs = SL_CL_LINK.objects.filter(
+        captured_lib__in=CL_SEQL_LINK.objects.filter(sequencing_lib__in=sequencing_run.sequencing_libs.all()).values("captured_lib")
+    ).values("sample_lib")
+
+    files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
+
+    return JsonResponse({
+        "sequencing_run":SingleSequencingRunSerializer(sequencing_run).data,
+        "sample_libs":serialize('json', list(sample_libs)),
+        "files":files
+    })
+
+def save_sequencing_files(request):
+    import os
+    import shutil
+
+    try:
+        seq_run_id = request.GET["id"]
+        file_names = json.loads(request.GET.get("file_names"))
+        sequencing_run = SequencingRun.objects.get(id=seq_run_id)
+
+        source_path = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, 'sequencingrun')
+        destination_path = os.makedirs(os.path.join(settings.SEQUENCING_FILES_DIRECTORY, 'new_folder_name'))
+
+        for file_name in file_names:
+            shutil.copy(f"{source_path}/{file_name}", f"{destination_path}/{file_name}")
+
+        success = True
+    except Exception as e:
+        success = False
+    return JsonResponse({"result":success})

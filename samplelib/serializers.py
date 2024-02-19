@@ -121,3 +121,9 @@ class SavedNuacidsSerializer(serializers.ModelSerializer):
 
     def get_input_amount(self,obj):
         return round(obj.input_amount,2)
+
+class SingleSampleLibSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = SampleLib
+        fields = "__all__"

@@ -127,7 +127,7 @@ var KTDatatablesServerSide = function () {
                             <!--begin::Menu-->
                             <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4" data-kt-menu="true">
                                 <!--begin::Menu item-->
-                                <div class="menu-item px-3">
+                                <div class="menu-item">
                                     <a href="/sequencingrun/edit/`+ row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
                                         Edit
                                     </a>
@@ -135,15 +135,23 @@ var KTDatatablesServerSide = function () {
                                 <!--end::Menu item-->
 
                                 <!--begin::Menu item-->
-                                <div class="menu-item px-2">
-                                    <a href="javascript:;" class="menu-link px-3 detail-link" data-kt-docs-table-filter="detail_row">
+                                <div class="menu-item">
+                                    <a href="javascript:;" class="menu-link detail-link" data-kt-docs-table-filter="detail_row">
                                         Used Library(s)
                                     </a>
                                 </div>
                                 <!--end::Menu item-->
 
                                 <!--begin::Menu item-->
-                                <div class="menu-item px-3">
+                                <div class="menu-item">
+                                    <a href="javascript:;" class="menu-link sequencing-files-link" data-kt-docs-table-filter="detail_row">
+                                        Get Sequencing Files
+                                    </a>
+                                </div>
+                                <!--end::Menu item-->
+
+                                <!--begin::Menu item-->
+                                <div class="menu-item">
                                     <a href="/sequencingrun/delete/` + row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
                                         Delete
                                     </a>
@@ -784,6 +792,40 @@ var KTDatatablesServerSide = function () {
 
     })();
 
+    function initSequencingFilesModal() {
+      console.log("init sequencing files modal");
+      const elSequencingFiles = document.getElementById("modal_sequencing_files");
+      const modalSequencingFiles = new bootstrap.Modal(elSequencingFiles);
+
+      document.querySelectorAll(".sequencing-files-link").forEach((item, i) => {
+        console.log("links..");
+        item.addEventListener("click", function () {
+          console.log("clicked item: " + this);
+          const parent = this.closest('tr');
+          // Get customer name
+          const id = parent.querySelector('input[type=checkbox]').value;
+
+          $.ajax({
+              url: "/sequencingrun/" + id + "/get_sequencing_files",
+              type: "GET",
+              success: function (retval) {
+
+                console.log(retval);
+
+                modalSequencingFiles.show();
+
+              },
+              error: function (xhr, ajaxOptions, thrownError) {
+
+              }
+          });
+
+        });
+
+      });
+
+    }
+
     var initRowActions = () => {
 
       const el = document.getElementById("modal_used_sequencinglibs");
@@ -792,6 +834,8 @@ var KTDatatablesServerSide = function () {
       var data = {};
 
       initModal();
+
+      initSequencingFilesModal();
 
       function initModal() {
 
@@ -806,7 +850,6 @@ var KTDatatablesServerSide = function () {
         });
 
         var detailLinks = document.querySelectorAll(".detail-link");
-
         for (var detail of detailLinks) {
 
           detail.addEventListener("click", function (e) {
@@ -851,6 +894,8 @@ var KTDatatablesServerSide = function () {
 
         }
       }
+
+
     }
 
     // Public methods

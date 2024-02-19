@@ -133,7 +133,7 @@ DATABASES = {
         'USER': 'testuser',
         'PASSWORD': '1235',
         'NAME': 'labdb',
-        'HOST': '10.65.11.68',
+        'HOST': '127.0.0.1',
         'PORT': '5432',
         'DISABLE_SERVER_SIDE_CURSORS': True
     }
@@ -258,3 +258,5 @@ LOGGING = {
     },
 }
 }
+
+SEQUENCING_FILES_DIRECTORY = BASE_DIR
