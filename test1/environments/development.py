@@ -259,4 +259,5 @@ LOGGING = {
 }
 }
 
-SEQUENCING_FILES_DIRECTORY = BASE_DIR
+smb_directory = "/mnt/smb_volume"
+SEQUENCING_FILES_DIRECTORY = Path(Path(smb_directory) / "BastianRaid-02" / "HiSeqData")

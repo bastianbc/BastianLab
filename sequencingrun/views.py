@@ -11,6 +11,8 @@ from capturedlib.models import *
 from core.decorators import permission_required_for_async
 from pathlib import Path
 import pandas as pd
+import re
+from samplelib.models import SampleLib
 
 
 @permission_required("sequencingrun.view_sequencingrun",raise_exception=True)
@@ -185,24 +187,60 @@ def add_async(request):
     except Exception as e:
         return JsonResponse({"success":False, "message": str(e)})
 
+def get_or_none(model_class, **kwargs):
+    try:
+        return model_class.objects.get(**kwargs)
+    except Exception as e:
+        return None
+
+
+def _get_matched_sample_libray(file, sample_libs):
+    match = re.search("[ATGC]{6}", file)
+    sl=sl_name=None
+    if match:
+        sl_name = re.split(r"(?=(_[ATGC]{6}|-[ATGC]{6}))", file, maxsplit=1)[0]
+        sl = sample_libs.filter(name__iexact=sl_name).first()
+
+    elif re.search("_S\d", file):
+        sl_name = file.split("_S")[0]
+        sl = sample_libs.filter(name__iexact=sl_name).first()
+    elif re.search(".deduplicated.realign.bam", file):
+        sl_name = file.split(".")[0]
+        sl = sample_libs.filter(name__iexact=sl_name).first()
+    elif file.endswith(".bam") or file.endswith(".bai"):
+        sl_name = file.split(".")[0]
+        sl = sample_libs.filter(name__iexact=sl_name).first()
+    elif re.search("_R", file):
+        sl_name = file.split("_R")[0]
+        sl = sample_libs.filter(name__iexact=sl_name).first()
+    return sl if sl else None
+
+
 def get_sequencing_files(request,id):
     import os
     from django.conf import settings
     from django.core.serializers import serialize
+    from samplelib.models import SampleLib
 
     sequencing_run = SequencingRun.objects.get(id=id)
 
-    sample_libs = SL_CL_LINK.objects.filter(
-        captured_lib__in=CL_SEQL_LINK.objects.filter(sequencing_lib__in=sequencing_run.sequencing_libs.all()).values("captured_lib")
-    ).values("sample_lib")
+    sample_libs = SampleLib.objects.filter(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct()
 
-    files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
+    try:
+        files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
+    except:
+        files = os.listdir(Path(Path(__file__).parent.parent / "uploads" / "files"))
+    d = dict()
+    l = [dict(
+        file=file,
+        sample_lib=serialize('json', [_get_matched_sample_libray(file, sample_libs)]),
+    ) for file in files]
+    d['files'] = l
+    d['sample_libs'] = serialize('json', sample_libs)
+    d['sequencing_run'] = serialize('json', [sequencing_run])
 
-    return JsonResponse({
-        "sequencing_run":SingleSequencingRunSerializer(sequencing_run).data,
-        "sample_libs":serialize('json', list(sample_libs)),
-        "files":files
-    })
+    return JsonResponse(json.dumps(d), safe=False)
+
 
 def save_sequencing_files(request):
     import os

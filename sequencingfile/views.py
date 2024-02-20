@@ -339,7 +339,7 @@ def _get_matched_sample_libray(file):
     match = re.search("[ATGC]{6}", file)
     sl=sl_name=None
     if match:
-        sl_name = re.split(r'(?=(_[ATGC]{6}|-[ATGC]{6}))', file, 1)[0]
+        sl_name = re.split(r'(?=(_[ATGC]{6}|-[ATGC]{6}))', file, 0)
         sl = get_or_none(SampleLib, name=sl_name)
     elif re.search("_S\d", file):
         sl_name = file.split("_S")[0]

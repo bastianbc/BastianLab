@@ -798,9 +798,7 @@ var KTDatatablesServerSide = function () {
       const modalSequencingFiles = new bootstrap.Modal(elSequencingFiles);
 
       document.querySelectorAll(".sequencing-files-link").forEach((item, i) => {
-        console.log("links..");
         item.addEventListener("click", function () {
-          console.log("clicked item: " + this);
           const parent = this.closest('tr');
           // Get customer name
           const id = parent.querySelector('input[type=checkbox]').value;
@@ -808,11 +806,12 @@ var KTDatatablesServerSide = function () {
           $.ajax({
               url: "/sequencingrun/" + id + "/get_sequencing_files",
               type: "GET",
-              success: function (retval) {
+              success: function (data) {
 
-                console.log(retval);
-
+                var d = JSON.parse(data);
+                fillElements(id,d);
                 modalSequencingFiles.show();
+
 
               },
               error: function (xhr, ajaxOptions, thrownError) {
@@ -825,6 +824,33 @@ var KTDatatablesServerSide = function () {
       });
 
     }
+
+
+    function fillElements(id,data) {
+
+        var listEl = document.querySelector(".list-body2");
+
+        listEl.setAttribute('data-captured_lib_id', id);
+
+        for (let i = 0; i < data.files.length; i++) {
+          var row = `<div class="row mb-1">
+              <div class="col-3 align-self-center">
+                    <select class="form-select-sl" id="select_${i}">
+                        <option value="${ JSON.parse(data.files[i].sample_lib)[0].fields.name }">${ JSON.parse(data.files[i].sample_lib)[0].fields.name }</option>
+                    </select>
+                </div>
+              <div class="col-6 align-self-center">${ data.files[i].file }</div>
+              <div class="col-3 align-self-center text-center">${ JSON.parse(data.sequencing_run)[0].fields.name }</div>
+            </div>`;
+          listEl.innerHTML += row;
+        }
+
+        var footer = `<div class="mt-5">
+              <button type="button" class="btn btn-lg btn-success" id="btn_save">Save</button>
+            </div>`;
+
+        listEl.innerHTML += footer;
+      }
 
     var initRowActions = () => {
 
@@ -908,6 +934,7 @@ var KTDatatablesServerSide = function () {
             handleDeleteRows();
             handleResetForm();
             initEditor();
+
         }
     }
 }();
