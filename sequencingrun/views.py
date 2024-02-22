@@ -221,6 +221,7 @@ def get_sequencing_files(request,id):
     from django.conf import settings
     from django.core.serializers import serialize
     from samplelib.models import SampleLib
+    from samplelib.serializers import SingleSampleLibSerializer
 
     sequencing_run = SequencingRun.objects.get(id=id)
 
@@ -230,16 +231,21 @@ def get_sequencing_files(request,id):
         files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
     except:
         files = os.listdir(Path(Path(__file__).parent.parent / "uploads" / "files"))
-    d = dict()
-    l = [dict(
-        file=file,
-        sample_lib=serialize('json', [_get_matched_sample_libray(file, sample_libs)]),
-    ) for file in files]
-    d['files'] = l
-    d['sample_libs'] = serialize('json', sample_libs)
-    d['sequencing_run'] = serialize('json', [sequencing_run])
 
-    return JsonResponse(json.dumps(d), safe=False)
+    # d = dict()
+    # l = [dict(
+    #     file=file,
+    #     sample_lib=serialize('json', [_get_matched_sample_libray(file, sample_libs)]),
+    # ) for file in files]
+    # d['files'] = l
+    # d['sample_libs'] = SingleSampleLibSerializer(sample_libs,many=True).data
+    # d['sequencing_run'] = SingleSequencingRunSerializer(sequencing_run).data
+
+    return JsonResponse({
+        "files" : [("file_name",65132,3)],
+        "sample_libs":SingleSampleLibSerializer(sample_libs,many=True).data,
+        "sequencing_run": SingleSequencingRunSerializer(sequencing_run).data
+    })
 
 
 def save_sequencing_files(request):
@@ -248,7 +254,8 @@ def save_sequencing_files(request):
 
     try:
         seq_run_id = request.GET["id"]
-        file_names = json.loads(request.GET.get("file_names"))
+        data = json.loads(request.GET.get("data"))
+
         sequencing_run = SequencingRun.objects.get(id=seq_run_id)
 
         source_path = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, 'sequencingrun')

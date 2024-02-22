@@ -808,10 +808,13 @@ var KTDatatablesServerSide = function () {
               type: "GET",
               success: function (data) {
 
-                var d = JSON.parse(data);
-                fillElements(id,d);
-                modalSequencingFiles.show();
+                fillElements(data);
 
+                document.querySelector('button[name=btnSave]').addEventListener("click", function () {
+                  saveChanges(id);
+                });
+
+                modalSequencingFiles.show();
 
               },
               error: function (xhr, ajaxOptions, thrownError) {
@@ -826,31 +829,79 @@ var KTDatatablesServerSide = function () {
     }
 
 
-    function fillElements(id,data) {
+    function fillElements(data) {
 
-        var listEl = document.querySelector(".list-body2");
+      var list = document.querySelector(".list-body2");
 
-        listEl.setAttribute('data-captured_lib_id', id);
+      list.innerHTML = ""; // Clean the list
 
-        for (let i = 0; i < data.files.length; i++) {
-          var row = `<div class="row mb-1">
-              <div class="col-3 align-self-center">
-                    <select class="form-select-sl" id="select_${i}">
-                        <option value="${ JSON.parse(data.files[i].sample_lib)[0].fields.name }">${ JSON.parse(data.files[i].sample_lib)[0].fields.name }</option>
-                    </select>
-                </div>
-              <div class="col-6 align-self-center">${ data.files[i].file }</div>
-              <div class="col-3 align-self-center text-center">${ JSON.parse(data.sequencing_run)[0].fields.name }</div>
-            </div>`;
-          listEl.innerHTML += row;
+      for (var i = 0; i < data.files.length; i++) {
+
+        var sel = document.createElement("select");
+        sel.classList.add("select","form-control","form-control-sm")
+        sel.add(document.createElement("option")); // added empty value
+
+        for (var sl of data.sample_libs) {
+          var opt = document.createElement("option");
+          opt.value = sl.id;
+          opt.text = sl.name;
+
+          if (sl.id == data.files[i][1]) { // mactched sample_lib
+            opt.setAttribute("selected", "selected");
+          }
+
+          sel.add(opt);
         }
 
-        var footer = `<div class="mt-5">
-              <button type="button" class="btn btn-lg btn-success" id="btn_save">Save</button>
-            </div>`;
+        var row = `<div class="row">
+                      <div class="col-3">${sel.outerHTML}</div>
+                      <div class="col-6"><input type="text" class="form-control form-control-sm" value="${data.files[i][0]}"></div>
+                      <div class="col-3 text-center"><span>${data.files[i][2]}</span></div>
+                   </div>
+                   `;
 
-        listEl.innerHTML += footer;
+        list.innerHTML += row;
       }
+
+    }
+
+    function saveChanges(id) {
+      var list = document.querySelectorAll(".list-body2 .row");
+
+      var data = [];
+
+      list.forEach((row, i) => {
+        var sample_lib_id = row.querySelector("select").value;
+        var file_set_name = row.querySelector("input[type=text]").value;
+        var file_numbers = row.querySelector("span").textContent;
+
+        data.push([sample_lib_id,file_set_name,file_numbers]);
+      });
+
+      $.ajax({
+          url: "/sequencingrun/save_sequencing_files",
+          data: {
+            "id":id,
+            "data":JSON.stringify(data),
+          },
+          type: "GET",
+          success: function (data) {
+
+            fillElements(data);
+
+            document.querySelector('button[name=btnSave]').addEventListener("click", function () {
+              saveChanges();
+            });
+
+            modalSequencingFiles.show();
+
+          },
+          error: function (xhr, ajaxOptions, thrownError) {
+
+          }
+      });
+
+    }
 
     var initRowActions = () => {
 
