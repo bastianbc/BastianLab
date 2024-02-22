@@ -81,3 +81,4 @@ environment.py
 development.py
 
 
+*.pyc

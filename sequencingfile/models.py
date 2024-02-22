@@ -122,6 +122,7 @@ class SequencingFile(models.Model):
                 "1": "name",
             }
             draw = int(kwargs.get('draw', None)[0])
+            print("*"*100,draw)
             length = int(kwargs.get('length', None)[0])
             start = int(kwargs.get('start', None)[0])
             search_value = kwargs.get('search[value]', None)[0]

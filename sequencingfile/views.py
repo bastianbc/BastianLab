@@ -2,6 +2,7 @@ import os
 import json
 import pandas as pd
 from pathlib import Path
+import re
 
 from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required,permission_required
@@ -15,6 +16,8 @@ from samplelib.models import *
 from sequencingrun.models import *
 from capturedlib.models import CapturedLib
 from sequencinglib.models import SequencingLib
+from django.core.exceptions import ObjectDoesNotExist
+from django.db.models.expressions import RawSQL
 
 
 @permission_required("sequencingfile.view_sequencingfile",raise_exception=True)
@@ -30,7 +33,7 @@ def filter_sequencingfiles(request):
     result['draw'] = sequencingfiles['draw']
     result['recordsTotal'] = sequencingfiles['total']
     result['recordsFiltered'] = sequencingfiles['count']
-
+    print(result, "&"*50)
     return JsonResponse(result)
 
 
@@ -368,7 +371,78 @@ def get_or_create_files_from_file(row):
     except Exception as e:
         print(e)
 
-def temp_directory(request):
+
+def tempfiles(request):
+
+    return render(request, "temp_file_list.html", locals())
+
+def pattern(file):
+    pattern = r"L\d{3}_R\d"
+    match = re.search(pattern, file)
+
+    if match:
+        print(f"Match found: {match.group()}")
+    else:
+        print("No match found.")
+
+def get_or_none(model_class, **kwargs):
+    try:
+        return model_class.objects.get(**kwargs)
+    except Exception as e:
+        return None
+
+def levenshtein_similarity(sl):
+    from django.db import connection
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT *, levenshtein(substring(name from 5), %s) as lev_distance
+            FROM sample_lib
+            WHERE name LIKE %s AND levenshtein(substring(name from 5), %s) <= 2
+        """, ['059', 'AMLP%', '059'])
+        results = cursor.fetchall()
+        sample_lib_objects = SampleLib.objects.filter(name__in=[result[1] for result in results])
+        return sample_lib_objects
+
+def trigramSimilarity(sl):
+    from django.contrib.postgres.search import TrigramSimilarity
+    similar_records = SampleLib.objects.annotate(
+        similarity=TrigramSimilarity('name', sl),
+    ).filter(similarity__gt=0.1).order_by('-similarity')
+    return similar_records
+
+def _get_matched_sample_libray(file):
+    match = re.search("[ATGC]{6}", file)
+    sl=sl_name=None
+    if match:
+        sl_name = re.split(r'(?=(_[ATGC]{6}|-[ATGC]{6}))', file, 0)
+        sl = get_or_none(SampleLib, name=sl_name)
+    elif re.search("_S\d", file):
+        sl_name = file.split("_S")[0]
+        sl = get_or_none(SampleLib, name=sl_name)
+        # if not sl:
+        #     sl = levenshtein_similarity(sl_name)
+        #     print(f"levenshtein_similarity__{sl_name}", sl)
+    elif re.search(".deduplicated.realign.bam", file):
+        sl_name = file.split(".")[0]
+        sl = get_or_none(SampleLib, name=sl_name)
+    elif file.endswith(".bam") or file.endswith(".bai"):
+        sl_name = file.split(".")[0]
+        sl = get_or_none(SampleLib, name=sl_name)
+    elif re.search("_R", file):
+        sl_name = file.split("_R")[0]
+        sl = get_or_none(SampleLib, name=sl_name)
+
+    return sl if sl else (file, sl_name)
+    # else:
+    #     pattern = r"((?:_L\d{3}_R\d)|(?:_L\d{3}_I\d)|(?:_R\d_\d{3}))"
+    #     match = re.search(pattern, file)
+    #     if match:
+    #         parts = re.split(pattern, file, 1)
+    #         sl = get_or_none(SampleLib,name=parts[0])
+
+
+
+def filter_temp_directory(request):
     smb_directory = "/mnt/smb_volume"  # Replace with the actual directory path
 
     '''
@@ -376,17 +450,80 @@ def temp_directory(request):
     command = f'mkdir -p {smb_directory}/TEMP'
     p = os.system('echo %s|sudo -S %s' % (sudoPassword, command))
     '''
+    #
+    # temp_directory = Path(Path(smb_directory) / "BastianRaid-02" / "HiSeqData"/ "TEMP")
+    #
+    # for root, dirs, files in os.walk(temp_directory):
+    #     d = dict([("name", files)])
+    file = Path(Path(__file__).parent.parent / "uploads" / "df_fq.csv")
+    df = pd.read_csv(file)
+    df_shuffled = df.sample(frac=1).reset_index(drop=True)
+    for index, value in enumerate(df['file']):
+        # print(value)
+        v = _get_matched_sample_libray(value)
+        if isinstance(v, tuple):
+            print(v)
 
-    smb_path = Path(smb_directory)
-    temp_directory = Path(Path(smb_directory) / "BastianRaid-02" / "HiSeqData"/ "TEMP")
+    # Extract the matching part of the pattern
+    # df['match'] = df['file'].str.extract(pattern)
+    # df2 = df['file'].str.split(pattern, expand=True)[0]
+    # for index, value in enumerate(df2):
+    #     try:
+    #         if ".bam" in value or '.bai' in value:
+    #             match = re.search("[ATGC]{6}", value)
+    #             if match:
+    #                 parts = re.split(r'(?=(_[ATGC]{6}))', value, 1)
+    #                 if "12_" in parts[0]:
+    #                     sl = SampleLib.objects.get(name__icontains=parts[0].replace("_","-"))
+    #                 elif "oniva" in parts[0]:
+    #                     sl = SampleLib.objects.get(name=parts[0].replace("Boniva","Bivona"))
+    #                 elif "CGH" in parts[0]:
+    #                     sl = SampleLib.objects.get(name__icontains=parts[0])
+    #                 elif "BB08" in parts[0]:
+    #                     sl = SampleLib.objects.get(name__icontains=parts[0].replace("BB08","BB008"))
+    #                 else:
+    #                     sl = SampleLib.objects.get(name=parts[0].replace("BB08","BB008"))
+    #                 file_set = sl.sequencing_file_sets.all()[0]
+    #             # file_set = SequencingFileSet.objects.get(prefix=value.strip())
+    #             # SequencingFile.objects.get_or_create(name=value, sequencing_file_set=file_set)
+    #         else:
+    #             match = re.search("[ATGC]{6}", value)
+    #             if match:
+    #                 parts = re.split(r'(?=(_[ATGC]{6}|-[ATGC]{6}))', value, 1)
+    #                 if "MIN" in value:
+    #                     sl = SampleLib.objects.get(name=parts[0].replace("-","_"))
+    #                 elif "WTMM" in value:
+    #                     sl = SampleLib.objects.get(name__icontains=parts[0])
+    #                 elif re.search("WTMM\d", value):
+    #                     print(parts[0])
+    #                     sl = SampleLib.objects.get(name__icontains=parts[0].replace("WTMM","WTMM-"))
+    #                 else:
+    #                     sl = SampleLib.objects.get(name=parts[0])
+    #     except ObjectDoesNotExist as e:
+    #         print(value, e)
+    #         # pass
+    #     except Exception as e:
+    #         print("@@@@@: ", e)
+    #         pass
+    l = [{
+        "id": i,
+        "seq_run": "",
+        "file_name": d,
+        "number_of_files": "",
+        "sample_lib": "",
+         } for i, d in enumerate(df_shuffled.file[:100].to_list())
+    ]
+    search_term = "AMPL-208"
+    res = SampleLib.objects.raw(
+        "SELECT * FROM sample_lib WHERE SOUNDEX(name) = SOUNDEX(%s)",
+        [search_term]
+    )
+    print(list(res))
+    result = dict()
+    result['data'] = l
+    # print(result,"&"*100)
 
-    for root, dirs, files in os.walk(temp_directory):
-        d = dict([("name", files)])
-
-    return JsonResponse(d)
-
-
-
+    return JsonResponse(result)
 
 
 

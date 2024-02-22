@@ -10,14 +10,10 @@ from .serializers import BlocksSerializer, BlocksSerializerObj
 from rest_framework.response import Response
 from django.contrib.auth.decorators import login_required,permission_required
 from core.decorators import permission_required_for_async
-import pandas as pd
-from pathlib import Path
 from method.models import Method
-
 
 @permission_required_for_async("blocks.view_blocks")
 def filter_blocks(request):
-    from .serializers import BlocksSerializer
     blocks = Blocks.query_by_args(request.user,**request.GET)
     serializer = BlocksSerializer(blocks['items'], many=True)
     result = dict()
@@ -25,6 +21,7 @@ def filter_blocks(request):
     result['draw'] = blocks['draw']
     result['recordsTotal'] = blocks['total']
     result['recordsFiltered'] = blocks['count']
+
     return JsonResponse(result)
 
 @permission_required("blocks.view_blocks",raise_exception=True)

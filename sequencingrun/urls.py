@@ -20,4 +20,6 @@ urlpatterns = [
     path('get_sequencers', views.get_sequencers, name='get-sequencers'),
     path('get_pes', views.get_pes, name='get-pes'),
     path('add_async', views.add_async, name="add_async"),
+    path('<int:id>/get_sequencing_files', views.get_sequencing_files, name="get-sequencing-files"),
+    path('save_sequencing_files', views.save_sequencing_files, name="save-sequencing-files"),
 ] + staticfiles_urlpatterns()

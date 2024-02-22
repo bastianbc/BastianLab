@@ -127,7 +127,7 @@ var KTDatatablesServerSide = function () {
                             <!--begin::Menu-->
                             <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4" data-kt-menu="true">
                                 <!--begin::Menu item-->
-                                <div class="menu-item px-3">
+                                <div class="menu-item">
                                     <a href="/sequencingrun/edit/`+ row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
                                         Edit
                                     </a>
@@ -135,15 +135,23 @@ var KTDatatablesServerSide = function () {
                                 <!--end::Menu item-->
 
                                 <!--begin::Menu item-->
-                                <div class="menu-item px-2">
-                                    <a href="javascript:;" class="menu-link px-3 detail-link" data-kt-docs-table-filter="detail_row">
+                                <div class="menu-item">
+                                    <a href="javascript:;" class="menu-link detail-link" data-kt-docs-table-filter="detail_row">
                                         Used Library(s)
                                     </a>
                                 </div>
                                 <!--end::Menu item-->
 
                                 <!--begin::Menu item-->
-                                <div class="menu-item px-3">
+                                <div class="menu-item">
+                                    <a href="javascript:;" class="menu-link sequencing-files-link" data-kt-docs-table-filter="detail_row">
+                                        Get Sequencing Files
+                                    </a>
+                                </div>
+                                <!--end::Menu item-->
+
+                                <!--begin::Menu item-->
+                                <div class="menu-item">
                                     <a href="/sequencingrun/delete/` + row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
                                         Delete
                                     </a>
@@ -784,6 +792,146 @@ var KTDatatablesServerSide = function () {
 
     })();
 
+    function initSequencingFilesModal() {
+      console.log("init sequencing files modal");
+      const elSequencingFiles = document.getElementById("modal_sequencing_files");
+      const modalSequencingFiles = new bootstrap.Modal(elSequencingFiles);
+
+      document.querySelectorAll(".sequencing-files-link").forEach((item, i) => {
+        item.addEventListener("click", function () {
+          const parent = this.closest('tr');
+          // Get customer name
+          const id = parent.querySelector('input[type=checkbox]').value;
+
+          $.ajax({
+              url: "/sequencingrun/" + id + "/get_sequencing_files",
+              type: "GET",
+              success: function (data) {
+
+                fillElements(data);
+
+                document.querySelector('button[name=btnSave]').addEventListener("click", function () {
+                  saveChanges(id);
+                });
+
+                document.querySelectorAll('.fl_sl').forEach(function(element) {
+                    element.addEventListener("change", function() {
+                        console.log($(this));
+                        var row = this.closest('.row');
+                        var file_set_input_name = row.querySelector('.fset');
+                        if (file_set_input_name && !file_set_input_name.value.includes("_FLAG_")) {
+                            file_set_input_name.value = file_set_input_name.value + "_FLAG_";
+                        }
+                    });
+                });
+
+                modalSequencingFiles.show();
+
+              },
+              error: function (xhr, ajaxOptions, thrownError) {
+
+              }
+          });
+
+        });
+
+      });
+
+    }
+
+
+    function fillElements(data) {
+
+      var list = document.querySelector(".list-body2");
+
+      list.innerHTML = ""; // Clean the list
+
+      for (var i = 0; i < data.files.length; i++) {
+
+        var sel = document.createElement("select");
+        sel.classList.add("select","form-control","form-control-sm", "fl_sl")
+        var defaultOption = document.createElement("option");
+        defaultOption.text = "Not Matched";
+        defaultOption.value = "not_matched";
+        defaultOption.setAttribute("selected", "selected");
+
+        sel.add(defaultOption);
+
+        var emptyOption = document.createElement("option");
+        emptyOption.text = "";
+        emptyOption.value = "";
+        sel.add(emptyOption, 0);
+
+        for (var sl of data.sample_libs) {
+          var opt = document.createElement("option");
+          opt.value = sl.id;
+          opt.text = sl.name;
+
+          if (sl.id == data.files[i][1]) { // mactched sample_lib
+            opt.setAttribute("selected", "selected");
+          }
+
+          sel.add(opt);
+        }
+
+        var row = `<div class="row">
+                      <div class="col-2">${sel.outerHTML}</div>
+                      <div class="col-4"><input type="text" class="form-control fset form-control-sm" value="${data.files[i][2]}"></div>
+                      <div class="col-4"><span class="fname">${data.files[i][0]}</span></div>
+                      <div class="col-2 text-center"><span class="num">${data.files[i][3]}</span></div>
+                   </div>
+                   `;
+        list.innerHTML += row;
+      }
+
+
+    }
+
+    function saveChanges(id) {
+      var list = document.querySelectorAll(".list-body2 .row");
+
+      var data = [];
+
+      list.forEach((row, i) => {
+        var sample_lib_id = row.querySelector("select").value;
+        var file_set_name = row.querySelector("input[type=text]").value;
+        var file_name = row.querySelector(".fname").textContent;
+        var file_numbers = row.querySelector(".num").textContent;
+
+        data.push({
+            sample_lib_id: sample_lib_id,
+            file_set_name: file_set_name,
+            file_name: file_name,
+            file_numbers: file_numbers
+          });
+      });
+
+      $.ajax({
+          url: "/sequencingrun/save_sequencing_files",
+          data: {
+            "id":id,
+            "data":JSON.stringify(data),
+          },
+          headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
+          type: "POST",
+          success: function (data) {
+
+            fillElements(data);
+
+            document.querySelector('button[name=btnSave]').addEventListener("click", function () {
+              saveChanges();
+            });
+
+            modalSequencingFiles.show();
+
+          },
+          error: function (xhr, ajaxOptions, thrownError) {
+
+          }
+      });
+
+    }
+
     var initRowActions = () => {
 
       const el = document.getElementById("modal_used_sequencinglibs");
@@ -792,6 +940,8 @@ var KTDatatablesServerSide = function () {
       var data = {};
 
       initModal();
+
+      initSequencingFilesModal();
 
       function initModal() {
 
@@ -806,7 +956,6 @@ var KTDatatablesServerSide = function () {
         });
 
         var detailLinks = document.querySelectorAll(".detail-link");
-
         for (var detail of detailLinks) {
 
           detail.addEventListener("click", function (e) {
@@ -851,6 +1000,8 @@ var KTDatatablesServerSide = function () {
 
         }
       }
+
+
     }
 
     // Public methods
@@ -863,6 +1014,7 @@ var KTDatatablesServerSide = function () {
             handleDeleteRows();
             handleResetForm();
             initEditor();
+
         }
     }
 }();
