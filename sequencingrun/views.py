@@ -293,9 +293,7 @@ def create_objects(row, seq_run):
 def save_sequencing_files(request):
     # try:
         data = json.loads(request.POST['data'])
-        print(data)
-        print(data['id'])
-        seq_run = SequencingRun.objects.get(id=int(data['id']))
+        seq_run = SequencingRun.objects.get(id=json.loads(request.POST['id']))
         for row in data:
             create_objects(row, seq_run)
         source_dir = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"HiSeqData/TEMP"))
