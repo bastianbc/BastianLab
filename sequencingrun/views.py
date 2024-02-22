@@ -274,7 +274,7 @@ def get_file_type(file):
     return ""
 
 def create_objects(row, seq_run):
-    try:
+    # try:
         sample_lib = SampleLib.objects.get(id=row["sample_lib_id"])
         file_set = SequencingFileSet.objects.get_or_create(
             prefix=row["file_set_name"],
@@ -287,8 +287,8 @@ def create_objects(row, seq_run):
             name=row["file_name"],
             type=get_file_type(row["file_name"])
         )
-    except Exception as e:
-        print(e)
+    # except Exception as e:
+    #     print(e)
 
 def save_sequencing_files(request):
     try:
