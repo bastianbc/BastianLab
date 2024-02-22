@@ -291,7 +291,7 @@ def create_objects(row, seq_run):
     #     print(e)
 
 def save_sequencing_files(request):
-    try:
+    # try:
         data = json.loads(request.POST['data'])
         seq_run = SequencingRun.objects.get(id=data['id'])
         for row in data:
@@ -306,7 +306,7 @@ def save_sequencing_files(request):
             shutil.move(source_file, destination_file)
 
         success = True
-    except Exception as e:
-        success = False
-        print(e)
-    return JsonResponse({"result":success})
+    # except Exception as e:
+    #     success = False
+    #     print(e)
+        return JsonResponse({"result":success})
