@@ -276,13 +276,14 @@ def get_file_type(file):
 def create_objects(row, seq_run):
     # try:
         sample_lib = SampleLib.objects.get(id=row["sample_lib_id"])
-        file_set = SequencingFileSet.objects.get_or_create(
+        file_set, _ = SequencingFileSet.objects.get_or_create(
             prefix=row["file_set_name"],
             sequencing_run=seq_run,
             sample_lib=sample_lib,
-            path=os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}")
+            path=f"BastianRaid-02/FD/{seq_run.name}"
+
         )
-        file = SequencingFile.objects.get_or_create(
+        file, _ = SequencingFile.objects.get_or_create(
             sequencing_file_set=file_set,
             name=row["file_name"],
             type=get_file_type(row["file_name"])
