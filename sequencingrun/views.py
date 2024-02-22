@@ -250,8 +250,9 @@ def get_sequencing_files(request, id):
     sample_libs = SampleLib.objects.filter(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct()
     try:
         files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"HiSeqData/TEMP"))
-    except:
-        files = os.listdir(Path(Path(__file__).parent.parent / "uploads" / "files"))
+    except Exception as e:
+        print(e)
+        # files = os.listdir(Path(Path(__file__).parent.parent / "uploads" / "files"))
     prefix_list = [(split_prefix(file), file) for file in files]
     files_list = [( file, _get_matched_sample_libray(file, sample_libs), split_prefix(file), count_file_set(file, prefix_list)) for file in files]
 
