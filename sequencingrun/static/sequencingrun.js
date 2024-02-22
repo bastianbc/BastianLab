@@ -814,6 +814,17 @@ var KTDatatablesServerSide = function () {
                   saveChanges(id);
                 });
 
+                document.querySelectorAll('.fl_sl').forEach(function(element) {
+                    element.addEventListener("change", function() {
+                        console.log($(this));
+                        var row = this.closest('.row');
+                        var file_set_input_name = row.querySelector('.fset');
+                        if (file_set_input_name && !file_set_input_name.value.includes("_FLAG_")) {
+                            file_set_input_name.value = file_set_input_name.value + "_FLAG_";
+                        }
+                    });
+                });
+
                 modalSequencingFiles.show();
 
               },
@@ -838,8 +849,18 @@ var KTDatatablesServerSide = function () {
       for (var i = 0; i < data.files.length; i++) {
 
         var sel = document.createElement("select");
-        sel.classList.add("select","form-control","form-control-sm")
-        sel.add(document.createElement("option")); // added empty value
+        sel.classList.add("select","form-control","form-control-sm", "fl_sl")
+        var defaultOption = document.createElement("option");
+        defaultOption.text = "Not Matched";
+        defaultOption.value = "not_matched";
+        defaultOption.setAttribute("selected", "selected");
+
+        sel.add(defaultOption);
+
+        var emptyOption = document.createElement("option");
+        emptyOption.text = "";
+        emptyOption.value = "";
+        sel.add(emptyOption, 0);
 
         for (var sl of data.sample_libs) {
           var opt = document.createElement("option");
@@ -854,14 +875,15 @@ var KTDatatablesServerSide = function () {
         }
 
         var row = `<div class="row">
-                      <div class="col-3">${sel.outerHTML}</div>
-                      <div class="col-6"><input type="text" class="form-control form-control-sm" value="${data.files[i][0]}"></div>
-                      <div class="col-3 text-center"><span>${data.files[i][2]}</span></div>
+                      <div class="col-2">${sel.outerHTML}</div>
+                      <div class="col-4"><input type="text" class="form-control fset form-control-sm" value="${data.files[i][2]}"></div>
+                      <div class="col-4"><span class="fname">${data.files[i][0]}</span></div>
+                      <div class="col-2 text-center"><span class="num">${data.files[i][3]}</span></div>
                    </div>
                    `;
-
         list.innerHTML += row;
       }
+
 
     }
 
@@ -873,9 +895,15 @@ var KTDatatablesServerSide = function () {
       list.forEach((row, i) => {
         var sample_lib_id = row.querySelector("select").value;
         var file_set_name = row.querySelector("input[type=text]").value;
-        var file_numbers = row.querySelector("span").textContent;
+        var file_name = row.querySelector(".fname").textContent;
+        var file_numbers = row.querySelector(".num").textContent;
 
-        data.push([sample_lib_id,file_set_name,file_numbers]);
+        data.push({
+            sample_lib_id: sample_lib_id,
+            file_set_name: file_set_name,
+            file_name: file_name,
+            file_numbers: file_numbers
+          });
       });
 
       $.ajax({
@@ -884,7 +912,8 @@ var KTDatatablesServerSide = function () {
             "id":id,
             "data":JSON.stringify(data),
           },
-          type: "GET",
+          headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
+          type: "POST",
           success: function (data) {
 
             fillElements(data);

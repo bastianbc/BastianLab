@@ -1,19 +1,22 @@
+import re
+import os
+import shutil
+from pathlib import Path
+from collections import Counter
+
 from django.shortcuts import render, redirect
-import json
 from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required,permission_required
+from django.contrib.auth.decorators import permission_required
 from .serializers import *
-from .models import *
 from sequencinglib.models import *
 from .forms import *
 from django.contrib import messages
-from capturedlib.models import *
 from core.decorators import permission_required_for_async
-from pathlib import Path
-import pandas as pd
-import re
+from django.conf import settings
+from django.core.serializers import serialize
 from samplelib.models import SampleLib
-
+from samplelib.serializers import SingleSampleLibSerializer
+from sequencingfile.models import SequencingFile,SequencingFileSet
 
 @permission_required("sequencingrun.view_sequencingrun",raise_exception=True)
 def sequencingruns(request):
@@ -213,58 +216,96 @@ def _get_matched_sample_libray(file, sample_libs):
     elif re.search("_R", file):
         sl_name = file.split("_R")[0]
         sl = sample_libs.filter(name__iexact=sl_name).first()
-    return sl if sl else None
+    return sl.id if sl else None
 
 
-def get_sequencing_files(request,id):
-    import os
-    from django.conf import settings
-    from django.core.serializers import serialize
-    from samplelib.models import SampleLib
-    from samplelib.serializers import SingleSampleLibSerializer
+def split_prefix(file):
+    pattern = "(.*[ATGC]{6})"
+    result = re.match(pattern, file)
+    if result:
+        prefix = result.group(1)
+    elif "fastq" in file:
+        prefix = file.split("_L0")[0] if "_L0" in file \
+            else file.split("_00")[0] if "_00" in file \
+            else None
+    elif ".bam.bai" in file:
+        prefix = file.split(".bam.bai")[0]
+    elif file.endswith(".bam"):
+        prefix = file.split(".bam")[0]
+    elif file.endswith(".bai"):
+        prefix = file.split(".bai")[0]
+    prefix = file.split("_L0")[0] if "_L0" in file else prefix
+    return prefix
 
+
+def count_file_set(file, prefix_list):
+    for prefix, f in prefix_list:
+        if f == file:
+            counter = Counter(prefix for prefix,f in prefix_list)
+            return counter[prefix]
+
+
+def get_sequencing_files(request, id):
     sequencing_run = SequencingRun.objects.get(id=id)
-
     sample_libs = SampleLib.objects.filter(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct()
-
     try:
-        files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
+        files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"HiSeqData/TEMP"))
     except:
         files = os.listdir(Path(Path(__file__).parent.parent / "uploads" / "files"))
-
-    # d = dict()
-    # l = [dict(
-    #     file=file,
-    #     sample_lib=serialize('json', [_get_matched_sample_libray(file, sample_libs)]),
-    # ) for file in files]
-    # d['files'] = l
-    # d['sample_libs'] = SingleSampleLibSerializer(sample_libs,many=True).data
-    # d['sequencing_run'] = SingleSequencingRunSerializer(sequencing_run).data
+    prefix_list = [(split_prefix(file), file) for file in files]
+    files_list = [( file, _get_matched_sample_libray(file, sample_libs), split_prefix(file), count_file_set(file, prefix_list)) for file in files]
 
     return JsonResponse({
-        "files" : [("file_name",65132,3)],
+        "files" : files_list,
         "sample_libs":SingleSampleLibSerializer(sample_libs,many=True).data,
         "sequencing_run": SingleSequencingRunSerializer(sequencing_run).data
     })
 
+def get_file_type(file):
+    if "fastq" in file:
+        return "fastq"
+    elif ".bam.bai" in file:
+        return "bai"
+    elif ".bam" in file:
+        return "bam"
+    elif ".bai" in file:
+        return "bai"
+    return ""
+
+def create_objects(row, seq_run):
+    try:
+        sample_lib = SampleLib.objects.get(id=row["sample_lib_id"])
+        file_set = SequencingFileSet.objects.get_or_create(
+            prefix=row["file_set_name"],
+            sequencing_run=seq_run,
+            sample_lib=sample_lib,
+            path=os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}")
+        )
+        file = SequencingFile.objects.get_or_create(
+            sequencing_file_set=file_set,
+            name=row["file_name"],
+            type=get_file_type(row["file_name"])
+        )
+    except Exception as e:
+        print(e)
 
 def save_sequencing_files(request):
-    import os
-    import shutil
-
     try:
-        seq_run_id = request.GET["id"]
-        data = json.loads(request.GET.get("data"))
+        data = json.loads(request.POST['data'])
+        seq_run = SequencingRun.objects.get(id=data['id'])
+        for row in data:
+            create_objects(row, seq_run)
+        source_dir = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"HiSeqData/TEMP"))
+        destination_dir = os.makedirs(os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}"), exist_ok=True)
 
-        sequencing_run = SequencingRun.objects.get(id=seq_run_id)
+        for filename in os.listdir(source_dir):
+            source_file = os.path.join(source_dir, filename)
+            destination_file = os.path.join(destination_dir, filename)
 
-        source_path = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, 'sequencingrun')
-        destination_path = os.makedirs(os.path.join(settings.SEQUENCING_FILES_DIRECTORY, 'new_folder_name'))
-
-        for file_name in file_names:
-            shutil.copy(f"{source_path}/{file_name}", f"{destination_path}/{file_name}")
+            shutil.move(source_file, destination_file)
 
         success = True
     except Exception as e:
         success = False
+        print(e)
     return JsonResponse({"result":success})
