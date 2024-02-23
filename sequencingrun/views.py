@@ -1,6 +1,7 @@
 import re
 import os
 import shutil
+import time
 from pathlib import Path
 from collections import Counter
 
@@ -276,14 +277,13 @@ def get_file_type(file):
 def create_objects(row, seq_run):
     # try:
         sample_lib = SampleLib.objects.get(id=row["sample_lib_id"])
-        file_set, _ = SequencingFileSet.objects.get_or_create(
+        file_set, _ = SequencingFileSet.objects.update_or_create(
             prefix=row["file_set_name"],
             sequencing_run=seq_run,
             sample_lib=sample_lib,
             path=f"BastianRaid-02/FD/{seq_run.name}"
-
         )
-        file, _ = SequencingFile.objects.get_or_create(
+        file, _ = SequencingFile.objects.update_or_create(
             sequencing_file_set=file_set,
             name=row["file_name"],
             type=get_file_type(row["file_name"])
@@ -301,7 +301,9 @@ def save_sequencing_files(request):
         destination_dir = os.makedirs(os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}"), exist_ok=True)
 
         for filename in os.listdir(source_dir):
+            # time.sleep(1)
             source_file = os.path.join(source_dir, filename)
+
             destination_file = os.path.join(destination_dir, filename)
 
             shutil.move(source_file, destination_file)
