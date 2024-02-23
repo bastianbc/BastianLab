@@ -305,14 +305,15 @@ def save_sequencing_files(request):
         source_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"HiSeqData/TEMP")
         destination_dir = os.makedirs(os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}"), exist_ok=True)
 
-        print(source_dir)
-        print(os.listdir(source_dir))
+        print("source_dir:\n", source_dir)
+        print("destination_dir:\n", destination_dir)
         for filename in os.listdir(source_dir):
-            # time.sleep(1)
-            print(filename)
+            print("filename:\n", filename)
             source_file = os.path.join(source_dir, filename)
+            print("source_file:\n", source_file)
 
             destination_file = os.path.join(destination_dir, filename)
+            print("destination_file:\n", destination_file)
 
             shutil.move(source_file, destination_file)
 
