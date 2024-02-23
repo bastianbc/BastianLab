@@ -897,6 +897,7 @@ var KTDatatablesServerSide = function () {
 
     function saveChanges(id) {
       var list = document.querySelectorAll(".list-body2 .row");
+      const modalSequencingFiles = new bootstrap.Modal(elSequencingFiles);
 
       var data = [];
 
@@ -923,14 +924,29 @@ var KTDatatablesServerSide = function () {
           headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
           type: "POST",
           success: function (data) {
-              console.log(data);
             modalSequencingFiles.hide();
+              Swal.fire({
+              text: "Sequencing Files Saved Succesfully.",
+              icon: "info",
+              buttonsStyling: false,
+              confirmButtonText: "Ok, got it!",
+              customClass: {
+                  confirmButton: "btn fw-bold btn-success",
+              }
+          });
           },
           error: function (xhr, ajaxOptions, thrownError) {
+              Swal.fire({
+              text: "Sequencing File(s)  could not be saved!",
+              icon: "error",
+              buttonsStyling: false,
+              confirmButtonText: "Ok, got it!",
+              customClass: {
+                  confirmButton: "btn fw-bold btn-success",
+              }
+          });
           }
-      }).done(function (data) {
-           alert("enter");
-        });
+      })
     }
 
     var initRowActions = () => {
