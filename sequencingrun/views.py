@@ -302,7 +302,7 @@ def save_sequencing_files(request):
         seq_run = SequencingRun.objects.get(id=json.loads(request.POST['id']))
         for row in data:
             create_objects(row, seq_run)
-        source_dir = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"HiSeqData/TEMP"))
+        source_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"HiSeqData/TEMP")
         destination_dir = os.makedirs(os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}"), exist_ok=True)
 
         print(source_dir)
