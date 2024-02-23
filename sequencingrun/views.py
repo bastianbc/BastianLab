@@ -275,7 +275,7 @@ def get_file_type(file):
     return ""
 
 def create_objects(row, seq_run):
-    # try:
+    try:
         sample_lib = SampleLib.objects.get(id=row["sample_lib_id"])
         file_set, _ = SequencingFileSet.objects.update_or_create(
             prefix=row["file_set_name"],
@@ -293,11 +293,11 @@ def create_objects(row, seq_run):
             }
 
         )
-    # except Exception as e:
-    #     print(e)
+    except Exception as e:
+        print(e)
 
 def save_sequencing_files(request):
-    # try:
+    try:
         data = json.loads(request.POST['data'])
         seq_run = SequencingRun.objects.get(id=json.loads(request.POST['id']))
         for row in data:
@@ -318,7 +318,8 @@ def save_sequencing_files(request):
             shutil.move(source_file, destination_file)
 
         success = True
-    # except Exception as e:
-    #     success = False
-    #     print(e)
+        return JsonResponse({"result": success})
+    except Exception as e:
+        success = False
+        print(e)
         return JsonResponse({"result":success})
