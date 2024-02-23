@@ -828,8 +828,16 @@ var KTDatatablesServerSide = function () {
                 modalSequencingFiles.show();
 
               },
-              error: function (xhr, ajaxOptions, thrownError) {
-
+              error: function (result, message) {
+                Swal.fire({
+                  text: message,
+                  icon: "error",
+                  buttonsStyling: false,
+                  confirmButtonText: "Ok, got it!",
+                  customClass: {
+                      confirmButton: "btn fw-bold btn-success",
+                  }
+              });
               }
           });
 
