@@ -923,6 +923,7 @@ var KTDatatablesServerSide = function () {
           headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
           type: "POST",
           success: function (data) {
+              console.log(data);
             modalSequencingFiles.hide();
           },
           error: function (xhr, ajaxOptions, thrownError) {
