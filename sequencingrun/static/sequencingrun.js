@@ -828,9 +828,9 @@ var KTDatatablesServerSide = function () {
                 modalSequencingFiles.show();
 
               },
-              error: function (success, message) {
+              error: function (data) {
                 Swal.fire({
-                  text: message,
+                  text: data.responseJSON.error,
                   icon: "error",
                   buttonsStyling: false,
                   confirmButtonText: "Ok, got it!",
