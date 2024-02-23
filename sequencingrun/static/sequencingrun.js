@@ -923,18 +923,9 @@ var KTDatatablesServerSide = function () {
           headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
           type: "POST",
           success: function (data) {
-
-            fillElements(data);
-
-            document.querySelector('button[name=btnSave]').addEventListener("click", function () {
-              saveChanges();
-            });
-
-            modalSequencingFiles.show();
-
+            modalSequencingFiles.hide();
           },
           error: function (xhr, ajaxOptions, thrownError) {
-
           }
       }).done(function (result) {
             if (result.success) {
