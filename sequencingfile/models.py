@@ -90,7 +90,7 @@ class SequencingFile(models.Model):
     )
     file_id = models.AutoField(primary_key=True)
     sequencing_file_set = models.ForeignKey(SequencingFileSet, on_delete=models.CASCADE, related_name="sequencing_files")
-    name = models.CharField(max_length=500, blank=True, null=True, verbose_name="File Name")
+    name = models.CharField(max_length=500, unique=True, verbose_name="File Name")
     checksum = models.CharField(max_length=100, blank=True, null=True)
     type = models.CharField(max_length=10, choices=FILE_TYPES, blank=True, null=True)
     date_added = models.DateTimeField(blank=True, null=True, auto_now_add=True)
