@@ -321,6 +321,5 @@ def save_sequencing_files(request):
         success = True
         return JsonResponse({"result": success})
     except Exception as e:
-        success = False
         print(e)
-        return JsonResponse({"result":success})
+        return JsonResponse({"error":str(e)})
