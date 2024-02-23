@@ -261,7 +261,8 @@ def get_sequencing_files(request, id):
             "sequencing_run": SingleSequencingRunSerializer(sequencing_run).data
         })
     except Exception as e:
-        return JsonResponse({"error":str(e)})
+        print("*"*100)
+        return JsonResponse({"error":str(e)}, status=400)
 
 
 def get_file_type(file):
@@ -319,7 +320,7 @@ def save_sequencing_files(request):
             shutil.move(source_file, destination_file)
 
         success = True
-        return JsonResponse({"result": success})
+        return JsonResponse({"result": success}, status=200)
     except Exception as e:
         print(e)
-        return JsonResponse({"error":str(e)})
+        return JsonResponse({"error":str(e)}, status=400)
