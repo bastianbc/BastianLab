@@ -305,7 +305,7 @@ def save_sequencing_files(request):
         source_dir = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"HiSeqData/TEMP"))
         destination_dir = os.makedirs(os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}"), exist_ok=True)
 
-
+        print(source_dir)
         print(os.listdir(source_dir))
         for filename in os.listdir(source_dir):
             # time.sleep(1)
