@@ -250,18 +250,18 @@ def get_sequencing_files(request, id):
     try:
         sequencing_run = SequencingRun.objects.get(id=id)
         sample_libs = SampleLib.objects.filter(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct()
-        files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"HiSeqData/TEMP"))
+        files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
         prefix_list = [(split_prefix(file), file) for file in files]
         files_list = [( file, _get_matched_sample_libray(file, sample_libs), split_prefix(file), count_file_set(file, prefix_list)) for file in files]
-        if not files_list:
-            return JsonResponse({"success": False, "message":"There is no file in TEMP directory."})
+        if len(files_list) == 0:
+            return JsonResponse({'error': 'There is no file in TEMP directory'}, status=400)  # Or any other appropriate status code
         return JsonResponse({
             "files": files_list,
             "sample_libs": SingleSampleLibSerializer(sample_libs, many=True).data,
             "sequencing_run": SingleSequencingRunSerializer(sequencing_run).data
         })
     except Exception as e:
-        return JsonResponse({"result":str(e)})
+        return JsonResponse({"error":str(e)})
 
 
 def get_file_type(file):
@@ -303,7 +303,7 @@ def save_sequencing_files(request):
         seq_run = SequencingRun.objects.get(id=json.loads(request.POST['id']))
         for row in data:
             create_objects(row, seq_run)
-        source_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"HiSeqData/TEMP")
+        source_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP")
         os.makedirs(os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}"), exist_ok=True)
         destination_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}")
         print("source_dir:\n", source_dir)
