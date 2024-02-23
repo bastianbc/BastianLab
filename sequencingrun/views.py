@@ -247,21 +247,22 @@ def count_file_set(file, prefix_list):
 
 
 def get_sequencing_files(request, id):
-    sequencing_run = SequencingRun.objects.get(id=id)
-    sample_libs = SampleLib.objects.filter(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct()
     try:
+        sequencing_run = SequencingRun.objects.get(id=id)
+        sample_libs = SampleLib.objects.filter(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct()
         files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"HiSeqData/TEMP"))
+        prefix_list = [(split_prefix(file), file) for file in files]
+        files_list = [( file, _get_matched_sample_libray(file, sample_libs), split_prefix(file), count_file_set(file, prefix_list)) for file in files]
+        if not files_list:
+            return JsonResponse({"result": False, "message":"There is no file in TEMP directory."})
+        return JsonResponse({
+            "files": files_list,
+            "sample_libs": SingleSampleLibSerializer(sample_libs, many=True).data,
+            "sequencing_run": SingleSequencingRunSerializer(sequencing_run).data
+        })
     except Exception as e:
-        print(e)
-        # files = os.listdir(Path(Path(__file__).parent.parent / "uploads" / "files"))
-    prefix_list = [(split_prefix(file), file) for file in files]
-    files_list = [( file, _get_matched_sample_libray(file, sample_libs), split_prefix(file), count_file_set(file, prefix_list)) for file in files]
+        return JsonResponse({"result":str(e)})
 
-    return JsonResponse({
-        "files" : files_list,
-        "sample_libs":SingleSampleLibSerializer(sample_libs,many=True).data,
-        "sequencing_run": SingleSequencingRunSerializer(sequencing_run).data
-    })
 
 def get_file_type(file):
     if "fastq" in file:
