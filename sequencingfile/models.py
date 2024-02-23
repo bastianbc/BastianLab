@@ -7,7 +7,7 @@ class SequencingFileSet(models.Model):
     set_id = models.AutoField(primary_key=True)
     sample_lib = models.ForeignKey("samplelib.SampleLib", on_delete=models.CASCADE, related_name="sequencing_file_sets")
     sequencing_run = models.ForeignKey("sequencingrun.SequencingRun", on_delete=models.CASCADE, related_name="sequencing_file_sets")
-    prefix = models.CharField(max_length=250, blank=True, null=True) #"Yurif_DNA_GGCTAC"
+    prefix = models.CharField(max_length=250, unique=True) #"Yurif_DNA_GGCTAC"
     path = models.CharField(max_length=1000, blank=True, null=True)
     date_added = models.DateTimeField(blank=True, null=True, auto_now_add=True)
 
