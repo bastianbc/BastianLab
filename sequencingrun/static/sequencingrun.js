@@ -927,31 +927,8 @@ var KTDatatablesServerSide = function () {
           },
           error: function (xhr, ajaxOptions, thrownError) {
           }
-      }).done(function (result) {
-            if (result.success) {
-              Swal.fire({
-                  text: "Sequencing Files Saved Succesfully.",
-                  icon: "info",
-                  buttonsStyling: false,
-                  confirmButtonText: "Ok, got it!",
-                  customClass: {
-                      confirmButton: "btn fw-bold btn-success",
-                  }
-              }).then(function(){
-                modalSequencingFiles.hide();
-              });
-            }
-            else {
-              Swal.fire({
-                  text: "Sequencing File(s)  could not be saved!",
-                  icon: "error",
-                  buttonsStyling: false,
-                  confirmButtonText: "Ok, got it!",
-                  customClass: {
-                      confirmButton: "btn fw-bold btn-success",
-                  }
-              });
-            }
+      }).done(function (data) {
+           alert("enter");
         });
     }
 
