@@ -254,7 +254,7 @@ def get_sequencing_files(request, id):
         prefix_list = [(split_prefix(file), file) for file in files]
         files_list = [( file, _get_matched_sample_libray(file, sample_libs), split_prefix(file), count_file_set(file, prefix_list)) for file in files]
         if not files_list:
-            return JsonResponse({"result": False, "message":"There is no file in TEMP directory."})
+            return JsonResponse({"success": False, "message":"There is no file in TEMP directory."})
         return JsonResponse({
             "files": files_list,
             "sample_libs": SingleSampleLibSerializer(sample_libs, many=True).data,
