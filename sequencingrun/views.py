@@ -279,14 +279,19 @@ def create_objects(row, seq_run):
         sample_lib = SampleLib.objects.get(id=row["sample_lib_id"])
         file_set, _ = SequencingFileSet.objects.update_or_create(
             prefix=row["file_set_name"],
-            sequencing_run=seq_run,
-            sample_lib=sample_lib,
-            path=f"BastianRaid-02/FD/{seq_run.name}"
+            defaults={
+                'sequencing_run': seq_run,
+                'sample_lib': sample_lib,
+                'path': f"BastianRaid-02/FD/{seq_run.name}"
+            }
         )
         file, _ = SequencingFile.objects.update_or_create(
-            sequencing_file_set=file_set,
             name=row["file_name"],
-            type=get_file_type(row["file_name"])
+            defaults={
+                "sequencing_file_set": file_set,
+                "type": get_file_type(row["file_name"])
+            }
+
         )
     # except Exception as e:
     #     print(e)
