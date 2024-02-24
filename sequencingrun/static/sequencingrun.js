@@ -824,8 +824,9 @@ var KTDatatablesServerSide = function () {
               url: "/sequencingrun/" + id + "/get_sequencing_files",
               type: "GET",
               success: function (data) {
-
                 fillElements(data);
+                var span = document.querySelector('.fname');
+                if (span.offsetWidth > span.parentElement.offsetWidth) {span.style.fontSize = 'smaller';}
                 document.querySelector('button[name=btnSave]').addEventListener("click", function () {
                   saveChanges(id, modalSequencingFiles);
                 });
