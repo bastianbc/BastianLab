@@ -924,6 +924,8 @@ var KTDatatablesServerSide = function () {
           headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
           type: "POST",
           }).done(function(result) {
+              console.log(result);
+              console.log(result.success);
             if (result.success) {
               Swal.fire({
               text: "Sequencing Files Saved Succesfully.",
@@ -946,7 +948,9 @@ var KTDatatablesServerSide = function () {
               customClass: {
                   confirmButton: "btn fw-bold btn-success",
               }
-            });
+            }).then(function(){
+                modalSequencingFiles.hide();
+              });
             }
 
           });
