@@ -900,7 +900,11 @@ var KTDatatablesServerSide = function () {
         var row = `<div class="row">
                       <div class="col-2">${sel.outerHTML}</div>
                       <div class="col-4"><input type="text" class="form-control fset form-control-sm" value="${data.files[i][2]}"></div>
-                      <div class="col-4"><span class="fname">${data.files[i][0]}</span></div>
+                      <div class="col-4 d-flex justify-content-center">
+                        <span class="fname" style="max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            ${data.files[i][0]}
+                        </span>
+                      </div>
                       <div class="col-2 text-center"><span class="num">${data.files[i][3]}</span></div>
                    </div>
                    `;
