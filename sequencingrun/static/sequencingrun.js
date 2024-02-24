@@ -802,6 +802,7 @@ var KTDatatablesServerSide = function () {
         loadingEl.classList.add("bg-dark");
         loadingEl.classList.add("bg-opacity-25");
         KTApp.showPageLoading();
+        alert("enters");
         return loadingEl;
     }
 
