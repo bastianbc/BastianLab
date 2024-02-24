@@ -951,6 +951,7 @@ var KTDatatablesServerSide = function () {
               }
           }).then(function(){
                 console.log(modalSequencingFiles);
+                loadingElement.remove();
                 modalSequencingFiles.hide();
               });
             }
@@ -966,6 +967,7 @@ var KTDatatablesServerSide = function () {
               }
             }).then(function(){
                 console.log(modalSequencingFiles);
+                loadingElement.remove();
                 modalSequencingFiles.hide();
               });
             }
