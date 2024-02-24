@@ -144,7 +144,7 @@ var KTDatatablesServerSide = function () {
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item">
-                                    <a href="javascript:;" class="menu-link detail-link" data-kt-docs-table-filter="detail_row">
+                                    <a href="javascript:;" class="menu-link sequencing-files-link text-start" data-kt-docs-table-filter="detail_row">
                                         Get Sequencing Files
                                     </a>
                                 </div>
