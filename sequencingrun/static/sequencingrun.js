@@ -952,9 +952,8 @@ var KTDatatablesServerSide = function () {
                   confirmButton: "btn fw-bold btn-success",
               }
           }).then(function(){
-                alert("done")
-                console.log(document.getElementById("modal_sequencing_files"));
-                document.getElementById("modal_sequencing_files").hide();
+                console.log(modalSequencingFiles);
+                modalSequencingFiles.hide();
               });
             }
             else {
