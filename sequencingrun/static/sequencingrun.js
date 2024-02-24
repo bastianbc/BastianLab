@@ -913,8 +913,8 @@ var KTDatatablesServerSide = function () {
     function saveChanges(id) {
         var loadingElement = loadingEl();
       var list = document.querySelectorAll(".list-body2 .row");
-      const modalSequencingFiles = document.getElementById("modal_sequencing_files");
-      // const modalSequencingFiles = new bootstrap.Modal(elSequencingFiles);
+      const elSequencingFiles = document.getElementById("modal_sequencing_files");
+      const modalSequencingFiles = new bootstrap.Modal(elSequencingFiles);
 
       var data = [];
 
