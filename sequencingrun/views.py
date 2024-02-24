@@ -257,9 +257,10 @@ def get_sequencing_files(request, id):
         sequencing_run = SequencingRun.objects.get(id=id)
         sample_libs = SampleLib.objects.filter(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct()
         files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
+        files = load_df_fq()["file"].tolist()
+
         prefix_list = [(split_prefix(file), file) for file in files]
         files_list = [( file, _get_matched_sample_libray(file, sample_libs), split_prefix(file), count_file_set(file, prefix_list)) for file in files]
-        files_list = load_df_fq()["file"].tolist()
         if len(files_list) == 0:
             return JsonResponse({'success': False, "message": 'There is no file in TEMP directory'}, status=400)  # Or any other appropriate status code
         return JsonResponse({
