@@ -144,7 +144,7 @@ var KTDatatablesServerSide = function () {
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item">
-                                    <a href="javascript:;" class="menu-link sequencing-files-link" data-kt-docs-table-filter="detail_row">
+                                    <a href="javascript:;" class="menu-link detail-link" data-kt-docs-table-filter="detail_row">
                                         Get Sequencing Files
                                     </a>
                                 </div>
@@ -900,7 +900,7 @@ var KTDatatablesServerSide = function () {
         var row = `<div class="row">
                       <div class="col-2">${sel.outerHTML}</div>
                       <div class="col-4"><input type="text" class="form-control fset form-control-sm" value="${data.files[i][2]}"></div>
-                      <div class="col-4 d-flex justify-content-center">
+                      <div class="col-4 d-flex align-items-center">
                         <span class="fname text-start" style="max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                             ${data.files[i][0]}
                         </span>
