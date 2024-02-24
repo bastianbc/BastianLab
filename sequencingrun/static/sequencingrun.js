@@ -792,20 +792,38 @@ var KTDatatablesServerSide = function () {
 
     })();
 
+    function loadingEl() {
+      const loadingEl = document.createElement("div");
+            document.body.prepend(loadingEl);
+            loadingEl.classList.add("page-loader");
+            loadingEl.classList.add("flex-column");
+            loadingEl.classList.add("bg-dark");
+            loadingEl.classList.add("bg-opacity-25");
+            loadingEl.innerHTML = `
+                <span class="spinner-border text-primary" role="status"></span>
+                <span class="text-gray-800 fs-6 fw-semibold mt-5">"CSV File is Generating..."</span>
+            `;
+
+            // Show page loading
+            KTApp.showPageLoading();
+            return loadingEl
+    };
+
     function initSequencingFilesModal() {
       const elSequencingFiles = document.getElementById("modal_sequencing_files");
       const modalSequencingFiles = new bootstrap.Modal(elSequencingFiles);
 
       document.querySelectorAll(".sequencing-files-link").forEach((item, i) => {
         item.addEventListener("click", function () {
+          var loadingEl = loadingEl();
           const parent = this.closest('tr');
           // Get customer name
           const id = parent.querySelector('input[type=checkbox]').value;
-
           $.ajax({
               url: "/sequencingrun/" + id + "/get_sequencing_files",
               type: "GET",
               success: function (data) {
+
                 fillElements(data);
                 document.querySelector('button[name=btnSave]').addEventListener("click", function () {
                   saveChanges(id);
@@ -820,9 +838,11 @@ var KTDatatablesServerSide = function () {
                         }
                     });
                 });
+                loadingEl.remove();
                 modalSequencingFiles.show();
               },
               error: function (data) {
+                loadingEl.remove();
                 Swal.fire({
                   text: data.responseJSON.message,
                   icon: "error",
