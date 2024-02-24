@@ -318,7 +318,7 @@ def save_sequencing_files(request):
             print("destination_file:\n", destination_file)
 
             shutil.move(source_file, destination_file)
-
+        print("!"*100)
         return JsonResponse({"result": True}, status=200)
     except Exception as e:
         print(e)
