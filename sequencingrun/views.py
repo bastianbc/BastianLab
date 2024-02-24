@@ -254,15 +254,16 @@ def get_sequencing_files(request, id):
         prefix_list = [(split_prefix(file), file) for file in files]
         files_list = [( file, _get_matched_sample_libray(file, sample_libs), split_prefix(file), count_file_set(file, prefix_list)) for file in files]
         if len(files_list) == 0:
-            return JsonResponse({'error': 'There is no file in TEMP directory'}, status=400)  # Or any other appropriate status code
+            return JsonResponse({'success': False, "message": 'There is no file in TEMP directory'}, status=400)  # Or any other appropriate status code
         return JsonResponse({
+            'success': True,
             "files": files_list,
             "sample_libs": SingleSampleLibSerializer(sample_libs, many=True).data,
             "sequencing_run": SingleSequencingRunSerializer(sequencing_run).data
-        })
+        }, status=200)
     except Exception as e:
         print("*"*100)
-        return JsonResponse({"error":str(e)}, status=400)
+        return JsonResponse({'success': False, "message": str(e)}, status=400)
 
 
 def get_file_type(file):
@@ -319,7 +320,7 @@ def save_sequencing_files(request):
 
             shutil.move(source_file, destination_file)
         print("!"*100)
-        return JsonResponse({"result": True}, status=200)
+        return JsonResponse({"success": True})
     except Exception as e:
         print(e)
-        return JsonResponse({"error":str(e)}, status=400)
+        return JsonResponse({"success":False, "message": str(e)})
