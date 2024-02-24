@@ -793,7 +793,6 @@ var KTDatatablesServerSide = function () {
     })();
 
     function initSequencingFilesModal() {
-      console.log("init sequencing files modal");
       const elSequencingFiles = document.getElementById("modal_sequencing_files");
       const modalSequencingFiles = new bootstrap.Modal(elSequencingFiles);
 
@@ -897,7 +896,8 @@ var KTDatatablesServerSide = function () {
 
     function saveChanges(id) {
       var list = document.querySelectorAll(".list-body2 .row");
-      const modalSequencingFiles = new bootstrap.Modal(elSequencingFiles);
+      const modalSequencingFiles = document.getElementById("modal_sequencing_files");
+      // const modalSequencingFiles = new bootstrap.Modal(elSequencingFiles);
 
       var data = [];
 
@@ -923,8 +923,8 @@ var KTDatatablesServerSide = function () {
           },
           headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
           type: "POST",
-          success: function (data) {
-            modalSequencingFiles.hide();
+          }).done(function(result) {
+            if (result.success) {
               Swal.fire({
               text: "Sequencing Files Saved Succesfully.",
               icon: "info",
@@ -933,9 +933,11 @@ var KTDatatablesServerSide = function () {
               customClass: {
                   confirmButton: "btn fw-bold btn-success",
               }
-          });
-          },
-          error: function (xhr, ajaxOptions, thrownError) {
+          }).then(function(){
+                modalSequencingFiles.hide();
+              });
+            }
+            else {
               Swal.fire({
               text: "Sequencing File(s)  could not be saved!",
               icon: "error",
@@ -944,9 +946,10 @@ var KTDatatablesServerSide = function () {
               customClass: {
                   confirmButton: "btn fw-bold btn-success",
               }
+            });
+            }
+
           });
-          }
-      })
     }
 
     var initRowActions = () => {
