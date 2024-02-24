@@ -827,7 +827,7 @@ var KTDatatablesServerSide = function () {
 
                 fillElements(data);
                 document.querySelector('button[name=btnSave]').addEventListener("click", function () {
-                  saveChanges(id);
+                  saveChanges(id, modalSequencingFiles);
                 });
                 document.querySelectorAll('.fl_sl').forEach(function(element) {
                     element.addEventListener("change", function() {
@@ -910,11 +910,9 @@ var KTDatatablesServerSide = function () {
 
     }
 
-    function saveChanges(id) {
+    function saveChanges(id, modalSequencingFiles) {
         var loadingElement = loadingEl();
       var list = document.querySelectorAll(".list-body2 .row");
-      const elSequencingFiles = document.getElementById("modal_sequencing_files");
-      const modalSequencingFiles = new bootstrap.Modal(elSequencingFiles);
 
       var data = [];
 
@@ -953,7 +951,7 @@ var KTDatatablesServerSide = function () {
               }
           }).then(function(){
                 console.log(modalSequencingFiles);
-                document.getElementById("modal_sequencing_files").style.display = "none";
+                modalSequencingFiles.hide();
               });
             }
             else {
@@ -967,7 +965,8 @@ var KTDatatablesServerSide = function () {
                   confirmButton: "btn fw-bold btn-success",
               }
             }).then(function(){
-                document.getElementById("modal_sequencing_files").style.display = "none";
+                console.log(modalSequencingFiles);
+                modalSequencingFiles.hide();
               });
             }
 
