@@ -222,6 +222,7 @@ def _get_matched_sample_libray(file, sample_libs):
 
 
 def split_prefix(file):
+    file = file.replace(".deduplicated.realign","")
     pattern = "(.*[ATGC]{6})"
     result = re.match(pattern, file)
     if result:
