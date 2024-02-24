@@ -952,11 +952,13 @@ var KTDatatablesServerSide = function () {
                   confirmButton: "btn fw-bold btn-success",
               }
           }).then(function(){
-                modalSequencingFiles.hide();
+                alert("done")
+                console.log(document.getElementById("modal_sequencing_files"));
+                document.getElementById("modal_sequencing_files").hide();
               });
             }
             else {
-                loadingElement.remove();
+              loadingElement.remove();
               Swal.fire({
               text: "Sequencing File(s)  could not be saved!",
               icon: "error",
