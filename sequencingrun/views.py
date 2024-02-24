@@ -4,6 +4,7 @@ import shutil
 import time
 from pathlib import Path
 from collections import Counter
+import pandas as pd
 
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
@@ -245,14 +246,20 @@ def count_file_set(file, prefix_list):
             counter = Counter(prefix for prefix,f in prefix_list)
             return counter[prefix]
 
+def load_df_fq():
+    file = Path(Path(__file__).parent.parent / "uploads" / "df_fq.csv")
+    df = pd.read_csv(file)
+    return df.sample(n=100)
 
 def get_sequencing_files(request, id):
     try:
+
         sequencing_run = SequencingRun.objects.get(id=id)
         sample_libs = SampleLib.objects.filter(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct()
         files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
         prefix_list = [(split_prefix(file), file) for file in files]
         files_list = [( file, _get_matched_sample_libray(file, sample_libs), split_prefix(file), count_file_set(file, prefix_list)) for file in files]
+        files_list = load_df_fq()["file"].tolist()
         if len(files_list) == 0:
             return JsonResponse({'success': False, "message": 'There is no file in TEMP directory'}, status=400)  # Or any other appropriate status code
         return JsonResponse({
@@ -262,7 +269,6 @@ def get_sequencing_files(request, id):
             "sequencing_run": SingleSequencingRunSerializer(sequencing_run).data
         }, status=200)
     except Exception as e:
-        print("*"*100)
         return JsonResponse({'success': False, "message": str(e)}, status=400)
 
 
@@ -308,19 +314,13 @@ def save_sequencing_files(request):
         source_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP")
         os.makedirs(os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}"), exist_ok=True)
         destination_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}")
-        print("source_dir:\n", source_dir)
-        print("destination_dir:\n", destination_dir)
         for filename in os.listdir(source_dir):
-            print("filename:\n", filename)
             source_file = os.path.join(source_dir, filename)
-            print("source_file:\n", source_file)
-
             destination_file = os.path.join(destination_dir, filename)
-            print("destination_file:\n", destination_file)
-
             shutil.move(source_file, destination_file)
-        print("!"*100)
         return JsonResponse({"success": True})
     except Exception as e:
         print(e)
         return JsonResponse({"success":False, "message": str(e)})
+
+
