@@ -801,15 +801,8 @@ var KTDatatablesServerSide = function () {
         loadingEl.classList.add("flex-column");
         loadingEl.classList.add("bg-dark");
         loadingEl.classList.add("bg-opacity-25");
-        loadingEl.innerHTML = `
-            <span class="spinner-border text-primary" role="status"></span>
-            <span class="text-gray-800 fs-6 fw-semibold mt-5">"CSV File is Generating..."</span>
-        `;
-
-        // Show page loading
         KTApp.showPageLoading();
         return loadingEl;
-
     }
 
 
@@ -914,6 +907,7 @@ var KTDatatablesServerSide = function () {
     }
 
     function saveChanges(id) {
+        var loadingElement = loadingEl();
       var list = document.querySelectorAll(".list-body2 .row");
       const modalSequencingFiles = document.getElementById("modal_sequencing_files");
       // const modalSequencingFiles = new bootstrap.Modal(elSequencingFiles);
@@ -944,6 +938,7 @@ var KTDatatablesServerSide = function () {
           type: "POST",
           }).done(function(result) {
             if (result.success) {
+                loadingElement.remove();
               Swal.fire({
               text: "Sequencing Files Saved Succesfully.",
               icon: "info",
@@ -957,6 +952,7 @@ var KTDatatablesServerSide = function () {
               });
             }
             else {
+                loadingElement.remove();
               Swal.fire({
               text: "Sequencing File(s)  could not be saved!",
               icon: "error",
@@ -966,6 +962,7 @@ var KTDatatablesServerSide = function () {
                   confirmButton: "btn fw-bold btn-success",
               }
             }).then(function(){
+
                 modalSequencingFiles.hide();
               });
             }
