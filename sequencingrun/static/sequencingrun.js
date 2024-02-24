@@ -953,7 +953,7 @@ var KTDatatablesServerSide = function () {
               }
           }).then(function(){
                 console.log(modalSequencingFiles);
-                modalSequencingFiles.hide();
+                document.getElementById("modal_sequencing_files").style.display = "none";
               });
             }
             else {
@@ -967,8 +967,7 @@ var KTDatatablesServerSide = function () {
                   confirmButton: "btn fw-bold btn-success",
               }
             }).then(function(){
-
-                modalSequencingFiles.hide();
+                document.getElementById("modal_sequencing_files").style.display = "none";
               });
             }
 
