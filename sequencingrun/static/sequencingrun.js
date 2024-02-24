@@ -806,13 +806,10 @@ var KTDatatablesServerSide = function () {
               url: "/sequencingrun/" + id + "/get_sequencing_files",
               type: "GET",
               success: function (data) {
-
                 fillElements(data);
-
                 document.querySelector('button[name=btnSave]').addEventListener("click", function () {
                   saveChanges(id);
                 });
-
                 document.querySelectorAll('.fl_sl').forEach(function(element) {
                     element.addEventListener("change", function() {
                         console.log($(this));
@@ -823,13 +820,11 @@ var KTDatatablesServerSide = function () {
                         }
                     });
                 });
-
                 modalSequencingFiles.show();
-
               },
               error: function (data) {
                 Swal.fire({
-                  text: data.responseJSON.error,
+                  text: data.responseJSON.message,
                   icon: "error",
                   buttonsStyling: false,
                   confirmButtonText: "Ok, got it!",
@@ -924,8 +919,6 @@ var KTDatatablesServerSide = function () {
           headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
           type: "POST",
           }).done(function(result) {
-              console.log(result);
-              console.log(result.success);
             if (result.success) {
               Swal.fire({
               text: "Sequencing Files Saved Succesfully.",
