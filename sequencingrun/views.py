@@ -254,7 +254,18 @@ def count_file_set(file, prefix_list):
 def load_df_fq():
     file = Path(Path(__file__).parent.parent / "uploads" / "df_fq.csv")
     df = pd.read_csv(file)
-    return df.sample(n=10)
+
+    def merge_files(files):
+        return list(files)
+
+    # Split the 'path' column and extract the second element
+    df['group'] = df['path'].str.split('/').str[1]
+
+    # Group by the 'group' column and aggregate the 'file' column using the custom function
+    result = df.groupby('group')['file'].agg(merge_files).reset_index()
+    print(result["group"])
+
+    return result.sample(n=1)
 
 def get_total_file_size(directory):
     total_size = 0
@@ -269,8 +280,14 @@ def get_sequencing_files(request, id):
         sequencing_run = SequencingRun.objects.get(id=id)
         sample_libs = SampleLib.objects.filter(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct()
         files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
-        files = load_df_fq()["file"].tolist()
+        group = load_df_fq()
+        files = load_df_fq()["file"]
+        print(group["group"])
 
+        for f in files:
+            src = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, "TEMP/AMLP-18_S17_L001_R1_001.fastq.gz")
+            dest = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"TEMP/{f}")
+            shutil.copy(src, dest)
         prefix_list = [(split_prefix(file), file) for file in files]
         files_list = [( file, _get_matched_sample_libray(file, sample_libs), split_prefix(file), count_file_set(file, prefix_list)) for file in files]
         if len(files_list) == 0:
