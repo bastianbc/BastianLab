@@ -276,7 +276,7 @@ def get_total_file_size(directory):
     return total_size
 
 def get_sequencing_files(request, id):
-    try:
+    # try:
         sequencing_run = SequencingRun.objects.get(id=id)
         sample_libs = SampleLib.objects.filter(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct()
         files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
@@ -300,8 +300,8 @@ def get_sequencing_files(request, id):
             "sample_libs": SingleSampleLibSerializer(sample_libs, many=True).data,
             "sequencing_run": SingleSequencingRunSerializer(sequencing_run).data
         }, status=200)
-    except Exception as e:
-        return JsonResponse({'success': False, "message": str(e)}, status=400)
+    # except Exception as e:
+    #     return JsonResponse({'success': False, "message": str(e)}, status=400)
 
 
 def get_file_type(file):
