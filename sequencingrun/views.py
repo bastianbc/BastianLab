@@ -254,7 +254,10 @@ def load_df_fq():
 
 def get_sequencing_files(request, id):
     try:
+        import multiprocessing
 
+        num_cpus = multiprocessing.cpu_count()
+        print("*" * 100, num_cpus)
         sequencing_run = SequencingRun.objects.get(id=id)
         sample_libs = SampleLib.objects.filter(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct()
         files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))

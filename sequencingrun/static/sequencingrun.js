@@ -830,7 +830,6 @@ var KTDatatablesServerSide = function () {
                 });
                 document.querySelectorAll('.fl_sl').forEach(function(element) {
                     element.addEventListener("change", function() {
-                        console.log($(this));
                         var row = this.closest('.row');
                         var file_set_input_name = row.querySelector('.fset');
                         if (file_set_input_name && !file_set_input_name.value.includes("_FLAG_")) {
@@ -900,7 +899,7 @@ var KTDatatablesServerSide = function () {
                       <div class="col-2">${sel.outerHTML}</div>
                       <div class="col-4"><input type="text" class="form-control fset form-control-sm" value="${data.files[i][2]}"></div>
                       <div class="col-4 d-flex align-items-center">
-                        <span class="fname text-start" style="max-width: 100%">
+                        <span class="fname text-start" style="max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                             ${data.files[i][0]}
                         </span>
                       </div>
