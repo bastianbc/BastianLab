@@ -280,14 +280,16 @@ def get_sequencing_files(request, id):
         sequencing_run = SequencingRun.objects.get(id=id)
         sample_libs = SampleLib.objects.filter(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct()
         files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
-        group = load_df_fq()
-        files = load_df_fq()["file"]
-        print(group["group"])
-        print(files, type(files))
-        # for f in files:
-        #     src = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, "TEMP/AMLP-18_S17_L001_R1_001.fastq.gz")
-        #     dest = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"TEMP/{f}")
-        #     shutil.copy(src, dest)
+        if not files:
+            group = load_df_fq()
+            files = load_df_fq()["file"].to_list()
+            print(group["group"])
+            print(files, type(files))
+            for f in files:
+                src = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, "TEMP/AMLP-18_S17_L001_R1_001.fastq.gz")
+                dest = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"TEMP/{f}")
+                print("*"*100)
+                shutil.copy(src, dest)
         prefix_list = [(split_prefix(file), file) for file in files]
         files_list = [( file, _get_matched_sample_libray(file, sample_libs), split_prefix(file), count_file_set(file, prefix_list)) for file in files]
         if len(files_list) == 0:
