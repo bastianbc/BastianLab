@@ -828,6 +828,10 @@ var KTDatatablesServerSide = function () {
                 document.querySelector('button[name=btnSave]').addEventListener("click", function () {
                   saveChanges(id, modalSequencingFiles);
                 });
+                document.querySelector('.remove-row').addEventListener("click", function () {
+                  var parentDiv = this.closest('.row');
+                    parentDiv.remove();
+                });
                 document.querySelectorAll('.fl_sl').forEach(function(element) {
                     element.addEventListener("change", function() {
                         var row = this.closest('.row');
@@ -903,7 +907,7 @@ var KTDatatablesServerSide = function () {
                             ${data.files[i][0]}
                         </span>
                       </div>
-                      <div class="col-2 text-center"><span class="num">${data.files[i][3]}</span></div>
+                      <div class="col-2 text-center"><span class="num">${data.files[i][3]}</span><i class="fa-solid fa-trash remove-row text-danger"></i></div>
                    </div>
                    `;
         list.innerHTML += row;
@@ -1039,7 +1043,7 @@ var KTDatatablesServerSide = function () {
               <div class="col-4 align-self-center" data-id="${ data[i].id }"><a href="/sequencinglib/edit/${ data[i].id }">${ data[i].name }</a></div>
               <div class="col-3 align-self-center">${ data[i].buffer }</div>
               <div class="col-3 align-self-center text-center">${ data[i].nmol }</div>
-              <div class="col-2 align-self-center text-center" data-id="${ data[i].id }"><a href="/sequencingrun/edit/${id}"><i class="far fa-trash fs-4 text-danger"></i></a></div>
+              <div class="col-2 align-self-center text-center" data-id="${ data[i].id }"><a href="/sequencingrun/edit/${id}"><i class="fa-trash fs-4 text-danger"></i></a></div>
             </div>`;
           listEl.innerHTML += row;
 
