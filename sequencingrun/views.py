@@ -297,9 +297,6 @@ def get_file_type(file):
 
 def create_objects(row, seq_run):
     try:
-        print(row['sample_lib_id'])
-        if row["sample_lib_id"] == "not_matched":
-            return JsonResponse({"success":False, "message": "Not matched files found! Please Check the Sample Libraries."})
         sample_lib = SampleLib.objects.get(id=row["sample_lib_id"])
         file_set, _ = SequencingFileSet.objects.update_or_create(
             prefix=row["file_set_name"],
@@ -324,9 +321,12 @@ def create_objects(row, seq_run):
 def save_sequencing_files(request):
     try:
         data = json.loads(request.POST['data'])
+        return next(
+        (JsonResponse({"success": False, "message": "Not matched files found! Please Check the Sample Libraries."})
+         for row in data if row["sample_lib_id"] == "not_matched"), None)
+
         seq_run = SequencingRun.objects.get(id=json.loads(request.POST['id']))
         for row in data:
-            print()
             create_objects(row, seq_run)
         source_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP")
         os.makedirs(os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}"), exist_ok=True)
