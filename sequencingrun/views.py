@@ -269,9 +269,6 @@ def get_sequencing_files(request, id):
         # import multiprocessing
         #
         # num_cpus = multiprocessing.cpu_count()
-        print("*" * 100)
-        total_size = get_total_file_size(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
-        print(f'{len(os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP")))} number of total files, {total_size} GB of size')
         sequencing_run = SequencingRun.objects.get(id=id)
         sample_libs = SampleLib.objects.filter(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct()
         files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
@@ -326,6 +323,11 @@ def create_objects(row, seq_run):
 
 def save_sequencing_files(request):
     try:
+        print("*" * 100)
+        total_size = get_total_file_size(os.path.join(settings.SEQUENCING_FILES_DIRECTORY, "TEMP"))
+        print(
+            f'{len(os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY, "TEMP")))} number of total files, {total_size} GB of size')
+
         data = json.loads(request.POST['data'])
         seq_run = SequencingRun.objects.get(id=json.loads(request.POST['id']))
         for row in data:
@@ -333,11 +335,14 @@ def save_sequencing_files(request):
         source_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP")
         os.makedirs(os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}"), exist_ok=True)
         destination_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}")
-
+        t1 = time.time()
         for filename in os.listdir(source_dir):
             source_file = os.path.join(source_dir, filename)
             destination_file = os.path.join(destination_dir, filename)
             shutil.move(source_file, destination_file)
+        t2 = time.time()
+        total_time = t2 - t1
+        print(f"total move time: {total_time/60} mins")
         return JsonResponse({"success": True})
     except Exception as e:
         print(e)
