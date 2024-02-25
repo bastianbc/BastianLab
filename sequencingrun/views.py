@@ -285,7 +285,7 @@ def get_sequencing_files(request, id):
             files = load_df_fq()["file"].to_list()
             print(group["group"])
             print(files, type(files))
-            for f in files:
+            for f in files[0]:
                 src = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, "TEMP/AMLP-18_S17_L001_R1_001.fastq.gz")
                 dest = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"TEMP/{f}")
                 print("*"*100)
