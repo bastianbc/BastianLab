@@ -254,7 +254,7 @@ def count_file_set(file, prefix_list):
 def load_df_fq():
     file = Path(Path(__file__).parent.parent / "uploads" / "df_fq.csv")
     df = pd.read_csv(file)
-    return df.sample(n=100)
+    return df.sample(n=10)
 
 def get_total_file_size(directory):
     total_size = 0
