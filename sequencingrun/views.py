@@ -19,6 +19,8 @@ from django.core.serializers import serialize
 from samplelib.models import SampleLib
 from samplelib.serializers import SingleSampleLibSerializer
 from sequencingfile.models import SequencingFile,SequencingFileSet
+from concurrent.futures import ThreadPoolExecutor
+
 
 @permission_required("sequencingrun.view_sequencingrun",raise_exception=True)
 def sequencingruns(request):
@@ -252,12 +254,21 @@ def load_df_fq():
     df = pd.read_csv(file)
     return df.sample(n=100)
 
+def get_total_file_size(directory):
+    total_size = 0
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            file_path = os.path.join(root, file)
+            total_size += os.path.getsize(file_path)
+    return total_size
+
 def get_sequencing_files(request, id):
     try:
-        import multiprocessing
-
-        num_cpus = multiprocessing.cpu_count()
-        print("*" * 100, num_cpus)
+        # import multiprocessing
+        #
+        # num_cpus = multiprocessing.cpu_count()
+        print("*" * 100)
+        print(get_total_file_size(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP")))
         sequencing_run = SequencingRun.objects.get(id=id)
         sample_libs = SampleLib.objects.filter(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct()
         files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
@@ -319,6 +330,7 @@ def save_sequencing_files(request):
         source_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP")
         os.makedirs(os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}"), exist_ok=True)
         destination_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}")
+
         for filename in os.listdir(source_dir):
             source_file = os.path.join(source_dir, filename)
             destination_file = os.path.join(destination_dir, filename)
