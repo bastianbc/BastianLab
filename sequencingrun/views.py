@@ -326,6 +326,7 @@ def create_objects(row, seq_run):
                 'path': f"BastianRaid-02/FD/{seq_run.name}"
             }
         )
+        print(row["file_name"])
         file, _ = SequencingFile.objects.update_or_create(
             name=row["file_name"],
             defaults={
