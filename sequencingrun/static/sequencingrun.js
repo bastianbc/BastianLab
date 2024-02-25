@@ -828,10 +828,13 @@ var KTDatatablesServerSide = function () {
                 document.querySelector('button[name=btnSave]').addEventListener("click", function () {
                   saveChanges(id, modalSequencingFiles);
                 });
-                document.querySelector('.remove-row').addEventListener("click", function () {
-                  var parentDiv = this.closest('.row');
-                    parentDiv.remove();
+                document.querySelectorAll('.remove-row').forEach(function(button) {
+                    button.addEventListener("click", function () {
+                        var parentDiv = this.closest('.row');
+                        parentDiv.remove();
+                    });
                 });
+
                 document.querySelectorAll('.fl_sl').forEach(function(element) {
                     element.addEventListener("change", function() {
                         var row = this.closest('.row');
