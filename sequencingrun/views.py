@@ -265,9 +265,6 @@ def get_total_file_size(directory):
 
 def get_sequencing_files(request, id):
     try:
-        # import multiprocessing
-        #
-        # num_cpus = multiprocessing.cpu_count()
         sequencing_run = SequencingRun.objects.get(id=id)
         sample_libs = SampleLib.objects.filter(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct()
         files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
@@ -300,6 +297,9 @@ def get_file_type(file):
 
 def create_objects(row, seq_run):
     try:
+        print(row['sample_lib_id'])
+        if row["sample_lib_id"] is None or row["sample_lib_id"] == "not_matched":
+            JsonResponse({"success":False, "message": "Not matched files found! Please Check the Sample Libraries."})
         sample_lib = SampleLib.objects.get(id=row["sample_lib_id"])
         file_set, _ = SequencingFileSet.objects.update_or_create(
             prefix=row["file_set_name"],
@@ -323,15 +323,11 @@ def create_objects(row, seq_run):
 @calculate_execution_time
 def save_sequencing_files(request):
     try:
-        # print("*" * 100)
-        # total_size = get_total_file_size(os.path.join(settings.SEQUENCING_FILES_DIRECTORY, "TEMP"))
-        # print(
-        #     f'{len(os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY, "TEMP")))} number of total files, {total_size} GB of size')
-
         data = json.loads(request.POST['data'])
         seq_run = SequencingRun.objects.get(id=json.loads(request.POST['id']))
-        # for row in data:
-        #     create_objects(row, seq_run)
+        for row in data:
+            print()
+            create_objects(row, seq_run)
         source_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP")
         os.makedirs(os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}"), exist_ok=True)
         destination_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}")
