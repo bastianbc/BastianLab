@@ -259,7 +259,7 @@ def get_total_file_size(directory):
     for root, dirs, files in os.walk(directory):
         for file in files:
             file_path = os.path.join(root, file)
-            total_size += os.stat(file_path).st_size / (1024 * 1024)
+            total_size += os.stat(file_path).st_size / (1024 * 1024 * 1024)
             print(f'file_path {file_path}')
             print(f'File Size in MegaBytes is {total_size}')
     return total_size
@@ -270,7 +270,8 @@ def get_sequencing_files(request, id):
         #
         # num_cpus = multiprocessing.cpu_count()
         print("*" * 100)
-        print(get_total_file_size(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP")))
+        total_size = get_total_file_size(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
+        print(f'{len(os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP")))} number of total files, {total_size} GB of size')
         sequencing_run = SequencingRun.objects.get(id=id)
         sample_libs = SampleLib.objects.filter(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct()
         files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
