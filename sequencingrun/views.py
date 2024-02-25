@@ -259,7 +259,9 @@ def get_total_file_size(directory):
     for root, dirs, files in os.walk(directory):
         for file in files:
             file_path = os.path.join(root, file)
-            total_size += os.path.getsize(file_path)
+            total_size += os.stat(file_path).st_size / (1024 * 1024)
+            print(f'file_path {file_path}')
+            print(f'File Size in MegaBytes is {total_size}')
     return total_size
 
 def get_sequencing_files(request, id):
