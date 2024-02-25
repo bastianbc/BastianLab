@@ -910,7 +910,7 @@ var KTDatatablesServerSide = function () {
                             ${data.files[i][0]}
                         </span>
                       </div>
-                      <div class="col-2 text-center"><span class="num mr-2">${data.files[i][3]}</span><i class="fa-solid fa-trash remove-row text-danger"></i></div>
+                      <div class="col-2 text-center"><span class="num" style="margin-right: 10px;">${data.files[i][3]}</span><i class="fa-solid fa-trash remove-row text-danger"></i></div>
                    </div>
                    `;
         list.innerHTML += row;
