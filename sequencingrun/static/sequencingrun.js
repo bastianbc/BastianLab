@@ -963,6 +963,9 @@ var KTDatatablesServerSide = function () {
               });
             }
             else {
+                console.log(result);
+                console.log(result.responseJSON);
+                console.log(result.responseJSON.message);
               loadingElement.remove();
               Swal.fire({
               text: result.responseJSON.message,
