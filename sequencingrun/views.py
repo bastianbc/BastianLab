@@ -282,10 +282,10 @@ def get_sequencing_files(request, id):
         files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
         if not len(files)>1:
             group = load_df_fq()
-            files = load_df_fq()["file"].to_list()
+            files = load_df_fq()["file"].to_list()[0]
             print(group["group"])
             print(files, type(files))
-            for f in files[0]:
+            for f in files:
                 src = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, "TEMP/CNS_29_Normal_CCTTCA_L003_R1_001_fastq.gz")
                 dest = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"TEMP/{f}")
                 print("*"*100)
