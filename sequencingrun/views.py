@@ -345,6 +345,9 @@ def save_sequencing_files(request):
             if row["sample_lib_id"] == "not_matched":
                 return JsonResponse({"success": False, "message": "Not matched files found! Please Check the Sample Libraries."})
         seq_run = SequencingRun.objects.get(id=json.loads(request.POST['id']))
+        print("*"*100)
+        print(request.POST['id'])
+        print(seq_run)
         for row in data:
             create_objects(row, seq_run)
         source_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP")
