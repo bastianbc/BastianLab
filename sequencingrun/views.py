@@ -322,10 +322,9 @@ def create_objects(row, seq_run):
 def save_sequencing_files(request):
     try:
         data = json.loads(request.POST['data'])
-        return next(
-        (JsonResponse({"success": False, "message": "Not matched files found! Please Check the Sample Libraries."})
-         for row in data if row["sample_lib_id"] == "not_matched"), None)
-
+        for row in data:
+            if row["sample_lib_id"] == "not_matched":
+                return JsonResponse({"success": False, "message": "Not matched files found! Please Check the Sample Libraries."})
         seq_run = SequencingRun.objects.get(id=json.loads(request.POST['id']))
         for row in data:
             create_objects(row, seq_run)
