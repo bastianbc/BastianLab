@@ -231,9 +231,10 @@ def split_prefix(file):
     if result:
         prefix = result.group(1)
     elif "fastq" in file:
-        prefix = file.split("_L0")[0] if "_L0" in file \
-            else file.split("_00")[0] if "_00" in file \
-            else None
+        prefix = (file.split("_L0")[0] if "_L0" in file
+          else file.split("_00")[0] if "_00" in file
+          else file.split("_R")[0] if "_R" in file and "_L0" not in file and "_00" not in file
+          else None)
     elif ".bam.bai" in file:
         prefix = file.split(".bam.bai")[0]
     elif file.endswith(".bam"):
