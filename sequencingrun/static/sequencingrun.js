@@ -965,7 +965,7 @@ var KTDatatablesServerSide = function () {
             else {
               loadingElement.remove();
               Swal.fire({
-              text: "Sequencing File(s)  could not be saved!",
+              text: result.responseJSON.message,
               icon: "error",
               buttonsStyling: false,
               confirmButtonText: "Ok, got it!",
@@ -973,9 +973,7 @@ var KTDatatablesServerSide = function () {
                   confirmButton: "btn fw-bold btn-success",
               }
             }).then(function(){
-                console.log(modalSequencingFiles);
                 loadingElement.remove();
-                modalSequencingFiles.hide();
               });
             }
 
