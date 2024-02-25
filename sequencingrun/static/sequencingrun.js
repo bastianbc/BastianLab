@@ -963,12 +963,9 @@ var KTDatatablesServerSide = function () {
               });
             }
             else {
-                console.log(result);
-                console.log(result.responseJSON);
-                console.log(result.responseJSON.message);
               loadingElement.remove();
               Swal.fire({
-              text: result.responseJSON.message,
+              text: result.message,
               icon: "error",
               buttonsStyling: false,
               confirmButtonText: "Ok, got it!",
