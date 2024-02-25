@@ -335,10 +335,11 @@ def save_sequencing_files(request):
         source_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP")
         os.makedirs(os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}"), exist_ok=True)
         destination_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}")
-        for filename in os.listdir(source_dir):
-            source_file = os.path.join(source_dir, filename)
-            destination_file = os.path.join(destination_dir, filename)
-            shutil.move(source_file, destination_file)
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            for filename in os.listdir(source_dir):
+                source_file = os.path.join(source_dir, filename)
+                destination_file = os.path.join(destination_dir, filename)
+                executor.submit(shutil.move(source_file, destination_file), source_file, destination_file)
         return JsonResponse({"success": True})
     except Exception as e:
         print(e)
