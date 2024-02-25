@@ -280,7 +280,7 @@ def get_sequencing_files(request, id):
         sequencing_run = SequencingRun.objects.get(id=id)
         sample_libs = SampleLib.objects.filter(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct()
         files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
-        if not files:
+        if not len(files)>1:
             group = load_df_fq()
             files = load_df_fq()["file"].to_list()
             print(group["group"])
@@ -352,9 +352,10 @@ def save_sequencing_files(request):
         destination_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}")
         with ThreadPoolExecutor(max_workers=2) as executor:
             for filename in os.listdir(source_dir):
-                source_file = os.path.join(source_dir, filename)
-                destination_file = os.path.join(destination_dir, filename)
-                executor.submit(shutil.move(source_file, destination_file), source_file, destination_file)
+                if filename is not "AMLP-18_S17_L001_R1_001.fastq.gz":
+                    source_file = os.path.join(source_dir, filename)
+                    destination_file = os.path.join(destination_dir, filename)
+                    executor.submit(shutil.move(source_file, destination_file), source_file, destination_file)
         return JsonResponse({"success": True})
     except Exception as e:
         print(e)
