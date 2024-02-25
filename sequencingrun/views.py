@@ -298,8 +298,8 @@ def get_file_type(file):
 def create_objects(row, seq_run):
     try:
         print(row['sample_lib_id'])
-        if row["sample_lib_id"] is None or row["sample_lib_id"] == "not_matched":
-            JsonResponse({"success":False, "message": "Not matched files found! Please Check the Sample Libraries."})
+        if row["sample_lib_id"] == "not_matched":
+            return JsonResponse({"success":False, "message": "Not matched files found! Please Check the Sample Libraries."})
         sample_lib = SampleLib.objects.get(id=row["sample_lib_id"])
         file_set, _ = SequencingFileSet.objects.update_or_create(
             prefix=row["file_set_name"],
