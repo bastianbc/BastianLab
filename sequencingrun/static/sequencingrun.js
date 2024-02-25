@@ -830,7 +830,6 @@ var KTDatatablesServerSide = function () {
                 });
                 document.querySelectorAll('.fl_sl').forEach(function(element) {
                     element.addEventListener("change", function() {
-                        console.log($(this));
                         var row = this.closest('.row');
                         var file_set_input_name = row.querySelector('.fset');
                         if (file_set_input_name && !file_set_input_name.value.includes("_FLAG_")) {
