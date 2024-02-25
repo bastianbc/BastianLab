@@ -359,7 +359,8 @@ def save_sequencing_files(request):
                 if filename is not "CNS_29_Normal_CCTTCA_L003_R1_001_fastq.gz":
                     source_file = os.path.join(source_dir, filename)
                     destination_file = os.path.join(destination_dir, filename)
-                    executor.submit(shutil.move(source_file, destination_file), source_file, destination_file)
+                    print("source_file: %s source_file: %s" %(source_file, destination_file))
+                    executor.submit(shutil.move(source_file, destination_file))
         return JsonResponse({"success": True})
     except Exception as e:
         print(e)
