@@ -324,10 +324,6 @@ def create_objects(row, seq_run):
     try:
         sample_lib = SampleLib.objects.get(id=row["sample_lib_id"])
         file_set = get_or_none(SequencingFileSet, {"prefix": row["file_set_name"]})
-        file_set.sequencing_run = seq_run
-        file_set.sample_lib = sample_lib
-        file_set.path = f"BastianRaid-02/FD/{seq_run.name}"
-        file_set.save()
         if not file_set:
             file_set = SequencingFileSet.objects.create(
                 prefix=row["file_set_name"],
@@ -335,18 +331,25 @@ def create_objects(row, seq_run):
                 sample_lib= sample_lib,
                 path= f"BastianRaid-02/FD/{seq_run.name}"
             )
+        else:
+            file_set.sequencing_run = seq_run
+            file_set.sample_lib = sample_lib
+            file_set.path = f"BastianRaid-02/FD/{seq_run.name}"
+            file_set.save()
+
         print("file_set", file_set)
         print('row["file_name"]: ', row["file_name"])
         file = get_or_none(SequencingFile,{'name': row["file_name"]})
-        file.sequencing_file_set = file_set
-        file.type = get_file_type(row["file_name"])
-        file.save()
         if not file:
             file = SequencingFile.objects.create(
                 name=row["file_name"],
                 sequencing_file_set=file_set,
                 type=get_file_type(row["file_name"])
             )
+        else:
+            file.sequencing_file_set = file_set
+            file.type = get_file_type(row["file_name"])
+            file.save()
     except Exception as e:
         print(e)
 
