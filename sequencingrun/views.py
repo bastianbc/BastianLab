@@ -343,7 +343,7 @@ def create_objects(row, seq_run):
 # @calculate_execution_time
 def save_sequencing_files(request):
     try:
-        lock = threading.Lock()
+        # lock = threading.Lock()
         data = json.loads(request.POST['data'])
         for row in data:
             if row["sample_lib_id"] == "not_matched":
@@ -358,14 +358,15 @@ def save_sequencing_files(request):
         source_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP")
         # with lock:
         os.makedirs(os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}"), exist_ok=True)
-        time.sleep(2)
+        if not os.path.isdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}")):
+            time.sleep(2)
         destination_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}")
         # with ThreadPoolExecutor(max_workers=2) as executor:
         for filename in os.listdir(source_dir):
             source_file = os.path.join(source_dir, filename)
             destination_file = os.path.join(destination_dir, filename)
-            print("source_file: %s destination_file: %s" %(source_file, destination_file))
             shutil.move(source_file, destination_file)
+            # print("source_file: %s destination_file: %s" %(source_file, destination_file))
             # executor.submit(shutil.move(source_file, destination_file))
         return JsonResponse({"success": True})
     except Exception as e:
