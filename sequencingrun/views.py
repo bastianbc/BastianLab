@@ -328,18 +328,12 @@ def create_objects(row, seq_run):
 
         file = get_or_none(SequencingFile, name=file_name)
         if not file:
-            print(f"***file_set: {file_set}")
-            print(f'***file_name: {file_name}')
             file = SequencingFile.objects.create(
                 name=file_name,
                 sequencing_file_set=file_set,
                 type=get_file_type(file_name)
             )
         else:
-            print(f"file_set: {file_set}")
-            print(f'file_name: {file_name}')
-            print(f'file.name: {file.name}')
-            file
             file.sequencing_file_set = file_set
             file.type = get_file_type(file_name)
             file.save()
@@ -369,7 +363,7 @@ def save_sequencing_files(request):
         for filename in os.listdir(source_dir):
             source_file = os.path.join(source_dir, filename)
             destination_file = os.path.join(destination_dir, filename)
-            # print("source_file: %s source_file: %s" %(source_file, destination_file))
+            print("source_file: %s destination_file: %s" %(source_file, destination_file))
             shutil.move(source_file, destination_file)
             # executor.submit(shutil.move(source_file, destination_file))
         return JsonResponse({"success": True})
