@@ -356,18 +356,18 @@ def save_sequencing_files(request):
         for row in data:
             create_objects(row, seq_run)
         source_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP")
-        with lock:
-            os.makedirs(os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}"), exist_ok=True)
-            # time.sleep(2)
-            destination_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}")
+        # with lock:
+        os.makedirs(os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}"), exist_ok=True)
+        time.sleep(2)
+        destination_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}")
         # with ThreadPoolExecutor(max_workers=2) as executor:
-            for filename in os.listdir(source_dir):
-                source_file = os.path.join(source_dir, filename)
-                destination_file = os.path.join(destination_dir, filename)
-                print("source_file: %s destination_file: %s" %(source_file, destination_file))
-                shutil.move(source_file, destination_file)
-                # executor.submit(shutil.move(source_file, destination_file))
-            return JsonResponse({"success": True})
+        for filename in os.listdir(source_dir):
+            source_file = os.path.join(source_dir, filename)
+            destination_file = os.path.join(destination_dir, filename)
+            print("source_file: %s destination_file: %s" %(source_file, destination_file))
+            shutil.move(source_file, destination_file)
+            # executor.submit(shutil.move(source_file, destination_file))
+        return JsonResponse({"success": True})
     except Exception as e:
         print(e)
         return JsonResponse({"success":False, "message": str(e)})
