@@ -880,7 +880,6 @@ var KTDatatablesServerSide = function () {
         defaultOption.text = "Not Matched";
         defaultOption.value = "not_matched";
         defaultOption.setAttribute("selected", "selected");
-        defaultOption.addClass("border border-danger");
         sel.add(defaultOption);
 
         var emptyOption = document.createElement("option");
@@ -900,6 +899,9 @@ var KTDatatablesServerSide = function () {
           sel.add(opt);
         }
 
+        if (defaultOption.selected) {
+          sel.classList.add("border", "border-danger");
+        }
         var row = `<div class="row">
                       <div class="col-2">${sel.outerHTML}</div>
                       <div class="col-4"><input type="text" class="form-control fset form-control-sm" value="${data.files[i][2]}"></div>
