@@ -5,6 +5,7 @@ import time
 from pathlib import Path
 from collections import Counter
 import pandas as pd
+import threading
 
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
@@ -344,6 +345,7 @@ def create_objects(row, seq_run):
 @calculate_execution_time
 def save_sequencing_files(request):
     try:
+        lock = threading.Lock()
         data = json.loads(request.POST['data'])
         for row in data:
             if row["sample_lib_id"] == "not_matched":
@@ -354,16 +356,17 @@ def save_sequencing_files(request):
         print(seq_run)
         for row in data:
             create_objects(row, seq_run)
-        source_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP")
-        os.makedirs(os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}"), exist_ok=True)
-        destination_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}")
-        with ThreadPoolExecutor(max_workers=2) as executor:
-            for filename in os.listdir(source_dir):
-                if filename is not "CNS_29_Normal_CCTTCA_L003_R1_001_fastq.gz":
-                    source_file = os.path.join(source_dir, filename)
-                    destination_file = os.path.join(destination_dir, filename)
-                    print("source_file: %s source_file: %s" %(source_file, destination_file))
-                    executor.submit(shutil.move(source_file, destination_file))
+        with lock:
+            source_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP")
+            os.makedirs(os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}"), exist_ok=True)
+            destination_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}")
+            with ThreadPoolExecutor(max_workers=2) as executor:
+                for filename in os.listdir(source_dir):
+                    if filename is not "CNS_29_Normal_CCTTCA_L003_R1_001_fastq.gz":
+                        source_file = os.path.join(source_dir, filename)
+                        destination_file = os.path.join(destination_dir, filename)
+                        # print("source_file: %s source_file: %s" %(source_file, destination_file))
+                        executor.submit(shutil.move(source_file, destination_file))
         return JsonResponse({"success": True})
     except Exception as e:
         print(e)
