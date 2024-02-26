@@ -319,26 +319,27 @@ def get_file_type(file):
         return "bai"
     return ""
 
+
 def create_objects(row, seq_run):
     try:
         sample_lib = SampleLib.objects.get(id=row["sample_lib_id"])
-        file_set, _ = SequencingFileSet.objects.update_or_create(
-            prefix=row["file_set_name"],
-            defaults={
-                'sequencing_run': seq_run,
-                'sample_lib': sample_lib,
-                'path': f"BastianRaid-02/FD/{seq_run.name}"
-            }
-        )
-        print(row["file_name"])
-        file, _ = SequencingFile.objects.update_or_create(
-            name=row["file_name"],
-            defaults={
-                "sequencing_file_set": file_set,
-                "type": get_file_type(row["file_name"])
-            }
-
-        )
+        file_set = get_or_none(SequencingFileSet, {"prefix": row["file_set_name"]})
+        if not file_set:
+            file_set = SequencingFileSet.objects.create(
+                prefix=row["file_set_name"],
+                sequencing_run= seq_run,
+                sample_lib= sample_lib,
+                path= f"BastianRaid-02/FD/{seq_run.name}"
+            )
+        print("file_set", file_set)
+        print('row["file_name"]: ', row["file_name"])
+        file = get_or_none(SequencingFile,{'name': row["file_name"]})
+        if not file:
+            file = SequencingFile.objects.create(
+                name=row["file_name"],
+                sequencing_file_set=file_set,
+                type=get_file_type(row["file_name"])
+            )
     except Exception as e:
         print(e)
 
@@ -351,9 +352,9 @@ def save_sequencing_files(request):
             if row["sample_lib_id"] == "not_matched":
                 return JsonResponse({"success": False, "message": "Not matched files found! Please Check the Sample Libraries."})
         seq_run = SequencingRun.objects.get(id=json.loads(request.POST['id']))
-        print("*"*100)
-        print(request.POST['id'])
-        print(seq_run)
+        # print("*"*100)
+        # print(request.POST['id'])
+        # print(seq_run)
         for row in data:
             create_objects(row, seq_run)
         with lock:
