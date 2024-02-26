@@ -309,12 +309,12 @@ def get_file_type(file):
 
 def create_objects(row, seq_run):
     try:
-        file_name = row["file_name"]
+        file_name = row["file_name"].strip()
         sample_lib = SampleLib.objects.get(id=row["sample_lib_id"])
-        file_set = get_or_none(SequencingFileSet, prefix=row["file_set_name"])
+        file_set = get_or_none(SequencingFileSet, prefix=row["file_set_name"].strip())
         if not file_set:
             file_set = SequencingFileSet.objects.create(
-                prefix=row["file_set_name"],
+                prefix=row["file_set_name"].strip(),
                 sequencing_run= seq_run,
                 sample_lib= sample_lib,
                 path= f"BastianRaid-02/FD/{seq_run.name}"
@@ -339,6 +339,7 @@ def create_objects(row, seq_run):
             print(f"file_set: {file_set}")
             print(f'file_name: {file_name}')
             print(f'file.name: {file.name}')
+            file
             file.sequencing_file_set = file_set
             file.type = get_file_type(file_name)
             file.save()
