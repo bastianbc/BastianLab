@@ -365,9 +365,9 @@ def save_sequencing_files(request):
         # print("*"*100)
         # print(request.POST['id'])
         # print(seq_run)
-        for row in data:
-            create_objects(row, seq_run)
         with lock:
+            for row in data:
+                create_objects(row, seq_run)
             source_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP")
             os.makedirs(os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}"), exist_ok=True)
             destination_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}")
