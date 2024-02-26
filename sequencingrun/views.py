@@ -325,16 +325,20 @@ def create_objects(row, seq_run):
             file_set.path = f"BastianRaid-02/FD/{seq_run.name}"
             file_set.save()
 
-        print(f"file_set: {file_set}")
-        print(f'file_name: {file_name}')
+
         file = get_or_none(SequencingFile, name=file_name)
         if not file:
+            print(f"***file_set: {file_set}")
+            print(f'***file_name: {file_name}')
             file = SequencingFile.objects.create(
                 name=file_name,
                 sequencing_file_set=file_set,
                 type=get_file_type(file_name)
             )
         else:
+            print(f"file_set: {file_set}")
+            print(f'file_name: {file_name}')
+            print(f'file.name: {file.name}')
             file.sequencing_file_set = file_set
             file.type = get_file_type(file_name)
             file.save()
@@ -344,7 +348,7 @@ def create_objects(row, seq_run):
 @calculate_execution_time
 def save_sequencing_files(request):
     try:
-        lock = threading.Lock()
+        # lock = threading.Lock()
         data = json.loads(request.POST['data'])
         for row in data:
             if row["sample_lib_id"] == "not_matched":
