@@ -252,21 +252,21 @@ def count_file_set(file, prefix_list):
             counter = Counter(prefix for prefix,f in prefix_list)
             return counter[prefix]
 
-def load_df_fq():
-    file = Path(Path(__file__).parent.parent / "uploads" / "df_fq.csv")
-    df = pd.read_csv(file)
-
-    def merge_files(files):
-        return list(files)
-
-    # Split the 'path' column and extract the second element
-    df['group'] = df['path'].str.split('/').str[1]
-
-    # Group by the 'group' column and aggregate the 'file' column using the custom function
-    result = df.groupby('group')['file'].agg(merge_files).reset_index()
-    # print(result[result["group"]=="AGEX-02"])
-
-    return result[result["group"]=="Nimblegen10_BB13"]
+# def load_df_fq():
+#     file = Path(Path(__file__).parent.parent / "uploads" / "df_fq.csv")
+#     df = pd.read_csv(file)
+#
+#     def merge_files(files):
+#         return list(files)
+#
+#     # Split the 'path' column and extract the second element
+#     df['group'] = df['path'].str.split('/').str[1]
+#
+#     # Group by the 'group' column and aggregate the 'file' column using the custom function
+#     result = df.groupby('group')['file'].agg(merge_files).reset_index()
+#     # print(result[result["group"]=="AGEX-02"])
+#
+#     return result[result["group"]=="Nimblegen10_BB13"]
 
 def get_total_file_size(directory):
     total_size = 0
@@ -277,23 +277,10 @@ def get_total_file_size(directory):
     return total_size
 
 def get_sequencing_files(request, id):
-    # try:
+    try:
         sequencing_run = SequencingRun.objects.get(id=id)
         sample_libs = SampleLib.objects.filter(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct()
         files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
-        # files = []
-        if not len(files)>1:
-            group = load_df_fq()
-            files = load_df_fq()["file"].to_list()[0]
-            # print(group["group"])
-            # print(files, type(files))
-            for f in files:
-                # print(f)
-                src = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, "TEMP/CNS_29_Normal_CCTTCA_L003_R1_001_fastq.gz")
-                dest = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"TEMP/{f}")
-                # print("*"*100)
-                shutil.copy(src, dest)
-                time.sleep(0.5)
         prefix_list = [(split_prefix(file), file) for file in files]
         files_list = [( file, _get_matched_sample_libray(file, sample_libs), split_prefix(file), count_file_set(file, prefix_list)) for file in files]
         if len(files_list) == 0:
@@ -304,8 +291,8 @@ def get_sequencing_files(request, id):
             "sample_libs": SingleSampleLibSerializer(sample_libs, many=True).data,
             "sequencing_run": SingleSequencingRunSerializer(sequencing_run).data
         }, status=200)
-    # except Exception as e:
-    #     return JsonResponse({'success': False, "message": str(e)}, status=400)
+    except Exception as e:
+        return JsonResponse({'success': False, "message": str(e)}, status=400)
 
 
 def get_file_type(file):
@@ -338,7 +325,7 @@ def create_objects(row, seq_run):
             file_set.path = f"BastianRaid-02/FD/{seq_run.name}"
             file_set.save()
 
-        print("file_set", file_set)
+        print(f"file_set: {file_set}")
         print(f'file_name: {file_name}')
         file = get_or_none(SequencingFile, name=file_name)
         if not file:
