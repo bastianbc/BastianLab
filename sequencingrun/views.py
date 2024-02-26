@@ -263,9 +263,9 @@ def load_df_fq():
 
     # Group by the 'group' column and aggregate the 'file' column using the custom function
     result = df.groupby('group')['file'].agg(merge_files).reset_index()
-    print(result["group"])
+    print(result[result["group"]=="AGEX-02"])
 
-    return result.sample(n=1)
+    return result[result["group"]=="AGEX-02"]
 
 def get_total_file_size(directory):
     total_size = 0
@@ -280,6 +280,7 @@ def get_sequencing_files(request, id):
         sequencing_run = SequencingRun.objects.get(id=id)
         sample_libs = SampleLib.objects.filter(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct()
         files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
+        # files = []
         if not len(files)>1:
             group = load_df_fq()
             files = load_df_fq()["file"].to_list()[0]
