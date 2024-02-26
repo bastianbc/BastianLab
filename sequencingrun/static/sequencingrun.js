@@ -880,7 +880,7 @@ var KTDatatablesServerSide = function () {
         defaultOption.text = "Not Matched";
         defaultOption.value = "not_matched";
         defaultOption.setAttribute("selected", "selected");
-        defaultOption.classList.add("border", "border-danger");
+        defaultOption.addClass("border border-danger");
         sel.add(defaultOption);
 
         var emptyOption = document.createElement("option");
