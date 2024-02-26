@@ -292,6 +292,7 @@ def get_sequencing_files(request, id):
                 dest = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"TEMP/{f}")
                 print("*"*100)
                 shutil.copy(src, dest)
+                time.sleep(0.5)
         prefix_list = [(split_prefix(file), file) for file in files]
         files_list = [( file, _get_matched_sample_libray(file, sample_libs), split_prefix(file), count_file_set(file, prefix_list)) for file in files]
         if len(files_list) == 0:
