@@ -359,7 +359,7 @@ def save_sequencing_files(request):
         # with lock:
         destination_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}")
         print(f"1-destination_dir: {destination_dir}")
-        if os.path.isdir(destination_dir):
+        if not os.path.isdir(destination_dir):
             os.makedirs(destination_dir)
             print(f"2-destination_dir: {destination_dir}")
             time.sleep(2)
