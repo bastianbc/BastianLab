@@ -340,7 +340,7 @@ def create_objects(row, seq_run):
     except Exception as e:
         print(e)
 
-@calculate_execution_time
+# @calculate_execution_time
 def save_sequencing_files(request):
     try:
         lock = threading.Lock()
