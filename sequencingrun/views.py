@@ -263,7 +263,7 @@ def load_df_fq():
 
     # Group by the 'group' column and aggregate the 'file' column using the custom function
     result = df.groupby('group')['file'].agg(merge_files).reset_index()
-    print(result[result["group"]=="AGEX-02"])
+    # print(result[result["group"]=="AGEX-02"])
 
     return result[result["group"]=="AGEX-02"]
 
@@ -284,13 +284,13 @@ def get_sequencing_files(request, id):
         if not len(files)>1:
             group = load_df_fq()
             files = load_df_fq()["file"].to_list()[0]
-            print(group["group"])
-            print(files, type(files))
+            # print(group["group"])
+            # print(files, type(files))
             for f in files:
-                print(f)
+                # print(f)
                 src = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, "TEMP/CNS_29_Normal_CCTTCA_L003_R1_001_fastq.gz")
                 dest = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"TEMP/{f}")
-                print("*"*100)
+                # print("*"*100)
                 shutil.copy(src, dest)
                 time.sleep(0.5)
         prefix_list = [(split_prefix(file), file) for file in files]
