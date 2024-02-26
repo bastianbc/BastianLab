@@ -323,7 +323,7 @@ def get_file_type(file):
 def create_objects(row, seq_run):
     try:
         sample_lib = SampleLib.objects.get(id=row["sample_lib_id"])
-        file_set = get_or_none(SequencingFileSet, {"prefix": row["file_set_name"]})
+        file_set = get_or_none(SequencingFileSet, prefix=row["file_set_name"])
         if not file_set:
             file_set = SequencingFileSet.objects.create(
                 prefix=row["file_set_name"],
@@ -339,7 +339,7 @@ def create_objects(row, seq_run):
 
         print("file_set", file_set)
         print('row["file_name"]: ', row["file_name"])
-        file = get_or_none(SequencingFile,{'name': row["file_name"]})
+        file = get_or_none(SequencingFile,name=row["file_name"])
         if not file:
             file = SequencingFile.objects.create(
                 name=row["file_name"],
