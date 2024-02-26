@@ -357,9 +357,11 @@ def save_sequencing_files(request):
             create_objects(row, seq_run)
         source_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP")
         # with lock:
-        os.makedirs(os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}"), exist_ok=True)
-        time.sleep(2)
         destination_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}")
+        if os.path.isdir(destination_dir):
+            os.makedirs(destination_dir)
+            time.sleep(2)
+
         # with ThreadPoolExecutor(max_workers=2) as executor:
         for filename in os.listdir(source_dir):
             source_file = os.path.join(source_dir, filename)
