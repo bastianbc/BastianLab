@@ -265,7 +265,7 @@ def load_df_fq():
     result = df.groupby('group')['file'].agg(merge_files).reset_index()
     # print(result[result["group"]=="AGEX-02"])
 
-    return result[result["group"]=="AGEX-02"]
+    return result[result["group"]=="Nimblegen10_BB13"]
 
 def get_total_file_size(directory):
     total_size = 0
