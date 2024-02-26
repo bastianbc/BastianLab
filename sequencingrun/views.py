@@ -338,6 +338,7 @@ def create_objects(row, seq_run):
         else:
             print(f"file_set: {file_set}")
             print(f'file_name: {file_name}')
+            print(f'file.name: {file.name}')
             file.sequencing_file_set = file_set
             file.type = get_file_type(file_name)
             file.save()
