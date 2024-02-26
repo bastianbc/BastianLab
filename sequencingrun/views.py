@@ -322,6 +322,7 @@ def get_file_type(file):
 
 def create_objects(row, seq_run):
     try:
+        file_name = row["file_name"]
         sample_lib = SampleLib.objects.get(id=row["sample_lib_id"])
         file_set = get_or_none(SequencingFileSet, prefix=row["file_set_name"])
         if not file_set:
@@ -338,17 +339,17 @@ def create_objects(row, seq_run):
             file_set.save()
 
         print("file_set", file_set)
-        print('row["file_name"]: ', row["file_name"])
-        file = get_or_none(SequencingFile,name=row["file_name"])
+        print(f'file_name: {file_name}')
+        file = get_or_none(SequencingFile, name=file_name)
         if not file:
             file = SequencingFile.objects.create(
-                name=row["file_name"],
+                name=file_name,
                 sequencing_file_set=file_set,
-                type=get_file_type(row["file_name"])
+                type=get_file_type(file_name)
             )
         else:
             file.sequencing_file_set = file_set
-            file.type = get_file_type(row["file_name"])
+            file.type = get_file_type(file_name)
             file.save()
     except Exception as e:
         print(e)
@@ -365,19 +366,20 @@ def save_sequencing_files(request):
         # print("*"*100)
         # print(request.POST['id'])
         # print(seq_run)
-        with lock:
-            for row in data:
-                create_objects(row, seq_run)
-            source_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP")
-            os.makedirs(os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}"), exist_ok=True)
-            destination_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}")
-            with ThreadPoolExecutor(max_workers=2) as executor:
-                for filename in os.listdir(source_dir):
-                    if filename is not "CNS_29_Normal_CCTTCA_L003_R1_001_fastq.gz":
-                        source_file = os.path.join(source_dir, filename)
-                        destination_file = os.path.join(destination_dir, filename)
-                        # print("source_file: %s source_file: %s" %(source_file, destination_file))
-                        executor.submit(shutil.move(source_file, destination_file))
+
+        for row in data:
+            create_objects(row, seq_run)
+        source_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP")
+        os.makedirs(os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}"), exist_ok=True)
+        time.sleep(2)
+        destination_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}")
+        # with ThreadPoolExecutor(max_workers=2) as executor:
+        for filename in os.listdir(source_dir):
+            source_file = os.path.join(source_dir, filename)
+            destination_file = os.path.join(destination_dir, filename)
+            # print("source_file: %s source_file: %s" %(source_file, destination_file))
+            shutil.move(source_file, destination_file)
+            # executor.submit(shutil.move(source_file, destination_file))
         return JsonResponse({"success": True})
     except Exception as e:
         print(e)
