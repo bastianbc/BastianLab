@@ -287,6 +287,7 @@ def get_sequencing_files(request, id):
             print(group["group"])
             print(files, type(files))
             for f in files:
+                print(f)
                 src = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, "TEMP/CNS_29_Normal_CCTTCA_L003_R1_001_fastq.gz")
                 dest = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"TEMP/{f}")
                 print("*"*100)
