@@ -22,7 +22,8 @@ from samplelib.serializers import SingleSampleLibSerializer
 from sequencingfile.models import SequencingFile,SequencingFileSet
 from concurrent.futures import ThreadPoolExecutor
 from utils.utils import calculate_execution_time
-
+from barcodeset.models import Barcode
+from django.db.models import Q
 
 @permission_required("sequencingrun.view_sequencingrun",raise_exception=True)
 def sequencingruns(request):
@@ -265,8 +266,19 @@ def count_file_set(file, prefix_list):
 #     # Group by the 'group' column and aggregate the 'file' column using the custom function
 #     result = df.groupby('group')['file'].agg(merge_files).reset_index()
 #     # print(result[result["group"]=="AGEX-02"])
-#
-#     return result[result["group"]=="Nimblegen10_BB13"]
+#     df['pattern'] = df['file'].str.extract(r'([ATGC]{6})')
+#     print(df[df['pattern'].notna()])
+    # def check_barcode(row):
+    #     q = Q(Q(i5=row["pattern"]) | Q(i7=row["pattern"]))
+    #     barcode = Barcode.objects.filter(q)
+    #     sl = SampleLib.objects.filter(sequencing_file_sets__sequencing_files__name=row['file'])
+    #     if sl:
+    #         print(sl)
+    #     # if not barcode:
+    #     #     print(row["pattern"])
+    # print(SampleLib.objects.filter(barcode__isnull=True).count())
+    # df[df['pattern'].notna()].apply(lambda row: check_barcode(row),axis=1)
+    # return df
 
 def get_total_file_size(directory):
     total_size = 0
@@ -282,12 +294,14 @@ def get_sequencing_files(request, id):
         sample_libs = SampleLib.objects.filter(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct()
         files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
         prefix_list = [(split_prefix(file), file) for file in files]
-        files_list = [( file, _get_matched_sample_libray(file, sample_libs), split_prefix(file), count_file_set(file, prefix_list)) for file in files]
-        if len(files_list) == 0:
+        unique_prefix_list = list(set(prefix_list))
+        file_set_list = [(prefix, _get_matched_sample_libray(prefix, sample_libs), files.count(prefix)) for prefix in prefix_list]
+        # files_list = [(prefix, _get_matched_sample_libray(prefix, sample_libs), split_prefix(file), files.count(prefix) for prefix in unique_prefix_list]
+        if len(file_set_list) == 0:
             return JsonResponse({'success': False, "message": 'There is no file in TEMP directory'}, status=400)  # Or any other appropriate status code
         return JsonResponse({
             'success': True,
-            "files": files_list,
+            "file_sets": file_set_list,
             "sample_libs": SingleSampleLibSerializer(sample_libs, many=True).data,
             "sequencing_run": SingleSequencingRunSerializer(sequencing_run).data
         }, status=200)
@@ -315,9 +329,9 @@ def create_objects(row, seq_run):
         if not file_set:
             file_set = SequencingFileSet.objects.create(
                 prefix=row["file_set_name"].strip(),
-                sequencing_run= seq_run,
-                sample_lib= sample_lib,
-                path= f"BastianRaid-02/FD/{seq_run.name}"
+                sequencing_run=seq_run,
+                sample_lib=sample_lib,
+                path=f"BastianRaid-02/FD/{seq_run.name}"
             )
         else:
             file_set.sequencing_run = seq_run

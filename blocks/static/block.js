@@ -109,7 +109,7 @@ var KTDatatablesServerSide = function () {
                     orderable: true,
                     render: function (data, type, row) {
                       if (data) {
-                        return `<a href="`+ row["block_url"]["url"] + row["scan_number"] +`" ><i class="fa-solid fa-image fa-xl" style="color: #40f900;"></i></a>`;
+                        return `<a href="`+ row["block_url"]["url"] + row["scan_number"] +`" target="_blank"><i class="fa-solid fa-image fa-xl" style="color: #40f900;"></i></a>`;
                       }
                       return "";
                     }
