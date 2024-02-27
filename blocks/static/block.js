@@ -257,8 +257,8 @@ var KTDatatablesServerSide = function () {
                 var parent = item.closest('tr');
                 var block = parent.querySelector('td:nth-child(3)').textContent;
 
-                // Pencerenin içeriğini güncelle (örneğin, sadece resim gösterimi)
-                popupWindow.document.body.innerHTML = '<h1>'+ block +'</h1><img src="' + item.getAttribute("data-url") + '" style="max-width:100%;max-height:100%;" />';
+                // popupWindow.document.body.innerHTML = '<h1>'+ block +'</h1><img src="' + item.getAttribute("data-url") + '" style="max-width:100%;max-height:100%;" />';
+                popupWindow.location.href = item.getAttribute("data-url");
 
             });
 
