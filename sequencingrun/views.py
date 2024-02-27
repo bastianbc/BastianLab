@@ -289,21 +289,37 @@ def get_total_file_size(directory):
             total_size += os.stat(file_path).st_size / (1024 * 1024 * 1024)
     return total_size
 
+def get_files_from_temp():
+    files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
+    # files = [
+    #     "7585_CGATGT_L001_R1_001.fastq.gz",
+    #     "1212_CGATGT_L002_R1_001.fastq.gz",
+    #     "1212_CGATGT_L002_R1_002.fastq.gz",
+    #     "1213_CGATGT_L001_R1_001.fastq.gz",
+    #     "1213_CGATGT_L001_R1_002.fastq.gz",
+    #     "1213_CGATGT_L001_R1_003.fastq.gz"
+    # ]
+    prefix_list = [(split_prefix(file), file) for file in files]
+    prefix_dict = {}
+    for prefix in prefix_list:
+        if prefix[0] in prefix_dict:
+            prefix_dict[prefix[0]].append(prefix[1])
+        else:
+            prefix_dict[prefix[0]] = [prefix[1]]
+    return prefix_dict
+
+
 def get_sequencing_files(request, id):
     # try:
         sequencing_run = SequencingRun.objects.get(id=id)
         sample_libs = SampleLib.objects.filter(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct()
-        files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
-        prefix_list = [(split_prefix(file), file) for file in files]
-        prefix_dict = {}
-        for prefix in prefix_list:
-            if prefix[0] in prefix_dict:
-                prefix_dict[prefix[0]].append(prefix[1])
-            else:
-                prefix_dict[prefix[0]] = [prefix[1]]
-        file_set_list = [(prefix, _get_matched_sample_libray(prefix, sample_libs), len(prefix_dict[prefix])) for prefix in prefix_dict]
-        if len(file_set_list) == 0:
+
+        prefix_dict = get_files_from_temp()
+
+        if not prefix_dict:
             return JsonResponse({'success': False, "message": 'There is no file in TEMP directory'}, status=400)  # Or any other appropriate status code
+
+        file_set_list = [(prefix, _get_matched_sample_libray(prefix, sample_libs), len(prefix_dict[prefix])) for prefix in prefix_dict]
         return JsonResponse({
             'success': True,
             "file_sets": file_set_list,
@@ -359,11 +375,18 @@ def create_objects(row, seq_run):
     except Exception as e:
         print(e)
 
+def swap(row):
+    prefix_dict = get_files_from_temp()
+    pass
+
 # @calculate_execution_time
 def save_sequencing_files(request):
     try:
         # lock = threading.Lock()
         data = json.loads(request.POST['data'])
+
+        print(data)
+        print("$$$")
         for row in data:
             if row["sample_lib_id"] == "not_matched":
                 return JsonResponse({"success": False, "message": "Not matched files found! Please Check the Sample Libraries."})
@@ -373,7 +396,10 @@ def save_sequencing_files(request):
         # print(seq_run)
 
         for row in data:
-            create_objects(row, seq_run)
+            if "FLAG" not in row["file_set_name"]:
+                create_objects(row, seq_run)
+            else:
+                swap(row)
         source_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP")
         # with lock:
         destination_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}")
