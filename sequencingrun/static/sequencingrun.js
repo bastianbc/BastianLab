@@ -834,12 +834,22 @@ var KTDatatablesServerSide = function () {
                 });
 
                 document.querySelectorAll('.fl_sl').forEach(function(element) {
+                    var previousValue; // Variable to store the previous value of the select option
+                    element.addEventListener("mouseover", function() {
+                        // Code to execute when hovering over the element
+                        previousValue = this.value;
+                    });
                     element.addEventListener("change", function() {
-                        console.log(this.value);
                         var row = this.closest('.row');
                         var file_set_input_name = row.querySelector('.fset');
-                        if (file_set_input_name && !file_set_input_name.value.includes("_FLAG_")) {
-                            file_set_input_name.value = file_set_input_name.value + "_FLAG_";
+                        if (previousValue != "not_matched"){
+                            if (file_set_input_name && !file_set_input_name.value.includes("_FLAG_")) {
+                                file_set_input_name.value = file_set_input_name.value + "_FLAG_";
+                            }
+                        }
+                        if (this.value != "not_matched") {
+                            // Remove the border-danger class if the default option is not selected
+                            this.classList.remove("border", "border-danger");
                         }
                     });
                 });
