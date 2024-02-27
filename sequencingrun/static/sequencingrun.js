@@ -903,9 +903,9 @@ var KTDatatablesServerSide = function () {
           sel.classList.add("border", "border-danger");
         }
         var row = `<div class="row">
-                      <div class="col-2">${sel.outerHTML}</div>
+                      <div class="col-4">${sel.outerHTML}</div>
                       <div class="col-4"><input type="text" class="form-control fset form-control-sm" value="${data.file_sets[i][0]}"></div>
-                      <div class="col-2 text-center"><span class="num" style="margin-right: 10px;">${data.file_sets[i][2]}</span><i class="fa-solid fa-trash remove-row text-danger"></i></div>
+                      <div class="col-4 text-center"><span class="num" style="margin-right: 10px;">${data.file_sets[i][2]}</span></div>
                    </div>
                    `;
         list.innerHTML += row;
