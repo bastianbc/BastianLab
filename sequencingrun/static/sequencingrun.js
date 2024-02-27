@@ -834,11 +834,22 @@ var KTDatatablesServerSide = function () {
                 });
 
                 document.querySelectorAll('.fl_sl').forEach(function(element) {
+                    var previousValue; // Variable to store the previous value of the select option
+                    element.addEventListener("mouseover", function() {
+                        // Code to execute when hovering over the element
+                        previousValue = this.value;
+                    });
                     element.addEventListener("change", function() {
                         var row = this.closest('.row');
                         var file_set_input_name = row.querySelector('.fset');
-                        if (file_set_input_name && !file_set_input_name.value.includes("_FLAG_")) {
-                            file_set_input_name.value = file_set_input_name.value + "_FLAG_";
+                        if (previousValue != "not_matched"){
+                            if (file_set_input_name && !file_set_input_name.value.includes("_FLAG_")) {
+                                file_set_input_name.value = file_set_input_name.value + "_FLAG_";
+                            }
+                        }
+                        if (this.value != "not_matched") {
+                            // Remove the border-danger class if the default option is not selected
+                            this.classList.remove("border", "border-danger");
                         }
                     });
                 });
@@ -872,7 +883,7 @@ var KTDatatablesServerSide = function () {
 
       list.innerHTML = ""; // Clean the list
 
-      for (var i = 0; i < data.files.length; i++) {
+      for (var i = 0; i < data.file_sets.length; i++) {
 
         var sel = document.createElement("select");
         sel.classList.add("select","form-control","form-control-sm", "fl_sl")
@@ -892,7 +903,7 @@ var KTDatatablesServerSide = function () {
           opt.value = sl.id;
           opt.text = sl.name;
 
-          if (sl.id == data.files[i][1]) { // mactched sample_lib
+          if (sl.id == data.file_sets[i][1]) { // mactched sample_lib
             opt.setAttribute("selected", "selected");
           }
 
@@ -903,14 +914,9 @@ var KTDatatablesServerSide = function () {
           sel.classList.add("border", "border-danger");
         }
         var row = `<div class="row">
-                      <div class="col-2">${sel.outerHTML}</div>
-                      <div class="col-4"><input type="text" class="form-control fset form-control-sm" value="${data.files[i][2]}"></div>
-                      <div class="col-4 d-flex align-items-center">
-                        <span class="fname text-start" style="max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                            ${data.files[i][0]}
-                        </span>
-                      </div>
-                      <div class="col-2 text-center"><span class="num" style="margin-right: 10px;">${data.files[i][3]}</span><i class="fa-solid fa-trash remove-row text-danger"></i></div>
+                      <div class="col-4">${sel.outerHTML}</div>
+                      <div class="col-4"><input type="text" class="form-control fset form-control-sm" value="${data.file_sets[i][0]}"></div>
+                      <div class="col-4 text-center"><span class="num" style="margin-right: 10px;">${data.file_sets[i][2]}</span></div>
                    </div>
                    `;
         list.innerHTML += row;
@@ -928,13 +934,11 @@ var KTDatatablesServerSide = function () {
       list.forEach((row, i) => {
         var sample_lib_id = row.querySelector("select").value;
         var file_set_name = row.querySelector("input[type=text]").value;
-        var file_name = row.querySelector(".fname").textContent;
         var file_numbers = row.querySelector(".num").textContent;
 
         data.push({
             sample_lib_id: sample_lib_id,
             file_set_name: file_set_name,
-            file_name: file_name,
             file_numbers: file_numbers
           });
       });
@@ -959,7 +963,6 @@ var KTDatatablesServerSide = function () {
                   confirmButton: "btn fw-bold btn-success",
               }
           }).then(function(){
-                console.log(modalSequencingFiles);
                 loadingElement.remove();
                 modalSequencingFiles.hide();
               });

@@ -22,7 +22,8 @@ from samplelib.serializers import SingleSampleLibSerializer
 from sequencingfile.models import SequencingFile,SequencingFileSet
 from concurrent.futures import ThreadPoolExecutor
 from utils.utils import calculate_execution_time
-
+from barcodeset.models import Barcode
+from django.db.models import Q
 
 @permission_required("sequencingrun.view_sequencingrun",raise_exception=True)
 def sequencingruns(request):
@@ -204,6 +205,7 @@ def get_or_none(model_class, **kwargs):
 
 
 def _get_matched_sample_libray(file, sample_libs):
+    print(file, sample_libs)
     match = re.search("[ATGC]{6}", file)
     sl=sl_name=None
     if match:
@@ -265,8 +267,19 @@ def count_file_set(file, prefix_list):
 #     # Group by the 'group' column and aggregate the 'file' column using the custom function
 #     result = df.groupby('group')['file'].agg(merge_files).reset_index()
 #     # print(result[result["group"]=="AGEX-02"])
-#
-#     return result[result["group"]=="Nimblegen10_BB13"]
+#     df['pattern'] = df['file'].str.extract(r'([ATGC]{6})')
+#     print(df[df['pattern'].notna()])
+    # def check_barcode(row):
+    #     q = Q(Q(i5=row["pattern"]) | Q(i7=row["pattern"]))
+    #     barcode = Barcode.objects.filter(q)
+    #     sl = SampleLib.objects.filter(sequencing_file_sets__sequencing_files__name=row['file'])
+    #     if sl:
+    #         print(sl)
+    #     # if not barcode:
+    #     #     print(row["pattern"])
+    # print(SampleLib.objects.filter(barcode__isnull=True).count())
+    # df[df['pattern'].notna()].apply(lambda row: check_barcode(row),axis=1)
+    # return df
 
 def get_total_file_size(directory):
     total_size = 0
@@ -276,23 +289,45 @@ def get_total_file_size(directory):
             total_size += os.stat(file_path).st_size / (1024 * 1024 * 1024)
     return total_size
 
+def get_files_from_temp():
+    files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
+    # files = [
+    #     "7585_CGATGT_L001_R1_001.fastq.gz",
+    #     "1212_CGATGT_L002_R1_001.fastq.gz",
+    #     "1212_CGATGT_L002_R1_002.fastq.gz",
+    #     "1213_CGATGT_L001_R1_001.fastq.gz",
+    #     "1213_CGATGT_L001_R1_002.fastq.gz",
+    #     "1213_CGATGT_L001_R1_003.fastq.gz"
+    # ]
+    prefix_list = [(split_prefix(file), file) for file in files]
+    prefix_dict = {}
+    for prefix in prefix_list:
+        if prefix[0] in prefix_dict:
+            prefix_dict[prefix[0]].append(prefix[1])
+        else:
+            prefix_dict[prefix[0]] = [prefix[1]]
+    return prefix_dict
+
+
 def get_sequencing_files(request, id):
-    try:
+    # try:
         sequencing_run = SequencingRun.objects.get(id=id)
         sample_libs = SampleLib.objects.filter(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct()
-        files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
-        prefix_list = [(split_prefix(file), file) for file in files]
-        files_list = [( file, _get_matched_sample_libray(file, sample_libs), split_prefix(file), count_file_set(file, prefix_list)) for file in files]
-        if len(files_list) == 0:
+
+        prefix_dict = get_files_from_temp()
+
+        if not prefix_dict:
             return JsonResponse({'success': False, "message": 'There is no file in TEMP directory'}, status=400)  # Or any other appropriate status code
+
+        file_set_list = [(prefix, _get_matched_sample_libray(prefix, sample_libs), len(prefix_dict[prefix])) for prefix in prefix_dict]
         return JsonResponse({
             'success': True,
-            "files": files_list,
+            "file_sets": file_set_list,
             "sample_libs": SingleSampleLibSerializer(sample_libs, many=True).data,
             "sequencing_run": SingleSequencingRunSerializer(sequencing_run).data
         }, status=200)
-    except Exception as e:
-        return JsonResponse({'success': False, "message": str(e)}, status=400)
+    # except Exception as e:
+    #     return JsonResponse({'success': False, "message": str(e)}, status=400)
 
 
 def get_file_type(file):
@@ -315,9 +350,9 @@ def create_objects(row, seq_run):
         if not file_set:
             file_set = SequencingFileSet.objects.create(
                 prefix=row["file_set_name"].strip(),
-                sequencing_run= seq_run,
-                sample_lib= sample_lib,
-                path= f"BastianRaid-02/FD/{seq_run.name}"
+                sequencing_run=seq_run,
+                sample_lib=sample_lib,
+                path=f"BastianRaid-02/FD/{seq_run.name}"
             )
         else:
             file_set.sequencing_run = seq_run
@@ -340,11 +375,18 @@ def create_objects(row, seq_run):
     except Exception as e:
         print(e)
 
+def swap(row):
+    prefix_dict = get_files_from_temp()
+    pass
+
 # @calculate_execution_time
 def save_sequencing_files(request):
     try:
         # lock = threading.Lock()
         data = json.loads(request.POST['data'])
+
+        print(data)
+        print("$$$")
         for row in data:
             if row["sample_lib_id"] == "not_matched":
                 return JsonResponse({"success": False, "message": "Not matched files found! Please Check the Sample Libraries."})
@@ -354,7 +396,10 @@ def save_sequencing_files(request):
         # print(seq_run)
 
         for row in data:
-            create_objects(row, seq_run)
+            if "FLAG" not in row["file_set_name"]:
+                create_objects(row, seq_run)
+            else:
+                swap(row)
         source_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP")
         # with lock:
         destination_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}")
