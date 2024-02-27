@@ -7,6 +7,7 @@ var KTDatatablesServerSide = function () {
     var dt;
     var filterPayment;
     var editor;
+    var popupWindow;
 
     // Private functions
     var initDatatable = function ( initialValue, p_stage, prim, collection , body_site ) {
@@ -109,7 +110,7 @@ var KTDatatablesServerSide = function () {
                     orderable: true,
                     render: function (data, type, row) {
                       if (data) {
-                        return `<a href="`+ row["block_url"]["url"] + row["scan_number"] +`" target="_blank"><i class="fa-solid fa-image fa-xl" style="color: #40f900;"></i></a>`;
+                        return `<a href="javascript:;" class="scan-image" data-url="`+ row["block_url"]["url"] + row["scan_number"] +`"><i class="fa-solid fa-image fa-xl" style="color: #40f900;"></i></a>`;
                       }
                       return "";
                     }
@@ -198,6 +199,7 @@ var KTDatatablesServerSide = function () {
             toggleToolbars();
             handleDeleteRows();
             handleResetForm();
+            initShowScanImage();
             KTMenu.createInstances();
         });
 
@@ -238,7 +240,31 @@ var KTDatatablesServerSide = function () {
     });
     }
 
+    var initShowScanImage = function () {
+        document.querySelectorAll(".scan-image").forEach((item, i) => {
 
+            item.addEventListener("click", function () {
+
+                // if the window didn't open before or the window made closed
+                if (!popupWindow || popupWindow.closed) {
+                    var windowWidth = 500; // Pencere genişliği
+                    var windowHeight = 500; // Pencere yüksekliği
+                    var left = (window.screen.width - windowWidth) / 2;
+                    var top = (window.screen.height - windowHeight) / 2;
+
+                    popupWindow = window.open('', '_blank', 'width=' + windowWidth + ',height=' + windowHeight + ',left=' + left + ',top=' + top);
+                }
+                var parent = item.closest('tr');
+                var block = parent.querySelector('td:nth-child(3)').textContent;
+
+                // Pencerenin içeriğini güncelle (örneğin, sadece resim gösterimi)
+                popupWindow.document.body.innerHTML = '<h1>'+ block +'</h1><img src="' + item.getAttribute("data-url") + '" style="max-width:100%;max-height:100%;" />';
+
+            });
+
+        });
+
+    }
 
     // Search Datatable --- official docs reference: https://datatables.net/reference/api/search()
     var handleSearchDatatable = function () {
