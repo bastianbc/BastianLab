@@ -256,9 +256,30 @@ var KTDatatablesServerSide = function () {
                 }
                 var parent = item.closest('tr');
                 var block = parent.querySelector('td:nth-child(3)').textContent;
+                $.ajax({
+                    url: 'https://64.54.108.121/app/WebViewer/view/image/05-37586A1',
+                    method: 'GET',
+                    success: function(response) {
+                        // Print the HTML content to the console
+                        console.log(response);
+                        // popupWindow.document.body.innerHTML = '<h1>'+ block +'</h1><img src="' + item.getAttribute("data-url") + '" style="max-width:100%;max-height:100%;" />';
+                        popupWindow.document.body.innerHTML = response;
 
+                    },
+                    error: function(xhr, status, error) {
+                        // Handle errors
+                        console.error(status, error);
+                    },
+                    // If the URL is using a self-signed certificate, you may need to set this option to true
+                    // This option should generally not be used in a production environment
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                    // If the URL is using a self-signed certificate, you may need to set this option to false
+                    // This option should generally not be used in a production environment
+                    crossDomain: true
+                });
                 // Pencerenin içeriğini güncelle (örneğin, sadece resim gösterimi)
-                popupWindow.document.body.innerHTML = '<h1>'+ block +'</h1><img src="' + item.getAttribute("data-url") + '" style="max-width:100%;max-height:100%;" />';
 
             });
 
