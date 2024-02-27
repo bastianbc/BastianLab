@@ -205,6 +205,7 @@ def get_or_none(model_class, **kwargs):
 
 
 def _get_matched_sample_libray(file, sample_libs):
+    print(file, sample_libs)
     match = re.search("[ATGC]{6}", file)
     sl=sl_name=None
     if match:
@@ -289,14 +290,18 @@ def get_total_file_size(directory):
     return total_size
 
 def get_sequencing_files(request, id):
-    try:
+    # try:
         sequencing_run = SequencingRun.objects.get(id=id)
         sample_libs = SampleLib.objects.filter(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct()
         files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
         prefix_list = [(split_prefix(file), file) for file in files]
-        unique_prefix_list = list(set(prefix_list))
-        file_set_list = [(prefix, _get_matched_sample_libray(prefix, sample_libs), files.count(prefix)) for prefix in prefix_list]
-        # files_list = [(prefix, _get_matched_sample_libray(prefix, sample_libs), split_prefix(file), files.count(prefix) for prefix in unique_prefix_list]
+        prefix_dict = {}
+        for prefix in prefix_list:
+            if prefix[0] in prefix_dict:
+                prefix_dict[prefix[0]].append(prefix[1])
+            else:
+                prefix_dict[prefix[0]] = [prefix[1]]
+        file_set_list = [(prefix, _get_matched_sample_libray(prefix, sample_libs), len(prefix_dict[prefix])) for prefix in prefix_dict]
         if len(file_set_list) == 0:
             return JsonResponse({'success': False, "message": 'There is no file in TEMP directory'}, status=400)  # Or any other appropriate status code
         return JsonResponse({
@@ -305,8 +310,8 @@ def get_sequencing_files(request, id):
             "sample_libs": SingleSampleLibSerializer(sample_libs, many=True).data,
             "sequencing_run": SingleSequencingRunSerializer(sequencing_run).data
         }, status=200)
-    except Exception as e:
-        return JsonResponse({'success': False, "message": str(e)}, status=400)
+    # except Exception as e:
+    #     return JsonResponse({'success': False, "message": str(e)}, status=400)
 
 
 def get_file_type(file):
