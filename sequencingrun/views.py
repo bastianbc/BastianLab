@@ -345,7 +345,7 @@ def get_file_type(file):
 
 
 def create_objects(row, seq_run):
-    try:
+    # try:
         sample_lib = SampleLib.objects.get(id=row["sample_lib_id"])
         file_set = get_or_none(SequencingFileSet, prefix=row["file_set_name"].strip())
         if not file_set:
@@ -374,8 +374,8 @@ def create_objects(row, seq_run):
                 file.sequencing_file_set = file_set
                 file.type = get_file_type(file_name)
                 file.save()
-    except Exception as e:
-        print(e)
+    # except Exception as e:
+    #     print(e)
 
 def swap(row):
     prefix_dict = get_files_from_temp()
@@ -387,18 +387,10 @@ def save_sequencing_files(request):
     try:
         lock = threading.Lock()
         data = json.loads(request.POST['data'])
-
-        print(data)
-        print("$$$")
         for row in data:
             if row["sample_lib_id"] == "not_matched":
                 return JsonResponse({"success": False, "message": "Not matched files found! Please Check the Sample Libraries."})
         seq_run = SequencingRun.objects.get(id=json.loads(request.POST['id']))
-        # print("*"*100)
-        # print(request.POST['id'])
-        prefix_dict = get_files_from_temp()
-        print("prefix_dict: ", prefix_dict)
-
         for row in data:
             if "_FLAG_" in row["file_set_name"]:
                 swap(row)
