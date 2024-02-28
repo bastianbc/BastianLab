@@ -412,7 +412,7 @@ def save_sequencing_files(request):
                 source_file = os.path.join(source_dir, filename)
                 destination_file = os.path.join(destination_dir, filename)
                 print(source_file, '\n', destination_dir, '\n')
-                shutil.copy2(source_file, destination_dir)
+                shutil.move(source_file, destination_dir)
             # executor.submit(shutil.move(source_file, destination_file))
             except shutil.SameFileError:
                 print("Source and destination represents the same file.")
