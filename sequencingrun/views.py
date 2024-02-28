@@ -410,9 +410,9 @@ def save_sequencing_files(request):
                 print(f"3-destination_dir: {destination_dir}")
                 source_file = os.path.join(source_dir, filename)
                 destination_file = os.path.join(destination_dir, filename)
-                cmd = ['sudo', 'mv', source_file, destination_file]
-                subprocess.run(cmd, check=True)
-                # os.rename(source_file, destination_file)
+                # cmd = ['sudo', 'mv', source_file, destination_file]
+                # subprocess.run(cmd, check=True)
+                os.replace(source_file, destination_file)
                 print("source_file: %s destination_file: %s" %(source_file, destination_file))
                 # executor.submit(shutil.move(source_file, destination_file))
             return JsonResponse({"success": True})
