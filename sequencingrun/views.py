@@ -290,17 +290,17 @@ def get_total_file_size(directory):
     return total_size
 
 def get_files_from_temp():
-    # files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
-    files = [
-        "Sample_KAM1-T_ACCCAGCA_L001_R1_001.fastq.gz",
-        "Sample_KAM1-T_ACCCAGCA_L001_R2_001.fastq.gz",
-        "Sample_KAM12-T_AGATAGTT_L001_R1_001.fastq.gz",
-        "Sample_KAM12-T_AGATAGTT_L001_R2_001.fastq.gz",
-        "Sample_KAM106-T_AGTCAACA_L001_R1_001.fastq.gz",
-        "Sample_KAM106-T_AGTCAACA_L001_R2_001.fastq.gz",
-        "Sample_KAM121-T-B_AGGTTTAC_L001_R1_001.fastq.gz"
-        "Sample_KAM121-T-B_AGGTTTAC_L001_R2_001.fastq.gz"
-    ]
+    files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
+    # files = [
+    #     "Sample_KAM1-T_ACCCAGCA_L001_R1_001.fastq.gz",
+    #     "Sample_KAM1-T_ACCCAGCA_L001_R2_001.fastq.gz",
+    #     "Sample_KAM12-T_AGATAGTT_L001_R1_001.fastq.gz",
+    #     "Sample_KAM12-T_AGATAGTT_L001_R2_001.fastq.gz",
+    #     "Sample_KAM106-T_AGTCAACA_L001_R1_001.fastq.gz",
+    #     "Sample_KAM106-T_AGTCAACA_L001_R2_001.fastq.gz",
+    #     "Sample_KAM121-T-B_AGGTTTAC_L001_R1_001.fastq.gz",
+    #     "Sample_KAM121-T-B_AGGTTTAC_L001_R2_001.fastq.gz"
+    # ]
     prefix_list = [(split_prefix(file), file) for file in files]
     prefix_dict = {}
     for prefix in prefix_list:
@@ -385,7 +385,7 @@ def swap(row):
 # @calculate_execution_time
 def save_sequencing_files(request):
     try:
-        # lock = threading.Lock()
+        lock = threading.Lock()
         data = json.loads(request.POST['data'])
 
         print(data)
@@ -406,23 +406,23 @@ def save_sequencing_files(request):
                 create_objects(row, seq_run)
 
         source_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP")
-        # with lock:
-        destination_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"HiSeqData/{seq_run.name}")
-        print(f"1-destination_dir: {destination_dir}")
-        if not os.path.isdir(destination_dir):
-            os.makedirs(destination_dir)
-            print(f"2-destination_dir: {destination_dir}")
-            time.sleep(2)
+        with lock:
+            destination_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"HiSeqData/{seq_run.name}")
+            print(f"1-destination_dir: {destination_dir}")
+            if not os.path.isdir(destination_dir):
+                os.makedirs(destination_dir)
+                print(f"2-destination_dir: {destination_dir}")
+                time.sleep(2)
 
-        # with ThreadPoolExecutor(max_workers=2) as executor:
-        for filename in os.listdir(source_dir):
-            print(f"3-destination_dir: {destination_dir}")
-            source_file = os.path.join(source_dir, filename)
-            destination_file = os.path.join(destination_dir, filename)
-            shutil.move(source_file, destination_file)
-            # print("source_file: %s destination_file: %s" %(source_file, destination_file))
-            # executor.submit(shutil.move(source_file, destination_file))
-        return JsonResponse({"success": True})
+            # with ThreadPoolExecutor(max_workers=2) as executor:
+            for filename in os.listdir(source_dir):
+                print(f"3-destination_dir: {destination_dir}")
+                source_file = os.path.join(source_dir, filename)
+                destination_file = os.path.join(destination_dir, filename)
+                shutil.move(source_file, destination_file)
+                # print("source_file: %s destination_file: %s" %(source_file, destination_file))
+                # executor.submit(shutil.move(source_file, destination_file))
+            return JsonResponse({"success": True})
     except Exception as e:
         print(e)
         return JsonResponse({"success":False, "message": str(e)})
