@@ -384,7 +384,7 @@ def swap(row):
 # @calculate_execution_time
 def save_sequencing_files(request):
     try:
-        lock = threading.Lock()
+        # lock = threading.Lock()
         data = json.loads(request.POST['data'])
         for row in data:
             if row["sample_lib_id"] == "not_matched":
@@ -397,25 +397,28 @@ def save_sequencing_files(request):
                 create_objects(row, seq_run)
 
         source_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP")
-        with lock:
-            destination_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"HiSeqData/{seq_run.name}")
-            print(f"1-destination_dir: {destination_dir}")
-            if not os.path.isdir(destination_dir):
-                os.makedirs(destination_dir)
-                print(f"2-destination_dir: {destination_dir}")
-                time.sleep(2)
+        # with lock:
+        destination_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"HiSeqData/{seq_run.name}")
+        print(f"1-destination_dir: {destination_dir}")
+        if not os.path.isdir(destination_dir):
+            os.makedirs(destination_dir)
+            print(f"2-destination_dir: {destination_dir}")
+            time.sleep(2)
 
-            # with ThreadPoolExecutor(max_workers=2) as executor:
-            for filename in os.listdir(source_dir):
+        # with ThreadPoolExecutor(max_workers=2) as executor:
+        for filename in os.listdir(source_dir):
+            try:
                 print(f"3-destination_dir: {destination_dir}")
                 source_file = os.path.join(source_dir, filename)
                 destination_file = os.path.join(destination_dir, filename)
                 # cmd = ['sudo', 'mv', source_file, destination_file]
                 # subprocess.run(cmd, check=True)
                 shutil.copy2(source_file, destination_file)
-                # print("source_file: %s destination_file: %s" %(source_file, destination_file))
-                # executor.submit(shutil.move(source_file, destination_file))
-            return JsonResponse({"success": True})
+            # print("source_file: %s destination_file: %s" %(source_file, destination_file))
+            # executor.submit(shutil.move(source_file, destination_file))
+            except Exception as e:
+                print(e)
+        return JsonResponse({"success": True})
     except Exception as e:
         print(e)
         # return JsonResponse({"success":False, "message": str(e)})
