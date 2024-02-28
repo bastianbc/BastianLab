@@ -290,15 +290,16 @@ def get_total_file_size(directory):
     return total_size
 
 def get_files_from_temp():
-    files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
-    # files = [
-    #     "7585_CGATGT_L001_R1_001.fastq.gz",
-    #     "1212_CGATGT_L002_R1_001.fastq.gz",
-    #     "1212_CGATGT_L002_R1_002.fastq.gz",
-    #     "1213_CGATGT_L001_R1_001.fastq.gz",
-    #     "1213_CGATGT_L001_R1_002.fastq.gz",
-    #     "1213_CGATGT_L001_R1_003.fastq.gz"
-    # ]
+    # files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
+    files = [
+        "Sample_KAM1-T_ACCCAGCA_L001_R1_001.fastq.gz",
+        "Sample_KAM1-T_ACCCAGCA_L001_R2_001.fastq.gz",
+        "Sample_KAM12-T_AGATAGTT_L001_R1_001.fastq.gz",
+        "Sample_KAM12-T_AGATAGTT_L001_R2_001.fastq.gz",
+        "Sample_KAM106-T_AGTCAACA_L001_R1_001.fastq.gz",
+        "Sample_KAM106-T_AGTCAACA_L001_R2_001.fastq.gz",
+        "Sample_KAM121-T-B_AGGTTTAC_L001_R1_001.fastq.gz"
+    ]
     prefix_list = [(split_prefix(file), file) for file in files]
     prefix_dict = {}
     for prefix in prefix_list:
@@ -377,6 +378,7 @@ def create_objects(row, seq_run):
 
 def swap(row):
     prefix_dict = get_files_from_temp()
+
     pass
 
 # @calculate_execution_time
@@ -396,13 +398,14 @@ def save_sequencing_files(request):
         # print(seq_run)
 
         for row in data:
-            if "FLAG" not in row["file_set_name"]:
-                create_objects(row, seq_run)
-            else:
+            if "_FLAG_" in row["file_set_name"]:
                 swap(row)
+            else:
+                create_objects(row, seq_run)
+
         source_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP")
         # with lock:
-        destination_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"FD/{seq_run.name}")
+        destination_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"HiSeqData/{seq_run.name}")
         print(f"1-destination_dir: {destination_dir}")
         if not os.path.isdir(destination_dir):
             os.makedirs(destination_dir)
