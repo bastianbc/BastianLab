@@ -383,7 +383,7 @@ def swap(row):
 
 # @calculate_execution_time
 def save_sequencing_files(request):
-    # try:
+    try:
         lock = threading.Lock()
         data = json.loads(request.POST['data'])
         for row in data:
@@ -416,8 +416,8 @@ def save_sequencing_files(request):
                 # print("source_file: %s destination_file: %s" %(source_file, destination_file))
                 # executor.submit(shutil.move(source_file, destination_file))
             return JsonResponse({"success": True})
-    # except Exception as e:
-    #     print(e)
-    #     return JsonResponse({"success":False, "message": str(e)})
+    except Exception as e:
+        print(e)
+        # return JsonResponse({"success":False, "message": str(e)})
 
 
