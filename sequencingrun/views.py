@@ -414,8 +414,16 @@ def save_sequencing_files(request):
                 print(source_file, '\n', destination_dir, '\n')
                 shutil.copy2(source_file, destination_dir)
             # executor.submit(shutil.move(source_file, destination_file))
-            except Exception as e:
-                print(e)
+            except shutil.SameFileError:
+                print("Source and destination represents the same file.")
+
+            # If there is any permission issue
+            except PermissionError:
+                print("Permission denied.")
+
+            # For other errors
+            except:
+                print("Error occurred while copying file.")
         return JsonResponse({"success": True})
     except Exception as e:
         print(e)
