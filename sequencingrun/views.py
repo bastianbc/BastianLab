@@ -404,7 +404,8 @@ def save_sequencing_files(request):
             os.makedirs(destination_dir)
             print(f"2-destination_dir: {destination_dir}")
             time.sleep(2)
-
+        perm = os.stat(source_dir).st_mode
+        print("File Permission mode:", perm, "\n")
         # with ThreadPoolExecutor(max_workers=2) as executor:
         for filename in os.listdir(source_dir):
             try:
