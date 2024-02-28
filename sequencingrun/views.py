@@ -409,15 +409,10 @@ def save_sequencing_files(request):
         # with ThreadPoolExecutor(max_workers=2) as executor:
         for filename in os.listdir(source_dir):
             try:
-                print(f"3-destination_dir: {destination_dir}")
                 source_file = os.path.join(source_dir, filename)
                 destination_file = os.path.join(destination_dir, filename)
-                # cmd = ['sudo', 'mv', source_file, destination_file]
-                # subprocess.run(cmd, check=True)
-                time.sleep(0.5)
+                print(source_file, '\n', destination_dir, '\n')
                 shutil.copy2(source_file, destination_dir)
-                time.sleep(0.5)
-            # print("source_file: %s destination_file: %s" %(source_file, destination_file))
             # executor.submit(shutil.move(source_file, destination_file))
             except Exception as e:
                 print(e)
