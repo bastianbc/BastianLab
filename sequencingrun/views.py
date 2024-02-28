@@ -413,7 +413,9 @@ def save_sequencing_files(request):
                 destination_file = os.path.join(destination_dir, filename)
                 # cmd = ['sudo', 'mv', source_file, destination_file]
                 # subprocess.run(cmd, check=True)
+                time.sleep(0.5)
                 shutil.move(source_file, destination_file)
+                time.sleep(0.5)
             # print("source_file: %s destination_file: %s" %(source_file, destination_file))
             # executor.submit(shutil.move(source_file, destination_file))
             except Exception as e:
