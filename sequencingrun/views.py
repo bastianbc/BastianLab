@@ -398,7 +398,7 @@ def save_sequencing_files(request):
 
         source_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP")
         # with lock:
-        destination_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"HiSeqData/{seq_run.name}")
+        destination_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"HiSeqData/{seq_run.name}/")
         print(f"1-destination_dir: {destination_dir}")
         if not os.path.isdir(destination_dir):
             os.makedirs(destination_dir)
@@ -414,7 +414,7 @@ def save_sequencing_files(request):
                 # cmd = ['sudo', 'mv', source_file, destination_file]
                 # subprocess.run(cmd, check=True)
                 time.sleep(0.5)
-                shutil.move(source_file, destination_file)
+                shutil.copy2(source_file, destination_dir)
                 time.sleep(0.5)
             # print("source_file: %s destination_file: %s" %(source_file, destination_file))
             # executor.submit(shutil.move(source_file, destination_file))
