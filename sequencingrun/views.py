@@ -290,17 +290,17 @@ def get_total_file_size(directory):
     return total_size
 
 def get_files_from_temp():
-    # files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
-    files = [
-        "Sample_KAM1-T_ACCCAGCA_L001_R1_001.fastq.gz",
-        "Sample_KAM1-T_ACCCAGCA_L001_R2_001.fastq.gz",
-        "Sample_KAM12-T_AGATAGTT_L001_R1_001.fastq.gz",
-        "Sample_KAM12-T_AGATAGTT_L001_R2_001.fastq.gz",
-        "Sample_KAM106-T_AGTCAACA_L001_R1_001.fastq.gz",
-        "Sample_KAM106-T_AGTCAACA_L001_R2_001.fastq.gz",
-        "Sample_KAM121-T-B_AGGTTTAC_L001_R1_001.fastq.gz"
-        "Sample_KAM121-T-B_AGGTTTAC_L001_R2_001.fastq.gz"
-    ]
+    files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
+    # files = [
+    #     "Sample_KAM1-T_ACCCAGCA_L001_R1_001.fastq.gz",
+    #     "Sample_KAM1-T_ACCCAGCA_L001_R2_001.fastq.gz",
+    #     "Sample_KAM12-T_AGATAGTT_L001_R1_001.fastq.gz",
+    #     "Sample_KAM12-T_AGATAGTT_L001_R2_001.fastq.gz",
+    #     "Sample_KAM106-T_AGTCAACA_L001_R1_001.fastq.gz",
+    #     "Sample_KAM106-T_AGTCAACA_L001_R2_001.fastq.gz",
+    #     "Sample_KAM121-T-B_AGGTTTAC_L001_R1_001.fastq.gz",
+    #     "Sample_KAM121-T-B_AGGTTTAC_L001_R2_001.fastq.gz"
+    # ]
     prefix_list = [(split_prefix(file), file) for file in files]
     prefix_dict = {}
     for prefix in prefix_list:
