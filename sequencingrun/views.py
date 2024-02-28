@@ -299,6 +299,7 @@ def get_files_from_temp():
         "Sample_KAM106-T_AGTCAACA_L001_R1_001.fastq.gz",
         "Sample_KAM106-T_AGTCAACA_L001_R2_001.fastq.gz",
         "Sample_KAM121-T-B_AGGTTTAC_L001_R1_001.fastq.gz"
+        "Sample_KAM121-T-B_AGGTTTAC_L001_R2_001.fastq.gz"
     ]
     prefix_list = [(split_prefix(file), file) for file in files]
     prefix_dict = {}
@@ -345,7 +346,6 @@ def get_file_type(file):
 
 def create_objects(row, seq_run):
     try:
-        file_name = row["file_name"].strip()
         sample_lib = SampleLib.objects.get(id=row["sample_lib_id"])
         file_set = get_or_none(SequencingFileSet, prefix=row["file_set_name"].strip())
         if not file_set:
@@ -353,26 +353,27 @@ def create_objects(row, seq_run):
                 prefix=row["file_set_name"].strip(),
                 sequencing_run=seq_run,
                 sample_lib=sample_lib,
-                path=f"BastianRaid-02/FD/{seq_run.name}"
+                path=f"BastianRaid-02/HiSeqData/{seq_run.name}"
             )
         else:
             file_set.sequencing_run = seq_run
             file_set.sample_lib = sample_lib
-            file_set.path = f"BastianRaid-02/FD/{seq_run.name}"
+            file_set.path = f"BastianRaid-02/HiSeqData/{seq_run.name}"
             file_set.save()
 
-
-        file = get_or_none(SequencingFile, name=file_name)
-        if not file:
-            file = SequencingFile.objects.create(
-                name=file_name,
-                sequencing_file_set=file_set,
-                type=get_file_type(file_name)
-            )
-        else:
-            file.sequencing_file_set = file_set
-            file.type = get_file_type(file_name)
-            file.save()
+        prefix_dict = get_files_from_temp()
+        for file_name in prefix_dict[row["file_set_name"]]:
+            file = get_or_none(SequencingFile, name=file_name)
+            if not file:
+                file = SequencingFile.objects.create(
+                    name=file_name,
+                    sequencing_file_set=file_set,
+                    type=get_file_type(file_name)
+                )
+            else:
+                file.sequencing_file_set = file_set
+                file.type = get_file_type(file_name)
+                file.save()
     except Exception as e:
         print(e)
 
@@ -395,7 +396,8 @@ def save_sequencing_files(request):
         seq_run = SequencingRun.objects.get(id=json.loads(request.POST['id']))
         # print("*"*100)
         # print(request.POST['id'])
-        # print(seq_run)
+        prefix_dict = get_files_from_temp()
+        print("prefix_dict: ", prefix_dict)
 
         for row in data:
             if "_FLAG_" in row["file_set_name"]:
