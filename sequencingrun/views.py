@@ -205,7 +205,6 @@ def get_or_none(model_class, **kwargs):
 
 
 def _get_matched_sample_libray(file, sample_libs):
-    print(file, sample_libs)
     match = re.search("[ATGC]{6}", file)
     sl=sl_name=None
     if match:
@@ -379,7 +378,6 @@ def create_objects(row, seq_run):
 
 def swap(row):
     prefix_dict = get_files_from_temp()
-
     pass
 
 # @calculate_execution_time
@@ -411,8 +409,8 @@ def save_sequencing_files(request):
                 print(f"3-destination_dir: {destination_dir}")
                 source_file = os.path.join(source_dir, filename)
                 destination_file = os.path.join(destination_dir, filename)
-                shutil.move(source_file, destination_file)
-                # print("source_file: %s destination_file: %s" %(source_file, destination_file))
+                os.rename(source_file, destination_file)
+                print("source_file: %s destination_file: %s" %(source_file, destination_file))
                 # executor.submit(shutil.move(source_file, destination_file))
             return JsonResponse({"success": True})
     # except Exception as e:
