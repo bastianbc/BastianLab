@@ -413,7 +413,7 @@ def save_sequencing_files(request):
                 # cmd = ['sudo', 'mv', source_file, destination_file]
                 # subprocess.run(cmd, check=True)
                 os.replace(source_file, destination_file)
-                print("source_file: %s destination_file: %s" %(source_file, destination_file))
+                # print("source_file: %s destination_file: %s" %(source_file, destination_file))
                 # executor.submit(shutil.move(source_file, destination_file))
             return JsonResponse({"success": True})
     # except Exception as e:
