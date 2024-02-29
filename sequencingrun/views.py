@@ -204,6 +204,21 @@ def get_or_none(model_class, **kwargs):
     except Exception as e:
         return None
 
+def get_sl_id_from_file(file):
+    match = re.search("[ATGC]{6}", file)
+    sl_name = None
+    if match:
+        sl_name = re.split(r"(?=(_[ATGC]{6}|-[ATGC]{6}))", file, maxsplit=1)[0]
+    elif re.search("_S\d", file):
+        sl_name = file.split("_S")[0]
+    elif re.search(".deduplicated.realign.bam", file):
+        sl_name = file.split(".")[0]
+    elif file.endswith(".bam") or file.endswith(".bai"):
+        sl_name = file.split(".")[0]
+    elif re.search("_R", file):
+        sl_name = file.split("_R")[0]
+    return sl_name
+
 
 def _get_matched_sample_libray(file, sample_libs):
     match = re.search("[ATGC]{6}", file)
@@ -310,18 +325,25 @@ def get_files_from_temp():
             prefix_dict[prefix[0]] = [prefix[1]]
     return prefix_dict
 
+def get_file_set_list(prefix_dict, sequencing_run):
+    sample_libs = SampleLib.objects.filter(
+        sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct()
+    return [(prefix, _get_matched_sample_libray(prefix, sample_libs), len(prefix_dict[prefix])) for prefix in
+                     prefix_dict] , sample_libs
+
 
 def get_sequencing_files(request, id):
     # try:
         sequencing_run = SequencingRun.objects.get(id=id)
-        sample_libs = SampleLib.objects.filter(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct()
 
         prefix_dict = get_files_from_temp()
 
         if not prefix_dict:
             return JsonResponse({'success': False, "message": 'There is no file in TEMP directory'}, status=400)  # Or any other appropriate status code
 
-        file_set_list = [(prefix, _get_matched_sample_libray(prefix, sample_libs), len(prefix_dict[prefix])) for prefix in prefix_dict]
+
+        file_set_list, sample_libs = get_file_set_list(prefix_dict, sequencing_run)
+
         return JsonResponse({
             'success': True,
             "file_sets": file_set_list,
@@ -344,7 +366,7 @@ def get_file_type(file):
     return ""
 
 
-def create_objects(row, seq_run):
+def create_objects(row, seq_run, prefix_dict):
     # try:
         sample_lib = SampleLib.objects.get(id=row["sample_lib_id"])
         file_set = get_or_none(SequencingFileSet, prefix=row["file_set_name"].strip())
@@ -361,7 +383,7 @@ def create_objects(row, seq_run):
             file_set.path = f"BastianRaid-02/HiSeqData/{seq_run.name}"
             file_set.save()
 
-        prefix_dict = get_files_from_temp()
+
         for file_name in prefix_dict[row["file_set_name"]]:
             file = get_or_none(SequencingFile, name=file_name)
             if not file:
@@ -377,56 +399,92 @@ def create_objects(row, seq_run):
     # except Exception as e:
     #     print(e)
 
-def swap(row):
-    prefix_dict = get_files_from_temp()
-    pass
+def swap(row, prefix_dict, seq_run):
+    try:
+        sample_lib = SampleLib.objects.get(id=row["sample_lib_id"])
+        file_set = SequencingFileSet.objects.create(
+            prefix=row["file_set_name"].strip(),
+            sequencing_run=seq_run,
+            sample_lib=sample_lib,
+            path=f"BastianRaid-02/HiSeqData/{seq_run.name}"
+        )
+        file_set_prefix = file_set.prefix.replace("_FLAG_","")
+        print(row, prefix_dict, file_set_prefix)
+        print("__file_entered__"*10)
+        '''
+        {'sample_lib_id': '60222', 
+        'file_set_name': 'DPN57-Tumor_TCATTCAT-TCATTCAT_FLAG_', 
+        'file_numbers': '2', 
+        'old_sl': '60223', 
+        'old_prefix': 'DPN57-Tumor_TCATTCAT-TCATTCAT'} 
+        
+        {'DPN56-Tumor_GAAACCAC-GAAACCAC': 
+        ['DPN56-Tumor_GAAACCAC-GAAACCAC_L001_R1_001.fastq.gz', 'DPN56-Tumor_GAAACCAC-GAAACCAC_L001_R2_001.fastq.gz'], 
+        'DPN57-Tumor_TCATTCAT-TCATTCAT': 
+        ['DPN57-Tumor_TCATTCAT-TCATTCAT_L002_R1_001.fastq.gz', 'DPN57-Tumor_TCATTCAT-TCATTCAT_L002_R2_001.fastq.gz']} 
+        DPN57-Tumor_TCATTCAT-TCATTCAT
+        '''
+        files = prefix_dict[file_set_prefix]
+        for file in files:
+            filtered_dict = [k for k, v in prefix_dict.items() if sample_lib.name in k][0]
+            print("file: ", file)
+            time.sleep(3)
+            _file_changed = file.replace(file_set_prefix, filtered_dict)
+            print("_file_changed: ", _file_changed)
+            time.sleep(3)
+            insert_position = min([pos for pos, char in enumerate(_file_changed) if char == "."])
+            file_changed = _file_changed[:insert_position] + "_FLAG_" + _file_changed[insert_position:]
+            print("2_file_changed_2: ", _file_changed)
+            time.sleep(3)
+            try:
+                os.rename(os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"TEMP/{file}"),
+                      os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"TEMP/{file_changed}"))
+            except Exception as e:
+                print(e)
+            _file = get_or_none(SequencingFile, name=file_changed)
+            if not _file:
+                _file = SequencingFile.objects.create(
+                    name=file_changed,
+                    sequencing_file_set=file_set,
+                    type=get_file_type(file_changed)
+                )
+            else:
+                _file.sequencing_file_set = file_set
+                _file.type = get_file_type(file_changed)
+                _file.save()
+    except Exception as e:
+        print(e)
+
 
 # @calculate_execution_time
 def save_sequencing_files(request):
-    try:
-        # lock = threading.Lock()
+    # try:
         data = json.loads(request.POST['data'])
+        prefix_dict = get_files_from_temp()
+        print("request data", data)
         for row in data:
             if row["sample_lib_id"] == "not_matched":
                 return JsonResponse({"success": False, "message": "Not matched files found! Please Check the Sample Libraries."})
         seq_run = SequencingRun.objects.get(id=json.loads(request.POST['id']))
         for row in data:
             if "_FLAG_" in row["file_set_name"]:
-                swap(row)
+                swap(row, prefix_dict, seq_run)
             else:
-                create_objects(row, seq_run)
-
+                create_objects(row, seq_run, prefix_dict)
         source_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP")
-        # with lock:
         destination_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"HiSeqData/{seq_run.name}/")
-        print(f"1-destination_dir: {destination_dir}")
         if not os.path.isdir(destination_dir):
             os.makedirs(destination_dir)
-            print(f"2-destination_dir: {destination_dir}")
             time.sleep(2)
-        perm = os.stat(source_dir).st_mode
-        print("File Permission mode:", perm, "\n")
-        # with ThreadPoolExecutor(max_workers=2) as executor:
         for filename in os.listdir(source_dir):
+            source_file = os.path.join(source_dir, filename)
             try:
-                source_file = os.path.join(source_dir, filename)
-                destination_file = os.path.join(destination_dir, filename)
-                print(source_file, '\n', destination_dir, '\n')
                 shutil.move(source_file, destination_dir)
-            # executor.submit(shutil.move(source_file, destination_file))
-            except shutil.SameFileError:
-                print("Source and destination represents the same file.")
-
-            # If there is any permission issue
-            except PermissionError:
-                print("Permission denied.")
-
-            # For other errors
-            except:
-                print("Error occurred while copying file.")
+            except Exception as e:
+                print(e)
         return JsonResponse({"success": True})
-    except Exception as e:
-        print(e)
-        return JsonResponse({"success":False, "message": str(e)})
+    # except Exception as e:
+    #     print(e)
+    #     return JsonResponse({"success":False, "message": str(e)})
 
 
