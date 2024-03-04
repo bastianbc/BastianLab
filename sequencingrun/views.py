@@ -305,37 +305,23 @@ def get_total_file_size(directory):
 
 def get_files_from_temp(sample_libs):
     files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
-    # files = [
-    #     "Sample_KAM1-T_ACCCAGCA_L001_R1_001.fastq.gz",
-    #     "Sample_KAM1-T_ACCCAGCA_L001_R2_001.fastq.gz",
-    #     "Sample_KAM12-T_AGATAGTT_L001_R1_001.fastq.gz",
-    #     "Sample_KAM12-T_AGATAGTT_L001_R2_001.fastq.gz",
-    #     "Sample_KAM106-T_AGTCAACA_L001_R1_001.fastq.gz",
-    #     "Sample_KAM106-T_AGTCAACA_L001_R2_001.fastq.gz",
-    #     "Sample_KAM121-T-B_AGGTTTAC_L001_R1_001.fastq.gz",
-    #     "Sample_KAM121-T-B_AGGTTTAC_L001_R2_001.fastq.gz"
-    # ]
     FileSet = namedtuple('FileSet', ['prefix','file','sl_id'])
-
-    file_sets = [FileSet(prefix=split_prefix(file), file=file, sl_id=_get_matched_sample_library(file, sample_libs)) for file in files]
-    # print(file_sets)
+    file_sets = [
+        FileSet(
+        prefix=split_prefix(file),
+        file=file,
+        sl_id=_get_matched_sample_library(file, sample_libs)) for file in files
+    ]
     prefix_dict = {}
     for file_set in file_sets:
         if file_set.prefix in prefix_dict:
             prefix_dict[file_set.prefix].append(file_set.file)
         else:
             prefix_dict[file_set.prefix] = [file_set.file]
-    return prefix_dict
-        # if file_set[0] in prefix_dict:
-        #     file = FileSet.file
-        #     FileSet(file=file.append(file_set[1]))
-        # else:
-        #     sl_id = _get_matched_sample_library(file_set[0], sample_libs)
-        #     file_set_nt = FileSet(prefix=file_set[0], files=[file_set[1]], sl_id=sl_id)
-    # print(FileSet)
-    # return FileSet
-    '''
-    '''
+    ret = [FileSet(prefix=key, file=value, sl_id=_get_matched_sample_library(key, sample_libs))._asdict() for key,value in prefix_dict.items()]
+    return ret
+
+
 
 def get_file_set_list(prefix_dict, sample_libs):
     return [(prefix, _get_matched_sample_library(prefix, sample_libs), len(prefix_dict[prefix])) for prefix in
@@ -347,18 +333,16 @@ def get_sequencing_files(request, id):
         sequencing_run = SequencingRun.objects.get(id=id)
         sample_libs = SampleLib.objects.filter(
             sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct()
-
-        prefix_dict = get_files_from_temp(sample_libs)
-
-        if not prefix_dict:
+        file_sets = get_files_from_temp(sample_libs)
+        if not file_sets:
             return JsonResponse({'success': False, "message": 'There is no file in TEMP directory'}, status=400)  # Or any other appropriate status code
 
 
-        file_set_list, sample_libs = get_file_set_list(prefix_dict, sample_libs)
-
+        # file_set_list, sample_libs = get_file_set_list(prefix_dict, sample_libs)
+        print(file_sets)
         return JsonResponse({
             'success': True,
-            "file_sets": file_set_list,
+            "file_sets": file_sets,
             "sample_libs": SingleSampleLibSerializer(sample_libs, many=True).data,
             "sequencing_run": SingleSequencingRunSerializer(sequencing_run).data
         }, status=200)
