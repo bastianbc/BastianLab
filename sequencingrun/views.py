@@ -3,7 +3,7 @@ import os
 import shutil
 import time
 from pathlib import Path
-from collections import Counter
+from collections import Counter, namedtuple
 import pandas as pd
 import threading
 import subprocess
@@ -220,7 +220,7 @@ def get_sl_id_from_file(file):
     return sl_name
 
 
-def _get_matched_sample_libray(file, sample_libs):
+def _get_matched_sample_library(file, sample_libs):
     match = re.search("[ATGC]{6}", file)
     sl=sl_name=None
     if match:
@@ -304,7 +304,7 @@ def get_total_file_size(directory):
             total_size += os.stat(file_path).st_size / (1024 * 1024 * 1024)
     return total_size
 
-def get_files_from_temp():
+def get_files_from_temp(sample_libs):
     files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
     # files = [
     #     "Sample_KAM1-T_ACCCAGCA_L001_R1_001.fastq.gz",
@@ -316,33 +316,45 @@ def get_files_from_temp():
     #     "Sample_KAM121-T-B_AGGTTTAC_L001_R1_001.fastq.gz",
     #     "Sample_KAM121-T-B_AGGTTTAC_L001_R2_001.fastq.gz"
     # ]
-    prefix_list = [(split_prefix(file), file) for file in files]
-    prefix_dict = {}
-    for prefix in prefix_list:
-        if prefix[0] in prefix_dict:
-            prefix_dict[prefix[0]].append(prefix[1])
-        else:
-            prefix_dict[prefix[0]] = [prefix[1]]
-    return prefix_dict
+    FileSet = namedtuple('FileSet', ['prefix','files','sl_id'])
 
-def get_file_set_list(prefix_dict, sequencing_run):
-    sample_libs = SampleLib.objects.filter(
-        sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct()
-    return [(prefix, _get_matched_sample_libray(prefix, sample_libs), len(prefix_dict[prefix])) for prefix in
+    file_sets = [FileSet(prefix=split_prefix(file), files=file, sl_id=_get_matched_sample_library(file, sample_libs)) for file in files]
+    print(file_sets)
+    # prefix_dict = {}
+    # file_set_nt = FileSet()
+    # for file_set in file_sets:
+    #     if file_set[0] in prefix_dict:
+    #         files = FileSet.files
+    #         FileSet(files=files.append(file_set[1]))
+    #     else:
+    #         sl_id = _get_matched_sample_library(file_set[0], sample_libs)
+    #         file_set_nt = FileSet(prefix=file_set[0], files=[file_set[1]], sl_id=sl_id)
+    # print(FileSet)
+    # return FileSet
+    '''
+    [FileSet(prefix='Sample_KAM20-T_AGCATCAT-AGCATCAT', 
+    files='Sample_KAM-T_AGCATCAT-AGCATCAT_L001_R1_001.fastq.gz', sl_id=61610), 
+    FileSet(prefix='Sample_KAM20-T_AGCATCAT-AGCATCAT', files='Sample_KAM20-T_AGCATCAT-AGCATCAT_L001_R1_002.fastq.gz', sl_id=61610), FileSet(prefix='Sample_KAM35-T_AGCATCAT-AGCATCAT', files='Sample_KAM35-T_AGCATCAT-AGCATCAT_L002_R1_001.fastq.gz', sl_id=61612), FileSet(prefix='Sample_KAM35-T_AGCATCAT-AGCATCAT', files='Sample_KAM35-T_AGCATCAT-AGCATCAT_L002_R1_002.fastq copy.gz', sl_id=61612)]
+    '''
+
+def get_file_set_list(prefix_dict, sample_libs):
+    return [(prefix, _get_matched_sample_library(prefix, sample_libs), len(prefix_dict[prefix])) for prefix in
                      prefix_dict] , sample_libs
 
 
 def get_sequencing_files(request, id):
     # try:
         sequencing_run = SequencingRun.objects.get(id=id)
+        sample_libs = SampleLib.objects.filter(
+            sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct()
 
-        prefix_dict = get_files_from_temp()
+        prefix_dict = get_files_from_temp(sample_libs)
 
         if not prefix_dict:
             return JsonResponse({'success': False, "message": 'There is no file in TEMP directory'}, status=400)  # Or any other appropriate status code
 
 
-        file_set_list, sample_libs = get_file_set_list(prefix_dict, sequencing_run)
+        file_set_list, sample_libs = get_file_set_list(prefix_dict, sample_libs)
 
         return JsonResponse({
             'success': True,
@@ -412,21 +424,17 @@ def swap(row, prefix_dict, seq_run):
         print(row, prefix_dict, file_set_prefix)
         print("__file_entered__"*10)
         '''
-        {'sample_lib_id': '60222', 
-        'file_set_name': 'DPN57-Tumor_TCATTCAT-TCATTCAT_FLAG_', 
+        {'sample_lib_id': '61610', 
+        'file_set_name': 'Sample_KAM35-T_AGCATCAT-AGCATCAT_FLAG_', 
         'file_numbers': '2', 
-        'old_sl': '60223', 
-        'old_prefix': 'DPN57-Tumor_TCATTCAT-TCATTCAT'} 
-        
-        {'DPN56-Tumor_GAAACCAC-GAAACCAC': 
-        ['DPN56-Tumor_GAAACCAC-GAAACCAC_L001_R1_001.fastq.gz', 'DPN56-Tumor_GAAACCAC-GAAACCAC_L001_R2_001.fastq.gz'], 
-        'DPN57-Tumor_TCATTCAT-TCATTCAT': 
-        ['DPN57-Tumor_TCATTCAT-TCATTCAT_L002_R1_001.fastq.gz', 'DPN57-Tumor_TCATTCAT-TCATTCAT_L002_R2_001.fastq.gz']} 
-        DPN57-Tumor_TCATTCAT-TCATTCAT
+        'old_sl': '61612', 
+        'old_prefix': 'Sample_KAM35-T_AGCATCAT-AGCATCAT'} 
+        {'Sample_KAM20-T_AGCATCAT-AGCATCAT': Files(values=['Sample_KAM20-T_AGCATCAT-AGCATCAT_L001_R1_001.fastq.gz', 'Sample_KAM20-T_AGCATCAT-AGCATCAT_L001_R1_002.fastq.gz'], sample_library=61610), 'Sample_KAM35-T_AGCATCAT-AGCATCAT': Files(values=['Sample_KAM35-T_AGCATCAT-AGCATCAT_L002_R1_001.fastq.gz', 'Sample_KAM35-T_AGCATCAT-AGCATCAT_L002_R1_002.fastq copy.gz'], sample_library=61612)} Sample_KAM35-T_AGCATCAT-AGCATCAT
         '''
         files = prefix_dict[file_set_prefix]
-        for file in files:
-            filtered_dict = [k for k, v in prefix_dict.items() if sample_lib.name in k][0]
+        print("files: ", files)
+        for file in list(files[0]):
+            filtered_dict = [k for k, v in prefix_dict.items() if row["sample_lib_id"] in v[0]][0]
             print("file: ", file)
             time.sleep(3)
             _file_changed = file.replace(file_set_prefix, filtered_dict)
@@ -436,11 +444,11 @@ def swap(row, prefix_dict, seq_run):
             file_changed = _file_changed[:insert_position] + "_FLAG_" + _file_changed[insert_position:]
             print("2_file_changed_2: ", _file_changed)
             time.sleep(3)
-            try:
-                os.rename(os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"TEMP/{file}"),
-                      os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"TEMP/{file_changed}"))
-            except Exception as e:
-                print(e)
+            # try:
+            #     # os.rename(os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"TEMP/{file}"),
+            #     #       os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"TEMP/{file_changed}"))
+            # except Exception as e:
+            #     print(e)
             _file = get_or_none(SequencingFile, name=file_changed)
             if not _file:
                 _file = SequencingFile.objects.create(
@@ -460,17 +468,20 @@ def swap(row, prefix_dict, seq_run):
 def save_sequencing_files(request):
     # try:
         data = json.loads(request.POST['data'])
-        prefix_dict = get_files_from_temp()
+        seq_run = SequencingRun.objects.get(id=json.loads(request.POST['id']))
+        sample_libs = SampleLib.objects.filter(
+            sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=seq_run).distinct()
+        prefix_dict = get_files_from_temp(sample_libs)
         print("request data", data)
         for row in data:
             if row["sample_lib_id"] == "not_matched":
                 return JsonResponse({"success": False, "message": "Not matched files found! Please Check the Sample Libraries."})
-        seq_run = SequencingRun.objects.get(id=json.loads(request.POST['id']))
         for row in data:
             if "_FLAG_" in row["file_set_name"]:
                 swap(row, prefix_dict, seq_run)
             else:
                 create_objects(row, seq_run, prefix_dict)
+        raise ValueError("Problem")
         source_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP")
         destination_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"HiSeqData/{seq_run.name}/")
         if not os.path.isdir(destination_dir):
