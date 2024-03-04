@@ -226,7 +226,6 @@ def _get_matched_sample_library(file, sample_libs):
     if match:
         sl_name = re.split(r"(?=(_[ATGC]{6}|-[ATGC]{6}))", file, maxsplit=1)[0]
         sl = sample_libs.filter(name__iexact=sl_name).first()
-
     elif re.search("_S\d", file):
         sl_name = file.split("_S")[0]
         sl = sample_libs.filter(name__iexact=sl_name).first()
@@ -316,25 +315,26 @@ def get_files_from_temp(sample_libs):
     #     "Sample_KAM121-T-B_AGGTTTAC_L001_R1_001.fastq.gz",
     #     "Sample_KAM121-T-B_AGGTTTAC_L001_R2_001.fastq.gz"
     # ]
-    FileSet = namedtuple('FileSet', ['prefix','files','sl_id'])
+    FileSet = namedtuple('FileSet', ['prefix','file','sl_id'])
 
-    file_sets = [FileSet(prefix=split_prefix(file), files=file, sl_id=_get_matched_sample_library(file, sample_libs)) for file in files]
-    print(file_sets)
-    # prefix_dict = {}
-    # file_set_nt = FileSet()
-    # for file_set in file_sets:
-    #     if file_set[0] in prefix_dict:
-    #         files = FileSet.files
-    #         FileSet(files=files.append(file_set[1]))
-    #     else:
-    #         sl_id = _get_matched_sample_library(file_set[0], sample_libs)
-    #         file_set_nt = FileSet(prefix=file_set[0], files=[file_set[1]], sl_id=sl_id)
+    file_sets = [FileSet(prefix=split_prefix(file), file=file, sl_id=_get_matched_sample_library(file, sample_libs)) for file in files]
+    # print(file_sets)
+    prefix_dict = {}
+    for file_set in file_sets:
+        if file_set.prefix in prefix_dict:
+            prefix_dict[file_set.prefix].append(file_set.file)
+        else:
+            prefix_dict[file_set.prefix] = [file_set.file]
+    return prefix_dict
+        # if file_set[0] in prefix_dict:
+        #     file = FileSet.file
+        #     FileSet(file=file.append(file_set[1]))
+        # else:
+        #     sl_id = _get_matched_sample_library(file_set[0], sample_libs)
+        #     file_set_nt = FileSet(prefix=file_set[0], files=[file_set[1]], sl_id=sl_id)
     # print(FileSet)
     # return FileSet
     '''
-    [FileSet(prefix='Sample_KAM20-T_AGCATCAT-AGCATCAT', 
-    files='Sample_KAM-T_AGCATCAT-AGCATCAT_L001_R1_001.fastq.gz', sl_id=61610), 
-    FileSet(prefix='Sample_KAM20-T_AGCATCAT-AGCATCAT', files='Sample_KAM20-T_AGCATCAT-AGCATCAT_L001_R1_002.fastq.gz', sl_id=61610), FileSet(prefix='Sample_KAM35-T_AGCATCAT-AGCATCAT', files='Sample_KAM35-T_AGCATCAT-AGCATCAT_L002_R1_001.fastq.gz', sl_id=61612), FileSet(prefix='Sample_KAM35-T_AGCATCAT-AGCATCAT', files='Sample_KAM35-T_AGCATCAT-AGCATCAT_L002_R1_002.fastq copy.gz', sl_id=61612)]
     '''
 
 def get_file_set_list(prefix_dict, sample_libs):
