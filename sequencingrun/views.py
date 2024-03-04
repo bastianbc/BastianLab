@@ -412,16 +412,16 @@ def swap(row, prefix_dict, seq_run):
         print(row, prefix_dict, file_set_prefix)
         print("__file_entered__"*10)
         '''
-        {'sample_lib_id': '60222', 
-        'file_set_name': 'DPN57-Tumor_TCATTCAT-TCATTCAT_FLAG_', 
-        'file_numbers': '2', 
-        'old_sl': '60223', 
-        'old_prefix': 'DPN57-Tumor_TCATTCAT-TCATTCAT'} 
-        
-        {'DPN56-Tumor_GAAACCAC-GAAACCAC': 
-        ['DPN56-Tumor_GAAACCAC-GAAACCAC_L001_R1_001.fastq.gz', 'DPN56-Tumor_GAAACCAC-GAAACCAC_L001_R2_001.fastq.gz'], 
-        'DPN57-Tumor_TCATTCAT-TCATTCAT': 
-        ['DPN57-Tumor_TCATTCAT-TCATTCAT_L002_R1_001.fastq.gz', 'DPN57-Tumor_TCATTCAT-TCATTCAT_L002_R2_001.fastq.gz']} 
+        {'sample_lib_id': '60222',
+        'file_set_name': 'DPN57-Tumor_TCATTCAT-TCATTCAT_FLAG_',
+        'file_numbers': '2',
+        'old_sl': '60223',
+        'old_prefix': 'DPN57-Tumor_TCATTCAT-TCATTCAT'}
+
+        {'DPN56-Tumor_GAAACCAC-GAAACCAC':
+        ['DPN56-Tumor_GAAACCAC-GAAACCAC_L001_R1_001.fastq.gz', 'DPN56-Tumor_GAAACCAC-GAAACCAC_L001_R2_001.fastq.gz'],
+        'DPN57-Tumor_TCATTCAT-TCATTCAT':
+        ['DPN57-Tumor_TCATTCAT-TCATTCAT_L002_R1_001.fastq.gz', 'DPN57-Tumor_TCATTCAT-TCATTCAT_L002_R2_001.fastq.gz']}
         DPN57-Tumor_TCATTCAT-TCATTCAT
         '''
         files = prefix_dict[file_set_prefix]
@@ -486,5 +486,3 @@ def save_sequencing_files(request):
     # except Exception as e:
     #     print(e)
     #     return JsonResponse({"success":False, "message": str(e)})
-
-
