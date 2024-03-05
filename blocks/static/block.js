@@ -247,15 +247,13 @@ var KTDatatablesServerSide = function () {
 
                 // if the window didn't open before or the window made closed
                 if (!popupWindow || popupWindow.closed) {
-                    var windowWidth = 500; // Pencere genişliği
-                    var windowHeight = 500; // Pencere yüksekliği
+                    var windowWidth = 500;
+                    var windowHeight = 500;
                     var left = (window.screen.width - windowWidth) / 2;
                     var top = (window.screen.height - windowHeight) / 2;
 
                     popupWindow = window.open('', '_blank', 'width=' + windowWidth + ',height=' + windowHeight + ',left=' + left + ',top=' + top);
                 }
-                var parent = item.closest('tr');
-                var block = parent.querySelector('td:nth-child(3)').textContent;
 
                 // popupWindow.document.body.innerHTML = '<h1>'+ block +'</h1><img src="' + item.getAttribute("data-url") + '" style="max-width:100%;max-height:100%;" />';
                 popupWindow.location.href = item.getAttribute("data-url");
