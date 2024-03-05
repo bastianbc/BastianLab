@@ -268,33 +268,6 @@ def count_file_set(file, prefix_list):
             counter = Counter(prefix for prefix,f in prefix_list)
             return counter[prefix]
 
-# def load_df_fq():
-#     file = Path(Path(__file__).parent.parent / "uploads" / "df_fq.csv")
-#     df = pd.read_csv(file)
-#
-#     def merge_files(files):
-#         return list(files)
-#
-#     # Split the 'path' column and extract the second element
-#     df['group'] = df['path'].str.split('/').str[1]
-#
-#     # Group by the 'group' column and aggregate the 'file' column using the custom function
-#     result = df.groupby('group')['file'].agg(merge_files).reset_index()
-#     # print(result[result["group"]=="AGEX-02"])
-#     df['pattern'] = df['file'].str.extract(r'([ATGC]{6})')
-#     print(df[df['pattern'].notna()])
-    # def check_barcode(row):
-    #     q = Q(Q(i5=row["pattern"]) | Q(i7=row["pattern"]))
-    #     barcode = Barcode.objects.filter(q)
-    #     sl = SampleLib.objects.filter(sequencing_file_sets__sequencing_files__name=row['file'])
-    #     if sl:
-    #         print(sl)
-    #     # if not barcode:
-    #     #     print(row["pattern"])
-    # print(SampleLib.objects.filter(barcode__isnull=True).count())
-    # df[df['pattern'].notna()].apply(lambda row: check_barcode(row),axis=1)
-    # return df
-
 def get_total_file_size(directory):
     total_size = 0
     for root, dirs, files in os.walk(directory):
@@ -305,6 +278,15 @@ def get_total_file_size(directory):
 
 def get_files_from_temp(sample_libs):
     files = os.listdir(os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP"))
+    file_sample_lib_match = {row['name']: False for row in sample_libs.values('name')}
+    for file in files:
+        if _get_matched_sample_library(file, sample_libs) not in file_sample_lib_match:
+            file_sample_lib_match[file] = True
+    print(file_sample_lib_match)
+    ret_value = {k: v for k, v in file_sample_lib_match.items() if v}
+    # if any(value == False for value in file_sample_lib_match.values()):
+    #     return JsonResponse({'success': False, "message": f'There should be all files belongs to this sequencing run:\n'
+    #                                                       f'Missing Sample Libraries of files:\n {ret_value.keys()}'}, status=400)
     FileSet = namedtuple('FileSet', ['prefix','file','sl_id'])
     file_sets = [
         FileSet(
@@ -322,21 +304,17 @@ def get_files_from_temp(sample_libs):
     return ret
 
 
-
-def get_file_set_list(prefix_dict, sample_libs):
-    return [(prefix, _get_matched_sample_library(prefix, sample_libs), len(prefix_dict[prefix])) for prefix in
-                     prefix_dict] , sample_libs
-
-
 def get_sequencing_files(request, id):
     # try:
         sequencing_run = SequencingRun.objects.get(id=id)
         sample_libs = SampleLib.objects.filter(
             sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct()
         file_sets = get_files_from_temp(sample_libs)
+        if not isinstance(file_sets, list):
+            return file_sets
         if not file_sets:
             return JsonResponse({'success': False, "message": 'There is no file in TEMP directory'}, status=400)  # Or any other appropriate status code
-
+        print(file_sets)
 
         # file_set_list, sample_libs = get_file_set_list(prefix_dict, sample_libs)
         print(file_sets)
@@ -407,14 +385,8 @@ def swap(row, prefix_dict, seq_run):
         file_set_prefix = file_set.prefix.replace("_FLAG_","")
         print(row, prefix_dict, file_set_prefix)
         print("__file_entered__"*10)
-        '''
-        {'sample_lib_id': '61610', 
-        'file_set_name': 'Sample_KAM35-T_AGCATCAT-AGCATCAT_FLAG_', 
-        'file_numbers': '2', 
-        'old_sl': '61612', 
-        'old_prefix': 'Sample_KAM35-T_AGCATCAT-AGCATCAT'} 
-        {'Sample_KAM20-T_AGCATCAT-AGCATCAT': Files(values=['Sample_KAM20-T_AGCATCAT-AGCATCAT_L001_R1_001.fastq.gz', 'Sample_KAM20-T_AGCATCAT-AGCATCAT_L001_R1_002.fastq.gz'], sample_library=61610), 'Sample_KAM35-T_AGCATCAT-AGCATCAT': Files(values=['Sample_KAM35-T_AGCATCAT-AGCATCAT_L002_R1_001.fastq.gz', 'Sample_KAM35-T_AGCATCAT-AGCATCAT_L002_R1_002.fastq copy.gz'], sample_library=61612)} Sample_KAM35-T_AGCATCAT-AGCATCAT
-        '''
+
+
         files = prefix_dict[file_set_prefix]
         print("files: ", files)
         for file in list(files[0]):
