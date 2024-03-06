@@ -883,8 +883,8 @@ var KTDatatablesServerSide = function () {
 
       list.innerHTML = ""; // Clean the list
 
-      for (var i = 0; i < data.file_sets.length; i++) {
-
+      for (const fileSet of data.file_sets) {
+          console.log(fileSet);
         var sel = document.createElement("select");
         sel.classList.add("select","form-control","form-control-sm", "fl_sl")
         var defaultOption = document.createElement("option");
@@ -903,7 +903,7 @@ var KTDatatablesServerSide = function () {
           opt.value = sl.id;
           opt.text = sl.name;
 
-          if (sl.id == data.file_sets[i][1]) { // mactched sample_lib
+          if (sl.id == fileSet.sl_id) { // mactched sample_lib
             opt.setAttribute("selected", "selected");
           }
 
@@ -915,8 +915,10 @@ var KTDatatablesServerSide = function () {
         }
         var row = `<div class="row">
                       <div class="col-4">${sel.outerHTML}</div>
-                      <div class="col-4"><input type="text" class="form-control fset form-control-sm" value="${data.file_sets[i][0]}"></div>
-                      <div class="col-4 text-center"><span class="num" style="margin-right: 10px;">${data.file_sets[i][2]}</span></div>
+                      <div class="col-6"><input type="text" class="form-control fset form-control-sm" value="${fileSet.prefix}"></div>
+                      <div class="col-2 text-center"><span class="num" style="margin-right: 10px;">${fileSet.file.length}</span></div>
+                      <input class="old_sl" type="hidden" value="${fileSet.sl_id}">
+                      <input class="old_prefix" type="hidden" value="${fileSet.prefix}">
                    </div>
                    `;
         list.innerHTML += row;
@@ -935,11 +937,15 @@ var KTDatatablesServerSide = function () {
         var sample_lib_id = row.querySelector("select").value;
         var file_set_name = row.querySelector("input[type=text]").value;
         var file_numbers = row.querySelector(".num").textContent;
+        var old_sl = row.querySelector(".old_sl").value;
+        var old_prefix = row.querySelector(".old_prefix").value;
 
         data.push({
             sample_lib_id: sample_lib_id,
             file_set_name: file_set_name,
-            file_numbers: file_numbers
+            file_numbers: file_numbers,
+            old_sl: old_sl,
+            old_prefix: old_prefix
           });
       });
 
