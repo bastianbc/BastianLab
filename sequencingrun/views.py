@@ -2,11 +2,7 @@ import re
 import os
 import shutil
 import time
-from pathlib import Path
 from collections import Counter, namedtuple
-import pandas as pd
-import threading
-import subprocess
 
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
@@ -17,14 +13,10 @@ from .forms import *
 from django.contrib import messages
 from core.decorators import permission_required_for_async
 from django.conf import settings
-from django.core.serializers import serialize
 from samplelib.models import SampleLib
 from samplelib.serializers import SingleSampleLibSerializer
 from sequencingfile.models import SequencingFile,SequencingFileSet
-from concurrent.futures import ThreadPoolExecutor
-from utils.utils import calculate_execution_time
-from barcodeset.models import Barcode
-from django.db.models import Q
+
 
 @permission_required("sequencingrun.view_sequencingrun",raise_exception=True)
 def sequencingruns(request):
