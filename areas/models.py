@@ -1,9 +1,6 @@
 from django.db import models
-from django.db.models import Q, Count, OuterRef, Subquery, Sum, Value, Case, When, IntegerField
+from django.db.models import Q, Count, Case, When, IntegerField
 from datetime import datetime
-from django.utils.crypto import get_random_string
-from django.db.models.functions import Coalesce
-from samplelib.models import NA_SL_LINK
 import json
 
 class Areas(models.Model):

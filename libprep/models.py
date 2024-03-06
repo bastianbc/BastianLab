@@ -1,7 +1,6 @@
 from django.db import models
-from datetime import date, datetime
-from django.db.models import Q, Count
-from areas.models import Areas
+from datetime import datetime
+from django.db.models import Q
 from django.db.models import Count, Subquery, OuterRef, Value
 from django.db.models.functions import Coalesce
 from samplelib.models import NA_SL_LINK
