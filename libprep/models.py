@@ -217,3 +217,6 @@ class AREA_NA_LINK(models.Model):
 
     class Meta:
         db_table = "area_na_link"
+
+    def __str__(self):
+        return f"{self.area.name} - {self.nucacid.name}"
