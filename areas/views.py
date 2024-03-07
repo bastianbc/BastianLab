@@ -7,8 +7,6 @@ from django.contrib import messages
 from blocks.models import *
 from django.contrib.auth.decorators import login_required,permission_required
 from core.decorators import permission_required_for_async
-import pandas as pd
-from pathlib import Path
 
 
 @permission_required_for_async("areas.view_areas")

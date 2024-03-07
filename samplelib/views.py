@@ -1,15 +1,12 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .models import SampleLib
 from .forms import *
-from .models import *
-from areas.models import Areas
 from method.models import Method
 from libprep.models import *
 import re
 import json
 from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required,permission_required
+from django.contrib.auth.decorators import permission_required
 from .serializers import *
 from django.db.models import Q
 from core.decorators import *
@@ -72,13 +69,14 @@ def new_samplelib(request):
 
 @permission_required_for_async("samplelib.add_samplelib")
 def new_samplelib_async(request):
-    from itertools import groupby
+        print(request)
+        from itertools import groupby
 
-    selected_ids = json.loads(request.GET.get("selected_ids"))
-    options = json.loads(request.GET.get("options"))
-    created_links = []
+        selected_ids = json.loads(request.GET.get("selected_ids"))
+        options = json.loads(request.GET.get("options"))
+        created_links = []
 
-    try:
+    # try:
 
         barcode_id = int(options["barcode_start_with"])
 
@@ -161,11 +159,11 @@ def new_samplelib_async(request):
         saved_links = NA_SL_LINK.objects.filter(id__in=created_links).order_by("nucacid__area")
         serializer = SavedNuacidsSerializer(saved_links, many=True)
 
-    except Exception as e:
-        print(str(e))
-        return JsonResponse({"success":False, "data":None})
+    # except Exception as e:
+    #     print(str(e))
+    #     return JsonResponse({"success":False, "data":None})
 
-    return JsonResponse({"success":True, "data":serializer.data})
+        return JsonResponse({"success":True, "data":serializer.data})
 
 @permission_required("samplelib.change_samplelib",raise_exception=True)
 def edit_samplelib(request,id):
