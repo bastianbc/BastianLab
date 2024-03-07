@@ -192,7 +192,7 @@ def add_async(request):
 
 def get_file_sets():
     from collections import defaultdict
-    files = os.listdir(settings.SEQUENCING_FILES_DIRECTORY)
+    files = os.listdir(settings.TEMP_DIRECTORY)
     file_sets = defaultdict(list)
     for file_name in files:
         parts = file_name.split('_')[:2]

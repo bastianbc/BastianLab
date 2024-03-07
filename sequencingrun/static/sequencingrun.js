@@ -866,7 +866,7 @@ var KTDatatablesServerSide = function () {
         var row = selectedItem.closest(".row");
         var slName = row.querySelector("input[type='text']").value;
 
-        if (selectedItem.value.startsWith( "1213" )) {
+        if (selectedItem.value.startsWith( slName )) {
 
             row.classList.remove("border","border-color");
 
