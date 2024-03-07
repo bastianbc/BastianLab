@@ -69,7 +69,6 @@ def new_samplelib(request):
 
 @permission_required_for_async("samplelib.add_samplelib")
 def new_samplelib_async(request):
-        print(request)
         from itertools import groupby
 
         selected_ids = json.loads(request.GET.get("selected_ids"))
@@ -98,7 +97,6 @@ def new_samplelib_async(request):
             autonumber = max_value + 1
 
         for group in grouped_nucacids:
-
             sample_lib = SampleLib.objects.create(
                 name="%s-%d" % (options["prefix"],autonumber),
                 barcode=Barcode.objects.get(id=barcode_id),
@@ -161,7 +159,7 @@ def new_samplelib_async(request):
     # except Exception as e:
     #     print(str(e))
     #     return JsonResponse({"success":False, "data":None})
-
+        print(serializer)
         return JsonResponse({"success":True, "data":serializer.data})
 
 @permission_required("samplelib.change_samplelib",raise_exception=True)
