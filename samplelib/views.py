@@ -69,25 +69,19 @@ def new_samplelib(request):
 
 @permission_required_for_async("samplelib.add_samplelib")
 def new_samplelib_async(request):
-        from itertools import groupby
+    from itertools import groupby
 
-        selected_ids = json.loads(request.GET.get("selected_ids"))
-        options = json.loads(request.GET.get("options"))
-        created_links = []
-    # try:
+    selected_ids = json.loads(request.GET.get("selected_ids"))
+    options = json.loads(request.GET.get("options"))
+    created_links = []
+    try:
 
         barcode_id = int(options["barcode_start_with"])
 
         target_amount = used_amount = float(options["target_amount"])
 
-        # nucacids = NucAcids.objects.filter(Q(nu_id__in=selected_ids) & Q(vol_remain__gt=0))
-        # grouped_nucacids = [list(result) for key, result in groupby(sorted(nucacids,key=lambda na: na.area.ar_id), key=lambda na: na.area.ar_id)]
-
-        # get area-nl links by selected_ids
         area_na_links = AREA_NA_LINK.objects.filter(nucacid__nu_id__in=selected_ids, nucacid__vol_remain__gt=0).order_by('area__ar_id')
-        # grouping by area
         grouped_area_na_links = [list(group) for key, group in groupby(area_na_links, key=lambda x: x.area.ar_id)]
-        # change the grouped list by nucacids
         grouped_nucacids = [[link.nucacid for link in group] for group in grouped_area_na_links]
 
         prefixies = SampleLib.objects.filter(name__startswith=options["prefix"])
@@ -152,15 +146,13 @@ def new_samplelib_async(request):
 
             barcode_id = (barcode_id % 192) + 1 #The barcode table contains numeric barcodes with barcode_id=1- 192
             autonumber += 1
-        # saved_links = NA_SL_LINK.objects.filter(id__in=created_links).order_by("nucacid__area")
         saved_links = NA_SL_LINK.objects.filter(id__in=created_links)
         serializer = SavedNuacidsSerializer(saved_links, many=True)
 
-    # except Exception as e:
-    #     print(str(e))
-    #     return JsonResponse({"success":False, "data":None})
-        print(serializer)
-        return JsonResponse({"success":True, "data":serializer.data})
+    except Exception as e:
+        print(str(e))
+        return JsonResponse({"success":False, "data":None})
+    return JsonResponse({"success":True, "data":serializer.data})
 
 @permission_required("samplelib.change_samplelib",raise_exception=True)
 def edit_samplelib(request,id):
