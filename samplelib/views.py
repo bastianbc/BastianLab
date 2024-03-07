@@ -75,7 +75,6 @@ def new_samplelib_async(request):
         selected_ids = json.loads(request.GET.get("selected_ids"))
         options = json.loads(request.GET.get("options"))
         created_links = []
-
     # try:
 
         barcode_id = int(options["barcode_start_with"])
@@ -155,8 +154,8 @@ def new_samplelib_async(request):
 
             barcode_id = (barcode_id % 192) + 1 #The barcode table contains numeric barcodes with barcode_id=1- 192
             autonumber += 1
-
-        saved_links = NA_SL_LINK.objects.filter(id__in=created_links).order_by("nucacid__area")
+        # saved_links = NA_SL_LINK.objects.filter(id__in=created_links).order_by("nucacid__area")
+        saved_links = NA_SL_LINK.objects.filter(id__in=created_links)
         serializer = SavedNuacidsSerializer(saved_links, many=True)
 
     # except Exception as e:
