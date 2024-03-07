@@ -814,59 +814,20 @@ var KTDatatablesServerSide = function () {
 
       document.querySelectorAll(".sequencing-files-link").forEach((item, i) => {
         item.addEventListener("click", function () {
-          var loadingElement = loadingEl();
           const parent = this.closest('tr');
-          // Get customer name
+
           const id = parent.querySelector('input[type=checkbox]').value;
+
           $.ajax({
               url: "/sequencingrun/" + id + "/get_sequencing_files",
               type: "GET",
               success: function (data) {
-                fillElements(data);
-                document.querySelector('button[name=btnSave]').addEventListener("click", function () {
-                  saveChanges(id, modalSequencingFiles);
-                });
-                document.querySelectorAll('.remove-row').forEach(function(button) {
-                    button.addEventListener("click", function () {
-                        var parentDiv = this.closest('.row');
-                        parentDiv.remove();
-                    });
-                });
-
-                document.querySelectorAll('.fl_sl').forEach(function(element) {
-                    var previousValue; // Variable to store the previous value of the select option
-                    element.addEventListener("mouseover", function() {
-                        // Code to execute when hovering over the element
-                        previousValue = this.value;
-                    });
-                    element.addEventListener("change", function() {
-                        var row = this.closest('.row');
-                        var file_set_input_name = row.querySelector('.fset');
-                        if (previousValue != "not_matched"){
-                            if (file_set_input_name && !file_set_input_name.value.includes("_FLAG_")) {
-                                file_set_input_name.value = file_set_input_name.value + "_FLAG_";
-                            }
-                        }
-                        if (this.value != "not_matched") {
-                            // Remove the border-danger class if the default option is not selected
-                            this.classList.remove("border", "border-danger");
-                        }
-                    });
-                });
-                loadingElement.remove();
-                modalSequencingFiles.show();
+                  console.log(data);
+                  fillElements(data);
+                  modalSequencingFiles.show();
               },
-              error: function (data) {
-                loadingElement.remove();
-                Swal.fire({
-                  text: data.responseJSON.message,
-                  icon: "error",
-                  buttonsStyling: false,
-                  confirmButtonText: "Ok, got it!",
-                  customClass: {
-                      confirmButton: "btn fw-bold btn-success",
-                  }
-              });
+              error: function (xhr, ajaxOptions, thrownError) {
+
               }
           });
 
@@ -876,53 +837,83 @@ var KTDatatablesServerSide = function () {
 
     }
 
+    // Creating file set dropdown
+    function generateFileSetSelect(file_sets) {
 
-    function fillElements(data) {
-
-      var list = document.querySelector(".list-body2");
-
-      list.innerHTML = ""; // Clean the list
-
-      for (const fileSet of data.file_sets) {
-          console.log(fileSet);
         var sel = document.createElement("select");
-        sel.classList.add("select","form-control","form-control-sm", "fl_sl")
-        var defaultOption = document.createElement("option");
-        defaultOption.text = "Not Matched";
-        defaultOption.value = "not_matched";
-        defaultOption.setAttribute("selected", "selected");
-        sel.add(defaultOption);
+        sel.classList.add("select","form-control","form-control-sm");
 
         var emptyOption = document.createElement("option");
-        emptyOption.text = "";
+        emptyOption.text = "Not Matched";
         emptyOption.value = "";
         sel.add(emptyOption, 0);
 
+        for (const item of file_sets) {
+            var option = document.createElement("option");
+            option.value = item.file_set;
+            option.text = item.file_set;
+            option.setAttribute("data-files_number",item.files.length);
+
+            sel.add(option);
+         }
+
+         return sel;
+
+    }
+
+    function checkMatching(selectedItem) {
+
+        var row = selectedItem.closest(".row");
+        var slName = row.querySelector("input[type='text']").value;
+
+        if (selectedItem.value.startsWith( "1213" )) {
+
+            row.classList.remove("border","border-color");
+
+        }
+        else {
+
+            row.classList.add("border","border-color");
+
+        }
+
+    }
+
+    function setFilesNumber(selectedItem) {
+        var row = selectedItem.closest(".row");
+        row.querySelector(".col-2 input[type='text']").value = selectedItem.getAttribute("data-files_number") | 0;
+    }
+
+    function fillElements(data) {
+
+        var list = document.querySelector(".list-body2");
+
+        list.innerHTML = ""; // Clean the list
+
+
         for (var sl of data.sample_libs) {
-          var opt = document.createElement("option");
-          opt.value = sl.id;
-          opt.text = sl.name;
+            var sel = generateFileSetSelect(data.file_sets);
 
-          if (sl.id == fileSet.sl_id) { // mactched sample_lib
-            opt.setAttribute("selected", "selected");
-          }
-
-          sel.add(opt);
-        }
-
-        if (defaultOption.selected) {
-          sel.classList.add("border", "border-danger");
-        }
-        var row = `<div class="row">
-                      <div class="col-4">${sel.outerHTML}</div>
-                      <div class="col-6"><input type="text" class="form-control fset form-control-sm" value="${fileSet.prefix}"></div>
-                      <div class="col-2 text-center"><span class="num" style="margin-right: 10px;">${fileSet.file.length}</span></div>
-                      <input class="old_sl" type="hidden" value="${fileSet.sl_id}">
-                      <input class="old_prefix" type="hidden" value="${fileSet.prefix}">
-                   </div>
+            var row = `<div class="row border border-danger">
+                        <div class="col-4"><input type="text" class="form-control form-control-sm" value="${sl.name}"></div>
+                        <div class="col-6">${sel.outerHTML}</div>
+                        <div class="col-2"><input type="text" class="form-control form-control-sm text-center" disabled value="${sel.getAttribute("data-files_number") | 0}"></div>
+                      </div>
                    `;
-        list.innerHTML += row;
-      }
+
+             list.innerHTML += row;
+       }
+
+       document.querySelectorAll(".list-body2 select").forEach((item, i) => {
+           item.addEventListener("change", function() {
+               // get selected item in file set select
+               var selectedItem = this.options[this.selectedIndex];
+               // set files number of file set from remote folder
+               setFilesNumber(selectedItem);
+               // check for matching of sample lib and file set
+               checkMatching(selectedItem);
+           });
+       });
 
 
     }

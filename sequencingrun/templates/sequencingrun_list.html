@@ -256,7 +256,7 @@
 <!--begin::Modal -->
 <div class="modal fade" id="modal_sequencing_files" tabindex="-1" aria-hidden="true">
   <!--begin::Modal dialog-->
-  <div class="modal-dialog modal-dialog-centered mw-1000px">
+  <div class="modal-dialog modal-dialog-centered mw-800px">
     <!--begin::Modal content-->
     <div class="modal-content">
       <!--begin::Modal header-->
@@ -289,7 +289,7 @@
                 <div class="row text-light-dark bg-primary">
                   <div class="col-4 text-center d-flex align-items-center">Sample Library</div>
                   <div class="col-6 text-center d-flex align-items-center">File Set Name</div>
-                  <div class="col-2 text-center d-flex align-items-center">Number of Files Belongs to File Set</div>
+                  <div class="col-2 text-center d-flex align-items-center">Number of Files</div>
                 </div>
               </div>
               <div class="list-body2">
@@ -300,11 +300,16 @@
           </div>
           <!--end::Card body-->
         </div>
+        <div class="row mt-3">
+            <div class="col-12">
+                <p>Note: Please delete _FLAG_ keyword if there is no SWAP between sequencing file sets</p>
+            </div>
+        </div>
       </div>
       <!--end::Modal body-->
-      <div class="modal-footer d-flex justify-content-between">
-          <p>Note: Please delete _FLAG_ keyword if there is no SWAP between sequencing file sets</p>
+      <div class="modal-footer d-flex justify-content-end">
         <button type="button" class="btn btn-primary" name="btnSave">Save Changes</button>
+        <button type="button" class="btn btn-success disabled" name="btnConfirm">Confirm Changes</button>
       </div>
     </div>
     <!--end::Modal content-->
