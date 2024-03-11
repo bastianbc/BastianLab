@@ -111,8 +111,7 @@ class SavedNuacidsSerializer(serializers.ModelSerializer):
         fields = ("id", "sample_lib", "nucacid", "area", "conc", "input_vol", "input_amount", )
 
     def get_area(self,obj):
-        import pdb; pdb.set_trace()
-        return obj.nucacid.area_na_links.first().name
+        return obj.nucacid.area_na_links.first().area.name
 
     def get_conc(self,obj):
         return obj.nucacid.conc

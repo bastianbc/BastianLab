@@ -192,17 +192,14 @@ def add_async(request):
 
 def get_file_sets():
     from collections import defaultdict
-
-    files = os.listdir(settings.SEQUENCING_FILES_DIRECTORY)
-
+    files = os.listdir(settings.TEMP_DIRECTORY)
     file_sets = defaultdict(list)
-
     for file_name in files:
         parts = file_name.split('_')[:2]
         key = '_'.join(parts)
         file_sets[key].append(file_name)
-
     return [{'file_set': key, 'files': value} for key, value in file_sets.items()]
+
 
 def get_sequencing_files(request, id):
     sequencing_run = SequencingRun.objects.get(id=id)
@@ -215,6 +212,7 @@ def get_sequencing_files(request, id):
         "sample_libs": SingleSampleLibSerializer(sample_libs, many=True).data,
         "sequencing_run": SingleSequencingRunSerializer(sequencing_run).data
     })
+
 
 def save_sequencing_files(request):
     data = json.loads(request.POST['data'])
