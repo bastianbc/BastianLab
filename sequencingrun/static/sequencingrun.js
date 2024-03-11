@@ -826,6 +826,7 @@ var KTDatatablesServerSide = function () {
                     console.log(data);
                     initialMachingTable(data);
                     fillElements(data);
+                    checkMatching();
                     modalSequencingFiles.show();
                 },
                 error: function (xhr, ajaxOptions, thrownError) {
@@ -841,7 +842,6 @@ var KTDatatablesServerSide = function () {
         function generateFileSetSelect(file_sets, sl=null) {
             var sel = document.createElement("select");
             sel.classList.add("select","form-control","form-control-sm");
-            sel.style.borderColor = "red";
 
             var emptyOption = document.createElement("option");
             emptyOption.text = "Not Matched";
@@ -865,7 +865,8 @@ var KTDatatablesServerSide = function () {
             sel.addEventListener("change", function (event) {
                 var select = event.target; // the select element that on the process
                 setFilesNumber(select);
-                checkMatching(select);
+                swap(select);
+                checkMatching();
             });
 
              return sel;
@@ -888,7 +889,7 @@ var KTDatatablesServerSide = function () {
             console.log(matchingTable);
         }
 
-        function checkMatching(select) {
+        function swap(select) {
             var selectedValue = select.value;
             //  All select elements for file_sets
             var selects = document.querySelectorAll(".list-body2 select");
@@ -913,6 +914,27 @@ var KTDatatablesServerSide = function () {
                 var swappingIndex = Array.from(selects).findIndex((sel) => sel.value === selectedValue);
                 matchingTable[swappingIndex]["file_set"] = selectedValue;
             }
+
+        }
+
+        function checkMatching() {
+
+            document.querySelectorAll(".list-body2 .row").forEach((item, i) => {
+                
+                if ( item.querySelector("select").value.startsWith(item.querySelector("input[type=text]").value) ) {
+
+                    item.querySelectorAll("input[type=text], select").forEach((element, i) => {
+                        element.style.border = "";
+                    });
+                }
+                else {
+
+                    item.querySelectorAll("input[type=text], select").forEach((element, i) => {
+                        element.style.border = "1px solid red";
+                    });
+
+                }
+            });
 
         }
 
