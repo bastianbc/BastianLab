@@ -807,179 +807,257 @@ var KTDatatablesServerSide = function () {
         return loadingEl;
     }
 
+    var initSequencingFilesModal = function () {
 
-    function initSequencingFilesModal() {
-      const elSequencingFiles = document.getElementById("modal_sequencing_files");
-      const modalSequencingFiles = new bootstrap.Modal(elSequencingFiles);
+        const elSequencingFiles = document.getElementById("modal_sequencing_files");
+        const modalSequencingFiles = new bootstrap.Modal(elSequencingFiles);
+        var matchingTable = [];
 
-      document.querySelectorAll(".sequencing-files-link").forEach((item, i) => {
-        item.addEventListener("click", function () {
-          const parent = this.closest('tr');
+        document.querySelectorAll(".sequencing-files-link").forEach((item, i) => {
+          item.addEventListener("click", function () {
+            const parent = this.closest('tr');
 
-          const id = parent.querySelector('input[type=checkbox]').value;
+            const id = parent.querySelector('input[type=checkbox]').value;
 
-          $.ajax({
-              url: "/sequencingrun/" + id + "/get_sequencing_files",
-              type: "GET",
-              success: function (data) {
-                  console.log(data);
-                  fillElements(data);
-                  modalSequencingFiles.show();
-              },
-              error: function (xhr, ajaxOptions, thrownError) {
+            $.ajax({
+                url: "/sequencingrun/" + id + "/get_sequencing_files",
+                type: "GET",
+                success: function (data) {
+                    console.log(data);
+                    initialMachingTable(data);
+                    fillElements(data);
+                    checkMatching();
+                    modalSequencingFiles.show();
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
 
-              }
+                }
+            });
+
           });
 
         });
 
-      });
+        // Creating file set dropdown
+        function generateFileSetSelect(file_sets, sl=null) {
+            var sel = document.createElement("select");
+            sel.classList.add("select","form-control","form-control-sm");
 
-    }
+            var emptyOption = document.createElement("option");
+            emptyOption.text = "Not Matched";
+            emptyOption.value = "";
+            sel.add(emptyOption, 0);
 
-    // Creating file set dropdown
-    function generateFileSetSelect(file_sets) {
+            for (const item of file_sets) {
+                var option = document.createElement("option");
+                option.value = item.file_set;
+                option.text = item.file_set;
+                option.setAttribute("data-files_number",item.files.length);
 
-        var sel = document.createElement("select");
-        sel.classList.add("select","form-control","form-control-sm");
+                if (item.file_set.startsWith(sl.name)) {
+                    option.selected = true;
+                }
 
-        var emptyOption = document.createElement("option");
-        emptyOption.text = "Not Matched";
-        emptyOption.value = "";
-        sel.add(emptyOption, 0);
+                sel.add(option);
+             }
 
-        for (const item of file_sets) {
-            var option = document.createElement("option");
-            option.value = item.file_set;
-            option.text = item.file_set;
-            option.setAttribute("data-files_number",item.files.length);
+             // Add a change event listener to the created select element
+            sel.addEventListener("change", function (event) {
+                var select = event.target; // the select element that on the process
+                setFilesNumber(select);
+                swap(select);
+                checkMatching();
+            });
 
-            sel.add(option);
-         }
-
-         return sel;
-
-    }
-
-    function checkMatching(selectedItem) {
-
-        var row = selectedItem.closest(".row");
-        var slName = row.querySelector("input[type='text']").value;
-
-        if (selectedItem.value.startsWith( "1213" )) {
-
-            row.classList.remove("border","border-color");
-
-        }
-        else {
-
-            row.classList.add("border","border-color");
+             return sel;
 
         }
 
-    }
+        function initialMachingTable(data) {
+            for (var sl of data.sample_libs) {
+                var tmp = {
+                    "sample_lib":sl.name,
+                    "file_set":"",
+                };
+                for (var fs of data.file_sets) {
+                    if (fs.file_set.startsWith(sl.name)) {
+                        tmp["file_set"] = fs.file_set;
+                    }
+                }
+                matchingTable.push(tmp);
+            }
+            console.log(matchingTable);
+        }
 
-    function setFilesNumber(selectedItem) {
-        var row = selectedItem.closest(".row");
-        row.querySelector(".col-2 input[type='text']").value = selectedItem.getAttribute("data-files_number") | 0;
-    }
+        function swap(select) {
+            var selectedValue = select.value;
+            //  All select elements for file_sets
+            var selects = document.querySelectorAll(".list-body2 select");
 
-    function fillElements(data) {
+            // The position of the selected item in the matchingTable
+            var matchedIndex = matchingTable.findIndex(item => item["file_set"] === selectedValue);
 
-        var list = document.querySelector(".list-body2");
+            if (matchedIndex !== -1) {
+                // reset
+                matchingTable[matchedIndex]["file_set"] = "";
+                selects[matchedIndex].value = "";
+                // Find the corresponding select element index in .list-body2
+                var swappingIndex = Array.from(selects).findIndex((sel) => sel.value === selectedValue);
+                // swapping the datas
+                matchingTable[matchedIndex]["file_set"] = matchingTable[swappingIndex]["file_set"];
+                matchingTable[swappingIndex]["file_set"] = selectedValue;
+                // set new value
+                selects[matchedIndex].value = matchingTable[matchedIndex]["file_set"];
 
-        list.innerHTML = ""; // Clean the list
-
-
-        for (var sl of data.sample_libs) {
-            var sel = generateFileSetSelect(data.file_sets);
-
-            var row = `<div class="row border border-danger">
-                        <div class="col-4"><input type="text" class="form-control form-control-sm" value="${sl.name}"></div>
-                        <div class="col-6">${sel.outerHTML}</div>
-                        <div class="col-2"><input type="text" class="form-control form-control-sm text-center" disabled value="${sel.getAttribute("data-files_number") | 0}"></div>
-                      </div>
-                   `;
-
-             list.innerHTML += row;
-       }
-
-       document.querySelectorAll(".list-body2 select").forEach((item, i) => {
-           item.addEventListener("change", function() {
-               // get selected item in file set select
-               var selectedItem = this.options[this.selectedIndex];
-               // set files number of file set from remote folder
-               setFilesNumber(selectedItem);
-               // check for matching of sample lib and file set
-               checkMatching(selectedItem);
-           });
-       });
-
-
-    }
-
-    function saveChanges(id, modalSequencingFiles) {
-        var loadingElement = loadingEl();
-      var list = document.querySelectorAll(".list-body2 .row");
-
-      var data = [];
-
-      list.forEach((row, i) => {
-        var sample_lib_id = row.querySelector("select").value;
-        var file_set_name = row.querySelector("input[type=text]").value;
-        var file_numbers = row.querySelector(".num").textContent;
-        var old_sl = row.querySelector(".old_sl").value;
-        var old_prefix = row.querySelector(".old_prefix").value;
-
-        data.push({
-            sample_lib_id: sample_lib_id,
-            file_set_name: file_set_name,
-            file_numbers: file_numbers,
-            old_sl: old_sl,
-            old_prefix: old_prefix
-          });
-      });
-
-      $.ajax({
-          url: "/sequencingrun/save_sequencing_files",
-          data: {
-            "id":id,
-            "data":JSON.stringify(data),
-          },
-          headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
-          type: "POST",
-          }).done(function(result) {
-            if (result.success) {
-                loadingElement.remove();
-              Swal.fire({
-              text: "Sequencing Files Saved Succesfully.",
-              icon: "info",
-              buttonsStyling: false,
-              confirmButtonText: "Ok, got it!",
-              customClass: {
-                  confirmButton: "btn fw-bold btn-success",
-              }
-          }).then(function(){
-                loadingElement.remove();
-                modalSequencingFiles.hide();
-              });
             }
             else {
-              loadingElement.remove();
-              Swal.fire({
-              text: result.message,
-              icon: "error",
-              buttonsStyling: false,
-              confirmButtonText: "Ok, got it!",
-              customClass: {
-                  confirmButton: "btn fw-bold btn-success",
-              }
-            }).then(function(){
-                loadingElement.remove();
-              });
+                var swappingIndex = Array.from(selects).findIndex((sel) => sel.value === selectedValue);
+                matchingTable[swappingIndex]["file_set"] = selectedValue;
             }
 
+        }
+
+        function checkMatching() {
+
+            document.querySelectorAll(".list-body2 .row").forEach((item, i) => {
+                
+                if ( item.querySelector("select").value.startsWith(item.querySelector("input[type=text]").value) ) {
+
+                    item.querySelectorAll("input[type=text], select").forEach((element, i) => {
+                        element.style.border = "";
+                    });
+                }
+                else {
+
+                    item.querySelectorAll("input[type=text], select").forEach((element, i) => {
+                        element.style.border = "1px solid red";
+                    });
+
+                }
+            });
+
+        }
+
+
+        function setFilesNumber(select) {
+            var selectedItem = select.options[select.selectedIndex]
+            var row = selectedItem.closest(".row");
+            row.querySelector(".col-2 input[type='text']").value = selectedItem.getAttribute("data-files_number") | 0;
+        }
+
+        function fillElements(data) {
+            var list = document.querySelector(".list-body2");
+
+            list.innerHTML = ""; // Clean the list
+
+
+            for (var sl of data.sample_libs) {
+                var sel = generateFileSetSelect(data.file_sets, sl);
+
+                // Create elements for the row and its columns
+                var row = document.createElement("div");
+                row.classList.add("row","mb-1");
+
+                var col1 = document.createElement("div");
+                col1.classList.add("col-4");
+                var input = document.createElement("input");
+                input.type = "text";
+                input.classList.add("form-control", "form-control-sm");
+                input.value = sl.name;
+                col1.appendChild(input);
+
+                var col2 = document.createElement("div");
+                col2.classList.add("col-6");
+                col2.appendChild(sel);
+
+                var col3 = document.createElement("div");
+                col3.classList.add("col-2");
+                var inputFilesNumber = document.createElement("input");
+                inputFilesNumber.type = "text";
+                inputFilesNumber.classList.add("form-control", "form-control-sm", "text-center");
+                inputFilesNumber.disabled = true;
+                inputFilesNumber.value = sel.options[sel.selectedIndex].getAttribute("data-files_number") || 0;
+                col3.appendChild(inputFilesNumber);
+
+                // Append columns to the row
+                row.appendChild(col1);
+                row.appendChild(col2);
+                row.appendChild(col3);
+
+                // Append the row to the list
+                list.appendChild(row);
+           }
+
+
+
+
+
+        }
+
+        function saveChanges(id, modalSequencingFiles) {
+            var loadingElement = loadingEl();
+          var list = document.querySelectorAll(".list-body2 .row");
+
+          var data = [];
+
+          list.forEach((row, i) => {
+            var sample_lib_id = row.querySelector("select").value;
+            var file_set_name = row.querySelector("input[type=text]").value;
+            var file_numbers = row.querySelector(".num").textContent;
+            var old_sl = row.querySelector(".old_sl").value;
+            var old_prefix = row.querySelector(".old_prefix").value;
+
+            data.push({
+                sample_lib_id: sample_lib_id,
+                file_set_name: file_set_name,
+                file_numbers: file_numbers,
+                old_sl: old_sl,
+                old_prefix: old_prefix
+              });
           });
+
+          $.ajax({
+              url: "/sequencingrun/save_sequencing_files",
+              data: {
+                "id":id,
+                "data":JSON.stringify(data),
+              },
+              headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
+              type: "POST",
+              }).done(function(result) {
+                if (result.success) {
+                    loadingElement.remove();
+                  Swal.fire({
+                  text: "Sequencing Files Saved Succesfully.",
+                  icon: "info",
+                  buttonsStyling: false,
+                  confirmButtonText: "Ok, got it!",
+                  customClass: {
+                      confirmButton: "btn fw-bold btn-success",
+                  }
+              }).then(function(){
+                    loadingElement.remove();
+                    modalSequencingFiles.hide();
+                  });
+                }
+                else {
+                  loadingElement.remove();
+                  Swal.fire({
+                  text: result.message,
+                  icon: "error",
+                  buttonsStyling: false,
+                  confirmButtonText: "Ok, got it!",
+                  customClass: {
+                      confirmButton: "btn fw-bold btn-success",
+                  }
+                }).then(function(){
+                    loadingElement.remove();
+                  });
+                }
+
+              });
+        }
+
     }
 
     var initRowActions = () => {

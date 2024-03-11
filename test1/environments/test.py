@@ -207,3 +207,4 @@ RESEARCHER_GROUP_NAME = "Researchers"
 
 smb_directory = "/Volumes/labshare/BastianRaid-02/"
 SEQUENCING_FILES_DIRECTORY = Path(Path(smb_directory))
+TEMP_DIRECTORY = Path(Path(smb_directory) / "TEMP")
