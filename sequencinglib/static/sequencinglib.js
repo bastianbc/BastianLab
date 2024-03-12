@@ -964,7 +964,7 @@ var KTDatatablesServerSide = function () {
                 success: function (retval) {
 
                   data = retval;
-
+                  console.log(data);
                   fillElements(id);
 
                   updateTotalPercentage();
@@ -996,7 +996,7 @@ var KTDatatablesServerSide = function () {
         listEl.setAttribute('data-nmol', data[0].nmol);
         listEl.setAttribute('data-target_vol', data[0].target_vol);
 
-        var total_persentage = 1;
+        var total_persentage = 100;
         var totalVolume = 0;
 
         for (var i = 0; i < data.length; i++) {
@@ -1009,7 +1009,7 @@ var KTDatatablesServerSide = function () {
           var v = 0.00;
 
           v = data[i].volume;
-          p = v / totalVolume || 0;
+          p = ((v / totalVolume) * 100) || 0;
 
           var row = `<div class="row mb-1 detail-row">
               <div class="col-2 align-self-center" data-id="${ data[i].captured_lib }"><a href="/capturedlib/edit/${ data[i].captured_lib }">${ data[i].name }</a></div>
