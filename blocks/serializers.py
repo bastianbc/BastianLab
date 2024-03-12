@@ -5,29 +5,29 @@ from lab.models import Patients
 class BlocksSerializer(serializers.ModelSerializer):
     num_areas = serializers.IntegerField()
     patient_id = serializers.SerializerMethodField()
-    patient_num = serializers.IntegerField()
     DT_RowId = serializers.SerializerMethodField()
     project_id = serializers.SerializerMethodField()
-    project_num = serializers.IntegerField()
     body_site = serializers.SerializerMethodField()
     collection_label = serializers.SerializerMethodField()
     block_url = serializers.SerializerMethodField()
+    patient = serializers.SerializerMethodField()
+    project = serializers.SerializerMethodField()
 
     class Meta:
         model = Blocks
-        fields = ("bl_id","name","project_id","project_num","patient_id",
-                  "patient_num","diagnosis","body_site","thickness","collection",
-                  "collection_label","date_added","num_areas","DT_RowId","block_url",
-                  "scan_number")
-
-    def get_value(self,obj):
-        return obj.patient.pat_id
+        fields = ("bl_id","name","project_id","patient_id","project","patient",
+                  "diagnosis","body_site","thickness","collection",
+                  "collection_label","date_added","num_areas",
+                  "DT_RowId","block_url","scan_number")
 
     def get_DT_RowId(self, obj):
            return getattr(obj, 'bl_id')
 
     def get_project(self, obj):
         return obj.project.name
+
+    def get_patient(self, obj):
+        return obj.patient.pat_id
 
     def get_body_site(self,obj):
         return obj.body_site.name if obj.body_site else None

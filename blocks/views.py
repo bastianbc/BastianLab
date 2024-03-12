@@ -21,7 +21,7 @@ def filter_blocks(request):
     result['draw'] = blocks['draw']
     result['recordsTotal'] = blocks['total']
     result['recordsFiltered'] = blocks['count']
-
+    print(result)
     return JsonResponse(result)
 
 @permission_required("blocks.view_blocks",raise_exception=True)
