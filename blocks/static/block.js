@@ -65,8 +65,8 @@ var KTDatatablesServerSide = function () {
               },
               { data: 'bl_id' },
               { data: 'name'},
-              { data: 'project_num'},
-              { data: 'patient_num' },
+              { data: 'project'},
+              { data: 'patient' },
               { data: 'diagnosis' },
               { data: 'body_site' },
               { data: 'scan_number'},
@@ -87,7 +87,7 @@ var KTDatatablesServerSide = function () {
                     targets: 3,
                     orderable: true,
                     render: function (data, type, row) {
-                        if (data > 0) {
+                        if (data !== null) {
                           let bl_id = row["bl_id"];
                           return `<a href="/projects?model=block&id=${bl_id}&initial=true">${data}</a>`;
                         }
@@ -98,7 +98,7 @@ var KTDatatablesServerSide = function () {
                     targets: 4,
                     orderable: true,
                     render: function (data, type, row) {
-                        if (data > 0) {
+                        if (data !== null) {
                           let bl_id = row["bl_id"];
                           return `<a href="/lab?model=block&id=${bl_id}&initial=true">${data}</a>`;
                         }
