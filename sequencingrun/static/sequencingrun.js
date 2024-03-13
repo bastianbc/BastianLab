@@ -812,17 +812,19 @@ var KTDatatablesServerSide = function () {
         const elSequencingFiles = document.getElementById("modal_sequencing_files");
         const modalSequencingFiles = new bootstrap.Modal(elSequencingFiles);
         var matchingTable = [];
+        var sequencingRunId = null;
 
         document.querySelectorAll(".sequencing-files-link").forEach((item, i) => {
           item.addEventListener("click", function () {
             const parent = this.closest('tr');
 
-            const id = parent.querySelector('input[type=checkbox]').value;
+            sequencingRunId = parent.querySelector('input[type=checkbox]').value;
 
             $.ajax({
-                url: "/sequencingrun/" + id + "/get_sequencing_files",
+                url: "/sequencingrun/" + sequencingRunId + "/get_sequencing_files",
                 type: "GET",
                 success: function (data) {
+                    console.log("sequencingRunId:"+sequencingRunId);
                     console.log(data);
                     initialMachingTable(data);
                     fillElements(data);
@@ -836,6 +838,10 @@ var KTDatatablesServerSide = function () {
 
           });
 
+        });
+
+        document.querySelector("#modal_sequencing_files button[name='btnSave']").addEventListener("click", function() {
+            saveChanges();
         });
 
         // Creating file set dropdown
@@ -877,11 +883,12 @@ var KTDatatablesServerSide = function () {
             for (var sl of data.sample_libs) {
                 var tmp = {
                     "sample_lib":sl.name,
-                    "file_set":"",
+                    "initial":"",
+                    "swap":"",
                 };
                 for (var fs of data.file_sets) {
                     if (fs.file_set.startsWith(sl.name)) {
-                        tmp["file_set"] = fs.file_set;
+                        tmp["swap"] = tmp["initial"] = fs.file_set;
                     }
                 }
                 matchingTable.push(tmp);
@@ -895,24 +902,24 @@ var KTDatatablesServerSide = function () {
             var selects = document.querySelectorAll(".list-body2 select");
 
             // The position of the selected item in the matchingTable
-            var matchedIndex = matchingTable.findIndex(item => item["file_set"] === selectedValue);
+            var matchedIndex = matchingTable.findIndex(item => item["swap"] === selectedValue);
 
             if (matchedIndex !== -1) {
                 // reset
-                matchingTable[matchedIndex]["file_set"] = "";
+                matchingTable[matchedIndex]["swap"] = "";
                 selects[matchedIndex].value = "";
                 // Find the corresponding select element index in .list-body2
                 var swappingIndex = Array.from(selects).findIndex((sel) => sel.value === selectedValue);
                 // swapping the datas
-                matchingTable[matchedIndex]["file_set"] = matchingTable[swappingIndex]["file_set"];
-                matchingTable[swappingIndex]["file_set"] = selectedValue;
+                matchingTable[matchedIndex]["swap"] = matchingTable[swappingIndex]["swap"];
+                matchingTable[swappingIndex]["swap"] = selectedValue;
                 // set new value
-                selects[matchedIndex].value = matchingTable[matchedIndex]["file_set"];
+                selects[matchedIndex].value = matchingTable[matchedIndex]["swap"];
 
             }
             else {
                 var swappingIndex = Array.from(selects).findIndex((sel) => sel.value === selectedValue);
-                matchingTable[swappingIndex]["file_set"] = selectedValue;
+                matchingTable[swappingIndex]["swap"] = selectedValue;
             }
 
         }
@@ -920,7 +927,7 @@ var KTDatatablesServerSide = function () {
         function checkMatching() {
 
             document.querySelectorAll(".list-body2 .row").forEach((item, i) => {
-                
+
                 if ( item.querySelector("select").value.startsWith(item.querySelector("input[type=text]").value) ) {
 
                     item.querySelectorAll("input[type=text], select").forEach((element, i) => {
@@ -938,7 +945,6 @@ var KTDatatablesServerSide = function () {
 
         }
 
-
         function setFilesNumber(select) {
             var selectedItem = select.options[select.selectedIndex]
             var row = selectedItem.closest(".row");
@@ -949,7 +955,6 @@ var KTDatatablesServerSide = function () {
             var list = document.querySelector(".list-body2");
 
             list.innerHTML = ""; // Clean the list
-
 
             for (var sl of data.sample_libs) {
                 var sel = generateFileSetSelect(data.file_sets, sl);
@@ -988,74 +993,23 @@ var KTDatatablesServerSide = function () {
                 list.appendChild(row);
            }
 
-
-
-
-
         }
 
-        function saveChanges(id, modalSequencingFiles) {
-            var loadingElement = loadingEl();
-          var list = document.querySelectorAll(".list-body2 .row");
+        function saveChanges() {
+            $.ajax({
+                url: "/sequencingrun/" + sequencingRunId + "/save_sequencing_files",
+                type: "POST",
+                headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
+                data: {
+                    data: JSON.stringify(matchingTable),
+                },
+                success: function (data) {
+                    console.log(data);
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
 
-          var data = [];
-
-          list.forEach((row, i) => {
-            var sample_lib_id = row.querySelector("select").value;
-            var file_set_name = row.querySelector("input[type=text]").value;
-            var file_numbers = row.querySelector(".num").textContent;
-            var old_sl = row.querySelector(".old_sl").value;
-            var old_prefix = row.querySelector(".old_prefix").value;
-
-            data.push({
-                sample_lib_id: sample_lib_id,
-                file_set_name: file_set_name,
-                file_numbers: file_numbers,
-                old_sl: old_sl,
-                old_prefix: old_prefix
-              });
-          });
-
-          $.ajax({
-              url: "/sequencingrun/save_sequencing_files",
-              data: {
-                "id":id,
-                "data":JSON.stringify(data),
-              },
-              headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
-              type: "POST",
-              }).done(function(result) {
-                if (result.success) {
-                    loadingElement.remove();
-                  Swal.fire({
-                  text: "Sequencing Files Saved Succesfully.",
-                  icon: "info",
-                  buttonsStyling: false,
-                  confirmButtonText: "Ok, got it!",
-                  customClass: {
-                      confirmButton: "btn fw-bold btn-success",
-                  }
-              }).then(function(){
-                    loadingElement.remove();
-                    modalSequencingFiles.hide();
-                  });
                 }
-                else {
-                  loadingElement.remove();
-                  Swal.fire({
-                  text: result.message,
-                  icon: "error",
-                  buttonsStyling: false,
-                  confirmButtonText: "Ok, got it!",
-                  customClass: {
-                      confirmButton: "btn fw-bold btn-success",
-                  }
-                }).then(function(){
-                    loadingElement.remove();
-                  });
-                }
-
-              });
+            });
         }
 
     }
