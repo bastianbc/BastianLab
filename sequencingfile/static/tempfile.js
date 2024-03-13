@@ -15,7 +15,6 @@ var KTDatatablesServerSide = function () {
    * @param  {String} filterNAType A parameter of custom filter.
    */
     var initDatatable = function (initialValue) {
-        console.log("data enters");
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
 
         dt = $(".table").DataTable({

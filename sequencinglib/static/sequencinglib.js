@@ -780,7 +780,6 @@ var KTDatatablesServerSide = function () {
                     responseType: 'blob'
                 },
                 success: function(data, status, xhr) {
-                    console.log(data, status, xhr);
                     var filename = "";
                     var disposition = xhr.getResponseHeader('Content-Disposition');
                     if (disposition && disposition.indexOf('attachment') !== -1) {
@@ -908,7 +907,6 @@ var KTDatatablesServerSide = function () {
                 modal.show();
                 // location.reload()
               } else if (result.isDenied){
-                  console.log("clicked no");
                   var modal = new bootstrap.Modal(document.getElementById("modal_sequencingrun_options"));
                   modal.show();
                   modal.hide();
@@ -964,7 +962,6 @@ var KTDatatablesServerSide = function () {
                 success: function (retval) {
 
                   data = retval;
-                  console.log(data);
                   fillElements(id);
 
                   updateTotalPercentage();
