@@ -823,7 +823,6 @@ var KTDatatablesServerSide = function () {
                 url: "/sequencingrun/" + id + "/get_sequencing_files",
                 type: "GET",
                 success: function (data) {
-                    console.log(data);
                     initialMachingTable(data);
                     fillElements(data);
                     checkMatching();
@@ -886,7 +885,6 @@ var KTDatatablesServerSide = function () {
                 }
                 matchingTable.push(tmp);
             }
-            console.log(matchingTable);
         }
 
         function swap(select) {
