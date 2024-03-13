@@ -7,6 +7,7 @@ class SequencingLib(models.Model):
         ("low-te", "Low TE"),
         ("te", "TE"),
         ("buffer-eb", "Buffer EB"),
+        ("water", "Water"),
     )
 
     name = models.CharField(max_length=50, unique=True, verbose_name="Name")
