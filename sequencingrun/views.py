@@ -1,9 +1,7 @@
 import re
-import os
 import shutil
 import time
 from collections import Counter, namedtuple
-
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.contrib.auth.decorators import permission_required
@@ -12,11 +10,10 @@ from sequencinglib.models import *
 from .forms import *
 from django.contrib import messages
 from core.decorators import permission_required_for_async
-from django.conf import settings
 from samplelib.models import SampleLib
 from samplelib.serializers import SingleSampleLibSerializer
 from sequencingfile.models import SequencingFile,SequencingFileSet
-
+import sequencingrun.helper as helper
 
 @permission_required("sequencingrun.view_sequencingrun",raise_exception=True)
 def sequencingruns(request):
@@ -190,21 +187,10 @@ def add_async(request):
     except Exception as e:
         return JsonResponse({"success":False, "message": str(e)})
 
-def get_file_sets():
-    from collections import defaultdict
-    files = os.listdir(settings.SEQUENCING_FILES_DIRECTORY)
-    file_sets = defaultdict(list)
-    for file_name in files:
-        parts = file_name.split('_')[:2]
-        key = '_'.join(parts)
-        file_sets[key].append(file_name)
-    return [{'file_set': key, 'files': value} for key, value in file_sets.items()]
-
-
 def get_sequencing_files(request, id):
     sequencing_run = SequencingRun.objects.get(id=id)
     sample_libs = SampleLib.objects.filter(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct()
-    file_sets = get_file_sets()
+    file_sets = helper.get_file_sets()
 
     return JsonResponse({
         'success': True,
@@ -213,32 +199,38 @@ def get_sequencing_files(request, id):
         "sequencing_run": SingleSequencingRunSerializer(sequencing_run).data
     })
 
+def save_sequencing_files(request, id):
+    success = False
+    sequencing_run = SequencingRun.objects.get(id=id)
+    source_dir = helper.get_source_directory()
+    destination_dir = helper.get_destination_directory(sequencing_run.name)
+    # get posted data
+    data = json.loads(request.POST.get('data'))
+    # files from source directory
+    file_sets = helper.get_file_sets()
 
-def save_sequencing_files(request):
-    data = json.loads(request.POST['data'])
-    seq_run = SequencingRun.objects.get(id=json.loads(request.POST['id']))
-    sample_libs = SampleLib.objects.filter(
-        sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=seq_run).distinct()
-    prefix_dict = get_files_from_temp(sample_libs)
-    print("request data", data)
-    for row in data:
-        if row["sample_lib_id"] == "not_matched":
-            return JsonResponse({"success": False, "message": "Not matched files found! Please Check the Sample Libraries."})
-    for row in data:
-        if "_FLAG_" in row["file_set_name"]:
-            swap(row, prefix_dict, seq_run)
+    transfers = [] # file pairs to transfer as (source,destination) construct
+    #create data of the transfer files
+    for d in data:
+        if d["initial"] != d["swap"]:
+            # files to swap
+            files = [x["files"] for x in file_sets if x["file_set"] == d["initial"] or x["file_set"] == d["swap"]]
+            for file_name in files[0]:
+                # change file name as inserting the "FLAG" statement
+                new_file_name = helper.add_flag_to_filename(file_name)
+                transfers.append((file_name,new_file_name))
         else:
-            create_objects(row, seq_run, prefix_dict)
-    raise ValueError("Problem")
-    source_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY,"TEMP")
-    destination_dir = os.path.join(settings.SEQUENCING_FILES_DIRECTORY, f"HiSeqData/{seq_run.name}/")
-    if not os.path.isdir(destination_dir):
-        os.makedirs(destination_dir)
-        time.sleep(2)
-    for filename in os.listdir(source_dir):
-        source_file = os.path.join(source_dir, filename)
-        try:
-            shutil.move(source_file, destination_dir)
-        except Exception as e:
-            print(e)
-    return JsonResponse({"success": True})
+            files = [x["files"] for x in file_sets if x["file_set"] == d["initial"]]
+            for file_name in files[0]:
+                transfers.append(file_name,file_name)
+
+    try:
+        for transfer in transfers:
+            source_file = os.path.join(source_dir,transfer[0])
+            destination_file = os.path.join(destination_dir,transfer[1])
+            shutil.move(source_file, destination_file)
+            success = True
+    except Exception as e:
+        success = False
+
+    return JsonResponse({"success": success})
