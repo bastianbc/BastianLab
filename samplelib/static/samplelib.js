@@ -658,28 +658,18 @@ var KTDatatablesServerSide = function () {
       }
 
       function checkSelectedRows() {
-
         var selectedRows = container.querySelectorAll('[type="checkbox"]:checked');
-
         var barcodeList = [];
-
-        for (var i = 0; i < selectedRows.length; i++) {
-
-          const parent = selectedRows[i].closest('tr');
+        for (let row of selectedRows) {
+          const parent = row.closest('tr');
           // Get barcode
-          const barcode = parent.querySelectorAll('td')[2].innerText;
-
+          const barcode = parent.querySelectorAll('td')[15].innerText;
           if (barcodeList.indexOf(barcode) > -1 ) {
-
             return false;
-
           }
-
           barcodeList.push(barcode);
         }
-
         return true;
-
       }
 
       document.getElementById("btn_continue").addEventListener('click', function () {

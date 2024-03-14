@@ -3,12 +3,9 @@ from django.contrib import messages
 from .forms import *
 from method.models import Method
 from libprep.models import *
-import re
-import json
 from django.http import JsonResponse
 from django.contrib.auth.decorators import permission_required
 from .serializers import *
-from django.db.models import Q
 from core.decorators import *
 
 @permission_required("samplelib.view_samplelib",raise_exception=True)
@@ -84,7 +81,7 @@ def new_samplelib_async(request):
         area_na_links = AREA_NA_LINK.objects.filter(nucacid__nu_id__in=selected_ids, nucacid__vol_remain__gt=0).order_by('area__ar_id')
         grouped_area_na_links = [list(group) for key, group in groupby(area_na_links, key=lambda x: x.area.ar_id)]
         grouped_nucacids = [[link.nucacid for link in group] for group in grouped_area_na_links]
-
+        print(grouped_nucacids)
         prefixies = SampleLib.objects.filter(name__startswith=options["prefix"])
         autonumber = 1
         if prefixies.exists():
@@ -95,7 +92,7 @@ def new_samplelib_async(request):
                 name="%s-%d" % (options["prefix"],autonumber),
                 barcode=Barcode.objects.get(id=barcode_id),
                 shear_volume=float(options["shear_volume"]),
-                method=Method.objects.all().first(),
+                method=group[0].method or None,
             )
 
             if len(group) > 1:

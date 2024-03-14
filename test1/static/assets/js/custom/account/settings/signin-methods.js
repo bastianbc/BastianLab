@@ -90,7 +90,6 @@ var KTAccountSettingsSigninMethods = function () {
 
         signInForm.querySelector('#kt_signin_submit').addEventListener('click', function (e) {
             e.preventDefault();
-            console.log('click');
 
             validation.validate().then(function (status) {
                 if (status == 'Valid') {
@@ -178,7 +177,6 @@ var KTAccountSettingsSigninMethods = function () {
 
         passwordForm.querySelector('#kt_password_submit').addEventListener('click', function (e) {
             e.preventDefault();
-            console.log('click');
 
             validation.validate().then(function (status) {
                 if (status == 'Valid') {
