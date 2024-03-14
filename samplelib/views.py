@@ -71,6 +71,7 @@ def new_samplelib(request):
 def new_samplelib_async(request):
     from itertools import groupby
 
+    success = False
     selected_ids = json.loads(request.GET.get("selected_ids"))
     options = json.loads(request.GET.get("options"))
     created_links = []
@@ -89,7 +90,6 @@ def new_samplelib_async(request):
         if prefixies.exists():
             max_value = max([int(p.name.split("-")[-1]) for p in prefixies])
             autonumber = max_value + 1
-
         for group in grouped_nucacids:
             sample_lib = SampleLib.objects.create(
                 name="%s-%d" % (options["prefix"],autonumber),
@@ -148,11 +148,11 @@ def new_samplelib_async(request):
             autonumber += 1
         saved_links = NA_SL_LINK.objects.filter(id__in=created_links)
         serializer = SavedNuacidsSerializer(saved_links, many=True)
-
+        success = True
     except Exception as e:
-        print(str(e))
+        raise
         return JsonResponse({"success":False, "data":None})
-    return JsonResponse({"success":True, "data":serializer.data})
+    return JsonResponse({"success":success, "data":serializer.data})
 
 @permission_required("samplelib.change_samplelib",raise_exception=True)
 def edit_samplelib(request,id):
