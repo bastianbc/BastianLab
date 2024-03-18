@@ -174,4 +174,3 @@ def check_can_deleted_async(request):
             })
 
     return JsonResponse({"related_objects":related_objects})
-

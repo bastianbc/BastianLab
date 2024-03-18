@@ -1,6 +1,6 @@
 from django import forms
 from .models import *
-from datetime import date
+from datetime import date, datetime
 from core.forms import BaseForm
 
 class SequencingRunForm(BaseForm):
@@ -10,7 +10,7 @@ class SequencingRunForm(BaseForm):
 
 class SequencingRunCreationForm(forms.Form):
     prefix = forms.CharField()
-    date_run = forms.DateField(initial=date.today)
+    date_run = forms.DateTimeField(initial=datetime.now)
     date = forms.DateField(initial=date.today)
     facility = forms.ChoiceField(choices=SequencingRun.FACILITY_TYPES)
     sequencer = forms.ChoiceField(choices=SequencingRun.SEQUENCER_TYPES)

@@ -7,14 +7,14 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import permission_required
 from .serializers import *
 from core.decorators import *
-
+from capturedlib.models import *
 
 @permission_required("samplelib.view_samplelib",raise_exception=True)
 def samplelibs(request):
     form = CapturedLibCreationOptionsForm()
+    form_cl_add = CapturedLibAddForm()
     filter = FilterForm()
     return render(request, "samplelib_list.html", locals())
-
 
 @permission_required_for_async("samplelib.view_samplelib")
 def filter_samplelibs(request):
@@ -69,7 +69,8 @@ def new_samplelib(request):
 @permission_required_for_async("samplelib.add_samplelib")
 def new_samplelib_async(request):
     from itertools import groupby
-    print(request)
+
+    success = False
     selected_ids = json.loads(request.GET.get("selected_ids"))
     options = json.loads(request.GET.get("options"))
     created_links = []
@@ -88,7 +89,6 @@ def new_samplelib_async(request):
         if prefixies.exists():
             max_value = max([int(p.name.split("-")[-1]) for p in prefixies])
             autonumber = max_value + 1
-
         for group in grouped_nucacids:
             sample_lib = SampleLib.objects.create(
                 name="%s-%d" % (options["prefix"],autonumber),
@@ -147,11 +147,11 @@ def new_samplelib_async(request):
             autonumber += 1
         saved_links = NA_SL_LINK.objects.filter(id__in=created_links)
         serializer = SavedNuacidsSerializer(saved_links, many=True)
-
+        success = True
     except Exception as e:
-        print(str(e))
+        raise
         return JsonResponse({"success":False, "data":None})
-    return JsonResponse({"success":True, "data":serializer.data})
+    return JsonResponse({"success":success, "data":serializer.data})
 
 @permission_required("samplelib.change_samplelib",raise_exception=True)
 def edit_samplelib(request,id):
@@ -281,3 +281,18 @@ def check_can_deleted_async(request):
             })
 
     return JsonResponse({"related_objects":related_objects})
+
+def add_async(request):
+    try:
+        id = request.GET.get("id")
+        selected_ids = json.loads(request.GET.get("selected_ids"))
+        cl = CapturedLib.objects.get(id=id)
+        for sl_id in selected_ids:
+            sl = SampleLib.objects.get(id=sl_id)
+            link = SL_CL_LINK.objects.get_or_create(captured_lib=cl, sample_lib=sl)
+        print(request)
+        print(id, selected_ids)
+    except Exception as e:
+        print(str(e))
+        return JsonResponse({"success": False})
+    return JsonResponse({"success": True})

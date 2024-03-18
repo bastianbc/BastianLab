@@ -592,13 +592,57 @@ var KTDatatablesServerSide = function () {
     }
 
     var handleSelectedRows = ((e) => {
-
+        console.log("1-enters");
       var container = document.querySelector('.table');
 
       var modal = new bootstrap.Modal(document.getElementById("modal_capturedlib_options"));
+      var modal_cl = new bootstrap.Modal(document.getElementById("add_to_captured_library"));
+
+      document.getElementById("create_captured_lib").addEventListener('click', function (e) {
+
+          Swal.fire({
+              title: "<h3 style='color:dodgerblue'>" + "Add to an existing Sequencing Run?" + "</h3>",
+              showDenyButton: true,
+              confirmButtonText: "Yes Add!",
+              denyButtonText: "No, Create New One",
+              icon: "question",
+              buttonsStyling: true,
+              customClass: {
+                  confirmButton: "btn fw-bold btn-success",
+                  denyButton: "btn fw-bold btn-primary",
+                  title: "text-light"
+              }
+          }).then((result) => {
+              /* Read more about isConfirmed, isDenied below */
+              if (result.isConfirmed) {
+                    modal_cl.show();
+              } else if (result.isDenied) {
+                  modal.show();
+              }
+          });
+      });
 
       document.getElementById("modal_capturedlib_options").addEventListener('show.bs.modal', function(e){
+        console.log("2-enters");
+        if (!checkSelectedRows()) {
 
+          Swal.fire({
+              text: "Identical barcodes are used in selected rows.",
+              icon: "error",
+              buttonsStyling: false,
+              confirmButtonText: "Ok, got it!",
+              customClass: {
+                  confirmButton: "btn fw-bold btn-primary",
+              }
+          });
+
+          return e.preventDefault()
+        }
+
+      });
+
+      document.getElementById("add_to_captured_library").addEventListener('show.bs.modal', function(e){
+        console.log("3-enters");
         if (!checkSelectedRows()) {
 
           Swal.fire({
@@ -671,6 +715,50 @@ var KTDatatablesServerSide = function () {
         }
         return true;
       }
+
+      document.getElementById("btn_add_continue").addEventListener('click', function () {
+        console.log("4-enters");
+          var selectElement = document.getElementById("id_captured_lib").value;
+        const modalElement = document.getElementById("add_to_captured_library"); // Replace "currentlyOpenModalID" with the ID of the modal that might be open
+        // const modal_cl = new bootstrap.Modal(modalElement);
+        // modal_cl.show();
+          $.ajax({
+            url: "/samplelib/add_async",
+            type: "GET",
+            data: {
+              "id": selectElement,
+              "selected_ids": getSelectedRows()
+            },
+          }).done(function(result) {
+
+            if (result.success) {
+              Swal.fire({
+                  text: "Sequencing Library(s) added succesfully.",
+                  icon: "info",
+                  buttonsStyling: false,
+                  confirmButtonText: "Ok, got it!",
+                  customClass: {
+                      confirmButton: "btn fw-bold btn-success",
+                  }
+              })
+            }
+            else {
+              Swal.fire({
+                  text: `Sequencing Library(s) could not added ${result.message}`,
+                  icon: "error",
+                  buttonsStyling: false,
+                  confirmButtonText: "Ok, got it!",
+                  customClass: {
+                      confirmButton: "btn fw-bold btn-danger",
+                  }
+              })
+            };
+            modal_cl.show();
+            modal_cl.hide();
+            dt.draw();
+          });
+
+        });
 
       document.getElementById("btn_continue").addEventListener('click', function () {
 

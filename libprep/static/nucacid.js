@@ -464,24 +464,7 @@ var KTDatatablesServerSide = function () {
 
         document.getElementById("modal_samplelib_options").addEventListener('show.bs.modal', function(e){
 
-          if (!checkSelectedRows()) {
 
-            Swal.fire({
-                text: "Identical barcodes are used in selected rows.",
-                icon: "error",
-                buttonsStyling: false,
-                confirmButtonText: "Ok, got it!",
-                customClass: {
-                    confirmButton: "btn fw-bold btn-primary",
-                }
-            }).then(function () {
-
-              modal.hide();
-
-            });
-
-          }
-          else {
 
             if (!isInit) {
 
@@ -490,7 +473,7 @@ var KTDatatablesServerSide = function () {
               initModalEvents().init();
             }
 
-          }
+
 
         });
 

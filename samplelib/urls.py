@@ -18,4 +18,5 @@ urlpatterns = [
     path('update_async', views.update_sl_na_link_async, name="update-async"),
     path('print_as_csv', views.print_as_csv, name="print_as_csv"),
     path('check_can_deleted_async', views.check_can_deleted_async, name='checkcan-deleted-async'),
+    path('add_async', views.add_async, name='add_async'),
 ] + staticfiles_urlpatterns()
