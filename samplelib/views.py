@@ -7,10 +7,12 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import permission_required
 from .serializers import *
 from core.decorators import *
+from capturedlib.models import *
 
 @permission_required("samplelib.view_samplelib",raise_exception=True)
 def samplelibs(request):
     form = CapturedLibCreationOptionsForm()
+    form_cl_add = CapturedLibAddForm()
     filter = FilterForm()
     return render(request, "samplelib_list.html", locals())
 
@@ -279,3 +281,18 @@ def check_can_deleted_async(request):
             })
 
     return JsonResponse({"related_objects":related_objects})
+
+def add_async(request):
+    try:
+        id = request.GET.get("id")
+        selected_ids = json.loads(request.GET.get("selected_ids"))
+        cl = CapturedLib.objects.get(id=id)
+        for sl_id in selected_ids:
+            sl = SampleLib.objects.get(id=sl_id)
+            link = SL_CL_LINK.objects.get_or_create(captured_lib=cl, sample_lib=sl)
+        print(request)
+        print(id, selected_ids)
+    except Exception as e:
+        print(str(e))
+        return JsonResponse({"success": False})
+    return JsonResponse({"success": True})

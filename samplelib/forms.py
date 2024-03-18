@@ -6,6 +6,7 @@ from barcodeset.models import Barcode
 from areas.models import Areas
 from core.forms import BaseForm
 from sequencingrun.models import SequencingRun
+from capturedlib.models import CapturedLib
 
 class SampleLibForm(BaseForm, forms.ModelForm):
     class Meta:
@@ -36,3 +37,7 @@ class FilterForm(forms.Form):
         self.fields["i7"].widget.attrs.update({'class':'form-control-sm'})
         self.fields["area_type"].widget.attrs.update({'class':'form-control-sm'})
         self.fields["bait"].widget.attrs.update({'class':'form-control-sm'})
+
+
+class CapturedLibAddForm(forms.Form):
+    captured_lib = forms.ModelChoiceField(queryset=CapturedLib.objects.all().order_by("name"), label="Captured Libs")
