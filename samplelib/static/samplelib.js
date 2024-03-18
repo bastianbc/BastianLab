@@ -601,7 +601,7 @@ var KTDatatablesServerSide = function () {
       document.getElementById("create_captured_lib").addEventListener('click', function (e) {
 
           Swal.fire({
-              title: "<h3 style='color:dodgerblue'>" + "Add to an existing Sequencing Run?" + "</h3>",
+              title: "<h3 style='color:dodgerblue'>" + "Add to an existing Captured Library?" + "</h3>",
               showDenyButton: true,
               confirmButtonText: "Yes Add!",
               denyButtonText: "No, Create New One",
@@ -733,7 +733,7 @@ var KTDatatablesServerSide = function () {
 
             if (result.success) {
               Swal.fire({
-                  text: "Sequencing Library(s) added succesfully.",
+                  text: "Sample Library(s) added succesfully.",
                   icon: "info",
                   buttonsStyling: false,
                   confirmButtonText: "Ok, got it!",
@@ -744,7 +744,7 @@ var KTDatatablesServerSide = function () {
             }
             else {
               Swal.fire({
-                  text: `Sequencing Library(s) could not added ${result.message}`,
+                  text: `Sample Library(s) could not added ${result.message}`,
                   icon: "error",
                   buttonsStyling: false,
                   confirmButtonText: "Ok, got it!",
