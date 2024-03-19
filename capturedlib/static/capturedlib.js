@@ -699,7 +699,6 @@ var KTDatatablesServerSide = function () {
       }
 
       function updateTotalAmount() {
-
         var total = 0;
 
         for (var detail of document.querySelectorAll(".detail-amount")) {
@@ -713,7 +712,6 @@ var KTDatatablesServerSide = function () {
       }
 
       function updateTotalVolume() {
-
         var total = 0;
 
         for (var detail of document.querySelectorAll(".detail-volume")) {
@@ -739,7 +737,6 @@ var KTDatatablesServerSide = function () {
             var volume = (this.value / conc).toFixed(2);
 
             parent.querySelector(".detail-volume").value = volume;
-
             updateTotalAmount();
             updateTotalVolume();
 
