@@ -1,6 +1,7 @@
 from django.db import models
 from datetime import datetime
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Sum
+
 
 class CapturedLib(models.Model):
     name = models.CharField(max_length=50, unique=True, verbose_name="Name")
@@ -38,14 +39,10 @@ class CapturedLib(models.Model):
 
     @property
     def amount(self):
-        # calculates the amount: amount = vol_init * conc
-        result = 0
-        try:
-            result = round(self.conc * self.vol_init,2)
-        except Exception as e:
-            pass
+        # calculates the amount: sum of all amounts that link belongs to self
+        result = sum(link.amount for link in SL_CL_LINK.objects.filter(captured_lib=self))
+        return round(result, 2) if result is not None else 0
 
-        return result
 
     def query_by_args(self, user, **kwargs):
 
@@ -132,7 +129,6 @@ class SL_CL_LINK(models.Model):
     captured_lib = models.ForeignKey("capturedlib.CapturedLib",on_delete=models.CASCADE, verbose_name="Captured Library", related_name="sl_cl_links")
     sample_lib = models.ForeignKey("samplelib.SampleLib", on_delete=models.CASCADE, verbose_name="Sample Library", related_name="sl_cl_links")
     volume = models.FloatField(default=0, verbose_name="Volume")
-    amount = models.FloatField(default=0, verbose_name="Amount")
     date = models.DateTimeField(default=datetime.now, verbose_name="Date")
 
     class Meta:

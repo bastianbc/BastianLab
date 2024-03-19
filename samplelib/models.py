@@ -34,6 +34,7 @@ class SampleLib(models.Model):
         if self.__vol_init != self.vol_init:
             self.vol_remain = self.vol_init
             self.amount_final = self.vol_remain * self.qpcr_conc
+        self.vol_remain = round(self.vol_remain, 2)
         super().save(*args, **kwargs)
 
     def update_volume(self, volume):

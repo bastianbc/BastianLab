@@ -31,7 +31,6 @@ def filter_capturedlibs(request):
 def edit_capturedlib_async(request):
     import re
     from core.utils import custom_update
-
     parameters = {}
 
     try:
@@ -43,7 +42,6 @@ def edit_capturedlib_async(request):
                     if v == '':
                         v = None
                     parameters[r.groups()[1]] = v
-
         captured_lib = custom_update(CapturedLib,pk=parameters["pk"],parameters=parameters)
 
         # captured_lib.set_nm()
@@ -153,7 +151,6 @@ def get_used_samplelibs(request,id):
 @permission_required_for_async("capturedlib.change_capturedlib")
 def update_async(request,id):
     import math
-
     try:
         values = json.loads(request.GET.get("values"))
         captured_lib = CapturedLib.objects.get(id=id)
