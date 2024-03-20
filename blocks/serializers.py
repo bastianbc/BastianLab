@@ -24,10 +24,10 @@ class BlocksSerializer(serializers.ModelSerializer):
            return getattr(obj, 'bl_id')
 
     def get_project(self, obj):
-        return obj.project.name
+        return obj.project.name if obj.project else None
 
     def get_patient(self, obj):
-        return obj.patient.pat_id
+        return obj.patient.pat_id if obj.patient else None
 
     def get_body_site(self,obj):
         return obj.body_site.name if obj.body_site else None
