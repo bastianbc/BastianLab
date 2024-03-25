@@ -10,6 +10,7 @@ from .forms import *
 from django.contrib import messages
 from core.decorators import permission_required_for_async
 
+
 @permission_required("capturedlib.view_capturedlib",raise_exception=True)
 def capturedlibs(request):
     form = SequencingLibCreationForm()

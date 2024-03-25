@@ -3269,6 +3269,3 @@ def blocks_sl_at(request):
     df2 = pd.read_csv(file)
 
     df.apply(lambda row: blocks_sl_at_get(row), axis=1)
-
-
-
