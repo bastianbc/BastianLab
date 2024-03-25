@@ -7,6 +7,7 @@ var KTDatatablesServerSide = function () {
     var dt;
     var filterPayment;
     var editor;
+    var selectedRows = [];
 
     // Private functions
     var initDatatable = function ( initialValue ) {
@@ -174,6 +175,8 @@ var KTDatatablesServerSide = function () {
 
         // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
         dt.on('draw', function () {
+            initRowSelection();
+            handleRestoreRowSelection();
             initToggleToolbar();
             toggleToolbars();
             handleDeleteRows();
@@ -182,6 +185,46 @@ var KTDatatablesServerSide = function () {
             handleSelectedRows.init();
             KTMenu.createInstances();
         });
+    }
+
+    var initRowSelection = function () {
+        // Select all checkboxes
+        const allCheckboxes = document.querySelectorAll('.table tbody [type="checkbox"]');
+        allCheckboxes.forEach(c => {
+            // Checkbox on Change event
+            c.addEventListener("change", function () {
+                toggleRowSelection(c.value);
+            });
+
+            // Checkbox on click event
+            c.addEventListener('click', function () {
+                setTimeout(function () {
+                    toggleToolbars();
+                }, 50);
+            });
+        });
+
+        function toggleRowSelection(id) {
+            var index = selectedRows.indexOf(id);
+            if (index === -1) {
+                // If the row is not selected, add it to selected rows
+                selectedRows.push(id);
+            } else {
+                // If the row is already selected, remove it in selected rows
+                selectedRows.splice(index, 1);
+            }
+        }
+
+    }
+
+    var handleRestoreRowSelection = function () {
+        const allCheckboxes = document.querySelectorAll('.table tbody [type="checkbox"]');
+        allCheckboxes.forEach(c => {
+            if ( selectedRows.indexOf(c.value) > -1 ) {
+                c.checked = true;
+            }
+        });
+
     }
 
     // Search Datatable --- official docs reference: https://datatables.net/reference/api/search()
@@ -381,24 +424,9 @@ var KTDatatablesServerSide = function () {
         const toolbarSelected = document.querySelector('[data-kt-docs-table-toolbar="selected"]');
         const selectedCount = document.querySelector('[data-kt-docs-table-select="selected_count"]');
 
-        // Select refreshed checkbox DOM elements
-        const allCheckboxes = container.querySelectorAll('tbody [type="checkbox"]');
-
-        // Detect checkboxes state & count
-        let checkedState = false;
-        let count = 0;
-
-        // Count checked boxes
-        allCheckboxes.forEach(c => {
-            if (c.checked) {
-                checkedState = true;
-                count++;
-            }
-        });
-
         // Toggle toolbars
-        if (checkedState) {
-            selectedCount.innerHTML = count;
+        if (selectedRows.length > 0) {
+            selectedCount.innerHTML = selectedRows.length;
             toolbarBase.classList.add('d-none');
             toolbarSelected.classList.remove('d-none');
         } else {
@@ -603,25 +631,6 @@ var KTDatatablesServerSide = function () {
 
       const container = document.querySelector('.table');
 
-      function getSelectedRows() {
-
-        const selectedRows = container.querySelectorAll('tbody [type="checkbox"]:checked');
-
-        const selectedIds = [];
-
-        selectedRows.forEach((p) => {
-          // Select parent row
-          const parent = p.closest('tr');
-          // Get customer name
-          const id = parent.querySelector('input[type=checkbox]').value;
-
-          selectedIds.push(id)
-
-        });
-
-        return JSON.stringify(selectedIds);
-      }
-
       function uncheckedFirstCheckBox() {
 
         dt.on( 'draw', function () {
@@ -654,7 +663,7 @@ var KTDatatablesServerSide = function () {
                 type: 'POST',
                 headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
                 data: {
-                    "selected_ids": getSelectedRows()
+                    "selected_ids": JSON.stringify(selectedRows)
                 },
                 xhrFields: {
                     responseType: 'blob'
@@ -742,7 +751,7 @@ var KTDatatablesServerSide = function () {
                             type: "GET",
                             url: "/sequencingrun/batch_delete",
                             data: {
-                              "selected_ids": getSelectedRows(),
+                              "selected_ids": JSON.stringify(selectedRows),
                             },
                             error: function (xhr, ajaxOptions, thrownError) {
                                 swal("Error deleting!", "Please try again", "error");
@@ -758,7 +767,10 @@ var KTDatatablesServerSide = function () {
                                       confirmButton: "btn fw-bold btn-success",
                                   }
                               }).then(function(){
-                                dt.draw();
+                                  // clean selected rows
+                                  selectedRows = [];
+                                  // refresh dataTable
+                                  dt.draw();
                               });
                             }
                             else {
