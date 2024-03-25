@@ -28,6 +28,7 @@ class Patients(models.Model):
     blocks_temp = models.CharField(max_length=100, blank=True, null=True, verbose_name="Blocks")
     notes = models.TextField(blank=True, null=True, verbose_name="Notes")
     pa_id = models.AutoField(primary_key=True)
+    pat_ip_id = models.CharField(max_length=20, blank=True, null=True, verbose_name="Intelipath Patient ID", help_text="Requires a unique identifier for each patient from intelipath.")
     date_added = models.DateTimeField(auto_now_add=True)
 
     class Meta:
