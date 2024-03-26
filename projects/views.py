@@ -101,10 +101,10 @@ def get_pi_options(request):
 @permission_required("projects.delete_projects",raise_exception=True)
 def delete_batch_projects(request):
     try:
-        selected_ids = json.loads(request.GET.get("selected_ids"))
+        selected_ids = json.loads(request.GET.get("selected_ids"))    
         Projects.objects.filter(pr_id__in=selected_ids).delete()
     except Exception as e:
-        return JsonResponse({ "deleted":False })
+        return JsonResponse({ "deleted":False, "message":str(e) })
 
     return JsonResponse({ "deleted":True })
 

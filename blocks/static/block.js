@@ -8,6 +8,7 @@ var KTDatatablesServerSide = function () {
     var filterPayment;
     var editor;
     var popupWindow;
+    var selectedRows = [];
 
     // Private functions
     var initDatatable = function ( initialValue, p_stage, prim, collection , body_site ) {
@@ -195,7 +196,9 @@ var KTDatatablesServerSide = function () {
 
         // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
         dt.on('draw', function () {
-            initToggleToolbar();
+            initRowSelection();
+            handleRestoreRowSelection();
+            handleBatchDeleteRows();
             toggleToolbars();
             handleDeleteRows();
             handleResetForm();
@@ -240,6 +243,46 @@ var KTDatatablesServerSide = function () {
     });
     }
 
+    var initRowSelection = function () {
+        // Select all checkboxes
+        const allCheckboxes = document.querySelectorAll('.table tbody [type="checkbox"]');
+        allCheckboxes.forEach(c => {
+            // Checkbox on Change event
+            c.addEventListener("change", function () {
+                toggleRowSelection(c.value);
+            });
+
+            // Checkbox on click event
+            c.addEventListener('click', function () {
+                setTimeout(function () {
+                    toggleToolbars();
+                }, 50);
+            });
+        });
+
+        function toggleRowSelection(id) {
+            var index = selectedRows.indexOf(id);
+            if (index === -1) {
+                // If the row is not selected, add it to selected rows
+                selectedRows.push(id);
+            } else {
+                // If the row is already selected, remove it in selected rows
+                selectedRows.splice(index, 1);
+            }
+        }
+
+    }
+
+    var handleRestoreRowSelection = function () {
+        const allCheckboxes = document.querySelectorAll('.table tbody [type="checkbox"]');
+        allCheckboxes.forEach(c => {
+            if ( selectedRows.indexOf(c.value) > -1 ) {
+                c.checked = true;
+            }
+        });
+
+    }
+
     var initShowScanImage = function () {
         document.querySelectorAll(".scan-image").forEach((item, i) => {
 
@@ -271,7 +314,6 @@ var KTDatatablesServerSide = function () {
             dt.search(e.target.value).draw();
         });
     }
-
 
     // Filter Datatable
     var handleFilterDatatable = () => {
@@ -428,7 +470,7 @@ var KTDatatablesServerSide = function () {
     }
 
     // Init toggle toolbar
-    var initToggleToolbar = function () {
+    var handleBatchDeleteRows = function () {
         // Toggle selected action toolbar
         // Select all checkboxes
         const container = document.querySelector('.table');
@@ -473,27 +515,6 @@ var KTDatatablesServerSide = function () {
                         timer: 2000
                     }).then(function () {
 
-                        function getSelectedRows() {
-
-                        const container = document.querySelector('.table');
-
-                        const selectedRows = container.querySelectorAll('[type="checkbox"]:checked');
-
-                        const selectedIds = [];
-
-                        selectedRows.forEach((p) => {
-                          // Select parent row
-                          const parent = p.closest('tr');
-                          // Get customer name
-                          const id = parent.querySelector('input[type=checkbox]').value;
-
-                          selectedIds.push(id)
-
-                        });
-
-                        return JSON.stringify(selectedIds);
-                      }
-
                         // Calling delete request with ajax
                         $.ajax({
                             type: "GET",
@@ -515,7 +536,10 @@ var KTDatatablesServerSide = function () {
                                       confirmButton: "btn fw-bold btn-success",
                                   }
                               }).then(function(){
-                                dt.draw();
+                                  // clean selected rows
+                                  selectedRows = [];
+                                  // refresh dataTable
+                                  dt.draw();
                               });
                             }
                             else {
@@ -562,10 +586,6 @@ var KTDatatablesServerSide = function () {
              }
         }
         });
-
-
-
-
 
     });
 
@@ -651,27 +671,6 @@ var KTDatatablesServerSide = function () {
 
         });
 
-      }
-
-      function getSelectedRows() {
-
-        const container = document.querySelector('.table');
-
-        const selectedRows = container.querySelectorAll('[type="checkbox"]:checked');
-
-        const selectedIds = [];
-
-        selectedRows.forEach((p) => {
-          // Select parent row
-          const parent = p.closest('tr');
-          // Get customer name
-          const id = parent.querySelector('input[type=checkbox]').value;
-
-          selectedIds.push(id)
-
-        });
-
-        return JSON.stringify(selectedIds);
       }
 
       const btnAddBlockToProject = document.querySelector('[data-kt-docs-table-select="event_add_block_to_project"]');
@@ -992,13 +991,13 @@ var KTDatatablesServerSide = function () {
         init: function () {
             initDatatable( handleInitialValue(), null, null, null, null );
             handleSearchDatatable();
-            initToggleToolbar();
+            handleBatchDeleteRows();
             handleFilterDatatable();
             handleDeleteRows();
             handleResetForm();
             handleSelectedRows.init();
             initEditor();
-            handleBlockDetails();
+            // handleBlockDetails();
         }
     }
 }();

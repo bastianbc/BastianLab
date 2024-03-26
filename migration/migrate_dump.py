@@ -112,8 +112,61 @@ class MigrateDump():
             except Exception as e:
                 print(row[0], e)
 
+    @staticmethod
+    def get_collection(value):
+        for x in Blocks.COLLECTION_CHOICES:
+            if value.lower() == x[1].lower():
+                return x[0]
+        return Blocks.SCRAPE
+
+    @staticmethod
+    def register_blocks():
+        rows = MigrateDump().cursor("SELECT * FROM blocks")
+        # print(Patients.objects.all().count())
+        for row in rows:
+            try:
+                # print(row[-4])
+                patient = Patients.objects.get(pat_id=row[-4])
+                block, created = Blocks.objects.get_or_create(
+                    name=row[1]
+                )
+                block.patient = patient
+                block.age = row[2]
+                # block.body_site =
+                block.ulceration = row[3]
+                block.thickness = row[4]
+                block.mitoses = row[5]
+                block.p_stage = row[6] if row[6] is not None else None
+                if row[7] != None:
+                    block.prim = row[7].lower() if row[7].lower() in [item[0].lower() for item in Blocks.PRIM_TYPES] else None
+                block.subtype = row[8]
+                block.slides = row[9]
+                block.slides_left = row[10]
+                block.fixation = row[11]
+                block.storage = row[12]
+                if row[13] != None:
+                    if "=" in row[13]:
+                        block.scan_number = row[13].split("=")[-1]
+                    else:
+                        block.scan_number = row[13].split("/")[-1]
+                    if block.scan_number.startswith(","):
+                        block.scan_number = block.scan_number[1:]
+                block.icd10 = row[14]
+                block.diagnosis = row[15]
+                block.notes = row[16]
+                block.micro = row[17]
+                block.gross = row[18]
+                block.clinical = row[19]
+                block.old_body_site = row[21]
+                if row[22] != None:
+                    block.collection = MigrateDump.get_collection(row[22])
+                block.path_note = row[23]
+                block.ip_dx = row[24]
+                block.save()
+            except Exception as e:
+                print(e)
 
 if __name__ == "__main__":
-    m = MigrateDump.register_patients()
+    m = MigrateDump.register_blocks()
     print(m)
     # res = m.cursor("SELECT * FROM patients")
