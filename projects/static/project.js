@@ -7,6 +7,7 @@ var KTDatatablesServerSide = function () {
     var dt;
     var filterPayment;
     var editor;
+    var selectedRows = [];
 
     /*
    * Initializes the datatable.
@@ -174,13 +175,55 @@ var KTDatatablesServerSide = function () {
 
         // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
         dt.on('draw', function () {
-            initToggleToolbar();
+            initRowSelection();
+            handleRestoreRowSelection();
+            handleBatchDeleteRows();
             toggleToolbars();
             handleDeleteRows();
             handleResetForm();
             KTMenu.createInstances();
         });
     };
+
+    var initRowSelection = function () {
+        // Select all checkboxes
+        const allCheckboxes = document.querySelectorAll('.table tbody [type="checkbox"]');
+        allCheckboxes.forEach(c => {
+            // Checkbox on Change event
+            c.addEventListener("change", function () {
+                toggleRowSelection(c.value);
+            });
+
+            // Checkbox on click event
+            c.addEventListener('click', function () {
+                setTimeout(function () {
+                    toggleToolbars();
+                }, 50);
+            });
+        });
+
+        function toggleRowSelection(id) {
+            var index = selectedRows.indexOf(id);
+            if (index === -1) {
+                // If the row is not selected, add it to selected rows
+                selectedRows.push(id);
+            } else {
+                // If the row is already selected, remove it in selected rows
+                selectedRows.splice(index, 1);
+            }
+        }
+
+    }
+
+    var handleRestoreRowSelection = function () {
+        const allCheckboxes = document.querySelectorAll('.table tbody [type="checkbox"]');
+        allCheckboxes.forEach(c => {
+            if ( selectedRows.indexOf(c.value) > -1 ) {
+                c.checked = true;
+            }
+        });
+
+    }
 
     // Search Datatable --- official docs reference: https://datatables.net/reference/api/search()
     var handleSearchDatatable = function () {
@@ -309,7 +352,7 @@ var KTDatatablesServerSide = function () {
     }
 
     // Init toggle toolbar
-    var initToggleToolbar = function () {
+    var handleBatchDeleteRows = function () {
         // Toggle selected action toolbar
         // Select all checkboxes
         const container = document.querySelector('.table');
@@ -354,33 +397,12 @@ var KTDatatablesServerSide = function () {
                         timer: 2000
                     }).then(function () {
 
-                        function getSelectedRows() {
-
-                        const container = document.querySelector('.table');
-
-                        const selectedRows = container.querySelectorAll('[type="checkbox"]:checked');
-
-                        const selectedIds = [];
-
-                        selectedRows.forEach((p) => {
-                          // Select parent row
-                          const parent = p.closest('tr');
-                          // Get customer name
-                          const id = parent.querySelector('input[type=checkbox]').value;
-
-                          selectedIds.push(id);
-
-                        });
-
-                        return JSON.stringify(selectedIds);
-                      }
-
                         // Calling delete request with ajax
                         $.ajax({
                             type: "GET",
                             url: "/projects/batch_delete",
                             data: {
-                              "selected_ids": getSelectedRows(),
+                              "selected_ids": JSON.stringify(selectedRows),
                             },
                             error: function (xhr, ajaxOptions, thrownError) {
                                 swal("Error deleting!", "Please try again", "error");
@@ -388,7 +410,7 @@ var KTDatatablesServerSide = function () {
                         }).done(function (result) {
                             if (result.deleted) {
                               Swal.fire({
-                                  text: "Projects(s) was deleted succesfully.",
+                                  text: "Projects deleted succesfully.",
                                   icon: "info",
                                   buttonsStyling: false,
                                   confirmButtonText: "Ok, got it!",
@@ -396,12 +418,15 @@ var KTDatatablesServerSide = function () {
                                       confirmButton: "btn fw-bold btn-success",
                                   }
                               }).then(function(){
-                                dt.draw();
+                                  // clean selected rows
+                                  selectedRows = [];
+                                  // refresh dataTable
+                                  dt.draw();
                               });
                             }
                             else {
                               Swal.fire({
-                                  text: "Projects(s) wasn't deleted!",
+                                  text: `Projects couldn't deleted!\n${result.message}`,
                                   icon: "error",
                                   buttonsStyling: false,
                                   confirmButtonText: "Ok, got it!",
@@ -429,24 +454,9 @@ var KTDatatablesServerSide = function () {
         const toolbarSelected = document.querySelector('[data-kt-docs-table-toolbar="selected"]');
         const selectedCount = document.querySelector('[data-kt-docs-table-select="selected_count"]');
 
-        // Select refreshed checkbox DOM elements
-        const allCheckboxes = container.querySelectorAll('tbody [type="checkbox"]');
-
-        // Detect checkboxes state & count
-        let checkedState = false;
-        let count = 0;
-
-        // Count checked boxes
-        allCheckboxes.forEach(c => {
-            if (c.checked) {
-                checkedState = true;
-                count++;
-            }
-        });
-
         // Toggle toolbars
-        if (checkedState) {
-            selectedCount.innerHTML = count;
+        if (selectedRows.length > 0) {
+            selectedCount.innerHTML = selectedRows.length;
             toolbarBase.classList.add('d-none');
             toolbarSelected.classList.remove('d-none');
         } else {
@@ -558,22 +568,22 @@ var KTDatatablesServerSide = function () {
 
     };
 
-    // Redirects from other pages
-    var handleInitialValue = () => {
-
-      // Remove parameters in URL
-      function cleanUrl() {
-        window.history.replaceState(null, null, window.location.pathname);
-      }
-
-      const params = new URLSearchParams(window.location.search);
-      const x = params.get('initial');
-
-      cleanUrl();
-
-      return x;
-
-    }
+    // // Redirects from other pages
+    // var handleInitialValue = () => {
+    //
+    //   // Remove parameters in URL
+    //   function cleanUrl() {
+    //     window.history.replaceState(null, null, window.location.pathname);
+    //   }
+    //
+    //   const params = new URLSearchParams(window.location.search);
+    //   const x = params.get('initial');
+    //
+    //   cleanUrl();
+    //
+    //   return x;
+    //
+    // }
 
     // Redirects from other pages
     var handleInitialValue = () => {
@@ -608,7 +618,7 @@ var KTDatatablesServerSide = function () {
         init: function () {
             initDatatable(handleInitialValue(), null, null, null, null);
             handleSearchDatatable();
-            initToggleToolbar();
+            handleBatchDeleteRows();
             handleFilterDatatable();
             handleDeleteRows();
             handleResetForm();
