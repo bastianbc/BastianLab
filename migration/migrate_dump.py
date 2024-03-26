@@ -120,6 +120,40 @@ class MigrateDump():
         return Blocks.SCRAPE
 
     @staticmethod
+    def get_abbreviation(name):
+        lookup = [
+            [["Acral melanoma"], "AM"],
+            [["Acral melanoma cell lines"], "AMCL"],
+            [["Nevus library", "Café aul lait", "lentiginous nevi"], "NL"],
+            [["Melanoma outcome study", "California Registry", "Melanoma prognosis"], "MOS"],
+            [["Conjunctival Melanoma"], "CONJ"],
+            [["Dysplastic nevus"], "DN"],
+            [["Progression", "Melanoma evolution", "Melanoma epigenetics"], "PROG"],
+            [["Dirk Hi-C"], "DHC"],
+            [["Nodular melanoma"], "NM"],
+            [["Oral melanoma"], "OM"],
+            [["Spitz melanoma"], "SM"],
+            [["Sclerotic nevi"], "SCL"],
+            [["Werner Syndrome"], "WS"],
+            [["Seattle"], ""],
+            [["KIT"], "KIT"],
+            [["Iwei Medley", "Fusion RNA", "Possible TERT fusion", "Seattle", "Atypical Spitz Progression",
+              "PRKC fused cases", "NRAS amplified", "Deep Penetrating Melanoma", "Clinical cases BCC",
+              "spatial gene expression", "Fusion RNA"], "FUS"],
+            [["CGH Validation"], "CGH"],
+            [["Melanocytic Nevus"], "MNE"],
+            [["Chromium Single Cell Gene Expression Flex"], "CSCGEF"],
+        ]
+        for l in lookup:
+            if name.lower().strip() in [x.lower() for x in l[0]]:
+                # qs = Projects.objects.filter(abbreviation__startswith=l[1])
+                # if qs.exists():
+                #     return "%s-%d" % (l[1],len(qs))
+                return l[1]
+
+        return ''.join(random.choices(string.digits, k=5))
+
+    @staticmethod
     def register_blocks():
         rows = MigrateDump().cursor("SELECT * FROM blocks")
         # print(Patients.objects.all().count())
@@ -163,7 +197,9 @@ class MigrateDump():
                 block.path_note = row[23]
                 block.ip_dx = row[24]
                 if row[-3] != None:
-                    project = Projects.objects.get_or_create(name=row[-3])
+                    project = Projects.objects.filter(name=row[-3]).first()
+                    if not project:
+                        project = Projects.objects.create(name=row[-3], abbreviation=MigrateDump.get_abbreviation(row[-3]))
                     block.project = project
                 block.save()
             except Exception as e:
