@@ -162,9 +162,12 @@ class MigrateDump():
                     block.collection = MigrateDump.get_collection(row[22])
                 block.path_note = row[23]
                 block.ip_dx = row[24]
+                if row[-3] != None:
+                    project = Projects.objects.get_or_create(name=row[-3])
+                    block.project = project
                 block.save()
             except Exception as e:
-                print(e)
+                print(e, row[-3])
 
 if __name__ == "__main__":
     m = MigrateDump.register_blocks()
