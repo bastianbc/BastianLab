@@ -112,8 +112,157 @@ class MigrateDump():
             except Exception as e:
                 print(row[0], e)
 
+    @staticmethod
+    def get_collection(value):
+        for x in Blocks.COLLECTION_CHOICES:
+            if value.lower() == x[1].lower():
+                return x[0]
+        return Blocks.SCRAPE
+
+    @staticmethod
+    def get_abbreviation(name):
+        lookup = [
+            [["Acral melanoma"], "AM"],
+            [["Acral melanoma cell lines"], "AMCL"],
+            [["Nevus library", "Café aul lait", "lentiginous nevi"], "NL"],
+            [["Melanoma outcome study", "California Registry", "Melanoma prognosis"], "MOS"],
+            [["Conjunctival Melanoma"], "CONJ"],
+            [["Dysplastic nevus"], "DN"],
+            [["Progression", "Melanoma evolution", "Melanoma epigenetics"], "PROG"],
+            [["Dirk Hi-C"], "DHC"],
+            [["Nodular melanoma"], "NM"],
+            [["Oral melanoma"], "OM"],
+            [["Spitz melanoma"], "SM"],
+            [["Sclerotic nevi"], "SCL"],
+            [["Werner Syndrome"], "WS"],
+            [["Seattle"], ""],
+            [["KIT"], "KIT"],
+            [["Iwei Medley", "Fusion RNA", "Possible TERT fusion", "Seattle", "Atypical Spitz Progression",
+              "PRKC fused cases", "NRAS amplified", "Deep Penetrating Melanoma", "Clinical cases BCC",
+              "spatial gene expression", "Fusion RNA"], "FUS"],
+            [["CGH Validation"], "CGH"],
+            [["Melanocytic Nevus"], "MNE"],
+            [["Chromium Single Cell Gene Expression Flex"], "CSCGEF"],
+        ]
+        for l in lookup:
+            if name.lower().strip() in [x.lower() for x in l[0]]:
+                # qs = Projects.objects.filter(abbreviation__startswith=l[1])
+                # if qs.exists():
+                #     return "%s-%d" % (l[1],len(qs))
+                return l[1]
+
+        return ''.join(random.choices(string.digits, k=5))
+
+    @staticmethod
+    def register_blocks():
+        rows = MigrateDump().cursor("SELECT * FROM blocks")
+        # print(Patients.objects.all().count())
+        for row in rows:
+            try:
+                # print(row[-4])
+                patient = Patients.objects.get(pat_id=row[-4])
+                block, created = Blocks.objects.get_or_create(
+                    name=row[1]
+                )
+                block.patient = patient
+                block.age = row[2]
+                # block.body_site =
+                block.ulceration = row[3]
+                block.thickness = row[4]
+                block.mitoses = row[5]
+                block.p_stage = row[6] if row[6] is not None else None
+                if row[7] != None:
+                    block.prim = row[7].lower() if row[7].lower() in [item[0].lower() for item in Blocks.PRIM_TYPES] else None
+                block.subtype = row[8]
+                block.slides = row[9]
+                block.slides_left = row[10]
+                block.fixation = row[11]
+                block.storage = row[12]
+                if row[13] != None:
+                    if "=" in row[13]:
+                        block.scan_number = row[13].split("=")[-1]
+                    else:
+                        block.scan_number = row[13].split("/")[-1]
+                    if block.scan_number.startswith(","):
+                        block.scan_number = block.scan_number[1:]
+                block.icd10 = row[14]
+                block.diagnosis = row[15]
+                block.notes = row[16]
+                block.micro = row[17]
+                block.gross = row[18]
+                block.clinical = row[19]
+                block.old_body_site = row[21]
+                if row[22] != None:
+                    block.collection = MigrateDump.get_collection(row[22])
+                block.path_note = row[23]
+                block.ip_dx = row[24]
+                if row[-3] != None:
+                    project = Projects.objects.filter(name=row[-3]).first()
+                    if not project:
+                        project = Projects.objects.create(name=row[-3], abbreviation=MigrateDump.get_abbreviation(row[-3]))
+                    block.project = project
+                block.save()
+            except Exception as e:
+                print(e, row[-3])
+
+    @staticmethod
+    def get_area_type(value):
+        for x in Areas.AREA_TYPE_TYPES:
+            if value.lower() == x[1].lower():
+                return x[0]
+        return None
+
+    @staticmethod
+    def register_areas():
+        sql = '''
+        SELECT a.*, l.*, b.name as block, b.bl_id FROM AREAS a
+        RIGHT JOIN block_area_link l on a.ar_id=l.area
+        RIGHT JOIN blocks b on l.block = b.bl_id
+        '''
+        sql2 = '''SELECT * FROM AREAS '''
+        rows = MigrateDump().cursor(sql)
+        rows2 = MigrateDump().cursor(sql2)
+        # for row in rows:
+        #     try:
+        #         if row[0] != None:
+        #             block = Blocks.objects.get(name=row[-2])
+        #             # print(block)
+        #             area, _ = Areas.objects.get_or_create(name=row[1],block = block)
+        #             # area.block = block
+        #             if row[2] != None:
+        #                 area.area_type = MigrateDump.get_area_type(row[2])
+        #             area.image = row[4]
+        #             area.notes = row[5]
+        #             area.save()
+        #         # print(row)
+        #     except Exception as e:
+        #         print(e)
+        for row in rows2:
+            try:
+                if row[0] != None:
+                    area = Areas.objects.filter(name=row[1])
+                    if not area:
+                        print(row[1], " - ", row[-1])
+                        block = Blocks.objects.get(name=row[-1].strip())
+                        # if "," in row[-1]:
+                        #     for i in row[-1].split(","):
+                        #         print(i)
+                        #         block = Blocks.objects.get(name=i)
+                        area, _ = Areas.objects.get_or_create(name=row[1],block=block)
+                        if row[2] != None:
+                            area.area_type = MigrateDump.get_area_type(row[2])
+                        area.image = row[4]
+                        area.notes = row[5]
+                        area.save()
+                        # else:
+                        #     block = Blocks.objects.get(name=row[-1])
+                    # area, _ = Areas.objects.get_or_create(name=row[1],block=block)
+
+                # print(row)
+            except Exception as e:
+                print(e)
 
 if __name__ == "__main__":
-    m = MigrateDump.register_patients()
+    m = MigrateDump.register_areas()
     print(m)
     # res = m.cursor("SELECT * FROM patients")
