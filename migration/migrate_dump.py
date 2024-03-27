@@ -214,6 +214,8 @@ class MigrateDump():
 
     @staticmethod
     def register_areas():
+        Blocks.objects.create(name="ZS10-3560A10")
+        Blocks.objects.create(name="21-52881")
         sql = '''
         SELECT a.*, l.*, b.name as block, b.bl_id FROM AREAS a
         RIGHT JOIN block_area_link l on a.ar_id=l.area
@@ -221,48 +223,96 @@ class MigrateDump():
         '''
         sql2 = '''SELECT * FROM AREAS '''
         rows = MigrateDump().cursor(sql)
-        rows2 = MigrateDump().cursor(sql2)
-        # for row in rows:
-        #     try:
-        #         if row[0] != None:
-        #             block = Blocks.objects.get(name=row[-2])
-        #             # print(block)
-        #             area, _ = Areas.objects.get_or_create(name=row[1],block = block)
-        #             # area.block = block
-        #             if row[2] != None:
-        #                 area.area_type = MigrateDump.get_area_type(row[2])
-        #             area.image = row[4]
-        #             area.notes = row[5]
-        #             area.save()
-        #         # print(row)
-        #     except Exception as e:
-        #         print(e)
-        for row in rows2:
+        # rows2 = MigrateDump().cursor(sql2)
+        for row in rows:
             try:
                 if row[0] != None:
-                    area = Areas.objects.filter(name=row[1])
-                    if not area:
-                        print(row[1], " - ", row[-1])
-                        block = Blocks.objects.get(name=row[-1].strip())
-                        # if "," in row[-1]:
-                        #     for i in row[-1].split(","):
-                        #         print(i)
-                        #         block = Blocks.objects.get(name=i)
-                        area, _ = Areas.objects.get_or_create(name=row[1],block=block)
-                        if row[2] != None:
-                            area.area_type = MigrateDump.get_area_type(row[2])
-                        area.image = row[4]
-                        area.notes = row[5]
-                        area.save()
-                        # else:
-                        #     block = Blocks.objects.get(name=row[-1])
-                    # area, _ = Areas.objects.get_or_create(name=row[1],block=block)
-
+                    block = Blocks.objects.get(name=row[-2].strip())
+                    # print(block)
+                    # area, _ = Areas.objects.get_or_create(name=row[1], block=block)
+                    # area.block = block
+                    # if row[2] != None:
+                    #     area.area_type = MigrateDump.get_area_type(row[2])
+                    # area.image = row[4]
+                    # area.notes = row[5]
+                    # area.save()
                 # print(row)
+            except Exception as e:
+                print(e,row[1], row[-1])
+        # for row in rows2:
+        #     try:
+        #         if row[0] != None:
+        #             area = Areas.objects.filter(name=row[1])
+        #             if not area:
+        #                 print(row[1], " - ", row[-1])
+        #                 block = Blocks.objects.get(name=row[-1].strip())
+        #                 # if "," in row[-1]:
+        #                 #     for i in row[-1].split(","):
+        #                 #         print(i)
+        #                 #         block = Blocks.objects.get(name=i)
+        #                 area, _ = Areas.objects.get_or_create(name=row[1],block=block)
+        #                 if row[2] != None:
+        #                     area.area_type = MigrateDump.get_area_type(row[2])
+        #                 area.image = row[4]
+        #                 area.notes = row[5]
+        #                 area.save()
+        #                 # else:
+        #                 #     block = Blocks.objects.get(name=row[-1])
+        #             # area, _ = Areas.objects.get_or_create(name=row[1],block=block)
+        #
+        #         # print(row)
             except Exception as e:
                 print(e)
 
+    @staticmethod
+    def get_na_type(value):
+        for x in NucAcids.NA_TYPES:
+            if value.lower() == x[1].lower():
+                return x[0]
+        return None
+
+    @staticmethod
+    def register_nuc_acids():
+        sql = '''
+            SELECT n.*, nl.*, a.name
+            FROM nuc_acids n
+            LEFT JOIN area_na_link nl on n.nu_id = nl.nucacid_id
+            LEFT JOIN areas a on a.ar_id = nl.area_id
+            order by n.name
+        '''
+        # sql = '''
+        #     SELECT * FROM nuc_acids
+        # '''
+        rows = MigrateDump().cursor(sql)
+        for row in rows:
+            try:
+                # print(row)
+                if row[-1] != None:
+                    area = Areas.objects.get(name=row[-1])
+                if row[3] != None:
+                    na_type = MigrateDump.get_na_type(row[3])
+                    nuc_acid, _ = NucAcids.objects.get_or_create(name=row[1],na_type=na_type)
+                else:
+                    nuc_acid, _ = NucAcids.objects.get_or_create(name=row[1])
+                link = AREA_NA_LINK.objects.get_or_create(
+                    nucacid=nuc_acid,
+                    area=area
+                )
+                if row[2] != None:
+                    nuc_acid.date = row[2]
+                if row[4] != None:
+                    nuc_acid.conc = row[4]
+                if row[5] != None:
+                    nuc_acid.vol_init = row[5]
+                if row[6] != None:
+                    nuc_acid.vol_remain = row[6]
+                nuc_acid.notes = row[7]
+                nuc_acid.save()
+            except Exception as e:
+                print(e, row[-1])
+
 if __name__ == "__main__":
     m = MigrateDump.register_areas()
-    print(m)
+    # m = MigrateDump.register_nuc_acids()
+    print("===FIN===")
     # res = m.cursor("SELECT * FROM patients")
