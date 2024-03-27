@@ -243,7 +243,7 @@ class MigrateDump():
                     area = Areas.objects.filter(name=row[1])
                     if not area:
                         print(row[1], " - ", row[-1])
-                        block = Blocks.objects.get(name="BB"+row[-1].strip())
+                        block = Blocks.objects.get(name=row[-1].strip())
                         # if "," in row[-1]:
                         #     for i in row[-1].split(","):
                         #         print(i)
