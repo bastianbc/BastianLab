@@ -1,5 +1,4 @@
 import re
-import shutil
 import time
 from collections import Counter, namedtuple
 from django.shortcuts import render, redirect
@@ -202,10 +201,8 @@ def get_sequencing_files(request, id):
 def save_sequencing_files(request, id):
     success = False
     sequencing_run = SequencingRun.objects.get(id=id)
-    source_dir = helper.get_source_directory()
-    destination_dir = helper.get_destination_directory(sequencing_run.name)
-    # get posted data
     data = json.loads(request.POST.get('data'))
+    # get posted data
     # files from source directory
     file_sets = helper.get_file_sets()
 
@@ -222,15 +219,8 @@ def save_sequencing_files(request, id):
         else:
             files = [x["files"] for x in file_sets if x["file_set"] == d["initial"]]
             for file_name in files[0]:
-                transfers.append(file_name,file_name)
+                transfers.append((file_name,file_name))
 
-    try:
-        for transfer in transfers:
-            source_file = os.path.join(source_dir,transfer[0])
-            destination_file = os.path.join(destination_dir,transfer[1])
-            shutil.move(source_file, destination_file)
-            success = True
-    except Exception as e:
-        success = False
+    success = helper.file_transfer(sequencing_run,transfers)
 
     return JsonResponse({"success": success})

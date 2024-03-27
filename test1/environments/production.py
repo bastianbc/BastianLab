@@ -226,5 +226,5 @@ TECHNICIAN_GROUP_NAME = "Technicians"
 RESEARCHER_GROUP_NAME = "Researchers"
 
 smb_directory = "/mnt/smb_volume"
-SEQUENCING_FILES_DIRECTORY = Path(Path(smb_directory) / "BastianRaid-02")
+SEQUENCING_FILES_SOURCE_DIRECTORY = Path(Path(smb_directory) / "BastianRaid-02")
 TEMP_DIRECTORY = Path(Path(smb_directory) / "BastianRaid-02" / "TEMP")

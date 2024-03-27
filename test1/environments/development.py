@@ -260,5 +260,5 @@ LOGGING = {
 }
 
 smb_directory = "/mnt/smb_volume"
-# SEQUENCING_FILES_DIRECTORY = Path(Path(smb_directory) / "BastianRaid-02")
-SEQUENCING_FILES_DIRECTORY = os.path.join(BASE_DIR,"uploads", "files")
+SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(BASE_DIR,"uploads", "files")
+SEQUENCING_FILES_DESTINATION_DIRECTORY = os.path.join(BASE_DIR,"uploads", "dest")
