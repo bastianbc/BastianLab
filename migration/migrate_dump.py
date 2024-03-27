@@ -205,7 +205,39 @@ class MigrateDump():
             except Exception as e:
                 print(e, row[-3])
 
+    @staticmethod
+    def get_area_type(value):
+        for x in Areas.AREA_TYPE_TYPES:
+            if value.lower() == x[1].lower():
+                return x[0]
+        return None
+
+    @staticmethod
+    def register_areas():
+        sql = '''
+        SELECT a.*, l.*, b.name as block, b.bl_id FROM AREAS a
+        RIGHT JOIN block_area_link l on a.ar_id=l.area
+        RIGHT JOIN blocks b on l.block = b.bl_id
+        '''
+        rows = MigrateDump().cursor(sql)
+        # print(Patients.objects.all().count())
+        for row in rows:
+            try:
+                if row[0] != None:
+                    block = Blocks.objects.get(name=row[-2])
+                    # print(block)
+                    area, _ = Areas.objects.get_or_create(name=row[1],block = block)
+                    # area.block = block
+                    if row[2] != None:
+                        area.area_type = MigrateDump.get_area_type(row[2])
+                    area.image = row[4]
+                    area.notes = row[5]
+                    area.save()
+                # print(row)
+            except Exception as e:
+                print(e)
+
 if __name__ == "__main__":
-    m = MigrateDump.register_blocks()
+    m = MigrateDump.register_areas()
     print(m)
     # res = m.cursor("SELECT * FROM patients")
