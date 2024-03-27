@@ -892,6 +892,7 @@ var KTDatatablesServerSide = function () {
         }
 
         function initialMachingTable(data) {
+            matchingTable = [];
             for (var sl of data.sample_libs) {
                 var tmp = {
                     "sample_lib":sl.name,
@@ -1016,6 +1017,30 @@ var KTDatatablesServerSide = function () {
                     data: JSON.stringify(matchingTable),
                 },
                 success: function (data) {
+                    if (data.success) {
+                        Swal.fire({
+                            text: "The sequencing files created successfully and the file locations replaced.",
+                            icon: "success",
+                            buttonsStyling: false,
+                            confirmButtonText: "Ok, got it!",
+                            customClass: {
+                                confirmButton: "btn fw-bold btn-primary",
+                            }
+                        });
+                    }
+                    else {
+                        Swal.fire({
+                            text: "An error occurred.The operation could not be performed.",
+                            icon: "error",
+                            buttonsStyling: false,
+                            confirmButtonText: "Ok, got it!",
+                            customClass: {
+                                confirmButton: "btn fw-bold btn-primary",
+                            }
+                        });
+                    }
+
+                    modalSequencingFiles.hide();
                     console.log(data);
                 },
                 error: function (xhr, ajaxOptions, thrownError) {
