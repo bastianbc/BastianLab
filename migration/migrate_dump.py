@@ -243,17 +243,17 @@ class MigrateDump():
                     area = Areas.objects.filter(name=row[1])
                     if not area:
                         print(row[1], " - ", row[-1])
-                        # block = Blocks.objects.get(name=row[-1].strip())
-                        if "," in row[-1]:
-                            for i in row[-1].split(","):
-                                print(i)
-                                block = Blocks.objects.get(name=i)
-                                area, _ = Areas.objects.get_or_create(name=row[1],block=block)
-                                if row[2] != None:
-                                    area.area_type = MigrateDump.get_area_type(row[2])
-                                area.image = row[4]
-                                area.notes = row[5]
-                                area.save()
+                        block = Blocks.objects.get(name="BB"+row[-1].strip())
+                        # if "," in row[-1]:
+                        #     for i in row[-1].split(","):
+                        #         print(i)
+                        #         block = Blocks.objects.get(name=i)
+                        area, _ = Areas.objects.get_or_create(name=row[1],block=block)
+                        if row[2] != None:
+                            area.area_type = MigrateDump.get_area_type(row[2])
+                        area.image = row[4]
+                        area.notes = row[5]
+                        area.save()
                         # else:
                         #     block = Blocks.objects.get(name=row[-1])
                     # area, _ = Areas.objects.get_or_create(name=row[1],block=block)
