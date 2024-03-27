@@ -219,20 +219,45 @@ class MigrateDump():
         RIGHT JOIN block_area_link l on a.ar_id=l.area
         RIGHT JOIN blocks b on l.block = b.bl_id
         '''
+        sql2 = '''SELECT * FROM AREAS '''
         rows = MigrateDump().cursor(sql)
-        # print(Patients.objects.all().count())
-        for row in rows:
+        rows2 = MigrateDump().cursor(sql2)
+        # for row in rows:
+        #     try:
+        #         if row[0] != None:
+        #             block = Blocks.objects.get(name=row[-2])
+        #             # print(block)
+        #             area, _ = Areas.objects.get_or_create(name=row[1],block = block)
+        #             # area.block = block
+        #             if row[2] != None:
+        #                 area.area_type = MigrateDump.get_area_type(row[2])
+        #             area.image = row[4]
+        #             area.notes = row[5]
+        #             area.save()
+        #         # print(row)
+        #     except Exception as e:
+        #         print(e)
+        for row in rows2:
             try:
                 if row[0] != None:
-                    block = Blocks.objects.get(name=row[-2])
-                    # print(block)
-                    area, _ = Areas.objects.get_or_create(name=row[1],block = block)
-                    # area.block = block
-                    if row[2] != None:
-                        area.area_type = MigrateDump.get_area_type(row[2])
-                    area.image = row[4]
-                    area.notes = row[5]
-                    area.save()
+                    area = Areas.objects.filter(name=row[1])
+                    if not area:
+                        print(row[1], " - ", row[-1])
+                        # block = Blocks.objects.get(name=row[-1].strip())
+                        if "," in row[-1]:
+                            for i in row[-1].split(","):
+                                print(i)
+                                block = Blocks.objects.get(name=i)
+                                area, _ = Areas.objects.get_or_create(name=row[1],block=block)
+                                if row[2] != None:
+                                    area.area_type = MigrateDump.get_area_type(row[2])
+                                area.image = row[4]
+                                area.notes = row[5]
+                                area.save()
+                        # else:
+                        #     block = Blocks.objects.get(name=row[-1])
+                    # area, _ = Areas.objects.get_or_create(name=row[1],block=block)
+
                 # print(row)
             except Exception as e:
                 print(e)
