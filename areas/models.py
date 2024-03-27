@@ -207,3 +207,16 @@ class Areas(models.Model):
         Option list of Area Type for the datatables' select field.
         '''
         return [{"label":"---------","value":""}] + [{ "label":c[1], "value":c[0] } for c in Areas.AREA_TYPE_TYPES]
+
+class BLOCK_AREA_LINK(models.Model):
+    block = models.ForeignKey("blocks.Blocks",on_delete=models.CASCADE, related_name="block_area_links", verbose_name="Block")
+    area = models.ForeignKey("areas.Areas", on_delete=models.CASCADE, related_name="block_area_links", verbose_name="Area")
+    input_vol = models.FloatField(blank=True, null=True, verbose_name="Volume")
+    input_amount = models.FloatField(blank=True, null=True, verbose_name="Amount")
+    date = models.DateTimeField(default=datetime.now, verbose_name="Date")
+
+    class Meta:
+        db_table = "block_area_link"
+
+    def __str__(self):
+        return f"{self.area.name} - {self.nucacid.name}"
