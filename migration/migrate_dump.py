@@ -237,8 +237,9 @@ class MigrateDump():
                     # area.save()
                 # print(row)
             except ObjectDoesNotExist:
-                block = Blocks.objects.filter(name="BB"+row[-1].strip())
-                print(block)
+                blocks = Blocks.objects.filter(name="BB"+row[-1].strip())
+                print(blocks)
+                area, _ = Areas.objects.get_or_create(name=row[1], block=block)
             except Exception as e:
                 print(e,row[1], row[-1])
         # for row in rows2:
