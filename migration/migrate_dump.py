@@ -393,6 +393,16 @@ class MigrateDump():
                 print(e,row[1],row[-1])
 
     @staticmethod
+    def get_barcode(sl):
+        try:
+            file = SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl).first()
+            barcode = re.search("^[ATGC-]+$", file.name)
+            q = Q(Q(i5=barcode) | Q(i7=barcode))
+            Barcode.objects.get(q)
+        except:
+            print(f"Barcode not found for {sl.name}")
+
+    @staticmethod
     def register_samplelib():
         # print(SampleLib.objects.filter(name__startswith="T12-"))
         # for sl in SampleLib.objects.filter(name__startswith="T12-"):
@@ -417,33 +427,35 @@ class MigrateDump():
         rows = MigrateDump().cursor(sql)
         rows2 = MigrateDump().cursor(sql2)
         rows3 = MigrateDump().cursor(sql3)
-        # for row in rows2:
-        #     try:
-        #         sl = SampleLib.objects.get(name=row[1].strip())
-        #         if row[2]:
-        #             sl.date = row[2]
-        #         sl.qubit = row[3] or 0
-        #         sl.shear_volume = row[4] or 0
-        #         sl.qpcr_conc = row[5] or 0
-        #         sl.pcr_cycles = row[6] or 0
-        #         sl.amount_in = row[7] or 0
-        #         sl.amount_final = row[8] or 0
-        #         sl.vol_init = row[9] or 0
-        #         sl.vol_remain = row[10] or 0
-        #         sl.notes = row[1]
-        #         sl.save()
-        #     except Exception as e:
-        #         print(e, row[1])
-        for row in rows3:
+        for row in rows2:
             try:
-                sl = SampleLib.objects.get(name=row[-2])
-                na = NucAcids.objects.get(name=row[-3])
-                link, _ = NA_SL_LINK.objects.get_or_create(sample_lib=sl, nucacid=na)
-                link.input_vol = row[1] or 0
-                link.input_amount = row[2] or 0
-                link.save()
+                sl = SampleLib.objects.get(name=row[1].strip())
+                MigrateDump.get_barcode(sl)
+                # if row[2]:
+                #     sl.date = row[2]
+                # sl.qubit = row[3] or 0
+                # sl.shear_volume = row[4] or 0
+                # sl.qpcr_conc = row[5] or 0
+                # sl.pcr_cycles = row[6] or 0
+                # sl.amount_in = row[7] or 0
+                # sl.amount_final = row[8] or 0
+                # sl.vol_init = row[9] or 0
+                # sl.vol_remain = row[10] or 0
+                # sl.notes = row[1]
+                #
+                # sl.save()
             except Exception as e:
-                print(e)
+                print(e, row[1])
+        # for row in rows3:
+        #     try:
+        #         sl = SampleLib.objects.get(name=row[-2])
+        #         na = NucAcids.objects.get(name=row[-3])
+        #         link, _ = NA_SL_LINK.objects.get_or_create(sample_lib=sl, nucacid=na)
+        #         link.input_vol = row[1] or 0
+        #         link.input_amount = row[2] or 0
+        #         link.save()
+        #     except Exception as e:
+        #         print(e)
 
 if __name__ == "__main__":
     # m = MigrateDump.register_areas()
