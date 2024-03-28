@@ -3153,7 +3153,7 @@ def check_projects_airtable_get(row):
 
 def check_projects_airtable(request):
     from .migrate_dump import MigrateDump
-    m = MigrateDump.register_areas()
+    m = MigrateDump.register_nuc_acids()
     # file = Path(Path(__file__).parent.parent / "uploads" / "Patients-Grid view (1).csv")
     # file = Path(Path(__file__).parent.parent / "uploads" / "Areas-Grid view (3).csv")
     # file = Path(Path(__file__).parent.parent / "uploads" / "Nucleic Acids-Grid view (2).csv")
