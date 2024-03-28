@@ -397,7 +397,8 @@ class MigrateDump():
         try:
             file = SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl).first()
             print(file)
-            barcode = re.find(r'[ATGC]{6,}', file.name)
+            barcode = re.search(r'[ATGC]{6,}', file.name)
+            barcode = barcode.group(1)
             print(barcode)
             q = Q(Q(i5=barcode) | Q(i7=barcode))
             barcode = Barcode.objects.filter(q)
