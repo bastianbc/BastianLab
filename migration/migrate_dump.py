@@ -236,6 +236,9 @@ class MigrateDump():
                     # area.notes = row[5]
                     # area.save()
                 # print(row)
+            except ObjectDoesNotExist:
+                block = Blocks.objects.filter(name="BB"+row[-1].strip())
+                print(block)
             except Exception as e:
                 print(e,row[1], row[-1])
         # for row in rows2:
