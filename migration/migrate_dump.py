@@ -242,7 +242,7 @@ class MigrateDump():
         #                 area.area_type = MigrateDump.get_area_type(row[2])
         #             area.image = row[4]
         #             area.notes = row[5]
-        #             # area.save()
+                    # area.save()
         #         # print(row)
         #     except ObjectDoesNotExist:
         #         print(row[-1])
@@ -255,6 +255,11 @@ class MigrateDump():
         for row in rows2:
             try:
                 area = Areas.objects.get(name=row[1])
+                if row[2] != None:
+                    area.area_type = MigrateDump.get_area_type(row[2])
+                area.image = row[4]
+                area.notes = row[5]
+                area.save()
                 # if not area:
                 #     print(row[1], " - ", row[-1])
                 #     block = Blocks.objects.get(name=row[-1].strip())
