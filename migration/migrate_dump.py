@@ -236,13 +236,13 @@ class MigrateDump():
                     # area.notes = row[5]
                     # area.save()
                 # print(row)
-            except ObjectDoesNotExist:
-                blocks = Blocks.objects.filter(name="BB"+row[-1].strip())
-                print(blocks)
-                if blocks:
-                    area = Areas.objects.get(name=row[1])
-                    area.block = blocks[0]
-                    area.save()
+            # except ObjectDoesNotExist:
+            #     blocks = Blocks.objects.filter(name="BB"+row[-1].strip())
+            #     print(blocks)
+            #     if blocks:
+            #         area = Areas.objects.get(name=row[1])
+            #         area.block = blocks[0]
+            #         area.save()
             except Exception as e:
                 print(e,row[1], row[-1])
         # for row in rows2:
