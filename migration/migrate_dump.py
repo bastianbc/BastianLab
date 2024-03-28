@@ -422,7 +422,7 @@ class MigrateDump():
         rows3 = MigrateDump().cursor(sql3)
         for row in rows2:
             try:
-                SampleLib.objects.get(name=row[1])
+                SampleLib.objects.get(name=row[1].strip())
             except Exception as e:
                 print(row[1])
 
