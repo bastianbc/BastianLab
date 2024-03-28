@@ -253,6 +253,7 @@ class MigrateDump():
         #     except Exception as e:
         #         print(e,row[1], row[-1])
         for row in rows2:
+            Blocks.objects.create(name="ZS10-3560A4")
             try:
                 if row[0] != None:
                     area = Areas.objects.filter(name=row[1])
