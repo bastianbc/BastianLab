@@ -386,7 +386,7 @@ class MigrateDump():
                 na = NucAcids.objects.get(name=row[-1])
                 link = AREA_NA_LINK.objects.get_or_create(area=area, nucacid=na)
             except Exception as e:
-                print(e)
+                print(e,row[1],row[-1])
 
 if __name__ == "__main__":
     # m = MigrateDump.register_areas()
