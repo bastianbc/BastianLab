@@ -280,7 +280,7 @@ class MigrateDump():
 
                 # print(row)
             except Exception as e:
-                print(e,row[1], row[-1])
+                print(e, row[-1])
 
     @staticmethod
     def get_na_type(value):
