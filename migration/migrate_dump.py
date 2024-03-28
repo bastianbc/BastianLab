@@ -239,7 +239,10 @@ class MigrateDump():
             except ObjectDoesNotExist:
                 blocks = Blocks.objects.filter(name="BB"+row[-1].strip())
                 print(blocks)
-                area, _ = Areas.objects.get_or_create(name=row[1], block=block)
+                if blocks:
+                    area = Areas.objects.get(name=row[1])
+                    area.block = blocks[0]
+                    area.save()
             except Exception as e:
                 print(e,row[1], row[-1])
         # for row in rows2:
