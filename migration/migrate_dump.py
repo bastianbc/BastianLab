@@ -49,6 +49,13 @@ class MigrateDump():
     database_host = "localhost"
     database_port = "5432"
 
+    @staticmethod
+    def get_or_none(model_class, **kwargs):
+        try:
+            return model_class.objects.get(**kwargs)
+        except Exception as e:
+            return None
+
     @classmethod
     def connection(cls):
         """Create a database connection to a PostgreSQL database"""
@@ -272,10 +279,13 @@ class MigrateDump():
                                 area.save()
                         else:
                             # print("iii")
-                            block = Blocks.objects.get(name=row[-1])
-                            area = Areas.objects.get(name=row[1])
-                            area.block = block
-                            area.save()
+                            block = MigrateDump.get_or_none(Blocks, name=row[-1])
+                            if not block:
+                                block = MigrateDump.get_or_none(Blocks, name="BB"+row[-1])
+                            if block:
+                                area = Areas.objects.get(name=row[1])
+                                area.block = block
+                                area.save()
                         # area, _ = Areas.objects.get_or_create(name=row[1],block=block)
 
                 # print(row)
