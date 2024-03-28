@@ -265,13 +265,13 @@ class MigrateDump():
                     else:
                         if "," in row[-1]:
                             for i in row[-1].split(","):
-                                print("%%%",i)
+                                # print("%%%",i)
                                 block = Blocks.objects.get(name=i)
                                 area = Areas.objects.get(name=row[1])
                                 area.block=block
                                 area.save()
                         else:
-                            print("iii")
+                            # print("iii")
                             block = Blocks.objects.get(name=i)
                             area = Areas.objects.get(name=row[1])
                             area.block = block
@@ -280,7 +280,7 @@ class MigrateDump():
 
                 # print(row)
             except Exception as e:
-                print(e)
+                print(e,row[1], row[-1])
 
     @staticmethod
     def get_na_type(value):
