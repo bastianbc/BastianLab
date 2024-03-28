@@ -422,9 +422,20 @@ class MigrateDump():
         rows3 = MigrateDump().cursor(sql3)
         for row in rows2:
             try:
-                SampleLib.objects.get(name=row[1].strip())
+                sl = SampleLib.objects.get(name=row[1].strip())
+                sl.date = row[2]
+                sl.qubit = row[3]
+                sl.shear_volume = row[4]
+                sl.qpcr_conc = row[5]
+                sl.pcr_cycles = row[6]
+                sl.amount_in = row[7]
+                sl.amount_final = row[8]
+                sl.vol_init = row[9]
+                sl.vol_remain = row[10]
+                sl.notes = row[1]
+                sl.save()
             except Exception as e:
-                print(row[1])
+                print(e, row[1])
 
 if __name__ == "__main__":
     # m = MigrateDump.register_areas()
