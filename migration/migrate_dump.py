@@ -265,11 +265,18 @@ class MigrateDump():
                     else:
                         if "," in row[-1]:
                             for i in row[-1].split(","):
-                                print(i)
+                                print("%%%",i)
                                 block = Blocks.objects.get(name=i)
+                                area = Areas.objects.get(name=row[1])
+                                area.block=block
+                                area.save()
                         else:
-                            block = Blocks.objects.get(name=row[-1].strip())
-                        area, _ = Areas.objects.get_or_create(name=row[1],block=block)
+                            print("iii")
+                            block = Blocks.objects.get(name=i)
+                            area = Areas.objects.get(name=row[1])
+                            area.block = block
+                            area.save()
+                        # area, _ = Areas.objects.get_or_create(name=row[1],block=block)
 
                 # print(row)
             except Exception as e:
