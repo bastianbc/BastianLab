@@ -423,15 +423,16 @@ class MigrateDump():
         for row in rows2:
             try:
                 sl = SampleLib.objects.get(name=row[1].strip())
-                sl.date = row[2]
-                sl.qubit = row[3]
-                sl.shear_volume = row[4]
-                sl.qpcr_conc = row[5]
-                sl.pcr_cycles = row[6]
-                sl.amount_in = row[7]
-                sl.amount_final = row[8]
-                sl.vol_init = row[9]
-                sl.vol_remain = row[10]
+                if row[2]:
+                    sl.date = row[2]
+                sl.qubit = row[3] or 0
+                sl.shear_volume = row[4] or 0
+                sl.qpcr_conc = row[5] or 0
+                sl.pcr_cycles = row[6] or 0
+                sl.amount_in = row[7] or 0
+                sl.amount_final = row[8] or 0
+                sl.vol_init = row[9] or 0
+                sl.vol_remain = row[10] or 0
                 sl.notes = row[1]
                 sl.save()
             except Exception as e:
