@@ -254,55 +254,51 @@ class MigrateDump():
         #         print(e,row[1], row[-1])
         for row in rows2:
             try:
-                if row[0] != None:
-                    area = Areas.objects.filter(name=row[1])
-                    if not area:
-                        print(row[1], " - ", row[-1])
-                        block = Blocks.objects.get(name=row[-1].strip())
-                        # if "," in row[-1]:
-                        #     for i in row[-1].split(","):
-                        #         print(i)
-                        #         block = Blocks.objects.get(name=i)
-                        area, _ = Areas.objects.get_or_create(name=row[1],block=block)
-                        if row[2] != None:
-                            area.area_type = MigrateDump.get_area_type(row[2])
-                        area.image = row[4]
-                        area.notes = row[5]
-                        if row[2] != None:
-                            area.area_type = MigrateDump.get_area_type(row[2])
-                        area.image = row[4]
-                        area.notes = row[5]
-                        area.save()
-                    else:
-                        if "," in row[-1]:
-                            for i in row[-1].split(","):
-                                # print("%%%",i)
-                                block = Blocks.objects.get(name=i)
-                                area = Areas.objects.get(name=row[1])
-                                area.block=block
-                                if row[2] != None:
-                                    area.area_type = MigrateDump.get_area_type(row[2])
-                                area.image = row[4]
-                                area.notes = row[5]
-                                area.save()
-                        else:
-                            # print("iii")
-                            block = MigrateDump.get_or_none(Blocks, name=row[-1])
-                            if not block:
-                                block = MigrateDump.get_or_none(Blocks, name="BB"+row[-1])
-                            if block:
-                                area = Areas.objects.get(name=row[1])
-                                area.block = block
-                                if row[2] != None:
-                                    area.area_type = MigrateDump.get_area_type(row[2])
-                                area.image = row[4]
-                                area.notes = row[5]
-                                area.save()
-                        # area, _ = Areas.objects.get_or_create(name=row[1],block=block)
-
-                # print(row)
+                area = Areas.objects.get(name=row[1])
+                # if not area:
+                #     print(row[1], " - ", row[-1])
+                #     block = Blocks.objects.get(name=row[-1].strip())
+                #     # if "," in row[-1]:
+                #     #     for i in row[-1].split(","):
+                #     #         print(i)
+                #     #         block = Blocks.objects.get(name=i)
+                #     area, _ = Areas.objects.get_or_create(name=row[1],block=block)
+                #     if row[2] != None:
+                #         area.area_type = MigrateDump.get_area_type(row[2])
+                #     area.image = row[4]
+                #     area.notes = row[5]
+                #     if row[2] != None:
+                #         area.area_type = MigrateDump.get_area_type(row[2])
+                #     area.image = row[4]
+                #     area.notes = row[5]
+                #     area.save()
+                # else:
+                #     if "," in row[-1]:
+                #         for i in row[-1].split(","):
+                #             # print("%%%",i)
+                #             block = Blocks.objects.get(name=i)
+                #             area = Areas.objects.get(name=row[1])
+                #             area.block=block
+                #             if row[2] != None:
+                #                 area.area_type = MigrateDump.get_area_type(row[2])
+                #             area.image = row[4]
+                #             area.notes = row[5]
+                #             area.save()
+                #     else:
+                #         # print("iii")
+                #         block = MigrateDump.get_or_none(Blocks, name=row[-1])
+                #         if not block:
+                #             block = MigrateDump.get_or_none(Blocks, name="BB"+row[-1])
+                #         if block:
+                #             area = Areas.objects.get(name=row[1])
+                #             area.block = block
+                #             if row[2] != None:
+                #                 area.area_type = MigrateDump.get_area_type(row[2])
+                #             area.image = row[4]
+                #             area.notes = row[5]
+                #             area.save()
             except Exception as e:
-                print(e, row[-1])
+                print("{} area:{}, block{}".format(e, row[1], row[-1]))
 
     @staticmethod
     def get_na_type(value):
