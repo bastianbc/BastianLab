@@ -398,9 +398,11 @@ class MigrateDump():
             file = SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl).first()
             barcode = re.search("^[ATGC-]+$", file.name)
             q = Q(Q(i5=barcode) | Q(i7=barcode))
-            Barcode.objects.get(q)
+            barcode = Barcode.objects.get(q)
+            print(barcode)
         except:
-            print(f"Barcode not found for {sl.name}")
+            # print(f"Barcode not found for {sl.name}")
+            pass
 
     @staticmethod
     def register_samplelib():
