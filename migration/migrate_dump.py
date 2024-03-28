@@ -220,7 +220,7 @@ class MigrateDump():
         RIGHT JOIN blocks b on l.block = b.bl_id
         '''
         sql2 = '''SELECT * FROM AREAS '''
-        rows = MigrateDump().cursor(sql)
+        rows = MigrateDump().cursor(sql2)
         # rows2 = MigrateDump().cursor(sql2)
         for row in rows:
             try:
