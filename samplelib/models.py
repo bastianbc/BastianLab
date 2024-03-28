@@ -48,9 +48,10 @@ class SampleLib(models.Model):
 
             return SampleLib.objects.all().annotate(
                 num_nucacids=Count('na_sl_links',distinct=True),
+                num_files=Count('sequencing_file_sets__sequencing_files',distinct=True),
                 num_blocks=Count('na_sl_links', distinct=True),
                 num_capturedlibs=Count('sl_cl_links', distinct=True),
-                area_num=Count("na_sl_links__nucacid__area_na_links__area", distinct=True)
+                area_num=Count("na_sl_links__nucacid__area_na_links__area", distinct=True),
             )
 
         def _parse_value(search_value):
@@ -66,13 +67,14 @@ class SampleLib(models.Model):
                 "0": "id",
                 "1": "name",
                 "2": "barcode",
-                "4": "date",
-                "5": "method",
-                "6": "conc",
-                "7": "pcr_cycles",
-                "8": "amount_in",
-                "9": "amount_final",
-                "10": "vol_init",
+                "3": "date",
+                "4": "num_files",
+                "5": "qpcr_conc",
+                "6": "vol_init",
+                "7": "amount_final",
+                "8": "pcr_cycles",
+                "9": "qubit",
+                "10": "amount_in",
                 "11": "vol_remain",
             }
             draw = int(kwargs.get('draw', None)[0])

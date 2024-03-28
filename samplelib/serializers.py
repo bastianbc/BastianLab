@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import *
 from libprep.serializers import AreaLinksSerializer, NucacidsSerializer
 from libprep.models import NucAcids
+from sequencingfile.models import SequencingFileSet
 
 class NaSlLinkSerializer(serializers.ModelSerializer):
     area_na_link = serializers.SerializerMethodField()
@@ -28,15 +29,18 @@ class SampleLibSerializer(serializers.ModelSerializer):
     amount_in = serializers.SerializerMethodField()
     amount_final = serializers.SerializerMethodField()
     num_nucacids = serializers.IntegerField()
+    num_files = serializers.IntegerField()
     barcode = serializers.StringRelatedField()
     area_id = serializers.SerializerMethodField()
     area_num = serializers.IntegerField()
     num_blocks = serializers.IntegerField()
     num_capturedlibs = serializers.IntegerField()
+    set_id = serializers.SerializerMethodField()
+
 
     class Meta:
         model = SampleLib
-        fields = ("id", "name", "barcode", "area_id",
+        fields = ("id", "name", "barcode", "area_id", "num_files", "set_id",
                   "area_num","date", "method", "method_label",
                   "amount_final", "qpcr_conc", "amount_in", "vol_init",
                   "vol_remain", "pcr_cycles", "qubit", "num_blocks",
@@ -67,6 +71,12 @@ class SampleLibSerializer(serializers.ModelSerializer):
 
     def get_method_label(self,obj):
         return obj.method.name if obj.method else None
+
+    def get_set_id(self, obj):
+        file_set = SequencingFileSet.objects.filter(sample_lib=obj).values("set_id").first()
+        if file_set:
+            return file_set
+        return None
 
 class UsedNuacidsSerializer(serializers.ModelSerializer):
     sample_lib_id = serializers.SerializerMethodField()

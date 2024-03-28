@@ -68,11 +68,7 @@ var KTDatatablesServerSide = function () {
                     return moment(data).format('MM/DD/YYYY');
                   }
                 },
-                { data: 'method',
-                  render: function (val, type, row) {
-                    return row["method_label"];
-                  }
-                },
+                { data: 'num_files' },
                 { data: 'qpcr_conc' },
                 { data: 'vol_init' },
                 { data: 'amount_final' },
@@ -104,6 +100,19 @@ var KTDatatablesServerSide = function () {
                           let sl_id = row["id"];
                           return `
                               <a href="/areas?model=sample_lib&id=${sl_id}&initial=true">${data}</a>`;
+                        }
+                        return data;
+                    }
+                },
+                {
+                    targets: 4,
+                    orderable: true,
+                    render: function (data, type, row) {
+                        if (data > 0) {
+                          let set_id = row["set_id"]["set_id"];
+                          console.log(set_id);
+                          return `
+                              <a href="/sequencingfile?initial=${set_id}">${data}</a>`;
                         }
                         return data;
                     }
