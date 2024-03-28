@@ -396,6 +396,7 @@ class MigrateDump():
     def get_barcode(sl):
         try:
             file = SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl).first()
+            print(file)
             barcode = re.search("^[ATGC-]+$", file.name)
             q = Q(Q(i5=barcode) | Q(i7=barcode))
             barcode = Barcode.objects.filter(q)
