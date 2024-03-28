@@ -228,7 +228,8 @@ class MigrateDump():
                     block = Blocks.objects.get(name=row[-1].strip())
                     # print(block)
                     # Areas.objects.get(name=row[1])
-                    area, _ = Areas.objects.get_or_create(name=row[1], block=block)
+                    if block:
+                        area, _ = Areas.objects.get_or_create(name=row[1], block=block)
                     # area.block = block
                     # if row[2] != None:
                     #     area.area_type = MigrateDump.get_area_type(row[2])
@@ -236,13 +237,12 @@ class MigrateDump():
                     # area.notes = row[5]
                     # area.save()
                 # print(row)
-            # except ObjectDoesNotExist:
-            #     blocks = Blocks.objects.filter(name="BB"+row[-1].strip())
-            #     print(blocks)
-            #     if blocks:
-            #         area = Areas.objects.get(name=row[1])
-            #         area.block = blocks[0]
-            #         area.save()
+            except ObjectDoesNotExist:
+                print(row[-1])
+                block = Blocks.objects.get(name="BB"+row[-1].strip())
+                area = Areas.objects.get(name=row[1])
+                area.block = block
+                area.save()
             except Exception as e:
                 print(e,row[1], row[-1])
         # for row in rows2:
