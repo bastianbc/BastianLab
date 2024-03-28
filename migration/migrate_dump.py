@@ -238,10 +238,10 @@ class MigrateDump():
         #             if block:
         #                 area, _ = Areas.objects.get_or_create(name=row[1], block=block)
         #             # area.block = block
-        #             # if row[2] != None:
-        #             #     area.area_type = MigrateDump.get_area_type(row[2])
-        #             # area.image = row[4]
-        #             # area.notes = row[5]
+        #             if row[2] != None:
+        #                 area.area_type = MigrateDump.get_area_type(row[2])
+        #             area.image = row[4]
+        #             area.notes = row[5]
         #             # area.save()
         #         # print(row)
         #     except ObjectDoesNotExist:
@@ -253,7 +253,6 @@ class MigrateDump():
         #     except Exception as e:
         #         print(e,row[1], row[-1])
         for row in rows2:
-            Blocks.objects.create(name="ZS10-3560A4")
             try:
                 if row[0] != None:
                     area = Areas.objects.filter(name=row[1])
@@ -269,6 +268,10 @@ class MigrateDump():
                             area.area_type = MigrateDump.get_area_type(row[2])
                         area.image = row[4]
                         area.notes = row[5]
+                        if row[2] != None:
+                            area.area_type = MigrateDump.get_area_type(row[2])
+                        area.image = row[4]
+                        area.notes = row[5]
                         area.save()
                     else:
                         if "," in row[-1]:
@@ -277,6 +280,10 @@ class MigrateDump():
                                 block = Blocks.objects.get(name=i)
                                 area = Areas.objects.get(name=row[1])
                                 area.block=block
+                                if row[2] != None:
+                                    area.area_type = MigrateDump.get_area_type(row[2])
+                                area.image = row[4]
+                                area.notes = row[5]
                                 area.save()
                         else:
                             # print("iii")
@@ -286,6 +293,10 @@ class MigrateDump():
                             if block:
                                 area = Areas.objects.get(name=row[1])
                                 area.block = block
+                                if row[2] != None:
+                                    area.area_type = MigrateDump.get_area_type(row[2])
+                                area.image = row[4]
+                                area.notes = row[5]
                                 area.save()
                         # area, _ = Areas.objects.get_or_create(name=row[1],block=block)
 
