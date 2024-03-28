@@ -323,53 +323,70 @@ class MigrateDump():
         sql2 = '''
             SELECT * FROM nuc_acids
         '''
+        sql3 = '''
+            SELECT nl.id,
+            a.name as area, 
+            n.name as nuc_acid FROM area_na_link nl
+            LEFT JOIN nuc_acids n on n.nu_id = nl.nucacid_id
+            LEFT JOIN areas a on a.ar_id = nl.area_id
+            WHERE nucacid_id is not NULL AND
+            area_id is not NULL
+        '''
         rows = MigrateDump().cursor(sql)
         rows2 = MigrateDump().cursor(sql2)
-        for row in rows:
+        rows3 = MigrateDump().cursor(sql3)
+        # for row in rows:
+        #     try:
+        #         # print(row)
+        #         if row[-1] != None:
+        #             area = Areas.objects.get(name=row[-1])
+        #         if row[3] != None:
+        #             na_type = MigrateDump.get_na_type(row[3])
+        #             nuc_acid, _ = NucAcids.objects.get_or_create(name=row[1],na_type=na_type)
+        #         else:
+        #             nuc_acid, _ = NucAcids.objects.get_or_create(name=row[1])
+        #         link = AREA_NA_LINK.objects.get_or_create(
+        #             nucacid=nuc_acid,
+        #             area=area
+        #         )
+        #         if row[2] != None:
+        #             nuc_acid.date = row[2]
+        #         if row[4] != None:
+        #             nuc_acid.conc = row[4]
+        #         if row[5] != None:
+        #             nuc_acid.vol_init = row[5]
+        #         if row[6] != None:
+        #             nuc_acid.vol_remain = row[6]
+        #         nuc_acid.notes = row[7]
+        #         nuc_acid.save()
+        #     except Exception as e:
+        #         print(e, row[1], row[-1])
+        # for row in rows2:
+        #     try:
+        #         if row[3] != None:
+        #             na_type = MigrateDump.get_na_type(row[3])
+        #             nuc_acid, _ = NucAcids.objects.get_or_create(name=row[1],na_type=na_type)
+        #         else:
+        #             nuc_acid, _ = NucAcids.objects.get_or_create(name=row[1])
+        #         if row[2] != None:
+        #             nuc_acid.date = row[2]
+        #         if row[4] != None:
+        #             nuc_acid.conc = row[4]
+        #         if row[5] != None:
+        #             nuc_acid.vol_init = row[5]
+        #         if row[6] != None:
+        #             nuc_acid.vol_remain = row[6]
+        #         nuc_acid.notes = row[7]
+        #         nuc_acid.save()
+        #     except Exception as e:
+        #         print(e, row[1])
+        for row in rows3:
             try:
-                # print(row)
-                if row[-1] != None:
-                    area = Areas.objects.get(name=row[-1])
-                if row[3] != None:
-                    na_type = MigrateDump.get_na_type(row[3])
-                    nuc_acid, _ = NucAcids.objects.get_or_create(name=row[1],na_type=na_type)
-                else:
-                    nuc_acid, _ = NucAcids.objects.get_or_create(name=row[1])
-                link = AREA_NA_LINK.objects.get_or_create(
-                    nucacid=nuc_acid,
-                    area=area
-                )
-                if row[2] != None:
-                    nuc_acid.date = row[2]
-                if row[4] != None:
-                    nuc_acid.conc = row[4]
-                if row[5] != None:
-                    nuc_acid.vol_init = row[5]
-                if row[6] != None:
-                    nuc_acid.vol_remain = row[6]
-                nuc_acid.notes = row[7]
-                nuc_acid.save()
+                area = Areas.objects.get(name=row[1])
+                na = NucAcids.objects.get(name=row[-1])
+                link = AREA_NA_LINK.objects.get_or_create(area=area, nucacid=na)
             except Exception as e:
-                print(e, row[1], row[-1])
-        for row in rows2:
-            try:
-                if row[3] != None:
-                    na_type = MigrateDump.get_na_type(row[3])
-                    nuc_acid, _ = NucAcids.objects.get_or_create(name=row[1],na_type=na_type)
-                else:
-                    nuc_acid, _ = NucAcids.objects.get_or_create(name=row[1])
-                if row[2] != None:
-                    nuc_acid.date = row[2]
-                if row[4] != None:
-                    nuc_acid.conc = row[4]
-                if row[5] != None:
-                    nuc_acid.vol_init = row[5]
-                if row[6] != None:
-                    nuc_acid.vol_remain = row[6]
-                nuc_acid.notes = row[7]
-                nuc_acid.save()
-            except Exception as e:
-                print(e, row[1])
+                print(e)
 
 if __name__ == "__main__":
     # m = MigrateDump.register_areas()
