@@ -324,7 +324,7 @@ class MigrateDump():
             SELECT * FROM nuc_acids
         '''
         sql3 = '''
-            SELECT nl.id,
+            SELECT nl.* ,
             a.name as area, 
             n.name as nuc_acid FROM area_na_link nl
             LEFT JOIN nuc_acids n on n.nu_id = nl.nucacid_id
@@ -382,7 +382,10 @@ class MigrateDump():
         #         print(e, row[1])
         for row in rows3:
             try:
-                area = Areas.objects.get(name=row[1])
+                if row[-2]:
+                    area = Areas.objects.get(name=row[-2])
+                else:
+                    area = Areas.objects.get(name=row[-4])
                 na = NucAcids.objects.get(name=row[-1])
                 link = AREA_NA_LINK.objects.get_or_create(area=area, nucacid=na)
             except Exception as e:
