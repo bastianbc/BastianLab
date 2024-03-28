@@ -315,10 +315,9 @@ class MigrateDump():
     @staticmethod
     def register_nuc_acids():
         sql = '''
-            SELECT n.*, nl.*, a.name
-            FROM nuc_acids n
-            LEFT JOIN area_na_link nl on n.nu_id = nl.nucacid_id
-            LEFT JOIN areas a on a.ar_id = nl.area_id
+            SELECT n.*, nl.*, a.name FROM AREAS a
+            LEFT JOIN area_na_link nl on nl.area_id = a.ar_id
+            LEFT JOIN nuc_acids n on n.nu_id = nl.nucacid_id
             order by n.name
         '''
         # sql = '''
@@ -353,7 +352,7 @@ class MigrateDump():
                 print(e, row[-1])
 
 if __name__ == "__main__":
-    m = MigrateDump.register_areas()
-    # m = MigrateDump.register_nuc_acids()
+    # m = MigrateDump.register_areas()
+    m = MigrateDump.register_nuc_acids()
     print("===FIN===")
     # res = m.cursor("SELECT * FROM patients")
