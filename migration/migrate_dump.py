@@ -392,8 +392,38 @@ class MigrateDump():
             except Exception as e:
                 print(e,row[1],row[-1])
 
+    @staticmethod
+    def register_samplelib():
+        sql = '''
+                    SELECT n.*, nl.*, a.name FROM AREAS a
+                    LEFT JOIN area_na_link nl on nl.area_id = a.ar_id
+                    LEFT JOIN nuc_acids n on n.nu_id = nl.nucacid_id
+                    order by n.name
+                '''
+        sql2 = '''
+                    SELECT * FROM sample_lib
+                '''
+        sql3 = '''
+                    SELECT nl.* ,
+                    a.name as area, 
+                    n.name as nuc_acid FROM area_na_link nl
+                    LEFT JOIN nuc_acids n on n.nu_id = nl.nucacid_id
+                    LEFT JOIN areas a on a.ar_id = nl.area_id
+                    WHERE nucacid_id is not NULL AND
+                    area_id is not NULL
+                '''
+        rows = MigrateDump().cursor(sql)
+        rows2 = MigrateDump().cursor(sql2)
+        rows3 = MigrateDump().cursor(sql3)
+        for row in rows2:
+            try:
+                SampleLib.objects.get(name=row[1])
+            except Exception as e:
+                print(e, row[1])
+
 if __name__ == "__main__":
     # m = MigrateDump.register_areas()
-    m = MigrateDump.register_nuc_acids()
+    # m = MigrateDump.register_nuc_acids()
+    m = MigrateDump.register_samplelib()
     print("===FIN===")
     # res = m.cursor("SELECT * FROM patients")
