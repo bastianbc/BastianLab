@@ -395,6 +395,10 @@ class MigrateDump():
     @staticmethod
     def register_samplelib():
         print(SampleLib.objects.filter(name__startswith="T12-"))
+        for sl in SampleLib.objects.filter(name__startswith="T12-"):
+            name = sl.name
+            sl.name = name.replace("-","_")
+            sl.save()
         sql = '''
                     SELECT n.*, nl.*, a.name FROM AREAS a
                     LEFT JOIN area_na_link nl on nl.area_id = a.ar_id
