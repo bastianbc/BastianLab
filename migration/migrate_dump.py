@@ -396,13 +396,12 @@ class MigrateDump():
     def get_barcode(sl):
         try:
             file = SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl).first()
-            print(file)
-            barcode = re.search(r'[ATGC]{5,}', file.name)
-            barcode = barcode.group(1)
-            print(barcode)
-            q = Q(Q(i5=barcode) | Q(i7=barcode))
-            barcode = Barcode.objects.filter(q)
-            print(barcode)
+            if file:
+                barcode = set(re.findall(r'[ATGC]{5,}', file.name))[0]
+                print(barcode)
+                q = Q(Q(i5=barcode) | Q(i7=barcode))
+                barcode = Barcode.objects.filter(q)
+                print(barcode)
         except:
             # print(f"Barcode not found for {sl.name}")
             pass
@@ -432,10 +431,16 @@ class MigrateDump():
         rows = MigrateDump().cursor(sql)
         rows2 = MigrateDump().cursor(sql2)
         rows3 = MigrateDump().cursor(sql3)
+
+
         for row in rows2:
             try:
+                files = SequencingFile.objects.filter(name__iregex=r'[ATGC]{5,}')
+                for file in files:
+                    print()
+
                 sl = SampleLib.objects.get(name=row[1].strip())
-                MigrateDump.get_barcode(sl)
+                # MigrateDump.get_barcode(sl)
                 # if row[2]:
                 #     sl.date = row[2]
                 # sl.qubit = row[3] or 0
