@@ -435,12 +435,8 @@ class MigrateDump():
 
         for row in rows2:
             try:
-                files = SequencingFile.objects.filter(name__iregex=r'[ATGC]{5,}')
-                for file in files:
-                    print()
-
                 sl = SampleLib.objects.get(name=row[1].strip())
-                # MigrateDump.get_barcode(sl)
+                MigrateDump.get_barcode(sl)
                 # if row[2]:
                 #     sl.date = row[2]
                 # sl.qubit = row[3] or 0
