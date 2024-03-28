@@ -419,7 +419,7 @@ class MigrateDump():
             try:
                 SampleLib.objects.get(name=row[1])
             except Exception as e:
-                print(e, row[1])
+                print(row[1])
 
 if __name__ == "__main__":
     # m = MigrateDump.register_areas()
