@@ -225,10 +225,10 @@ class MigrateDump():
         for row in rows:
             try:
                 if row[0] != None:
-                    # block = Blocks.objects.get(name=row[-2].strip())
+                    block = Blocks.objects.get(name=row[-1].strip())
                     # print(block)
-                    Areas.objects.get(name=row[1])
-                    # area, _ = Areas.objects.get_or_create(name=row[1], block=block)
+                    # Areas.objects.get(name=row[1])
+                    area, _ = Areas.objects.get_or_create(name=row[1], block=block)
                     # area.block = block
                     # if row[2] != None:
                     #     area.area_type = MigrateDump.get_area_type(row[2])
