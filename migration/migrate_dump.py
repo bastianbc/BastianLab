@@ -272,7 +272,7 @@ class MigrateDump():
                                 area.save()
                         else:
                             # print("iii")
-                            block = Blocks.objects.get(name=i)
+                            block = Blocks.objects.get(name=row[-1])
                             area = Areas.objects.get(name=row[1])
                             area.block = block
                             area.save()
