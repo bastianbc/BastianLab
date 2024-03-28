@@ -225,7 +225,7 @@ class MigrateDump():
         for row in rows:
             try:
                 if row[0] != None:
-                    block = Blocks.objects.get(name=row[-2].strip())
+                    block = Blocks.objects.get(name=row[-1].strip())
                     # print(block)
                     # Areas.objects.get(name=row[1])
                     area, _ = Areas.objects.get_or_create(name=row[1], block=block)
