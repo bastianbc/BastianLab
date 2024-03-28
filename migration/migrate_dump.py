@@ -409,34 +409,41 @@ class MigrateDump():
                     SELECT * FROM sample_lib
                 '''
         sql3 = '''
-                    SELECT nl.* ,
-                    a.name as area, 
-                    n.name as nuc_acid FROM area_na_link nl
-                    LEFT JOIN nuc_acids n on n.nu_id = nl.nucacid_id
-                    LEFT JOIN areas a on a.ar_id = nl.area_id
-                    WHERE nucacid_id is not NULL AND
-                    area_id is not NULL
+                    SELECT l.*, n.name as nucacid, s.name as samplelib, s.na_name
+                    FROM na_sl_link l
+                    LEFT JOIN sample_lib s on l.sample_lib_id = s.id
+                    LEFT JOIN nuc_acids n on n.nu_id = l.nucacid_id
                 '''
         rows = MigrateDump().cursor(sql)
         rows2 = MigrateDump().cursor(sql2)
         rows3 = MigrateDump().cursor(sql3)
-        for row in rows2:
+        # for row in rows2:
+        #     try:
+        #         sl = SampleLib.objects.get(name=row[1].strip())
+        #         if row[2]:
+        #             sl.date = row[2]
+        #         sl.qubit = row[3] or 0
+        #         sl.shear_volume = row[4] or 0
+        #         sl.qpcr_conc = row[5] or 0
+        #         sl.pcr_cycles = row[6] or 0
+        #         sl.amount_in = row[7] or 0
+        #         sl.amount_final = row[8] or 0
+        #         sl.vol_init = row[9] or 0
+        #         sl.vol_remain = row[10] or 0
+        #         sl.notes = row[1]
+        #         sl.save()
+        #     except Exception as e:
+        #         print(e, row[1])
+        for row in rows3:
             try:
-                sl = SampleLib.objects.get(name=row[1].strip())
-                if row[2]:
-                    sl.date = row[2]
-                sl.qubit = row[3] or 0
-                sl.shear_volume = row[4] or 0
-                sl.qpcr_conc = row[5] or 0
-                sl.pcr_cycles = row[6] or 0
-                sl.amount_in = row[7] or 0
-                sl.amount_final = row[8] or 0
-                sl.vol_init = row[9] or 0
-                sl.vol_remain = row[10] or 0
-                sl.notes = row[1]
-                sl.save()
+                sl = SampleLib.objects.get(name=row[-2])
+                na = NucAcids.objects.get(name=row[-3])
+                link, _ = NA_SL_LINK.objects.get_or_create(sample_lib=sl, nucacid=na)
+                link.input_vol = row[1] or 0
+                link.input_amount = row[2] or 0
+                link.save()
             except Exception as e:
-                print(e, row[1])
+                print(e)
 
 if __name__ == "__main__":
     # m = MigrateDump.register_areas()
