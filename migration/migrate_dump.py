@@ -395,24 +395,21 @@ class MigrateDump():
     @staticmethod
     def get_barcode(sl):
         try:
-            file = SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl).first()
-
-            barcode = set(re.findall(r'[ATGC]{5,}', file.name))[0]
-            print(barcode)
-            q = Q(Q(i5=barcode) | Q(i7=barcode))
-            barcode = Barcode.objects.filter(q)
-            print(barcode)
+            files = SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl)
+            for file in files:
+                # print(file.name)
+                barcode = list(set(re.findall(r'[ATGC]{5,}', file.name)))[0]
+                q = Q(Q(i5=barcode) | Q(i7=barcode))
+                if barcode:
+                    _barcode = Barcode.objects.filter(q)
+                    if _barcode:
+                        return _barcode[0]
+            return None
         except:
-            # print(f"Barcode not found for {sl.name}")
-            pass
+            print(f"Barcode not found for {sl.name}")
 
     @staticmethod
     def register_samplelib():
-        # print(SampleLib.objects.filter(name__startswith="T12-"))
-        # for sl in SampleLib.objects.filter(name__startswith="T12-"):
-        #     name = sl.name
-        #     sl.name = name.replace("-","_")
-        #     sl.save()
         sql = '''
                     SELECT n.*, nl.*, a.name FROM AREAS a
                     LEFT JOIN area_na_link nl on nl.area_id = a.ar_id
@@ -423,20 +420,19 @@ class MigrateDump():
                     SELECT * FROM sample_lib
                 '''
         sql3 = '''
-                    SELECT l.*, n.name as nucacid, s.name as samplelib, s.na_name
-                    FROM na_sl_link l
-                    LEFT JOIN sample_lib s on l.sample_lib_id = s.id
-                    LEFT JOIN nuc_acids n on n.nu_id = l.nucacid_id
-                '''
+            SELECT l.*, n.name as nucacid, s.name as samplelib, s.na_name
+            FROM na_sl_link l
+            LEFT JOIN sample_lib s on l.sample_lib_id = s.id
+            LEFT JOIN nuc_acids n on n.nu_id = l.nucacid_id
+        '''
         rows = MigrateDump().cursor(sql)
         rows2 = MigrateDump().cursor(sql2)
         rows3 = MigrateDump().cursor(sql3)
-
-
         for row in rows2:
             try:
                 sl = SampleLib.objects.get(name=row[1].strip())
-                MigrateDump.get_barcode(sl)
+                barcode = MigrateDump.get_barcode(sl)
+                sl.barcode = barcode or None
                 # if row[2]:
                 #     sl.date = row[2]
                 # sl.qubit = row[3] or 0
@@ -449,7 +445,7 @@ class MigrateDump():
                 # sl.vol_remain = row[10] or 0
                 # sl.notes = row[1]
                 #
-                # sl.save()
+                sl.save()
             except Exception as e:
                 print(e, row[1])
         # for row in rows3:
