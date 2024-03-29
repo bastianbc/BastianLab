@@ -407,7 +407,6 @@ class MigrateDump():
             return None
         except:
             print(f"Barcode not found for {sl.name}")
-            # pass
 
     @staticmethod
     def register_samplelib():
