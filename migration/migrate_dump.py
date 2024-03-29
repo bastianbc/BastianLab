@@ -417,7 +417,7 @@ class MigrateDump():
                     order by n.name
                 '''
         sql2 = '''
-                    SELECT * FROM sample_lib
+                    SELECT * FROM sample_lib order by name
                 '''
         sql3 = '''
             SELECT l.*, n.name as nucacid, s.name as samplelib, s.na_name
