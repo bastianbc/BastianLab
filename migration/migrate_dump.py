@@ -452,7 +452,7 @@ class MigrateDump():
                 #
                 sl.save()
             except Exception as e:
-                print(e, row[1])
+                print(e, row[1],row[-3])
         # for row in rows3:
         #     try:
         #         sl = SampleLib.objects.get(name=row[-2])
