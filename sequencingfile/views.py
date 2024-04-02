@@ -33,7 +33,6 @@ def filter_sequencingfiles(request):
     result['draw'] = sequencingfiles['draw']
     result['recordsTotal'] = sequencingfiles['total']
     result['recordsFiltered'] = sequencingfiles['count']
-    print(result, "&"*50)
     return JsonResponse(result)
 
 

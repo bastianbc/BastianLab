@@ -83,7 +83,7 @@ var KTDatatablesServerSide = function () {
                         if (data > 0) {
                           let set_id = row["set_id"];
                           return `
-                              <a href="/sequencingfile?initial=${set_id}">${data}</a>`;
+                              <a href="/sequencingfile?initial=true&model=sequencingfileset&id=${set_id}">${data}</a>`;
                         }
                         return data;
                     }
@@ -488,11 +488,20 @@ var KTDatatablesServerSide = function () {
       }
 
       const params = new URLSearchParams(window.location.search);
-      const x = params.get('initial');
-
+      const model = params.get('model');
+      const id = params.get('id');
+      const initial = params.get('initial');
       cleanUrl();
 
-      return x;
+      if (initial =="true" && model != null && id !=null) {
+        return JSON.stringify({
+          "model": model,
+          "id": id
+        });
+
+      }
+
+      return null;
 
     }
 
