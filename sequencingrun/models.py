@@ -24,8 +24,10 @@ class SequencingRun(models.Model):
     )
 
     PE_TYPES = (
-        ("100", "100"),
-        ("150", "150"),
+        ("PE 50", "PE 50"),
+        ("PE 100", "PE 100"),
+        ("PE 150", "PE 150"),
+        ("SE 150", "SE 150"),
     )
 
     name = models.CharField(max_length=50, unique=True, verbose_name="Name")

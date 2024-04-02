@@ -326,7 +326,6 @@ def get_or_create_seqrun(cl, name):
 
 def get_or_create_files_from_file(row):
     prefix = next(iter(row['fastq_file'])).split("_L0")[0]
-    print(prefix)
     try:
         set_ = get_or_create_set(
             prefix=prefix,
