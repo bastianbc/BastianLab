@@ -109,10 +109,9 @@ var KTDatatablesServerSide = function () {
                     orderable: true,
                     render: function (data, type, row) {
                         if (data > 0) {
-                          let set_id = row["set_id"]["set_id"];
-                          console.log(set_id);
+                          let sl_id = row["id"];
                           return `
-                              <a href="/sequencingfile?initial=${set_id}">${data}</a>`;
+                              <a href="/sequencingfile?id=${sl_id}&initial=true&model=sample_lib">${data}</a>`;
                         }
                         return data;
                     }
@@ -627,7 +626,6 @@ var KTDatatablesServerSide = function () {
     }
 
     var handleSelectedRows = ((e) => {
-        console.log("1-enters");
       var container = document.querySelector('.table');
 
       var modal = new bootstrap.Modal(document.getElementById("modal_capturedlib_options"));
@@ -658,7 +656,6 @@ var KTDatatablesServerSide = function () {
       });
 
       document.getElementById("modal_capturedlib_options").addEventListener('show.bs.modal', function(e){
-        console.log("2-enters");
         if (!checkSelectedRows()) {
 
           Swal.fire({
@@ -677,7 +674,6 @@ var KTDatatablesServerSide = function () {
       });
 
       document.getElementById("add_to_captured_library").addEventListener('show.bs.modal', function(e){
-        console.log("3-enters");
         if (!checkSelectedRows()) {
 
           Swal.fire({
@@ -733,7 +729,6 @@ var KTDatatablesServerSide = function () {
       }
 
       document.getElementById("btn_add_continue").addEventListener('click', function () {
-        console.log("4-enters");
           var selectElement = document.getElementById("id_captured_lib").value;
         const modalElement = document.getElementById("add_to_captured_library"); // Replace "currentlyOpenModalID" with the ID of the modal that might be open
         // const modal_cl = new bootstrap.Modal(modalElement);

@@ -119,6 +119,7 @@ class Blocks(models.Model):
             return search_value
 
         def _is_initial_value(search_value):
+            print("search_value: ", search_value)
             '''
             When the datatables are to be filled with a certain data, the search function of datatables is used.
             The incoming parameter is parsed ve returned. If there is a initial value, the "search_value" has "_initial" prefix.

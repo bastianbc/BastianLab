@@ -1,7 +1,7 @@
 from django.db import models
 from datetime import datetime
 from django.db.models import Q, Count, OuterRef, Subquery, Value
-
+import json
 
 class SequencingFileSet(models.Model):
     set_id = models.AutoField(primary_key=True)
@@ -24,9 +24,16 @@ class SequencingFileSet(models.Model):
             return SequencingFileSet.objects.all().annotate(num_sequencing_files=Count('sequencing_files'))
 
         def _parse_value(search_value):
+            '''
+            When the datatables are to be filled with a certain data, the search function of datatables is used.
+            The incoming parameter is parsed ve returned. If there is a initial value, the "search_value" has "_initial" prefix.
+            Parameters:
+                search_value (str): A string
+            Returns:
+                search_value (str): Parsed value
+            '''
             if "_initial:" in search_value:
-                v = search_value.split("_initial:")[1]
-                return None if v == "null" or not v.isnumeric() else v
+                return json.loads(search_value.split("_initial:")[1])
             return search_value
 
         def _is_initial_value(search_value):
@@ -56,10 +63,9 @@ class SequencingFileSet(models.Model):
 
             is_initial = _is_initial_value(search_value)
             search_value = _parse_value(search_value)
-
             if is_initial:
                 queryset = queryset.filter(
-                    Q(sequencing_files__file_id=search_value)
+                    Q(sequencing_files__file_id=search_value["id"])
                 )
             elif search_value:
                 queryset = queryset.filter(
@@ -68,7 +74,6 @@ class SequencingFileSet(models.Model):
                 )
 
             count = queryset.count()
-            print(count)
             queryset = queryset.order_by(order_column)[start:start + length]
             # queryset = queryset[start:start + length]
             return {
@@ -108,9 +113,16 @@ class SequencingFile(models.Model):
             return SequencingFile.objects.all()
 
         def _parse_value(search_value):
+            '''
+            When the datatables are to be filled with a certain data, the search function of datatables is used.
+            The incoming parameter is parsed ve returned. If there is a initial value, the "search_value" has "_initial" prefix.
+            Parameters:
+                search_value (str): A string
+            Returns:
+                search_value (str): Parsed value
+            '''
             if "_initial:" in search_value:
-                v = search_value.split("_initial:")[1]
-                return None if v == "null" or not v.isnumeric() else v
+                return json.loads(search_value.split("_initial:")[1])
             return search_value
 
         def _is_initial_value(search_value):
@@ -122,7 +134,6 @@ class SequencingFile(models.Model):
                 "1": "name",
             }
             draw = int(kwargs.get('draw', None)[0])
-            print("*"*100,draw)
             length = int(kwargs.get('length', None)[0])
             start = int(kwargs.get('start', None)[0])
             search_value = kwargs.get('search[value]', None)[0]
@@ -130,21 +141,29 @@ class SequencingFile(models.Model):
             order = kwargs.get('order[0][dir]', None)[0]
 
             order_column = ORDER_COLUMN_CHOICES[order_column]
-            # django orm '-' -> desc
             if order == 'desc':
                 order_column = '-' + order_column
 
             queryset = _get_authorizated_queryset()
-
             total = queryset.count()
-
             is_initial = _is_initial_value(search_value)
             search_value = _parse_value(search_value)
 
+            print("*" * 100, is_initial)
             if is_initial:
-                queryset = queryset.filter(
-                    Q(sequencing_file_set__set_id=search_value)
-                )
+                if search_value["model"] == "sample_lib":
+                    queryset = queryset.filter(
+                        Q(sequencing_file_set__sample_lib__id=search_value["id"])
+                    )
+                elif search_value["model"] == "sequencingfileset":
+                    queryset = queryset.filter(
+                        Q(sequencing_file_set__set_id=search_value["id"])
+                    )
+                else:
+                    print("*" * 100, search_value)
+                    queryset = queryset.filter(
+                        Q(sequencing_file_set__set_id=search_value)
+                    )
             elif search_value:
                 queryset = queryset.filter(
                     Q(name__icontains=search_value) |
@@ -153,7 +172,6 @@ class SequencingFile(models.Model):
                 )
 
             count = queryset.count()
-            print(count)
             queryset = queryset.order_by(order_column)[start:start + length]
             # queryset = queryset[start:start + length]
             return {
