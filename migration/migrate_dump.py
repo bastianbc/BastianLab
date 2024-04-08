@@ -493,11 +493,12 @@ class MigrateDump():
         sample_libs_without_sl_cl_link = SampleLib.objects.filter(sl_cl_links__isnull=True).order_by('name')
 
         for sample_lib in sample_libs_without_sl_cl_link:
-            prefixes = ['21_', '26', '28_']
+            print(sample_lib.name)
+            prefixes = ['AGL14-2']
             # Check if any string in the list starts with the prefix
             if any(sample_lib.name.startswith(s) for s in prefixes):
                 print(sample_lib.name)
-                cl= CapturedLib.objects.get(name='BB5_CL')
+                cl= CapturedLib.objects.get(name='AGL_HiSeq1_CL')
                 SL_CL_LINK.objects.get_or_create(sample_lib=sample_lib,captured_lib=cl)
 
 
