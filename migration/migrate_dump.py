@@ -437,6 +437,8 @@ class MigrateDump():
                 else:
                     barcode = Barcode.objects.get(name=row[-3])
                     sl.barcode = barcode
+            except Exception as e:
+                print("error")
                 if row[2]:
                     sl.date = row[2]
                 sl.qubit = row[3] or 0
