@@ -464,16 +464,21 @@ class MigrateDump():
                 sl.save()
             except Exception as e:
                 print(e, row[1],row[-3])
-        # for row in rows3:
-        #     try:
-        #         sl = SampleLib.objects.get(name=row[-2])
-        #         na = NucAcids.objects.get(name=row[-3])
-        #         link, _ = NA_SL_LINK.objects.get_or_create(sample_lib=sl, nucacid=na)
-        #         link.input_vol = row[1] or 0
-        #         link.input_amount = row[2] or 0
-        #         link.save()
-        #     except Exception as e:
-        #         print(e)
+        for row in rows3:
+            try:
+                if "uffy" in row[-2]:
+                    sl = SampleLib.objects.get(name="Buffy_Coat")
+                elif row[-2].startswith("H12_") or row[-2].startswith("T12_"):
+                    continue
+                else:
+                    sl, _ = SampleLib.objects.get_or_create(name=row[-2].strip())
+                na = NucAcids.objects.get(name=row[-3])
+                link, _ = NA_SL_LINK.objects.get_or_create(sample_lib=sl, nucacid=na)
+                link.input_vol = row[1] or 0
+                link.input_amount = row[2] or 0
+                link.save()
+            except Exception as e:
+                print(e)
 
 if __name__ == "__main__":
     # m = MigrateDump.register_areas()
