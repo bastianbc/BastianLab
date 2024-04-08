@@ -442,7 +442,12 @@ class MigrateDump():
             #     print("error")
 
             try:
-                sl = SampleLib.objects.get(name=row[1].strip())
+                if "uffy" in row[1]:
+                    sl = SampleLib.objects.create(name="Buffy_Coat")
+                elif row[1].startswith("H12_") or row[1].startswith("T12_"):
+                    continue
+                else:
+                    sl, _ = SampleLib.objects.get_or_create(name=row[1].strip())
                 if row[2]:
                     sl.date = row[2]
                 sl.qubit = row[3] or 0
