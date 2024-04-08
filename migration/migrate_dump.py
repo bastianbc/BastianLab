@@ -429,20 +429,17 @@ class MigrateDump():
         rows2 = MigrateDump().cursor(sql2)
         rows3 = MigrateDump().cursor(sql3)
         for row in rows2:
-            if row[1].strip() == 'D366':
-                raise ValueError(row[1])
-            # try:
-            #     sl = SampleLib.objects.get(name=row[1].strip())
-            #     if not row[-3]:
-            #         barcode = MigrateDump.get_barcode(sl)
-            #         sl.barcode = barcode or None
-            #     else:
-            #         barcode = Barcode.objects.get(name=row[-3])
-            #         sl.barcode = barcode
-            # except Exception as e:
-            #     print("error")
-
             try:
+                sl = SampleLib.objects.get(name=row[1].strip())
+                if not row[-3]:
+                    barcode = MigrateDump.get_barcode(sl)
+                    sl.barcode = barcode or None
+                    sl.save()
+                else:
+                    barcode = Barcode.objects.get(name=row[-3])
+                    sl.barcode = barcode
+                    sl.save()
+
                 if "uffy" in row[1]:
                     sl = SampleLib.objects.get(name="Buffy_Coat")
                 elif row[1].startswith("H12_") or row[1].startswith("T12_"):
