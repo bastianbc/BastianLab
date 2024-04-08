@@ -431,7 +431,7 @@ class MigrateDump():
         for row in rows2:
 
             # try:
-            sl = SampleLib.objects.get(name=row[1].strip())
+            #     sl = SampleLib.objects.get(name=row[1].strip())
             #     if not row[-3]:
             #         barcode = MigrateDump.get_barcode(sl)
             #         sl.barcode = barcode or None
@@ -442,6 +442,7 @@ class MigrateDump():
             #     print("error")
 
             try:
+                sl = SampleLib.objects.get(name=row[1].strip())
                 if row[2]:
                     sl.date = row[2]
                 sl.qubit = row[3] or 0
