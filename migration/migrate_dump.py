@@ -473,6 +473,7 @@ class MigrateDump():
                     sl.notes = row[11]
                 else:
                     sl.notes = ""
+                sl.save()
                 if not " migration_dump" in sl.notes:
                     sl.notes = sl.notes + " migration_dump"
                 sl.save()
