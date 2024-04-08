@@ -431,14 +431,11 @@ class MigrateDump():
         for row in rows2:
             try:
                 sl = SampleLib.objects.get(name=row[1].strip())
-                if not row[-3]:
-                    barcode = MigrateDump.get_barcode(sl)
-                    sl.barcode = barcode or None
-                    sl.save()
-                else:
-                    barcode = Barcode.objects.get(name=row[-3])
-                    sl.barcode = barcode
-                    sl.save()
+
+                barcode = MigrateDump.get_barcode(sl)
+                sl.barcode = barcode or None
+                sl.save()
+
 
                 if "uffy" in row[1]:
                     sl = SampleLib.objects.get(name="Buffy_Coat")
