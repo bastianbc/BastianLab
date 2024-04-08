@@ -430,16 +430,16 @@ class MigrateDump():
         rows3 = MigrateDump().cursor(sql3)
         for row in rows2:
 
-            try:
-                sl = SampleLib.objects.get(name=row[1].strip())
-                if not row[-3]:
-                    barcode = MigrateDump.get_barcode(sl)
-                    sl.barcode = barcode or None
-                else:
-                    barcode = Barcode.objects.get(name=row[-3])
-                    sl.barcode = barcode
-            except Exception as e:
-                print("error")
+            # try:
+            sl = SampleLib.objects.get(name=row[1].strip())
+            #     if not row[-3]:
+            #         barcode = MigrateDump.get_barcode(sl)
+            #         sl.barcode = barcode or None
+            #     else:
+            #         barcode = Barcode.objects.get(name=row[-3])
+            #         sl.barcode = barcode
+            # except Exception as e:
+            #     print("error")
 
             try:
                 if row[2]:
