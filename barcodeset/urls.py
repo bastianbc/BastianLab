@@ -1,7 +1,7 @@
 from django.urls import path
 from . import views
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-print(staticfiles_urlpatterns())
+
 urlpatterns = [
     path("", views.barcodesets, name="barcodesets"),
     path("new", views.new_barcodeset, name="new-barcodeset"),
@@ -13,4 +13,3 @@ urlpatterns = [
     path("filter_barcodes", views.filter_barcodes, name="filter-barcodes"),
     path("edit_barcode_async", views.edit_barcode_async, name="edit-barcode-async"),
 ] + staticfiles_urlpatterns()
-print(urlpatterns)
