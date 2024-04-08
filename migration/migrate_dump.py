@@ -432,7 +432,7 @@ class MigrateDump():
             try:
                 sl = SampleLib.objects.get(name=row[1].strip())
                 if row[12]:
-                    barcode = Barcode.objects.get(name=row[12])
+                    barcode = Barcode.objects.get(name=row[12].strip())
                     sl.barcode = barcode or None
                     sl.save()
                 else:
