@@ -428,19 +428,8 @@ class MigrateDump():
         rows = MigrateDump().cursor(sql)
         rows2 = MigrateDump().cursor(sql2)
         rows3 = MigrateDump().cursor(sql3)
-        rows4 = MigrateDump().cursor("SELECT name FROM sample_lib order by name")
-        # print(rows4)
-        # print(type(rows4))
-        result_set = {item[0] for item in rows4}
-        # print(result_set)
-        sl_list = SampleLib.objects.filter(notes__contains="migration_dump").values('name')
-        print(sl_list)
-        names_set = {d['name'] for d in sl_list}
-        result_set_operator = names_set - result_set
-        print(result_set_operator)
-
         for row in rows2:
-            if row[1] == 'D366':
+            if row[1].strip() == 'D366':
                 raise ValueError(row[1])
             # try:
             #     sl = SampleLib.objects.get(name=row[1].strip())
