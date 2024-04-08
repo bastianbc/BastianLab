@@ -440,7 +440,8 @@ class MigrateDump():
         print(result_set_operator)
 
         for row in rows2:
-
+            if row[1] == 'D366':
+                raise ValueError(row[1])
             # try:
             #     sl = SampleLib.objects.get(name=row[1].strip())
             #     if not row[-3]:
