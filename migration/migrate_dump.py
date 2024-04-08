@@ -443,7 +443,7 @@ class MigrateDump():
 
             try:
                 if "uffy" in row[1]:
-                    sl = SampleLib.objects.create(name="Buffy_Coat")
+                    sl = SampleLib.objects.get(name="Buffy_Coat")
                 elif row[1].startswith("H12_") or row[1].startswith("T12_"):
                     continue
                 else:
