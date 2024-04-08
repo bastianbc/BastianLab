@@ -409,6 +409,21 @@ class MigrateDump():
             print(f"Barcode not found for {sl.name}")
 
     @staticmethod
+    def register_barcode(row, sl):
+        try:
+            if row[12]:
+                barcode = Barcode.objects.get(name=row[12].strip())
+                sl.barcode = barcode or None
+                sl.save()
+            else:
+                barcode = MigrateDump.get_barcode(sl)
+                sl.barcode = barcode or None
+                sl.save()
+        except:
+            print(f"Barcode not found for {sl.name}")
+
+
+    @staticmethod
     def register_samplelib():
         sql = '''
                     SELECT n.*, nl.*, a.name FROM AREAS a
@@ -453,15 +468,8 @@ class MigrateDump():
                 sl.save()
                 if not " migration_dump" in sl.notes:
                     sl.notes = sl.notes + " migration_dump"
-                if row[12]:
-                    barcode = Barcode.objects.get(name=row[12].strip())
-                    sl.barcode = barcode or None
-                    sl.save()
-                else:
-                    barcode = MigrateDump.get_barcode(sl)
-                    sl.barcode = barcode or None
-                    sl.save()
                 sl.save()
+                MigrateDump.register_barcode(row, sl)
             except Exception as e:
                 print(e, row[1],row[-3])
         for row in rows3:
