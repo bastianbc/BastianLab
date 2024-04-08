@@ -5,8 +5,8 @@ import json
 
 class SequencingFileSet(models.Model):
     set_id = models.AutoField(primary_key=True)
-    sample_lib = models.ForeignKey("samplelib.SampleLib", on_delete=models.CASCADE, related_name="sequencing_file_sets")
-    sequencing_run = models.ForeignKey("sequencingrun.SequencingRun", on_delete=models.CASCADE, related_name="sequencing_file_sets")
+    sample_lib = models.ForeignKey("samplelib.SampleLib", blank=True, null=True, on_delete=models.SET_NULL, related_name="sequencing_file_sets")
+    sequencing_run = models.ForeignKey("sequencingrun.SequencingRun", blank=True, null=True, on_delete=models.SET_NULL, related_name="sequencing_file_sets")
     prefix = models.CharField(max_length=250, unique=True) #"Yurif_DNA_GGCTAC"
     path = models.CharField(max_length=1000, blank=True, null=True)
     date_added = models.DateTimeField(blank=True, null=True, auto_now_add=True)
@@ -94,7 +94,7 @@ class SequencingFile(models.Model):
         ("bai", "Bam Bai File"),
     )
     file_id = models.AutoField(primary_key=True)
-    sequencing_file_set = models.ForeignKey(SequencingFileSet, on_delete=models.CASCADE, related_name="sequencing_files")
+    sequencing_file_set = models.ForeignKey(SequencingFileSet, blank=True, null=True, on_delete=models.SET_NULL, related_name="sequencing_files")
     name = models.CharField(max_length=500, unique=True, verbose_name="File Name")
     checksum = models.CharField(max_length=100, blank=True, null=True)
     type = models.CharField(max_length=10, choices=FILE_TYPES, blank=True, null=True)

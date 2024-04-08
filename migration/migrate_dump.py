@@ -491,6 +491,7 @@ class MigrateDump():
     @staticmethod
     def register_captured_lib_and_so():
         sample_libs_without_sl_cl_link = SampleLib.objects.filter(sl_cl_links__isnull=True).order_by('name')
+
         for sample_lib in sample_libs_without_sl_cl_link:
             print(sample_lib.name)
 
