@@ -469,7 +469,7 @@ class MigrateDump():
                 sl.amount_final = row[8] or 0
                 sl.vol_init = row[9] or 0
                 sl.vol_remain = row[10] or 0
-                sl.notes = row[1]
+                sl.notes = row[11]
                 if not " migration_dump" in sl.notes:
                     sl.notes = sl.notes + " migration_dump"
                 sl.save()
