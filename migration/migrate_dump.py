@@ -409,6 +409,21 @@ class MigrateDump():
             print(f"Barcode not found for {sl.name}")
 
     @staticmethod
+    def register_barcode(row, sl):
+        try:
+            if row[12]:
+                barcode = Barcode.objects.get(name=row[12].strip())
+                sl.barcode = barcode or None
+                sl.save()
+            else:
+                barcode = MigrateDump.get_barcode(sl)
+                sl.barcode = barcode or None
+                sl.save()
+        except:
+            print(f"Barcode not found for {sl.name}")
+
+
+    @staticmethod
     def register_samplelib():
         sql = '''
                     SELECT n.*, nl.*, a.name FROM AREAS a
@@ -428,6 +443,16 @@ class MigrateDump():
         rows = MigrateDump().cursor(sql)
         rows2 = MigrateDump().cursor(sql2)
         rows3 = MigrateDump().cursor(sql3)
+        rows4 = MigrateDump().cursor("SELECT name FROM sample_lib order by name")
+        # print(rows4)
+        # print(type(rows4))
+        result_set = {item[0] for item in rows4}
+        # print(result_set)
+        sl_list = SampleLib.objects.filter(notes__contains="migration_dump").values('name')
+        print(sl_list)
+        names_set = {d['name'] for d in sl_list}
+        result_set_operator = names_set - result_set
+        print(result_set_operator)
         for row in rows2:
             try:
                 if "uffy" in row[1]:
@@ -453,15 +478,8 @@ class MigrateDump():
                 sl.save()
                 if not " migration_dump" in sl.notes:
                     sl.notes = sl.notes + " migration_dump"
-                if row[12]:
-                    barcode = Barcode.objects.get(name=row[12].strip())
-                    sl.barcode = barcode or None
-                    sl.save()
-                else:
-                    barcode = MigrateDump.get_barcode(sl)
-                    sl.barcode = barcode or None
-                    sl.save()
                 sl.save()
+                MigrateDump.register_barcode(row, sl)
             except Exception as e:
                 print(e, row[1],row[-3])
         for row in rows3:
