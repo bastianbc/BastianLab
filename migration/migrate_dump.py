@@ -443,16 +443,6 @@ class MigrateDump():
         rows = MigrateDump().cursor(sql)
         rows2 = MigrateDump().cursor(sql2)
         rows3 = MigrateDump().cursor(sql3)
-        rows4 = MigrateDump().cursor("SELECT name FROM sample_lib order by name")
-        # print(rows4)
-        # print(type(rows4))
-        result_set = {item[0] for item in rows4}
-        # print(result_set)
-        sl_list = SampleLib.objects.filter(notes__contains="migration_dump").values('name')
-        print(sl_list)
-        names_set = {d['name'] for d in sl_list}
-        result_set_operator = names_set - result_set
-        print(result_set_operator)
         for row in rows2:
             try:
                 if "uffy" in row[1]:
@@ -498,9 +488,17 @@ class MigrateDump():
             except Exception as e:
                 print(e, row[-2],row[-3])
 
+    @staticmethod
+    def register_captured_lib_and_so():
+        sample_libs_without_sl_cl_link = SampleLib.objects.filter(sl_cl_links__isnull=True).order_by('name')
+        for sample_lib in sample_libs_without_sl_cl_link:
+            print(sample_lib.name)
+
+
 if __name__ == "__main__":
     # m = MigrateDump.register_areas()
     # m = MigrateDump.register_nuc_acids()
-    m = MigrateDump.register_samplelib()
+    # m = MigrateDump.register_samplelib()
+    m = MigrateDump.register_captured_lib_and_so()
     print("===FIN===")
     # res = m.cursor("SELECT * FROM patients")
