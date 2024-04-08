@@ -478,7 +478,7 @@ class MigrateDump():
                 link.input_amount = row[2] or 0
                 link.save()
             except Exception as e:
-                print(e)
+                print(e, row[-2],row[-3])
 
 if __name__ == "__main__":
     # m = MigrateDump.register_areas()
