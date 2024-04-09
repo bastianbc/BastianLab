@@ -494,7 +494,7 @@ class MigrateDump():
 
         for sample_lib in sample_libs_without_sl_cl_link:
             print(sample_lib.name)
-            prefixes = ['HW_']
+            prefixes = ['HW']
             # Check if any string in the list starts with the prefix
             if any(sample_lib.name.startswith(s) for s in prefixes):
                 print(sample_lib.name)
