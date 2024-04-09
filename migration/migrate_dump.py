@@ -494,11 +494,11 @@ class MigrateDump():
 
         for sample_lib in sample_libs_without_sl_cl_link:
             print(sample_lib.name)
-            prefixes = ['AGL14-Bastian']
+            prefixes = ['ChIP1']
             # Check if any string in the list starts with the prefix
             if any(sample_lib.name.startswith(s) for s in prefixes):
                 print(sample_lib.name)
-                cl= CapturedLib.objects.get(name='BB62_CL')
+                cl= CapturedLib.objects.get(name='BB37_CL')
                 SL_CL_LINK.objects.get_or_create(sample_lib=sample_lib,captured_lib=cl)
 
 
