@@ -493,8 +493,8 @@ class MigrateDump():
         # sample_libs_without_sl_cl_link = SampleLib.objects.filter(sl_cl_links__isnull=True).order_by('name')
         capture_libs_without_cl_seql_link = CapturedLib.objects.filter(cl_seql_links__isnull=True).order_by("name")
 
-        # for capture_lib in capture_libs_without_cl_seql_link:
-        #     print(capture_lib.name)
+        for capture_lib in capture_libs_without_cl_seql_link:
+            print(capture_lib.name)
         #     prefixes = ['CL']
         #     # # Check if any string in the list starts with the prefix
         #     if any(capture_lib.name.startswith(s) for s in prefixes):
