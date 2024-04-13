@@ -515,7 +515,7 @@ class MigrateDump():
             if any(seqL.name.startswith(s) for s in prefixes):
                 print(seqL.name)
                 suffix = seqL.name.split("_")[1]
-                seqrun = SequencingRun.objects.create(name=f'CL_{suffix}')
+                seqrun = SequencingRun.objects.get_or_create(name=f'CL_{suffix}')
                 seqrun.sequencing_libs.add(seqL)
 
 
