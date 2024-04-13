@@ -493,15 +493,15 @@ class MigrateDump():
         # sample_libs_without_sl_cl_link = SampleLib.objects.filter(sl_cl_links__isnull=True).order_by('name')
         capture_libs_without_cl_seql_link = CapturedLib.objects.filter(cl_seql_links__isnull=True).order_by("name")
 
-        for capture_lib in capture_libs_without_cl_seql_link:
-            print(capture_lib.name)
-            prefixes = ['CL']
-            # # Check if any string in the list starts with the prefix
-            if any(capture_lib.name.startswith(s) for s in prefixes):
-                print(capture_lib.name)
-                suffix = capture_lib.name.split("_")[1]
-                seqL = SequencingLib.objects.create(name=f'CL_{suffix}_SeqL')
-                CL_SEQL_LINK.objects.get_or_create(captured_lib=capture_lib,sequencing_lib=seqL)
+        # for capture_lib in capture_libs_without_cl_seql_link:
+        #     print(capture_lib.name)
+        #     prefixes = ['CL']
+        #     # # Check if any string in the list starts with the prefix
+        #     if any(capture_lib.name.startswith(s) for s in prefixes):
+        #         print(capture_lib.name)
+        #         suffix = capture_lib.name.split("_")[1]
+        #         seqL = SequencingLib.objects.create(name=f'CL_{suffix}_SeqL')
+        #         CL_SEQL_LINK.objects.get_or_create(captured_lib=capture_lib,sequencing_lib=seqL)
 
 
 
