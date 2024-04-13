@@ -490,16 +490,17 @@ class MigrateDump():
 
     @staticmethod
     def register_captured_lib_and_so():
-        sample_libs_without_sl_cl_link = SampleLib.objects.filter(sl_cl_links__isnull=True).order_by('name')
+        # sample_libs_without_sl_cl_link = SampleLib.objects.filter(sl_cl_links__isnull=True).order_by('name')
+        capture_libs_without_cl_seql_link = CapturedLib.objects.filter(cl_seql_links__isnull=True).order_by("name")
 
-        for sample_lib in sample_libs_without_sl_cl_link:
-            print(sample_lib.name)
-            prefixes = ['Rob-']
-            # Check if any string in the list starts with the prefix
-            if any(sample_lib.name.startswith(s) for s in prefixes):
-                print(sample_lib.name)
-                cl= CapturedLib.objects.get(name='BB90_CL')
-                SL_CL_LINK.objects.get_or_create(sample_lib=sample_lib,captured_lib=cl)
+        for capture_lib in capture_libs_without_cl_seql_link:
+            print(capture_lib.name)
+            # prefixes = ['Rob-']
+            # # Check if any string in the list starts with the prefix
+            # if any(sample_lib.name.startswith(s) for s in prefixes):
+            #     print(sample_lib.name)
+            #     cl= CapturedLib.objects.get(name='BB90_CL')
+            #     SL_CL_LINK.objects.get_or_create(sample_lib=sample_lib,captured_lib=cl)
 
 
 
