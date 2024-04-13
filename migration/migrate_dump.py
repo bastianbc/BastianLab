@@ -492,7 +492,73 @@ class MigrateDump():
     def register_captured_lib_and_so():
         # sample_libs_without_sl_cl_link = SampleLib.objects.filter(sl_cl_links__isnull=True).order_by('name')
         capture_libs_without_cl_seql_link = CapturedLib.objects.filter(cl_seql_links__isnull=True).order_by("name")
-
+        l = ["WGS-01",
+            "WGS-01_rerun",
+            "WGS-03",
+            "WGS-03_rerun",
+            "WGS-04",
+            "WGS-05",
+            "WGS-06",
+            "WGS-07",
+            "WGS-08",
+            "WGS-09",
+            "WGS-10",
+            "WGS-11",
+            "WGS-12",
+            "WGS-13",
+            "XuCL-1",
+            "XuCL-2",
+            "XuCL-3",
+            "XuCL-4",
+            "XuCL-5",
+            "XuCL-6",
+            "XuCL-7",
+            "XuCL-8",
+            "XuCL-9",
+            "XuCL-10",
+            "XuCL-11",
+            "XuCL-12",
+            "XuCL-13",
+            "XuCL-14",
+            "XuCL-15",
+            "XuCL-16"]
+        m = [
+            "BCB022",
+            "BCB024",
+            "BCB034",
+            "BCB035",
+            "BCB044",
+            "BCB045",
+            "BCB046",
+            "BCB047",
+            "BCB048",
+            "BCB049",
+            "BCB050",
+            "BCB051",
+            "BCB052",
+            "BCB053",
+            "BCB003",
+            "BCB003",
+            "BCB003",
+            "BCB003",
+            "BCB003",
+            "BCB003",
+            "BCB003",
+            "BCB003",
+            "BCB003",
+            "BCB003",
+            "BCB003",
+            "BCB003",
+            "BCB003",
+            "BCB003",
+            "BCB003",
+            "BCB003"
+        ]
+        s = dict(zip(l,m))
+        for k,v in s.items():
+            cl = CapturedLib.objects.get(name=k)
+            seqL = SequencingLib.objects.get(name=f'{v}_SeqL')
+            CL_SEQL_LINK.objects.get_or_create(captured_lib=cl, sequencing_lib=seqL)
         for capture_lib in capture_libs_without_cl_seql_link:
             print(capture_lib.name)
         #     prefixes = ['CL']
