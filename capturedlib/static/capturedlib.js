@@ -128,7 +128,6 @@ var KTDatatablesServerSide = function () {
                     render: function (data, type, row) {
                         if (data > 0) {
                           let id = row["id"];
-                          console.log(id, data,type,row);
                           return `<a href="/sequencinglib?initial=${id}">${data}</a>`;
                         }
                         return data;
