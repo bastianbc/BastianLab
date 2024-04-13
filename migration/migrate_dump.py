@@ -516,7 +516,7 @@ class MigrateDump():
                 print(seqL.name)
                 suffix = seqL.name.split("_")[1]
                 seqrun = SequencingRun.objects.get(name=f'CL_{suffix}')
-                seqrun.add(seqL)
+                seqrun.sequencing_libs.add(seqL)
 
 
 
