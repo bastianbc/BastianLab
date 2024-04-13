@@ -494,7 +494,7 @@ class MigrateDump():
         capture_libs_without_cl_seql_link = CapturedLib.objects.filter(cl_seql_links__isnull=True).order_by("name")
         sequencinglibs_without_seqruns  = SequencingLib.objects.annotate(
             num_runs=Count('sequencing_runs')
-        ).filter(num_runs=0)
+        ).filter(num_runs=0).order_by('name')
         # l = ["WGS-01",
         #     "WGS-01_rerun",
         #     ]
