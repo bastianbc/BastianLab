@@ -492,6 +492,9 @@ class MigrateDump():
     def register_captured_lib_and_so():
         # sample_libs_without_sl_cl_link = SampleLib.objects.filter(sl_cl_links__isnull=True).order_by('name')
         capture_libs_without_cl_seql_link = CapturedLib.objects.filter(cl_seql_links__isnull=True).order_by("name")
+        sequencinglibs_without_seqruns  = SequencingLib.objects.annotate(
+            num_runs=Count('sequencing_runs')
+        ).filter(num_runs=0)
         # l = ["WGS-01",
         #     "WGS-01_rerun",
         #     ]
@@ -505,8 +508,8 @@ class MigrateDump():
         #     cl = CapturedLib.objects.get(name=k)
         #     seqL = SequencingLib.objects.get(name=f'{v}_SeqL')
         #     CL_SEQL_LINK.objects.get_or_create(captured_lib=cl, sequencing_lib=seqL)
-        for capture_lib in capture_libs_without_cl_seql_link:
-            print(capture_lib.name)
+        for seqL in sequencinglibs_without_seqruns:
+            print(seqL.name)
         #     prefixes = ['CL']
         #     # # Check if any string in the list starts with the prefix
         #     if any(capture_lib.name.startswith(s) for s in prefixes):
