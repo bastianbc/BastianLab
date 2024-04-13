@@ -67,7 +67,6 @@ class SequencingLib(models.Model):
 
             is_initial = _is_initial_value(search_value)
             search_value = _parse_value(search_value)
-
             if is_initial:
                 filter = [cl_seql_link.sequencing_lib.id for cl_seql_link in CL_SEQL_LINK.objects.filter(captured_lib__id=search_value)]
                 queryset = queryset.filter(Q(id__in=filter))
