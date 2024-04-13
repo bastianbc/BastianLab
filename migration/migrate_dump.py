@@ -495,11 +495,12 @@ class MigrateDump():
 
         for capture_lib in capture_libs_without_cl_seql_link:
             print(capture_lib.name)
-            prefixes = ['CAPTURE']
+            prefixes = ['CL']
             # # Check if any string in the list starts with the prefix
             if any(capture_lib.name.startswith(s) for s in prefixes):
                 print(capture_lib.name)
-                seqL = SequencingLib.objects.get(name='BCB003_SeqL')
+                suffix = capture_lib.name.split("_")[1]
+                seqL = SequencingLib.objects.create(name=f'CL_{suffix}_SeqL')
                 CL_SEQL_LINK.objects.get_or_create(captured_lib=capture_lib,sequencing_lib=seqL)
 
 
