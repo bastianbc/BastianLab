@@ -510,13 +510,13 @@ class MigrateDump():
         #     CL_SEQL_LINK.objects.get_or_create(captured_lib=cl, sequencing_lib=seqL)
         for seqL in sequencinglibs_without_seqruns:
             print(seqL.name)
-            prefixes = ['CL']
-            # # Check if any string in the list starts with the prefix
-            if any(seqL.name.startswith(s) for s in prefixes):
-                print(seqL.name)
-                suffix = seqL.name.split("_")[1]
-                seqrun,_ = SequencingRun.objects.get_or_create(name=f'CL_{suffix}')
-                seqrun.sequencing_libs.add(seqL)
+            # prefixes = ['CL']
+            # # # Check if any string in the list starts with the prefix
+            # if any(seqL.name.startswith(s) for s in prefixes):
+            #     print(seqL.name)
+            #     suffix = seqL.name.split("_")[1]
+            #     seqrun,_ = SequencingRun.objects.get_or_create(name=f'CL_{suffix}')
+            #     seqrun.sequencing_libs.add(seqL)
 
 
 
