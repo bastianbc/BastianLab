@@ -92,11 +92,9 @@ class CustomSampleLibSerializer(serializers.ModelSerializer):
 
 
 def get_sample_lib_list(request):
-    print(SampleLib.objects.exclude(notes__icontains="migration_dump").delete())
     samplelibs = SampleLib.query_by_args(
         **request.GET,
         user=request.user,
-        notes__icontains='migration_dump',
         sequencing_run=[False],
         barcode=[False],
         i5=[False],
