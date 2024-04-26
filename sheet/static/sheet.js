@@ -13,7 +13,7 @@ var KTDatatablesServerSide = function () {
             searchDelay: 500,
             processing: true,
             serverSide: true,
-            pageLength: 100,
+            pageLength: 10,
             order: [[5, 'desc']],
             stateSave: true,
             buttons: [
@@ -54,6 +54,7 @@ var KTDatatablesServerSide = function () {
                 { data: 'qpcr_conc' },
                 { data: 'matching_normal_sl' },
                 { data: 'seq_run' },
+                { data: 'files' },
                 { data: null },
             ],
             columnDefs: [
@@ -72,6 +73,19 @@ var KTDatatablesServerSide = function () {
                     targets: -2,
                     render: function (data, type, row) {
                         let namesList = [];
+                        if (Array.isArray(row["files"])) {
+                            row["files"].forEach(sqr => {
+                                namesList.push(sqr.name);
+                            });
+                        }
+                        // This will return the names list. Adjust based on your requirements
+                        return namesList.join(", ");
+                    }
+                },
+                {
+                    targets: -3,
+                    render: function (data, type, row) {
+                        let namesList = [];
                         if (Array.isArray(row["seq_run"])) {
                             row["seq_run"].forEach(sqr => {
                                 namesList.push(sqr.name);
@@ -82,7 +96,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: -3,
+                    targets: -4,
                     render: function (data, type, row) {
                         let namesList = [];
                         if (Array.isArray(row["matching_normal_sl"])) {

@@ -166,6 +166,7 @@ class SampleLib(models.Model):
                 )
 
             count = queryset.count()
+            print("!"*100,order_column)
             queryset = queryset.order_by(order_column)[start:start + length]
 
             return {
