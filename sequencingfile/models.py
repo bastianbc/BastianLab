@@ -4,7 +4,6 @@ from django.db.models import Q, Count, OuterRef, Subquery, Value
 
 
 class SequencingFileSet(models.Model):
-    set_id = models.AutoField(primary_key=True)
     sample_lib = models.ForeignKey("samplelib.SampleLib", on_delete=models.CASCADE, related_name="sequencing_file_sets")
     sequencing_run = models.ForeignKey("sequencingrun.SequencingRun", on_delete=models.CASCADE, related_name="sequencing_file_sets")
     prefix = models.CharField(max_length=250, unique=True) #"Yurif_DNA_GGCTAC"
@@ -88,7 +87,6 @@ class SequencingFile(models.Model):
         ("bam", "Bam File"),
         ("bai", "Bam Bai File"),
     )
-    file_id = models.AutoField(primary_key=True)
     sequencing_file_set = models.ForeignKey(SequencingFileSet, on_delete=models.CASCADE, related_name="sequencing_files")
     name = models.CharField(max_length=500, unique=True, verbose_name="File Name")
     checksum = models.CharField(max_length=100, blank=True, null=True)
