@@ -98,7 +98,7 @@ def new_sequencinglib_async(request):
             CL_SEQL_LINK.objects.create(
                 sequencing_lib = sequencing_lib,
                 captured_lib = captured_lib,
-                volume = ((float(options["nm"]) * float(options["vol_init"])) / len(selected_ids))/captured_lib.nm
+                # volume = ((float(options["nm"]) * float(options["vol_init"])) / len(selected_ids))/captured_lib.nm
             )
 
     except Exception as e:
@@ -136,7 +136,7 @@ def recreate_sequencinglib_async(request):
             CL_SEQL_LINK.objects.create(
                 sequencing_lib = sequencing_lib,
                 captured_lib = captured_lib,
-                volume = ((float(options["nm"]) * float(options["vol_init"])) / len(selected_ids))/captured_lib.nm
+                # volume = ((float(options["nm"]) * float(options["vol_init"])) / len(selected_ids))/captured_lib.nm
             )
 
     except Exception as e:

@@ -33,7 +33,6 @@ def filter_sequencingfiles(request):
     result['draw'] = sequencingfiles['draw']
     result['recordsTotal'] = sequencingfiles['total']
     result['recordsFiltered'] = sequencingfiles['count']
-    print(result, "&"*50)
     return JsonResponse(result)
 
 @permission_required("sequencingfile.add_sequencingfile",raise_exception=True)
@@ -251,7 +250,6 @@ def get_or_create_seqrun(cl, name):
 
 def get_or_create_files_from_file(row):
     prefix = next(iter(row['fastq_file'])).split("_L0")[0]
-    print(prefix)
     try:
         set_ = get_or_create_set(
             prefix=prefix,

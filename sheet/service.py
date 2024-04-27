@@ -6,6 +6,9 @@ from django.http import HttpResponse
 from sequencingrun.models import SequencingRun
 from capturedlib.models import CapturedLib
 from sequencinglib.models import SequencingLib
+from sequencingfile.models import SequencingFile,SequencingFileSet
+from lab.models import Patients
+
 
 class SequencingRunSerializerManual(serializers.ModelSerializer):
     class Meta:
@@ -17,6 +20,15 @@ class SampleLibSerializerManual(serializers.ModelSerializer):
         model = SampleLib
         fields = "__all__"
 
+class SequencingFileSerializerManual(serializers.ModelSerializer):
+    class Meta:
+        model = SequencingFile
+        fields = "__all__"
+
+class PatientsSerializerManual(serializers.ModelSerializer):
+    class Meta:
+        model = Patients
+        fields = '__all__'
 
 class CustomSampleLibSerializer(serializers.ModelSerializer):
     method_label = serializers.SerializerMethodField()
@@ -26,12 +38,18 @@ class CustomSampleLibSerializer(serializers.ModelSerializer):
     patient = serializers.SerializerMethodField()
     matching_normal_sl = serializers.SerializerMethodField()
     seq_run = serializers.SerializerMethodField()
+    files = serializers.SerializerMethodField()
 
     class Meta:
         model = SampleLib
         fields = ("id", "name",  "shear_volume",  "qpcr_conc", "barcode",
                   "na_type", "area_type", "method", "method_label",
-                  "patient", "matching_normal_sl", "seq_run")
+                  "patient", "matching_normal_sl", "seq_run", "files")
+
+    def get_files(self, obj):
+        seq_files = SequencingFile.objects.filter(sequencing_file_set__sample_lib=obj)
+        files = SequencingRunSerializerManual(seq_files, many=True).data
+        return files
 
     def get_method_label(self,obj):
         return obj.method.name if obj.method else None
@@ -55,14 +73,17 @@ class CustomSampleLibSerializer(serializers.ModelSerializer):
         return area_type
 
     def get_patient(self, obj):
-        if obj.na_sl_links.first():
-            nuc_acid = obj.na_sl_links.first().nucacid
-            if nuc_acid.area_na_links.first():
-                area = nuc_acid.area_na_links.first().area
-                if area:
-                    patient = area.block.patient.pat_id
-                    return patient
-        return None
+        _patients = Patients.objects.filter(patient_blocks__block_areas__area_na_links__nucacid__na_sl_links__sample_lib=obj)
+        _patients = PatientsSerializerManual(_patients, many=True).data
+        return _patients
+        # if obj.na_sl_links.first():
+        #     nuc_acid = obj.na_sl_links.first().nucacid
+        #     if nuc_acid.area_na_links.first():
+        #         area = nuc_acid.area_na_links.first().area
+        #         if area:
+        #             patient = area.block.patient.pat_id
+        #             return patient
+        # return None
 
     def get_matching_normal_sl(self, obj):
         matching_normal_sl=[]
@@ -92,15 +113,46 @@ class CustomSampleLibSerializer(serializers.ModelSerializer):
 
 
 def get_sample_lib_list(request):
+    ORDER_COLUMN_CHOICES = {
+        "0": "id",
+        "1": "patient",
+        "2": "name",
+        "3": "barcode",
+        "4": "na_type",
+        "5": "area_type",
+        "6": "volume",
+        "7": "conc",
+        "8": "matching_normal",
+        "9": "sequncing_run",
+        "10": "files",
+    }
+    '''
+    'order[0][column]': ['2'], 
+    'order[0][dir]': ['asc'], 
+    'start': ['40'], 
+    'length': ['10'], 
+    'search[value]': [''], 
+    'search[regex]': ['false'],
+    '''
+    # Patients.objects.filter(patient_blocks__block_areas__area_na_links__nucacid__na_sl_links__sample_lib=obj)
+    sl = SampleLib.objects.get(name='12-12366')
+    pat = Patients.objects.filter(patient_blocks__block_areas__area_na_links__nucacid__na_sl_links__sample_lib__name="12-12366")
+    print(sl, pat)
+    mutable_querydict = request.GET.copy()
+    mutable_querydict['order[0][column]'] = '1'
+    mutable_querydict['order[0][dir]'] = 'asc'
     samplelibs = SampleLib.query_by_args(
-        **request.GET,
+        **mutable_querydict,
         user=request.user,
+        order_column="name",
+        order="asc",
         sequencing_run=[False],
         barcode=[False],
         i5=[False],
         i7=[False],
         area_type=[False],
         bait=[False])
+
     serializer = CustomSampleLibSerializer(samplelibs['items'], many=True)
     result = dict()
     result['data'] = serializer.data

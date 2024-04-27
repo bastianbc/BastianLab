@@ -49,6 +49,13 @@ class MigrateDump():
     database_host = "localhost"
     database_port = "5432"
 
+    @staticmethod
+    def get_or_none(model_class, **kwargs):
+        try:
+            return model_class.objects.get(**kwargs)
+        except Exception as e:
+            return None
+
     @classmethod
     def connection(cls):
         """Create a database connection to a PostgreSQL database"""
@@ -220,49 +227,305 @@ class MigrateDump():
         RIGHT JOIN blocks b on l.block = b.bl_id
         '''
         sql2 = '''SELECT * FROM AREAS '''
-        rows = MigrateDump().cursor(sql)
+        # rows = MigrateDump().cursor(sql2)
         rows2 = MigrateDump().cursor(sql2)
         # for row in rows:
         #     try:
         #         if row[0] != None:
-        #             block = Blocks.objects.get(name=row[-2])
+        #             block = Blocks.objects.get(name=row[-1].strip())
         #             # print(block)
-        #             area, _ = Areas.objects.get_or_create(name=row[1],block = block)
+        #             # Areas.objects.get(name=row[1])
+        #             if block:
+        #                 area, _ = Areas.objects.get_or_create(name=row[1], block=block)
         #             # area.block = block
         #             if row[2] != None:
         #                 area.area_type = MigrateDump.get_area_type(row[2])
         #             area.image = row[4]
         #             area.notes = row[5]
-        #             area.save()
+                    # area.save()
         #         # print(row)
+        #     except ObjectDoesNotExist:
+        #         print(row[-1])
+        #         block = Blocks.objects.get(name="BB"+row[-1].strip())
+        #         area = Areas.objects.get(name=row[1])
+        #         area.block = block
+        #         area.save()
         #     except Exception as e:
-        #         print(e)
+        #         print(e,row[1], row[-1])
         for row in rows2:
             try:
-                if row[0] != None:
-                    area = Areas.objects.filter(name=row[1])
-                    if not area:
-                        print(row[1], " - ", row[-1])
-                        block = Blocks.objects.get(name=row[-1].strip())
-                        # if "," in row[-1]:
-                        #     for i in row[-1].split(","):
-                        #         print(i)
-                        #         block = Blocks.objects.get(name=i)
-                        area, _ = Areas.objects.get_or_create(name=row[1],block=block)
-                        if row[2] != None:
-                            area.area_type = MigrateDump.get_area_type(row[2])
-                        area.image = row[4]
-                        area.notes = row[5]
-                        area.save()
-                        # else:
-                        #     block = Blocks.objects.get(name=row[-1])
-                    # area, _ = Areas.objects.get_or_create(name=row[1],block=block)
-
-                # print(row)
+                area = Areas.objects.get(name=row[1])
+                if row[2] != None:
+                    area.area_type = MigrateDump.get_area_type(row[2])
+                area.image = row[4]
+                area.notes = row[5]
+                area.save()
+                # if not area:
+                #     print(row[1], " - ", row[-1])
+                #     block = Blocks.objects.get(name=row[-1].strip())
+                #     # if "," in row[-1]:
+                #     #     for i in row[-1].split(","):
+                #     #         print(i)
+                #     #         block = Blocks.objects.get(name=i)
+                #     area, _ = Areas.objects.get_or_create(name=row[1],block=block)
+                #     if row[2] != None:
+                #         area.area_type = MigrateDump.get_area_type(row[2])
+                #     area.image = row[4]
+                #     area.notes = row[5]
+                #     if row[2] != None:
+                #         area.area_type = MigrateDump.get_area_type(row[2])
+                #     area.image = row[4]
+                #     area.notes = row[5]
+                #     area.save()
+                # else:
+                #     if "," in row[-1]:
+                #         for i in row[-1].split(","):
+                #             # print("%%%",i)
+                #             block = Blocks.objects.get(name=i)
+                #             area = Areas.objects.get(name=row[1])
+                #             area.block=block
+                #             if row[2] != None:
+                #                 area.area_type = MigrateDump.get_area_type(row[2])
+                #             area.image = row[4]
+                #             area.notes = row[5]
+                #             area.save()
+                #     else:
+                #         # print("iii")
+                #         block = MigrateDump.get_or_none(Blocks, name=row[-1])
+                #         if not block:
+                #             block = MigrateDump.get_or_none(Blocks, name="BB"+row[-1])
+                #         if block:
+                #             area = Areas.objects.get(name=row[1])
+                #             area.block = block
+                #             if row[2] != None:
+                #                 area.area_type = MigrateDump.get_area_type(row[2])
+                #             area.image = row[4]
+                #             area.notes = row[5]
+                #             area.save()
             except Exception as e:
-                print(e)
+                print("{} area:{}, block{}".format(e, row[1], row[-1]))
+
+    @staticmethod
+    def get_na_type(value):
+        for x in NucAcids.NA_TYPES:
+            if value.lower() == x[1].lower():
+                return x[0]
+        return None
+
+    @staticmethod
+    def register_nuc_acids():
+        sql = '''
+            SELECT n.*, nl.*, a.name FROM AREAS a
+            LEFT JOIN area_na_link nl on nl.area_id = a.ar_id
+            LEFT JOIN nuc_acids n on n.nu_id = nl.nucacid_id
+            order by n.name
+        '''
+        sql2 = '''
+            SELECT * FROM nuc_acids
+        '''
+        sql3 = '''
+            SELECT nl.* ,
+            a.name as area, 
+            n.name as nuc_acid FROM area_na_link nl
+            LEFT JOIN nuc_acids n on n.nu_id = nl.nucacid_id
+            LEFT JOIN areas a on a.ar_id = nl.area_id
+            WHERE nucacid_id is not NULL AND
+            area_id is not NULL
+        '''
+        rows = MigrateDump().cursor(sql)
+        rows2 = MigrateDump().cursor(sql2)
+        rows3 = MigrateDump().cursor(sql3)
+        # for row in rows:
+        #     try:
+        #         # print(row)
+        #         if row[-1] != None:
+        #             area = Areas.objects.get(name=row[-1])
+        #         if row[3] != None:
+        #             na_type = MigrateDump.get_na_type(row[3])
+        #             nuc_acid, _ = NucAcids.objects.get_or_create(name=row[1],na_type=na_type)
+        #         else:
+        #             nuc_acid, _ = NucAcids.objects.get_or_create(name=row[1])
+        #         link = AREA_NA_LINK.objects.get_or_create(
+        #             nucacid=nuc_acid,
+        #             area=area
+        #         )
+        #         if row[2] != None:
+        #             nuc_acid.date = row[2]
+        #         if row[4] != None:
+        #             nuc_acid.conc = row[4]
+        #         if row[5] != None:
+        #             nuc_acid.vol_init = row[5]
+        #         if row[6] != None:
+        #             nuc_acid.vol_remain = row[6]
+        #         nuc_acid.notes = row[7]
+        #         nuc_acid.save()
+        #     except Exception as e:
+        #         print(e, row[1], row[-1])
+        # for row in rows2:
+        #     try:
+        #         if row[3] != None:
+        #             na_type = MigrateDump.get_na_type(row[3])
+        #             nuc_acid, _ = NucAcids.objects.get_or_create(name=row[1],na_type=na_type)
+        #         else:
+        #             nuc_acid, _ = NucAcids.objects.get_or_create(name=row[1])
+        #         if row[2] != None:
+        #             nuc_acid.date = row[2]
+        #         if row[4] != None:
+        #             nuc_acid.conc = row[4]
+        #         if row[5] != None:
+        #             nuc_acid.vol_init = row[5]
+        #         if row[6] != None:
+        #             nuc_acid.vol_remain = row[6]
+        #         nuc_acid.notes = row[7]
+        #         nuc_acid.save()
+        #     except Exception as e:
+        #         print(e, row[1])
+        for row in rows3:
+            try:
+                if row[-2]:
+                    area = Areas.objects.get(name=row[-2])
+                else:
+                    print("else")
+                    area = Areas.objects.get(name=row[-4])
+                na = NucAcids.objects.get(name=row[-1])
+                link = AREA_NA_LINK.objects.get_or_create(area=area, nucacid=na)
+            except Exception as e:
+                print(e,row[1],row[-1])
+
+    @staticmethod
+    def get_barcode(sl):
+        try:
+            files = SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl)
+            for file in files:
+                # print(file.name)
+                barcode = list(set(re.findall(r'[ATGC]{5,}', file.name)))[0]
+                q = Q(Q(i5=barcode) | Q(i7=barcode))
+                if barcode:
+                    _barcode = Barcode.objects.filter(q)
+                    if _barcode:
+                        return _barcode[0]
+            return None
+        except:
+            print(f"Barcode not found for {sl.name}")
+
+    @staticmethod
+    def register_barcode(row, sl):
+        try:
+            if row[12]:
+                barcode = Barcode.objects.get(name=row[12].strip())
+                sl.barcode = barcode or None
+                sl.save()
+            else:
+                barcode = MigrateDump.get_barcode(sl)
+                sl.barcode = barcode or None
+                sl.save()
+        except:
+            print(f"Barcode not found for {sl.name}")
+
+
+    @staticmethod
+    def register_samplelib():
+        sql = '''
+                    SELECT n.*, nl.*, a.name FROM AREAS a
+                    LEFT JOIN area_na_link nl on nl.area_id = a.ar_id
+                    LEFT JOIN nuc_acids n on n.nu_id = nl.nucacid_id
+                    order by n.name
+                '''
+        sql2 = '''
+                    SELECT * FROM sample_lib order by name
+                '''
+        sql3 = '''
+            SELECT l.*, n.name as nucacid, s.name as samplelib, s.na_name
+            FROM na_sl_link l
+            LEFT JOIN sample_lib s on l.sample_lib_id = s.id
+            LEFT JOIN nuc_acids n on n.nu_id = l.nucacid_id
+        '''
+        rows = MigrateDump().cursor(sql)
+        rows2 = MigrateDump().cursor(sql2)
+        rows3 = MigrateDump().cursor(sql3)
+        for row in rows2:
+            try:
+                if "uffy" in row[1]:
+                    sl = SampleLib.objects.get(name="Buffy_Coat")
+                elif row[1].startswith("H12_") or row[1].startswith("T12_"):
+                    continue
+                else:
+                    sl, _ = SampleLib.objects.get_or_create(name=row[1].strip())
+                if row[2]:
+                    sl.date = row[2]
+                sl.qubit = row[3] or 0
+                sl.shear_volume = row[4] or 0
+                sl.qpcr_conc = row[5] or 0
+                sl.pcr_cycles = row[6] or 0
+                sl.amount_in = row[7] or 0
+                sl.amount_final = row[8] or 0
+                sl.vol_init = row[9] or 0
+                sl.vol_remain = row[10] or 0
+                if row[11]:
+                    sl.notes = row[11]
+                else:
+                    sl.notes = ""
+                sl.save()
+                if not " migration_dump" in sl.notes:
+                    sl.notes = sl.notes + " migration_dump"
+                sl.save()
+                MigrateDump.register_barcode(row, sl)
+            except Exception as e:
+                print(e, row[1],row[-3])
+        for row in rows3:
+            try:
+                if "uffy" in row[-2]:
+                    sl = SampleLib.objects.get(name="Buffy_Coat")
+                elif row[-2].startswith("H12_") or row[-2].startswith("T12_"):
+                    continue
+                else:
+                    sl, _ = SampleLib.objects.get_or_create(name=row[-2].strip())
+                na = NucAcids.objects.get(name=row[-3])
+                link, _ = NA_SL_LINK.objects.get_or_create(sample_lib=sl, nucacid=na)
+                link.input_vol = row[1] or 0
+                link.input_amount = row[2] or 0
+                link.save()
+            except Exception as e:
+                print(e, row[-2],row[-3])
+
+    @staticmethod
+    def register_captured_lib_and_so():
+        # sample_libs_without_sl_cl_link = SampleLib.objects.filter(sl_cl_links__isnull=True).order_by('name')
+        capture_libs_without_cl_seql_link = CapturedLib.objects.filter(cl_seql_links__isnull=True).order_by("name")
+        sequencinglibs_without_seqruns  = SequencingLib.objects.annotate(
+            num_runs=Count('sequencing_runs')
+        ).filter(num_runs=0).order_by('name')
+        # l = ["WGS-01",
+        #     "WGS-01_rerun",
+        #     ]
+        # m = [
+        #     "BCB022",
+        #     "BCB024",
+        #
+        # ]
+        # s = dict(zip(l,m))
+        # for k,v in s.items():
+        #     cl = CapturedLib.objects.get(name=k)
+        #     seqL = SequencingLib.objects.get(name=f'{v}_SeqL')
+        #     CL_SEQL_LINK.objects.get_or_create(captured_lib=cl, sequencing_lib=seqL)
+        for seqL in sequencinglibs_without_seqruns:
+            print(seqL.name)
+            # prefixes = ['CL']
+            # # # Check if any string in the list starts with the prefix
+            # if any(seqL.name.startswith(s) for s in prefixes):
+            #     print(seqL.name)
+            #     suffix = seqL.name.split("_")[1]
+            #     seqrun,_ = SequencingRun.objects.get_or_create(name=f'CL_{suffix}')
+            #     seqrun.sequencing_libs.add(seqL)
+
+
+
+
 
 if __name__ == "__main__":
-    m = MigrateDump.register_areas()
-    print(m)
+    # m = MigrateDump.register_areas()
+    # m = MigrateDump.register_nuc_acids()
+    # m = MigrateDump.register_samplelib()
+    m = MigrateDump.register_captured_lib_and_so()
+    print("===FIN===")
     # res = m.cursor("SELECT * FROM patients")

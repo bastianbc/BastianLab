@@ -13,7 +13,7 @@ class CapturedLibForm(forms.ModelForm):
         self.fields["nm"].required = False
 
 class SequencingLibCreationForm(forms.Form):
-    sequencing_lib = forms.ModelChoiceField(queryset=SequencingLib.objects.all(), label="Sequencing Library")
+    sequencing_lib = forms.ModelChoiceField(queryset=SequencingLib.objects.all().order_by("name"), label="Sequencing Library")
     prefix = forms.CharField()
     date = forms.DateField(initial=date.today)
     buffer = forms.ChoiceField(choices=SequencingLib.BUFFER_TYPES)

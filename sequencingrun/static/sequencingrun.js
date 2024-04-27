@@ -836,8 +836,6 @@ var KTDatatablesServerSide = function () {
                 url: "/sequencingrun/" + sequencingRunId + "/get_sequencing_files",
                 type: "GET",
                 success: function (data) {
-                    console.log("sequencingRunId:"+sequencingRunId);
-                    console.log(data);
                     initialMachingTable(data);
                     fillElements(data);
                     checkMatching();
@@ -906,7 +904,6 @@ var KTDatatablesServerSide = function () {
                 }
                 matchingTable.push(tmp);
             }
-            console.log(matchingTable);
         }
 
         function swap(select) {
@@ -1041,7 +1038,6 @@ var KTDatatablesServerSide = function () {
                     }
 
                     modalSequencingFiles.hide();
-                    console.log(data);
                 },
                 error: function (xhr, ajaxOptions, thrownError) {
 

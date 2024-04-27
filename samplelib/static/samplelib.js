@@ -68,11 +68,7 @@ var KTDatatablesServerSide = function () {
                     return moment(data).format('MM/DD/YYYY');
                   }
                 },
-                { data: 'method',
-                  render: function (val, type, row) {
-                    return row["method_label"];
-                  }
-                },
+                { data: 'num_files' },
                 { data: 'qpcr_conc' },
                 { data: 'vol_init' },
                 { data: 'amount_final' },
@@ -104,6 +100,18 @@ var KTDatatablesServerSide = function () {
                           let sl_id = row["id"];
                           return `
                               <a href="/areas?model=sample_lib&id=${sl_id}&initial=true">${data}</a>`;
+                        }
+                        return data;
+                    }
+                },
+                {
+                    targets: 4,
+                    orderable: true,
+                    render: function (data, type, row) {
+                        if (data > 0) {
+                          let sl_id = row["id"];
+                          return `
+                              <a href="/sequencingfile?id=${sl_id}&initial=true&model=sample_lib">${data}</a>`;
                         }
                         return data;
                     }
@@ -842,10 +850,8 @@ var KTDatatablesServerSide = function () {
 
     var handleSelectedRows = ((e) => {
       const container = document.querySelector('.table');
-
       const modal = new bootstrap.Modal(document.getElementById("modal_capturedlib_options"));
       const modalCL = new bootstrap.Modal(document.getElementById("add_to_captured_library"));
-
 
       document.getElementById("create_captured_lib").addEventListener('click', function (e) {
 
@@ -890,7 +896,6 @@ var KTDatatablesServerSide = function () {
       });
 
       document.getElementById("add_to_captured_library").addEventListener('show.bs.modal', function(e){
-        console.log("3-enters");
         if (!checkSelectedRows()) {
 
           Swal.fire({
@@ -946,7 +951,10 @@ var KTDatatablesServerSide = function () {
       }
 
       document.getElementById("btn_add_continue").addEventListener('click', function () {
-        var selectElement = document.getElementById("id_captured_lib").value;
+          var selectElement = document.getElementById("id_captured_lib").value;
+        const modalElement = document.getElementById("add_to_captured_library"); // Replace "currentlyOpenModalID" with the ID of the modal that might be open
+        // const modal_cl = new bootstrap.Modal(modalElement);
+        // modal_cl.show();
           $.ajax({
             url: "/samplelib/add_async",
             type: "GET",

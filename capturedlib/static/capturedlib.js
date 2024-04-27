@@ -600,6 +600,13 @@ var KTDatatablesServerSide = function () {
       });
 
     }
+    function wait(ms){
+       var start = new Date().getTime();
+       var end = start;
+       while(end < start + ms) {
+         end = new Date().getTime();
+      }
+    }
 
     // Redirects from other pages
     var handleInitialValue = () => {
@@ -608,14 +615,10 @@ var KTDatatablesServerSide = function () {
       function cleanUrl() {
         window.history.replaceState(null, null, window.location.pathname);
       }
-
       const params = new URLSearchParams(window.location.search);
       const x = params.get('initial');
-
       cleanUrl();
-
       return x;
-
     }
 
     var initRowActions = () => {
