@@ -26,7 +26,7 @@ var KTDatatablesServerSide = function () {
             order: [[0, 'desc']],
             stateSave: false,
             destroy: true,
-            pageLength: 10,
+            pageLength: 100,
             select: {
                 style: 'multi',
                 selector: 'td:first-child input[type="checkbox"]',

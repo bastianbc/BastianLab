@@ -8,6 +8,7 @@ var KTDatatablesServerSide = function () {
     var filterPayment;
     var editor;
     var selectedRows = [];
+    var selectedSampleLibs = [];
 
     // Private functions
     var initDatatable = function ( initialValue, filterSequencingRun, filterBarcode, filterI5, filterI7, filterAreaType, filterBait ) {
@@ -231,6 +232,7 @@ var KTDatatablesServerSide = function () {
             // Checkbox on Change event
             c.addEventListener("change", function () {
                 toggleRowSelection(c.value);
+                toggleSelectedSampleLibs(c.closest("tr").querySelector("td:nth-child(2)").textContent.trim());
             });
 
             // Checkbox on click event
@@ -249,6 +251,17 @@ var KTDatatablesServerSide = function () {
             } else {
                 // If the row is already selected, remove it in selected rows
                 selectedRows.splice(index, 1);
+            }
+        }
+
+        function toggleSelectedSampleLibs(name) {
+            var index = selectedSampleLibs.indexOf(name);
+            if (index === -1) {
+                // If the row is not selected, add it to selected rows
+                selectedSampleLibs.push(name);
+            } else {
+                // If the row is already selected, remove it in selected rows
+                selectedSampleLibs.splice(index, 1);
             }
         }
 
@@ -634,9 +647,8 @@ var KTDatatablesServerSide = function () {
         var sampleLibs = [];
 
         document.getElementById("qpcr_analysis").addEventListener("click", function () {
-            var selectedItems = Array.from(container.querySelectorAll('[type="checkbox"]:checked'));
-
-            if (selectedItems.length > 0) {
+            // var selectedItems = Array.from(container.querySelectorAll('[type="checkbox"]:checked'));
+            if (selectedSampleLibs.length > 0) {
                 const modalBody = document.querySelector("#modal_qpcr_analysis .modal-body .card-body");
                 var ul = modalBody.querySelector("ul");
                 // if modalBody does not contain a <ul> element, then create it
@@ -648,24 +660,23 @@ var KTDatatablesServerSide = function () {
                 var existingItems = modalBody.querySelectorAll("ul li");
 
                 // Array to store the names of existing items
-                var existingItemNames = Array.from(existingItems).map(item => item.textContent.trim());
+                var existingSampleLibs = Array.from(existingItems).map(item => item.textContent.trim());
                 // Remove items from the list that are not in the selectedItems array
                 existingItems.forEach(existingItem => {
                     var existingItemName = existingItem.textContent.trim();
-                    if (!selectedItems.some(item => item.closest("tr").querySelector("td:nth-child(2)").textContent.trim() === existingItemName)) {
+                    if (!selectedSampleLibs.some(item => item === existingItemName)) {
                         existingItem.remove();
                     }
                 });
 
                 // Add new selected items to the list
-                selectedItems.forEach(item => {
-                    var itemName = item.closest("tr").querySelector("td:nth-child(2)").textContent.trim();
-                    if (!existingItemNames.includes(itemName)) {
+                for (var name of selectedSampleLibs) {
+                    if (!existingSampleLibs.includes(name)) {
                         var li = document.createElement("li");
-                        li.textContent = itemName;
+                        li.textContent = name;
                         ul.appendChild(li);
                     }
-                });
+                }
 
                 // Append the updated list to the modal body
                 modalBody.innerHTML = ""; // Clear the modal body first
@@ -717,18 +728,30 @@ var KTDatatablesServerSide = function () {
             var cols = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
             var rows = ["A", "B", "C", "D", "E", "F", "G", "H"];
             var constantData = ["STD 1", "STD 2", "STD 3", "STD 4", "STD 5", "STD 6", "NTC", "EMPTY"];
-            // for (var i = 1; i <= 36; i++) {
-            //     sampleLibs.push("Sample Library " + i);
-            // }
-
-            var sampleLibs = Array.from(modalBody.querySelectorAll("ul li")).map(item => item.textContent.trim());
-
-            // Let's create groups of 8
-            var groupedSampleLibs = [];
-            for (var j = 0; j < sampleLibs.length; j += 8) {
-                groupedSampleLibs.push(sampleLibs.slice(j, j + 8));
+            for (var i = 1; i <= 36; i++) {
+                sampleLibs.push("Sample Library " + i);
             }
 
+            // var sampleLibs = Array.from(modalBody.querySelectorAll("ul li")).map(item => item.textContent.trim());
+
+            // Let's create groups of 8
+            // var groupedSampleLibs = [];
+            // for (var j = 0; j < sampleLibs.length; j += 8) {
+            //     groupedSampleLibs.push(sampleLibs.slice(j, j + 8));
+            // }
+
+            function splitToGroups(veri, maxGrupSayisi) {
+                var gruplar = new Array(maxGrupSayisi).fill().map(() => []);
+                for (var i = 0; i < veri.length; i++) {
+                    var grupIndex = i % maxGrupSayisi;
+                    gruplar[grupIndex].push(veri[i]);
+                }
+                return gruplar;
+            }
+
+            var groupedSampleLibs = splitToGroups(sampleLibs, 8);
+
+            console.log(groupedSampleLibs);
             // Let's duplicate grouped selected items without last one
             var extendedSampleLibs = [];
             for (var i = 0; i < groupedSampleLibs.length -1; i++) {
@@ -740,16 +763,24 @@ var KTDatatablesServerSide = function () {
                 extendedSampleLibs.push(duplicatedSubArray);
             }
 
-            // Son grubun elemanlarını duplike etmek ve ardışık çift elemanlar haline getirmek
-            var lastGroupIndex = groupedSampleLibs.length - 1;
-            var lastGroup = groupedSampleLibs[lastGroupIndex];
-            var tmp = [];
-            lastGroup.forEach(function(item) {
-                tmp.push(item, item);
-            });
+            // The order of the last row on the plate is different from the others
+            if (groupedSampleLibs.length == 8) {
+                // Duplicate the elements of the last group and make them into consecutive double elements
+                var lastGroupIndex = groupedSampleLibs.length - 1;
+                var lastGroup = groupedSampleLibs[lastGroupIndex];
+                var tmp = [];
 
-            extendedSampleLibs.push(tmp);
+                lastGroup.forEach(function(item) {
+                    tmp.push(item, item);
+                });
 
+                extendedSampleLibs.push(tmp);
+            }
+            else {
+                extendedSampleLibs = groupedSampleLibs;
+            }
+
+            console.log(extendedSampleLibs);
             // Add the ConstantData array to the beginning of extendSelectedItems three times
             for (var i = 0; i < 3; i++) {
                 extendedSampleLibs.unshift(constantData);
@@ -764,7 +795,7 @@ var KTDatatablesServerSide = function () {
                 }
                 matrix.push(row);
             }
-
+            console.log(matrix);
             // Pair the matrix and data
             var mergedArray = [];
             for (var i = 0; i < matrix.length; i++) {
@@ -775,6 +806,7 @@ var KTDatatablesServerSide = function () {
                 }
                 mergedArray.push(mergedSubArray);
             }
+            console.log(mergedArray);
 
             return mergedArray;
         }
@@ -843,8 +875,8 @@ var KTDatatablesServerSide = function () {
 
             // Combine date and prefixes
             const fileName = `${date}-${prefixString}.csv`;
-            // return fileName;
-            return "deneme.csv"
+            return fileName;
+            // return "deneme.csv"
         }
     })();
 
