@@ -19,4 +19,5 @@ urlpatterns = [
     path('print_as_csv', views.print_as_csv, name="print_as_csv"),
     path('check_can_deleted_async', views.check_can_deleted_async, name='checkcan-deleted-async'),
     path('add_async', views.add_async, name='add_async'),
+    # path('export_csv_qpcr_analysis', views.export_csv_qpcr_analysis, name="export-csv-qpcr-analysis"),
 ] + staticfiles_urlpatterns()

@@ -3,7 +3,7 @@ from django.contrib import messages
 from .forms import *
 from method.models import Method
 from libprep.models import *
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.decorators import permission_required
 from .serializers import *
 from core.decorators import *
@@ -296,3 +296,20 @@ def add_async(request):
         print(str(e))
         return JsonResponse({"success": False})
     return JsonResponse({"success": True})
+
+# def export_csv_qpcr_analysis(request):
+#     from .helper import CreateCSV
+#
+#     selected_items = request.POST.get("selected_items")
+#     print("selected_items: ",selected_items)
+#
+#     csv_helper = CreateCSV(selected_items)
+#
+#     response = HttpResponse(
+#         content_type='text/csv',
+#         headers={'Content-Disposition': f'attachment; filename="deneme.csv"'},
+#     )
+#
+#     response.write(csv_helper.get_value())
+#
+#     return response

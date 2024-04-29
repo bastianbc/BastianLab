@@ -42,4 +42,7 @@ def file_transfer(sequencing_run,transfers):
         print(e)
         success = False
 
-    return success
+    return success, destination_dir
+
+def get_samplelib(file_set):
+    return file_set.split("_")[0]

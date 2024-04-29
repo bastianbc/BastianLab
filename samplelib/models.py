@@ -80,6 +80,7 @@ class SampleLib(models.Model):
             draw = int(kwargs.get('draw', None)[0])
             length = int(kwargs.get('length', None)[0])
             start = int(kwargs.get('start', None)[0])
+            print(start,length)
             search_value = kwargs.get('search[value]', None)[0]
             order_column = kwargs.get('order[0][column]', None)[0]
             order = kwargs.get('order[0][dir]', None)[0]
@@ -168,7 +169,7 @@ class SampleLib(models.Model):
             count = queryset.count()
             print("!"*100,order_column)
             queryset = queryset.order_by(order_column)[start:start + length]
-
+            print(queryset)
             return {
                 'items': queryset,
                 'count': count,

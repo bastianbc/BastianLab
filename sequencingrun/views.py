@@ -221,6 +221,6 @@ def save_sequencing_files(request, id):
             for file_name in files[0]:
                 transfers.append((file_name,file_name))
 
-    success = helper.file_transfer(sequencing_run,transfers)
+    success, directory_path = helper.file_transfer(sequencing_run,transfers)
 
     return JsonResponse({"success": success})
