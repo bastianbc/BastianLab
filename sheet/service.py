@@ -73,7 +73,9 @@ class CustomSampleLibSerializer(serializers.ModelSerializer):
         return area_type
 
     def get_patient(self, obj):
-        _patients = Patients.objects.filter(patient_blocks__block_areas__area_na_links__nucacid__na_sl_links__sample_lib=obj)
+        _patients = Patients.objects.filter(
+            patient_blocks__block_areas__area_na_links__nucacid__na_sl_links__sample_lib=obj
+        ).distinct()
         _patients = PatientsSerializerManual(_patients, many=True).data
         return _patients
         # if obj.na_sl_links.first():
@@ -134,10 +136,6 @@ def get_sample_lib_list(request):
     'search[value]': [''], 
     'search[regex]': ['false'],
     '''
-    # Patients.objects.filter(patient_blocks__block_areas__area_na_links__nucacid__na_sl_links__sample_lib=obj)
-    sl = SampleLib.objects.get(name='12-12366')
-    pat = Patients.objects.filter(patient_blocks__block_areas__area_na_links__nucacid__na_sl_links__sample_lib__name="12-12366")
-    print(sl, pat)
     mutable_querydict = request.GET.copy()
     mutable_querydict['order[0][column]'] = '1'
     mutable_querydict['order[0][dir]'] = 'asc'
