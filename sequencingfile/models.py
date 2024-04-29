@@ -93,12 +93,8 @@ class SequencingFile(models.Model):
         ("bam", "Bam File"),
         ("bai", "Bam Bai File"),
     )
-<<<<<<< HEAD
-    sequencing_file_set = models.ForeignKey(SequencingFileSet, on_delete=models.CASCADE, related_name="sequencing_files")
-=======
     file_id = models.AutoField(primary_key=True)
     sequencing_file_set = models.ForeignKey(SequencingFileSet, blank=True, null=True, on_delete=models.SET_NULL, related_name="sequencing_files")
->>>>>>> a34973cff6df694359a2d7f91b58a17e6432ef46
     name = models.CharField(max_length=500, unique=True, verbose_name="File Name")
     checksum = models.CharField(max_length=100, blank=True, null=True)
     type = models.CharField(max_length=10, choices=FILE_TYPES, blank=True, null=True)
