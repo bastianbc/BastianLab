@@ -625,11 +625,233 @@ var KTDatatablesServerSide = function () {
 
     }
 
-    var handleSelectedRows = ((e) => {
-      var container = document.querySelector('.table');
+    var handleModalQPCRAnalysis = ((e) => {
+        const container = document.querySelector('.table');
+        const modalQPCRAnalysis = new bootstrap.Modal(document.getElementById("modal_qpcr_analysis"));
+        const modalBody = document.querySelector("#modal_qpcr_analysis .modal-body .card-body");
+        const btnExport = document.querySelector("button[name='btnExport']");
+        const btnDismiss = document.querySelector("button[name='btnDismiss']");
+        var sampleLibs = [];
 
-      var modal = new bootstrap.Modal(document.getElementById("modal_capturedlib_options"));
-      var modal_cl = new bootstrap.Modal(document.getElementById("add_to_captured_library"));
+        document.getElementById("qpcr_analysis").addEventListener("click", function () {
+            var selectedItems = Array.from(container.querySelectorAll('[type="checkbox"]:checked'));
+
+            if (selectedItems.length > 0) {
+                const modalBody = document.querySelector("#modal_qpcr_analysis .modal-body .card-body");
+                var ul = modalBody.querySelector("ul");
+                // if modalBody does not contain a <ul> element, then create it
+                if (!ul) {
+                    ul = document.createElement("ul");
+                }
+
+                // Get existing items in the list
+                var existingItems = modalBody.querySelectorAll("ul li");
+
+                // Array to store the names of existing items
+                var existingItemNames = Array.from(existingItems).map(item => item.textContent.trim());
+                // Remove items from the list that are not in the selectedItems array
+                existingItems.forEach(existingItem => {
+                    var existingItemName = existingItem.textContent.trim();
+                    if (!selectedItems.some(item => item.closest("tr").querySelector("td:nth-child(2)").textContent.trim() === existingItemName)) {
+                        existingItem.remove();
+                    }
+                });
+
+                // Add new selected items to the list
+                selectedItems.forEach(item => {
+                    var itemName = item.closest("tr").querySelector("td:nth-child(2)").textContent.trim();
+                    if (!existingItemNames.includes(itemName)) {
+                        var li = document.createElement("li");
+                        li.textContent = itemName;
+                        ul.appendChild(li);
+                    }
+                });
+
+                // Append the updated list to the modal body
+                modalBody.innerHTML = ""; // Clear the modal body first
+                modalBody.appendChild(ul);
+                enableExportButton();
+            } else {
+                // Clear the modal body if there are no selected items
+                modalBody.innerHTML = "";
+            }
+
+            modalQPCRAnalysis.show();
+        });
+
+        btnDismiss.addEventListener("click", function () {
+            modalBody.innerHTML = "";
+            disableExportButton();
+        });
+
+        btnExport.addEventListener("click", function () {
+            exportToCSV();
+            modalQPCRAnalysis.hide();
+            clearSelectedItems();
+        });
+
+        function enableExportButton() {
+            btnExport.disabled = false;
+        }
+
+        function disableExportButton() {
+            btnExport.disabled = true;
+        }
+
+        function clearSelectedItems() {
+
+        }
+
+        function exportToCSV() {
+            // create content from data
+            var content = initialContent();
+            // create csv data
+            var csvData = arrayToCSV(content);
+            // generate a file name according to some rules
+            var fileName = generateFileName();
+            // Call the function to download the CSV data
+            downloadCSV(csvData, fileName);
+        }
+
+        function initialContent() {
+            var cols = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+            var rows = ["A", "B", "C", "D", "E", "F", "G", "H"];
+            var constantData = ["STD 1", "STD 2", "STD 3", "STD 4", "STD 5", "STD 6", "NTC", "EMPTY"];
+            // for (var i = 1; i <= 36; i++) {
+            //     sampleLibs.push("Sample Library " + i);
+            // }
+
+            var sampleLibs = Array.from(modalBody.querySelectorAll("ul li")).map(item => item.textContent.trim());
+
+            // Let's create groups of 8
+            var groupedSampleLibs = [];
+            for (var j = 0; j < sampleLibs.length; j += 8) {
+                groupedSampleLibs.push(sampleLibs.slice(j, j + 8));
+            }
+
+            // Let's duplicate grouped selected items without last one
+            var extendedSampleLibs = [];
+            for (var i = 0; i < groupedSampleLibs.length -1; i++) {
+                // copy array
+                var duplicatedSubArray = groupedSampleLibs[i].slice();
+
+                // insert the new array to extendedSampleLibs twice
+                extendedSampleLibs.push(duplicatedSubArray);
+                extendedSampleLibs.push(duplicatedSubArray);
+            }
+
+            // Son grubun elemanlarını duplike etmek ve ardışık çift elemanlar haline getirmek
+            var lastGroupIndex = groupedSampleLibs.length - 1;
+            var lastGroup = groupedSampleLibs[lastGroupIndex];
+            var tmp = [];
+            lastGroup.forEach(function(item) {
+                tmp.push(item, item);
+            });
+
+            extendedSampleLibs.push(tmp);
+
+            // Add the ConstantData array to the beginning of extendSelectedItems three times
+            for (var i = 0; i < 3; i++) {
+                extendedSampleLibs.unshift(constantData);
+            }
+
+            // create a matrix from cols and rows
+            var matrix = [];
+            for (var i = 0; i < rows.length; i++) {
+                var row = [];
+                for (var j = 0; j < cols.length; j++) {
+                    row.push(rows[i] + cols[j]);
+                }
+                matrix.push(row);
+            }
+
+            // Pair the matrix and data
+            var mergedArray = [];
+            for (var i = 0; i < matrix.length; i++) {
+                var arrayA = matrix[i];
+                var mergedSubArray = [];
+                for (var j = 0; j < extendedSampleLibs.length; j++) {
+                    mergedSubArray.push([arrayA[j], extendedSampleLibs[j][i]]);
+                }
+                mergedArray.push(mergedSubArray);
+            }
+
+            return mergedArray;
+        }
+
+        function arrayToCSV(array) {
+            var csv = '';
+
+            // Iterate over each row in the array
+            array.forEach(function(row) {
+                // Iterate over each element in the row
+                row.forEach(function(pair) {
+                    // Append the element to the CSV string
+                    csv += pair.join(',') + '\n';
+                });
+            });
+
+            return csv;
+        }
+
+        function downloadCSV(csvData, fileName) {
+            // Create a Blob object from the CSV data
+            var blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+
+            // Create a temporary link element
+            var link = document.createElement('a');
+            if (link.download !== undefined) { // feature detection
+                // Set the download attribute of the link
+                var url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', fileName);
+
+                // Append the link to the document body
+                document.body.appendChild(link);
+
+                // Click the link programmatically to trigger the download
+                link.click();
+
+                // Remove the link from the document body
+                document.body.removeChild(link);
+            } else {
+                console.error('Your browser does not support downloading files programmatically. Please try another browser.');
+            }
+        }
+
+        function generateFileName() {
+            // qPCR_analysis should have the following format: DATE-SLprefix.
+            // Date should be MMDDYY. SLprefix are any letters before the SL.name (e.g. AMLP for SLs named AMLP-1 etc.., e.g. 040224-AMLP.
+            // If there are SLs with different prefixes e.g. AMLP-1 and SGP-123, use all prefixes for qPCR_analysis (e.g. 040224-AMLP+SGP).
+            // Get the current date and format it as MMDDYY
+            const today = new Date();
+            const date = today.toLocaleDateString('en-US', {
+                month: '2-digit',
+                day: '2-digit',
+                year: '2-digit'
+            }).replace(/\//g, ''); // remove slashes
+
+            // Extract SL prefixes
+            const prefixes = new Set();
+            for (const slName of sampleLibs) {
+                const prefix = slName.split('-')[0]; // Get the prefix before the dash
+                prefixes.add(prefix);
+            }
+
+            // Combine prefixes
+            const prefixString = [...prefixes].sort().join('+');
+
+            // Combine date and prefixes
+            const fileName = `${date}-${prefixString}.csv`;
+            // return fileName;
+            return "deneme.csv"
+        }
+    })();
+
+    var handleSelectedRows = ((e) => {
+      const container = document.querySelector('.table');
+      const modal = new bootstrap.Modal(document.getElementById("modal_capturedlib_options"));
+      const modalCL = new bootstrap.Modal(document.getElementById("add_to_captured_library"));
 
       document.getElementById("create_captured_lib").addEventListener('click', function (e) {
 
@@ -648,7 +870,7 @@ var KTDatatablesServerSide = function () {
           }).then((result) => {
               /* Read more about isConfirmed, isDenied below */
               if (result.isConfirmed) {
-                    modal_cl.show();
+                    modalCL.show();
               } else if (result.isDenied) {
                   modal.show();
               }
@@ -764,8 +986,8 @@ var KTDatatablesServerSide = function () {
                   }
               })
             };
-            modal_cl.show();
-            modal_cl.hide();
+            modalCL.show();
+            modalCL.hide();
             dt.draw();
           });
 
