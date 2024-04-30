@@ -646,7 +646,7 @@ var KTDatatablesServerSide = function () {
         const btnDismiss = document.querySelector("button[name='btnDismiss']");
         var sampleLibs = [];
 
-        document.getElementById("qpcr_analysis").addEventListener("click", function () {
+        document.getElementById("menu_qpcr_analysis").addEventListener("click", function () {
             // var selectedItems = Array.from(container.querySelectorAll('[type="checkbox"]:checked'));
             if (selectedSampleLibs.length > 0) {
                 const modalBody = document.querySelector("#modal_qpcr_analysis .modal-body .card-body");
@@ -690,6 +690,14 @@ var KTDatatablesServerSide = function () {
             modalQPCRAnalysis.show();
         });
 
+        document.getElementById("modal_qpcr_analysis").addEventListener("hide.bs.modal", function () {
+            // clear selections
+            selectedRows = [];
+            selectedSampleLibs = [];
+            // refresh datatable
+            dt.draw();
+        });
+
         btnDismiss.addEventListener("click", function () {
             modalBody.innerHTML = "";
             disableExportButton();
@@ -698,7 +706,6 @@ var KTDatatablesServerSide = function () {
         btnExport.addEventListener("click", function () {
             exportToCSV();
             modalQPCRAnalysis.hide();
-            clearSelectedItems();
         });
 
         function enableExportButton() {
@@ -707,10 +714,6 @@ var KTDatatablesServerSide = function () {
 
         function disableExportButton() {
             btnExport.disabled = true;
-        }
-
-        function clearSelectedItems() {
-
         }
 
         function exportToCSV() {
@@ -728,30 +731,25 @@ var KTDatatablesServerSide = function () {
             var cols = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
             var rows = ["A", "B", "C", "D", "E", "F", "G", "H"];
             var constantData = ["STD 1", "STD 2", "STD 3", "STD 4", "STD 5", "STD 6", "NTC", "EMPTY"];
-            for (var i = 1; i <= 36; i++) {
-                sampleLibs.push("Sample Library " + i);
-            }
-
-            // var sampleLibs = Array.from(modalBody.querySelectorAll("ul li")).map(item => item.textContent.trim());
-
-            // Let's create groups of 8
-            // var groupedSampleLibs = [];
-            // for (var j = 0; j < sampleLibs.length; j += 8) {
-            //     groupedSampleLibs.push(sampleLibs.slice(j, j + 8));
+            const MAX_ITEM = 36;
+            //DEMO DATA:
+            // for (var i = 1; i <= 36; i++) {
+            //     sampleLibs.push("Sample Library " + i);
             // }
 
-            function splitToGroups(veri, maxGrupSayisi) {
-                var gruplar = new Array(maxGrupSayisi).fill().map(() => []);
-                for (var i = 0; i < veri.length; i++) {
-                    var grupIndex = i % maxGrupSayisi;
-                    gruplar[grupIndex].push(veri[i]);
-                }
-                return gruplar;
+            var sampleLibs = Array.from(modalBody.querySelectorAll("ul li")).map(item => item.textContent.trim());
+
+            // Let's check the length of the list, if less than 36, complete the missing parts with null.
+            while (sampleLibs.length < MAX_ITEM) {
+                sampleLibs.push(null);
             }
 
-            var groupedSampleLibs = splitToGroups(sampleLibs, 8);
+            // Let's create groups of 8
+            var groupedSampleLibs = [];
+            for (var j = 0; j < sampleLibs.length; j += 8) {
+                groupedSampleLibs.push(sampleLibs.slice(j, j + 8));
+            }
 
-            console.log(groupedSampleLibs);
             // Let's duplicate grouped selected items without last one
             var extendedSampleLibs = [];
             for (var i = 0; i < groupedSampleLibs.length -1; i++) {
@@ -764,7 +762,7 @@ var KTDatatablesServerSide = function () {
             }
 
             // The order of the last row on the plate is different from the others
-            if (groupedSampleLibs.length == 8) {
+            if (groupedSampleLibs.length == 5) {
                 // Duplicate the elements of the last group and make them into consecutive double elements
                 var lastGroupIndex = groupedSampleLibs.length - 1;
                 var lastGroup = groupedSampleLibs[lastGroupIndex];
@@ -776,11 +774,7 @@ var KTDatatablesServerSide = function () {
 
                 extendedSampleLibs.push(tmp);
             }
-            else {
-                extendedSampleLibs = groupedSampleLibs;
-            }
 
-            console.log(extendedSampleLibs);
             // Add the ConstantData array to the beginning of extendSelectedItems three times
             for (var i = 0; i < 3; i++) {
                 extendedSampleLibs.unshift(constantData);
@@ -795,7 +789,7 @@ var KTDatatablesServerSide = function () {
                 }
                 matrix.push(row);
             }
-            console.log(matrix);
+
             // Pair the matrix and data
             var mergedArray = [];
             for (var i = 0; i < matrix.length; i++) {
@@ -806,7 +800,6 @@ var KTDatatablesServerSide = function () {
                 }
                 mergedArray.push(mergedSubArray);
             }
-            console.log(mergedArray);
 
             return mergedArray;
         }
@@ -865,7 +858,7 @@ var KTDatatablesServerSide = function () {
 
             // Extract SL prefixes
             const prefixes = new Set();
-            for (const slName of sampleLibs) {
+            for (const slName of selectedSampleLibs) {
                 const prefix = slName.split('-')[0]; // Get the prefix before the dash
                 prefixes.add(prefix);
             }
