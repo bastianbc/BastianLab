@@ -220,14 +220,11 @@ class MigrateDump():
                     area.notes = row[5]
                     area.save()
                 # print(row)
-            # except ObjectDoesNotExist:
-            #     print(row[-1])
-            #     block = Blocks.objects.get(name="BB"+row[-1].strip())
-            #     area = Areas.objects.get(name=row[1])
-            #     area.block = block
-            #     area.save()
             except Exception as e:
                 print(e,row[1], "Block: ",row[-2])
+                # for i in row[-6].split(","):
+                #     block = Blocks.objects.get(name=i)
+                #     print(block)
         # for row in rows2:
         #     try:
         #         area = Areas.objects.get(name=row[1])
