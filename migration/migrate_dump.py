@@ -22,8 +22,8 @@ from psycopg2 import OperationalError
 
 class MigrateDump():
     database_name = "migration_dump3"
-    database_user = "cbagci"
-    database_password = 'Deneme-12345'
+    database_user = "cbagi"
+    database_password = '1235'
     database_host = "localhost"
     database_port = "5432"
 
