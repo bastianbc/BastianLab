@@ -2892,8 +2892,8 @@ def patients(row):
 
 def check_patient(request):
     from .migrate_dump import MigrateDump
-    Areas.objects.filter().delete()
-    MigrateDump.register_areas()
+    Blocks.objects.filter().delete()
+    MigrateDump.register_blocks()
     # for na in NucAcids.objects.all():
     #     print(na)
     #     obj, created = AREA_NA_LINK.objects.get_or_create(nucacid=na,area=na.area)

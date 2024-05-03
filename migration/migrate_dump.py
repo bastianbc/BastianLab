@@ -149,7 +149,7 @@ class MigrateDump():
                 # print(row[-4])
                 patient = Patients.objects.get(pat_id=row[-4])
                 block, created = Blocks.objects.get_or_create(
-                    name=row[1]
+                    name=row[1].strip()
                 )
                 block.patient = patient
                 block.age = row[2]
@@ -203,22 +203,17 @@ class MigrateDump():
     @staticmethod
     def register_areas():
         sql = '''
-        SELECT a.*, l.*, b.name as block, b.bl_id FROM AREAS a
-        RIGHT JOIN block_area_link l on a.ar_id=l.area
-        RIGHT JOIN blocks b on l.block = b.bl_id
+        SELECT a.*, l.*, b.name as block, b.bl_id 
+        FROM AREAS a 
+        LEFT JOIN block_area_link l on a.ar_id=l.area 
+        LEFT JOIN blocks b on l.block = b.bl_id
         '''
-        sql2 = '''SELECT * FROM AREAS '''
-        rows = MigrateDump().cursor(sql2)
-        # rows2 = MigrateDump().cursor(sql2)
+        rows = MigrateDump().cursor(sql)
         for row in rows:
             try:
                 if row[0] != None:
-                    block = Blocks.objects.get(name=row[-1].strip())
-                    # print(block)
-                    # Areas.objects.get(name=row[1])
-                    if block:
-                        area, _ = Areas.objects.get_or_create(name=row[1], block=block)
-                    # area.block = block
+                    block = Blocks.objects.get(name=row[-2].strip())
+                    area, _ = Areas.objects.get_or_create(name=row[1], block=block)
                     if row[2] != None:
                         area.area_type = MigrateDump.get_area_type(row[2])
                     area.image = row[4]
@@ -232,7 +227,7 @@ class MigrateDump():
             #     area.block = block
             #     area.save()
             except Exception as e:
-                print(e,row[1], row[-1])
+                print(e,row[1], "Block: ",row[-2])
         # for row in rows2:
         #     try:
         #         area = Areas.objects.get(name=row[1])
