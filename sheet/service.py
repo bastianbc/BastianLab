@@ -8,6 +8,8 @@ from capturedlib.models import CapturedLib
 from sequencinglib.models import SequencingLib
 from sequencingfile.models import SequencingFile,SequencingFileSet
 from lab.models import Patients
+from bait.serializers import BaitSerializer
+from bait.models import Bait
 
 
 class SequencingRunSerializerManual(serializers.ModelSerializer):
@@ -32,24 +34,38 @@ class PatientsSerializerManual(serializers.ModelSerializer):
 
 class CustomSampleLibSerializer(serializers.ModelSerializer):
     method_label = serializers.SerializerMethodField()
-    barcode = serializers.StringRelatedField()
+    barcode = serializers.SerializerMethodField()
+    bait = serializers.SerializerMethodField()
     na_type = serializers.SerializerMethodField()
     area_type = serializers.SerializerMethodField()
     patient = serializers.SerializerMethodField()
     matching_normal_sl = serializers.SerializerMethodField()
     seq_run = serializers.SerializerMethodField()
     files = serializers.SerializerMethodField()
+    path = serializers.SerializerMethodField()
 
     class Meta:
         model = SampleLib
-        fields = ("id", "name",  "shear_volume",  "qpcr_conc", "barcode",
+        fields = ("id", "name",  "shear_volume",  "qpcr_conc", "barcode", "bait",
                   "na_type", "area_type", "method", "method_label",
-                  "patient", "matching_normal_sl", "seq_run", "files")
+                  "patient", "matching_normal_sl", "seq_run", "files", "path")
+
+    def get_bait(self, obj):
+        baits = Bait.objects.filter(captured_libs__sl_cl_links__sample_lib=obj).distinct()
+        bait = BaitSerializer(baits, many=True).data
+        return bait if bait else None
+
+    def get_barcode(self,obj):
+        barcode = obj.barcode
+        return obj.barcode.i5 or obj.barcode.i7 if barcode else None
 
     def get_files(self, obj):
         seq_files = SequencingFile.objects.filter(sequencing_file_set__sample_lib=obj)
         files = SequencingRunSerializerManual(seq_files, many=True).data
         return files
+
+    def get_path(self, obj):
+        return obj.sequencing_file_sets.first().path if obj.sequencing_file_sets.first() else None
 
     def get_method_label(self,obj):
         return obj.method.name if obj.method else None

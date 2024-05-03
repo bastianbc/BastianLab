@@ -10,12 +10,12 @@ var KTDatatablesServerSide = function () {
     // Private functions
     var initDatatable = function () {
         dt = $("#kt_datatable_example_1").DataTable({
-            searchDelay: 500,
+            // searchDelay: 500,
             processing: true,
             serverSide: true,
-            pageLength: 10,
+            pageLength: 100,
             order: [[2, 'asc']],
-            stateSave: true,
+            stateSave: false,
             select: {
                 style: 'multi',
                 selector: 'td:first-child input[type="checkbox"]',
@@ -45,13 +45,13 @@ var KTDatatablesServerSide = function () {
                 { data: 'patient' },
                 { data: 'name' },
                 { data: 'barcode' },
+                { data: 'bait' },
                 { data: 'na_type' },
                 { data: 'area_type' },
-                { data: 'shear_volume' },
-                { data: 'qpcr_conc' },
                 { data: 'matching_normal_sl' },
                 { data: 'seq_run' },
                 { data: 'files' },
+                { data: 'path' },
             ],
             columnDefs: [
                 {
@@ -79,7 +79,20 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: -1,
+                    targets: 4,
+                    render: function (data, type, row) {
+                        let namesList = [];
+                        if (Array.isArray(row["bait"])) {
+                            row["bait"].forEach(sqr => {
+                                namesList.push(sqr.pat_id);
+                            });
+                        }
+                        // This will return the names list. Adjust based on your requirements
+                        return namesList.join(", ");
+                    }
+                },
+                {
+                    targets: -2,
                     render: function (data, type, row) {
                         let namesList = [];
                         if (Array.isArray(row["files"])) {
@@ -92,7 +105,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: -2,
+                    targets: -3,
                     render: function (data, type, row) {
                         let namesList = [];
                         if (Array.isArray(row["seq_run"])) {
@@ -105,7 +118,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: -3,
+                    targets: -4,
                     render: function (data, type, row) {
                         let namesList = [];
                         if (Array.isArray(row["matching_normal_sl"])) {
