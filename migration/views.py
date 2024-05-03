@@ -2891,9 +2891,12 @@ def patients(row):
 
 
 def check_patient(request):
-    for na in NucAcids.objects.all():
-        print(na)
-        obj, created = AREA_NA_LINK.objects.get_or_create(nucacid=na,area=na.area)
+    from .migrate_dump import MigrateDump
+    Patients.objects.filter().delete()
+    MigrateDump.register_patients()
+    # for na in NucAcids.objects.all():
+    #     print(na)
+    #     obj, created = AREA_NA_LINK.objects.get_or_create(nucacid=na,area=na.area)
     # file = Path(Path(__file__).parent.parent / "uploads" / "report_patients_not_matched.csv")
     # df = pd.read_csv(file)
     # df.apply(lambda row: patients(row), axis=1)

@@ -2,48 +2,26 @@ import os
 import django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'test1.settings')
 django.setup()
-from django.shortcuts import get_object_or_404
-
-from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from datetime import datetime
-import csv
-from io import StringIO
 from lab.models import Patients
 from blocks.models import Blocks
 from projects.models import Projects
-from account.models import User
 from areas.models import Areas
 from libprep.models import NucAcids, AREA_NA_LINK
-from method.models import Method
 from samplelib.models import SampleLib, NA_SL_LINK
 from capturedlib.models import CapturedLib, SL_CL_LINK
-from bait.models import Bait
 from barcodeset.models import Barcodeset,Barcode
-from sequencingrun.models import SequencingRun
 from sequencinglib.models import SequencingLib,CL_SEQL_LINK
 from sequencingfile.models import SequencingFile, SequencingFileSet
-from variant.models import *
-from gene.models import *
 from body.models import *
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-import json
-import xlrd
 import string
 import random
-from itertools import groupby,chain
 import re
-import ast
-from pathlib import Path
-import pandas as pd
-import uuid
 import psycopg2
 from psycopg2 import OperationalError
-import getpass
 
 
 class MigrateDump():
-    database_name = "migration_dump"
+    database_name = "migration_dump3"
     database_user = "cbagci"
     database_password = 'Deneme-12345'
     database_host = "localhost"
@@ -92,8 +70,8 @@ class MigrateDump():
 
     @staticmethod
     def register_patients():
+
         rows = MigrateDump().cursor("SELECT * FROM patients")
-        # print(Patients.objects.all().count())
         for row in rows:
             try:
                 # print(row)
@@ -115,7 +93,7 @@ class MigrateDump():
                 patient.pat_ip_id = row[9] or ""
                 patient.save()
                 # patient = get_or_create(Patients, pat_id=row[0])
-                # print(patient)
+                print(patient)
             except Exception as e:
                 print(row[0], e)
 

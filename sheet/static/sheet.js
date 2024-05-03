@@ -83,8 +83,8 @@ var KTDatatablesServerSide = function () {
                     render: function (data, type, row) {
                         let namesList = [];
                         if (Array.isArray(row["bait"])) {
-                            row["bait"].forEach(sqr => {
-                                namesList.push(sqr.pat_id);
+                            row["bait"].forEach(bait => {
+                                namesList.push(bait.name);
                             });
                         }
                         // This will return the names list. Adjust based on your requirements
@@ -95,9 +95,9 @@ var KTDatatablesServerSide = function () {
                     targets: -2,
                     render: function (data, type, row) {
                         let namesList = [];
-                        if (Array.isArray(row["files"])) {
-                            row["files"].forEach(sqr => {
-                                namesList.push(sqr.name);
+                        if (Array.isArray(row["file_set"])) {
+                            row["file_set"].forEach(file => {
+                                namesList.push(file.prefix);
                             });
                         }
                         // This will return the names list. Adjust based on your requirements
