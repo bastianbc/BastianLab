@@ -10,12 +10,12 @@ var KTDatatablesServerSide = function () {
     // Private functions
     var initDatatable = function () {
         dt = $("#kt_datatable_example_1").DataTable({
-            searchDelay: 500,
+            // searchDelay: 500,
             processing: true,
             serverSide: true,
-            pageLength: 10,
+            pageLength: 100,
             order: [[2, 'asc']],
-            stateSave: true,
+            stateSave: false,
             select: {
                 style: 'multi',
                 selector: 'td:first-child input[type="checkbox"]',
