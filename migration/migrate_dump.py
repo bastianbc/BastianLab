@@ -226,13 +226,13 @@ class MigrateDump():
                     if row[-6] is not None:
                         for i in row[-6].split(","):
                             block, _ = Blocks.objects.get_or_create(name=i)
-                            # area, _ = Areas.objects.get_or_create(name=row[1])
-                            # if row[2] != None:
-                            #     area.area_type = MigrateDump.get_area_type(row[2])
-                            # area.image = row[4]
-                            # area.notes = row[5] + " additional blocks: " + row[6]
-                            # area.save()
-                            # print(block)
+                    area, _ = Areas.objects.get_or_create(name=row[1], block=block)
+                    if row[2] != None:
+                        area.area_type = MigrateDump.get_area_type(row[2])
+                    area.image = row[4]
+                    area.notes = row[5] + " additional blocks: " + row[6]
+                    area.save()
+                    print(block)
                 except Exception as e:
                     print(e)
         # for row in rows2:
