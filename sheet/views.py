@@ -12,8 +12,8 @@ from capturedlib.models import CapturedLib
 
 def _get_queryset(seq_runs):
     query_set = SampleLib.objects.filter(
-        sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=seq_runs).annotate(
-        na_type=F('na_sl_links__nucacid__na_type'),
+        sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=seq_runs
+        ).annotate(na_type=F('na_sl_links__nucacid__na_type'),
         seq_run=Subquery(
             SequencingRun.objects.filter(
                 sequencing_libs__cl_seql_links__captured_lib__sl_cl_links__sample_lib=OuterRef('pk'),
@@ -56,7 +56,15 @@ def _get_queryset(seq_runs):
             ),
             output_field=CharField()
         ),
-        barcode_name=F('barcode__name')
+       barcode_name=Case(
+           When(barcode__i5__isnull=False, then=F('barcode__i5')),
+           When(barcode__i5__isnull=True, barcode__i7__isnull=False, then=F('barcode__i7')),
+           default=Value(""),
+           output_field=CharField()
+       ),
+        file_set=F("sequencing_file_sets__prefix"),
+        path=F("sequencing_file_sets__path"),
+        bait=F("sl_cl_links__captured_lib__bait__name")
     ).distinct().order_by('name')
     return query_set
 

@@ -11,6 +11,10 @@ from lab.models import Patients
 from bait.serializers import BaitSerializer
 from bait.models import Bait
 
+class SequencingFileSetSerializerManual(serializers.ModelSerializer):
+    class Meta:
+        model = SequencingFileSet
+        fields = "__all__"
 
 class SequencingRunSerializerManual(serializers.ModelSerializer):
     class Meta:
@@ -41,14 +45,14 @@ class CustomSampleLibSerializer(serializers.ModelSerializer):
     patient = serializers.SerializerMethodField()
     matching_normal_sl = serializers.SerializerMethodField()
     seq_run = serializers.SerializerMethodField()
-    files = serializers.SerializerMethodField()
+    file_set = serializers.SerializerMethodField()
     path = serializers.SerializerMethodField()
 
     class Meta:
         model = SampleLib
         fields = ("id", "name",  "shear_volume",  "qpcr_conc", "barcode", "bait",
                   "na_type", "area_type", "method", "method_label",
-                  "patient", "matching_normal_sl", "seq_run", "files", "path")
+                  "patient", "matching_normal_sl", "seq_run", "file_set", "path")
 
     def get_bait(self, obj):
         baits = Bait.objects.filter(captured_libs__sl_cl_links__sample_lib=obj).distinct()
@@ -59,9 +63,9 @@ class CustomSampleLibSerializer(serializers.ModelSerializer):
         barcode = obj.barcode
         return obj.barcode.i5 or obj.barcode.i7 if barcode else None
 
-    def get_files(self, obj):
-        seq_files = SequencingFile.objects.filter(sequencing_file_set__sample_lib=obj)
-        files = SequencingRunSerializerManual(seq_files, many=True).data
+    def get_file_set(self, obj):
+        seq_files = SequencingFileSet.objects.filter(sample_lib=obj)
+        files = SequencingFileSetSerializerManual(seq_files, many=True).data
         return files
 
     def get_path(self, obj):
@@ -94,32 +98,30 @@ class CustomSampleLibSerializer(serializers.ModelSerializer):
         ).distinct()
         _patients = PatientsSerializerManual(_patients, many=True).data
         return _patients
-        # if obj.na_sl_links.first():
-        #     nuc_acid = obj.na_sl_links.first().nucacid
-        #     if nuc_acid.area_na_links.first():
-        #         area = nuc_acid.area_na_links.first().area
-        #         if area:
-        #             patient = area.block.patient.pat_id
-        #             return patient
-        # return None
+
 
     def get_matching_normal_sl(self, obj):
+        print("="*100,obj.name)
         matching_normal_sl=[]
         if obj.na_sl_links.all():
             for na_sl_link in obj.na_sl_links.all():
+                print("na_sl_links", na_sl_link.nucacid.name)
                 if na_sl_link.nucacid.area_na_links.all():
                     for area_na_link in na_sl_link.nucacid.area_na_links.all():
                         area = area_na_link.area
-                        if area.name == "UndefinedArea":
-                            continue
+                        print("area", area.name, area.area_type)
                         if area.area_type:
                             at = "Normal" if area.area_type.lower() == "normal" else "Tumor"
                             if at == "Tumor":
                                 patient = area.block.patient
+                                print("patient: ", patient)
                                 matching_normal = Areas.objects.filter(block__patient=patient, area_type="normal")
+                                print("matching_normal: ", matching_normal)
                                 matching_normal_sl = SampleLib.objects.filter(na_sl_links__nucacid__area_na_links__area__in=matching_normal).values("name").distinct()
                                 matching_normal_sl = SampleLibSerializerManual(matching_normal_sl, many=True).data
-            return matching_normal_sl
+
+            return matching_normal_sl if len(matching_normal_sl) < 4 else None
+
         return None
 
     def get_seq_run(self, obj):
@@ -131,27 +133,6 @@ class CustomSampleLibSerializer(serializers.ModelSerializer):
 
 
 def get_sample_lib_list(request):
-    ORDER_COLUMN_CHOICES = {
-        "0": "id",
-        "1": "patient",
-        "2": "name",
-        "3": "barcode",
-        "4": "na_type",
-        "5": "area_type",
-        "6": "volume",
-        "7": "conc",
-        "8": "matching_normal",
-        "9": "sequncing_run",
-        "10": "files",
-    }
-    '''
-    'order[0][column]': ['2'], 
-    'order[0][dir]': ['asc'], 
-    'start': ['40'], 
-    'length': ['10'], 
-    'search[value]': [''], 
-    'search[regex]': ['false'],
-    '''
     mutable_querydict = request.GET.copy()
     mutable_querydict['order[0][column]'] = '1'
     mutable_querydict['order[0][dir]'] = 'asc'
@@ -174,6 +155,7 @@ def get_sample_lib_list(request):
 
 
 def generate_file(data, file_name):
+
     class Report(object):
         no = 0
         patient = ""
@@ -189,7 +171,6 @@ def generate_file(data, file_name):
     res = []
 
     for index, row in enumerate(data):
-        print(index,row)
         report = Report()
         report.no = index + 1
 
@@ -197,12 +178,15 @@ def generate_file(data, file_name):
         report.sample_lib = row.name
         report.sex = row.sex
         report.barcode = row.barcode_name
+        report.bait = row.bait
         report.na_type = row.na_type
         report.area_type = row.area_type
         report.matching_normal_sl = row.matching_normal_sl
         report.conc = row.qpcr_conc
         report.volume = row.shear_volume
         report.seq_run = row.seq_run
+        report.file_set = row.file_set
+        report.path = row.path
         res.append(report)
 
     response = HttpResponse(
@@ -210,8 +194,8 @@ def generate_file(data, file_name):
         headers={'Content-Disposition': f'attachment; filename="{file_name}.csv"'},
     )
 
-    field_names = ["no", "patient", "sample_lib", "sex", "barcode", "na_type", "area_type",
-                   "volume", "conc", "matching_normal_sl", "seq_run"]
+    field_names = ["no", "patient", "sample_lib", "sex", "barcode", "bait", "na_type", "area_type",
+                   "volume", "conc", "matching_normal_sl", "seq_run", "file_set", "path"]
     writer = csv.writer(response)
     writer.writerow(field_names)
     for item in res:
