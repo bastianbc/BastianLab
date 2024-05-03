@@ -142,7 +142,9 @@ class MigrateDump():
     def register_blocks():
         rows = MigrateDump().cursor("SELECT * FROM blocks")
         # print(Patients.objects.all().count())
+        count = 0
         for row in rows:
+            count += 1
             try:
                 # print(row[-4])
                 patient = Patients.objects.get(pat_id=row[-4])
@@ -187,6 +189,7 @@ class MigrateDump():
                         project = Projects.objects.create(name=row[-3], abbreviation=MigrateDump.get_abbreviation(row[-3]))
                     block.project = project
                 block.save()
+                print(count, block)
             except Exception as e:
                 print(e, row[-3])
 
