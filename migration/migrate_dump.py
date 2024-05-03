@@ -222,9 +222,19 @@ class MigrateDump():
                 # print(row)
             except Exception as e:
                 print(e,row[1], "Block: ",row[-2])
-                # for i in row[-6].split(","):
-                #     block = Blocks.objects.get(name=i)
-                #     print(block)
+                try:
+                    if row[-6] is not None:
+                        for i in row[-6].split(","):
+                            block, _ = Blocks.objects.get_or_cerate(name=i)
+                            area, _ = Areas.objects.get_or_create(name=row[1], block=block)
+                            if row[2] != None:
+                                area.area_type = MigrateDump.get_area_type(row[2])
+                            area.image = row[4]
+                            area.notes = row[5]
+                            area.save()
+                            print(block)
+                except Exception as e:
+                    print(e)
         # for row in rows2:
         #     try:
         #         area = Areas.objects.get(name=row[1])
