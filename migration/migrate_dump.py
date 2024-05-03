@@ -225,7 +225,7 @@ class MigrateDump():
                 try:
                     if row[-6] is not None:
                         for i in row[-6].split(","):
-                            block, _ = Blocks.objects.get_or_cerate(name=i)
+                            block, _ = Blocks.objects.get_or_cereate(name=i)
                             area, _ = Areas.objects.get_or_create(name=row[1], block=block)
                             if row[2] != None:
                                 area.area_type = MigrateDump.get_area_type(row[2])
