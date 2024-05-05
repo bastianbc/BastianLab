@@ -38,6 +38,5 @@ class FilterForm(forms.Form):
         self.fields["area_type"].widget.attrs.update({'class':'form-control-sm'})
         self.fields["bait"].widget.attrs.update({'class':'form-control-sm'})
 
-
 class CapturedLibAddForm(forms.Form):
     captured_lib = forms.ModelChoiceField(queryset=CapturedLib.objects.all().order_by("name"), label="Captured Libs")
