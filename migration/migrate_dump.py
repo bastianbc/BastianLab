@@ -2,50 +2,28 @@ import os
 import django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'test1.settings')
 django.setup()
-from django.shortcuts import get_object_or_404
-
-from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from datetime import datetime
-import csv
-from io import StringIO
 from lab.models import Patients
 from blocks.models import Blocks
 from projects.models import Projects
-from account.models import User
 from areas.models import Areas
 from libprep.models import NucAcids, AREA_NA_LINK
-from method.models import Method
 from samplelib.models import SampleLib, NA_SL_LINK
 from capturedlib.models import CapturedLib, SL_CL_LINK
-from bait.models import Bait
 from barcodeset.models import Barcodeset,Barcode
-from sequencingrun.models import SequencingRun
 from sequencinglib.models import SequencingLib,CL_SEQL_LINK
 from sequencingfile.models import SequencingFile, SequencingFileSet
-from variant.models import *
-from gene.models import *
 from body.models import *
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-import json
-import xlrd
 import string
 import random
-from itertools import groupby,chain
 import re
-import ast
-from pathlib import Path
-import pandas as pd
-import uuid
 import psycopg2
 from psycopg2 import OperationalError
-import getpass
 
 
 class MigrateDump():
-    database_name = "migration_dump"
-    database_user = "cbagci"
-    database_password = 'Deneme-12345'
+    database_name = "migration_dump3"
+    database_user = "cbagi"
+    database_password = '1235'
     database_host = "localhost"
     database_port = "5432"
 
@@ -92,8 +70,8 @@ class MigrateDump():
 
     @staticmethod
     def register_patients():
+
         rows = MigrateDump().cursor("SELECT * FROM patients")
-        # print(Patients.objects.all().count())
         for row in rows:
             try:
                 # print(row)
@@ -115,7 +93,7 @@ class MigrateDump():
                 patient.pat_ip_id = row[9] or ""
                 patient.save()
                 # patient = get_or_create(Patients, pat_id=row[0])
-                # print(patient)
+                print(patient)
             except Exception as e:
                 print(row[0], e)
 
@@ -164,12 +142,14 @@ class MigrateDump():
     def register_blocks():
         rows = MigrateDump().cursor("SELECT * FROM blocks")
         # print(Patients.objects.all().count())
+        count = 0
         for row in rows:
+            count += 1
             try:
                 # print(row[-4])
                 patient = Patients.objects.get(pat_id=row[-4])
                 block, created = Blocks.objects.get_or_create(
-                    name=row[1]
+                    name=row[1].strip()
                 )
                 block.patient = patient
                 block.age = row[2]
@@ -209,6 +189,7 @@ class MigrateDump():
                         project = Projects.objects.create(name=row[-3], abbreviation=MigrateDump.get_abbreviation(row[-3]))
                     block.project = project
                 block.save()
+                print(count, block)
             except Exception as e:
                 print(e, row[-3])
 
@@ -222,44 +203,46 @@ class MigrateDump():
     @staticmethod
     def register_areas():
         sql = '''
-        SELECT a.*, l.*, b.name as block, b.bl_id FROM AREAS a
-        RIGHT JOIN block_area_link l on a.ar_id=l.area
-        RIGHT JOIN blocks b on l.block = b.bl_id
+        SELECT a.*, l.*, b.name as block, b.bl_id 
+        FROM AREAS a 
+        LEFT JOIN block_area_link l on a.ar_id=l.area 
+        LEFT JOIN blocks b on l.block = b.bl_id
         '''
-        sql2 = '''SELECT * FROM AREAS '''
-        # rows = MigrateDump().cursor(sql2)
-        rows2 = MigrateDump().cursor(sql2)
-        # for row in rows:
-        #     try:
-        #         if row[0] != None:
-        #             block = Blocks.objects.get(name=row[-1].strip())
-        #             # print(block)
-        #             # Areas.objects.get(name=row[1])
-        #             if block:
-        #                 area, _ = Areas.objects.get_or_create(name=row[1], block=block)
-        #             # area.block = block
-        #             if row[2] != None:
-        #                 area.area_type = MigrateDump.get_area_type(row[2])
-        #             area.image = row[4]
-        #             area.notes = row[5]
-                    # area.save()
-        #         # print(row)
-        #     except ObjectDoesNotExist:
-        #         print(row[-1])
-        #         block = Blocks.objects.get(name="BB"+row[-1].strip())
-        #         area = Areas.objects.get(name=row[1])
-        #         area.block = block
-        #         area.save()
-        #     except Exception as e:
-        #         print(e,row[1], row[-1])
-        for row in rows2:
+        rows = MigrateDump().cursor(sql)
+        for row in rows:
             try:
-                area = Areas.objects.get(name=row[1])
-                if row[2] != None:
-                    area.area_type = MigrateDump.get_area_type(row[2])
-                area.image = row[4]
-                area.notes = row[5]
-                area.save()
+                if row[0] != None:
+                    block = Blocks.objects.get(name=row[-2].strip())
+                    area, _ = Areas.objects.get_or_create(name=row[1], block=block)
+                    if row[2] != None:
+                        area.area_type = MigrateDump.get_area_type(row[2])
+                    area.image = row[4]
+                    area.notes = row[5]
+                    area.save()
+                # print(row)
+            except Exception as e:
+                print(e,row[1], "Block: ",row[-2])
+                try:
+                    if row[-6] is not None:
+                        for i in row[-6].split(","):
+                            block, _ = Blocks.objects.get_or_create(name=i)
+                    area, _ = Areas.objects.get_or_create(name=row[1], block=block)
+                    if row[2] != None:
+                        area.area_type = MigrateDump.get_area_type(row[2])
+                    area.image = row[4]
+                    area.notes = row[5] + " additional blocks: " + row[6]
+                    area.save()
+                    print(block)
+                except Exception as e:
+                    print(e)
+        # for row in rows2:
+        #     try:
+        #         area = Areas.objects.get(name=row[1])
+        #         if row[2] != None:
+        #             area.area_type = MigrateDump.get_area_type(row[2])
+        #         area.image = row[4]
+        #         area.notes = row[5]
+        #         area.save()
                 # if not area:
                 #     print(row[1], " - ", row[-1])
                 #     block = Blocks.objects.get(name=row[-1].strip())
@@ -302,8 +285,8 @@ class MigrateDump():
                 #             area.image = row[4]
                 #             area.notes = row[5]
                 #             area.save()
-            except Exception as e:
-                print("{} area:{}, block{}".format(e, row[1], row[-1]))
+            # except Exception as e:
+            #     print("{} area:{}, block{}".format(e, row[1], row[-1]))
 
     @staticmethod
     def get_na_type(value):
