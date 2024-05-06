@@ -41,6 +41,10 @@ class SampleLib(models.Model):
         self.vol_remain = 0 if volume > self.vol_remain else self.vol_remain - volume
         self.save()
 
+    def update_qpcr(self, value):
+        self.qpcr_conc = value
+        self.save()
+
     @staticmethod
     def query_by_args(user, **kwargs):
 

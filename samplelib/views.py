@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import permission_required
 from .serializers import *
 from core.decorators import *
 from capturedlib.models import *
+from .helper import QPCRAnalysis
 
 @permission_required("samplelib.view_samplelib",raise_exception=True)
 def samplelibs(request):
@@ -290,26 +291,23 @@ def add_async(request):
         for sl_id in selected_ids:
             sl = SampleLib.objects.get(id=sl_id)
             link = SL_CL_LINK.objects.get_or_create(captured_lib=cl, sample_lib=sl)
-        print(request)
-        print(id, selected_ids)
     except Exception as e:
         print(str(e))
         return JsonResponse({"success": False})
     return JsonResponse({"success": True})
 
-# def export_csv_qpcr_analysis(request):
-#     from .helper import CreateCSV
-#
-#     selected_items = request.POST.get("selected_items")
-#     print("selected_items: ",selected_items)
-#
-#     csv_helper = CreateCSV(selected_items)
-#
-#     response = HttpResponse(
-#         content_type='text/csv',
-#         headers={'Content-Disposition': f'attachment; filename="deneme.csv"'},
-#     )
-#
-#     response.write(csv_helper.get_value())
-#
-#     return response
+def import_csv_qpcr_analysis(request):
+    file = request.FILES.get("file")
+
+    try:
+        qpcr = QPCRAnalysis(file)
+        graphic = qpcr.create_normalization_curve()
+        results = qpcr.calculate_concentration()
+
+        for result in results:
+            sample_lib = SampleLib.objects.get(name=result[0])
+            sample_lib.update_qpcr(result[1])
+        return JsonResponse({"success": True})  # Return a JSON response indicating success
+    except Exception as e:
+        print(e)
+        return JsonResponse({"success": False, "message":str(e)})  # Return a JSON response indicating success
