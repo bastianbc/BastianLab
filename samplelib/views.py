@@ -305,8 +305,11 @@ def import_csv_qpcr_analysis(request):
         results = qpcr.calculate_concentration()
 
         for result in results:
-            sample_lib = SampleLib.objects.get(name=result[0])
-            sample_lib.update_qpcr(result[1])
+            try:
+                sample_lib = SampleLib.objects.get(name=result[0])
+                sample_lib.update_qpcr(result[1])
+            except:
+                print("not found")
         return JsonResponse({"success": True})  # Return a JSON response indicating success
     except Exception as e:
         print(e)
