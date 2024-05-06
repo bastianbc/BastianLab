@@ -165,7 +165,8 @@ class QPCRAnalysis():
         canvas.draw()
         pilImage = Image.frombytes("RGB", canvas.get_width_height(), canvas.tostring_rgb())
         pilImage.save(buffer, "PNG")
-
+        img = base64.b64encode(buffer.getvalue()).decode("utf-8")
+        print("image :", img)
         return base64.b64encode(buffer.getvalue()).decode("utf-8")
 
     def calculate_concentration(self):
