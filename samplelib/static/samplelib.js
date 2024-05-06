@@ -875,18 +875,18 @@ var KTDatatablesServerSide = function () {
 
     var handleImportFile = ((e) => {
         // Fetch CSRF token from cookies
-    function getCSRFToken() {
-        const cookieValue = document.cookie
-            .split('; ')
-            .find(cookie => cookie.startsWith('csrftoken='))
-            .split('=')[1];
-        return cookieValue;
-    }
+        function getCSRFToken() {
+            const cookieValue = document.cookie
+                .split('; ')
+                .find(cookie => cookie.startsWith('csrftoken='))
+                .split('=')[1];
+            return cookieValue;
+        }
 
         document.querySelector("button[name='import_file']").addEventListener("click", function () {
             let input = document.createElement('input');
             input.type = 'file';
-            input.accept = '.csv'; // Restrict to CSV files
+            input.accept = '.txt'; // Restrict to CSV files
             input.multiple = false; // Allow only one file to be selected
             input.onchange = _ => {
                 let formData = new FormData();
@@ -912,9 +912,14 @@ var KTDatatablesServerSide = function () {
                     }
                 })
                 .then(data => {
+                    console.log(data.sample_libs);
                     if (data.success) {
                       Swal.fire({
-                          text: "QPCR Analysis imported succesfully.",
+                          html: `<p>QPCR Analysis imported succesfully</p><p>${data.sample_libs}</p>`,
+                          imageUrl: `data:image/png;base64, ${data.graphic}`,
+                          imageWidth: 400,
+                          imageHeight: 200,
+                          imageAlt: "Normalization curve",
                           icon: "info",
                           buttonsStyling: false,
                           confirmButtonText: "Ok, got it!",

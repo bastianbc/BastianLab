@@ -78,7 +78,6 @@ class CreateCSV():
     def generate_csv(self,content):
         # Create a StringIO object to hold the CSV data
         csv_data = StringIO()
-        print(content)
         # Write the CSV data to the StringIO object
         writer = csv.writer(csv_data)
         for row in content:
@@ -100,34 +99,36 @@ class QPCRAnalysis():
         self._extract_data()
 
     def _extract_data(self):
-        # Wrap the file in a TextIOWrapper to decode it from bytes to string
+        # Wrap the InMemoryUploadedFile in a TextIOWrapper to decode it from bytes to string
         file_wrapper = TextIOWrapper(self.file, encoding='utf-8')
 
-        # Now use the wrapped file to create a CSV reader
-        reader = csv.reader(file_wrapper)
+        # Read all lines of the text file
+        lines = file_wrapper.readlines()
 
-        row = next(reader)  # Skip the first row (assuming it's a header row)
+        # Skip the first line (assuming it's a header line)
+        header = lines.pop(0)
 
         # Raw qPCR data: STD number from column name, concentration in pM from column status, Ct values from column Cp in cp.text
         values = []
         tmp = []
-        for i,row in enumerate(reader):
+        for i, line in enumerate(lines):
+            # Split the line into fields based on a delimiter (assuming it's a tab-delimited file)
+            row = line.strip().split('\t')
             index = i % 12
-            if index<3:
+            if index < 3:
                 if row[3].startswith("STD"):
                     std_number = float(row[3][-1])
                     concentration_pm = float(row[6])
                     ct_value = 0 if row[4] == "" else float(row[4])
                     self.standart_data.append([std_number, concentration_pm, ct_value])
-            elif index>=3 and index<=10:
+            elif 3 <= index <= 10:
                 ct_value = 0 if row[4] == "" else float(row[4])
                 sample_lib = row[3]
-                values.append((sample_lib,ct_value))
+                values.append((sample_lib, ct_value))
             else:
-                print(row)
                 ct_value = 0 if row[4] == "" else float(row[4])
                 sample_lib = row[3]
-                tmp.append((sample_lib,ct_value))
+                tmp.append((sample_lib, ct_value))
         values.extend(tmp)
         # Sample data: # Sample data of three SLs with their duplicates in positions 1 and 2 of the tuple and a constant Average fragment length (bp) of 999 to be added for all in position 3 of the tuple]
         self.samples = [[values[i][1], values[i + 1][1], 999, values[i][0]] for i in range(0, len(values), 2)]
@@ -165,8 +166,7 @@ class QPCRAnalysis():
         canvas.draw()
         pilImage = Image.frombytes("RGB", canvas.get_width_height(), canvas.tostring_rgb())
         pilImage.save(buffer, "PNG")
-        img = base64.b64encode(buffer.getvalue()).decode("utf-8")
-        print("image :", img)
+
         return base64.b64encode(buffer.getvalue()).decode("utf-8")
 
     def calculate_concentration(self):
