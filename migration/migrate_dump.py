@@ -318,51 +318,51 @@ class MigrateDump():
         rows = MigrateDump().cursor(sql)
         rows2 = MigrateDump().cursor(sql2)
         rows3 = MigrateDump().cursor(sql3)
-        # for row in rows:
-        #     try:
-        #         # print(row)
-        #         if row[-1] != None:
-        #             area = Areas.objects.get(name=row[-1])
-        #         if row[3] != None:
-        #             na_type = MigrateDump.get_na_type(row[3])
-        #             nuc_acid, _ = NucAcids.objects.get_or_create(name=row[1],na_type=na_type)
-        #         else:
-        #             nuc_acid, _ = NucAcids.objects.get_or_create(name=row[1])
-        #         link = AREA_NA_LINK.objects.get_or_create(
-        #             nucacid=nuc_acid,
-        #             area=area
-        #         )
-        #         if row[2] != None:
-        #             nuc_acid.date = row[2]
-        #         if row[4] != None:
-        #             nuc_acid.conc = row[4]
-        #         if row[5] != None:
-        #             nuc_acid.vol_init = row[5]
-        #         if row[6] != None:
-        #             nuc_acid.vol_remain = row[6]
-        #         nuc_acid.notes = row[7]
-        #         nuc_acid.save()
-        #     except Exception as e:
-        #         print(e, row[1], row[-1])
-        # for row in rows2:
-        #     try:
-        #         if row[3] != None:
-        #             na_type = MigrateDump.get_na_type(row[3])
-        #             nuc_acid, _ = NucAcids.objects.get_or_create(name=row[1],na_type=na_type)
-        #         else:
-        #             nuc_acid, _ = NucAcids.objects.get_or_create(name=row[1])
-        #         if row[2] != None:
-        #             nuc_acid.date = row[2]
-        #         if row[4] != None:
-        #             nuc_acid.conc = row[4]
-        #         if row[5] != None:
-        #             nuc_acid.vol_init = row[5]
-        #         if row[6] != None:
-        #             nuc_acid.vol_remain = row[6]
-        #         nuc_acid.notes = row[7]
-        #         nuc_acid.save()
-        #     except Exception as e:
-        #         print(e, row[1])
+        for row in rows:
+            try:
+                # print(row)
+                if row[-1] != None:
+                    area = Areas.objects.get(name=row[-1])
+                if row[3] != None:
+                    na_type = MigrateDump.get_na_type(row[3])
+                    nuc_acid, _ = NucAcids.objects.get_or_create(name=row[1],na_type=na_type)
+                else:
+                    nuc_acid, _ = NucAcids.objects.get_or_create(name=row[1])
+                link = AREA_NA_LINK.objects.get_or_create(
+                    nucacid=nuc_acid,
+                    area=area
+                )
+                if row[2] != None:
+                    nuc_acid.date = row[2]
+                if row[4] != None:
+                    nuc_acid.conc = row[4]
+                if row[5] != None:
+                    nuc_acid.vol_init = row[5]
+                if row[6] != None:
+                    nuc_acid.vol_remain = row[6]
+                nuc_acid.notes = row[7]
+                nuc_acid.save()
+            except Exception as e:
+                print(e, row[1], row[-1])
+        for row in rows2:
+            try:
+                if row[3] != None:
+                    na_type = MigrateDump.get_na_type(row[3])
+                    nuc_acid, _ = NucAcids.objects.get_or_create(name=row[1],na_type=na_type)
+                else:
+                    nuc_acid, _ = NucAcids.objects.get_or_create(name=row[1])
+                if row[2] != None:
+                    nuc_acid.date = row[2]
+                if row[4] != None:
+                    nuc_acid.conc = row[4]
+                if row[5] != None:
+                    nuc_acid.vol_init = row[5]
+                if row[6] != None:
+                    nuc_acid.vol_remain = row[6]
+                nuc_acid.notes = row[7]
+                nuc_acid.save()
+            except Exception as e:
+                print(e, row[1])
         for row in rows3:
             try:
                 if row[-2]:
