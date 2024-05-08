@@ -2892,7 +2892,7 @@ def patients(row):
 
 def check_patient(request):
     from .migrate_dump import MigrateDump
-    NucAcids.objects.filter().delete()
+    # NucAcids.objects.filter().delete()
     MigrateDump.register_nuc_acids()
     # for na in NucAcids.objects.all():
     #     print(na)
