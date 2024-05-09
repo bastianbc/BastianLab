@@ -414,7 +414,7 @@ class MigrateDump():
                     SELECT * FROM sample_lib order by name
                 '''
         sql3 = '''
-            SELECT l.*, n.name as nucacid, s.name as samplelib, s.na_name
+            SELECT l.*, n.name as nucacid, s.name as samplelib, s.name
             FROM na_sl_link l
             LEFT JOIN sample_lib s on l.sample_lib_id = s.id
             LEFT JOIN nuc_acids n on n.nu_id = l.nucacid_id
