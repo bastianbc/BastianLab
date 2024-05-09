@@ -365,11 +365,7 @@ class MigrateDump():
         #         print(e, row[1])
         for row in rows3:
             try:
-                # if row[-2]:
                 area = Areas.objects.get(name=row[-2])
-                # else:
-                #     print("else")
-                #     area = Areas.objects.get(name=row[-4])
                 na = NucAcids.objects.get(name=row[-1])
                 link = AREA_NA_LINK.objects.get_or_create(area=area, nucacid=na)
             except Exception as e:
