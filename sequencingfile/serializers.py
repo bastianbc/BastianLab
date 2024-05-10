@@ -34,7 +34,7 @@ class SequencingFileSetSerializer(serializers.ModelSerializer):
        return getattr(obj, 'set_id')
 
     def get_sample_lib(self,obj):
-        return obj.sample_lib.name or None
+        return obj.sample_lib.name if obj.sample_lib else None
 
     def get_sequencing_run(self,obj):
-        return obj.sequencing_run.name or None
+        return obj.sequencing_run.name if obj.sequencing_run else None
