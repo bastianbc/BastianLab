@@ -1,14 +1,13 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from .service import get_sample_lib_list, CustomSampleLibSerializer, generate_file
+from .service import get_sample_lib_list, generate_file
 from samplelib.models import SampleLib
 from sequencingrun.models import SequencingRun
 from lab.models import Patients
 from django.db.models import Case, CharField, F, OuterRef, Subquery, Value, When
 import json
 from areas.models import Areas
-from sequencinglib.models import SequencingLib
-from capturedlib.models import CapturedLib
+
 
 def _get_queryset(seq_runs):
     query_set = SampleLib.objects.filter(
