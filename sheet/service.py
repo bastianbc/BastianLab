@@ -163,8 +163,6 @@ def generate_file(data, file_name):
         barcode = ""
         na_type = ""
         area_type = ""
-        volume = 0
-        conc = 0
         matching_normal_sl = ""
         seq_run = ""
 
@@ -182,8 +180,6 @@ def generate_file(data, file_name):
         report.na_type = row.na_type
         report.area_type = row.area_type
         report.matching_normal_sl = row.matching_normal_sl
-        report.conc = row.qpcr_conc
-        report.volume = row.shear_volume
         report.seq_run = row.seq_run
         report.file_set = row.file_set
         report.path = row.path
@@ -195,7 +191,8 @@ def generate_file(data, file_name):
     )
 
     field_names = ["no", "patient", "sample_lib", "sex", "barcode", "bait", "na_type", "area_type",
-                   "volume", "conc", "matching_normal_sl", "seq_run", "file_set", "path"]
+                   "matching_normal_sl", "seq_run", "file_set", "path"]
+
     writer = csv.writer(response)
     writer.writerow(field_names)
     for item in res:
