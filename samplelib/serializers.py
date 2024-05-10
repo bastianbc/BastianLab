@@ -23,7 +23,7 @@ class NaSlLinkSerializer(serializers.ModelSerializer):
         return None
 
 class SampleLibSerializer(serializers.ModelSerializer):
-    na_sl_links = NaSlLinkSerializer(read_only=True, many=True)
+    # na_sl_links = NaSlLinkSerializer(read_only=True, many=True)
     DT_RowId = serializers.SerializerMethodField()
     method_label = serializers.SerializerMethodField()
     amount_in = serializers.SerializerMethodField()
@@ -40,11 +40,12 @@ class SampleLibSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SampleLib
-        fields = ("id", "name", "barcode", "area_id", "num_files", "set_id",
+        fields = ("id", "name",
+                  "barcode", "area_id", "num_files", "set_id",
                   "area_num","date", "method", "method_label",
                   "amount_final", "qpcr_conc", "amount_in", "vol_init",
                   "vol_remain", "pcr_cycles", "qubit", "num_blocks",
-                  "num_nucacids", "num_capturedlibs", "DT_RowId", "na_sl_links",)
+                  "num_nucacids", "num_capturedlibs", "DT_RowId",)
 
     def get_DT_RowId(self, obj):
        return getattr(obj, 'id')
