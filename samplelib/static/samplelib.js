@@ -79,7 +79,7 @@ var KTDatatablesServerSide = function () {
                 { data: 'vol_remain' },
                 { data: 'num_blocks' },
                 { data: 'num_nucacids' },
-                { data: 'num_capturedlibs' },
+                // { data: 'num_capturedlibs' },
                 { data: 'barcode' },
             ],
             columnDefs: [
@@ -142,20 +142,20 @@ var KTDatatablesServerSide = function () {
                         return data;
                     }
                 },
+                // {
+                //     targets: 14,
+                //     orderable: false,
+                //     render: function (data, type, row) {
+                //         if (data > 0) {
+                //           let id = row["id"];
+                //           return `
+                //               <a href="/capturedlib?initial=${id}">${data}</a>`;
+                //         }
+                //         return data;
+                //     }
+                // },
                 {
-                    targets: 14,
-                    orderable: false,
-                    render: function (data, type, row) {
-                        if (data > 0) {
-                          let id = row["id"];
-                          return `
-                              <a href="/capturedlib?initial=${id}">${data}</a>`;
-                        }
-                        return data;
-                    }
-                },
-                {
-                    targets: 16,
+                    targets: 15,
                     data: null,
                     orderable: false,
                     className: 'text-end',
