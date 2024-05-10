@@ -2892,7 +2892,7 @@ def patients(row):
 
 def check_patient(request):
     from .migrate_dump import MigrateDump
-    SampleLib.objects.filter().delete()
+    # SampleLib.objects.filter().delete()
     MigrateDump.register_samplelib()
     # for na in NucAcids.objects.all():
     #     print(na)
