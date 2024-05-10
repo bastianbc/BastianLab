@@ -134,8 +134,18 @@ DATABASES = {
         'HOST': '10.65.11.68',
         'PORT': '5432',
         'DISABLE_SERVER_SIDE_CURSORS': True
-   }
+   },
+    'local': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'USER': 'testuser',
+        'PASSWORD': '1235',
+        'NAME': 'testlabdb',
+        'HOST': "64.54.0.186",
+        'PORT': '5432',
+        'DISABLE_SERVER_SIDE_CURSORS': True
+   },
 }
+
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql_psycopg2',

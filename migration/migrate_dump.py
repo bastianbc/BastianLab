@@ -52,6 +52,23 @@ class MigrateDump():
         return connection
 
     @classmethod
+    def connection_ucsf(cls):
+        connection= None
+        try:
+            connection = psycopg2.connect(
+                database = "labdb",
+                user="testuser",
+                password="1235",
+                host='10.65.11.68',
+                port='5432',
+            )
+            print("Connection to UCSF PostgreSQL DB successful")
+        except OperationalError as e:
+            print(f"The error '{e}' occurred")
+        return connection
+
+
+    @classmethod
     def cursor(cls, sql_statement):
         conn = cls.connection()
         cur = conn.cursor()
@@ -476,33 +493,47 @@ class MigrateDump():
 
     @staticmethod
     def register_captured_lib_and_so():
-        # sample_libs_without_sl_cl_link = SampleLib.objects.filter(sl_cl_links__isnull=True).order_by('name')
-        capture_libs_without_cl_seql_link = CapturedLib.objects.filter(cl_seql_links__isnull=True).order_by("name")
-        sequencinglibs_without_seqruns  = SequencingLib.objects.annotate(
-            num_runs=Count('sequencing_runs')
-        ).filter(num_runs=0).order_by('name')
-        # l = ["WGS-01",
-        #     "WGS-01_rerun",
-        #     ]
-        # m = [
-        #     "BCB022",
-        #     "BCB024",
-        #
-        # ]
-        # s = dict(zip(l,m))
-        # for k,v in s.items():
-        #     cl = CapturedLib.objects.get(name=k)
-        #     seqL = SequencingLib.objects.get(name=f'{v}_SeqL')
-        #     CL_SEQL_LINK.objects.get_or_create(captured_lib=cl, sequencing_lib=seqL)
-        for seqL in sequencinglibs_without_seqruns:
-            print(seqL.name)
-            # prefixes = ['CL']
-            # # # Check if any string in the list starts with the prefix
-            # if any(seqL.name.startswith(s) for s in prefixes):
-            #     print(seqL.name)
-            #     suffix = seqL.name.split("_")[1]
-            #     seqrun,_ = SequencingRun.objects.get_or_create(name=f'CL_{suffix}')
-            #     seqrun.sequencing_libs.add(seqL)
+
+        # cursor_ucsf = MigrateDump.connection_ucsf()
+        sl_ucsf = SampleLib.objects.filter()
+        local = SampleLib.objects.using('local').filter().count()
+        print(sl_ucsf, local)
+        # for link in SL_CL_LINK.objects.filter():
+        #     try:
+        #         sl = SampleLib.objects.using('ucsf').get(name=link.sample_lib.name)
+        #         cl = CapturedLib.objects.using("ucsf").get(name=link.captured_lib.name)
+        #         SL_CL_LINK.objects.using("ucsf").create(sample_lib=sl, captured_lib=cl)
+        #         print("created", sl, cl)
+        #     except Exception as e:
+        #         print(e)
+
+        # # sample_libs_without_sl_cl_link = SampleLib.objects.filter(sl_cl_links__isnull=True).order_by('name')
+        # capture_libs_without_cl_seql_link = CapturedLib.objects.filter(cl_seql_links__isnull=True).order_by("name")
+        # sequencinglibs_without_seqruns  = SequencingLib.objects.annotate(
+        #     num_runs=Count('sequencing_runs')
+        # ).filter(num_runs=0).order_by('name')
+        # # l = ["WGS-01",
+        # #     "WGS-01_rerun",
+        # #     ]
+        # # m = [
+        # #     "BCB022",
+        # #     "BCB024",
+        # #
+        # # ]
+        # # s = dict(zip(l,m))
+        # # for k,v in s.items():
+        # #     cl = CapturedLib.objects.get(name=k)
+        # #     seqL = SequencingLib.objects.get(name=f'{v}_SeqL')
+        # #     CL_SEQL_LINK.objects.get_or_create(captured_lib=cl, sequencing_lib=seqL)
+        # for seqL in sequencinglibs_without_seqruns:
+        #     print(seqL.name)
+        #     # prefixes = ['CL']
+        #     # # # Check if any string in the list starts with the prefix
+        #     # if any(seqL.name.startswith(s) for s in prefixes):
+        #     #     print(seqL.name)
+        #     #     suffix = seqL.name.split("_")[1]
+        #     #     seqrun,_ = SequencingRun.objects.get_or_create(name=f'CL_{suffix}')
+        #     #     seqrun.sequencing_libs.add(seqL)
 
 
 

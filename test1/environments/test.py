@@ -148,6 +148,15 @@ DATABASES = {
         'HOST': '127.0.0.1',
         'PORT': '5432',
         'DISABLE_SERVER_SIDE_CURSORS': True
+   },
+    'ucsf': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'USER': 'testuser',
+        'PASSWORD': '1235',
+        'NAME': 'labdb',
+        'HOST': '10.65.11.68',
+        'PORT': '5432',
+        'DISABLE_SERVER_SIDE_CURSORS': True
    }
 }
 
