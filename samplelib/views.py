@@ -26,7 +26,7 @@ def filter_samplelibs(request):
     result['draw'] = samplelibs['draw']
     result['recordsTotal'] = samplelibs['total']
     result['recordsFiltered'] = samplelibs['count']
-
+    print(result['data'])
     return JsonResponse(result)
 
 @permission_required_for_async("samplelib.change_samplelib")
