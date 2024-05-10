@@ -37,7 +37,7 @@ class UsedSampleLibSerializer(serializers.ModelSerializer):
         return obj.sample_lib.id
 
     def get_name(self, obj):
-        return obj.sample_lib.name
+        return obj.sample_lib.name or None
 
     def get_conc(self, obj):
         return obj.sample_lib.qpcr_conc

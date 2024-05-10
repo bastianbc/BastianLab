@@ -495,9 +495,18 @@ class MigrateDump():
     def register_captured_lib_and_so():
 
         # cursor_ucsf = MigrateDump.connection_ucsf()
-        sl_ucsf = SampleLib.objects.filter()
-        local = SampleLib.objects.using('local').filter().count()
-        print(sl_ucsf, local)
+        # sl_ucsf = SampleLib.objects.filter()
+        # local = SampleLib.objects.using('local').filter().count()
+        # print(sl_ucsf, local)
+        for file_set in SequencingFileSet.objects.filter():
+            try:
+                sl_ucsf = SampleLib.objects.using('ucsf').get(name=file_set.sample_lib.name)
+                file_set_ucsf = SequencingFileSet.objects.using('ucsf').get(prefix=file_set.prefix)
+                file_set_ucsf.sample_lib = sl_ucsf
+                file_set_ucsf.save()
+                print("saved", sl_ucsf)
+            except Exception as e:
+                print(e, file_set)
         # for link in SL_CL_LINK.objects.filter():
         #     try:
         #         sl = SampleLib.objects.using('ucsf').get(name=link.sample_lib.name)
