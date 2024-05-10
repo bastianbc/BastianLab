@@ -405,10 +405,7 @@ class MigrateDump():
     @staticmethod
     def register_samplelib():
         sql = '''
-                    SELECT n.*, nl.*, a.name FROM AREAS a
-                    LEFT JOIN area_na_link nl on nl.area_id = a.ar_id
-                    LEFT JOIN nuc_acids n on n.nu_id = nl.nucacid_id
-                    order by n.name
+                    SELECT * FROM na_sl_link l
                 '''
         sql2 = '''
                     SELECT * FROM sample_lib order by name
@@ -422,50 +419,60 @@ class MigrateDump():
         rows = MigrateDump().cursor(sql)
         rows2 = MigrateDump().cursor(sql2)
         rows3 = MigrateDump().cursor(sql3)
-        for row in rows2:
+        for row in rows:
             try:
-                if "uffy" in row[1]:
-                    sl = SampleLib.objects.get(name="Buffy_Coat")
-                elif row[1].startswith("H12_") or row[1].startswith("T12_"):
-                    continue
-                else:
-                    sl, _ = SampleLib.objects.get_or_create(name=row[1].strip())
-                if row[2]:
-                    sl.date = row[2]
-                sl.qubit = row[3] or 0
-                sl.shear_volume = row[4] or 0
-                sl.qpcr_conc = row[5] or 0
-                sl.pcr_cycles = row[6] or 0
-                sl.amount_in = row[7] or 0
-                sl.amount_final = row[8] or 0
-                sl.vol_init = row[9] or 0
-                sl.vol_remain = row[10] or 0
-                if row[11]:
-                    sl.notes = row[11]
-                else:
-                    sl.notes = ""
-                sl.save()
-                if not " migration_dump" in sl.notes:
-                    sl.notes = sl.notes + " migration_dump"
-                sl.save()
-                MigrateDump.register_barcode(row, sl)
+                nas = row[-1].split(',')
+                sl = SampleLib.objects.get(name=row[-2])
+                for na in nas:
+                    nuc_acid = NucAcids.objects.get(name=na.strip())
+                    NA_SL_LINK.objects.get_or_create(sample_lib=sl, nucacid=nuc_acid)
             except Exception as e:
-                print(e, row[1],row[-3])
-        for row in rows3:
-            try:
-                if "uffy" in row[-2]:
-                    sl = SampleLib.objects.get(name="Buffy_Coat")
-                elif row[-2].startswith("H12_") or row[-2].startswith("T12_"):
-                    continue
-                else:
-                    sl, _ = SampleLib.objects.get_or_create(name=row[-2].strip())
-                na = NucAcids.objects.get(name=row[-3])
-                link, _ = NA_SL_LINK.objects.get_or_create(sample_lib=sl, nucacid=na)
-                link.input_vol = row[1] or 0
-                link.input_amount = row[2] or 0
-                link.save()
-            except Exception as e:
-                print(e, row[-2],row[-3])
+                print(e)
+
+        # for row in rows2:
+        #     try:
+        #         if "uffy" in row[1]:
+        #             sl = SampleLib.objects.get(name="Buffy_Coat")
+        #         elif row[1].startswith("H12_") or row[1].startswith("T12_"):
+        #             continue
+        #         else:
+        #             sl, _ = SampleLib.objects.get_or_create(name=row[1].strip())
+        #         if row[2]:
+        #             sl.date = row[2]
+        #         sl.qubit = row[3] or 0
+        #         sl.shear_volume = row[4] or 0
+        #         sl.qpcr_conc = row[5] or 0
+        #         sl.pcr_cycles = row[6] or 0
+        #         sl.amount_in = row[7] or 0
+        #         sl.amount_final = row[8] or 0
+        #         sl.vol_init = row[9] or 0
+        #         sl.vol_remain = row[10] or 0
+        #         if row[11]:
+        #             sl.notes = row[11]
+        #         else:
+        #             sl.notes = ""
+        #         sl.save()
+        #         if not " migration_dump" in sl.notes:
+        #             sl.notes = sl.notes + " migration_dump"
+        #         sl.save()
+        #         MigrateDump.register_barcode(row, sl)
+        #     except Exception as e:
+        #         print(e, row[1],row[-3])
+        # for row in rows3:
+        #     try:
+        #         if "uffy" in row[-2]:
+        #             sl = SampleLib.objects.get(name="Buffy_Coat")
+        #         elif row[-2].startswith("H12_") or row[-2].startswith("T12_"):
+        #             continue
+        #         else:
+        #             sl, _ = SampleLib.objects.get_or_create(name=row[-2].strip())
+        #         na = NucAcids.objects.get(name=row[-3])
+        #         link, _ = NA_SL_LINK.objects.get_or_create(sample_lib=sl, nucacid=na)
+        #         link.input_vol = row[1] or 0
+        #         link.input_amount = row[2] or 0
+        #         link.save()
+        #     except Exception as e:
+        #         print(e, row[-2],row[-3])
 
     @staticmethod
     def register_captured_lib_and_so():
