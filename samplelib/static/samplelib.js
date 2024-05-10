@@ -87,6 +87,7 @@ var KTDatatablesServerSide = function () {
                     targets: 0,
                     orderable: false,
                     render: function (data) {
+                        console.log(data);
                         return `
                             <div class="form-check form-check-sm form-check-custom form-check-solid">
                                 <input class="form-check-input" type="checkbox" value="${data}" />
