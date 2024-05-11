@@ -2045,6 +2045,58 @@ def get_or_create_files_from_file(row):
     except Exception as e:
         print(e, row["sample_lib"], row["sequencing_run"])
 
+def get_file_set(prefix):
+    try:
+        SequencingFileSet.objects.get(prefix=prefix)
+    except Exception as e:
+        print(e, prefix)
+
+def generate_prefix(x, y):
+    prefix = "*"*30
+    match = re.match(r'(\w+)[-_]([ACTG]{6,8}(?:-[ACTG]{6,8})?)', x)
+    if match:
+        dna = match.group(2)
+        prefix = x.split(dna)[0] + dna
+    elif ".fastq" in x:
+        prefix = x.split("_L0")[0]
+        if "." in prefix:
+            prefix = x.split("_R")[0]
+    elif ".sorted" in x:
+        prefix = x.split(".sorted")[0]
+    elif "deduplicated.realign.bam" in x:
+        prefix = x.split(".deduplicated.realign.bam")[0]
+    elif ".bam" in x and "deduplicated" not in x:
+        prefix = x.split(".bam")[0]
+        if "." in prefix:
+            prefix = x.split(".sortq")[0]
+    elif ".bai" in x and not ".bam" in x:
+        prefix = x.split(".bai")[0]
+
+    if "." not in prefix:
+        try:
+            SequencingFileSet.objects.create(prefix=prefix, path=y)
+            print("created")
+        except:
+            print("error")
+        return prefix
+    return
+
+def execute_rules():
+    SequencingFileSet.objects.filter(prefix__regex=r'_R\d$').delete()
+    SequencingFileSet.objects.filter(prefix__regex=r'[ACTG]{6,8}.*S\d$').delete()
+
+
+def create_file_from_df_fq(request):
+    execute_rules()
+    file = Path(Path(
+        __file__).parent.parent / "uploads" / "df_fq.csv")
+    df = pd.read_csv(file)
+    print(df.count())
+    df["prefix"] = df.apply(lambda row: generate_prefix(row['file'], row['path']), axis=1)
+    df["prefix"].apply(lambda x: get_file_set(x))
+
+
+
 def create_file_from_file(request):
     file = Path(Path(
         __file__).parent.parent / "uploads" / "report_matching_sample_lib_with_bait_after_reducing_fastq_files.csv")

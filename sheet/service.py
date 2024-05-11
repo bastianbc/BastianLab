@@ -101,22 +101,17 @@ class CustomSampleLibSerializer(serializers.ModelSerializer):
 
 
     def get_matching_normal_sl(self, obj):
-        print("="*100,obj.name)
         matching_normal_sl=[]
         if obj.na_sl_links.all():
             for na_sl_link in obj.na_sl_links.all():
-                print("na_sl_links", na_sl_link.nucacid.name)
                 if na_sl_link.nucacid.area_na_links.all():
                     for area_na_link in na_sl_link.nucacid.area_na_links.all():
                         area = area_na_link.area
-                        print("area", area.name, area.area_type)
                         if area.area_type:
                             at = "Normal" if area.area_type.lower() == "normal" else "Tumor"
                             if at == "Tumor":
                                 patient = area.block.patient
-                                print("patient: ", patient)
                                 matching_normal = Areas.objects.filter(block__patient=patient, area_type="normal")
-                                print("matching_normal: ", matching_normal)
                                 matching_normal_sl = SampleLib.objects.filter(na_sl_links__nucacid__area_na_links__area__in=matching_normal).values("name").distinct()
                                 matching_normal_sl = SampleLibSerializerManual(matching_normal_sl, many=True).data
 
