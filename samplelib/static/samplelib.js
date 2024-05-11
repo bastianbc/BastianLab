@@ -155,7 +155,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 15,
+                    targets: 16,
                     data: null,
                     orderable: false,
                     className: 'text-end',
