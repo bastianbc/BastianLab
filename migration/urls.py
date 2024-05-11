@@ -43,4 +43,5 @@ urlpatterns = [
     path("check_patients_airtable", views.check_patients_airtable, name="check_patients_airtable"),
     path("blocks_sl_at", views.blocks_sl_at, name="blocks_sl_at"),
     path("check_projects_airtable", views.check_projects_airtable, name="check_projects_airtable"),
+    path("create_file_from_df_fq", views.create_file_from_df_fq, name="create_file_from_df_fq"),
 ]
