@@ -2074,10 +2074,9 @@ def generate_prefix(x, y):
 
     if "." not in prefix:
         try:
-            SequencingFileSet.objects.create(prefix=prefix, path=y)
-            print("created")
-        except:
-            print("error")
+            SequencingFileSet.objects.get_or_create(prefix=prefix, path=y)
+        except Exception as e:
+            print(e)
         return prefix
     return
 
@@ -2094,6 +2093,7 @@ def create_file_from_df_fq(request):
     print(df.count())
     df["prefix"] = df.apply(lambda row: generate_prefix(row['file'], row['path']), axis=1)
     df["prefix"].apply(lambda x: get_file_set(x))
+
 
 
 
