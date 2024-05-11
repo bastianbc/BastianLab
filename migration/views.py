@@ -2084,6 +2084,25 @@ def generate_prefix(x, y):
 def execute_rules():
     SequencingFileSet.objects.filter(prefix__regex=r'_R\d$').delete()
     SequencingFileSet.objects.filter(prefix__regex=r'[ACTG]{6,8}.*S\d$').delete()
+    for fs in SequencingFileSet.objects.filter(sample_lib__isnull=True):
+        try:
+            match = re.match(r'([ACTG]{6,8})', fs.prefix)
+            if match:
+                print("*"*30)
+                name = fs.prefix.replace(match.group(1),"")
+                sl = SampleLib.objects.get(name=name)
+                fs.sample_lib = sl
+                fs.save()
+                print(sl)
+            elif re.search(r'S\d$', fs.prefix):
+                print("$"*30)
+                name = fs.prefix.split("_S")[0]
+                sl = SampleLib.objects.get(name=name)
+                fs.sample_lib = sl
+                fs.save()
+                print(sl)
+        except Exception as e:
+            print(e)
 
 def create_file(file, prefix):
     try:
@@ -2106,6 +2125,7 @@ def create_file_from_df_fq(request):
     df["prefix"] = df.apply(lambda row: generate_prefix(row['file'], row['path']), axis=1)
     df["prefix"].apply(lambda x: get_file_set(x))
     df.apply(lambda row: create_file(row['file'], row['prefix']), axis=1)
+
 
 
 
