@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from .forms import *
 from django.http import HttpResponse
+from django.db import IntegrityError
 from datetime import datetime
 import csv
 from io import StringIO
@@ -2075,8 +2076,8 @@ def generate_prefix(x, y):
     if "." not in prefix:
         try:
             SequencingFileSet.objects.get_or_create(prefix=prefix, path=y)
-        except Exception as e:
-            print(e)
+        except:
+            pass
         return prefix
     return
 
@@ -2084,6 +2085,17 @@ def execute_rules():
     SequencingFileSet.objects.filter(prefix__regex=r'_R\d$').delete()
     SequencingFileSet.objects.filter(prefix__regex=r'[ACTG]{6,8}.*S\d$').delete()
 
+def create_file(file, prefix):
+    try:
+        fs = SequencingFileSet.objects.get(prefix=prefix)
+        file = SequencingFile.objects.create(name=file, sequencing_file_set=fs)
+    except IntegrityError as e:
+        file = SequencingFile.objects.get(name=file)
+        file.sequencing_file_set = fs
+        file.save()
+        print(f"Saved")
+    except Exception as e:
+        print(e)
 
 def create_file_from_df_fq(request):
     execute_rules()
@@ -2093,6 +2105,8 @@ def create_file_from_df_fq(request):
     print(df.count())
     df["prefix"] = df.apply(lambda row: generate_prefix(row['file'], row['path']), axis=1)
     df["prefix"].apply(lambda x: get_file_set(x))
+    df.apply(lambda row: create_file(row['file'], row['prefix']), axis=1)
+
 
 
 
