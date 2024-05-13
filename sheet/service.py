@@ -166,17 +166,15 @@ def generate_file(data, file_name):
     for index, row in enumerate(data):
         report = Report()
         report.no = index + 1
-
+        files = dict(zip(row.file, row.checksum))
         report.patient = row.patient
-        report.sample_lib = row.name
-        report.sex = row.sex
-        report.barcode = row.barcode_name
-        report.bait = row.bait
-        report.na_type = row.na_type
-        report.area_type = row.area_type
-        report.matching_normal_sl = row.matching_normal_sl
-        report.seq_run = row.seq_run
-        report.file_set = row.file_set
+        report.sample_lib = row.name # ✓
+        report.barcode = row.barcode_name # ✓
+        report.na_type = row.na_type # ✓
+        report.area_type = row.area_type # ✓
+        report.matching_normal_sl = row.matching_normal_sl # ✓
+        report.seq_run = row.seq_run # ✓
+        report.file = files
         report.path = row.path
         res.append(report)
 
@@ -185,8 +183,8 @@ def generate_file(data, file_name):
         headers={'Content-Disposition': f'attachment; filename="{file_name}.csv"'},
     )
 
-    field_names = ["no", "patient", "sample_lib", "sex", "barcode", "bait", "na_type", "area_type",
-                   "matching_normal_sl", "seq_run", "file_set", "path"]
+    field_names = ["no", "patient", "sample_lib",  "barcode", "na_type", "area_type",
+                   "matching_normal_sl", "seq_run", "file", "path"]
 
     writer = csv.writer(response)
     writer.writerow(field_names)

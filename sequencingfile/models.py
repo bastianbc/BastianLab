@@ -107,6 +107,14 @@ class SequencingFile(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def file_info(self):
+        return {
+            "file": self.name,
+            "checksum": self.checksum,
+        }
+
+
     def query_by_args(self, user, **kwargs):
 
         def _get_authorizated_queryset():

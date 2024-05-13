@@ -3115,11 +3115,60 @@ def get_all_md5(row):
     except Exception as e:
         print("===", e, row["md5"])
 
+def get_all_md5_2(line):
+    try:
+
+        if "./" in line:
+            md5, file = line.split("./")
+            sf = SequencingFile.objects.get(name=file)
+            if sf.checksum is None:
+                print(sf, sf.checksum)
+            return 1
+        if "=" in line:
+            _file, md5 = line.split("=")
+            file = re.findall(r'\((.*?)\)', _file)
+            sf = SequencingFile.objects.get(name=file[0])
+            if sf.checksum is None:
+                print(sf, sf.checksum)
+            return 1
+        if "/" not in line and "=" not in line:
+            md5, _,file = line.split(" ")
+            sf = SequencingFile.objects.get(name=file)
+            if sf.checksum is None:
+                print(sf, sf.checksum)
+            return 1
+        if line.count("/") > 1:
+            md5, _, path = line.split(" ")
+            file = path.split("/")[-1]
+            sf = SequencingFile.objects.get(name=file)
+            if sf.checksum is None:
+                print(sf, sf.checksum)
+            return 1
+    except Exception as e:
+        print("===", e, line)
+
 def upload_file_tree_all_md5(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "all_md5.txt")
     df = pd.read_csv(file, index_col=False, encoding='iso-8859-1', on_bad_lines = 'warn')
-    # print(df)
-    df[~df["md5"].isnull()].apply(lambda row: get_all_md5(row), axis=1)
+    df.apply(lambda row: get_all_md5(row), axis=1)
+
+
+def upload_file_tree_all_md5_2(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "md5" / "merged.txt")
+    # df = pd.read_csv(file, index_col=False, encoding='iso-8859-1', on_bad_lines = 'warn')
+    # print(df.columns)
+    # df.apply(lambda row: get_all_md5(row), axis=1)
+    with open(file, 'r', encoding='utf-8') as file:
+        count = 0
+        f = 0
+        for line in file:
+            count += 1
+            if "fastq.gz" in line:
+                res = get_all_md5_2(line.strip())
+                if res == 1:
+                    f+=1
+        print(count,"   ",f)
+
 
 
 def get_sample_library(row):
