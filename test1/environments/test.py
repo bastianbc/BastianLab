@@ -58,7 +58,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'django_tables2',
-    # 'debug_toolbar',
+    'debug_toolbar',
     'widget_tweaks',
     'rest_framework',
     'crispy_forms',
@@ -144,7 +144,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'USER': 'testuser',
         'PASSWORD': '1235',
-        'NAME': 'testlabdb',
+        'NAME': 'locallabdb',
         'HOST': '127.0.0.1',
         'PORT': '5432',
         'DISABLE_SERVER_SIDE_CURSORS': True

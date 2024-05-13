@@ -2,7 +2,6 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Patients
 from .forms import PatientForm, FilterForm
-import json
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required,permission_required
 from core.decorators import permission_required_for_async

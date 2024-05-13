@@ -2,7 +2,6 @@ from django.shortcuts import render, redirect
 from .models import *
 from .forms import *
 from django.http import JsonResponse
-import json
 from django.contrib import messages
 from blocks.models import *
 from django.contrib.auth.decorators import login_required,permission_required
