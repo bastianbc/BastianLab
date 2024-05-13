@@ -4,10 +4,11 @@ from .service import get_sample_lib_list, generate_file
 from samplelib.models import SampleLib
 from sequencingrun.models import SequencingRun
 from lab.models import Patients
-from django.db.models import Case, CharField, F, OuterRef, Subquery, Value, When
+from django.db.models import Case, F, OuterRef, Subquery, Value, When, CharField
+from django.contrib.postgres.aggregates import ArrayAgg
+from django.db.models.functions import Concat
 import json
 from areas.models import Areas
-
 
 def _get_queryset(seq_runs):
     query_set = SampleLib.objects.filter(
@@ -63,6 +64,8 @@ def _get_queryset(seq_runs):
        ),
         file_set=F("sequencing_file_sets__prefix"),
         path=F("sequencing_file_sets__path"),
+        file=ArrayAgg('sequencing_file_sets__sequencing_files__name'),
+        checksum=ArrayAgg('sequencing_file_sets__sequencing_files__checksum'),
         bait=F("sl_cl_links__captured_lib__bait__name")
     ).distinct().order_by('name')
     return query_set

@@ -36,6 +36,7 @@ urlpatterns = [
     path("check_block2", views.check_block2, name="check_block2"),
     path("check_block3", views.check_block3, name="check_block3"),
     path("upload_file_tree_all_md5", views.upload_file_tree_all_md5, name="upload_file_tree_all_md5"),
+    path("upload_file_tree_all_md5_2", views.upload_file_tree_all_md5_2, name="upload_file_tree_all_md5_2"),
     path("check_sample_library", views.check_sample_library, name="check_sample_library"),
     path("check_seq_run", views.check_seq_run, name="check_seq_run"),
     path("check_dna_rna", views.check_dna_rna, name="check_dna_rna"),
