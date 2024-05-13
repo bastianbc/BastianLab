@@ -544,7 +544,19 @@ class MigrateDump():
         #     #     seqrun,_ = SequencingRun.objects.get_or_create(name=f'CL_{suffix}')
         #     #     seqrun.sequencing_libs.add(seqL)
 
-
+    @staticmethod
+    def register_barcodes():
+        rows = MigrateDump().cursor("SELECT name, barcode_id FROM sample_lib")
+        for row in rows:
+            try:
+                if row[1] != "NaN":
+                    sl = SampleLib.objects.get(name=row[0])
+                    b_name = row[1].replace(".0","").strip()
+                    barcode = Barcode.objects.get(name=b_name)
+                    sl.barcode = barcode
+                    sl.save()
+            except Exception as e:
+                print(e, row)
 
 
 
