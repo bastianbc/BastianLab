@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect
-from .models import Blocks
 from .forms import *
 from django.http import JsonResponse
 import json
@@ -7,10 +6,8 @@ from django.contrib import messages
 from lab.models import Patients
 from projects.models import Projects
 from .serializers import BlocksSerializer, BlocksSerializerObj
-from rest_framework.response import Response
 from django.contrib.auth.decorators import login_required,permission_required
 from core.decorators import permission_required_for_async
-from method.models import Method
 
 @permission_required_for_async("blocks.view_blocks")
 def filter_blocks(request):

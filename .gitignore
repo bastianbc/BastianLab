@@ -1,4 +1,6 @@
-migrations/
+**/migrations/**
+!**/migrations
+!**/migrations/__init__.py
 backup/
 db.sqlite3
 .DS_Store

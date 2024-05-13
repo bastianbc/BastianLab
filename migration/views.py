@@ -2979,7 +2979,7 @@ def patients(row):
 def check_patient(request):
     from .migrate_dump import MigrateDump
     # SampleLib.objects.filter().delete()
-    # MigrateDump.register_captured_lib_and_so()
+    MigrateDump.register_barcodes()
     # for na in NucAcids.objects.all():
     #     print(na)
     #     obj, created = AREA_NA_LINK.objects.get_or_create(nucacid=na,area=na.area)
