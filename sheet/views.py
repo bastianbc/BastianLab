@@ -85,7 +85,6 @@ def get_sheet(request):
 
 
 def create_csv_sheet(request):
-    SequencingFileSet.objects.filter(path__icontains='TEST').delete()
     try:
         seq_runs = SequencingRun.objects.filter()
         query_set = _get_queryset(seq_runs)
