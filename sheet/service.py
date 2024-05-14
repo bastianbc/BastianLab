@@ -174,7 +174,8 @@ def generate_file(data, file_name):
         report.na_type = row.na_type # ✓
         report.area_type = row.area_type # ✓
         report.matching_normal_sl = row.matching_normal_sl # ✓
-        report.seq_run = row.seq_run # ✓
+        seq_run = row.path.split("/")[1] or ""
+        report.seq_run = seq_run # ✓
         report.file = files
         report.path = row.path
         res.append(report)

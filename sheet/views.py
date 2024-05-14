@@ -74,9 +74,6 @@ def _get_queryset(seq_runs):
 def filter_sheet(request):
     result = get_sample_lib_list(request)
     result["data"] = result['data'][0]
-
-    print(type(result))
-    print(result)
     return JsonResponse(result)
 
 
@@ -88,7 +85,6 @@ def create_csv_sheet(request):
     try:
         seq_runs = SequencingRun.objects.filter()
         query_set = _get_queryset(seq_runs)
-        print(query_set)
         return generate_file(data=query_set, file_name="all_seq_runs")
     except Exception as e:
         print(e)
