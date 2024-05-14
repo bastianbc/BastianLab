@@ -9,6 +9,7 @@ from django.contrib.postgres.aggregates import ArrayAgg
 from django.db.models.functions import Concat
 import json
 from areas.models import Areas
+from sequencingfile.models import SequencingFileSet
 
 def _get_queryset(seq_runs):
     query_set = SampleLib.objects.filter(
@@ -84,6 +85,7 @@ def get_sheet(request):
 
 
 def create_csv_sheet(request):
+    SequencingFileSet.objects.filter(name__icontains='TEST').delete()
     try:
         seq_runs = SequencingRun.objects.filter()
         query_set = _get_queryset(seq_runs)
