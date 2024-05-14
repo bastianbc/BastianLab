@@ -167,6 +167,7 @@ def generate_file(data, file_name):
         report = Report()
         report.no = index + 1
         files = dict(zip(row.file, row.checksum))
+        print(row.name, files)
         report.patient = row.patient
         report.sample_lib = row.name # ✓
         report.barcode = row.barcode_name # ✓
