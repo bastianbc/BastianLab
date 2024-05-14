@@ -3412,10 +3412,14 @@ def blocks_sl_at(request):
 
 
 def im_ar_types(row):
-    print(row['data-1715715228037'])
-    area = Areas.objects.get(ar_id=row['data-1715715228037'])
-    area.area_type = row["Unnamed: 2"].lower()
-    area.save()
+    try:
+        print(row['data-1715715228037'])
+        area = Areas.objects.get(ar_id=int(row['data-1715715228037']))
+        area.area_type = row["Unnamed: 2"].lower()
+        area.save()
+    except:
+        print(row)
+
 
 
 def import_area_types(request):
