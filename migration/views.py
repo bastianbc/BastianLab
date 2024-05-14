@@ -3409,3 +3409,16 @@ def blocks_sl_at(request):
     df2 = pd.read_csv(file)
 
     df.apply(lambda row: blocks_sl_at_get(row), axis=1)
+
+
+def im_ar_types(row):
+    print(row['data-1715715228037'])
+    area = Areas.objects.get(ar_id=row['data-1715715228037'])
+    area.area_type = row["Unnamed: 2"].lower()
+    area.save()
+
+
+def import_area_types(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "area_types.csv")
+    df = pd.read_csv(file)
+    df.apply(lambda row: im_ar_types(row), axis=1)
