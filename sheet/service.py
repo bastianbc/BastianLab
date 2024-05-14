@@ -167,14 +167,14 @@ def generate_file(data, file_name):
         report = Report()
         report.no = index + 1
         files = dict(zip(row.file, row.checksum))
-        print(row.name, files)
         report.patient = row.patient
         report.sample_lib = row.name # ✓
         report.barcode = row.barcode_name # ✓
         report.na_type = row.na_type # ✓
         report.area_type = row.area_type # ✓
         report.matching_normal_sl = row.matching_normal_sl # ✓
-        seq_run = row.path.split("/")[1] or ""
+        row.path = None if row.path == 'nan' else row.path
+        seq_run = row.path.split("/")[1] if row.path != None else ""
         report.seq_run = seq_run # ✓
         report.file = files
         report.path = row.path

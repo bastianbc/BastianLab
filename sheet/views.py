@@ -63,7 +63,6 @@ def _get_queryset(seq_runs):
            default=Value(""),
            output_field=CharField()
        ),
-        file_set=F("sequencing_file_sets__prefix"),
         path=F("sequencing_file_sets__path"),
         file=ArrayAgg('sequencing_file_sets__sequencing_files__name'),
         checksum=ArrayAgg('sequencing_file_sets__sequencing_files__checksum'),
