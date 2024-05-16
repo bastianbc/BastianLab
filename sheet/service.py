@@ -160,6 +160,7 @@ def generate_file(data, file_name):
         area_type = ""
         matching_normal_sl = ""
         seq_run = ""
+        footprint = ""
 
     res = []
 
@@ -177,7 +178,9 @@ def generate_file(data, file_name):
         seq_run = row.path.split("/")[1] if row.path != None else ""
         report.seq_run = seq_run # ✓
         report.file = files
+        report.footprint = row.bait
         report.path = row.path
+        print(row.bait)
         res.append(report)
 
     response = HttpResponse(
@@ -186,7 +189,7 @@ def generate_file(data, file_name):
     )
 
     field_names = ["no", "patient", "sample_lib",  "barcode", "na_type", "area_type",
-                   "matching_normal_sl", "seq_run", "file", "path"]
+                   "matching_normal_sl", "seq_run", "footprint", "file", "path"]
 
     writer = csv.writer(response)
     writer.writerow(field_names)
