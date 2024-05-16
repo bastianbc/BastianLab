@@ -3422,3 +3422,22 @@ def import_area_types(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "area_types.csv")
     df = pd.read_csv(file)
     df.apply(lambda row: im_ar_types(row), axis=1)
+
+
+def im_bait(row):
+    # print(row["bait"], row["CL"])
+    try:
+        cl = CapturedLib.objects.get(name=row["CL"])
+        bait = Bait.objects.get(name=row["Bait"])
+        if cl.bait is None:
+            cl.bait = bait
+            cl.save()
+            print("saved")
+    except Exception as e:
+        print(e, row["Bait"])
+
+
+def import_bait(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
+    df = pd.read_csv(file)
+    df.apply(lambda row: im_bait(row), axis=1)
