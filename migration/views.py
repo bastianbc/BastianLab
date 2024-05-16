@@ -3404,22 +3404,18 @@ def blocks_sl_at_get(row):
 def blocks_sl_at(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view (5).csv")
     file2 = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
-
     df = pd.read_csv(file)
     df2 = pd.read_csv(file)
-
     df.apply(lambda row: blocks_sl_at_get(row), axis=1)
 
 
 def im_ar_types(row):
     try:
-        print(row['data-1715715228037'])
         area = Areas.objects.get(ar_id=int(row['data-1715715228037']))
         area.area_type = row["Unnamed: 2"].lower()
         area.save()
     except:
         print(row)
-
 
 
 def import_area_types(request):
