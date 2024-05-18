@@ -4,23 +4,19 @@ from .service import get_sample_lib_list, generate_file
 from samplelib.models import SampleLib
 from sequencingrun.models import SequencingRun
 from lab.models import Patients
-from django.db.models import Case, F, OuterRef, Subquery, Value, When, CharField
+from django.db.models import Case, F, Q, OuterRef, Subquery, Value, When, CharField
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.db.models.functions import Concat
 import json
 from areas.models import Areas
-from sequencingfile.models import SequencingFileSet
+from sequencingfile.models import SequencingFileSet, SequencingFile
+from sequencinglib.models import SequencingLib
 
 def _get_queryset(seq_runs):
     query_set = SampleLib.objects.filter(
         sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=seq_runs
         ).annotate(na_type=F('na_sl_links__nucacid__na_type'),
-        seq_run=Subquery(
-            SequencingRun.objects.filter(
-                sequencing_libs__cl_seql_links__captured_lib__sl_cl_links__sample_lib=OuterRef('pk'),
-                id__in=seq_runs
-            ).values('name')[:1]
-        ),
+                   seq_run=F('sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs'),
         patient=Subquery(
             Patients.objects.filter(
                 patient_blocks__block_areas__area_na_links__nucacid__na_sl_links__sample_lib=OuterRef('pk')
@@ -63,14 +59,47 @@ def _get_queryset(seq_runs):
            default=Value(""),
            output_field=CharField()
        ),
-        path=F("sequencing_file_sets__path"),
-        file=ArrayAgg('sequencing_file_sets__sequencing_files__name'),
-        checksum=ArrayAgg('sequencing_file_sets__sequencing_files__checksum'),
-        bait=F("sl_cl_links__captured_lib__bait__name")
+       path=Subquery(
+           SequencingFileSet.objects.filter(
+               sample_lib=OuterRef('pk'),
+               sequencing_run=OuterRef('seq_run')
+           ).values('path')[:1]
+       ),
+       file=ArrayAgg(
+           'sequencing_file_sets__sequencing_files__name',
+           filter=Q(
+               sequencing_file_sets__sample_lib=F('pk'),
+               sequencing_file_sets__sequencing_run=F('seq_run')
+           )
+       ),
+
+        checksum=ArrayAgg(
+           'sequencing_file_sets__sequencing_files__checksum',
+           filter=Q(
+               sequencing_file_sets__sample_lib=F('pk'),
+               sequencing_file_sets__sequencing_run=F('seq_run')
+           )
+       ),
+       bait=F("sl_cl_links__captured_lib__bait__name")
     ).distinct().order_by('name')
     return query_set
 
 def filter_sheet(request):
+    print("data"*30)
+    # sq = SequencingRun.objects.get(name="BCB018_Part1")
+    # sq.sequencing_libs.add(SequencingLib.objects.get(name="BCB018_SeqL_Part1"))
+    # sq.save()
+    # sq = SequencingRun.objects.get(name="BCB018_Part2")
+    # sq.sequencing_libs.add(SequencingLib.objects.get(name="BCB018_SeqL_Part2"))
+    # sq.save()
+    seq_runs = SequencingRun.objects.filter()
+    query_set = _get_queryset(seq_runs)
+    print(query_set)
+    for i in query_set:
+        print(i.__dict__)
+
+
+
     result = get_sample_lib_list(request)
     result["data"] = result['data'][0]
     return JsonResponse(result)
