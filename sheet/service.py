@@ -176,6 +176,7 @@ def generate_file(data, file_name):
         row.path = None if row.path == 'nan' else row.path
         seq_run = row.path.split("/")[1] if row.path != None else ""
         report.seq_run = seq_run # ✓
+        print(row.file, row.files, row.path, row.name)
         report.file = files
         report.footprint = row.bait
         report.path = row.path
