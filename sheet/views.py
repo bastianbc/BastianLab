@@ -52,7 +52,8 @@ def sheet_seq_run(request):
         _seq_run = request.GET['seq_run']
         seq_runs = SequencingRun.objects.filter(id=_seq_run)
         query_set = _get_authorizated_queryset(seq_runs)
-        return generate_file(data=query_set, file_name=f"Analysis Report_{seq_runs.values('name')}")
+        serializer = CustomSampleLibSerializer(query_set['items'], many=True)
+        return generate_file(data=serializer.data, file_name=f"Analysis Report_{seq_runs.values('name')}")
     except Exception as e:
         print(e)
         return JsonResponse({'error': str(e)}, status=500)
@@ -62,7 +63,8 @@ def sheet_multiple(request):
     selected_ids = json.loads(request.POST.get("selected_ids"))
     seq_runs = SequencingRun.objects.filter(id__in=selected_ids)
     query_set = query_by_args(request.user, seq_runs, **request.GET)
-    return generate_file(data=query_set, file_name=("_".join([s.name for s in seq_runs]))[:50])
+    serializer = CustomSampleLibSerializer(query_set['items'], many=True)
+    return generate_file(data=serializer.data, file_name=("_".join([s.name for s in seq_runs]))[:50])
 
 
 # def sheet_multiple(request):
