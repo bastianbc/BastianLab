@@ -30,9 +30,10 @@ class FilterForm(forms.Form):
 
 
 class ReportForm(forms.Form):
-    sequencing_run = forms.ModelMultipleChoiceField(queryset=SequencingRun.objects.all().order_by("name"),
+    sequencing_run_report = forms.ModelChoiceField(queryset=SequencingRun.objects.filter(sequencing_libs__cl_seql_links__captured_lib__sl_cl_links__sample_lib__isnull=False).distinct().order_by("name"),
                                                     label="Sequencing Run")
 
     def __init__(self, *args, **kwargs):
         super(ReportForm, self).__init__(*args, **kwargs)
-        self.fields["sequencing_run"].widget.attrs.update({'class':'form-control-sm'})
+        self.fields["sequencing_run_report"].widget.attrs.update({'class':'form-control-sm'})
+        self.fields["sequencing_run_report"].widget.attrs["data-control"] = "select2"

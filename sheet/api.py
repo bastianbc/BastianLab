@@ -11,21 +11,14 @@ from sequencingfile.models import SequencingFile, SequencingFileSet
 from sequencingrun.models import SequencingRun
 
 
-@staticmethod
-def query_by_args(user, seq_runs, **kwargs):
-
-    def _get_authorizated_queryset(seq_runs):
+def _get_authorizated_queryset(seq_runs):
 
         return SampleLib.objects.filter(
         sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=seq_runs
         ).annotate(
         na_type=F('na_sl_links__nucacid__na_type'),
         seq_run=F('sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs'),
-        patient=Subquery(
-            Patients.objects.filter(
-                patient_blocks__block_areas__area_na_links__nucacid__na_sl_links__sample_lib=OuterRef('pk')
-            ).values('pat_id')[:1]
-        ),
+        patient=F('na_sl_links__nucacid__area_na_links__area__block__patient__pat_id'),
         sex=Subquery(
             Patients.objects.filter(
                 patient_blocks__block_areas__area_na_links__nucacid__na_sl_links__sample_lib=OuterRef('pk')
@@ -87,14 +80,16 @@ def query_by_args(user, seq_runs, **kwargs):
        bait=F("sl_cl_links__captured_lib__bait__name")
     ).distinct().order_by('name')
 
-    def _parse_value(search_value):
-        if "_initial:" in search_value:
-            return json.loads(search_value.split("_initial:")[1])
-        return search_value
+def _parse_value(search_value):
+    if "_initial:" in search_value:
+        return json.loads(search_value.split("_initial:")[1])
+    return search_value
 
-    def _is_initial_value(search_value):
-        return "_initial:" in search_value and search_value.split("_initial:")[1] != "null"
+def _is_initial_value(search_value):
+    return "_initial:" in search_value and search_value.split("_initial:")[1] != "null"
 
+
+def query_by_args(user, seq_runs, **kwargs):
     try:
         ORDER_COLUMN_CHOICES = {
             "0": "id",
@@ -129,13 +124,11 @@ def query_by_args(user, seq_runs, **kwargs):
 
         total = queryset.count()
 
-        is_initial = _is_initial_value(search_value)
         search_value = _parse_value(search_value)
         if sequencing_run_filter[0] != "":
             queryset = queryset.filter(Q(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=sequencing_run_filter))
 
         if patient_filter:
-            # filter = [na_sl_link.sample_lib.name for na_sl_link in NA_SL_LINK.objects.filter(nucacid__area__block__patient__pat_id=patient_filter)]
             patient = Patients.objects.get(pa_id=patient_filter).pat_id
             queryset = queryset.filter(Q(patient=patient))
 
@@ -143,15 +136,10 @@ def query_by_args(user, seq_runs, **kwargs):
             queryset = queryset.filter(Q(barcode__id=barcode_filter))
 
         if area_type_filter:
-            if area_type_filter == "normal":
-                queryset = queryset.filter(Q(area_type="normal"))
-            else:
-                filter = [na_sl_link.sample_lib.name for na_sl_link in NA_SL_LINK.objects.exclude(nucacid__area__area_type="normal")]
-
-
+            queryset = queryset.filter(Q(area_type=area_type_filter))
 
         if na_type_filter:
-            queryset = queryset.filter(Q(na_type=filter))
+            queryset = queryset.filter(Q(na_type=na_type_filter))
 
         if bait_filter:
             queryset = queryset.filter(

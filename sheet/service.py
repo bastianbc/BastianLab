@@ -150,11 +150,6 @@ def get_sample_lib_list(request):
 
 
 def generate_file(data, file_name):
-    import pandas as pd
-    df = pd.DataFrame(
-        data
-    )
-    print(df)
     class Report(object):
         no = 0
         patient = ""
