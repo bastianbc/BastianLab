@@ -69,8 +69,7 @@ def _get_authorizated_queryset(seq_runs):
                sequencing_file_sets__sequencing_run=F('seq_run')
            )
        ),
-
-        checksum=ArrayAgg(
+       checksum=ArrayAgg(
            'sequencing_file_sets__sequencing_files__checksum',
            filter=Q(
                sequencing_file_sets__sample_lib=F('pk'),
