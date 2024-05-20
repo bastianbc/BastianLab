@@ -40,9 +40,8 @@ def create_csv_sheet(request):
     try:
         seq_runs = SequencingRun.objects.filter()
         query_set = _get_authorizated_queryset(seq_runs)
-        for i in query_set:
-            print("!!!",i.__dict__)
-        return generate_file(data=query_set, file_name="Analysis Report")
+        serializer = CustomSampleLibSerializer(query_set['items'], many=True)
+        return generate_file(data=serializer.data, file_name="Analysis Report")
     except Exception as e:
         print(e)
         return JsonResponse({'error': str(e)}, status=500)
@@ -52,6 +51,7 @@ def sheet_seq_run(request):
         _seq_run = request.GET['seq_run']
         seq_runs = SequencingRun.objects.filter(id=_seq_run)
         query_set = _get_authorizated_queryset(seq_runs)
+
         serializer = CustomSampleLibSerializer(query_set['items'], many=True)
         return generate_file(data=serializer.data, file_name=f"Analysis Report_{seq_runs.values('name')}")
     except Exception as e:
