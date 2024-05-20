@@ -150,11 +150,6 @@ def get_sample_lib_list(request):
 
 
 def generate_file(data, file_name):
-    import pandas as pd
-    df = pd.DataFrame(
-        data
-    )
-    print(df)
     class Report(object):
         no = 0
         patient = ""
@@ -169,6 +164,7 @@ def generate_file(data, file_name):
     res = []
 
     for index, row in enumerate(data):
+        # print(row.__dict__)
         report = Report()
         report.no = index + 1
         files = dict(zip(row.file, row.checksum))
@@ -181,10 +177,11 @@ def generate_file(data, file_name):
         row.path = None if row.path == 'nan' else row.path
         seq_run = row.path.split("/")[1] if row.path != None else ""
         report.seq_run = seq_run # ✓
+        # print(row.file, row.file, row.path, row.name)
         report.file = files
         report.footprint = row.bait
         report.path = row.path
-        print(row.bait)
+        # print(row.bait)
         res.append(report)
 
     response = HttpResponse(
