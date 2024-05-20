@@ -9,7 +9,7 @@ var KTDatatablesServerSide = function () {
 
     // Private functions
     var initDatatable = function (filterSequencingRun,filterPatient,filterBarcode,filterBait,filterAreaType,filterNaType) {
-        console.log(filterSequencingRun,filterPatient,filterBarcode,filterBait,filterAreaType,filterNaType);
+        console.log("initDataTable", filterSequencingRun);
         var element = $("#kt_datatable_example_1");
             if ($.fn.DataTable.isDataTable(element)) {
                 // If the table is already initialized, clear and destroy it.
@@ -31,15 +31,16 @@ var KTDatatablesServerSide = function () {
             ajax: {
               url: "/sheet/filter_sheet",
               type: 'GET',
-                data :{
-                "sequencing_run": filterSequencingRun,
-                "patient": filterPatient,
-                "barcode": filterBarcode,
-                "bait": filterBait,
-                "area_type": filterAreaType,
-                "na_type": filterNaType,
-
-              },
+                data :function (d) {
+                    return $.extend({}, d, {
+                        "sequencing_run[]": filterSequencingRun,
+                        "patient": filterPatient,
+                        "barcode": filterBarcode,
+                        "bait": filterBait,
+                        "area_type": filterAreaType,
+                        "na_type": filterNaType
+                    });
+                },
               error: function (xhr, ajaxOptions, thrownError) {
                   if (xhr.status == 403) {
 
@@ -175,12 +176,11 @@ var KTDatatablesServerSide = function () {
     // Filter Datatable
     var handleFilterDatatable = () => {
         const filterButton = document.querySelector('[data-kt-docs-table-filter="filter"]');
-        console.log("filter button:", filterButton);
         // Filter datatable on submit
         filterButton.addEventListener('click', function () {
+          var sequencingRun = $('#id_sequencing_run').select2('data'); // Fetches the data objects for selected options
+        var selectedSequencingRuns = sequencingRun.map(option => option.id); // Maps over the data objects to extract the ids
 
-          var sequencingRun = document.getElementById("id_sequencing_run").value;
-          console.log(sequencingRun, "id_sequencing_run");
           var patient = document.getElementById("id_patient").value;
           var barcode = document.getElementById("id_barcode").value;
           var bait = document.getElementById("id_bait").value;
@@ -188,7 +188,7 @@ var KTDatatablesServerSide = function () {
           var na_type = document.getElementById("id_na_type").value;
             console.log("handleFilterDatatable",sequencingRun,patient,barcode,bait,area_type,na_type);
 
-          initDatatable(sequencingRun,patient,barcode,bait,area_type,na_type);
+          initDatatable(selectedSequencingRuns,patient,barcode,bait,area_type,na_type);
 
         });
     }

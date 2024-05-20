@@ -113,8 +113,8 @@ def query_by_args(user, seq_runs, **kwargs):
         search_value = kwargs.get('search[value]', None)[0]
         order_column = kwargs.get('order[0][column]', None)[0]
         order = kwargs.get('order[0][dir]', None)[0]
-        sequencing_run_filter = kwargs.get('sequencing_run', None)[0]
-        print("#"*200, sequencing_run_filter)
+        print("#sequencing_run"*200, kwargs.get('sequencing_run[]', None))
+        sequencing_run_filter = kwargs.get('sequencing_run[]', None)
         patient_filter = kwargs.get('patient', None)[0]
         barcode_filter = kwargs.get('barcode', None)[0]
         bait_filter = kwargs.get('bait', None)[0]
@@ -130,22 +130,13 @@ def query_by_args(user, seq_runs, **kwargs):
 
         is_initial = _is_initial_value(search_value)
         search_value = _parse_value(search_value)
-
-        if sequencing_run_filter:
+        if sequencing_run_filter[0] != "":
             from sequencingrun.models import SequencingRun
+            print(type(sequencing_run_filter))
+            print(len(sequencing_run_filter))
+            queryset = queryset.filter(Q(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=sequencing_run_filter))
+            print(queryset)
 
-            filter = []
-            try:
-                seq_r = SequencingRun.objects.get(id=sequencing_run_filter)
-                for seq_l in seq_r.sequencing_libs.all():
-                    for cl_seql_link in seq_l.cl_seql_links.all():
-                        for sl_cl_link in cl_seql_link.captured_lib.sl_cl_links.all():
-                            filter.append(sl_cl_link.sample_lib.name)
-
-            except Exception as e:
-                pass
-
-            queryset = queryset.filter(Q(name__in=filter))
 
         # if patient_filter:
         #     filter = [na_sl_link.sample_lib.name for na_sl_link in NA_SL_LINK.objects.filter(nucacid__area__block__patient__pat_id=patient_filter)]
