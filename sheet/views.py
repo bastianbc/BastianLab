@@ -88,7 +88,7 @@ from .service import CustomSampleLibSerializer
 #     return query_set
 
 def filter_sheet(request):
-    print("filter_sheet:"*10,request.GET.getlist('sequencing_run[]'))
+    print("filter_sheet:"*10)
     seq_runs = SequencingRun.objects.filter()
     samplelibs = query_by_args(request.user, seq_runs, **request.GET)
     serializer = CustomSampleLibSerializer(samplelibs['items'], many=True)

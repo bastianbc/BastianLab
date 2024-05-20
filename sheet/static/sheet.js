@@ -9,7 +9,7 @@ var KTDatatablesServerSide = function () {
 
     // Private functions
     var initDatatable = function (filterSequencingRun,filterPatient,filterBarcode,filterBait,filterAreaType,filterNaType) {
-        console.log("initDataTable", filterSequencingRun);
+        console.log("filterBait", filterBait);
         var element = $("#kt_datatable_example_1");
             if ($.fn.DataTable.isDataTable(element)) {
                 // If the table is already initialized, clear and destroy it.

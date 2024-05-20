@@ -8,6 +8,8 @@ from samplelib.models import SampleLib, NA_SL_LINK
 from lab.models import Patients
 from areas.models import Areas
 from sequencingfile.models import SequencingFile, SequencingFileSet
+from sequencingrun.models import SequencingRun
+
 
 @staticmethod
 def query_by_args(user, seq_runs, **kwargs):
@@ -113,8 +115,7 @@ def query_by_args(user, seq_runs, **kwargs):
         search_value = kwargs.get('search[value]', None)[0]
         order_column = kwargs.get('order[0][column]', None)[0]
         order = kwargs.get('order[0][dir]', None)[0]
-        print("#sequencing_run"*200, kwargs.get('sequencing_run[]', None))
-        sequencing_run_filter = kwargs.get('sequencing_run[]', None)
+        sequencing_run_filter = kwargs.get('sequencing_run[]', [""])
         patient_filter = kwargs.get('patient', None)[0]
         barcode_filter = kwargs.get('barcode', None)[0]
         bait_filter = kwargs.get('bait', None)[0]
@@ -131,44 +132,30 @@ def query_by_args(user, seq_runs, **kwargs):
         is_initial = _is_initial_value(search_value)
         search_value = _parse_value(search_value)
         if sequencing_run_filter[0] != "":
-            from sequencingrun.models import SequencingRun
-            print(type(sequencing_run_filter))
-            print(len(sequencing_run_filter))
             queryset = queryset.filter(Q(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=sequencing_run_filter))
-            print(queryset)
+
+        if patient_filter:
+            # filter = [na_sl_link.sample_lib.name for na_sl_link in NA_SL_LINK.objects.filter(nucacid__area__block__patient__pat_id=patient_filter)]
+            patient = Patients.objects.get(pa_id=patient_filter).pat_id
+            queryset = queryset.filter(Q(patient=patient))
+
+        if barcode_filter:
+            queryset = queryset.filter(Q(barcode__id=barcode_filter))
+
+        if area_type_filter:
+            if area_type_filter == "normal":
+                queryset = queryset.filter(Q(area_type="normal"))
+            else:
+                filter = [na_sl_link.sample_lib.name for na_sl_link in NA_SL_LINK.objects.exclude(nucacid__area__area_type="normal")]
 
 
-        # if patient_filter:
-        #     filter = [na_sl_link.sample_lib.name for na_sl_link in NA_SL_LINK.objects.filter(nucacid__area__block__patient__pat_id=patient_filter)]
-        #     queryset = queryset.filter(Q(name__in=filter))
-        #
-        # if barcode_filter:
-        #     queryset = queryset.filter(Q(barcode__id=barcode_filter))
-        #
-        # if area_type_filter:
-        #     if area_type_filter == "normal":
-        #         filter = [na_sl_link.sample_lib.name for na_sl_link in NA_SL_LINK.objects.filter(nucacid__area__area_type=area_type_filter)]
-        #     else:
-        #         filter = [na_sl_link.sample_lib.name for na_sl_link in NA_SL_LINK.objects.exclude(nucacid__area__area_type="normal")]
-        #
-        #     queryset = queryset.filter(Q(name__in=filter))
-        #
-        # if na_type_filter:
-        #     queryset = queryset.filter(Q(na_type=filter))
-        #
-        # if bait_filter:
-        #     from capturedlib.models import CapturedLib
-        #
-        #     filter = []
-        #     try:
-        #         for captured_lib in CapturedLib.objects.filter(bait=bait_filter):
-        #             for sl_cl_link in captured_lib.sl_cl_links.all():
-        #                 filter.append(sl_cl_link.sample_lib.name)
-        #
-        #     except Exception as e:
-        #         pass
-        #
-        #     queryset = queryset.filter(Q(name__in=filter))
+
+        if na_type_filter:
+            queryset = queryset.filter(Q(na_type=filter))
+
+        if bait_filter:
+            queryset = queryset.filter(
+                Q(sl_cl_links__captured_lib__bait__id=bait_filter))
 
         elif search_value:
             queryset = queryset.filter(
