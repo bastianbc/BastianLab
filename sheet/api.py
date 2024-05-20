@@ -121,7 +121,7 @@ def query_by_args(user, seq_runs, **kwargs):
 
         queryset = _get_authorizated_queryset(seq_runs)
         for i in queryset:
-            print(i.__dict__)
+            print("@@@",i.__dict__)
         total = queryset.count()
 
         search_value = _parse_value(search_value)

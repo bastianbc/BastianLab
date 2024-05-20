@@ -41,7 +41,7 @@ def create_csv_sheet(request):
         seq_runs = SequencingRun.objects.filter()
         query_set = _get_authorizated_queryset(seq_runs)
         for i in query_set:
-            print(i.__dict__)
+            print("!!!",i.__dict__)
         return generate_file(data=query_set, file_name="Analysis Report")
     except Exception as e:
         print(e)
