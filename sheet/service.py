@@ -164,7 +164,7 @@ def generate_file(data, file_name):
     res = []
 
     for index, row in enumerate(data):
-        print(row.__dict__)
+        # print(row.__dict__)
         report = Report()
         report.no = index + 1
         files = dict(zip(row.file, row.checksum))
