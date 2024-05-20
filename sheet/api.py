@@ -11,7 +11,6 @@ from sequencingfile.models import SequencingFile, SequencingFileSet
 from sequencingrun.models import SequencingRun
 
 
-@staticmethod
 def query_by_args(user, seq_runs, **kwargs):
 
     def _get_authorizated_queryset(seq_runs):
@@ -122,6 +121,7 @@ def query_by_args(user, seq_runs, **kwargs):
         area_type_filter = kwargs.get('area_type', None)[0]
         na_type_filter = kwargs.get('na_type', None)[0]
         order_column = ORDER_COLUMN_CHOICES[order_column]
+        
         if order == 'desc':
             order_column = '-' + order_column
 
@@ -142,6 +142,7 @@ def query_by_args(user, seq_runs, **kwargs):
         if barcode_filter:
             queryset = queryset.filter(Q(barcode__id=barcode_filter))
 
+        filter = None
         if area_type_filter:
             if area_type_filter == "normal":
                 queryset = queryset.filter(Q(area_type="normal"))

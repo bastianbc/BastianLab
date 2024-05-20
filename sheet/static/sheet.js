@@ -9,18 +9,13 @@ var KTDatatablesServerSide = function () {
 
     // Private functions
     var initDatatable = function (filterSequencingRun,filterPatient,filterBarcode,filterBait,filterAreaType,filterNaType) {
-        console.log("filterBait", filterBait);
-        var element = $("#kt_datatable_example_1");
-            if ($.fn.DataTable.isDataTable(element)) {
-                // If the table is already initialized, clear and destroy it.
-                element.DataTable().clear().destroy();
-            }
 
         dt = $("#kt_datatable_example_1").DataTable({
             // searchDelay: 500,
             processing: true,
             serverSide: true,
             pageLength: 100,
+            destroy: true,
             order: [[2, 'asc']],
             stateSave: false,
             select: {
@@ -31,16 +26,14 @@ var KTDatatablesServerSide = function () {
             ajax: {
               url: "/sheet/filter_sheet",
               type: 'GET',
-                data :function (d) {
-                    return $.extend({}, d, {
-                        "sequencing_run[]": filterSequencingRun,
-                        "patient": filterPatient,
-                        "barcode": filterBarcode,
-                        "bait": filterBait,
-                        "area_type": filterAreaType,
-                        "na_type": filterNaType
-                    });
-                },
+              data : {
+                  "sequencing_run": filterSequencingRun,
+                  "patient": filterPatient,
+                  "barcode": filterBarcode,
+                  "bait": filterBait,
+                  "area_type": filterAreaType,
+                  "na_type": filterNaType
+              },
               error: function (xhr, ajaxOptions, thrownError) {
                   if (xhr.status == 403) {
 
@@ -179,7 +172,7 @@ var KTDatatablesServerSide = function () {
         // Filter datatable on submit
         filterButton.addEventListener('click', function () {
           var sequencingRun = $('#id_sequencing_run').select2('data'); // Fetches the data objects for selected options
-        var selectedSequencingRuns = sequencingRun.map(option => option.id); // Maps over the data objects to extract the ids
+          var selectedSequencingRuns = sequencingRun.map(option => option.id); // Maps over the data objects to extract the ids
 
           var patient = document.getElementById("id_patient").value;
           var barcode = document.getElementById("id_barcode").value;
