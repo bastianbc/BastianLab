@@ -8,7 +8,13 @@ var KTDatatablesServerSide = function () {
     var filterPayment;
 
     // Private functions
-    var initDatatable = function () {
+    var initDatatable = function (filterSequencingRun,filterPatient,filterBarcode,filterBait,filterAreaType,filterNaType) {
+        var element = $("#kt_datatable_example_1");
+            if ($.fn.DataTable.isDataTable(element)) {
+                // If the table is already initialized, clear and destroy it.
+                element.DataTable().clear().destroy();
+            }
+
         dt = $("#kt_datatable_example_1").DataTable({
             // searchDelay: 500,
             processing: true,
@@ -24,6 +30,16 @@ var KTDatatablesServerSide = function () {
             ajax: {
               url: "/sheet/filter_sheet",
               type: 'GET',
+                data :function (d) {
+                    return $.extend({}, d, {
+                        "sequencing_run[]": filterSequencingRun,
+                        "patient": filterPatient,
+                        "barcode": filterBarcode,
+                        "bait": filterBait,
+                        "area_type": filterAreaType,
+                        "na_type": filterNaType
+                    });
+                },
               error: function (xhr, ajaxOptions, thrownError) {
                   if (xhr.status == 403) {
 
@@ -50,7 +66,7 @@ var KTDatatablesServerSide = function () {
                 { data: 'area_type' },
                 { data: 'matching_normal_sl' },
                 { data: 'seq_run' },
-                { data: 'files' },
+                { data: 'file' },
                 { data: 'path' },
             ],
             columnDefs: [
@@ -95,9 +111,9 @@ var KTDatatablesServerSide = function () {
                     targets: -2,
                     render: function (data, type, row) {
                         let namesList = [];
-                        if (Array.isArray(row["file_set"])) {
-                            row["file_set"].forEach(file => {
-                                namesList.push(file.prefix);
+                        if (Array.isArray(row["file"])) {
+                            row["file"].forEach(file => {
+                                namesList.push(file.name);
                             });
                         }
                         // This will return the names list. Adjust based on your requirements
@@ -141,8 +157,8 @@ var KTDatatablesServerSide = function () {
 
         // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
         dt.on('draw', function () {
-            // initToggleToolbar();
-            // toggleToolbars();
+
+            handleResetFilter();
             handleDeleteRows();
             KTMenu.createInstances();
         });
@@ -157,32 +173,23 @@ var KTDatatablesServerSide = function () {
     }
 
     // Filter Datatable
-    // var handleFilterDatatable = () => {
-    //     // Select filter options
-    //     filterPayment = document.querySelectorAll('[data-kt-docs-table-filter="payment_type"] [name="payment_type"]');
-    //     const filterButton = document.querySelector('[data-kt-docs-table-filter="filter"]');
-    //
-    //     // Filter datatable on submit
-    //     filterButton.addEventListener('click', function () {
-    //         // Get filter values
-    //         let paymentValue = '';
-    //
-    //         // Get payment value
-    //         filterPayment.forEach(r => {
-    //             if (r.checked) {
-    //                 paymentValue = r.value;
-    //             }
-    //
-    //             // Reset payment value if "All" is selected
-    //             if (paymentValue === 'all') {
-    //                 paymentValue = '';
-    //             }
-    //         });
-    //
-    //         // Filter datatable --- official docs reference: https://datatables.net/reference/api/search()
-    //         dt.search(paymentValue).draw();
-    //     });
-    // }
+    var handleFilterDatatable = () => {
+        const filterButton = document.querySelector('[data-kt-docs-table-filter="filter"]');
+        // Filter datatable on submit
+        filterButton.addEventListener('click', function () {
+          var sequencingRun = $('#id_sequencing_run').select2('data'); // Fetches the data objects for selected options
+        var selectedSequencingRuns = sequencingRun.map(option => option.id); // Maps over the data objects to extract the ids
+
+          var patient = document.getElementById("id_patient").value;
+          var barcode = document.getElementById("id_barcode").value;
+          var bait = document.getElementById("id_bait").value;
+          var area_type = document.getElementById("id_area_type").value;
+          var na_type = document.getElementById("id_na_type").value;
+
+          initDatatable(selectedSequencingRuns,patient,barcode,bait,area_type,na_type);
+
+        });
+    }
 
     // Delete customer
     var handleDeleteRows = () => {
@@ -252,19 +259,24 @@ var KTDatatablesServerSide = function () {
     }
 
     // Reset Filter
-    // var handleResetForm = () => {
-    //     // Select reset button
-    //     const resetButton = document.querySelector('[data-kt-docs-table-filter="reset"]');
-    //
-    //     // Reset datatable
-    //     resetButton.addEventListener('click', function () {
-    //         // Reset payment type
-    //         filterPayment[0].checked = true;
-    //
-    //         // Reset datatable --- official docs reference: https://datatables.net/reference/api/search()
-    //         dt.search('').draw();
-    //     });
-    // }
+    var handleResetFilter = () => {
+        // Select reset button
+        const resetButton = document.querySelector('[data-kt-docs-table-filter="reset"]');
+
+        // Reset datatable
+        resetButton.addEventListener('click', function () {
+
+          document.getElementById("id_sequencing_run").value="";
+          document.getElementById("id_patient").value="";
+          document.getElementById("id_barcode").value="";
+          document.getElementById("id_bait").value="";
+          document.getElementById("id_area_type").value="";
+          document.getElementById("id_na_type").value="";
+
+          initDatatable(null,null,null,null,null,null);
+
+        });
+    }
 
     // // Init toggle toolbar
     // var initToggleToolbar = function () {
@@ -377,6 +389,7 @@ var KTDatatablesServerSide = function () {
     // }
     var init_csv_button = function (){
         document.getElementById('export_to_csv').onclick = function(){
+            console.log("init_csv_button");
             const loadingEl = document.createElement("div");
             document.body.prepend(loadingEl);
             loadingEl.classList.add("page-loader");
@@ -387,7 +400,8 @@ var KTDatatablesServerSide = function () {
                 <span class="spinner-border text-primary" role="status"></span>
                 <span class="text-gray-800 fs-6 fw-semibold mt-5">"CSV File is Generating..."</span>
             `;
-
+            var seq_run = document.getElementById("id_sequencing_run_report");
+            console.log(seq_run);
             // Show page loading
             KTApp.showPageLoading();
 
@@ -409,7 +423,7 @@ var KTDatatablesServerSide = function () {
 
                     var link = document.createElement('a');
                     link.href = window.URL.createObjectURL(blob);
-                    link.download = filename || "seq_run_sheet.csv";
+                    link.download = filename || "analysis_report.csv";
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
@@ -441,16 +455,118 @@ var KTDatatablesServerSide = function () {
         };
 
     };
+
+    var init_csv_button_individual = function (){
+        document.getElementById('export_to_csv_individual').onclick = function(){
+            console.log("export_to_csv_individual");
+            const loadingEl = document.createElement("div");
+            document.body.prepend(loadingEl);
+            loadingEl.classList.add("page-loader");
+            loadingEl.classList.add("flex-column");
+            loadingEl.classList.add("bg-dark");
+            loadingEl.classList.add("bg-opacity-25");
+            loadingEl.innerHTML = `
+                <span class="spinner-border text-primary" role="status"></span>
+                <span class="text-gray-800 fs-6 fw-semibold mt-5">"CSV File is Generating..."</span>
+            `;
+            var seq_run = document.getElementById("id_sequencing_run_report").value;
+            console.log(seq_run);
+            // Show page loading
+            KTApp.showPageLoading();
+
+            $.ajax({
+                url: '/sheet/sheet_seq_run', // Replace with your actual URL
+                type: 'GET',
+                data:{
+                    "seq_run": seq_run
+                },
+                xhrFields: {
+                    responseType: 'blob' // Important for handling binary data
+                },
+                success: function(data, status, xhr) {
+                    var filename = "";
+                    var disposition = xhr.getResponseHeader('Content-Disposition');
+                    if (disposition && disposition.indexOf('attachment') !== -1) {
+                        var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+                        var matches = filenameRegex.exec(disposition);
+                        if (matches != null && matches[1]) filename = matches[1].replace(/['"]/g, '');
+                    }
+                    var blob = new Blob([data], { type: 'text/csv' });
+
+                    var link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = filename || "analysis_report.csv";
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    loadingEl.remove();
+                    Swal.fire({
+                        text: "Your file is downloaded!.",
+                        icon: "success",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn fw-bold btn-primary",
+                        }
+                    });
+                },
+                error: function(response) {
+                    loadingEl.remove();
+                     Swal.fire({
+                        text: "Your file can not created",
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn fw-bold btn-primary",
+                        }
+                    });
+
+                }
+            });
+        };
+
+    };
+
+    // Redirects from other pages
+    var handleInitialValue = () => {
+
+      // Remove parameters in URL
+      function cleanUrl() {
+        window.history.replaceState(null, null, window.location.pathname);
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const model = params.get('model');
+      const id = params.get('id');
+      const initial = params.get('initial');
+
+      cleanUrl();
+
+      if (initial =="true" && model != null && id !=null) {
+
+        return JSON.stringify({
+          "model": model,
+          "id": id
+        });
+
+      }
+
+      return null;
+
+    }
+
+
     // Public methods
     return {
         init: function () {
-            initDatatable();
+            initDatatable(null, null, null, null, null, null);
             handleSearchDatatable();
-            // initToggleToolbar();
-            // handleFilterDatatable();
+            handleFilterDatatable();
+            handleResetFilter();
             handleDeleteRows();
-            // handleResetForm();
             init_csv_button();
+            init_csv_button_individual();
         }
     }
 }();

@@ -12,6 +12,7 @@ var KTDatatablesServerSide = function () {
 
     // Private functions
     var initDatatable = function ( initialValue, filterSequencingRun, filterBarcode, filterI5, filterI7, filterAreaType, filterBait ) {
+        console.log(initialValue, filterSequencingRun, filterBarcode, filterI5, filterI7, filterAreaType, filterBait );
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
 
         dt = $(".table").DataTable({
@@ -87,7 +88,6 @@ var KTDatatablesServerSide = function () {
                     targets: 0,
                     orderable: false,
                     render: function (data) {
-                        console.log(data);
                         return `
                             <div class="form-check form-check-sm form-check-custom form-check-solid">
                                 <input class="form-check-input" type="checkbox" value="${data}" />
@@ -300,7 +300,7 @@ var KTDatatablesServerSide = function () {
           var i7 = document.getElementById("id_i7").value;
           var areaType = document.getElementById("id_area_type").value;
           var bait = document.getElementById("id_bait").value;
-
+            console.log("handleFilterDatatable", sequencingRun);
           initDatatable(null,sequencingRun,barcode,i5,i7,areaType,bait);
 
         });
@@ -913,7 +913,6 @@ var KTDatatablesServerSide = function () {
                     }
                 })
                 .then(data => {
-                    console.log(data.sample_libs);
                     if (data.success) {
                       Swal.fire({
                           html: `<p>QPCR Analysis imported succesfully</p><p>${data.sample_libs}</p>`,

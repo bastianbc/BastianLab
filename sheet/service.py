@@ -45,14 +45,14 @@ class CustomSampleLibSerializer(serializers.ModelSerializer):
     patient = serializers.SerializerMethodField()
     matching_normal_sl = serializers.SerializerMethodField()
     seq_run = serializers.SerializerMethodField()
-    file_set = serializers.SerializerMethodField()
+    file = serializers.SerializerMethodField()
     path = serializers.SerializerMethodField()
 
     class Meta:
         model = SampleLib
         fields = ("id", "name",  "shear_volume",  "qpcr_conc", "barcode", "bait",
                   "na_type", "area_type", "method", "method_label",
-                  "patient", "matching_normal_sl", "seq_run", "file_set", "path")
+                  "patient", "matching_normal_sl", "seq_run", "file", "path")
 
     def get_bait(self, obj):
         baits = Bait.objects.filter(captured_libs__sl_cl_links__sample_lib=obj).distinct()
@@ -63,9 +63,9 @@ class CustomSampleLibSerializer(serializers.ModelSerializer):
         barcode = obj.barcode
         return obj.barcode.i5 or obj.barcode.i7 if barcode else None
 
-    def get_file_set(self, obj):
-        seq_files = SequencingFileSet.objects.filter(sample_lib=obj)
-        files = SequencingFileSetSerializerManual(seq_files, many=True).data
+    def get_file(self, obj):
+        seq_files = SequencingFile.objects.filter(sequencing_file_set__sample_lib=obj)
+        files = SequencingFileSerializerManual(seq_files, many=True).data
         return files
 
     def get_path(self, obj):
@@ -150,7 +150,6 @@ def get_sample_lib_list(request):
 
 
 def generate_file(data, file_name):
-
     class Report(object):
         no = 0
         patient = ""
