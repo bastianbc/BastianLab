@@ -370,6 +370,76 @@ var KTDatatablesServerSide = function () {
                 <span class="spinner-border text-primary" role="status"></span>
                 <span class="text-gray-800 fs-6 fw-semibold mt-5">"CSV File is Generating..."</span>
             `;
+            var seq_run = document.getElementById('id_sequencing_run_report').value;
+            // Show page loading
+            KTApp.showPageLoading();
+
+            $.ajax({
+                url: '/sheet/sheet_seq_run', // Replace with your actual URL
+                type: 'GET',
+                data: {
+                    "seq_run": seq_run
+                },
+                xhrFields: {
+                    responseType: 'blob' // Important for handling binary data
+                },
+                success: function(data, status, xhr) {
+                    var filename = "";
+                    var disposition = xhr.getResponseHeader('Content-Disposition');
+                    if (disposition && disposition.indexOf('attachment') !== -1) {
+                        var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+                        var matches = filenameRegex.exec(disposition);
+                        if (matches != null && matches[1]) filename = matches[1].replace(/['"]/g, '');
+                    }
+                    var blob = new Blob([data], { type: 'text/csv' });
+
+                    var link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = filename || "seq_run_sheet.csv";
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    loadingEl.remove();
+                    Swal.fire({
+                        text: "Your file is downloaded!.",
+                        icon: "success",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn fw-bold btn-primary",
+                        }
+                    });
+                },
+                error: function(response) {
+                    loadingEl.remove();
+                     Swal.fire({
+                        text: "Your file can not created",
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn fw-bold btn-primary",
+                        }
+                    });
+
+                }
+            });
+        };
+
+    };
+
+    var init_csv_button_2 = function (){
+        document.getElementById('export_to_csv_individual').onclick = function(){
+            const loadingEl = document.createElement("div");
+            document.body.prepend(loadingEl);
+            loadingEl.classList.add("page-loader");
+            loadingEl.classList.add("flex-column");
+            loadingEl.classList.add("bg-dark");
+            loadingEl.classList.add("bg-opacity-25");
+            loadingEl.innerHTML = `
+                <span class="spinner-border text-primary" role="status"></span>
+                <span class="text-gray-800 fs-6 fw-semibold mt-5">"CSV File is Generating..."</span>
+            `;
 
             // Show page loading
             KTApp.showPageLoading();
@@ -463,6 +533,7 @@ var KTDatatablesServerSide = function () {
             handleResetFilter();
             handleDeleteRows();
             init_csv_button();
+            init_csv_button_2();
         }
     }
 }();
