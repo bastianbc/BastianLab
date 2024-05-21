@@ -95,7 +95,6 @@ class SampleLib(models.Model):
             area_type_filter = kwargs.get('area_type', None)[0]
             bait_filter = kwargs.get('bait', None)[0]
             order_column = ORDER_COLUMN_CHOICES[order_column]
-            print("*"*100, sequencing_run_filter, bait_filter,i5_filter, i7_filter)
             # django orm '-' -> desc
             if order == 'desc':
                 order_column = '-' + order_column

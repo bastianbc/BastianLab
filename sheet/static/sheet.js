@@ -60,7 +60,7 @@ var KTDatatablesServerSide = function () {
                 { data: 'id' },
                 { data: 'patient' },
                 { data: 'name' },
-                { data: 'barcode' },
+                { data: 'barcode_name' },
                 { data: 'bait' },
                 { data: 'na_type' },
                 { data: 'area_type' },
@@ -94,19 +94,19 @@ var KTDatatablesServerSide = function () {
                         return namesList.join(", ");
                     }
                 },
-                {
-                    targets: 4,
-                    render: function (data, type, row) {
-                        let namesList = [];
-                        if (Array.isArray(row["bait"])) {
-                            row["bait"].forEach(bait => {
-                                namesList.push(bait.name);
-                            });
-                        }
-                        // This will return the names list. Adjust based on your requirements
-                        return namesList.join(", ");
-                    }
-                },
+                // {
+                //     targets: 4,
+                //     render: function (data, type, row) {
+                //         let namesList = [];
+                //         if (Array.isArray(row["bait"])) {
+                //             row["bait"].forEach(bait => {
+                //                 namesList.push(bait.name);
+                //             });
+                //         }
+                //         // This will return the names list. Adjust based on your requirements
+                //         return namesList.join(", ");
+                //     }
+                // },
                 {
                     targets: -2,
                     render: function (data, type, row) {
@@ -123,6 +123,7 @@ var KTDatatablesServerSide = function () {
                 {
                     targets: -3,
                     render: function (data, type, row) {
+                        console.log(row["seq_run"]);
                         let namesList = [];
                         if (Array.isArray(row["seq_run"])) {
                             row["seq_run"].forEach(sqr => {
@@ -133,19 +134,19 @@ var KTDatatablesServerSide = function () {
                         return namesList.join(", ");
                     }
                 },
-                {
-                    targets: -4,
-                    render: function (data, type, row) {
-                        let namesList = [];
-                        if (Array.isArray(row["matching_normal_sl"])) {
-                            row["matching_normal_sl"].forEach(sl => {
-                                namesList.push(sl.name);
-                            });
-                        }
-                        // This will return the names list. Adjust based on your requirements
-                        return namesList.join(", ");
-                    }
-                },
+                // {
+                //     targets: -4,
+                //     render: function (data, type, row) {
+                //         let namesList = [];
+                //         if (Array.isArray(row["matching_normal_sl"])) {
+                //             row["matching_normal_sl"].forEach(sl => {
+                //                 namesList.push(sl.name);
+                //             });
+                //         }
+                //         // This will return the names list. Adjust based on your requirements
+                //         return namesList.join(", ");
+                //     }
+                // },
             ],
             // Add data-filter attribute
             createdRow: function (row, data, dataIndex) {
@@ -389,7 +390,6 @@ var KTDatatablesServerSide = function () {
     // }
     var init_csv_button = function (){
         document.getElementById('export_to_csv').onclick = function(){
-            console.log("init_csv_button");
             const loadingEl = document.createElement("div");
             document.body.prepend(loadingEl);
             loadingEl.classList.add("page-loader");
@@ -401,7 +401,6 @@ var KTDatatablesServerSide = function () {
                 <span class="text-gray-800 fs-6 fw-semibold mt-5">"CSV File is Generating..."</span>
             `;
             var seq_run = document.getElementById("id_sequencing_run_report");
-            console.log(seq_run);
             // Show page loading
             KTApp.showPageLoading();
 
@@ -458,7 +457,6 @@ var KTDatatablesServerSide = function () {
 
     var init_csv_button_individual = function (){
         document.getElementById('export_to_csv_individual').onclick = function(){
-            console.log("export_to_csv_individual");
             const loadingEl = document.createElement("div");
             document.body.prepend(loadingEl);
             loadingEl.classList.add("page-loader");
@@ -470,7 +468,6 @@ var KTDatatablesServerSide = function () {
                 <span class="text-gray-800 fs-6 fw-semibold mt-5">"CSV File is Generating..."</span>
             `;
             var seq_run = document.getElementById("id_sequencing_run_report").value;
-            console.log(seq_run);
             // Show page loading
             KTApp.showPageLoading();
 

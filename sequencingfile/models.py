@@ -157,7 +157,6 @@ class SequencingFile(models.Model):
             is_initial = _is_initial_value(search_value)
             search_value = _parse_value(search_value)
 
-            print("*" * 100, is_initial)
             if is_initial:
                 if search_value["model"] == "sample_lib":
                     queryset = queryset.filter(
@@ -168,7 +167,6 @@ class SequencingFile(models.Model):
                         Q(sequencing_file_set__set_id=search_value["id"])
                     )
                 else:
-                    print("*" * 100, search_value)
                     queryset = queryset.filter(
                         Q(sequencing_file_set__set_id=search_value)
                     )
