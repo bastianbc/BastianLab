@@ -54,7 +54,7 @@ var KTDatatablesServerSide = function () {
                 { data: 'id' },
                 { data: 'patient' },
                 { data: 'name' },
-                { data: 'barcode' },
+                { data: 'barcode_name' },
                 { data: 'bait' },
                 { data: 'na_type' },
                 { data: 'area_type' },
@@ -88,19 +88,7 @@ var KTDatatablesServerSide = function () {
                         return namesList.join(", ");
                     }
                 },
-                {
-                    targets: 4,
-                    render: function (data, type, row) {
-                        let namesList = [];
-                        if (Array.isArray(row["bait"])) {
-                            row["bait"].forEach(bait => {
-                                namesList.push(bait.name);
-                            });
-                        }
-                        // This will return the names list. Adjust based on your requirements
-                        return namesList.join(", ");
-                    }
-                },
+
                 {
                     targets: -2,
                     render: function (data, type, row) {
@@ -127,19 +115,7 @@ var KTDatatablesServerSide = function () {
                         return namesList.join(", ");
                     }
                 },
-                {
-                    targets: -4,
-                    render: function (data, type, row) {
-                        let namesList = [];
-                        if (Array.isArray(row["matching_normal_sl"])) {
-                            row["matching_normal_sl"].forEach(sl => {
-                                namesList.push(sl.name);
-                            });
-                        }
-                        // This will return the names list. Adjust based on your requirements
-                        return namesList.join(", ");
-                    }
-                },
+
             ],
             // Add data-filter attribute
             createdRow: function (row, data, dataIndex) {
