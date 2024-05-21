@@ -370,16 +370,12 @@ var KTDatatablesServerSide = function () {
                 <span class="spinner-border text-primary" role="status"></span>
                 <span class="text-gray-800 fs-6 fw-semibold mt-5">"CSV File is Generating..."</span>
             `;
-            var seq_run = document.getElementById('id_sequencing_run_report').value;
             // Show page loading
             KTApp.showPageLoading();
 
             $.ajax({
-                url: '/sheet/sheet_seq_run', // Replace with your actual URL
+                url: '/sheet/create_csv_sheet', // Replace with your actual URL
                 type: 'GET',
-                data: {
-                    "seq_run": seq_run
-                },
                 xhrFields: {
                     responseType: 'blob' // Important for handling binary data
                 },
@@ -443,10 +439,14 @@ var KTDatatablesServerSide = function () {
 
             // Show page loading
             KTApp.showPageLoading();
+            var seq_run = document.getElementById('id_sequencing_run_report').value;
 
             $.ajax({
-                url: '/sheet/create_csv_sheet', // Replace with your actual URL
+                url: '/sheet/sheet_seq_run', // Replace with your actual URL
                 type: 'GET',
+                data: {
+                    "seq_run": seq_run
+                },
                 xhrFields: {
                     responseType: 'blob' // Important for handling binary data
                 },
