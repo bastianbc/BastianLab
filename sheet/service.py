@@ -37,31 +37,21 @@ class PatientsSerializerManual(serializers.ModelSerializer):
         fields = '__all__'
 
 class CustomSampleLibSerializer(serializers.ModelSerializer):
-    method_label = serializers.SerializerMethodField()
-    barcode = serializers.SerializerMethodField()
-    bait = serializers.SerializerMethodField()
-    na_type = serializers.SerializerMethodField()
-    area_type = serializers.SerializerMethodField()
     patient = serializers.SerializerMethodField()
-    matching_normal_sl = serializers.SerializerMethodField()
     seq_run = serializers.SerializerMethodField()
     file = serializers.SerializerMethodField()
     path = serializers.SerializerMethodField()
+    na_type = serializers.CharField(read_only=True)
+    bait = serializers.CharField(read_only=True)
+    area_type = serializers.CharField(read_only=True)
+    matching_normal_sl = serializers.CharField(read_only=True)
+    barcode_name = serializers.CharField(read_only=True)
 
     class Meta:
         model = SampleLib
-        fields = ("id", "name",  "shear_volume",  "qpcr_conc", "barcode", "bait",
-                  "na_type", "area_type", "method", "method_label",
+        fields = ("id", "name",  "shear_volume",  "qpcr_conc", "barcode_name", "bait",
+                  "na_type", "area_type",
                   "patient", "matching_normal_sl", "seq_run", "file", "path")
-
-    def get_bait(self, obj):
-        baits = Bait.objects.filter(captured_libs__sl_cl_links__sample_lib=obj).distinct()
-        bait = BaitSerializer(baits, many=True).data
-        return bait if bait else None
-
-    def get_barcode(self,obj):
-        barcode = obj.barcode
-        return obj.barcode.i5 or obj.barcode.i7 if barcode else None
 
     def get_file(self, obj):
         seq_files = SequencingFile.objects.filter(sequencing_file_set__sample_lib=obj)
@@ -71,26 +61,6 @@ class CustomSampleLibSerializer(serializers.ModelSerializer):
     def get_path(self, obj):
         return obj.sequencing_file_sets.first().path if obj.sequencing_file_sets.first() else None
 
-    def get_method_label(self,obj):
-        return obj.method.name if obj.method else None
-
-    def get_na_type(self, obj):
-        return obj.na_sl_links.first().nucacid.na_type if len(obj.na_sl_links.all())>0 else None
-
-    def get_area_type(self, obj):
-        area_type=[]
-        if obj.na_sl_links.all():
-            for na_sl_link in obj.na_sl_links.all():
-                if na_sl_link.nucacid.area_na_links.all():
-                    for area_na_link in na_sl_link.nucacid.area_na_links.all():
-                        area = area_na_link.area
-                        if area.name == "UndefinedArea":
-                            continue
-                        if area.area_type:
-                            at = "Normal" if area.area_type.lower() == "normal" else "Tumor"
-                            if at not in area_type:
-                                area_type.append(at)
-        return area_type
 
     def get_patient(self, obj):
         _patients = Patients.objects.filter(
@@ -99,30 +69,10 @@ class CustomSampleLibSerializer(serializers.ModelSerializer):
         _patients = PatientsSerializerManual(_patients, many=True).data
         return _patients
 
-
-    def get_matching_normal_sl(self, obj):
-        matching_normal_sl=[]
-        if obj.na_sl_links.all():
-            for na_sl_link in obj.na_sl_links.all():
-                if na_sl_link.nucacid.area_na_links.all():
-                    for area_na_link in na_sl_link.nucacid.area_na_links.all():
-                        area = area_na_link.area
-                        if area.area_type:
-                            at = "Normal" if area.area_type.lower() == "normal" else "Tumor"
-                            if at == "Tumor":
-                                patient = area.block.patient
-                                matching_normal = Areas.objects.filter(block__patient=patient, area_type="normal")
-                                matching_normal_sl = SampleLib.objects.filter(na_sl_links__nucacid__area_na_links__area__in=matching_normal).values("name").distinct()
-                                matching_normal_sl = SampleLibSerializerManual(matching_normal_sl, many=True).data
-
-            return matching_normal_sl if len(matching_normal_sl) < 4 else None
-
-        return None
-
     def get_seq_run(self, obj):
-        captured_libs = CapturedLib.objects.filter(sl_cl_links__sample_lib_id=obj.id)
-        sequencing_libs = SequencingLib.objects.filter(cl_seql_links__captured_lib__in=captured_libs)
-        _sequencing_runs = SequencingRun.objects.filter(sequencing_libs__in=sequencing_libs).values("name").distinct()
+        _sequencing_runs = SequencingRun.objects.filter(
+            sequencing_libs__cl_seql_links__captured_lib__sl_cl_links__sample_lib=obj
+        )
         sequencing_runs = SequencingRunSerializerManual(_sequencing_runs, many=True).data
         return sequencing_runs
 
@@ -148,6 +98,14 @@ def get_sample_lib_list(request):
     result['data'] = serializer.data
     return result
 
+def _get_file(sl):
+    seq_files = SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl).values('name', 'checksum').distinct()
+    file_dict = {item['name']: item['checksum'] for item in seq_files}
+    return file_dict
+
+def _get_path(sl):
+    return sl.sequencing_file_sets.first().path if sl.sequencing_file_sets.first() else None
+
 
 def generate_file(data, file_name):
     class Report(object):
@@ -164,24 +122,32 @@ def generate_file(data, file_name):
     res = []
 
     for index, row in enumerate(data):
-        # print(row.__dict__)
+        sl = SampleLib.objects.get(name=row.name)
         report = Report()
         report.no = index + 1
-        files = dict(zip(row.file, row.checksum))
+
+
         report.patient = row.patient
         report.sample_lib = row.name # ✓
         report.barcode = row.barcode_name # ✓
         report.na_type = row.na_type # ✓
         report.area_type = row.area_type # ✓
         report.matching_normal_sl = row.matching_normal_sl # ✓
-        row.path = None if row.path == 'nan' else row.path
-        seq_run = row.path.split("/")[1] if row.path != None else ""
-        report.seq_run = seq_run # ✓
-        # print(row.file, row.file, row.path, row.name)
-        report.file = files
+
         report.footprint = row.bait
-        report.path = row.path
-        # print(row.bait)
+
+        if row.file:
+            report.file = dict(zip(row.file, row.checksum))
+            report.path = row.path
+        else:
+            report.file = _get_file(sl)
+            report.path = _get_path(sl)
+        if any([report.path == None, report.path == ""]):
+            print(row.name, report.path, row.file)
+        seq_run = report.path.split("/")[1] if report.path != None else ""
+        # print(seq_run)
+        report.seq_run = seq_run  # ✓
+
         res.append(report)
 
     response = HttpResponse(

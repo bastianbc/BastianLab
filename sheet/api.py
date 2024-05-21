@@ -3,6 +3,7 @@ from django.db import models
 from datetime import datetime
 from django.db.models import Q, F, Count, OuterRef, Subquery, Value, Case, When, CharField
 from django.contrib.postgres.aggregates import ArrayAgg
+from django.db.models.functions import Coalesce
 
 from samplelib.models import SampleLib, NA_SL_LINK
 from lab.models import Patients
@@ -12,7 +13,6 @@ from sequencingrun.models import SequencingRun
 
 
 def _get_authorizated_queryset(seq_runs):
-
         return SampleLib.objects.filter(
         sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=seq_runs
         ).annotate(
@@ -50,12 +50,7 @@ def _get_authorizated_queryset(seq_runs):
             ),
             output_field=CharField()
         ),
-       barcode_name=Case(
-           When(barcode__i5__isnull=False, then=F('barcode__i5')),
-           When(barcode__i5__isnull=True, barcode__i7__isnull=False, then=F('barcode__i7')),
-           default=Value(""),
-           output_field=CharField()
-       ),
+       barcode_name=Coalesce('barcode__i5', 'barcode__i7', default=Value(''), output_field=CharField()),
        path=Subquery(
            SequencingFileSet.objects.filter(
                sample_lib=OuterRef('pk'),
@@ -103,61 +98,65 @@ def query_by_args(user, seq_runs, **kwargs):
             "9": "file",
             "10": "path",
         }
-        draw = int(kwargs.get('draw', None)[0])
-        length = int(kwargs.get('length', None)[0])
-        start = int(kwargs.get('start', None)[0])
-        search_value = kwargs.get('search[value]', None)[0]
-        order_column = kwargs.get('order[0][column]', None)[0]
-        order = kwargs.get('order[0][dir]', None)[0]
-        sequencing_run_filter = kwargs.get('sequencing_run[]', [""])
-        patient_filter = kwargs.get('patient', None)[0]
-        barcode_filter = kwargs.get('barcode', None)[0]
-        bait_filter = kwargs.get('bait', None)[0]
-        area_type_filter = kwargs.get('area_type', None)[0]
-        na_type_filter = kwargs.get('na_type', None)[0]
-        order_column = ORDER_COLUMN_CHOICES[order_column]
-        if order == 'desc':
-            order_column = '-' + order_column
+        if kwargs.get('draw', None) != None:
 
-        queryset = _get_authorizated_queryset(seq_runs)
-        for i in queryset:
-            print("@@@",i.__dict__)
-        total = queryset.count()
+            draw = int(kwargs.get('draw', None)[0])
+            length = int(kwargs.get('length', None)[0])
+            start = int(kwargs.get('start', None)[0])
+            search_value = kwargs.get('search[value]', None)[0]
+            order_column = kwargs.get('order[0][column]', None)[0]
+            order = kwargs.get('order[0][dir]', None)[0]
+            sequencing_run_filter = kwargs.get('sequencing_run[]', [""])
+            patient_filter = kwargs.get('patient', None)[0]
+            barcode_filter = kwargs.get('barcode', None)[0]
+            bait_filter = kwargs.get('bait', None)[0]
+            area_type_filter = kwargs.get('area_type', None)[0]
+            na_type_filter = kwargs.get('na_type', None)[0]
+            order_column = ORDER_COLUMN_CHOICES[order_column]
+            if order == 'desc':
+                order_column = '-' + order_column
 
-        search_value = _parse_value(search_value)
-        if sequencing_run_filter[0] != "":
-            queryset = queryset.filter(Q(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=sequencing_run_filter))
+            queryset = _get_authorizated_queryset(seq_runs)
+            total = queryset.count()
 
-        if patient_filter:
-            patient = Patients.objects.get(pa_id=patient_filter).pat_id
-            queryset = queryset.filter(Q(patient=patient))
+            search_value = _parse_value(search_value)
+            if sequencing_run_filter[0] != "":
+                queryset = queryset.filter(Q(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=sequencing_run_filter))
 
-        if barcode_filter:
-            queryset = queryset.filter(Q(barcode__id=barcode_filter))
+            if patient_filter:
+                patient = Patients.objects.get(pa_id=patient_filter).pat_id
+                queryset = queryset.filter(Q(patient=patient))
 
-        if area_type_filter:
-            queryset = queryset.filter(Q(area_type=area_type_filter))
+            if barcode_filter:
+                queryset = queryset.filter(Q(barcode__id=barcode_filter))
 
-        if na_type_filter:
-            queryset = queryset.filter(Q(na_type=na_type_filter))
+            if area_type_filter:
+                queryset = queryset.filter(Q(area_type=area_type_filter))
 
-        if bait_filter:
-            queryset = queryset.filter(
-                Q(sl_cl_links__captured_lib__bait__id=bait_filter))
+            if na_type_filter:
+                queryset = queryset.filter(Q(na_type=na_type_filter))
 
-        elif search_value:
-            queryset = queryset.filter(
-                Q(name__icontains=search_value)
-            )
+            if bait_filter:
+                queryset = queryset.filter(
+                    Q(sl_cl_links__captured_lib__bait__id=bait_filter))
 
-        count = queryset.count()
-        queryset = queryset.order_by(order_column)[start:start + length]
-        return {
-            'items': queryset,
-            'count': count,
-            'total': total,
-            'draw': draw
-        }
+            elif search_value:
+                queryset = queryset.filter(
+                    Q(name__icontains=search_value)
+                )
+
+            count = queryset.count()
+            queryset = queryset.order_by(order_column)[start:start + length]
+            return {
+                'items': queryset,
+                'count': count,
+                'total': total,
+                'draw': draw
+            }
+        else:
+            query_set = _get_authorizated_queryset(seq_runs)
+            return _get_authorizated_queryset(seq_runs)
+
     except Exception as e:
         print(str(e))
         raise
