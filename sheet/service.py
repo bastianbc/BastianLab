@@ -118,15 +118,15 @@ def generate_file(data, file_name):
         matching_normal_sl = ""
         seq_run = ""
         footprint = ""
+        seen = ""
 
     res = []
-
+    seen = set()
     for index, row in enumerate(data):
         sl = SampleLib.objects.get(name=row.name)
         report = Report()
+
         report.no = index + 1
-
-
         report.patient = row.patient
         report.sample_lib = row.name # ✓
         report.barcode = row.barcode_name # ✓
@@ -145,10 +145,16 @@ def generate_file(data, file_name):
         if any([report.path == None, report.path == ""]):
             print(row.name, report.path, row.file)
         seq_run = report.path.split("/")[1] if report.path != None else ""
-        # print(seq_run)
         report.seq_run = seq_run  # ✓
 
-        res.append(report)
+        concat = f"{row.name}_{row.seq_run}"
+
+        # Only add report if it hasn't been added before
+        if concat not in seen:
+            seen.add(concat)
+            res.append(report)
+        else:
+            continue
 
     response = HttpResponse(
         content_type='text/csv',

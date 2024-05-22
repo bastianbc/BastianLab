@@ -71,9 +71,8 @@ def _get_authorizated_queryset(seq_runs):
                sequencing_file_sets__sequencing_run=F('seq_run')
            ),distinct=True
        ),
-       bait=F("sl_cl_links__captured_lib__bait__name"),
-       distinct_name=Concat('name', 'seq_run', output_field=CharField())
-    ).distinct('distinct_name').order_by('name')
+       bait=F("sl_cl_links__captured_lib__bait__name")
+    ).distinct().order_by('name')
 
 def _parse_value(search_value):
     if "_initial:" in search_value:
