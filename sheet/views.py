@@ -22,21 +22,29 @@ def filter_sheet(request):
     seq_runs = SequencingRun.objects.filter()
 
     # Query SampleLib filtering by name and linked SequencingRun that has an associated SequencingFileSet
-    q = SampleLib.objects.filter(
+    file_set_exists = SequencingFileSet.objects.filter(
+        sample_lib=OuterRef('pk'),
+        sequencing_run=OuterRef('sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs')
+    ).exists()
+
+    # Correctly place the Exists query inside a Case when constructing the annotation
+    sample_libs = SampleLib.objects.filter(
         name='AMLP-215',
         sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=seq_runs
     ).annotate(
         valid_seq_runs=ArrayAgg(
-            Subquery(
-                SequencingRun.objects.filter(
-                    id=OuterRef('sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id'),
-                    exists=SequencingFileSet.objects.filter(
-        sample_lib=OuterRef('pk'),  # Linking SampleLib via primary key
-        sequencing_run=OuterRef('sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id')
-        # Linking SequencingRun
-    ).exists()  # Ensuring there is a matching SequencingFileSet
-                ).values('name')[:1],
-                output_field=CharField()
+            Case(
+                When(
+                    # The Exists condition wrapped inside the When clause of the Case expression
+                    exists=Subquery(file_set_exists, output_field=CharField()),
+                    then=Subquery(
+                        SequencingRun.objects.filter(
+                            id=OuterRef('sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs')
+                        ).values('name')[:1],
+                        output_field=CharField()
+                    )
+                ),
+                default=Value(None)  # If no file set exists, we can decide to show None or skip
             ),
             distinct=True
         )
