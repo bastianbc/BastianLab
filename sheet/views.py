@@ -23,7 +23,13 @@ def filter_sheet(request):
     q = SampleLib.objects.filter(name='AMLP-215',
         sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=seq_runs
         ).annotate(
-        seq_run=F('sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs'),
+        seq_run=Subquery(
+           SequencingRun.objects.filter(
+               sequencing_libs__cl_seql_links__captured_lib__sl_cl_links__sample_lib=OuterRef('pk'),
+           ).values('name')[:1]
+       ),
+
+        # F('sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs'),
        # path=Subquery(
        #     SequencingFileSet.objects.filter(
        #         sample_lib=OuterRef('pk'),
