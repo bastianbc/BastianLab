@@ -34,13 +34,13 @@ def filter_sheet(request):
        #         sequencing_run=OuterRef('seq_run')
        #     ).values('path')[:1]
        # ),
-       file=ArrayAgg(
-           'sequencing_file_sets__sequencing_files__name',
-           filter=Q(
-               sequencing_file_sets__sample_lib=F('pk'),
-               sequencing_file_sets__sequencing_run__name=F('seq_run')
-           )
-       ),
+       # file=ArrayAgg(
+       #     'sequencing_file_sets__sequencing_files__name',
+       #     filter=Q(
+       #         sequencing_file_sets__sample_lib=F('pk'),
+       #         sequencing_file_sets__sequencing_run__name=F('seq_run')
+       #     )
+       # ),
        # checksum=ArrayAgg(
        #     'sequencing_file_sets__sequencing_files__checksum',
        #     filter=Q(
