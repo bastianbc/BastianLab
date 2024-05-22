@@ -17,10 +17,34 @@ from .service import CustomSampleLibSerializer
 
 
 def filter_sheet(request):
-    seq_files = SequencingFile.objects.filter(sequencing_file_set__sample_lib__name="12-12366").values('name', 'checksum').distinct()
-
-    print(seq_files)
-
+    q = SampleLib.objects.filter(name='AMLP-215',
+        sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=seq_runs
+        ).annotate(
+        seq_run=F('sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs'),
+       path=Subquery(
+           SequencingFileSet.objects.filter(
+               sample_lib=OuterRef('pk'),
+               sequencing_run=OuterRef('seq_run')
+           ).values('path')[:1]
+       ),
+       file=ArrayAgg(
+           'sequencing_file_sets__sequencing_files__name',
+           filter=Q(
+               sequencing_file_sets__sample_lib=F('pk'),
+               sequencing_file_sets__sequencing_run=F('seq_run')
+           )
+       ),
+       checksum=ArrayAgg(
+           'sequencing_file_sets__sequencing_files__checksum',
+           filter=Q(
+               sequencing_file_sets__sample_lib=F('pk'),
+               sequencing_file_sets__sequencing_run=F('seq_run')
+           )
+       ),
+       bait=F("sl_cl_links__captured_lib__bait__name")
+    ).distinct().order_by('name')
+    for i in q:
+        print(i)
     seq_runs = SequencingRun.objects.filter()
     samplelibs = query_by_args(request.user, seq_runs, **request.GET)
     serializer = CustomSampleLibSerializer(samplelibs['items'], many=True)
