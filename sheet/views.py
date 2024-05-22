@@ -20,11 +20,6 @@ from capturedlib.models import CapturedLib
 
 def filter_sheet(request):
     seq_runs = SequencingRun.objects.filter()
-    seq_file_set_exists = SequencingFileSet.objects.filter(
-        sample_lib=OuterRef('pk'),  # Linking SampleLib via primary key
-        sequencing_run=OuterRef('sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id')
-        # Linking SequencingRun
-    ).exists()
 
     # Query SampleLib filtering by name and linked SequencingRun that has an associated SequencingFileSet
     q = SampleLib.objects.filter(
@@ -35,7 +30,11 @@ def filter_sheet(request):
             Subquery(
                 SequencingRun.objects.filter(
                     id=OuterRef('sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id'),
-                    exists=seq_file_set_exists  # Ensuring there is a matching SequencingFileSet
+                    exists=SequencingFileSet.objects.filter(
+        sample_lib=OuterRef('pk'),  # Linking SampleLib via primary key
+        sequencing_run=OuterRef('sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id')
+        # Linking SequencingRun
+    ).exists()  # Ensuring there is a matching SequencingFileSet
                 ).values('name')[:1],
                 output_field=CharField()
             ),
