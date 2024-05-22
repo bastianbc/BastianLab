@@ -20,23 +20,26 @@ from capturedlib.models import CapturedLib
 
 def filter_sheet(request):
     seq_runs = SequencingRun.objects.filter()
-    related_file_set_exists = SequencingFileSet.objects.filter(
-        sample_lib=OuterRef('pk'),
+    seq_file_set_exists = SequencingFileSet.objects.filter(
+        sample_lib=OuterRef('pk'),  # Linking SampleLib via primary key
         sequencing_run=OuterRef('sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id')
+        # Linking SequencingRun
     ).exists()
 
+    # Query SampleLib filtering by name and linked SequencingRun that has an associated SequencingFileSet
     q = SampleLib.objects.filter(
         name='AMLP-215',
         sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=seq_runs
     ).annotate(
-        seq_run=Case(
-            When(
-                # Only include SequencingRun names if there's a related SequencingFileSet
-                Exists(related_file_set_exists),
-                then=F('sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__name')
+        valid_seq_runs=ArrayAgg(
+            Subquery(
+                SequencingRun.objects.filter(
+                    id=OuterRef('sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id'),
+                    exists=seq_file_set_exists  # Ensuring there is a matching SequencingFileSet
+                ).values('name')[:1],
+                output_field=CharField()
             ),
-            default=Value(None),  # Optionally specify a default if no related file set exists
-            output_field=CharField()
+            distinct=True
         )
     )
 
