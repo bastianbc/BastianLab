@@ -72,7 +72,7 @@ def _get_authorizated_queryset(seq_runs):
            ),distinct=True
        ),
        bait=F("sl_cl_links__captured_lib__bait__name")
-    ).distinct().order_by('name')
+    ).distinct('name', 'seq_run').order_by('name')
 
 def _parse_value(search_value):
     if "_initial:" in search_value:
