@@ -17,6 +17,7 @@ from .service import CustomSampleLibSerializer
 
 
 def filter_sheet(request):
+    seq_runs = SequencingRun.objects.filter()
     q = SampleLib.objects.filter(name='AMLP-215',
         sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=seq_runs
         ).annotate(
