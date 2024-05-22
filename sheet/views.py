@@ -29,20 +29,19 @@ def filter_sheet(request):
            ).values('name')[:1]
        ),
 
-        # F('sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs'),
        # path=Subquery(
        #     SequencingFileSet.objects.filter(
        #         sample_lib=OuterRef('pk'),
        #         sequencing_run=OuterRef('seq_run')
        #     ).values('path')[:1]
        # ),
-       # file=ArrayAgg(
-       #     'sequencing_file_sets__sequencing_files__name',
-       #     filter=Q(
-       #         sequencing_file_sets__sample_lib=F('pk'),
-       #         sequencing_file_sets__sequencing_run=F('seq_run')
-       #     )
-       # ),
+       file=ArrayAgg(
+           'sequencing_file_sets__sequencing_files__name',
+           filter=Q(
+               sequencing_file_sets__sample_lib=F('pk'),
+               sequencing_file_sets__sequencing_run__name=F('seq_run')
+           )
+       ),
        # checksum=ArrayAgg(
        #     'sequencing_file_sets__sequencing_files__checksum',
        #     filter=Q(
