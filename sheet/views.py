@@ -44,12 +44,12 @@ def filter_sheet(request):
                sequencing_file_sets__sequencing_run=F('seq_run')
            )
        ),
-       bait=Subquery(
-               CapturedLib.objects.filter(
-                   cl_seql_links__sequencing_lib__sequencing_runs=OuterRef('seq_run')
-               ).values('bait__name')[:1],
-               output_field=CharField()
-       ),
+       # bait=Subquery(
+       #         CapturedLib.objects.filter(
+       #             cl_seql_links__sequencing_lib__sequencing_runs=OuterRef('seq_run')
+       #         ).values('bait__name')[:1],
+       #         output_field=CharField()
+       # ),
     ).distinct().order_by('name')
     for i in q:
         print(i)
