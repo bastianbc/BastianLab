@@ -153,6 +153,7 @@ def generate_file(data, file_name):
         if concat not in seen:
             seen.add(concat)
             res.append(report)
+            print(row.name, concat, (concat in seen))
         else:
             continue
 
