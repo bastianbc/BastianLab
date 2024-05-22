@@ -56,7 +56,7 @@ def filter_sheet(request):
        # ),
     ).distinct().order_by('name')
     for i in q:
-        print(i)
+        print(i.__dict__)
     seq_runs = SequencingRun.objects.filter()
     samplelibs = query_by_args(request.user, seq_runs, **request.GET)
     serializer = CustomSampleLibSerializer(samplelibs['items'], many=True)
