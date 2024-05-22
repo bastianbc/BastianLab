@@ -3,7 +3,7 @@ from django.db import models
 from datetime import datetime
 from django.db.models import Q, F, Count, OuterRef, Subquery, Value, Case, When, CharField
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.db.models.functions import Coalesce
+from django.db.models.functions import Coalesce, Concat
 
 from samplelib.models import SampleLib, NA_SL_LINK
 from lab.models import Patients
@@ -71,8 +71,9 @@ def _get_authorizated_queryset(seq_runs):
                sequencing_file_sets__sequencing_run=F('seq_run')
            ),distinct=True
        ),
-       bait=F("sl_cl_links__captured_lib__bait__name")
-    ).distinct('name', 'seq_run').order_by('name')
+       bait=F("sl_cl_links__captured_lib__bait__name"),
+       distinct_name=Concat('name', 'seq_run', output_field=CharField())
+    ).distinct('distinct_name').order_by('name')
 
 def _parse_value(search_value):
     if "_initial:" in search_value:
