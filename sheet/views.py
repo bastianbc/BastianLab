@@ -14,69 +14,42 @@ from sequencinglib.models import SequencingLib
 from .forms import FilterForm, ReportForm
 from .api import query_by_args, _get_authorizated_queryset
 from .service import CustomSampleLibSerializer
+from bait.models import Bait
+from capturedlib.models import CapturedLib
 
 
 def filter_sheet(request):
     seq_runs = SequencingRun.objects.filter()
-    # q = SampleLib.objects.filter(name='AMLP-215',
-    #     sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=seq_runs
-    #     ).annotate(
-    #     seq_run=F('sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs'),
-    #    path=Subquery(
-    #        SequencingFileSet.objects.filter(
-    #            sample_lib=OuterRef('pk'),
-    #            sequencing_run=OuterRef('seq_run')
-    #        ).values('path')[:1]
-    #    ),
-    #    file=ArrayAgg(
-    #        'sequencing_file_sets__sequencing_files__name',
-    #        filter=Q(
-    #            sequencing_file_sets__sample_lib=F('pk'),
-    #            sequencing_file_sets__sequencing_run=F('seq_run')
-    #        )
-    #    ),
-    #    checksum=ArrayAgg(
-    #        'sequencing_file_sets__sequencing_files__checksum',
-    #        filter=Q(
-    #            sequencing_file_sets__sample_lib=F('pk'),
-    #            sequencing_file_sets__sequencing_run=F('seq_run')
-    #        )
-    #    ),
-    #    bait=F("sl_cl_links__captured_lib__bait__name")
-    # ).distinct().order_by('name')
-    q = SampleLib.objects.filter(
-        name='AMLP-215',
+    q = SampleLib.objects.filter(name='AMLP-215',
         sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=seq_runs
-    ).values(
-        'name',  # The name of the SampleLib
-        'sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id',  # Sequencing Run ID
-        'sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__name'  # Sequencing Run Name
-    ).annotate(
-        file=ArrayAgg(
-            'sequencing_file_sets__sequencing_files__name',
-            filter=Q(
-                sequencing_file_sets__sample_lib=OuterRef('pk'),
-                sequencing_file_sets__sequencing_run=OuterRef(
-                    'sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs')
-            ),
-            distinct=True
-        ),
-        path=Subquery(
-            SequencingFileSet.objects.filter(
-                sample_lib=OuterRef('pk'),
-                sequencing_run=OuterRef('sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs')
-            ).values('path')[:1]
-        ),
-        checksum=ArrayAgg(
-            'sequencing_file_sets__sequencing_files__checksum',
-            filter=Q(
-                sequencing_file_sets__sample_lib=OuterRef('pk'),
-                sequencing_file_sets__sequencing_run=OuterRef(
-                    'sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs')
-            ),
-            distinct=True
-        ),
-        bait=F("sl_cl_links__captured_lib__bait__name")
+        ).annotate(
+        seq_run=F('sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs'),
+       path=Subquery(
+           SequencingFileSet.objects.filter(
+               sample_lib=OuterRef('pk'),
+               sequencing_run=OuterRef('seq_run')
+           ).values('path')[:1]
+       ),
+       file=ArrayAgg(
+           'sequencing_file_sets__sequencing_files__name',
+           filter=Q(
+               sequencing_file_sets__sample_lib=F('pk'),
+               sequencing_file_sets__sequencing_run=F('seq_run')
+           )
+       ),
+       checksum=ArrayAgg(
+           'sequencing_file_sets__sequencing_files__checksum',
+           filter=Q(
+               sequencing_file_sets__sample_lib=F('pk'),
+               sequencing_file_sets__sequencing_run=F('seq_run')
+           )
+       ),
+       bait=Subquery(
+               CapturedLib.objects.filter(
+                   cl_seql_links__sequencing_lib__sl_cl_links__sample_lib=OuterRef('pk')
+               ).values('bait__name')[:1],
+               output_field=CharField()
+       ),
     ).distinct().order_by('name')
     for i in q:
         print(i)

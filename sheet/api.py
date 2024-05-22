@@ -62,14 +62,14 @@ def _get_authorizated_queryset(seq_runs):
            filter=Q(
                sequencing_file_sets__sample_lib=F('pk'),
                sequencing_file_sets__sequencing_run=F('seq_run')
-           )
+           ),distinct=True
        ),
        checksum=ArrayAgg(
            'sequencing_file_sets__sequencing_files__checksum',
            filter=Q(
                sequencing_file_sets__sample_lib=F('pk'),
                sequencing_file_sets__sequencing_run=F('seq_run')
-           )
+           ),distinct=True
        ),
        bait=F("sl_cl_links__captured_lib__bait__name")
     ).distinct().order_by('name')
