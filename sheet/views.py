@@ -46,7 +46,7 @@ def filter_sheet(request):
        ),
        bait=Subquery(
                CapturedLib.objects.filter(
-                   cl_seql_links__sequencing_lib__sl_cl_links__sample_lib=OuterRef('pk')
+                   cl_seql_links__sequencing_lib__sequencing_runs=OuterRef('seq_run')
                ).values('bait__name')[:1],
                output_field=CharField()
        ),
