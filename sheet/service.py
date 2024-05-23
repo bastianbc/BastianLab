@@ -147,7 +147,7 @@ def generate_file(data, file_name):
         report.seq_run = seq_run  # ✓
 
         concat = f"{report.sample_lib}_{report.seq_run}"
-        print(report.file is None, "$$$")
+        print(not report.file, "$$$")
         # Only add report if it hasn't been added before
         if concat not in seen:
             seen.add(concat)
