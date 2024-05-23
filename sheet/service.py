@@ -148,7 +148,8 @@ def generate_file(data, file_name):
 
         concat = f"{report.sample_lib}_{report.seq_run}"
         # Only add report if it hasn't been added before
-        if concat not in seen or report.file:
+
+        if concat not in seen and report.file:
             seen.add(concat)
             res.append(report)
             print(f"{report.sample_lib}_{report.seq_run}")
