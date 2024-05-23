@@ -152,7 +152,6 @@ def generate_file(data, file_name):
         if concat not in seen and report.file:
             seen.add(concat)
             res.append(report)
-            print(f"{report.sample_lib}_{report.seq_run}")
         else:
             continue
 
