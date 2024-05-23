@@ -2088,14 +2088,12 @@ def execute_rules():
         try:
             match = re.match(r'([ACTG]{6,8})', fs.prefix)
             if match:
-                print("*"*30)
                 name = fs.prefix.replace(match.group(1),"")
                 sl = SampleLib.objects.get(name=name)
                 fs.sample_lib = sl
                 fs.save()
                 print(sl)
             elif re.search(r'S\d$', fs.prefix):
-                print("$"*30)
                 name = fs.prefix.split("_S")[0]
                 sl = SampleLib.objects.get(name=name)
                 fs.sample_lib = sl
@@ -3432,7 +3430,6 @@ def im_bait(row):
         if cl.bait is None:
             cl.bait = bait
             cl.save()
-            print("saved")
     except Exception as e:
         print(e, row["Bait"])
 
