@@ -336,8 +336,9 @@ var KTDatatablesServerSide = function () {
     // Delete customer
     var handleDeleteRows = () => {
         // Select all delete buttons
+        console.log("delete_row");
         const deleteButtons = document.querySelectorAll('[data-kt-docs-table-filter="delete_row"]');
-
+        console.log(deleteButtons);
         deleteButtons.forEach(d => {
             // Delete button on click
             d.addEventListener('click', function (e) {

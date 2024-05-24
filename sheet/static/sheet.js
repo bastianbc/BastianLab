@@ -60,7 +60,7 @@ var KTDatatablesServerSide = function () {
                 { data: 'area_type' },
                 { data: 'matching_normal_sl' },
                 { data: 'seq_run' },
-                { data: 'file' },
+                { data: 'file_set' },
                 { data: 'path' },
             ],
             columnDefs: [
@@ -70,7 +70,11 @@ var KTDatatablesServerSide = function () {
                     render: function (data) {
                         return `
                             <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                <input class="form-check-input" type="checkbox" value="${data}" />
+                                <input class="form-check-input m-1" type="checkbox" value="${data}" />
+<!--                                <a class="menu-link px-3" data-kt-docs-table-filter="delete_row">-->
+<!--                                        Delete-->
+<!--                                    </a>-->
+                                <button data-kt-docs-table-filter="delete_row"><i class="fa fa-trash text-danger"></i></button>
                             </div>`;
                     }
                 },
@@ -88,20 +92,37 @@ var KTDatatablesServerSide = function () {
                         return namesList.join(", ");
                     }
                 },
-
                 {
                     targets: -2,
                     render: function (data, type, row) {
                         let namesList = [];
-                        if (Array.isArray(row["file"])) {
-                            row["file"].forEach(file => {
-                                namesList.push(file.name);
+                        if (Array.isArray(row["file_set"])) {
+                            row["file_set"].forEach(file => {
+                                let link = `<a href="/sequencingfile?initial=true&model=sequencingfileset&id=${file.set_id}">${file.prefix}</a>`;
+                                namesList.push(link);
                             });
                         }
                         // This will return the names list. Adjust based on your requirements
-                        return namesList.join(", ");
+                        return namesList.join(" ");
                     }
                 },
+
+                // {
+                //     targets: -2,
+                //     render: function (data, type, row) {
+                //         let namesList = [];
+                //         console.log(row['file_set'][0]);
+                //
+                //         if (Array.isArray(row["file_set"])) {
+                //             row["file_set"].forEach(file => {
+                //               let link = `<a href="/sequencingfile/sequencingfilesets?initial=true&model=sequencingfile&id=${}">${file.prefix}</a>`;
+                //               namesList.push(link);
+                //             });
+                //         return namesList.join(" ");
+                //         }
+                //
+                //     }
+                // },
                 {
                     targets: -3,
                     render: function (data, type, row) {
@@ -115,6 +136,7 @@ var KTDatatablesServerSide = function () {
                         return namesList.join(", ");
                     }
                 },
+
 
             ],
             // Add data-filter attribute
@@ -155,7 +177,6 @@ var KTDatatablesServerSide = function () {
           var bait = document.getElementById("id_bait").value;
           var area_type = document.getElementById("id_area_type").value;
           var na_type = document.getElementById("id_na_type").value;
-            console.log("handleFilterDatatable",sequencingRun,patient,barcode,bait,area_type,na_type);
 
           initDatatable(selectedSequencingRuns,patient,barcode,bait,area_type,na_type);
 
@@ -176,7 +197,7 @@ var KTDatatablesServerSide = function () {
                 const parent = e.target.closest('tr');
 
                 // Get customer name
-                const customerName = parent.querySelectorAll('td')[1].innerText;
+                const customerName = parent.querySelectorAll('td')[2].innerText;
 
                 // SweetAlert2 pop up --- official docs reference: https://sweetalert2.github.io/
                 Swal.fire({
@@ -522,7 +543,6 @@ var KTDatatablesServerSide = function () {
       return null;
 
     }
-
 
     // Public methods
     return {

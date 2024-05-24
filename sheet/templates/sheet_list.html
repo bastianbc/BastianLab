@@ -47,7 +47,6 @@
                 <!--end::Menu separator-->
                 <!--begin::Form-->
                 <div class="px-7 py-5">
-
                     <!--begin::Input group-->
                     <div class="mb-10">
                         <!--begin::Label-->
@@ -55,7 +54,33 @@
                             {{ filter_report.sequencing_run_report|as_crispy_field }}
                         <!--begin::Options-->
                         <div class="d-flex">
-
+                        </div>
+                        <!--end::Options-->
+                    </div>
+                    <!--end::Input group-->
+                    <!--begin::Actions-->
+                    <div class="d-flex justify-content-end">
+                        <button type="button" href="javascript:;" class="btn btn-sm btn-primary" id="export_to_csv_individual">Apply</button>
+                    </div>
+                    <!--end::Actions-->
+                </div>
+                <!--end::Form--><!--begin::Header-->
+                <div class="px-7 py-5">
+                    <div class="fs-5 text-gray-900 fw-bold">Specific SeqRuns</div>
+                </div>
+                <!--end::Header-->
+                <!--begin::Menu separator-->
+                <div class="separator border-gray-200"></div>
+                <!--end::Menu separator-->
+                <!--begin::Form-->
+                <div class="px-7 py-5">
+                    <!--begin::Input group-->
+                    <div class="mb-10">
+                        <!--begin::Label-->
+                        <!--end::Label-->
+                            {{ filter_report.sequencing_run_report_multiple|as_crispy_field }}
+                        <!--begin::Options-->
+                        <div class="d-flex">
                         </div>
                         <!--end::Options-->
                     </div>
