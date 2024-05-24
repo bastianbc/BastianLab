@@ -40,6 +40,7 @@ class CustomSampleLibSerializer(serializers.ModelSerializer):
     patient = serializers.SerializerMethodField()
     seq_run = serializers.SerializerMethodField()
     file = serializers.SerializerMethodField()
+    file_set = serializers.SerializerMethodField()
     path = serializers.SerializerMethodField()
     na_type = serializers.CharField(read_only=True)
     bait = serializers.CharField(read_only=True)
@@ -51,11 +52,16 @@ class CustomSampleLibSerializer(serializers.ModelSerializer):
         model = SampleLib
         fields = ("id", "name",  "shear_volume",  "qpcr_conc", "barcode_name", "bait",
                   "na_type", "area_type",
-                  "patient", "matching_normal_sl", "seq_run", "file", "path")
+                  "patient", "matching_normal_sl", "seq_run", "file", "file_set", "path")
 
     def get_file(self, obj):
         seq_files = SequencingFile.objects.filter(sequencing_file_set__sample_lib=obj)
         files = SequencingFileSerializerManual(seq_files, many=True).data
+        return files
+
+    def get_file_set(self, obj):
+        seq_files = SequencingFileSet.objects.filter(sample_lib=obj)
+        files = SequencingFileSetSerializerManual(seq_files, many=True).data
         return files
 
     def get_path(self, obj):

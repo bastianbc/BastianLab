@@ -12,7 +12,6 @@ var KTDatatablesServerSide = function () {
 
     // Private functions
     var initDatatable = function ( initialValue, filterSequencingRun, filterBarcode, filterI5, filterI7, filterAreaType, filterBait ) {
-        console.log(initialValue, filterSequencingRun, filterBarcode, filterI5, filterI7, filterAreaType, filterBait );
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
 
         dt = $(".table").DataTable({
