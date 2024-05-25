@@ -14,7 +14,7 @@ var KTDatatablesServerSide = function () {
             // searchDelay: 500,
             processing: true,
             serverSide: true,
-            pageLength: 100,
+            pageLength: 1000,
             destroy: true,
             order: [[2, 'asc']],
             stateSave: false,
@@ -74,7 +74,6 @@ var KTDatatablesServerSide = function () {
 <!--                                <a class="menu-link px-3" data-kt-docs-table-filter="delete_row">-->
 <!--                                        Delete-->
 <!--                                    </a>-->
-                                <button data-kt-docs-table-filter="delete_row"><i class="fa fa-trash text-danger"></i></button>
                             </div>`;
                     }
                 },
@@ -150,7 +149,7 @@ var KTDatatablesServerSide = function () {
         // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
         dt.on('draw', function () {
 
-            handleResetFilter();
+            // handleResetFilter();
             handleDeleteRows();
             KTMenu.createInstances();
         });
@@ -257,8 +256,8 @@ var KTDatatablesServerSide = function () {
 
         // Reset datatable
         resetButton.addEventListener('click', function () {
-
-          document.getElementById("id_sequencing_run").value="";
+          document.querySelector("select[name='sequencing_run']").value = "";
+          document.getElementById("select2-id_sequencing_run-container").innerHTML = "";
           document.getElementById("id_patient").value="";
           document.getElementById("id_barcode").value="";
           document.getElementById("id_bait").value="";
@@ -544,6 +543,60 @@ var KTDatatablesServerSide = function () {
 
     }
 
+    var handleAlternativeExport = () => {
+        // event listener
+        document.querySelector("button[name='alternative_export']").addEventListener("click", function () {
+            exportTableToCSV("alternative_export.csv")
+        });
+
+        function exportTableToCSV(filename) {
+            var data = [];
+
+            // Add header
+            var headers = [], headerCols = document.querySelectorAll("table thead tr th");
+            for (var i = 1; i < headerCols.length; i++) {
+                headers.push(headerCols[i].innerText.toLowerCase());
+            }
+            data.push(headers.join(","));
+
+            var rowNumber = 1;
+            var rows = document.querySelectorAll("table tbody tr");
+            for (var i = 0; i < rows.length; i++) {
+                var row = [], cols = rows[i].querySelectorAll("td");
+
+                // exclude checked rows
+                if (cols.length > 0 && !cols[0].querySelector('input[type="checkbox"]').checked) {
+                    row.push(rowNumber); // Sıra numarasını ekleyin
+                    rowNumber++;
+                    for (var j = 1; j < cols.length; j++) {
+                        row.push(cols[j].innerText);
+                    }
+                    data.push(row.join(","));
+                }
+            }
+
+            downloadCSV(data.join("\n"), filename);
+        }
+
+        function downloadCSV(data, filename) {
+            // Create a temporary link element
+            var url = new Blob([data], {type: "text/csv"});
+            var link = document.createElement("a");
+            link.download = filename;
+            link.href = window.URL.createObjectURL(url);
+            link.style.display = "none";
+
+            // Append the link to the document body
+            document.body.appendChild(link);
+
+            // Click the link programmatically to trigger the download
+            link.click();
+
+            // Remove the link from the document body
+            document.body.removeChild(link);
+        }
+    }
+
     // Public methods
     return {
         init: function () {
@@ -554,6 +607,7 @@ var KTDatatablesServerSide = function () {
             handleDeleteRows();
             init_csv_button();
             init_csv_button_2();
+            handleAlternativeExport();
         }
     }
 }();
