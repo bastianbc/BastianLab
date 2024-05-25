@@ -555,16 +555,19 @@ var KTDatatablesServerSide = function () {
             // Add header
             var headers = [], headerCols = document.querySelectorAll("table thead tr th");
             for (var i = 1; i < headerCols.length; i++) {
-                headers.push(headerCols[i].innerText);
+                headers.push(headerCols[i].innerText.toLowerCase());
             }
             data.push(headers.join(","));
 
+            var rowNumber = 1;
             var rows = document.querySelectorAll("table tbody tr");
             for (var i = 0; i < rows.length; i++) {
-                var row = [], cols = rows[i].querySelectorAll("td, th");
+                var row = [], cols = rows[i].querySelectorAll("td");
 
                 // exclude checked rows
                 if (cols.length > 0 && !cols[0].querySelector('input[type="checkbox"]').checked) {
+                    row.push(rowNumber); // Sıra numarasını ekleyin
+                    rowNumber++;
                     for (var j = 1; j < cols.length; j++) {
                         row.push(cols[j].innerText);
                     }
