@@ -1,15 +1,11 @@
 from samplelib.models import SampleLib
 from rest_framework import serializers
-from areas.models import Areas
 import csv
 from django.http import HttpResponse
 from sequencingrun.models import SequencingRun
-from capturedlib.models import CapturedLib
-from sequencinglib.models import SequencingLib
 from sequencingfile.models import SequencingFile,SequencingFileSet
 from lab.models import Patients
-from bait.serializers import BaitSerializer
-from bait.models import Bait
+import json
 
 class SequencingFileSetSerializerManual(serializers.ModelSerializer):
     class Meta:
@@ -50,14 +46,15 @@ class CustomSampleLibSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SampleLib
-        fields = ("id", "name",  "shear_volume",  "qpcr_conc", "barcode_name", "bait",
-                  "na_type", "area_type",
-                  "patient", "matching_normal_sl", "seq_run", "file", "file_set", "path")
+        fields = ("id", "name", "barcode_name",
+                  "na_type", "area_type", "patient", "bait",
+                  "matching_normal_sl", "seq_run", "file", "file_set", "path")
 
     def get_file(self, obj):
         seq_files = SequencingFile.objects.filter(sequencing_file_set__sample_lib=obj)
         files = SequencingFileSerializerManual(seq_files, many=True).data
-        return files
+        file_dict = {file['name']: file['checksum'] for file in files}
+        return json.dumps(file_dict)
 
     def get_file_set(self, obj):
         seq_files = SequencingFileSet.objects.filter(sample_lib=obj)

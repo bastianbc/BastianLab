@@ -1,6 +1,4 @@
 import json
-from django.db import models
-from datetime import datetime
 from django.db.models import Q, F, Count, OuterRef, Subquery, Value, Case, When, CharField
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.db.models.functions import Coalesce, Concat
