@@ -415,7 +415,7 @@ var KTDatatablesServerSide = function () {
                 headers.push(headerCols[i].innerText.toLowerCase());
             }
             headers.unshift("no");
-            data.push(headers.join(","));
+            data.push(headers.join("\t"));
             console.log(data);
             var rowNumber = 1;
             var rows = document.querySelectorAll("table tbody tr");
@@ -429,7 +429,7 @@ var KTDatatablesServerSide = function () {
                     for (var j = 1; j < cols.length; j++) {
                         row.push(cols[j].innerText);
                     }
-                    data.push(row.join(","));
+                    data.push(row.join("\t"));
                 }
             }
 

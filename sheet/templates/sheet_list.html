@@ -23,7 +23,7 @@
   <div class="d-flex justify-content-end" data-kt-docs-table-toolbar="base">
       <div class="d-flex flex-column flex-lg-row gap-2">
         <button type="button" class="btn btn-light-info fw-bold me-3" name="alternative_export">
-            Alternative Export</button>
+            Export Report After Filter</button>
       </div>
 
       <div class="d-flex flex-column flex-lg-row gap-2">
@@ -31,79 +31,79 @@
             Export Analysis Report for All SeqRuns</button>
       </div>
         
-      <div class="d-flex align-items-center">
-        <!--begin::Wrapper-->
-        <div class="me-4">
-            <!--begin::Menu-->
-            <a href="#" class="btn btn-light-info fw-bold" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
-                <i class="ki-duotone ki-filter fs-5 text-gray-500 me-1"><span class="path1"></span><span class="path2"></span></i>
-                Export Analysis Report for One SeqRun
-            </a>
-            <!--begin::Menu 1-->
-            <div class="menu menu-sub menu-sub-dropdown w-500px w-md-300px " data-kt-menu="true" id="kt_menu_664b5f6007c9b">
-                <!--begin::Header-->
-                <div class="px-7 py-5">
-                    <div class="fs-5 text-gray-900 fw-bold">Specific SeqRuns</div>
-                </div>
-                <!--end::Header-->
-                <!--begin::Menu separator-->
-                <div class="separator border-gray-200"></div>
-                <!--end::Menu separator-->
-                <!--begin::Form-->
-                <div class="px-7 py-5">
-                    <!--begin::Input group-->
-                    <div class="mb-10">
-                        <!--begin::Label-->
-                        <!--end::Label-->
-                            {{ filter_report.sequencing_run_report|as_crispy_field }}
-                        <!--begin::Options-->
-                        <div class="d-flex">
-                        </div>
-                        <!--end::Options-->
-                    </div>
-                    <!--end::Input group-->
-                    <!--begin::Actions-->
-                    <div class="d-flex justify-content-end">
-                        <button type="button" href="javascript:;" class="btn btn-sm btn-primary" id="export_to_csv_individual">Apply</button>
-                    </div>
-                    <!--end::Actions-->
-                </div>
-                <!--end::Form--><!--begin::Header-->
-                <div class="px-7 py-5">
-                    <div class="fs-5 text-gray-900 fw-bold">Specific SeqRuns</div>
-                </div>
-                <!--end::Header-->
-                <!--begin::Menu separator-->
-                <div class="separator border-gray-200"></div>
-                <!--end::Menu separator-->
-                <!--begin::Form-->
-                <div class="px-7 py-5">
-                    <!--begin::Input group-->
-                    <div class="mb-10">
-                        <!--begin::Label-->
-                        <!--end::Label-->
-                            {{ filter_report.sequencing_run_report_multiple|as_crispy_field }}
-                        <!--begin::Options-->
-                        <div class="d-flex">
-                        </div>
-                        <!--end::Options-->
-                    </div>
-                    <!--end::Input group-->
-                    <!--begin::Actions-->
-                    <div class="d-flex justify-content-end">
-                        <button type="button" href="javascript:;" class="btn btn-sm btn-primary" id="export_to_csv_individual">Apply</button>
-                    </div>
-                    <!--end::Actions-->
-                </div>
-                <!--end::Form-->
-            </div>
-            <!--end::Menu 1-->
-            <!--end::Menu-->
-        </div>
-        <!--end::Wrapper-->
-
-
-    </div>
+{#      <div class="d-flex align-items-center">#}
+{#        <!--begin::Wrapper-->#}
+{#        <div class="me-4">#}
+{#            <!--begin::Menu-->#}
+{#            <a href="#" class="btn btn-light-info fw-bold" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">#}
+{#                <i class="ki-duotone ki-filter fs-5 text-gray-500 me-1"><span class="path1"></span><span class="path2"></span></i>#}
+{#                Export Analysis Report for One SeqRun#}
+{#            </a>#}
+{#            <!--begin::Menu 1-->#}
+{#            <div class="menu menu-sub menu-sub-dropdown w-500px w-md-300px " data-kt-menu="true" id="kt_menu_664b5f6007c9b">#}
+{#                <!--begin::Header-->#}
+{#                <div class="px-7 py-5">#}
+{#                    <div class="fs-5 text-gray-900 fw-bold">Specific SeqRuns</div>#}
+{#                </div>#}
+{#                <!--end::Header-->#}
+{#                <!--begin::Menu separator-->#}
+{#                <div class="separator border-gray-200"></div>#}
+{#                <!--end::Menu separator-->#}
+{#                <!--begin::Form-->#}
+{#                <div class="px-7 py-5">#}
+{#                    <!--begin::Input group-->#}
+{#                    <div class="mb-10">#}
+{#                        <!--begin::Label-->#}
+{#                        <!--end::Label-->#}
+{#                            {{ filter_report.sequencing_run_report|as_crispy_field }}#}
+{#                        <!--begin::Options-->#}
+{#                        <div class="d-flex">#}
+{#                        </div>#}
+{#                        <!--end::Options-->#}
+{#                    </div>#}
+{#                    <!--end::Input group-->#}
+{#                    <!--begin::Actions-->#}
+{#                    <div class="d-flex justify-content-end">#}
+{#                        <button type="button" href="javascript:;" class="btn btn-sm btn-primary" id="export_to_csv_individual">Apply</button>#}
+{#                    </div>#}
+{#                    <!--end::Actions-->#}
+{#                </div>#}
+{#                <!--end::Form--><!--begin::Header-->#}
+{#                <div class="px-7 py-5">#}
+{#                    <div class="fs-5 text-gray-900 fw-bold">Specific SeqRuns</div>#}
+{#                </div>#}
+{#                <!--end::Header-->#}
+{#                <!--begin::Menu separator-->#}
+{#                <div class="separator border-gray-200"></div>#}
+{#                <!--end::Menu separator-->#}
+{#                <!--begin::Form-->#}
+{#                <div class="px-7 py-5">#}
+{#                    <!--begin::Input group-->#}
+{#                    <div class="mb-10">#}
+{#                        <!--begin::Label-->#}
+{#                        <!--end::Label-->#}
+{#                            {{ filter_report.sequencing_run_report_multiple|as_crispy_field }}#}
+{#                        <!--begin::Options-->#}
+{#                        <div class="d-flex">#}
+{#                        </div>#}
+{#                        <!--end::Options-->#}
+{#                    </div>#}
+{#                    <!--end::Input group-->#}
+{#                    <!--begin::Actions-->#}
+{#                    <div class="d-flex justify-content-end">#}
+{#                        <button type="button" href="javascript:;" class="btn btn-sm btn-primary" id="export_to_csv_individual">Apply</button>#}
+{#                    </div>#}
+{#                    <!--end::Actions-->#}
+{#                </div>#}
+{#                <!--end::Form-->#}
+{#            </div>#}
+{#            <!--end::Menu 1-->#}
+{#            <!--end::Menu-->#}
+{#        </div>#}
+{#        <!--end::Wrapper-->#}
+{##}
+{##}
+{#    </div>#}
 
     <!--begin::Filter-->
     <button type="button" class="btn btn-light-primary me-3" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
@@ -163,6 +163,7 @@
 
 </div>
 <!--end::Wrapper-->
+    <p>Note: <br>1. Generate report for one or multiple sequencing run please use filter <br>2. For exclude sample libraries  use select checkboxes</p>
 <!--begin::Datatable-->
 <table id="kt_datatable_example_1" class="table align-middle table-row-dashed fs-6 gy-5">
     <thead>
