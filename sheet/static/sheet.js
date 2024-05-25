@@ -463,8 +463,6 @@ var KTDatatablesServerSide = function () {
             handleFilterDatatable();
             handleResetFilter();
             handleDeleteRows();
-            init_csv_button();
-            init_csv_button_2();
             handleAlternativeExport();
         }
     }
