@@ -109,6 +109,11 @@ def _get_file(sl):
 def _get_path(sl):
     return sl.sequencing_file_sets.first().path if sl.sequencing_file_sets.first() else None
 
+def _get_checksum(file):
+    try:
+        return SampleLib.objects.get(name=file).checksum
+    except:
+        return
 
 def generate_file(data, file_name):
     class Report(object):
@@ -138,9 +143,8 @@ def generate_file(data, file_name):
         report.matching_normal_sl = row.matching_normal_sl # ✓
 
         report.footprint = row.bait
-
         if row.file:
-            report.file = dict(zip(row.file, row.checksum))
+            report.file = {f: _get_checksum(f) for f in row.file}
             report.path = row.path
         else:
             report.file = _get_file(sl)
