@@ -143,12 +143,9 @@ def generate_file(data, file_name):
         report.matching_normal_sl = row.matching_normal_sl # ✓
 
         report.footprint = row.bait
-        print("###", row.file, row.name, row.checksum)
         if row.file:
             report.file = {f: _get_checksum(f) for f in row.file}
-            # report.file = dict(zip(row.file, row.checksum))
             report.path = row.path
-            print("$$$ ",report.file)
         else:
             report.file = _get_file(sl)
             report.path = _get_path(sl)
@@ -159,7 +156,6 @@ def generate_file(data, file_name):
         concat = f"{report.sample_lib}_{report.seq_run}"
         # Only add report if it hasn't been added before
 
-        print("!!! ",report.file)
         if concat not in seen and report.file:
             seen.add(concat)
             res.append(report)
