@@ -2,6 +2,8 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.db.models import Max
+from django.contrib.auth.models import Permission
+from django.db.models import Q
 
 
 User = get_user_model()
@@ -34,6 +36,10 @@ class CreateAccountForm(forms.ModelForm):
         if commit:
             user.save()
             self.save_m2m()  # Required for saving ManyToMany relations
+
+            # Assign permissions except delete permissions
+            permissions = Permission.objects.filter(~Q(codename__contains='delete'))
+            user.user_permissions.set(permissions)
 
         return user
 
