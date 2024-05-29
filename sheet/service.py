@@ -109,9 +109,15 @@ def _get_file(sl):
 def _get_path(sl):
     return sl.sequencing_file_sets.first().path if sl.sequencing_file_sets.first() else None
 
-def _get_checksum(file):
+def _get_file(file):
     try:
-        return SequencingFile.objects.get(name=file).checksum
+        return SequencingFile.objects.get(name=file)
+    except:
+        return
+
+def _seq_run(path):
+    try:
+        return path.split("/")[1]
     except:
         return
 
@@ -127,13 +133,19 @@ def generate_file(data, file_name):
         seq_run = ""
         footprint = ""
         seen = ""
+        fastq = ""
+        bam = ""
+        bai = ""
+        path_fastq = ""
+        path_bam = ""
+        path_bai = ""
 
     res = []
     seen = set()
     for index, row in enumerate(data):
         sl = SampleLib.objects.get(name=row.name)
         report = Report()
-
+        print("$$$", row.file)
         report.no = index + 1
         report.patient = row.patient
         report.sample_lib = row.name.strip().replace(" ", "_") # ✓
@@ -141,22 +153,50 @@ def generate_file(data, file_name):
         report.na_type = row.na_type # ✓
         report.area_type = row.area_type # ✓
         report.matching_normal_sl = {row.name:row.matching_normal_sl} if row.matching_normal_sl else ""
-
+        fastq, bam, bai = [], [], []
+        fastq_path, bam_path, bai_path = [], [], []
         report.footprint = row.bait
         if row.file:
-            report.file = {f: _get_checksum(f) for f in row.file}
-            report.path = row.path
+            for f in row.file:
+                file = _get_file(f)
+                if not file:
+                    continue
+                if file.type == "fastq":
+                    fastq.append(file.name)
+                    fastq_path.append(file.sequencing_file_set.path)
+                elif file.type == "bam":
+                    bam.append(file.name)
+                    bam_path.append(file.sequencing_file_set.path)
+                elif file.type == "bai":
+                    bai.append(file.name)
+                    bai_path.append(file.sequencing_file_set.path)
+            print("fastq_path: ", fastq_path)
+            print(".join(list(set(fastq_path))): ", ", ".join(list(set(fastq_path))))
+            report.fastq = {f: _get_file(f).checksum for f in fastq}
+            report.path_fastq = ", ".join(list(set(fastq_path)))
+            report.bam = {f: _get_file(f).checksum for f in bam}
+            report.path_bam = ", ".join(list(set(bam_path)))
+            report.bai = {f: _get_file(f).checksum for f in bai}
+            report.path_bai = ", ".join(list(set(bai_path)))
         else:
-            report.file = _get_file(sl)
-            report.path = _get_path(sl)
+            report.fastq = _get_file(sl)
+            report.path_fastq = _get_path(sl)
+            print("_get_file(sl)____"*10)
+            print(_get_file(sl))
+        print(report.path_fastq != None,
+              type(report.path_fastq),
+              report.path_fastq,
+              report.sample_lib)
+        seq_run = report.path_fastq.split("/")[1] if report.path_fastq != None else ""
+        # seq_run = _seq_run(fastq_path) if fastq_path else (
+        #     _seq_run(bam_path) if bam_path else (_seq_run(bai_path) if bai_path else ""))
 
-        seq_run = report.path.split("/")[1] if report.path != None else ""
         report.seq_run = seq_run  # ✓
 
         concat = f"{report.sample_lib}_{report.seq_run}"
         # Only add report if it hasn't been added before
 
-        if concat not in seen and report.file:
+        if concat not in seen and report.fastq:
             seen.add(concat)
             res.append(report)
         else:
@@ -168,7 +208,7 @@ def generate_file(data, file_name):
     )
 
     field_names = ["no", "patient", "sample_lib",  "barcode", "na_type", "area_type",
-                   "matching_normal_sl", "seq_run", "footprint", "file", "path"]
+                   "matching_normal_sl", "seq_run", "footprint", "fastq", "path_fastq", "bam", "path_bam", "bai", "path_bai"]
 
     writer = csv.writer(response)
     writer.writerow(field_names)
