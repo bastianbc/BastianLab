@@ -12,10 +12,13 @@ def accounts(request):
 @permission_required("account.add_user",raise_exception=True)
 def new_account(request):
     if request.method=="POST":
+        print(request)
         form = CreateAccountForm(request.POST)
+        print(form)
         if form.is_valid():
             form.save()
             messages.success(request,"Account created successfully")
+            print(form)
             return redirect('/account')
         else:
             messages.error(request,"Account could not be created!")

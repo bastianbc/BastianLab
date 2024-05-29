@@ -111,7 +111,7 @@ def _get_path(sl):
 
 def _get_checksum(file):
     try:
-        return SampleLib.objects.get(name=file).checksum
+        return SequencingFile.objects.get(name=file).checksum
     except:
         return
 
