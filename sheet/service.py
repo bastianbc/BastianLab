@@ -158,7 +158,7 @@ def generate_file(data, file_name):
         report.barcode = row.barcode_name # ✓
         report.na_type = row.na_type # ✓
         report.area_type = row.area_type # ✓
-        report.matching_normal_sl = {row.name:row.matching_normal_sl} if row.matching_normal_sl else ""
+        report.matching_normal_sl = row.matching_normal_sl.replace(" ", "_") if row.matching_normal_sl else ""
         fastq, bam, bai = [], [], []
         fastq_path, bam_path, bai_path = [], [], []
         report.footprint = row.bait

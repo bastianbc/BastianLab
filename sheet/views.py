@@ -30,7 +30,6 @@ def create_csv_sheet(request):
     try:
         seq_runs = SequencingRun.objects.filter()
         query_set = query_by_args(request.user, seq_runs, **request.GET)
-        print(query_set.count())
         return generate_file(data=query_set, file_name="Analysis Report")
     except Exception as e:
         print(e)
