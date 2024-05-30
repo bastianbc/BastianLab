@@ -145,7 +145,6 @@ def generate_file(data, file_name):
     for index, row in enumerate(data):
         sl = SampleLib.objects.get(name=row.name)
         report = Report()
-        print("$$$", row.file)
         report.no = index + 1
         report.patient = row.patient
         report.sample_lib = row.name.strip().replace(" ", "_") # ✓
@@ -170,8 +169,6 @@ def generate_file(data, file_name):
                 elif file.type == "bai":
                     bai.append(file.name)
                     bai_path.append(file.sequencing_file_set.path)
-            print("fastq_path: ", fastq_path)
-            print(".join(list(set(fastq_path))): ", ", ".join(list(set(fastq_path))))
             report.fastq = {f: _get_file(f).checksum for f in fastq}
             report.path_fastq = ", ".join(list(set(fastq_path)))
             report.bam = {f: _get_file(f).checksum for f in bam}
@@ -181,18 +178,9 @@ def generate_file(data, file_name):
         else:
             report.fastq = _get_file(sl)
             report.path_fastq = _get_path(sl)
-            print("_get_file(sl)____"*10)
-            print(_get_file(sl))
 
-        print(report.path_fastq != "",report.path_fastq != None,
-              type(report.path_fastq),
-              report.path_fastq,
-              report.sample_lib)
 
         seq_run = report.path_fastq.split("/")[1] if report.path_fastq != "" and report.path_fastq != None else ""
-        # seq_run = _seq_run(fastq_path) if fastq_path else (
-        #     _seq_run(bam_path) if bam_path else (_seq_run(bai_path) if bai_path else ""))
-
         report.seq_run = seq_run  # ✓
 
         concat = f"{report.sample_lib}_{report.seq_run}"
