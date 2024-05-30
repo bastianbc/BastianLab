@@ -192,7 +192,7 @@ def generate_file(data, file_name):
         concat_files = f"{report.path_fastq}{report.path_bam}{report.path_bai}"
         # Only add report if it hasn't been added before
         print(concat_files, concat not in seen, concat_files != "", report.sample_lib)
-        if concat not in seen and concat_files != "":
+        if concat not in seen and concat_files != None:
             seen.add(concat)
             res.append(report)
         else:
