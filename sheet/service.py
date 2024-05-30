@@ -144,7 +144,7 @@ def generate_file(data, file_name):
     seen = set()
     for index, row in enumerate(data):
         sl = SampleLib.objects.get(name=row.name)
-        print("%%%",row.file)
+        # print("%%%",row.file)
         report = Report()
         report.no = index + 1
         report.patient = row.patient
@@ -180,7 +180,7 @@ def generate_file(data, file_name):
             report.fastq = _get_file(sl)
             report.path_fastq = _get_path(sl)
 
-        print(report.sample_lib, report.fastq, row.file)
+        # print(report.sample_lib, report.fastq, row.file)
         seq_run = report.path_fastq.split("/")[1] if report.path_fastq != "" and report.path_fastq != None else ""
         report.seq_run = seq_run  # ✓
 
