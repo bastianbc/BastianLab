@@ -11,8 +11,8 @@ from sequencingrun.models import SequencingRun
 
 
 def _get_authorizated_queryset(seq_runs):
-        return SampleLib.objects.filter(name__icontains="22597",
-        sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=seq_runs
+        return SampleLib.objects.filter(
+            sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=seq_runs
         ).annotate(
         na_type=F('na_sl_links__nucacid__na_type'),
         seq_run=F('sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs'),
