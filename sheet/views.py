@@ -21,6 +21,11 @@ def filter_sheet(request):
 
 
 def get_sheet(request):
+    from .api import _get_authorizated_queryset
+
+    s = _get_authorizated_queryset(SequencingRun.objects.all())
+    for i in s:
+        print(i.file)
     filter = FilterForm()
     filter_report = ReportForm()
     return render(request,"sheet_list.html",locals())
