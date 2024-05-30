@@ -163,6 +163,7 @@ def generate_file(data, file_name):
         fastq_path, bam_path, bai_path = [], [], []
         report.footprint = row.bait
         files = _get_files(row.name)
+        print(files, row.name)
         if files:
             for file in files:
                 if file.type == "fastq":
