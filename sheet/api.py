@@ -66,6 +66,7 @@ def _get_authorizated_queryset(seq_runs):
        bait=F("sl_cl_links__captured_lib__bait__name")
     ).distinct().order_by('name')
 
+
 def _parse_value(search_value):
     if "_initial:" in search_value:
         return json.loads(search_value.split("_initial:")[1])
