@@ -190,9 +190,10 @@ def generate_file(data, file_name):
         report.seq_run = seq_run  # ✓
 
         concat = f"{report.sample_lib}_{report.seq_run}"
+        concat_files = f"{report.path_fastq}{report.path_bam}{report.path_bai}"
         # Only add report if it hasn't been added before
 
-        if concat not in seen and report.fastq:
+        if concat not in seen and concat_files != "":
             seen.add(concat)
             res.append(report)
         else:
