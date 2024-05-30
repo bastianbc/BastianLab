@@ -115,6 +115,12 @@ def _get_file(file):
     except:
         return
 
+def _get_files(sample_lib):
+    try:
+        return SequencingFile.objects.filter(sample_lib__name=sample_lib)
+    except:
+        return
+
 def _seq_run(path):
     try:
         return path.split("/")[1]
@@ -156,11 +162,9 @@ def generate_file(data, file_name):
         fastq, bam, bai = [], [], []
         fastq_path, bam_path, bai_path = [], [], []
         report.footprint = row.bait
-        if row.file:
-            for f in row.file:
-                file = _get_file(f)
-                if not file:
-                    continue
+        files = _get_files(row.name)
+        if files:
+            for file in files:
                 if file.type == "fastq":
                     fastq.append(file.name)
                     fastq_path.append(file.sequencing_file_set.path)
