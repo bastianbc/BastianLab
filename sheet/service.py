@@ -169,11 +169,11 @@ def generate_file(data, file_name):
                 elif file.type == "bai":
                     bai.append(file.name)
                     bai_path.append(file.sequencing_file_set.path)
-            report.fastq = {f: _get_file(f).checksum for f in fastq}
+            report.fastq = {f: _get_file(f).checksum for f in fastq} or ""
             report.path_fastq = ", ".join(list(set(fastq_path)))
-            report.bam = {f: _get_file(f).checksum for f in bam}
+            report.bam = {f: _get_file(f).checksum for f in bam} or ""
             report.path_bam = ", ".join(list(set(bam_path)))
-            report.bai = {f: _get_file(f).checksum for f in bai}
+            report.bai = {f: _get_file(f).checksum for f in bai} or ""
             report.path_bai = ", ".join(list(set(bai_path)))
         else:
             report.fastq = _get_file(sl)
