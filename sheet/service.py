@@ -183,10 +183,12 @@ def generate_file(data, file_name):
             report.path_fastq = _get_path(sl)
             print("_get_file(sl)____"*10)
             print(_get_file(sl))
-        print(report.path_fastq != "",
+
+        print(report.path_fastq != "",report.path_fastq != None,
               type(report.path_fastq),
               report.path_fastq,
               report.sample_lib)
+
         seq_run = report.path_fastq.split("/")[1] if report.path_fastq != "" or report.path_fastq != None else ""
         # seq_run = _seq_run(fastq_path) if fastq_path else (
         #     _seq_run(bam_path) if bam_path else (_seq_run(bai_path) if bai_path else ""))
