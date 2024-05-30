@@ -189,7 +189,7 @@ def generate_file(data, file_name):
               report.path_fastq,
               report.sample_lib)
 
-        seq_run = report.path_fastq.split("/")[1] if report.path_fastq != "" or report.path_fastq != None else ""
+        seq_run = report.path_fastq.split("/")[1] if report.path_fastq != "" and report.path_fastq != None else ""
         # seq_run = _seq_run(fastq_path) if fastq_path else (
         #     _seq_run(bam_path) if bam_path else (_seq_run(bai_path) if bai_path else ""))
 
