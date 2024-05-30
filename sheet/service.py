@@ -163,10 +163,10 @@ def generate_file(data, file_name):
                 if file.type == "fastq":
                     fastq.append(file.name)
                     fastq_path.append(file.sequencing_file_set.path)
-                elif file.type == "bam":
+                if file.type == "bam":
                     bam.append(file.name)
                     bam_path.append(file.sequencing_file_set.path)
-                elif file.type == "bai":
+                if file.type == "bai":
                     bai.append(file.name)
                     bai_path.append(file.sequencing_file_set.path)
             report.fastq = {f: _get_file(f).checksum for f in fastq} or ""
@@ -179,7 +179,7 @@ def generate_file(data, file_name):
             report.fastq = _get_file(sl)
             report.path_fastq = _get_path(sl)
 
-        print(report.sample_lib, report.fastq, report.path_fastq)
+        print(report.sample_lib, report.fastq, row.file)
         seq_run = report.path_fastq.split("/")[1] if report.path_fastq != "" and report.path_fastq != None else ""
         report.seq_run = seq_run  # ✓
 
