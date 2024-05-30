@@ -189,10 +189,10 @@ def generate_file(data, file_name):
         report.seq_run = seq_run  # ✓
 
         concat = f"{report.sample_lib}_{report.seq_run}"
-        concat_files = f"{report.path_fastq}{report.path_bam}{report.path_bai}"
+        concat_files = f"{report.path_fastq}{report.path_bam}{report.path_bai}".replace(" ","").strip()
         # Only add report if it hasn't been added before
-        print(concat_files, concat not in seen, concat_files != "", report.sample_lib)
-        if concat not in seen and concat_files != None:
+        print(concat_files, concat not in seen, concat_files is not None, not concat_files, report.sample_lib)
+        if concat not in seen and concat_files is not None:
             seen.add(concat)
             res.append(report)
         else:
