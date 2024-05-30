@@ -117,7 +117,7 @@ def _get_file(file):
 
 def _get_files(sample_lib):
     try:
-        return SequencingFile.objects.filter(sample_lib__name=sample_lib)
+        return SequencingFile.objects.filter(sequencing_file_set__sample_lib__name=sample_lib)
     except:
         return
 
