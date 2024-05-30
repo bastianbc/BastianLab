@@ -144,6 +144,7 @@ def generate_file(data, file_name):
     seen = set()
     for index, row in enumerate(data):
         sl = SampleLib.objects.get(name=row.name)
+        print("%%%",row.file)
         report = Report()
         report.no = index + 1
         report.patient = row.patient
