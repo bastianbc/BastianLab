@@ -1,6 +1,7 @@
 from django.db import models
 from datetime import datetime
 from django.db.models import Q, Count
+from core.validators import validate_name_contains_space
 
 class SequencingLib(models.Model):
     BUFFER_TYPES = (
@@ -10,7 +11,7 @@ class SequencingLib(models.Model):
         ("water", "Water"),
     )
 
-    name = models.CharField(max_length=50, unique=True, verbose_name="Name")
+    name = models.CharField(max_length=50, unique=True, validators=[validate_name_contains_space], verbose_name="Name")
     date = models.DateTimeField(default=datetime.now, verbose_name="Date")
     nmol = models.FloatField(default=0, verbose_name="N Mol")
     target_vol = models.FloatField(default=0, verbose_name="Target Volume")

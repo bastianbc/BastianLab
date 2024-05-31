@@ -2,6 +2,7 @@ from django.db import models
 from django.db.models import Q, Count, Case, When, IntegerField
 from datetime import datetime
 import json
+from core.validators import validate_name_contains_space
 
 class Areas(models.Model):
     AREA_TYPE_TYPES = [
@@ -47,7 +48,7 @@ class Areas(models.Model):
 
     ar_id = models.AutoField(primary_key=True)
     block = models.ForeignKey('blocks.Blocks', on_delete=models.CASCADE, db_column='block', related_name="block_areas")
-    name = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=50, unique=True, validators=[validate_name_contains_space])
     area_type = models.CharField(max_length=30, choices=AREA_TYPE_TYPES, blank=True, null=True)
     completion_date = models.DateTimeField(default=datetime.now)
     image = models.ImageField(null=True, blank=True, upload_to="images/%y/%m/%d")

@@ -221,16 +221,17 @@ var KTDatatablesServerSide = function () {
 
         // Reset datatable
         resetButton.addEventListener('click', function () {
-          document.querySelector("select[name='sequencing_run']").value = "";
-          document.getElementById("select2-id_sequencing_run-container").innerHTML = "";
-          document.getElementById("id_patient").value="";
-          document.getElementById("id_barcode").value="";
-          document.getElementById("id_bait").value="";
-          document.getElementById("id_area_type").value="";
-          document.getElementById("id_na_type").value="";
+            // clean the selected sequencing runs
+            document.getElementById("select2-id_sequencing_run-container").innerHTML = "";
+            // clean the selected patient
+            document.getElementById("select2-id_patient-container").innerHTML = "";
+            document.getElementById("id_patient").value="";
+            document.getElementById("id_barcode").value="";
+            document.getElementById("id_bait").value="";
+            document.getElementById("id_area_type").value="";
+            document.getElementById("id_na_type").value="";
 
-          initDatatable(null,null,null,null,null,null);
-
+            initDatatable(null,null,null,null,null,null);
         });
     }
 

@@ -2,7 +2,7 @@ from django.db import models
 from datetime import datetime
 from django.db.models import Q, Count
 import json
-
+from core.validators import validate_name_contains_space
 
 class SequencingRun(models.Model):
     FACILITY_TYPES = (
@@ -30,7 +30,7 @@ class SequencingRun(models.Model):
         ("SE 150", "SE 150"),
     )
 
-    name = models.CharField(max_length=50, unique=True, verbose_name="Name")
+    name = models.CharField(max_length=50, unique=True, validators=[validate_name_contains_space], verbose_name="Name")
     date_run = models.DateTimeField(default=datetime.now, verbose_name="Date Run")
     date = models.DateTimeField(default=datetime.now, verbose_name="Date")
     facility = models.CharField(max_length=20, choices=FACILITY_TYPES, blank=True, null=True, verbose_name="Facility")

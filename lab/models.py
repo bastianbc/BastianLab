@@ -2,6 +2,7 @@ from django.db import models
 from django.urls import reverse
 from django.db.models import Q, Count
 import json
+from core.validators import validate_name_contains_space
 
 class Patients(models.Model):
 
@@ -20,7 +21,7 @@ class Patients(models.Model):
         ("f","Female"),
     )
 
-    pat_id = models.CharField(max_length=12, blank=False, null=False, unique=True, verbose_name="Patient ID", help_text="Requires a unique identifier for each patient.")
+    pat_id = models.CharField(max_length=12, blank=False, null=False, unique=True, validators=[validate_name_contains_space], verbose_name="Patient ID", help_text="Requires a unique identifier for each patient.")
     sex = models.CharField(max_length=1, choices=SEX_TYPES, blank=True, null=True, verbose_name="Sex")
     dob = models.IntegerField(blank=True, null=True, verbose_name="Birthyear")
     race = models.SmallIntegerField(choices=RACE_TYPES, default=7, blank=True, null=True)

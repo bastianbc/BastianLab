@@ -2,9 +2,10 @@ from django.db import models
 from datetime import datetime
 from django.db.models import Q, Count, OuterRef, Subquery, Value
 import json
+from core.validators import validate_name_contains_space
 
 class SampleLib(models.Model):
-    name = models.CharField(max_length=50, unique=True, verbose_name="Name")
+    name = models.CharField(max_length=50, unique=True, validators=[validate_name_contains_space], verbose_name="Name")
     barcode = models.ForeignKey("barcodeset.Barcode", blank=True, null=True, on_delete=models.CASCADE, verbose_name="Barcode")
     date = models.DateTimeField(default=datetime.now, verbose_name="Date")
     method = models.ForeignKey("method.Method",related_name="sample_libs",on_delete=models.CASCADE, blank=True, null=True, verbose_name="Method")
