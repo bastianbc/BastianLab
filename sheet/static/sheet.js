@@ -91,19 +91,19 @@ var KTDatatablesServerSide = function () {
                         return namesList.join(", ");
                     }
                 },
-                {
-                    targets: 8,
-                    render: function (data, type, row) {
-                        let namesList = [];
-                        if (Array.isArray(row["seq_run"])) {
-                            row["seq_run"].forEach(sqr => {
-                                namesList.push(sqr.name);
-                            });
-                        }
-                        // This will return the names list. Adjust based on your requirements
-                        return namesList.join(", ");
-                    }
-                },
+                // {
+                //     targets: 8,
+                //     render: function (data, type, row) {
+                //         let namesList = [];
+                //         if (Array.isArray(row["seq_run"])) {
+                //             row["seq_run"].forEach(sqr => {
+                //                 namesList.push(sqr.name);
+                //             });
+                //         }
+                //         // This will return the names list. Adjust based on your requirements
+                //         return namesList.join(", ");
+                //     }
+                // },
 
 
             ],

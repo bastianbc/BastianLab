@@ -11,6 +11,7 @@ from .service import CustomSampleLibSerializer
 def filter_sheet(request):
     seq_runs = SequencingRun.objects.filter()
     samplelibs = query_by_args(request.user, seq_runs, **request.GET)
+    print(samplelibs['items'][0].seq_run)
     serializer = CustomSampleLibSerializer(samplelibs['items'], many=True)
     result = dict()
     result['data'] = serializer.data
