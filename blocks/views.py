@@ -56,7 +56,7 @@ def add_block_to_patient_async(request):
 
     try:
         for id in selected_ids:
-            patient = Patients.objects.get(pat_id=id)
+            patient = Patients.objects.get(pa_id=id)
             Blocks.objects.create(patient=patient)
     except Exception as e:
         return JsonResponse({"success":False})
