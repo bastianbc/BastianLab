@@ -3179,26 +3179,31 @@ def get_all_md5_3(row):
 def upload_file_tree_all_md5_3(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "df_md5.csv")
     df = pd.read_csv(file, index_col=False, encoding='iso-8859-1', on_bad_lines='warn')
+
     for file in SequencingFile.objects.filter(checksum__isnull=True):
     # Define the substring to search for
-        substring = file.name
-        cols = ["r1_zip", "r2_zip"]
-        # Ensure we're only applying .str.contains to string columns
-        mask = np.column_stack([df[col].astype(str).str.contains(substring, na=False) for col in cols])
+        try:
+            substring = file.name
+            cols = ["r1_zip", "r2_zip"]
+            # Ensure we're only applying .str.contains to string columns
+            mask = np.column_stack([df[col].astype(str).str.contains(substring, na=False) for col in cols])
 
-        # Get the rows where any cell contains the substring
-        matching_rows = df[cols].loc[mask.any(axis=1)]
+            # Get the rows where any cell contains the substring
+            matching_rows = df[cols].loc[mask.any(axis=1)]
 
-        # Find the specific cell value that matches the substring
-        for col in cols:
-            matched_values = matching_rows[matching_rows[col].astype(str).str.contains(substring, na=False)][col]
-            if not matched_values.empty:
-                # print(f"Column: {col}, Value: {matched_values.values[0]}, type: {type(matched_values.values[0])}")
-                v = json.loads(matched_values.values[0].replace("'", "\""))
-                # print(f"{v}, {type(v)}")
-                print(f"{v[substring]}")
-                break
-
+            # Find the specific cell value that matches the substring
+            for col in cols:
+                matched_values = matching_rows[matching_rows[col].astype(str).str.contains(substring, na=False)][col]
+                if not matched_values.empty:
+                    # print(f"Column: {col}, Value: {matched_values.values[0]}, type: {type(matched_values.values[0])}")
+                    v = json.loads(matched_values.values[0].replace("'", "\""))
+                    # print(f"{v}, {type(v)}")
+                    # print(f"{v[substring]}")
+                    file.checksum = v[substring]
+                    file.save()
+                    break
+        except Exception as e:
+            print(e, substring)
 
 
 def get_sample_library(row):
