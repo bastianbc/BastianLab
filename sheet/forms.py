@@ -9,7 +9,10 @@ class FilterForm(forms.Form):
         queryset=SequencingRun.objects.filter(sequencing_libs__cl_seql_links__captured_lib__sl_cl_links__sample_lib__isnull=False).distinct().order_by("name"),
         label="Sequencing Run"
     )
-    patient = forms.ModelChoiceField(queryset=Patients.objects.filter())
+    patient = forms.ModelChoiceField(
+        queryset=Patients.objects.filter(
+            patient_blocks__block_areas__area_na_links__nucacid__na_sl_links__sample_lib__isnull=False
+        ).distinct().order_by("pat_id"))
     barcode = forms.ModelChoiceField(queryset=Barcode.objects.filter())
     bait = forms.ModelChoiceField(queryset=Bait.objects.filter())
     area_type = forms.ChoiceField(choices=[('','---------' ),("normal","Normal"),("tumor","Tumor")], label="Area Type", required=False)

@@ -35,20 +35,52 @@ class PatientsSerializerManual(serializers.ModelSerializer):
 class CustomSampleLibSerializer(serializers.ModelSerializer):
     patient = serializers.SerializerMethodField()
     seq_run = serializers.SerializerMethodField()
-    file = serializers.SerializerMethodField()
+    # file = serializers.SerializerMethodField()
     file_set = serializers.SerializerMethodField()
-    path = serializers.SerializerMethodField()
+    # path = serializers.SerializerMethodField()
     na_type = serializers.CharField(read_only=True)
     bait = serializers.CharField(read_only=True)
     area_type = serializers.CharField(read_only=True)
     matching_normal_sl = serializers.CharField(read_only=True)
     barcode_name = serializers.CharField(read_only=True)
+    fastq = serializers.SerializerMethodField()
+    bam = serializers.SerializerMethodField()
+    bai = serializers.SerializerMethodField()
+    path_fastq = serializers.SerializerMethodField()
+    path_bam = serializers.SerializerMethodField()
+    path_bai = serializers.SerializerMethodField()
 
     class Meta:
         model = SampleLib
         fields = ("id", "name", "barcode_name",
                   "na_type", "area_type", "patient", "bait",
-                  "matching_normal_sl", "seq_run", "file", "file_set", "path")
+                  "fastq", "bam", "bai",
+                  "path_fastq", "path_bam", "path_bai",
+                  "matching_normal_sl", "seq_run",  "file_set")
+
+    def get_fastq(self, obj):
+        seq_files = SequencingFile.objects.filter(sequencing_file_set__sample_lib=obj, type='fastq')
+        if seq_files:
+            files = SequencingFileSerializerManual(seq_files, many=True).data
+            file_dict = {file['name']: file['checksum'] for file in files}
+            return json.dumps(file_dict)
+        return
+
+    def get_bam(self, obj):
+        seq_files = SequencingFile.objects.filter(sequencing_file_set__sample_lib=obj, type='bam')
+        if seq_files:
+            files = SequencingFileSerializerManual(seq_files, many=True).data
+            file_dict = {file['name']: file['checksum'] for file in files}
+            return json.dumps(file_dict)
+        return
+
+    def get_bai(self, obj):
+        seq_files = SequencingFile.objects.filter(sequencing_file_set__sample_lib=obj, type='bai')
+        if seq_files:
+            files = SequencingFileSerializerManual(seq_files, many=True).data
+            file_dict = {file['name']: file['checksum'] for file in files}
+            return json.dumps(file_dict)
+        return
 
     def get_file(self, obj):
         seq_files = SequencingFile.objects.filter(sequencing_file_set__sample_lib=obj)
@@ -61,8 +93,14 @@ class CustomSampleLibSerializer(serializers.ModelSerializer):
         files = SequencingFileSetSerializerManual(seq_files, many=True).data
         return files
 
-    def get_path(self, obj):
-        return obj.sequencing_file_sets.first().path if obj.sequencing_file_sets.first() else None
+    def get_path_fastq(self, obj):
+        return obj.sequencing_file_sets.filter(sequencing_files__type='fastq')[0].path if obj.sequencing_file_sets.filter(sequencing_files__type='fastq') else None
+
+    def get_path_bam(self, obj):
+        return obj.sequencing_file_sets.filter(sequencing_files__type='bam')[0].path if obj.sequencing_file_sets.filter(sequencing_files__type='bam') else None
+
+    def get_path_bai(self, obj):
+        return obj.sequencing_file_sets.filter(sequencing_files__type='bai')[0].path if obj.sequencing_file_sets.filter(sequencing_files__type='bai') else None
 
 
     def get_patient(self, obj):
@@ -160,40 +198,33 @@ def generate_file(data, file_name):
         report.area_type = row.area_type # ✓
         report.matching_normal_sl = row.matching_normal_sl.replace(" ", "_") if row.matching_normal_sl else ""
         fastq, bam, bai = [], [], []
-        fastq_path, bam_path, bai_path = [], [], []
         report.footprint = row.bait
         files = _get_files(row.name)
         if files:
             for file in files:
                 if file.type == "fastq":
                     fastq.append(file.name)
-                    fastq_path.append(file.sequencing_file_set.path)
+                    report.path_fastq = row.path if row.path else ""
                 if file.type == "bam":
                     bam.append(file.name)
-                    bam_path.append(file.sequencing_file_set.path)
+                    report.path_bam = row.path if row.path else ""
                 if file.type == "bai":
                     bai.append(file.name)
-                    bai_path.append(file.sequencing_file_set.path)
+                    report.path_bai = row.path if row.path else ""
             report.fastq = {f: _get_file(f).checksum for f in fastq} or ""
-            report.path_fastq = ", ".join(list(set(fastq_path)))
             report.bam = {f: _get_file(f).checksum for f in bam} or ""
-            report.path_bam = ", ".join(list(set(bam_path)))
             report.bai = {f: _get_file(f).checksum for f in bai} or ""
-            report.path_bai = ", ".join(list(set(bai_path)))
         else:
             report.fastq = _get_file(sl)
             report.path_fastq = _get_path(sl)
 
-        # print(report.sample_lib, report.fastq, row.file)
         seq_run = report.path_fastq.split("/")[1] if report.path_fastq != "" and report.path_fastq != None else ""
         report.seq_run = seq_run  # ✓
-
         concat = f"{report.sample_lib}_{report.seq_run}"
-        concat_files = f"{report.path_fastq}{report.path_bam}{report.path_bai}".replace("None","").strip()
+        concat_files = f"{report.fastq}{report.bam}{report.bai}".replace("None","").strip()
         # Only add report if it hasn't been added before
-        # print(concat_files, concat_files is not None, concat_files == None, not concat_files, concat_files == "",concat_files != "", report.sample_lib)
-        if concat not in seen and concat_files != "":
-            seen.add(concat)
+        if concat_files != "":
+            # seen.add(concat)
             res.append(report)
         else:
             continue
