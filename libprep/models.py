@@ -5,6 +5,7 @@ from django.db.models import Count, Subquery, OuterRef, Value
 from django.db.models.functions import Coalesce
 from samplelib.models import NA_SL_LINK
 import json
+from core.validators import validate_name_contains_space
 
 class NucAcids(models.Model):
     DNA = "dna"
@@ -17,7 +18,7 @@ class NucAcids(models.Model):
     ]
 
     nu_id = models.AutoField(primary_key=True, verbose_name="NA ID")
-    name = models.CharField(max_length=50, unique=True, verbose_name="Name")
+    name = models.CharField(max_length=50, unique=True, validators=[validate_name_contains_space], verbose_name="Name")
     date = models.DateTimeField(default=datetime.now, verbose_name="Extraction Date")
     method = models.ForeignKey("method.Method",related_name="nuc_acids",on_delete=models.CASCADE, blank=True, null=True, verbose_name="Method")
     na_type = models.CharField(max_length=4, choices=NA_TYPES, blank=True, null=True, verbose_name="NA Type")

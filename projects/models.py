@@ -3,6 +3,7 @@ from datetime import datetime
 from django.db.models import Q, Count
 from django.contrib.auth import get_user_model
 import json
+from core.validators import validate_name_contains_space
 
 User = get_user_model()
 
@@ -14,7 +15,7 @@ class Projects(models.Model):
         (BORIS, 'Boris Bastian'),
         (IWEI, 'Iwei Yeh'),
     ]
-    name = models.CharField(max_length=100, blank=False, null=False, verbose_name="Name")
+    name = models.CharField(max_length=100, blank=False, null=False, validators=[validate_name_contains_space], verbose_name="Name")
     abbreviation = models.CharField(max_length=7, blank=False, null=False, unique=True, default='XY', verbose_name="Abbreviation", help_text="Requires a unique identifier for each Project.")
     pi = models.CharField(max_length=2, choices=PI_CHOICES, default=BORIS, blank=True, null=True, verbose_name="Principal Investigator")
     speedtype = models.CharField(max_length=50, blank=True, null=True, verbose_name="Speed Type")

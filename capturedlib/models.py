@@ -1,10 +1,10 @@
 from django.db import models
 from datetime import datetime
 from django.db.models import Q, Count, Sum
-
+from core.validators import validate_name_contains_space
 
 class CapturedLib(models.Model):
-    name = models.CharField(max_length=50, unique=True, verbose_name="Name")
+    name = models.CharField(max_length=50, unique=True, validators=[validate_name_contains_space], verbose_name="Name")
     date = models.DateTimeField(default=datetime.now, verbose_name="Date")
     bait = models.ForeignKey("bait.Bait", verbose_name="Bait", on_delete=models.SET_NULL, null=True, blank=True, related_name="captured_libs")
     frag_size = models.FloatField(default=0, verbose_name="Fragment Size")
