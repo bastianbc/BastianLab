@@ -153,9 +153,10 @@ def _get_file(file):
     except:
         return
 
-def _get_files(sample_lib):
+def _get_files(sample_lib, sequencing_run):
     try:
-        return SequencingFile.objects.filter(sequencing_file_set__sample_lib__name=sample_lib)
+        return SequencingFile.objects.filter(sequencing_file_set__sample_lib__name=sample_lib,
+                                             sequencing_file_set__sequencing_run__id=sequencing_run)
     except:
         return
 
@@ -199,7 +200,8 @@ def generate_file(data, file_name):
         report.matching_normal_sl = row.matching_normal_sl.replace(" ", "_") if row.matching_normal_sl else ""
         fastq, bam, bai = [], [], []
         report.footprint = row.bait
-        files = _get_files(row.name)
+
+        files = _get_files(row.name, row.seq_run)
         if files:
             for file in files:
                 if file.type == "fastq":
