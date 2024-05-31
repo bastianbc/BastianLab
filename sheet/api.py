@@ -1,5 +1,5 @@
 import json
-from django.db.models import Q, F, Count, OuterRef, Subquery, Value, Case, When, CharField
+from django.db.models import Q, F, Count, OuterRef,Exists, Subquery, Value, Case, When, CharField
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.db.models.functions import Coalesce, Concat
 
@@ -11,7 +11,11 @@ from sequencingrun.models import SequencingRun
 
 
 def _get_authorizated_queryset(seq_runs):
-        return SampleLib.objects.filter(
+    seq_run_subquery = SequencingFileSet.objects.filter(
+        sample_lib=OuterRef('pk'),
+        sequencing_run__id__in=seq_runs
+    ).values('sequencing_run')
+    return SampleLib.objects.filter(
             sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=seq_runs
         ).annotate(
         na_type=F('na_sl_links__nucacid__na_type'),
@@ -64,6 +68,22 @@ def _get_authorizated_queryset(seq_runs):
            distinct=True
        ),
        bait=F("sl_cl_links__captured_lib__bait__name")
+    ).filter(
+        Exists(seq_run_subquery)
+    ).distinct().order_by('name')
+
+def _get_authorizated_queryset_2(seq_runs):
+    seq_run_subquery = SequencingFileSet.objects.filter(
+        sample_lib=OuterRef('pk'),
+        sequencing_run__id__in=seq_runs
+    ).values('sequencing_run')
+
+    # Main query to filter SampleLib objects and annotate with the sequencing runs from the subquery
+    return SampleLib.objects.filter(
+        name="AMLP-270",
+        sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=seq_runs
+    ).annotate(
+        seq_run=Subquery(seq_run_subquery)
     ).distinct().order_by('name')
 
 

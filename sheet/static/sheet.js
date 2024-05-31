@@ -60,8 +60,12 @@ var KTDatatablesServerSide = function () {
                 { data: 'area_type' },
                 { data: 'matching_normal_sl' },
                 { data: 'seq_run' },
-                { data: 'file' },
-                { data: 'path' },
+                { data: 'fastq' },
+                { data: 'path_fastq' },
+                { data: 'bam' },
+                { data: 'path_bam' },
+                { data: 'bai' },
+                { data: 'path_bai' },
             ],
             columnDefs: [
                 {
@@ -88,7 +92,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: -3,
+                    targets: 8,
                     render: function (data, type, row) {
                         let namesList = [];
                         if (Array.isArray(row["seq_run"])) {
