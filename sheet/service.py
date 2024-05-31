@@ -1,15 +1,11 @@
 from samplelib.models import SampleLib
 from rest_framework import serializers
-from areas.models import Areas
 import csv
 from django.http import HttpResponse
 from sequencingrun.models import SequencingRun
-from capturedlib.models import CapturedLib
-from sequencinglib.models import SequencingLib
 from sequencingfile.models import SequencingFile,SequencingFileSet
 from lab.models import Patients
-from bait.serializers import BaitSerializer
-from bait.models import Bait
+import json
 
 class SequencingFileSetSerializerManual(serializers.ModelSerializer):
     class Meta:
@@ -50,14 +46,15 @@ class CustomSampleLibSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SampleLib
-        fields = ("id", "name",  "shear_volume",  "qpcr_conc", "barcode_name", "bait",
-                  "na_type", "area_type",
-                  "patient", "matching_normal_sl", "seq_run", "file", "file_set", "path")
+        fields = ("id", "name", "barcode_name",
+                  "na_type", "area_type", "patient", "bait",
+                  "matching_normal_sl", "seq_run", "file", "file_set", "path")
 
     def get_file(self, obj):
         seq_files = SequencingFile.objects.filter(sequencing_file_set__sample_lib=obj)
         files = SequencingFileSerializerManual(seq_files, many=True).data
-        return files
+        file_dict = {file['name']: file['checksum'] for file in files}
+        return json.dumps(file_dict)
 
     def get_file_set(self, obj):
         seq_files = SequencingFileSet.objects.filter(sample_lib=obj)
@@ -112,6 +109,23 @@ def _get_file(sl):
 def _get_path(sl):
     return sl.sequencing_file_sets.first().path if sl.sequencing_file_sets.first() else None
 
+def _get_file(file):
+    try:
+        return SequencingFile.objects.get(name=file)
+    except:
+        return
+
+def _get_files(sample_lib):
+    try:
+        return SequencingFile.objects.filter(sequencing_file_set__sample_lib__name=sample_lib)
+    except:
+        return
+
+def _seq_run(path):
+    try:
+        return path.split("/")[1]
+    except:
+        return
 
 def generate_file(data, file_name):
     class Report(object):
@@ -125,37 +139,60 @@ def generate_file(data, file_name):
         seq_run = ""
         footprint = ""
         seen = ""
+        fastq = ""
+        bam = ""
+        bai = ""
+        path_fastq = ""
+        path_bam = ""
+        path_bai = ""
 
     res = []
     seen = set()
     for index, row in enumerate(data):
         sl = SampleLib.objects.get(name=row.name)
+        # print("%%%",row.file)
         report = Report()
-
         report.no = index + 1
         report.patient = row.patient
-        report.sample_lib = row.name # ✓
+        report.sample_lib = row.name.strip().replace(" ", "_") # ✓
         report.barcode = row.barcode_name # ✓
         report.na_type = row.na_type # ✓
         report.area_type = row.area_type # ✓
-        report.matching_normal_sl = row.matching_normal_sl # ✓
-
+        report.matching_normal_sl = row.matching_normal_sl.replace(" ", "_") if row.matching_normal_sl else ""
+        fastq, bam, bai = [], [], []
+        fastq_path, bam_path, bai_path = [], [], []
         report.footprint = row.bait
-
-        if row.file:
-            report.file = dict(zip(row.file, row.checksum))
-            report.path = row.path
+        files = _get_files(row.name)
+        if files:
+            for file in files:
+                if file.type == "fastq":
+                    fastq.append(file.name)
+                    fastq_path.append(file.sequencing_file_set.path)
+                if file.type == "bam":
+                    bam.append(file.name)
+                    bam_path.append(file.sequencing_file_set.path)
+                if file.type == "bai":
+                    bai.append(file.name)
+                    bai_path.append(file.sequencing_file_set.path)
+            report.fastq = {f: _get_file(f).checksum for f in fastq} or ""
+            report.path_fastq = ", ".join(list(set(fastq_path)))
+            report.bam = {f: _get_file(f).checksum for f in bam} or ""
+            report.path_bam = ", ".join(list(set(bam_path)))
+            report.bai = {f: _get_file(f).checksum for f in bai} or ""
+            report.path_bai = ", ".join(list(set(bai_path)))
         else:
-            report.file = _get_file(sl)
-            report.path = _get_path(sl)
+            report.fastq = _get_file(sl)
+            report.path_fastq = _get_path(sl)
 
-        seq_run = report.path.split("/")[1] if report.path != None else ""
+        # print(report.sample_lib, report.fastq, row.file)
+        seq_run = report.path_fastq.split("/")[1] if report.path_fastq != "" and report.path_fastq != None else ""
         report.seq_run = seq_run  # ✓
 
         concat = f"{report.sample_lib}_{report.seq_run}"
+        concat_files = f"{report.path_fastq}{report.path_bam}{report.path_bai}".replace("None","").strip()
         # Only add report if it hasn't been added before
-
-        if concat not in seen and report.file:
+        # print(concat_files, concat_files is not None, concat_files == None, not concat_files, concat_files == "",concat_files != "", report.sample_lib)
+        if concat not in seen and concat_files != "":
             seen.add(concat)
             res.append(report)
         else:
@@ -167,7 +204,7 @@ def generate_file(data, file_name):
     )
 
     field_names = ["no", "patient", "sample_lib",  "barcode", "na_type", "area_type",
-                   "matching_normal_sl", "seq_run", "footprint", "file", "path"]
+                   "matching_normal_sl", "seq_run", "footprint", "fastq", "path_fastq", "bam", "path_bam", "bai", "path_bai"]
 
     writer = csv.writer(response)
     writer.writerow(field_names)

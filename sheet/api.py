@@ -1,6 +1,4 @@
 import json
-from django.db import models
-from datetime import datetime
 from django.db.models import Q, F, Count, OuterRef, Subquery, Value, Case, When, CharField
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.db.models.functions import Coalesce, Concat
@@ -14,7 +12,7 @@ from sequencingrun.models import SequencingRun
 
 def _get_authorizated_queryset(seq_runs):
         return SampleLib.objects.filter(
-        sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=seq_runs
+            sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=seq_runs
         ).annotate(
         na_type=F('na_sl_links__nucacid__na_type'),
         seq_run=F('sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs'),
@@ -59,20 +57,15 @@ def _get_authorizated_queryset(seq_runs):
        ),
        file=ArrayAgg(
            'sequencing_file_sets__sequencing_files__name',
-           filter=Q(
-               sequencing_file_sets__sample_lib=F('pk'),
-               sequencing_file_sets__sequencing_run=F('seq_run')
-           ),distinct=True
+           distinct=True
        ),
        checksum=ArrayAgg(
            'sequencing_file_sets__sequencing_files__checksum',
-           filter=Q(
-               sequencing_file_sets__sample_lib=F('pk'),
-               sequencing_file_sets__sequencing_run=F('seq_run')
-           ),distinct=True
+           distinct=True
        ),
        bait=F("sl_cl_links__captured_lib__bait__name")
     ).distinct().order_by('name')
+
 
 def _parse_value(search_value):
     if "_initial:" in search_value:
@@ -154,7 +147,6 @@ def query_by_args(user, seq_runs, **kwargs):
                 'draw': draw
             }
         else:
-            query_set = _get_authorizated_queryset(seq_runs)
             return _get_authorizated_queryset(seq_runs)
 
     except Exception as e:

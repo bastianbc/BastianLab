@@ -1,16 +1,14 @@
 from django import forms
-from samplelib.models import SampleLib
-from datetime import date
 from bait.models import Bait
 from barcodeset.models import Barcode
-from areas.models import Areas
-from core.forms import BaseForm
 from sequencingrun.models import SequencingRun
-from capturedlib.models import CapturedLib
 from lab.models import Patients
 
 class FilterForm(forms.Form):
-    sequencing_run = forms.ModelMultipleChoiceField(queryset=SequencingRun.objects.all().order_by("name"), label="Sequencing Run")
+    sequencing_run = forms.ModelMultipleChoiceField(
+        queryset=SequencingRun.objects.filter(sequencing_libs__cl_seql_links__captured_lib__sl_cl_links__sample_lib__isnull=False).distinct().order_by("name"),
+        label="Sequencing Run"
+    )
     patient = forms.ModelChoiceField(queryset=Patients.objects.filter())
     barcode = forms.ModelChoiceField(queryset=Barcode.objects.filter())
     bait = forms.ModelChoiceField(queryset=Bait.objects.filter())
@@ -30,11 +28,14 @@ class FilterForm(forms.Form):
 
 
 class ReportForm(forms.Form):
-    sequencing_run_report = forms.ModelChoiceField(queryset=SequencingRun.objects.filter(sequencing_libs__cl_seql_links__captured_lib__sl_cl_links__sample_lib__isnull=False).distinct().order_by("name"),
-                                                    label="Sequencing Run")
-
-    sequencing_run_report_multiple = forms.ModelMultipleChoiceField(queryset=SequencingRun.objects.filter(sequencing_libs__cl_seql_links__captured_lib__sl_cl_links__sample_lib__isnull=False).distinct().order_by("name"),
-                                                    label="Sequencing Run Multiple Selection")
+    sequencing_run_report = forms.ModelChoiceField(
+        queryset=SequencingRun.objects.filter(sequencing_libs__cl_seql_links__captured_lib__sl_cl_links__sample_lib__isnull=False).distinct().order_by("name"),
+        label="Sequencing Run"
+    )
+    sequencing_run_report_multiple = forms.ModelMultipleChoiceField(
+        queryset=SequencingRun.objects.filter(sequencing_libs__cl_seql_links__captured_lib__sl_cl_links__sample_lib__isnull=False).distinct().order_by("name"),
+        label="Sequencing Run Multiple Selection"
+    )
 
     def __init__(self, *args, **kwargs):
         super(ReportForm, self).__init__(*args, **kwargs)
