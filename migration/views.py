@@ -3199,8 +3199,13 @@ def upload_file_tree_all_md5_3(request):
                     v = json.loads(matched_values.values[0].replace("'", "\""))
                     # print(f"{v}, {type(v)}")
                     # print(f"{v[substring]}")
-                    file.checksum = v[substring]
-                    file.save()
+                    if substring.startswith("CGH11"):
+                        file.checksum = v["BB09_"+substring]
+                        # file.save()
+                        print("^&"*100)
+                    else:
+                        file.checksum = v[substring]
+                        file.save()
                     break
         except Exception as e:
             print(e, substring)
