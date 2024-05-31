@@ -1,6 +1,7 @@
 from samplelib.models import SampleLib
 from rest_framework import serializers
 import csv
+from django.db.models import OuterRef, Exists
 from django.http import HttpResponse
 from sequencingrun.models import SequencingRun
 from sequencingfile.models import SequencingFile,SequencingFileSet
@@ -110,12 +111,19 @@ class CustomSampleLibSerializer(serializers.ModelSerializer):
         _patients = PatientsSerializerManual(_patients, many=True).data
         return _patients
 
+    # def get_seq_run(self, obj):
+    #     _sequencing_runs = SequencingRun.objects.filter(
+    #         sequencing_libs__cl_seql_links__captured_lib__sl_cl_links__sample_lib=obj
+    #     )
+    #     sequencing_runs = SequencingRunSerializerManual(_sequencing_runs, many=True).data
+    #     return sequencing_runs
+
     def get_seq_run(self, obj):
-        _sequencing_runs = SequencingRun.objects.filter(
-            sequencing_libs__cl_seql_links__captured_lib__sl_cl_links__sample_lib=obj
-        )
-        sequencing_runs = SequencingRunSerializerManual(_sequencing_runs, many=True).data
-        return sequencing_runs
+        try:
+            seq_run = SequencingRun.objects.get(id=obj.seq_run)
+            return seq_run.name
+        except SequencingRun.DoesNotExist:
+            return None
 
 
 def get_sample_lib_list(request):
