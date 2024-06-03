@@ -16,6 +16,12 @@ import sequencingrun.helper as helper
 
 @permission_required("sequencingrun.view_sequencingrun",raise_exception=True)
 def sequencingruns(request):
+    q = SequencingRun.objects.filter(name="BioSci6_BB58").annotate(
+                fff=Count('sequencing_file_sets__sequencing_files', distinct=True),
+                sss=Count('sequencing_file_sets', distinct=True),
+                num_sequencinglibs=Count("sequencing_libs", distinct=True),
+            )[0]
+    print(q.fff, q.sss, q.num_sequencinglibs, )
     return render(request, "sequencingrun_list.html", locals())
 
 @permission_required_for_async("sequencingrun.view_sequencingrun")
