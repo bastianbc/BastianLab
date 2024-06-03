@@ -80,7 +80,6 @@ def _get_authorizated_queryset_2(seq_runs):
 
     # Main query to filter SampleLib objects and annotate with the sequencing runs from the subquery
     return SampleLib.objects.filter(
-        name="AMLP-270",
         sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=seq_runs
     ).annotate(
         seq_run=Subquery(seq_run_subquery)

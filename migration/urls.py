@@ -48,4 +48,5 @@ urlpatterns = [
     path("import_area_types", views.import_area_types, name="import_area_types"),
     path("import_bait", views.import_bait, name="import_bait"),
     path("upload_file_tree_all_md5_3", views.upload_file_tree_all_md5_3, name="upload_file_tree_all_md5_3"),
+    path("match_seq_runs_with_dffq", views.match_seq_runs_with_dffq, name="match_seq_runs_with_dffq"),
 ]

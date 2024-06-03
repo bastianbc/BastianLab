@@ -2185,6 +2185,31 @@ def qpcr_at_leftover(request):
     df = pd.read_csv(file)
     df[~df["file"].isnull()].apply(lambda row: leftover(row), axis=1)
 
+def _match_seq_runs_with_dffq(row):
+    try:
+        file = SequencingFile.objects.get(name=row['file'])
+        seq_run = file.sequencing_file_set.sequencing_run.name if file.sequencing_file_set and file.sequencing_file_set.sequencing_run else None
+        sl = file.sequencing_file_set.sample_lib.name if file.sequencing_file_set and file.sequencing_file_set.sample_lib else None
+
+        if row['path'].split("/")[1] != seq_run and seq_run and sl:
+            print("*"*20, row['file'], row['path'], sl, seq_run, sep=' -- ')
+            if sl.startswith("AMLP"):
+                sf = file.sequencing_file_set
+                sf.path = row['path']
+                sf.sequencing_run = SequencingRun.objects.get(name='BCB030')
+                sf.save()
+                print("saved")
+
+
+    except Exception as e:
+        print(e,row['file'])
+
+def match_seq_runs_with_dffq(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "df_fq.csv")
+    df = pd.read_csv(file)
+    df = df.sort_values(by=['file'])
+    df[~df["file"].isnull()].apply(lambda row: _match_seq_runs_with_dffq(row), axis=1)
+
 
 def remove_NAN(request):
     from django.db.models import CharField, BooleanField, DateTimeField, DateField, FloatField, TextField
