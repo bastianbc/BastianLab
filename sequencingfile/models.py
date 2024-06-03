@@ -64,9 +64,14 @@ class SequencingFileSet(models.Model):
             is_initial = _is_initial_value(search_value)
             search_value = _parse_value(search_value)
             if is_initial:
-                queryset = queryset.filter(
-                    Q(sequencing_files__file_id=search_value["id"])
-                )
+                if search_value["model"] == "sequencing_run":
+                    queryset = queryset.filter(
+                        Q(sequencing_run__id=search_value["id"])
+                    )
+                else:
+                    queryset = queryset.filter(
+                        Q(sequencing_files__file_id=search_value["id"])
+                    )
             elif search_value:
                 queryset = queryset.filter(
                     Q(prefix__icontains=search_value) |

@@ -47,9 +47,11 @@ class SequencingRun(models.Model):
         return self.name
 
     def query_by_args(self, user, **kwargs):
-        # print("*" * 100, **kwargs)
         def _get_authorizated_queryset():
-            return SequencingRun.objects.all().annotate(num_sequencinglibs=Count("sequencing_libs"))
+            return SequencingRun.objects.all().annotate(
+                num_file_sets=Count('sequencing_file_sets', distinct=True),
+                num_sequencinglibs=Count("sequencing_libs", distinct=True),
+            )
 
         def _parse_value(search_value):
             '''

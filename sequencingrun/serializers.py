@@ -9,10 +9,13 @@ class SequencingRunSerializer(serializers.ModelSerializer):
     sequencer_label = serializers.SerializerMethodField()
     pe_label = serializers.SerializerMethodField()
     num_sequencinglibs = serializers.IntegerField()
+    num_file_sets = serializers.IntegerField()
+
 
     class Meta:
         model = SequencingRun
-        fields = ("id", "name", "date", "facility", "facility_label", "sequencer", "sequencer_label", "pe", "pe_label", "amp_cycles", "date_run", "num_sequencinglibs", "DT_RowId",)
+        fields = ("id", "name", "date", "facility", "facility_label", "sequencer", "sequencer_label", "pe",
+                  "pe_label", "amp_cycles", "date_run", "num_sequencinglibs", "DT_RowId", "num_file_sets")
 
     def get_DT_RowId(self, obj):
        return getattr(obj, 'id')
