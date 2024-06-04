@@ -304,6 +304,7 @@ def import_csv_qpcr_analysis(request):
         results = qpcr.calculate_concentration()
 
         for result in results:
+            print(result)
             sample_lib = SampleLib.objects.get(name=result[0])
             sample_lib.update_qpcr(result[1])
 
