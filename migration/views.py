@@ -2190,15 +2190,20 @@ def _match_seq_runs_with_dffq(row):
         file = SequencingFile.objects.get(name=row['file'])
         seq_run = file.sequencing_file_set.sequencing_run.name if file.sequencing_file_set and file.sequencing_file_set.sequencing_run else None
         sl = file.sequencing_file_set.sample_lib.name if file.sequencing_file_set and file.sequencing_file_set.sample_lib else None
-
+        _sl = file.sequencing_file_set.sample_lib if file.sequencing_file_set and file.sequencing_file_set.sample_lib else None
+        real_seq_run = SequencingRun.objects.filter(sequencing_libs__cl_seql_links__captured_lib__sl_cl_links__sample_lib=_sl)
+        # real_seq_run = _sl.sl_cl_links.captured_lib.cl_seql_links.sequencing_lib.sequencing_runs
         if row['path'].split("/")[1] != seq_run and seq_run and sl:
-            print("*"*20, row['file'], row['path'], sl, seq_run, sep=' -- ')
+            print("/"*10, row['file'], row['path'], sl, seq_run,
+                  real_seq_run,
+                  sep='/')
             if sl.startswith("AMLP"):
                 sf = file.sequencing_file_set
                 sf.path = row['path']
                 sf.sequencing_run = SequencingRun.objects.get(name='BCB030')
                 sf.save()
                 print("saved")
+
 
 
     except Exception as e:
