@@ -310,4 +310,4 @@ def import_csv_qpcr_analysis(request):
         return JsonResponse({"success": True, "graphic":graphic, "sample_libs":[result[0] for result in results]})  # Return a JSON response indicating success
     except Exception as e:
         print(e)
-        return JsonResponse({"success": False, "message":str(e), "sample_libs":",".join([result[0] for result in results])})  # Return a JSON response indicating success
+        return JsonResponse({"success": False, "message":str(e)})  # Return a JSON response indicating success
