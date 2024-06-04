@@ -111,25 +111,43 @@ class QPCRAnalysis():
         # Raw qPCR data: STD number from column name, concentration in pM from column status, Ct values from column Cp in cp.text
         values = []
         tmp = []
-        for i, line in enumerate(lines):
+
+        for i, line in enumerate(lines[1:]):
             # Split the line into fields based on a delimiter (assuming it's a tab-delimited file)
             row = line.strip().split('\t')
             index = i % 12
-            if index < 3:
-                if row[3].startswith("STD"):
+            # if index < 3:
+            #     if row[3].startswith("STD"):
+            #         std_number = float(row[3][-1])
+            #         concentration_pm = float(row[6])
+            #         ct_value = 0 if row[4] == "" else float(row[4])
+            #         self.standart_data.append([std_number, concentration_pm, ct_value])
+            # elif 3 <= index <= 10:
+            #     ct_value = 0 if row[4] == "" else float(row[4])
+            #     sample_lib = row[3]
+            #     values.append((sample_lib, ct_value))
+            # else:
+            #     ct_value = 0 if row[4] == "" else float(row[4])
+            #     sample_lib = row[3]
+            #     tmp.append((sample_lib, ct_value))
+            if row[3].startswith("STD"):
+                if index < 3:
                     std_number = float(row[3][-1])
                     concentration_pm = float(row[6])
                     ct_value = 0 if row[4] == "" else float(row[4])
                     self.standart_data.append([std_number, concentration_pm, ct_value])
-            elif 3 <= index <= 10:
-                ct_value = 0 if row[4] == "" else float(row[4])
-                sample_lib = row[3]
-                values.append((sample_lib, ct_value))
             else:
-                ct_value = 0 if row[4] == "" else float(row[4])
-                sample_lib = row[3]
-                tmp.append((sample_lib, ct_value))
+                if 3 <= index <= 10 and not row[3].startswith("STD"):
+                    ct_value = 0 if row[4] == "" else float(row[4])
+                    sample_lib = row[3]
+                    values.append((sample_lib, ct_value))
+                else:
+                    ct_value = 0 if row[4] == "" else float(row[4])
+                    sample_lib = row[3]
+                    tmp.append((sample_lib, ct_value))
+
         values.extend(tmp)
+        
         # Sample data: # Sample data of three SLs with their duplicates in positions 1 and 2 of the tuple and a constant Average fragment length (bp) of 999 to be added for all in position 3 of the tuple]
         self.samples = [[values[i][1], values[i + 1][1], 999, values[i][0]] for i in range(0, len(values), 2)]
 
@@ -170,12 +188,14 @@ class QPCRAnalysis():
         return base64.b64encode(buffer.getvalue()).decode("utf-8")
 
     def calculate_concentration(self):
+        constant_data = ["STD 1", "STD 2", "STD 3", "STD 4", "STD 5", "STD 6", "NTC", "EMPTY"]
         # Standard fragment length in bp
         standard_fragment_length = 452
         # Dilution factor
         dilution_factor = 25000
 
         results = []
+
         for sample in self.samples:
             average_cq = np.mean(sample[:2])
             log_concentration = (average_cq - self.intercept) / self.slope

@@ -16,8 +16,8 @@ class BaseForm(forms.ModelForm):
                 visible.field.widget.attrs['data-close-on-select'] = "false"
                 visible.field.widget.attrs['data-placeholder'] = "Select an option"
                 visible.field.widget.attrs['data-allow-clear'] = "true"
-            if type(visible.field) == forms.fields.TypedChoiceField or type(visible.field) == forms.models.ModelChoiceField or type(visible.field) == forms.ChoiceField:
-                visible.field.widget.attrs["data-control"] = "select2"
+            # if type(visible.field) == forms.fields.TypedChoiceField or type(visible.field) == forms.models.ModelChoiceField or type(visible.field) == forms.ChoiceField:
+            #     visible.field.widget.attrs["data-control"] = "select2"
             # if type(visible.field)==forms.fields.DateTimeField:
             #     visible.field.widget.attrs['class'] += ' sat-datetime'
             # if type(visible.field)==forms.fields.DateField:
