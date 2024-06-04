@@ -37,6 +37,26 @@ class Blocks(models.Model):
         (FFPE, 'FFPE')
     ]
 
+    SUBTYPE_CHOICES = (
+        ("low-csd", "Low CSD"),
+        ("high-csd", "High CSD"),
+        ("acral", "Acral"),
+        ("mucosal", "Mucosal"),
+        ("uveal", "Uveal"),
+        ("desmoplastic", "Desmoplastic"),
+        ("melanoma-ex-blue-nevus", "Melanoma Ex Blue Nevus"),
+        ("melanoma-ex-congenital-nevus", "Melanoma Ex Congenital Nevus" ),
+        ("conjunctival-melanoma", "Conjunctival Melanoma"),
+        ("desmoplastic-melanoma", "Desmoplastic Melanoma"),
+        ("nos", "NOS"),
+    )
+
+    FIXATION_CHOICES = (
+        ("ffpe", "FFPE"),
+        ("frozen" , "frozen"),
+        ("ethanol", "ethanol"),
+    )
+
     bl_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50, blank=True, null=False, unique=True, validators=[validate_name_contains_space])
     patient = models.ForeignKey('lab.Patients', on_delete=models.CASCADE, db_column='patient', blank=True, null=True, related_name="patient_blocks")
@@ -47,14 +67,14 @@ class Blocks(models.Model):
         ])
     body_site = models.ForeignKey("body.Body", on_delete=models.CASCADE, blank=True, null=True)
     ulceration = models.BooleanField(blank=True, null=True)
-    thickness = models.FloatField(blank=True, null=True, help_text="float field ex. 0.1")
-    mitoses = models.IntegerField(blank=True, null=True)
+    thickness = models.FloatField(blank=True, null=True, help_text="float field ex. 0.1", verbose_name="Tumor thickness [mm]")
+    mitoses = models.IntegerField(blank=True, null=True, verbose_name="Mitoses [per mm2]")
     p_stage = models.CharField(max_length=10, choices=P_STAGE_TYPES, blank=True, null=True)
     prim = models.CharField(max_length=10, choices=PRIM_TYPES, blank=True, null=True)
-    subtype = models.CharField(max_length=120, blank=True, null=True)
+    subtype = models.CharField(max_length=120, blank=True, null=True, choices=SUBTYPE_CHOICES)
     slides = models.IntegerField(blank=True, null=True)
     slides_left = models.IntegerField(blank=True, null=True)
-    fixation = models.CharField(max_length=100, blank=True, null=True)
+    fixation = models.CharField(max_length=100, blank=True, null=True, choices=FIXATION_CHOICES, default="ffpe")
     storage = models.CharField(max_length=50, blank=True, null=True)
     scan_number = models.CharField(max_length=200,blank=True, null=True)
     icd10 = models.TextField(blank=True, null=True)
