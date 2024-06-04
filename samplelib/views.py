@@ -303,8 +303,10 @@ def import_csv_qpcr_analysis(request):
         graphic = qpcr.create_normalization_curve()
         results = qpcr.calculate_concentration()
 
+        print(results)
         for result in results:
             print(result)
+
             sample_lib = SampleLib.objects.get(name=result[0])
             sample_lib.update_qpcr(result[1])
 
