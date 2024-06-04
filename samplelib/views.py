@@ -304,7 +304,7 @@ def import_csv_qpcr_analysis(request):
         results = qpcr.calculate_concentration()
         print("*"*100, results)
         for result in results:
-            if not result[0].startswith("STD"):
+            if not result[0].startswith("STD") and result[0] != "":
                 sample_lib = SampleLib.objects.get(name=result[0])
                 sample_lib.update_qpcr(result[1])
         return JsonResponse({"success": True, "graphic":graphic, "sample_libs":[result[0] for result in results]})  # Return a JSON response indicating success
