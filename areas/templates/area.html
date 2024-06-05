@@ -11,14 +11,36 @@
     </div>
     <div class="card-body">
       {% csrf_token %}
-      <div class="row">
-        <div class="col-6"> {{form.name|as_crispy_field}}</div>
-        <div class="col-6"> {{form.block|as_crispy_field}}</div>
-        <div class="col-6">{{ form.area_type|as_crispy_field }}</div>
-        <div class="col-6">{{ form.completion_date|as_crispy_field }}</div>
-        <div class="col-12">{{ form.image|as_crispy_field }}</div>
-        <div class="col-12">{{ form.notes|as_crispy_field }}</div>
-      </div>
+          <div class="row">
+              <div class="col-12"> {{form.block|as_crispy_field}}</div>
+          </div>
+          <div class="row bg-secondary m-5 block-info">
+              <div class="col-6 mb-2">
+                  <label>Patient</label>
+                  <input type="text" name="patient" class="form-control" value="">
+              </div>
+              <div class="col-6 mb-2">
+                  <label>Project</label>
+                  <input type="text" name="project" class="form-control" value="">
+              </div>
+              <div class="col-6">
+                  <a href="" name="image" target="_blank">Show scanned image</a>
+              </div>
+          </div>
+        <div class="row">
+            <div class="col-6"> {{form.name|as_crispy_field}}</div>
+            <div class="col-6">{{ form.area_type|as_crispy_field }}</div>
+        </div>
+        <div class="row">
+            <div class="col-6">{{ form.completion_date|as_crispy_field }}</div>
+            <div class="col-6"> {{form.collection|as_crispy_field}}</div>
+        </div>
+        <div class="row">
+            <div class="col-6">{{ form.image|as_crispy_field }}</div>
+        </div>
+        <div class="row">
+            <div class="col-12">{{ form.notes|as_crispy_field }}</div>
+        </div>
     </div>
     <div class="card-footer">
       <a href="/areas" class="btn btn-secondary">Cancel</a>
@@ -29,6 +51,7 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="/areas/static/area-form.js" charset="utf-8"></script>
 <script src="/static/assets/js/custom/documentation/forms/flatpickr.js"></script>
 <script src="/areas/static/init.dateinput.areas.js"></script>
 {% endblock %}

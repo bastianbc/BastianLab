@@ -14,7 +14,6 @@ urlpatterns = [
     path('delete/<str:id>', views.delete_block, name='delete-block'),
     path('batch_delete', views.delete_batch_blocks, name='delete-batch-blocks'),
     path('check_can_deleted_async', views.check_can_deleted_async, name='checkcan-deleted-async'),
-    path("get_collections", views.get_collections, name='get-collections'),
     path("get_block_async", views.get_block_async, name='get-get_block_async'),
     path("export_csv_all_data", views.export_csv_all_data, name="export-csv-all-data"),
     path("edit_block_url", views.edit_block_url, name="edit_block_url"),

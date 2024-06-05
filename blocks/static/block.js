@@ -166,14 +166,6 @@ var KTDatatablesServerSide = function () {
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                  <a href="javascript:;" class="menu-link px-3" data-block_id=` + row["bl_id"] + ` data-block_name=` + row["name"] + ` data-bs-toggle="modal" data-bs-target="#block_details">
-                                      Block Details
-                                  </a>
-                                </div>
-                                <!--end::Menu item-->
-
-                                <!--begin::Menu item-->
-                                <div class="menu-item px-3">
                                     <a href="/blocks/delete/` + row["bl_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
                                         Delete
                                     </a>
@@ -205,42 +197,6 @@ var KTDatatablesServerSide = function () {
             initShowScanImage();
             KTMenu.createInstances();
         });
-
-        // Add event listener for opening and closing details
-        dt.on('click', 'td.dt-control', function (e) {
-        var tr = event.target.closest('tr');
-        var row = dt.row(tr);
-
-
-        $('#block_details').modal('toggle');
-        var html = (key, value) => `
-                <div class="card col-6 p-1" id="d_details">
-                    <h3 class="text-active-dark">${key}</h3><p>${value}</p>
-                </div>`
-        var contentDiv = $('#d_details');
-        contentDiv.empty();
-          $.ajax({
-              type: "GET",
-              url: "/blocks/get_block_async",
-              data: {
-                id: row.data()["bl_id"],
-              },
-              dataType: 'json',
-              success: function (data) {
-                  for (var key in data) {
-                    if (data.hasOwnProperty(key)) {
-                        var value = data[key];
-                        if (value !== null && value !== '') {
-                            if (key == "date_added") {
-                                var value = moment(value).format('MM/DD/YYYY');
-                            }
-                            contentDiv.append(html(key.toLocaleUpperCase(), value));
-                        }
-                    }
-                 }
-            }
-            });
-    });
     }
 
     var initRowSelection = function () {
@@ -566,30 +522,6 @@ var KTDatatablesServerSide = function () {
 
     }
 
-    var handleBlockDetails = (function (e) {
-        var html = (key, value) => `
-                <div class="col-3" id="d_details">
-                    <p><h3 class="text-active-dark bold">${key}</h3>${value}</p>
-                </div>`
-      $.ajax({
-          type: "GET",
-          url: "/blocks/get_block_async",
-          data: {
-            id: e.relatedTarget.getAttribute("data-block_id"),
-          },
-          dataType: 'json',
-          success: function (data) {
-              for (var key in data) {
-                if (data.hasOwnProperty(key)) {
-                    var value = data[key];
-                    $('#d_details').append(html(key,value));
-                }
-             }
-        }
-        });
-
-    });
-
     var handleSelectedRows = (function (e) {
 
       var modal = new bootstrap.Modal(document.getElementById("modal_area_options"));
@@ -818,109 +750,81 @@ var KTDatatablesServerSide = function () {
       var collectionOptions = [];
 
       Promise.all([
-
-        getBodyOptions(),
-        getCollectionOptions()
-
+          getBodyOptions(),
       ]).then(function () {
+          editor = new $.fn.dataTable.Editor({
+            ajax: {
+                url: "/blocks/edit_block_async",
+                type: "POST",
+                headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
+                success: function (data) {
 
-        editor = new $.fn.dataTable.Editor({
-        ajax: {
-          url: "/blocks/edit_block_async",
-          type: "POST",
-          headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
-          success: function (data) {
+                  if ( !data.success ) {
 
-            if ( !data.success ) {
+                    Swal.fire({
+                        text: data.message,
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn fw-bold btn-primary",
+                        }
+                    });
 
-              Swal.fire({
-                  text: data.message,
-                  icon: "error",
-                  buttonsStyling: false,
-                  confirmButtonText: "Ok, got it!",
-                  customClass: {
-                      confirmButton: "btn fw-bold btn-primary",
                   }
-              });
 
-            }
-
-            dt.draw();
-          },
-          error: function (xhr, ajaxOptions, thrownError) {
-              swal("Error updating!", "Please try again!", "error");
-          }
-        },
-        table: ".table",
-        fields: [
-          {
-            label: "Name:",
-            name: "name"
-          },
-          {
-            label: "Diagnosis:",
-            name: "diagnosis"
-          },
-          {
-            label: "Body Site:",
-            name: "body_site",
-            // type: "select",
-            // options: bodyOptions
-            type: "readonly",
-            attr: {
-              disabled:true
-            }
-          },
-          {
-            label: "Thickness:",
-            name: "thickness"
-          },
-          {
-             label: "Collection:",
-             name: "collection",
-             type: "select",
-             options: collectionOptions
-          },
-          {
-            label: "Date Added:",
-            name: "date_added",
-            type: "readonly",
-            attr: {
-              disabled:true
-            }
-          }
-       ],
-       formOptions: {
-          inline: {
-            onBlur: 'submit'
-          }
-       }
-     });
-
-      })
-
-      // Gets the collection options and fills the dropdown. It is executed synchronous.
-      function getCollectionOptions() {
-
-        $.ajax({
-            url: "/blocks/get_collections",
-            type: "GET",
-            async: false,
-            success: function (data) {
-
-             data.forEach((item, i) => {
-
-               collectionOptions.push({
-                 "label":item["label"],
-                 "value":item["value"]
-               })
-
-             });
+                  dt.draw();
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    swal("Error updating!", "Please try again!", "error");
+                }
+            },
+            table: ".table",
+            fields: [
+              {
+                label: "Name:",
+                name: "name"
+              },
+              {
+                label: "Diagnosis:",
+                name: "diagnosis"
+              },
+              {
+                label: "Body Site:",
+                name: "body_site",
+                // type: "select",
+                // options: bodyOptions
+                type: "readonly",
+                attr: {
+                  disabled:true
+                }
+              },
+              {
+                label: "Thickness:",
+                name: "thickness"
+              },
+              {
+                 label: "Collection:",
+                 name: "collection",
+                 type: "select",
+                 options: collectionOptions
+              },
+              {
+                label: "Date Added:",
+                name: "date_added",
+                type: "readonly",
+                attr: {
+                  disabled:true
+                }
+              }
+           ],
+            formOptions: {
+              inline: {
+                onBlur: 'submit'
+              }
             }
         });
-
-      }
-
+      });
 
       function getBodyOptions() {
 
@@ -998,7 +902,6 @@ var KTDatatablesServerSide = function () {
             handleResetForm();
             handleSelectedRows.init();
             initEditor();
-            // handleBlockDetails();
         }
     }
 }();

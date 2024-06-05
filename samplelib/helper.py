@@ -110,44 +110,21 @@ class QPCRAnalysis():
 
         # Raw qPCR data: STD number from column name, concentration in pM from column status, Ct values from column Cp in cp.text
         values = []
-        tmp = []
-
         for i, line in enumerate(lines[1:]):
             # Split the line into fields based on a delimiter (assuming it's a tab-delimited file)
             row = line.strip().split('\t')
-            index = i % 12
-            # if index < 3:
-            #     if row[3].startswith("STD"):
-            #         std_number = float(row[3][-1])
-            #         concentration_pm = float(row[6])
-            #         ct_value = 0 if row[4] == "" else float(row[4])
-            #         self.standart_data.append([std_number, concentration_pm, ct_value])
-            # elif 3 <= index <= 10:
-            #     ct_value = 0 if row[4] == "" else float(row[4])
-            #     sample_lib = row[3]
-            #     values.append((sample_lib, ct_value))
-            # else:
-            #     ct_value = 0 if row[4] == "" else float(row[4])
-            #     sample_lib = row[3]
-            #     tmp.append((sample_lib, ct_value))
-            if row[3].startswith("STD"):
-                if index < 3:
-                    std_number = float(row[3][-1])
-                    concentration_pm = float(row[6])
-                    ct_value = 0 if row[4] == "" else float(row[4])
-                    self.standart_data.append([std_number, concentration_pm, ct_value])
-            else:
-                if 3 <= index <= 10 and not row[3].startswith("STD"):
-                    ct_value = 0 if row[4] == "" else float(row[4])
-                    sample_lib = row[3]
-                    values.append((sample_lib, ct_value))
-                else:
-                    ct_value = 0 if row[4] == "" else float(row[4])
-                    sample_lib = row[3]
-                    tmp.append((sample_lib, ct_value))
+            index = i % 12 # data is in rows of 12. index is the line number of txt file
 
-        values.extend(tmp)
-        
+            if index < 3 and row[3].startswith("STD"): # The first 3 lines consist of empty standard data
+                std_number = float(row[3][-1])
+                concentration_pm = float(row[6])
+                ct_value = 0 if row[4] == "" else float(row[4])
+                self.standart_data.append([std_number, concentration_pm, ct_value])
+            elif index >= 3 and  not row[3] == "": # real sample library data
+                ct_value = 0 if row[4] == "" else float(row[4])
+                sample_lib = row[3]
+                values.append((sample_lib, ct_value))
+
         # Sample data: # Sample data of three SLs with their duplicates in positions 1 and 2 of the tuple and a constant Average fragment length (bp) of 999 to be added for all in position 3 of the tuple]
         self.samples = [[values[i][1], values[i + 1][1], 999, values[i][0]] for i in range(0, len(values), 2)]
 

@@ -1,127 +1,109 @@
-const MAX_TIER = 4;
+$(document).ready(function() {
+    var bodies = [];
+    var selectedId = document.getElementById("id_body_site").value;
 
-const row = document.getElementsByClassName("body-site-row")[0];
+    const bodyContainer = document.querySelector('.body-site-row');
 
-document.addEventListener('DOMContentLoaded', (event) => {
+    function createDropdown(level, parentId, selectedValue = null) {
+        var col = document.createElement("div");
+        col.classList.add("col-2");
 
-  var bodySites = getBodySites("");
+        const dropdown = document.createElement('select');
+        dropdown.classList.add('level');
+        dropdown.setAttribute('data-level', level);
+        dropdown.classList.add("select","form-control","form-control-solid");
 
-  removeDropdownList(1);
+        const defaultOption = document.createElement('option');
+        defaultOption.text = 'Select...';
+        defaultOption.value = '';
+        dropdown.appendChild(defaultOption);
 
-  if (bodySites.length > 0) {
+        var hasOptions = false;
 
-    addNewDropdownList(bodySites,1);
+        bodies.forEach(body => {
+            if (body.parent == parentId) {
+                const option = document.createElement('option');
+                option.text = body.name;
+                option.value = body.id;
+                if (body.id == selectedValue) {
+                    option.selected = true;
+                }
+                dropdown.appendChild(option);
+                hasOptions = true;
+            }
+        });
 
-  }
+        dropdown.addEventListener('change', handleDropdownChange);
 
-  setBodySite();
+        col.appendChild(dropdown)
 
+        // Only return the dropdown if it has options
+        return hasOptions ? col : null;
+    }
+
+    function handleDropdownChange(event) {
+        selectedId = this.value;
+        const currentLevel = parseInt(this.getAttribute('data-level'), 10);
+
+        // Remove all dropdowns below the current level
+        const dropdowns = document.querySelectorAll(`.level[data-level]`);
+        dropdowns.forEach(dropdown => {
+            if (parseInt(dropdown.getAttribute('data-level'), 10) > currentLevel) {
+                dropdown.remove();
+            }
+        });
+
+        if (selectedId) {
+            const newDropdown = createDropdown(currentLevel + 1, selectedId);
+            if (newDropdown) {
+                bodyContainer.appendChild(newDropdown);
+            }
+
+            setBodySite();
+        }
+    }
+
+    function loadSelectedBody(selectedBodyId) {
+        let currentBody = bodies.find(body => body.id == selectedBodyId);
+        let level = 0;
+
+        while (currentBody) {
+            const parentId = currentBody.parent;
+            const dropdown = createDropdown(level, parentId, currentBody.id);
+            if (dropdown) {
+                bodyContainer.appendChild(dropdown);
+            }
+            level++;
+            currentBody = bodies.find(body => body.id == parentId);
+        }
+    }
+
+    function getBodySites(parent_id) {
+        $.ajax({
+            url: "/body/get_bodies/" + parent_id,
+            type: "GET",
+            async: false,
+            success: function (data) {
+              bodies = data;
+            }
+        });
+    }
+
+    // Set django form field
+    function setBodySite() {
+        document.getElementById("id_body_site").value = selectedId;
+    }
+
+    getBodySites("");
+
+    // Initial dropdown
+    const initialDropdown = createDropdown(0, null);
+    if (initialDropdown) {
+        bodyContainer.appendChild(initialDropdown);
+    }
+
+    // Load the selected body if available
+    if (selectedId) {
+        loadSelectedBody( selectedId );
+    }
 });
-
-function getBodySites(parent_id) {
-
-  var result = [];
-
-  $.ajax({
-      url: "/body/get_bodies/" + parent_id,
-      type: "GET",
-      async: false,
-      success: function (data) {
-
-        result = data;
-
-      }
-  });
-
-  return result;
-
-}
-
-function addNewDropdownList(items,tier) {
-
-  if (tier > 4) {
-
-    return;
-
-  }
-
-  var element = document.getElementById("id_mock_body_site");
-
-  var col = document.createElement("div");
-  col.classList.add("col-2");
-
-  var label = document.createElement("label");
-  label.innerHTML = "";
-  label.htmlFor = "body_site_" + tier;
-
-  var select = document.createElement("select");
-  select.name = "body_site_" + tier;
-  select.id = "id_mock_body_site_" + tier;
-  select.classList.add("select","form-control");;
-
-  var option = document.createElement("option");
-  option.value = null;
-  option.text = "-----------";
-  select.appendChild(option);
-
-  for (const item of items)
-  {
-    var option = document.createElement("option");
-    option.value = item.id;
-    option.text = item.name;
-    select.appendChild(option);
-  }
-
-  col.appendChild(label);
-  col.appendChild(select);
-
-  row.appendChild(col);
-
-  select.addEventListener("change", function () {
-
-    var bodySites = getBodySites(this.value);
-
-    removeDropdownList(tier + 1);
-
-    if (bodySites.length > 0) {
-
-      addNewDropdownList(bodySites, tier + 1);
-
-    }
-
-    setBodySite();
-
-  });
-
-}
-
-function removeDropdownList(tier) {
-
-  for (var i = tier; i <= MAX_TIER; i++) {
-
-    var element = document.getElementById("id_mock_body_site_" + i);
-
-    if (element) {
-
-      element.parentElement.remove();
-
-    }
-
-  }
-
-}
-
-function setBodySite() {
-
-  for (var i = 1; i <= MAX_TIER; i++) {
-
-    var element = document.getElementById("id_mock_body_site_" + i);
-
-    if (element) {
-      document.getElementById("id_body_site").value = element.value;
-
-    }
-
-  }
-
-}

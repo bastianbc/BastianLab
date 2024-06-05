@@ -5,7 +5,7 @@ import json
 from django.contrib import messages
 from lab.models import Patients
 from projects.models import Projects
-from .serializers import BlocksSerializer, BlocksSerializerObj
+from .serializers import BlocksSerializer, SingleBlockSerializer
 from django.contrib.auth.decorators import login_required,permission_required
 from core.decorators import permission_required_for_async
 
@@ -18,7 +18,6 @@ def filter_blocks(request):
     result['draw'] = blocks['draw']
     result['recordsTotal'] = blocks['total']
     result['recordsFiltered'] = blocks['count']
-    print(result)
     return JsonResponse(result)
 
 @permission_required("blocks.view_blocks",raise_exception=True)
@@ -176,12 +175,9 @@ def check_can_deleted_async(request):
 
     return JsonResponse({"related_objects":related_objects})
 
-def get_collections(request):
-    return JsonResponse(Blocks.get_collections(), safe=False)
-
 def get_block_async(request):
     block = Blocks.objects.get(bl_id=request.GET["id"])
-    serializer = BlocksSerializerObj(block)
+    serializer = SingleBlockSerializer(block)
     return JsonResponse(serializer.data)
 
 def export_csv_all_data(request):
@@ -202,7 +198,6 @@ def export_csv_all_data(request):
         writer.writerow([getattr(patient, field) for field in field_names])
 
     return response
-
 
 def edit_block_url(request):
     instance = BlockUrl.objects.first()
