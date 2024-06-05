@@ -1,20 +1,41 @@
 from django import forms
-from .models import NucAcids
+from .models import NucAcids, AREA_NA_LINK
 from barcodeset.models import Barcode
-from django.core.exceptions import ValidationError
+from areas.models import Areas
 from core.forms import BaseForm
 
 
 class NucAcidForm(BaseForm, forms.ModelForm):
+    area = forms.ModelMultipleChoiceField(queryset=Areas.objects.all(),
+                                          label="Area"
+                                          )
     amount = forms.FloatField()
 
     class Meta:
         model = NucAcids
-        fields = ("name", "date", "method", "na_type", "conc", "vol_init", "vol_remain", "notes", )
+        fields = ("name", "date", "method", "na_type", "conc", "vol_init", "vol_remain", "notes", "area", )
 
     def __init__(self, *args, **kwargs):
         super(NucAcidForm, self).__init__(*args, **kwargs)
         self.fields["name"].required = False
+        self.fields['area'].required = False
+
+        if self.instance.pk:
+            self.fields['area'].initial = self.instance.area_na_links.values_list('area', flat=True)
+
+    def save(self, commit=True):
+        instance = super(NucAcidForm, self).save(commit=False)
+        if commit:
+            instance.save()
+        AREA_NA_LINK.objects.filter(nucacid=instance).delete()
+        for area in self.cleaned_data['area']:
+            AREA_NA_LINK.objects.create(
+                nucacid=instance,
+                area=area,
+                input_vol=0,
+                input_amount=0
+            )
+        return instance
 
 
 class SampleLibCreationOptionsForm(forms.Form):
