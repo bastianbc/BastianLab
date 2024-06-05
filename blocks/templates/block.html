@@ -23,11 +23,11 @@
             <div class="col-10"> {{form.patient|as_crispy_field}}</div>
           </div>
           <div class="row">
-            <div class="col-10"> {{form.age|as_crispy_field}}</div>
+            <div class="col-2"> {{form.age|as_crispy_field}}</div>
           </div>
           <div class="row body-site-row">
-            {{ form.body_site|as_crispy_field }}
-            <label for="">Body Site</label>
+              <label>Body Sites</label>
+              {{ form.body_site|as_crispy_field }}
           </div>
           <div class="row">
             <div class="col-2"> {{form.ulceration|as_crispy_field}}</div>
@@ -37,24 +37,16 @@
             <div class="col-2"> {{form.p_stage|as_crispy_field}}</div>
           </div>
           <div class="row">
+              <div class="col-10"> {{form.prim|as_crispy_field}}</div>
+          </div>
+          <div class="row">
+              <div class="col-4"> {{form.fixation|as_crispy_field}}</div>
+              <div class="col-3"> {{form.slides|as_crispy_field}}</div>
+              <div class="col-3"> {{form.slides_left|as_crispy_field}}</div>
           </div>
           <div class="row">
           </div>
           <div class="row">
-          </div>
-          <div class="row">
-            <div class="col-10"> {{form.prim|as_crispy_field}}</div>
-          </div>
-          <div class="row">
-          </div>
-          <div class="row">
-            <div class="col-10"> {{form.slides|as_crispy_field}}</div>
-          </div>
-          <div class="row">
-            <div class="col-10"> {{form.slides_left|as_crispy_field}}</div>
-          </div>
-          <div class="row">
-            <div class="col-10"> {{form.fixation|as_crispy_field}}</div>
           </div>
           <div class="row">
             <div class="col-10"> {{form.storage|as_crispy_field}}</div>
@@ -63,7 +55,7 @@
             <div class="col-10"> {{form.scan_number|as_crispy_field}}</div>
           </div>
           <div class="row">
-            <div class="col-10"> {{form.icd10|as_crispy_field}}</div>
+            <div class="col-4"> {{form.icd10|as_crispy_field}}</div>
           </div>
           <div class="row">
             <div class="col-10"> {{form.diagnosis|as_crispy_field}}</div>
@@ -81,9 +73,6 @@
             <div class="col-10"> {{form.path_note|as_crispy_field}}</div>
           </div>
           <div class="row">
-            <div class="col-10"> {{form.collection|as_crispy_field}}</div>
-          </div>
-          <div class="row">
             <div class="col-10"> {{form.notes|as_crispy_field}}</div>
           </div>
         </div>
@@ -98,5 +87,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="static/body_site.init.js" charset="utf-8"></script>
+<script src="/blocks/static/body_site.init.js" charset="utf-8"></script>
 {% endblock %}

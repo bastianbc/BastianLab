@@ -52,9 +52,6 @@
             <div class="col-sm-12">{{ filter.prim|as_crispy_field }}</div>
           </div>
           <div class="row mb-2">
-            <div class="col-sm-12">{{ filter.collection|as_crispy_field }}</div>
-          </div>
-          <div class="row mb-2">
             <div class="col-sm-12">{{ filter.body_site|as_crispy_field }}</div>
           </div>
 
@@ -258,59 +255,6 @@
   <!--end::Modal dialog-->
 </div>
 <!--end::Modal -->
-
-<!--begin::Modal -->
-<div class="modal fade" id="block_details" tabindex="-1" aria-hidden="true">
-  <!--begin::Modal dialog-->
-  <div class="modal-dialog modal-dialog-centered mw-1000px">
-    <!--begin::Modal content-->
-    <div class="modal-content">
-      <!--begin::Modal header-->
-      <div class="modal-header">
-        <!--begin::Modal title-->
-        <h2>Block Details</h2>
-        <!--end::Modal title-->
-        <!--begin::Close-->
-        <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
-          <!--begin::Svg Icon | path: icons/duotune/arrows/arr061.svg-->
-          <span class="svg-icon svg-icon-1">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor" />
-              <rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor" />
-            </svg>
-          </span>
-          <!--end::Svg Icon-->
-        </div>
-        <!--end::Close-->
-      </div>
-      <!--end::Modal header-->
-      <!--begin::Modal body-->
-      <div class="modal-body py-lg-10 px-lg-10">
-          <i>Showing fields which has values</i>
-        <div class="card-flush">
-          <!--begin::Card body-->
-          <div class="card-body pt-5">
-            <!--begin::Step 3-->
-            <div data-kt-stepper-element="content">
-                <!--begin::Wrapper-->
-                <div class="w-100 row" id="d_details">
-
-                </div>
-                <!--end::Wrapper-->
-            </div>
-            <!--end::Step 3-->
-          </div>
-          <!--end::Card body-->
-        </div>
-      </div>
-      <!--end::Modal body-->
-    </div>
-    <!--end::Modal content-->
-  </div>
-  <!--end::Modal dialog-->
-</div>
-<!--end::Modal -->
-
 
 {% endblock %}
 

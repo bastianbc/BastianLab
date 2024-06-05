@@ -8,13 +8,14 @@ class AreasSerializer(serializers.ModelSerializer):
     num_blocks = serializers.IntegerField()
     num_projects = serializers.IntegerField()
     area_type_label = serializers.SerializerMethodField()
+    # collection_label = serializers.SerializerMethodField()
     investigator = serializers.SerializerMethodField()
     num_samplelibs = serializers.IntegerField()
 
     class Meta:
         model = Areas
         fields = ("ar_id", "name", "num_blocks", "num_projects", "area_type", "area_type_label", "completion_date", "investigator","num_nucacids", "num_samplelibs", "DT_RowId",)
-
+        # "collection","collection_label",
     def get_DT_RowId(self, obj):
         return getattr(obj, 'ar_id')
 

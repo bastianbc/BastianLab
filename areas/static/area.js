@@ -708,6 +708,28 @@ var KTDatatablesServerSide = function () {
         });
       }
 
+      // Gets the collection options and fills the dropdown. It is executed synchronous.
+      function getCollectionOptions() {
+
+        $.ajax({
+            url: "/areas/get_collections",
+            type: "GET",
+            async: false,
+            success: function (data) {
+
+             data.forEach((item, i) => {
+
+               collectionOptions.push({
+                 "label":item["label"],
+                 "value":item["value"]
+               })
+
+             });
+            }
+        });
+
+      }
+
     }
 
     // Redirects from other pages

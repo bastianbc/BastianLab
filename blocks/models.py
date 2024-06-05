@@ -23,20 +23,6 @@ class Blocks(models.Model):
          ("metastasis","Metastasis"),
     )
 
-
-    PUNCH = 'PU'
-    SCRAPE = 'SC'
-    PELLET = 'PE'
-    CURLS = 'CU'
-    FFPE = 'FF'
-    COLLECTION_CHOICES = [
-        (PUNCH, 'Punch'),
-        (SCRAPE, 'Scraping'),
-        (PELLET, 'Cell Pellet'),
-        (CURLS, 'Curls'),
-        (FFPE, 'FFPE')
-    ]
-
     SUBTYPE_CHOICES = (
         ("low-csd", "Low CSD"),
         ("high-csd", "High CSD"),
@@ -77,15 +63,15 @@ class Blocks(models.Model):
     fixation = models.CharField(max_length=100, blank=True, null=True, choices=FIXATION_CHOICES, default="ffpe")
     storage = models.CharField(max_length=50, blank=True, null=True)
     scan_number = models.CharField(max_length=200,blank=True, null=True)
-    icd10 = models.TextField(blank=True, null=True)
+    icd10 = models.CharField(max_length=8 ,blank=True, null=True)
     diagnosis = models.TextField(blank=True, null=True)
-    notes = models.TextField(blank=True, null=True)
+    notes = models.TextField(blank=True, null=True, verbose_name="Investigator notes")
     micro = models.TextField(blank=True, null=True)
     gross = models.TextField(blank=True, null=True)
     clinical = models.TextField(blank=True, null=True)
     date_added = models.DateTimeField(blank=True, null=True, auto_now_add=True)
     old_body_site = models.CharField(max_length=600,blank=True, null=True)
-    collection = models.CharField(max_length=2, choices=COLLECTION_CHOICES, default=SCRAPE)
+
     path_note = models.TextField(blank=True, null=True)
     ip_dx = models.TextField(blank=True, null=True)
 
@@ -185,7 +171,7 @@ class Blocks(models.Model):
             search_value = kwargs.get('search[value]', None)[0]
             p_stage = kwargs.get('p_stage', None)[0]
             prim = kwargs.get('prim', None)[0]
-            collection = kwargs.get('collection', None)[0]
+            # collection = kwargs.get('collection', None)[0]
             body_site = kwargs.get('body_site', None)[0]
             order_column = kwargs.get('order[0][column]', None)[0]
             order = kwargs.get('order[0][dir]', None)[0]
@@ -209,10 +195,10 @@ class Blocks(models.Model):
                 queryset = queryset.filter(
                     Q(prim=prim)
                 )
-            if collection:
-                queryset = queryset.filter(
-                    Q(collection=collection)
-                )
+            # if collection:
+            #     queryset = queryset.filter(
+            #         Q(collection=collection)
+            #     )
             if body_site:
                 queryset = queryset.filter(
                     Q(body_site__id=body_site)
@@ -245,14 +231,6 @@ class Blocks(models.Model):
         except Exception as e:
             print(str(e))
             raise
-
-    @staticmethod
-    def get_collections():
-        '''
-        Option list of Collection for the datatables' select field.
-        '''
-        return [{"label":"---------","value":""}] + [{ "label":c[1], "value":c[0] } for c in Blocks.COLLECTION_CHOICES]
-
 
     @staticmethod
     def get_block_url():

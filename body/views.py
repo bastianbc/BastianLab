@@ -64,5 +64,5 @@ def filter_bodys(request):
 
 @login_required
 def get_bodies(request,parent_id=None):
-    serializer = BodySerializer(Body.objects.filter(parent_id=parent_id), many=True)
+    serializer = BodySerializer(Body.objects.all(), many=True)
     return JsonResponse(serializer.data,safe=False)

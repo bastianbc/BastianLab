@@ -46,6 +46,14 @@ class Areas(models.Model):
         ("other","Other"),
     ]
 
+    COLLECTION_CHOICES = [
+        ('PU', 'Punch'),
+        ('SC', 'Scraping'),
+        ('PE', 'Cell Pellet'),
+        ('CU', 'Curls'),
+        ('FF', 'FFPE')
+    ]
+
     ar_id = models.AutoField(primary_key=True)
     block = models.ForeignKey('blocks.Blocks', on_delete=models.CASCADE, db_column='block', related_name="block_areas")
     name = models.CharField(max_length=50, unique=True, validators=[validate_name_contains_space])
@@ -53,6 +61,7 @@ class Areas(models.Model):
     completion_date = models.DateTimeField(default=datetime.now)
     image = models.ImageField(null=True, blank=True, upload_to="images/%y/%m/%d")
     notes = models.TextField(blank=True, null=True)
+    collection = models.CharField(max_length=2, choices=COLLECTION_CHOICES, default="SC")
 
     class Meta:
         db_table = 'areas'
@@ -208,6 +217,13 @@ class Areas(models.Model):
         Option list of Area Type for the datatables' select field.
         '''
         return [{"label":"---------","value":""}] + [{ "label":c[1], "value":c[0] } for c in Areas.AREA_TYPE_TYPES]
+
+    @staticmethod
+    def get_collections():
+        '''
+        Option list of Collection for the datatables' select field.
+        '''
+        return [{"label":"---------","value":""}] + [{ "label":c[1], "value":c[0] } for c in Areas.COLLECTION_CHOICES]
 
 class BLOCK_AREA_LINK(models.Model):
     block = models.ForeignKey("blocks.Blocks",on_delete=models.CASCADE, related_name="block_area_links", verbose_name="Block")
