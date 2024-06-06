@@ -12,6 +12,7 @@
     <div class="card-body">
       {% csrf_token %}
       <div class="row">
+        <div class="col-6">{{ form.nuc_acid|as_crispy_field }}</div>
         <div class="col-6">{{ form.name|as_crispy_field }}</div>
         <div class="col-6">{{ form.barcode|as_crispy_field }}</div>
         <div class="col-6">{{ form.date|as_crispy_field }}</div>

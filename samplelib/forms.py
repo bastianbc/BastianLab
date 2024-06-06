@@ -1,5 +1,5 @@
 from django import forms
-from .models import SampleLib
+from .models import SampleLib, NA_SL_LINK
 from datetime import date
 from bait.models import Bait
 from barcodeset.models import Barcode
@@ -7,11 +7,40 @@ from areas.models import Areas
 from core.forms import BaseForm
 from sequencingrun.models import SequencingRun
 from capturedlib.models import CapturedLib
+from libprep.models import NucAcids
 
 class SampleLibForm(BaseForm, forms.ModelForm):
     class Meta:
         model = SampleLib
         fields = "__all__"
+
+    nuc_acid = forms.ModelMultipleChoiceField(
+        queryset=NucAcids.objects.all(),
+        label="Nucleic Acid"
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(SampleLibForm, self).__init__(*args, **kwargs)
+        self.fields['nuc_acid'].required = False
+
+
+        if self.instance.pk:
+            self.fields['nuc_acid'].initial = self.instance.na_sl_links.values_list('nucacid', flat=True)
+
+    def save(self, commit=True):
+        instance = super(SampleLibForm, self).save(commit=False)
+        if commit:
+            instance.save()
+        NA_SL_LINK.objects.filter(sample_lib=instance).delete()
+        for na in self.cleaned_data['nuc_acid']:
+            NA_SL_LINK.objects.create(
+                sample_lib=instance,
+                nucacid=na,
+                input_vol=0,
+                input_amount=0
+            )
+        return instance
+
 
 class CapturedLibCreationOptionsForm(forms.Form):
     prefix = forms.CharField()
