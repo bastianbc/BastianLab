@@ -2188,32 +2188,28 @@ def qpcr_at_leftover(request):
 def _match_seq_runs_with_dffq(row):
     try:
         file = SequencingFile.objects.get(name=row['file'])
-        seq_run = file.sequencing_file_set.sequencing_run.name if file.sequencing_file_set and file.sequencing_file_set.sequencing_run else None
-        sl = file.sequencing_file_set.sample_lib.name if file.sequencing_file_set and file.sequencing_file_set.sample_lib else None
-        _sl = file.sequencing_file_set.sample_lib if file.sequencing_file_set and file.sequencing_file_set.sample_lib else None
-        real_seq_run = SequencingRun.objects.filter(sequencing_libs__cl_seql_links__captured_lib__sl_cl_links__sample_lib=_sl)
-        # real_seq_run = _sl.sl_cl_links.captured_lib.cl_seql_links.sequencing_lib.sequencing_runs
-        if row['path'].split("/")[1] != seq_run and seq_run and sl:
-            print("/"*10, row['file'], row['path'], sl, seq_run,
-                  real_seq_run,
-                  sep='/')
-            if sl.startswith("AMLP"):
-                sf = file.sequencing_file_set
-                sf.path = row['path']
-                sf.sequencing_run = SequencingRun.objects.get(name='BCB030')
-                sf.save()
-                print("saved")
+        row['file_set'] = file.sequencing_file_set.prefix if file.sequencing_file_set else None
+        row['sample_lib'] = file.sequencing_file_set.sample_lib.name if file.sequencing_file_set and file.sequencing_file_set.sample_lib else None
+        row['seq_run'] = file.sequencing_file_set.sequencing_run.name if file.sequencing_file_set and file.sequencing_file_set.sequencing_run else None
+        row['seq_run_path'] = row['path'].split('/')[1]
+        return row
+
 
 
 
     except Exception as e:
         print(e,row['file'])
+        return row
 
 def match_seq_runs_with_dffq(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "df_fq.csv")
+    sls = SampleLib.objects.filter(sequencing_file_sets__isnull=True).order_by('name')
+    for sl in sls:
+        print(sl.name)
     df = pd.read_csv(file)
     df = df.sort_values(by=['file'])
-    df[~df["file"].isnull()].apply(lambda row: _match_seq_runs_with_dffq(row), axis=1)
+    df = df[~df["file"].isnull()].apply(lambda row: _match_seq_runs_with_dffq(row), axis=1)
+    df.to_csv("seq_run_matching.csv", index=False)
 
 
 def remove_NAN(request):
