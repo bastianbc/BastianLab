@@ -25,8 +25,12 @@
           <div class="row">
             <div class="col-2"> {{form.age|as_crispy_field}}</div>
           </div>
-          <div class="row body-site-row">
-              <label>Body Sites</label>
+          <div class="row">
+              <div class="col-12">
+                  <label>Body Sites</label>
+              </div>
+          </div>
+          <div class="row body-site-row mb-3 mt-3">
               {{ form.body_site|as_crispy_field }}
           </div>
           <div class="row">
