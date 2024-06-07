@@ -2189,9 +2189,12 @@ def _match_seq_runs_with_dffq(row):
     try:
         file = SequencingFile.objects.get(name=row['file'])
         row['file_set'] = file.sequencing_file_set.prefix if file.sequencing_file_set else None
+        sl = file.sequencing_file_set.sample_lib.name if file.sequencing_file_set and file.sequencing_file_set.sample_lib else None
         row['sample_lib'] = file.sequencing_file_set.sample_lib.name if file.sequencing_file_set and file.sequencing_file_set.sample_lib else None
         row['seq_run'] = file.sequencing_file_set.sequencing_run.name if file.sequencing_file_set and file.sequencing_file_set.sequencing_run else None
+        row['rel_seq_run'] = SequencingRun.objects.filter(sequencing_libs__cl_seql_links__captured_lib__sl_cl_links__sample_lib__name=sl).values('name')
         row['seq_run_path'] = row['path'].split('/')[1]
+        row['res'] = row['seq_run_path'] == row['seq_run']
         return row
 
 
