@@ -2186,7 +2186,8 @@ def qpcr_at_leftover(request):
     df[~df["file"].isnull()].apply(lambda row: leftover(row), axis=1)
 
 def _create_file_and_set(row):
-    try:
+    # try:
+        print("123456")
         for col in row.index:
             if row[col] == 'TRUE':
                 _type_ = col
@@ -2195,8 +2196,8 @@ def _create_file_and_set(row):
             type=_type_
         )
         print("created")
-    except:
-        return
+    # except:
+    #     return
 
 
 def _match_seq_runs_with_dffq(row):
