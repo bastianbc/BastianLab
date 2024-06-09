@@ -2217,8 +2217,7 @@ def _match_seq_runs_with_dffq(row):
         today = timezone.now().date()
         file = SequencingFile.objects.get(name=row['file'])
         if file.date_added.date() == today:
-            print("%"*100)
-            print(file)
+            _create_file_and_set(row)
         row['file_set'] = file.sequencing_file_set.prefix if file.sequencing_file_set else None
         sl = file.sequencing_file_set.sample_lib.name if file.sequencing_file_set and file.sequencing_file_set.sample_lib else None
         row['sample_lib'] = file.sequencing_file_set.sample_lib.name if file.sequencing_file_set and file.sequencing_file_set.sample_lib else None
