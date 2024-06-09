@@ -2190,7 +2190,7 @@ def qpcr_at_leftover(request):
 def _create_file_and_set(row):
     try:
         if row['file'].startswith('AMLP'):
-            sl = row['file'].split("_S")[0]
+            sl = row['file'].split("_S")[0].replace("_Undetermined", "")
             print(sl)
             _sl = SampleLib.objects.get(name=sl)
             sr = row['path'].split('/')[1]
@@ -2235,9 +2235,6 @@ def _match_seq_runs_with_dffq(row):
 
 def match_seq_runs_with_dffq(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "df_fq_new.csv")
-    sls = SampleLib.objects.filter(sequencing_file_sets__isnull=True).order_by('name')
-    for sl in sls:
-        print(sl.name)
     df = pd.read_csv(file)
     df = df.sort_values(by=['file'])
     df = df[~df["file"].isnull()].apply(lambda row: _match_seq_runs_with_dffq(row), axis=1)
