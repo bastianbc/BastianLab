@@ -34,6 +34,8 @@ from pathlib import Path
 import pandas as pd
 import uuid
 import numpy as np
+from django.utils import timezone
+
 
 def migrate(request):
 
@@ -2186,25 +2188,37 @@ def qpcr_at_leftover(request):
     df[~df["file"].isnull()].apply(lambda row: leftover(row), axis=1)
 
 def _create_file_and_set(row):
-    # try:
-        print("123456")
-        for col in row.index:
-            print(row[col])
-            print(type(row[col]))
-            if row[col] == True:
-                _type_ = col
-        SequencingFile.objects.create(
-            name=row['file'],
-            type=_type_
-        )
-        print("created")
-    # except:
-    #     return
+    try:
+        if row['file'].startswith('AMLP'):
+            sl = row['file'].split("_S")[0]
+            _sl = SampleLib.objects.get(name=sl)
+            sr = row['path'].split('/')[1]
+            _sr = SequencingRun.objects.get(name=sr)
+            fs,_ = SequencingFileSet.objects.get_or_create(prefix=row['file'].split("_L")[0])
+            fs.sample_lib = _sl
+            fs.sequencing_run = _sr
+            fs.path = row['path']
+            fs.save()
+            f = SequencingFile.objects.get(name=row['file'])
+            f.sequencing_file_set = fs
+            f.save()
+
+        # SequencingFile.objects.create(
+        #     name=row['file'],
+        #     type=_type_
+        # )
+    except Exception as e:
+        print(e)
+        return
 
 
 def _match_seq_runs_with_dffq(row):
     try:
+        today = timezone.now().date()
         file = SequencingFile.objects.get(name=row['file'])
+        if file.created_at.date() == today:
+            print("%"*100)
+            print(file)
         row['file_set'] = file.sequencing_file_set.prefix if file.sequencing_file_set else None
         sl = file.sequencing_file_set.sample_lib.name if file.sequencing_file_set and file.sequencing_file_set.sample_lib else None
         row['sample_lib'] = file.sequencing_file_set.sample_lib.name if file.sequencing_file_set and file.sequencing_file_set.sample_lib else None
