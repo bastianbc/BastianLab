@@ -2196,7 +2196,7 @@ def _create_file_and_set(row):
             sr = row['path'].split('/')[1]
             print(sr)
             _sr = SequencingRun.objects.get(name=sr)
-            fs,_ = SequencingFileSet.objects.get_or_create(prefix=row['file'].split("_L")[0])
+            fs,_ = SequencingFileSet.objects.get_or_create(prefix=row['file'].replace("_Undetermined", "").split("_L")[0])
             fs.sample_lib = _sl
             fs.sequencing_run = _sr
             fs.path = row['path']
