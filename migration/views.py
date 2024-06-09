@@ -2185,6 +2185,19 @@ def qpcr_at_leftover(request):
     df = pd.read_csv(file)
     df[~df["file"].isnull()].apply(lambda row: leftover(row), axis=1)
 
+def _create_file_and_set(row):
+    try:
+        for col in row.index:
+            if row[col] == 'TRUE':
+                _type_ = col
+        SequencingFile.objects.create(
+            name=row['file'],
+            type=_type_
+        )
+    except:
+        return
+
+
 def _match_seq_runs_with_dffq(row):
     try:
         file = SequencingFile.objects.get(name=row['file'])
@@ -2196,12 +2209,9 @@ def _match_seq_runs_with_dffq(row):
         row['seq_run_path'] = row['path'].split('/')[1]
         row['res'] = row['seq_run_path'] == row['seq_run']
         return row
-
-
-
-
     except Exception as e:
         print(e,row['file'])
+        _create_file_and_set(row)
         return row
 
 def match_seq_runs_with_dffq(request):
