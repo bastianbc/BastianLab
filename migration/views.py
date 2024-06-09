@@ -2217,10 +2217,7 @@ def _create_file_and_set(row):
 
 def _match_seq_runs_with_dffq(row):
     try:
-        today = timezone.now().date()
         file = SequencingFile.objects.get(name=row['file'])
-        if file.date_added.date() == today:
-            _create_file_and_set(row)
         row['file_set'] = file.sequencing_file_set.prefix if file.sequencing_file_set else None
         sl = file.sequencing_file_set.sample_lib.name if file.sequencing_file_set and file.sequencing_file_set.sample_lib else None
         row['sample_lib'] = file.sequencing_file_set.sample_lib.name if file.sequencing_file_set and file.sequencing_file_set.sample_lib else None
@@ -2235,13 +2232,6 @@ def _match_seq_runs_with_dffq(row):
         return row
 
 def match_seq_runs_with_dffq(request):
-    for sr in ['BCB077', 'BCB084', 'BCB082', 'BCB091', 'BCB086', 'BCB088', 'BCB075']:
-        cl,_ = CapturedLib.objects.get_or_create(name=sr+"_CL")
-        seql,_  = SequencingLib.objects.get_or_create(name=sr+"SeqL")
-        seqlink,_  = CL_SEQL_LINK.objects.get_or_create(captured_lib=cl, sequencing_lib=seql)
-        seqr,_  = SequencingRun.objects.get_or_create(name=sr)
-        seqr.sequencing_libs.add(seql)
-
     file = Path(Path(__file__).parent.parent / "uploads" / "df_fq_new.csv")
     df = pd.read_csv(file)
     df = df.sort_values(by=['file'])
