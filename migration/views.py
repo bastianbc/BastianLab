@@ -2239,8 +2239,7 @@ def match_seq_runs_with_dffq(request):
         seql = SequencingLib.objects.create(name=sr+"SeqL")
         seqlink = CL_SEQL_LINK.objects.create(captured_lib=cl, sequencing_lib=seql)
         seqr = SequencingRun.objects.create(name=sr)
-        seqr.add(seql)
-        seqr.save()
+        seqr.sequencing_libs.add(seql)
 
     file = Path(Path(__file__).parent.parent / "uploads" / "df_fq_new.csv")
     df = pd.read_csv(file)
