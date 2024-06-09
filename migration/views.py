@@ -2205,7 +2205,7 @@ def _match_seq_runs_with_dffq(row):
         return row
 
 def match_seq_runs_with_dffq(request):
-    file = Path(Path(__file__).parent.parent / "uploads" / "df_fq.csv")
+    file = Path(Path(__file__).parent.parent / "uploads" / "df_fq_new.csv")
     sls = SampleLib.objects.filter(sequencing_file_sets__isnull=True).order_by('name')
     for sl in sls:
         print(sl.name)
