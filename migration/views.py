@@ -2191,7 +2191,7 @@ def _create_file_and_set(row):
         for col in row.index:
             print(row[col])
             print(type(row[col]))
-            if row[col] == 'TRUE':
+            if row[col] == True:
                 _type_ = col
         SequencingFile.objects.create(
             name=row['file'],
