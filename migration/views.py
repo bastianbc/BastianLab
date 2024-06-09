@@ -2194,6 +2194,7 @@ def _create_file_and_set(row):
             name=row['file'],
             type=_type_
         )
+        print("created")
     except:
         return
 
