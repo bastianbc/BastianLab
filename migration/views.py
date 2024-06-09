@@ -2211,8 +2211,8 @@ def _match_seq_runs_with_dffq(row):
         row['res'] = row['seq_run_path'] == row['seq_run']
         return row
     except Exception as e:
-        print(e,row['file'])
         _create_file_and_set(row)
+        print(e,row['file'])
         return row
 
 def match_seq_runs_with_dffq(request):
