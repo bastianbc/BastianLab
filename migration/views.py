@@ -2191,8 +2191,10 @@ def _create_file_and_set(row):
     try:
         if row['file'].startswith('AMLP'):
             sl = row['file'].split("_S")[0]
+            print(sl)
             _sl = SampleLib.objects.get(name=sl)
             sr = row['path'].split('/')[1]
+            print(sr)
             _sr = SequencingRun.objects.get(name=sr)
             fs,_ = SequencingFileSet.objects.get_or_create(prefix=row['file'].split("_L")[0])
             fs.sample_lib = _sl
