@@ -2181,7 +2181,7 @@ def leftover(row):
 
 
 def qpcr_at_leftover(request):
-    file = Path(Path(__file__).parent.parent / "uploads" / "df_fq.csv")
+    file = Path(Path(__file__).parent.parent / "uploads" / "df_fq_new.csv")
     df = pd.read_csv(file)
     df[~df["file"].isnull()].apply(lambda row: leftover(row), axis=1)
 
