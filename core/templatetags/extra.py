@@ -15,6 +15,7 @@ def is_admin_area(path):
         "migration",
         "sequencingfile",
         "gene",
+        "wiki",
     ]
 
     app_name = path.split("/")[1]

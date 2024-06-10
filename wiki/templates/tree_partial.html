@@ -1,0 +1,10 @@
+<li class="">
+    <a href="{% url 'view-article' slug=article.slug %}">{{ article.title }}</a>
+    {% if article.children.exists %}
+        <ul class="list-group ml-3">
+            {% for child in article.children.all %}
+                {% include 'tree_partial.html' with article=child %}
+            {% endfor %}
+        </ul>
+    {% endif %}
+</li>
