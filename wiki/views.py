@@ -6,9 +6,9 @@ def articles(request):
 
     search_query = request.GET.get('search', '')
     if search_query:
-        articles = Article.objects.filter(title__icontains=search_query)
+        articles = Article.objects.filter(title__icontains=search_query).order_by('-created_at')
     else:
-        articles = Article.objects.all()
+        articles = Article.objects.all().order_by('-created_at')
     return render(request, 'articles.html', {'articles': articles, 'search_query': search_query})
 
 def view_article(request, slug):
