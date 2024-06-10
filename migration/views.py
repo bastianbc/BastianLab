@@ -34,6 +34,8 @@ from pathlib import Path
 import pandas as pd
 import uuid
 import numpy as np
+from django.utils import timezone
+
 
 def migrate(request):
 
@@ -2181,39 +2183,60 @@ def leftover(row):
 
 
 def qpcr_at_leftover(request):
-    file = Path(Path(__file__).parent.parent / "uploads" / "df_fq.csv")
+    file = Path(Path(__file__).parent.parent / "uploads" / "df_fq_new.csv")
     df = pd.read_csv(file)
     df[~df["file"].isnull()].apply(lambda row: leftover(row), axis=1)
+
+def _create_file_and_set(row):
+    try:
+        if row['file'].startswith('AMLP'):
+            sl = row['file'].split("_S")[0].replace("_Undetermined", "")
+            print(sl)
+            _sl = SampleLib.objects.get(name=sl)
+            sr = row['path'].split('/')[1]
+            print(sr)
+            _sr = SequencingRun.objects.get(name=sr)
+            prefix = row['file'].replace("_Undetermined", "").split("_S")[0]
+            fs,_ = SequencingFileSet.objects.get_or_create(prefix=prefix+'_S')
+            fs.sample_lib = _sl
+            fs.sequencing_run = _sr
+            fs.path = row['path']
+            fs.save()
+            f = SequencingFile.objects.get(name=row['file'])
+            f.sequencing_file_set = fs
+            f.save()
+
+        # SequencingFile.objects.create(
+        #     name=row['file'],
+        #     type=_type_
+        # )
+    except Exception as e:
+        print(e)
+        return
+
 
 def _match_seq_runs_with_dffq(row):
     try:
         file = SequencingFile.objects.get(name=row['file'])
-        seq_run = file.sequencing_file_set.sequencing_run.name if file.sequencing_file_set and file.sequencing_file_set.sequencing_run else None
+        row['file_set'] = file.sequencing_file_set.prefix if file.sequencing_file_set else None
         sl = file.sequencing_file_set.sample_lib.name if file.sequencing_file_set and file.sequencing_file_set.sample_lib else None
-        _sl = file.sequencing_file_set.sample_lib if file.sequencing_file_set and file.sequencing_file_set.sample_lib else None
-        real_seq_run = SequencingRun.objects.filter(sequencing_libs__cl_seql_links__captured_lib__sl_cl_links__sample_lib=_sl)
-        # real_seq_run = _sl.sl_cl_links.captured_lib.cl_seql_links.sequencing_lib.sequencing_runs
-        if row['path'].split("/")[1] != seq_run and seq_run and sl:
-            print("/"*10, row['file'], row['path'], sl, seq_run,
-                  real_seq_run,
-                  sep='/')
-            if sl.startswith("AMLP"):
-                sf = file.sequencing_file_set
-                sf.path = row['path']
-                sf.sequencing_run = SequencingRun.objects.get(name='BCB030')
-                sf.save()
-                print("saved")
-
-
-
+        row['sample_lib'] = file.sequencing_file_set.sample_lib.name if file.sequencing_file_set and file.sequencing_file_set.sample_lib else None
+        row['seq_run'] = file.sequencing_file_set.sequencing_run.name if file.sequencing_file_set and file.sequencing_file_set.sequencing_run else None
+        row['rel_seq_run'] = SequencingRun.objects.filter(sequencing_libs__cl_seql_links__captured_lib__sl_cl_links__sample_lib__name=sl).values('name')
+        row['seq_run_path'] = row['path'].split('/')[1]
+        row['res'] = row['seq_run_path'] == row['seq_run']
+        return row
     except Exception as e:
+        _create_file_and_set(row)
         print(e,row['file'])
+        return row
 
 def match_seq_runs_with_dffq(request):
-    file = Path(Path(__file__).parent.parent / "uploads" / "df_fq.csv")
+    file = Path(Path(__file__).parent.parent / "uploads" / "df_fq_new.csv")
     df = pd.read_csv(file)
     df = df.sort_values(by=['file'])
-    df[~df["file"].isnull()].apply(lambda row: _match_seq_runs_with_dffq(row), axis=1)
+    df = df[~df["file"].isnull()].apply(lambda row: _match_seq_runs_with_dffq(row), axis=1)
+    df.to_csv("seq_run_matching.csv", index=False)
 
 
 def remove_NAN(request):
