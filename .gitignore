@@ -85,3 +85,6 @@ development.py
 
 
 *.pyc
+
+vent/share/python-wheels/
+
