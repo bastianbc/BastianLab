@@ -85,6 +85,7 @@ development.py
 
 
 *.pyc
+*.whl
 
 vent/share/python-wheels/
 
