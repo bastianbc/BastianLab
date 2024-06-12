@@ -6,7 +6,7 @@ class Article(models.Model):
     title = models.CharField(max_length=250)
     content = models.TextField()
     slug = models.SlugField(blank=True, null=True)
-    parent = models.ForeignKey("self", blank=True, null=True, on_delete=models.CASCADE)
+    parent = models.ForeignKey("self", blank=True, null=True, on_delete=models.CASCADE, related_name="children")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

@@ -8,7 +8,8 @@ def articles(request):
     if search_query:
         articles = Article.objects.filter(title__icontains=search_query)
     else:
-        articles = Article.objects.all()
+        articles = Article.objects.filter(parent__isnull=True)
+
     return render(request, 'articles.html', {'articles': articles, 'search_query': search_query})
 
 def view_article(request, slug):
