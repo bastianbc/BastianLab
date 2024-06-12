@@ -6,7 +6,7 @@ def articles(request):
 
     search_query = request.GET.get('search', '')
     if search_query:
-        articles = Article.objects.filter(title__icontains=search_query)
+        articles = Article.objects.filter(title__icontains=search_query).order_by('-created_at')
     else:
         articles = Article.objects.filter(parent__isnull=True)
 

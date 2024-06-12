@@ -72,7 +72,7 @@ INSTALLED_APPS = [
     'areas.apps.AreasConfig',
     'libprep.apps.LibprepConfig',
     'lab.apps.LabConfig',
-    'capturedlib.apps.CapturedlibConfig',
+    'capturedlib',
     'samplelib',
     'sequencinglib',
     'sequencingrun',
