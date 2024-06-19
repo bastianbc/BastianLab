@@ -58,12 +58,14 @@ def parse_and_create_variants(g_variant, aachange, func, gene_detail):
             )
 
 @transaction.atomic
-def load_data_to_db(df,filename):
+def variant_file_parser(file):
+    df = pd.read_csv(file, sep='\t')
+
     run_analysis = get_run_analysis()
     sample_lib = get_sample_lib()
     sequencing_run = get_sequencing_run()
-    caller = extract_caller_from_filename(filename)
-    
+    caller = extract_caller_from_filename(file.name)
+
     for _, row in df.iterrows():
         variant_call = VariantCall.objects.create(
             run_analysis=run_analysis,
