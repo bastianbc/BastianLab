@@ -21,3 +21,18 @@ def filter_variants(request):
     result['recordsFiltered'] = variants['count']
 
     return JsonResponse(result)
+
+def upload_file(request):
+    if request.method == 'POST' and request.FILES['file']:
+        file = request.FILES['file']
+        filename = file.name
+
+        # Read the file into a DataFrame using streaming
+        df = pd.read_csv(file, sep='\t')
+
+        # Load data into the database
+        load_data_to_db(df, filename)
+
+        return redirect('success_url')  # Redirect to a success page or another view
+
+    return render(request, 'upload.html')  # Render the upload form
