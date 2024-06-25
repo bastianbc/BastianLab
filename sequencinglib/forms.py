@@ -44,3 +44,11 @@ class SequencingLibRecreateForm(forms.Form):
 
 class SequencingLibAddForm(forms.Form):
     seq_run = forms.ModelChoiceField(queryset=SequencingRun.objects.all().order_by("name"), label="Sequencing Runs")
+
+class SequencingFacilityForm(forms.Form):
+    FACILITY_CHOICES =(
+        ("facility1", "Facility 1"),
+        ("facility2", "Facility 2"),
+        ("facility3", "Facility 3"),
+    )
+    facility = forms.ChoiceField(choices=FACILITY_CHOICES)
