@@ -924,7 +924,7 @@ var KTDatatablesServerSide = function () {
 
             stepper.on("kt.stepper.next", function (stepper) {
                 stepper.goNext(); // go next step
-
+                // show the export button in second step in the stepper
                 if (stepper.currentStepIndex === 2) {
                     exportButton.classList.remove("d-none");
                 }
@@ -932,6 +932,7 @@ var KTDatatablesServerSide = function () {
 
             stepper.on("kt.stepper.previous", function (stepper) {
                 stepper.goPrevious(); // go previous step
+                // hide the export button in second step in the stepper
                 if (stepper.currentStepIndex === 1) {
                     exportButton.classList.add("d-none");
                 }
