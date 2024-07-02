@@ -89,3 +89,4 @@ development.py
 
 vent/share/python-wheels/
 
+.DS_Store
