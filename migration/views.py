@@ -2232,6 +2232,12 @@ def _match_seq_runs_with_dffq(row):
         return row
 
 def match_seq_runs_with_dffq(request):
+    for file in SequencingFile.objects.filter(name__startswith='Acral-11-Cntl_CCTTCA'):
+        name1 = file.name.split(".")[0] + "BB54"
+        name2 = file.name.split(".")[0] + "BB48"
+        SequencingFile.objects.create(name=name1, type='fastq')
+        SequencingFile.objects.create(name=name2, type='fastq')
+
     file = Path(Path(__file__).parent.parent / "uploads" / "df_fq_new.csv")
     df = pd.read_csv(file)
     df = df.sort_values(by=['file'])

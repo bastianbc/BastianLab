@@ -113,3 +113,16 @@ class PVariant(models.Model):
 
     class Meta:
         db_table = "p_variant"
+
+class RunAnalysis(models.Model):
+    HG_CHOICES = [
+        ("","")
+    ]
+    sequencing_run = models.ForeignKey("sequencingrun.SequencingRun", on_delete=models.CASCADE, related_name="run_analyzes", blank=True, null=True)
+    date = models.DateTimeField()
+    pipeline = models.CharField(max_length=50, null=True, blank=True)
+    job_id = models.CharField(max_length=50, null=True, blank=True)
+    hg = models.CharField(max_length=10, choices=HG_CHOICES)
+
+    class Meta:
+        db_table = "run_analysis"

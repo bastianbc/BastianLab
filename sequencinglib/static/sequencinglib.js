@@ -930,9 +930,34 @@ var KTDatatablesServerSide = function () {
 
     }
 
+      function initSequencingSheetModal() {
+          const stepper = new KTStepper(document.getElementById("modal_stepper"));
+          const exportButton = document.querySelector('button[name="btn_export_sheet"]');
+
+          if (Object.keys(stepper).length !== 0) { //isEmpty
+
+            stepper.on("kt.stepper.next", function (stepper) {
+                stepper.goNext(); // go next step
+                // show the export button in second step in the stepper
+                if (stepper.currentStepIndex === 2) {
+                    exportButton.classList.remove("d-none");
+                }
+            });
+
+            stepper.on("kt.stepper.previous", function (stepper) {
+                stepper.goPrevious(); // go previous step
+                // hide the export button in second step in the stepper
+                if (stepper.currentStepIndex === 1) {
+                    exportButton.classList.add("d-none");
+                }
+            });
+
+          }
+      }
+
       return {
         init: function () {
-          initModal(), handleBatchDelete(), uncheckedFirstCheckBox(), initCreateSequencingRun();
+          initModal(), handleBatchDelete(), uncheckedFirstCheckBox(), initCreateSequencingRun(), initSequencingSheetModal();
         },
       }
 
@@ -1223,6 +1248,7 @@ var KTDatatablesServerSide = function () {
             handleDeleteRows();
             handleResetForm();
             initEditor();
+
         }
     }
 }();

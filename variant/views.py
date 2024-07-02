@@ -5,6 +5,7 @@ from core.decorators import permission_required_for_async
 from .models import *
 from .serializers import *
 from django.http import JsonResponse
+from .helper import variant_file_parser
 
 def variants(request):
     filter = FilterForm()
@@ -21,3 +22,14 @@ def filter_variants(request):
     result['recordsFiltered'] = variants['count']
 
     return JsonResponse(result)
+
+def upload_file(request):
+    if request.method == 'POST' and request.FILES['file']:
+        file = request.FILES['file']
+
+        # parsing and saving data into the database
+        variant_file_parser(file)
+
+        return redirect('success_url')  # Redirect to a success page or another view
+
+    return render(request, 'upload.html')  # Render the upload form

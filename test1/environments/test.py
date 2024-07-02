@@ -145,7 +145,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'USER': 'testuser',
         'PASSWORD': '1235',
-        'NAME': 'locallabdb',
+        'NAME': 'labdb',
         'HOST': '127.0.0.1',
         'PORT': '5432',
         'DISABLE_SERVER_SIDE_CURSORS': True
