@@ -117,7 +117,9 @@ var KTDatatablesServerSide = function () {
                     orderable: false,
                     render: function (data, type, row) {
                         if (data > 0) {
-                          return `<a href="javascript:;" class="detail-link">${data}</a>`;
+                          let id = row["id"];
+                          return `
+                              <a href="/samplelib?model=captured_lib&id=${id}&initial=true">${data}</a>`;
                         }
                         return data;
                     }
@@ -128,7 +130,7 @@ var KTDatatablesServerSide = function () {
                     render: function (data, type, row) {
                         if (data > 0) {
                           let id = row["id"];
-                          return `<a href="/sequencinglib?initial=${id}">${data}</a>`;
+                          return `<a href="/sequencinglib?model=captured_lib&initial=true&id=${id}">${data}</a>`;
                         }
                         return data;
                     }
@@ -615,10 +617,23 @@ var KTDatatablesServerSide = function () {
       function cleanUrl() {
         window.history.replaceState(null, null, window.location.pathname);
       }
+
       const params = new URLSearchParams(window.location.search);
-      const x = params.get('initial');
+      const model = params.get('model');
+      const id = params.get('id');
+      const initial = params.get('initial');
       cleanUrl();
-      return x;
+
+      if (initial =="true" && model != null && id !=null) {
+
+        return JSON.stringify({
+          "model": model,
+          "id": id
+        });
+
+      }
+
+      return null;
     }
 
     var initRowActions = () => {

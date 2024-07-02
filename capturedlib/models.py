@@ -2,6 +2,8 @@ from django.db import models
 from datetime import datetime
 from django.db.models import Q, Count, Sum
 from core.validators import validate_name_contains_space
+from sequencinglib.models import CL_SEQL_LINK
+import json
 
 class CapturedLib(models.Model):
     name = models.CharField(max_length=50, unique=True, validators=[validate_name_contains_space], verbose_name="Name")
@@ -54,8 +56,7 @@ class CapturedLib(models.Model):
 
         def _parse_value(search_value):
             if "_initial:" in search_value:
-                v = search_value.split("_initial:")[1]
-                return None if v == "null" or not v.isnumeric() else v
+                return json.loads(search_value.split("_initial:")[1])
             return search_value
 
         def _is_initial_value(search_value):
@@ -93,8 +94,13 @@ class CapturedLib(models.Model):
             search_value = _parse_value(search_value)
 
             if is_initial:
-                filter = [sl_cl_link.captured_lib.id for sl_cl_link in SL_CL_LINK.objects.filter(sample_lib__id=search_value)]
-                queryset = queryset.filter(Q(id__in=filter))
+                if search_value["model"] == "sample_lib":
+                    filter = [sl_cl_link.captured_lib.id for sl_cl_link in SL_CL_LINK.objects.filter(sample_lib__id=search_value["id"])]
+                    queryset = queryset.filter(Q(id__in=filter))
+                if search_value["model"] == "seqlib":
+                    filter = [cl_seql_link.captured_lib.id for cl_seql_link in
+                              CL_SEQL_LINK.objects.filter(sequencing_lib__id=search_value["id"])]
+                    queryset = queryset.filter(Q(id__in=filter))
             elif search_value:
                 queryset = queryset.filter(
                     Q(name__icontains=search_value) |
