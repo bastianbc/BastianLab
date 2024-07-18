@@ -87,7 +87,6 @@ def new_sequencingrun_async(request):
         if prefixies.exists():
             max_value = max([int(p.name.split("-")[-1]) for p in prefixies])
             autonumber = max_value + 1
-
         sequencing_run = SequencingRun.objects.create(
             name="%s-%d" % (options["prefix"],autonumber),
             date=options["date"],
@@ -196,7 +195,6 @@ def get_sequencing_files(request, id):
     sequencing_run = SequencingRun.objects.get(id=id)
     sample_libs = SampleLib.objects.filter(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct()
     file_sets = helper.get_file_sets()
-
     return JsonResponse({
         'success': True,
         "file_sets": file_sets,
@@ -230,3 +228,19 @@ def save_sequencing_files(request, id):
     success, directory_path = helper.file_transfer(sequencing_run,transfers)
 
     return JsonResponse({"success": success})
+
+def get_sample_libs_async(request):
+    selected_ids = json.loads(request.GET.get("selected_ids"))
+
+    data = {}
+
+    for sequencing_run_id in sequencing_run_ids:
+        sample_libs = SampleLib.objects.filter(
+            sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id=sequencing_run_id
+        ).distinct()
+
+        data[sequencing_run_id] = [
+            {"id": sample_lib.id, "name": sample_lib.name} for sample_lib in sample_libs
+        ]
+
+    return JsonResponse(data)

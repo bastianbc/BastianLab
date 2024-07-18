@@ -809,16 +809,123 @@ var KTDatatablesServerSide = function () {
 
       }
 
+      function handleGenerateAnalysisSheet() {
+          const modalElement = document.getElementById("modal_analysis_sheet");
+          const modal = new bootstrap.Modal(modalElement);
+          const menuItem = document.querySelector('[data-kt-docs-table-select="generate_analysis_sheet"]');
+          const stepperElement = document.getElementById("modal_stepper");
+          // const exportButton = document.getElementById("export_button");
+          let stepper = null;
+
+          initGenerateAnalysisSheetButton(modal);
+          initStepper(stepperElement);
+
+          function initGenerateAnalysisSheetButton(modal) {
+              menuItem.addEventListener("click", function () {
+                  fetchData();
+              });
+          }
+
+          function initStepper(stepperElement) {
+              stepper = new KTStepper(stepperElement);
+
+              if (!isStepperEmpty()) {
+                  stepper.on("kt.stepper.next", function () {
+                      handleNextStep();
+                  });
+
+                  stepper.on("kt.stepper.previous", function () {
+                      handlePreviousStep();
+                  });
+              }
+          }
+
+          function isStepperEmpty() {
+              return Object.keys(stepper).length === 0;
+          }
+
+          function handleNextStep() {
+              stepper.goNext(); // Go to next step
+
+              if (stepper.currentStepIndex === 2) {
+                  // exportButton.classList.remove("d-none");
+              }
+          }
+
+          function handlePreviousStep() {
+              stepper.goPrevious(); // Go to previous step
+
+              if (stepper.currentStepIndex === 1) {
+                  // exportButton.classList.add("d-none");
+              }
+          }
+
+          function fetchData() {
+              $.ajax({
+                  type: "GET",
+                  url: "/sequencingrun/get_sample_libs_async",
+                  data: {
+                    "selected_ids": JSON.stringify(selectedRows),
+                  },
+                  error: function (xhr, ajaxOptions, thrownError) {
+                      swal("Error getting records!", "Please try again", "error");
+                  }
+              }).done(function (result) {
+                  populateTable(result);
+                  modal.show();
+              });
+          }
+
+          function populateTable(data) {
+              console.log(data);
+
+              const tbody = document.querySelector('table tbody');
+              let rowIndex = 1;
+
+              // Iterate over each sequencing run and its sample libraries
+              for (const sequencingRunId in data.sequencing_runs) {
+                  const sampleLibs = data.sequencing_runs[sequencingRunId];
+
+                  sampleLibs.forEach(sampleLib => {
+                      const row = document.createElement('tr');
+
+                      // Create cells for the row
+                      const checkboxCell = document.createElement('td');
+                      const sampleLibCell = document.createElement('td');
+                      const sequencingRunCell = document.createElement('td');
+
+                      // Create the checkbox
+                      const checkbox = document.createElement('input');
+                      checkbox.type = 'checkbox';
+                      checkbox.value = sampleLib.id;
+
+                      // Append the checkbox to the checkbox cell
+                      checkboxCell.appendChild(checkbox);
+
+                      // Set the cell values
+                      sampleLibCell.textContent = sampleLib.name;
+                      sequencingRunCell.textContent = sequencingRunId;
+
+                      // Append cells to the row
+                      row.appendChild(checkboxCell);
+                      row.appendChild(sampleLibCell);
+                      row.appendChild(sequencingRunCell);
+
+                      // Append the row to the tbody
+                      tbody.appendChild(row);
+                  });
+              }
+          }
+      }
+
       return {
         init: function () {
-          handleBatchDelete(), handleGenerateSheet(), uncheckedFirstCheckBox();
+          handleBatchDelete(), handleGenerateSheet(), uncheckedFirstCheckBox(), handleGenerateAnalysisSheet();
         }
       }
 
     })();
 
-
-    // loadingEl
     function loadingEl() {
         const loadingEl = document.createElement("div");
         document.body.prepend(loadingEl);

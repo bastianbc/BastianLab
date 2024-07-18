@@ -879,42 +879,41 @@ var KTDatatablesServerSide = function () {
 
 
         document.getElementById("create_sequencing_run").addEventListener('click', function (e) {
-        const container = document.querySelector('.table');
-        const selectedRows = container.querySelectorAll('[type="checkbox"]:checked');
-        const selectedIds = [];
-        selectedRows.forEach((p) => {
-          const parent = p.closest('tr');
-          const id = parent.querySelector('input[type=checkbox]').value;
-          selectedIds.push(id)
-        });
-        Swal.fire({
-              title: "<h3 style='color:dodgerblue'>" + "Add to an existing Sequencing Run?" + "</h3>",
-              showDenyButton: true,
-              confirmButtonText: "Yes Add!",
-              denyButtonText: "No, Create New One",
-              icon: "question",
-              buttonsStyling: true,
-              customClass: {
-                  confirmButton: "btn fw-bold btn-success",
-                  denyButton: "btn fw-bold btn-primary",
-                  title: "text-light"
-              }
-          }).then((result) => {
-              /* Read more about isConfirmed, isDenied below */
-              if (result.isConfirmed) {
-
-                var modal = new bootstrap.Modal(document.getElementById("add_to_seq_run"));
-                modal.show();
-                // location.reload()
-              } else if (result.isDenied){
-                  var modal = new bootstrap.Modal(document.getElementById("modal_sequencingrun_options"));
-                  modal.show();
-                  modal.hide();
-              }
+            const container = document.querySelector('.table');
+            const selectedRows = container.querySelectorAll('[type="checkbox"]:checked');
+            const selectedIds = [];
+            selectedRows.forEach((p) => {
+              const parent = p.closest('tr');
+              const id = parent.querySelector('input[type=checkbox]').value;
+              selectedIds.push(id)
             });
-        });
+            Swal.fire({
+                  title: "<h3 style='color:dodgerblue'>" + "Add to an existing Sequencing Run?" + "</h3>",
+                  showDenyButton: true,
+                  confirmButtonText: "Yes Add!",
+                  denyButtonText: "No, Create New One",
+                  icon: "question",
+                  buttonsStyling: true,
+                  customClass: {
+                      confirmButton: "btn fw-bold btn-success",
+                      denyButton: "btn fw-bold btn-primary",
+                      title: "text-light"
+                  }
+              }).then((result) => {
+                  /* Read more about isConfirmed, isDenied below */
+                  if (result.isConfirmed) {
 
-    }
+                    var modal = new bootstrap.Modal(document.getElementById("add_to_seq_run"));
+                    modal.show();
+                    // location.reload()
+                  } else if (result.isDenied){
+                      var modal = new bootstrap.Modal(document.getElementById("modal_sequencingrun_options"));
+                      modal.show();
+                      modal.hide();
+                  }
+                });
+            });
+      }
 
       function initSequencingSheetModal() {
           const stepper = new KTStepper(document.getElementById("modal_stepper"));
