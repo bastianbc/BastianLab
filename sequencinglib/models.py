@@ -2,6 +2,7 @@ from django.db import models
 from datetime import datetime
 from django.db.models import Q, Count
 from core.validators import validate_name_contains_space
+import json
 
 class SequencingLib(models.Model):
     BUFFER_TYPES = (
@@ -35,8 +36,7 @@ class SequencingLib(models.Model):
 
         def _parse_value(search_value):
             if "_initial:" in search_value:
-                v = search_value.split("_initial:")[1]
-                return None if v == "null" or not v.isnumeric() else v
+                return json.loads(search_value.split("_initial:")[1])
             return search_value
 
         def _is_initial_value(search_value):
@@ -54,6 +54,8 @@ class SequencingLib(models.Model):
             length = int(kwargs.get('length', None)[0])
             start = int(kwargs.get('start', None)[0])
             search_value = kwargs.get('search[value]', None)[0]
+            print("search_value:", "$" * 100)
+            print(search_value)
             order_column = kwargs.get('order[0][column]', None)[0]
             order = kwargs.get('order[0][dir]', None)[0]
 
@@ -68,9 +70,14 @@ class SequencingLib(models.Model):
 
             is_initial = _is_initial_value(search_value)
             search_value = _parse_value(search_value)
+            print("search_value:", "*"*100)
+            print(search_value)
             if is_initial:
-                filter = [cl_seql_link.sequencing_lib.id for cl_seql_link in CL_SEQL_LINK.objects.filter(captured_lib__id=search_value)]
-                queryset = queryset.filter(Q(id__in=filter))
+                if search_value["model"] == "sequencing_run":
+                    queryset = queryset.filter(Q(sequencing_runs__id=search_value["id"]))
+                if search_value["model"] == "captured_lib":
+                    filter = [cl_seql_link.sequencing_lib.id for cl_seql_link in CL_SEQL_LINK.objects.filter(captured_lib__id=search_value["id"])]
+                    queryset = queryset.filter(Q(id__in=filter))
             elif search_value:
                 queryset = queryset.filter(
                     Q(name__icontains=search_value) |

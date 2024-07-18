@@ -3,6 +3,7 @@ from datetime import datetime
 from django.db.models import Q, Count, OuterRef, Subquery, Value
 import json
 from core.validators import validate_name_contains_space
+from capturedlib.models import SL_CL_LINK
 
 class SampleLib(models.Model):
     name = models.CharField(max_length=50, unique=True, validators=[validate_name_contains_space], verbose_name="Name")
@@ -106,7 +107,8 @@ class SampleLib(models.Model):
 
             is_initial = _is_initial_value(search_value)
             search_value = _parse_value(search_value)
-
+            print("search_value:", "$" * 100)
+            print(search_value)
             if sequencing_run_filter:
                 from sequencingrun.models import SequencingRun
 
@@ -157,7 +159,8 @@ class SampleLib(models.Model):
                     pass
 
                 queryset = queryset.filter(Q(name__in=filter))
-
+            print("search_value:", "*"*100)
+            print(search_value)
             if is_initial:
                 if search_value["model"] == "nucacid":
                     filter = [na_sl_link.sample_lib.id for na_sl_link in NA_SL_LINK.objects.filter(nucacid=search_value["id"])]
@@ -165,6 +168,11 @@ class SampleLib(models.Model):
                 if search_value["model"] == "area":
                     filter = [na_sl_link.sample_lib.id for na_sl_link in NA_SL_LINK.objects.filter(nucacid__area_na_links__area=search_value["id"])]
                     queryset = queryset.filter(Q(id__in=filter))
+                if search_value["model"] == "captured_lib":
+                    filter = [sl_cl_link.sample_lib.id for sl_cl_link in
+                              SL_CL_LINK.objects.filter(captured_lib__id=search_value["id"])]
+                    queryset = queryset.filter(Q(id__in=filter))
+                    print(queryset)
             elif search_value:
                 queryset = queryset.filter(
                     Q(name__icontains=search_value)

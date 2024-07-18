@@ -103,7 +103,7 @@ var KTDatatablesServerSide = function () {
                         if (data > 0) {
                           let id = row["id"];
                           return `
-                              <a href="javascript:;" class="detail-link">${data}</a>`;
+                              <a href="/sequencinglib?model=sequencing_run&id=${id}&initial=true">${data}</a>`;
                         }
                         return data;
                     }

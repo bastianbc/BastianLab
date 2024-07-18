@@ -148,7 +148,7 @@ var KTDatatablesServerSide = function () {
                         if (data > 0) {
                           let id = row["id"];
                           return `
-                              <a href="/capturedlib?initial=${id}">${data}</a>`;
+                              <a href="/capturedlib?model=sample_lib&id=${id}&initial=true">${data}</a>`;
                         }
                         return data;
                     }

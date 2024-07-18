@@ -126,7 +126,6 @@ class Blocks(models.Model):
             return search_value
 
         def _is_initial_value(search_value):
-            print("search_value: ", search_value)
             '''
             When the datatables are to be filled with a certain data, the search function of datatables is used.
             The incoming parameter is parsed ve returned. If there is a initial value, the "search_value" has "_initial" prefix.
@@ -147,13 +146,7 @@ class Blocks(models.Model):
             return queryset.filter(Q(block_areas__ar_id=value))
 
         def _filter_by_samplelib(value):
-            # from samplelib.models import SampleLib
-            # sample_lib = SampleLib.objects.get(id=value)
-            # filter = [na_sl_link.nucacid.area.block.name for na_sl_link in sample_lib.na_sl_links.all()]
-            # queryset = queryset.filter(Q(block_areas__area_na_links__nucacid__na_sl_links__sample_lib__id=search_value["id"]))
-
             return queryset.filter(Q(block_areas__area_na_links__nucacid__na_sl_links__sample_lib__id=value))
-            # return queryset.filter(Q(name__in=filter))
 
         try:
             ORDER_COLUMN_CHOICES = {
@@ -171,7 +164,6 @@ class Blocks(models.Model):
             search_value = kwargs.get('search[value]', None)[0]
             p_stage = kwargs.get('p_stage', None)[0]
             prim = kwargs.get('prim', None)[0]
-            # collection = kwargs.get('collection', None)[0]
             body_site = kwargs.get('body_site', None)[0]
             order_column = kwargs.get('order[0][column]', None)[0]
             order = kwargs.get('order[0][dir]', None)[0]
@@ -195,10 +187,7 @@ class Blocks(models.Model):
                 queryset = queryset.filter(
                     Q(prim=prim)
                 )
-            # if collection:
-            #     queryset = queryset.filter(
-            #         Q(collection=collection)
-            #     )
+
             if body_site:
                 queryset = queryset.filter(
                     Q(body_site__id=body_site)
@@ -221,7 +210,6 @@ class Blocks(models.Model):
 
             count = queryset.count()
             queryset = queryset.order_by(order_column)[start:start + length]
-            # queryset = queryset[start:start + length]
             return {
                 'items': queryset,
                 'count': count,
