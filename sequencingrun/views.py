@@ -13,15 +13,11 @@ from samplelib.models import SampleLib
 from samplelib.serializers import SingleSampleLibSerializer
 from sequencingfile.models import SequencingFile,SequencingFileSet
 import sequencingrun.helper as helper
+from django.core.files.base import ContentFile
 
 @permission_required("sequencingrun.view_sequencingrun",raise_exception=True)
 def sequencingruns(request):
-    q = SequencingRun.objects.filter(name="BioSci6_BB58").annotate(
-                fff=Count('sequencing_file_sets__sequencing_files', distinct=True),
-                sss=Count('sequencing_file_sets', distinct=True),
-                num_sequencinglibs=Count("sequencing_libs", distinct=True),
-            )[0]
-    print(q.fff, q.sss, q.num_sequencinglibs, )
+    form = AnalysisRunForm(initial={"user":request.user})
     return render(request, "sequencingrun_list.html", locals())
 
 @permission_required_for_async("sequencingrun.view_sequencingrun")
@@ -230,17 +226,62 @@ def save_sequencing_files(request, id):
     return JsonResponse({"success": success})
 
 def get_sample_libs_async(request):
+    """
+    Provides the data needed to generate an analysis sheet. Returns a list that the sequencing run and the sample libraries that belong to it.
+    It can be worked on multiple sequencing runs selected by a user.
+    # Parameters:
+    selected_ids: List of Ids of selected and pushed sequencing runs.
+    # Returns:
+    A list data formatted according to purpose.
+    """
     selected_ids = json.loads(request.GET.get("selected_ids"))
 
     data = {}
 
-    for sequencing_run_id in sequencing_run_ids:
+    for selected_id in selected_ids:
+        sequencing_run = SequencingRun.objects.get(id=selected_id)
         sample_libs = SampleLib.objects.filter(
-            sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id=sequencing_run_id
+            sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id=selected_id
         ).distinct()
 
-        data[sequencing_run_id] = [
+        data[sequencing_run.name] = [
             {"id": sample_lib.id, "name": sample_lib.name} for sample_lib in sample_libs
         ]
 
+    data = {
+        "seqr1":[
+            {"id":1, "name":"sample_lib 1"},
+            {"id":2, "name":"sample_lib 2"},
+            {"id":3, "name":"sample_lib 3"},
+        ],
+        "seqr2":[
+            {"id":4, "name":"sample_lib 4"},
+            {"id":5, "name":"sample_lib 5"},
+        ],
+    }
+
     return JsonResponse(data)
+
+def save_analysis_run(request):
+    """
+    """
+    if request.method == "POST":
+        form = AnalysisRunForm(request.POST)
+        if form.is_valid():
+            # Formu kaydetmeden önce instance oluştur
+            analysis_run = form.save(commit=False)
+
+            sheet_content = form.cleaned_data['sheet_content']
+
+            # convert to csv
+            csv_file = ContentFile(sheet_content.encode('utf-8'))
+            file_name = f"{analysis_run.user.username}_analysis_sheet.csv"
+
+            # Dosyayı 'sheet' alanına kaydet
+            analysis_run.sheet.save(file_name, csv_file, save=False)
+
+            # AnalysisRun instance'ını kaydet
+            analysis_run.save()
+
+            return JsonResponse({"success": True})
+    return JsonResponse({"success": False})

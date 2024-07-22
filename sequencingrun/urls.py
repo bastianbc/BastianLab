@@ -23,4 +23,5 @@ urlpatterns = [
     path('<int:id>/get_sequencing_files', views.get_sequencing_files, name="get-sequencing-files"),
     path('<int:id>/save_sequencing_files', views.save_sequencing_files, name="save-sequencing-files"),
     path('get_sample_libs_async', views.get_sample_libs_async, name='get-sample-libs-async'),
+    path('save_analysis_run', views.save_analysis_run, name='save-analysis-run'),
 ] + staticfiles_urlpatterns()

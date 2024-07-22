@@ -16,3 +16,13 @@ class SequencingRunCreationForm(forms.Form):
     sequencer = forms.ChoiceField(choices=SequencingRun.SEQUENCER_TYPES)
     pe = forms.ChoiceField(choices=SequencingRun.PE_TYPES)
     amp_cycles = forms.IntegerField(initial=0)
+
+class AnalysisRunForm(BaseForm):
+    sheet_content = forms.CharField(widget=forms.HiddenInput())
+
+    class Meta:
+        model = AnalysisRun
+        fields = ("user", "pipeline", "genome")
+        widgets = {
+            "user": forms.HiddenInput(),
+        }

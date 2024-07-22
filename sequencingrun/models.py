@@ -3,6 +3,7 @@ from datetime import datetime
 from django.db.models import Q, Count
 import json
 from core.validators import validate_name_contains_space
+from django.contrib.auth.models import User
 
 class SequencingRun(models.Model):
     FACILITY_TYPES = (
@@ -131,3 +132,20 @@ class SequencingRun(models.Model):
         except Exception as e:
             print(str(e))
             raise
+
+class AnalysisRun(models.Model):
+    PIPELINE_CHOICES = (
+        ("v1", "V1"),
+    )
+
+    GENOME_CHOICES = (
+        ("hg19", "Hg19"),
+    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="analysis_runs")
+    pipeline = models.CharField(max_length=10, choices=PIPELINE_CHOICES, verbose_name = "Pipeline Version")
+    genome = models.CharField(max_length=10, choices=GENOME_CHOICES, verbose_name = "Reference Genome")
+    date = models.DateTimeField(auto_now_add=True)
+    sheet = models.FileField(upload_to="files/")
+
+    class Meta:
+        db_table = "analysis_run"

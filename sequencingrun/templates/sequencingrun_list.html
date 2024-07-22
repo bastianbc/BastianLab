@@ -332,7 +332,7 @@
       <!--begin::Modal header-->
       <div class="modal-header">
         <!--begin::Modal title-->
-        <h2>Generate Sequencing Sheet</h2>
+        <h2>Generate Analysis Sheet</h2>
         <!--end::Modal title-->
         <!--begin::Close-->
         <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
@@ -373,78 +373,78 @@
                 <!--end::Step 2-->
             </div>
             <!--end::Nav-->
-            <!--begin::Form-->
-            <form class="form mx-auto" novalidate="novalidate" action="">
-                <!--begin::Group-->
-                <div class="mb-5">
+            <!--begin::Group-->
+            <div class="mb-5">
 
-                    <!--begin::Step 1-->
-                    <div class="flex-column current" data-kt-stepper-element="content">
-                        <table class="mb-5">
-                            <thead>
-                            <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
-                                <th>#</th>
-                                <th>Sample Library</th>
-                                <th>Sequencing Run</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
+                <!--begin::Step 1-->
+                <div class="flex-column current" data-kt-stepper-element="content">
+                    <div id="analysis-sheet-list" class="d-flex flex-column gap-5">
+                        <div class="list-header">
+                          <div class="row text-light-dark bg-primary">
+                            <div class="col-1">#</div>
+                            <div class="col-5">Sample Library</div>
+                            <div class="col-6">Sequencing Run</div>
+                          </div>
+                        </div>
+                        <div class="list-body">
+
+                        </div>
                     </div>
-                    <!--end::Step 1-->
-
-                    <!--begin::Step 2-->
-                    <div class="flex-column" data-kt-stepper-element="content">
-
-                    </div>
-                    <!--end::Step 2-->
                 </div>
-                <!--end::Group-->
+                <!--end::Step 1-->
 
-                <!--begin::Actions-->
-                <div class="d-flex flex-stack">
-                    <!--begin::Wrapper-->
-                    <div class="me-2">
-                        <button type="button" class="btn btn-light btn-active-light-primary" data-kt-stepper-action="previous">
-                            Back
-                        </button>
-                    </div>
-                    <!--end::Wrapper-->
-
-                    <!--begin::Wrapper-->
-                    <div>
-                        <button type="button" class="btn btn-light-info fw-bold me-3 d-none" name="btn_export_sheet">
-                            <span class="indicator-label">
-                                Export Sample Sheet
-                            </span>
-                        </button>
-
-                        <button type="button" class="btn btn-success" data-kt-stepper-action="submit">
-                            <span class="indicator-label">
-                                Submit
-                            </span>
-                        </button>
-
-                        <button type="button" class="btn btn-primary" data-kt-stepper-action="next">
-                            <span class="indicator-label">
-                                Continue
-                            </span>
-                            <!--begin::Svg Icon | path: icons/duotune/arrows/arr064.svg-->
-                            <span class="svg-icon svg-icon-3 ms-1 me-0">
-                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <rect opacity="0.5" x="18" y="13" width="13" height="2" rx="1" transform="rotate(-180 18 13)" fill="currentColor" />
-                                <path d="M15.4343 12.5657L11.25 16.75C10.8358 17.1642 10.8358 17.8358 11.25 18.25C11.6642 18.6642 12.3358 18.6642 12.75 18.25L18.2929 12.7071C18.6834 12.3166 18.6834 11.6834 18.2929 11.2929L12.75 5.75C12.3358 5.33579 11.6642 5.33579 11.25 5.75C10.8358 6.16421 10.8358 6.83579 11.25 7.25L15.4343 11.4343C15.7467 11.7467 15.7467 12.2533 15.4343 12.5657Z" fill="currentColor" />
-                              </svg>
-                            </span>
-                            <!--end::Svg Icon-->
-                        </button>
-                    </div>
-                    <!--end::Wrapper-->
+                <!--begin::Step 2-->
+                <div class="flex-column" data-kt-stepper-element="content">
+                    <form id="form-analysis-run" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ form }}
+                    </form>
                 </div>
-                <!--end::Actions-->
-            </form>
-            <!--end::Form-->
+                <!--end::Step 2-->
+            </div>
+            <!--end::Group-->
+
+            <!--begin::Actions-->
+            <div class="d-flex flex-stack">
+                <!--begin::Wrapper-->
+                <div class="me-2">
+                    <button type="button" class="btn btn-light btn-active-light-primary" data-kt-stepper-action="previous">
+                        Back
+                    </button>
+                </div>
+                <!--end::Wrapper-->
+
+                <!--begin::Wrapper-->
+                <div>
+                    <button type="button" class="btn btn-light-info fw-bold me-3 d-none" name="btn_export_sheet">
+                        <span class="indicator-label">
+                            Export Sample Sheet
+                        </span>
+                    </button>
+
+                    <button type="button" class="btn btn-success" data-kt-stepper-action="submit">
+                        <span class="indicator-label">
+                            Submit
+                        </span>
+                    </button>
+
+                    <button type="button" class="btn btn-primary" data-kt-stepper-action="next">
+                        <span class="indicator-label">
+                            Continue
+                        </span>
+                        <!--begin::Svg Icon | path: icons/duotune/arrows/arr064.svg-->
+                        <span class="svg-icon svg-icon-3 ms-1 me-0">
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect opacity="0.5" x="18" y="13" width="13" height="2" rx="1" transform="rotate(-180 18 13)" fill="currentColor" />
+                            <path d="M15.4343 12.5657L11.25 16.75C10.8358 17.1642 10.8358 17.8358 11.25 18.25C11.6642 18.6642 12.3358 18.6642 12.75 18.25L18.2929 12.7071C18.6834 12.3166 18.6834 11.6834 18.2929 11.2929L12.75 5.75C12.3358 5.33579 11.6642 5.33579 11.25 5.75C10.8358 6.16421 10.8358 6.83579 11.25 7.25L15.4343 11.4343C15.7467 11.7467 15.7467 12.2533 15.4343 12.5657Z" fill="currentColor" />
+                          </svg>
+                        </span>
+                        <!--end::Svg Icon-->
+                    </button>
+                </div>
+                <!--end::Wrapper-->
+            </div>
+            <!--end::Actions-->
         </div>
         <!--end::Stepper-->
       </div>

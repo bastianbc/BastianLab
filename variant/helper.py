@@ -1,6 +1,6 @@
 import pandas as pd
 from django.db import transaction
-from .models import VariantCall, GVariant, CVariant, PVariant, RunAnalysis
+from .models import VariantCall, GVariant, CVariant, PVariant
 import re
 
 def extract_caller_from_filename(filename):

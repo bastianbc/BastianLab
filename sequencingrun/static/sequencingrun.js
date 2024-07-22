@@ -873,48 +873,130 @@ var KTDatatablesServerSide = function () {
               }).done(function (result) {
                   populateTable(result);
                   modal.show();
+                  initModalEvents();
               });
           }
 
           function populateTable(data) {
-              console.log(data);
-
-              const tbody = document.querySelector('table tbody');
+              const listBody = document.querySelector('#analysis-sheet-list .list-body');
               let rowIndex = 1;
 
-              // Iterate over each sequencing run and its sample libraries
-              for (const sequencingRunId in data.sequencing_runs) {
-                  const sampleLibs = data.sequencing_runs[sequencingRunId];
+              for (const sequencingRunName in data) {
+                  const sampleLibs = data[sequencingRunName];
 
                   sampleLibs.forEach(sampleLib => {
-                      const row = document.createElement('tr');
+                      // Create elements for the row and its columns
+                      var row = document.createElement("div");
+                      row.classList.add("row","mt-1");
 
-                      // Create cells for the row
-                      const checkboxCell = document.createElement('td');
-                      const sampleLibCell = document.createElement('td');
-                      const sequencingRunCell = document.createElement('td');
+                      var col1 = document.createElement("div");
+                      col1.classList.add("col-1");
+                      var checkDiv = document.createElement("div");
+                      checkDiv.classList.add("form-check", "form-check-sm");
+                      var input = document.createElement("input");
+                      input.type = "checkbox";
+                      input.classList.add("form-check-input");
+                      input.value = sampleLib.id;
+                      input.checked = true;
+                      checkDiv.append(input);
+                      col1.appendChild(checkDiv);
 
-                      // Create the checkbox
-                      const checkbox = document.createElement('input');
-                      checkbox.type = 'checkbox';
-                      checkbox.value = sampleLib.id;
+                      var col2 = document.createElement("div");
+                      col2.classList.add("col-5");
+                      var span = document.createElement("span");
+                      span.textContent = sampleLib.name;
+                      col2.appendChild(span);
 
-                      // Append the checkbox to the checkbox cell
-                      checkboxCell.appendChild(checkbox);
+                      var col3 = document.createElement("div");
+                      col3.classList.add("col-6");
+                      var span = document.createElement("span");
+                      span.textContent = sequencingRunName;
+                      col3.appendChild(span)
 
-                      // Set the cell values
-                      sampleLibCell.textContent = sampleLib.name;
-                      sequencingRunCell.textContent = sequencingRunId;
+                      // Append columns to the row
+                      row.appendChild(col1);
+                      row.appendChild(col2);
+                      row.appendChild(col3);
 
-                      // Append cells to the row
-                      row.appendChild(checkboxCell);
-                      row.appendChild(sampleLibCell);
-                      row.appendChild(sequencingRunCell);
-
-                      // Append the row to the tbody
-                      tbody.appendChild(row);
+                      // Append the row to the list
+                      listBody.appendChild(row);
                   });
               }
+          }
+
+          function generateCSV() {
+              const rows = document.querySelectorAll('#analysis-sheet-list .list-body .row');
+              let csvContent = "ID,Name,Sequencing Run Name\n";
+
+              rows.forEach(row => {
+                  const checkbox = row.querySelector('input[type="checkbox"]');
+                  if (checkbox.checked) {
+                      const id = checkbox.value;
+                      const name = row.querySelector('.col-5 span').textContent;
+                      const sequencingRunName = row.querySelector('.col-6 span').textContent;
+                      csvContent += `${id},${name},${sequencingRunName}\n`;
+                  }
+              });
+
+              const sheetContent = document.querySelector('input[name="sheet_content"]');
+              sheetContent.value = csvContent;
+          }
+
+          function submitForm() {
+              generateCSV();
+
+              const formData = new FormData(document.getElementById('form-analysis-run'));
+
+              $.ajax({
+                  url: "/sequencingrun/save_analysis_run",
+                  type: "POST",
+                  headers: {
+                      'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value
+                  },
+                  data: formData,
+                  processData: false,
+                  contentType: false,
+                  success: function (data) {
+                      if (data.success) {
+                          Swal.fire({
+                              text: "Run analysis created and a CSV file saved.",
+                              icon: "success",
+                              buttonsStyling: false,
+                              confirmButtonText: "Ok, got it!",
+                              customClass: {
+                                  confirmButton: "btn fw-bold btn-primary",
+                              }
+                          });
+                      }
+                      else {
+                          Swal.fire({
+                              text: "An error occurred.The operation could not be performed.",
+                              icon: "error",
+                              buttonsStyling: false,
+                              confirmButtonText: "Ok, got it!",
+                              customClass: {
+                                  confirmButton: "btn fw-bold btn-primary",
+                              }
+                          });
+                      }
+                  },
+                  error: function (xhr, ajaxOptions, thrownError) {
+
+                  }
+              });
+          }
+
+          function initModalEvents() {
+              // clean data when it closed
+              modalElement.addEventListener('hide.bs.modal', function(){
+                  const listBody = document.querySelector('#analysis-sheet-list .list-body');
+                  listBody.innerHTML = "";
+              });
+
+              // submit button
+              document.querySelector('[data-kt-stepper-action="submit"]').addEventListener("click", function () {
+                  submitForm();
+              });
           }
       }
 
