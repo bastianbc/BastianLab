@@ -248,17 +248,17 @@ def get_sample_libs_async(request):
             {"id": sample_lib.id, "name": sample_lib.name} for sample_lib in sample_libs
         ]
 
-    data = {
-        "seqr1":[
-            {"id":1, "name":"sample_lib 1"},
-            {"id":2, "name":"sample_lib 2"},
-            {"id":3, "name":"sample_lib 3"},
-        ],
-        "seqr2":[
-            {"id":4, "name":"sample_lib 4"},
-            {"id":5, "name":"sample_lib 5"},
-        ],
-    }
+    # data = {
+    #     "seqr1":[
+    #         {"id":1, "name":"sample_lib 1"},
+    #         {"id":2, "name":"sample_lib 2"},
+    #         {"id":3, "name":"sample_lib 3"},
+    #     ],
+    #     "seqr2":[
+    #         {"id":4, "name":"sample_lib 4"},
+    #         {"id":5, "name":"sample_lib 5"},
+    #     ],
+    # }
 
     return JsonResponse(data)
 
