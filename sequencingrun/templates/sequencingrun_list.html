@@ -324,9 +324,9 @@
 <!--end::Modal -->
 
 <!--begin::Modal - Sequencing Sheet-->
-<div class="modal fade" id="modal_analysis_sheet" tabindex="-1" aria-hidden="true">
+<div class="modal modal-xl fade" id="modal_analysis_sheet" tabindex="-1" aria-hidden="true">
   <!--begin::Modal dialog-->
-  <div class="modal-dialog modal-dialog-centered mw-500px">
+  <div class="modal-dialog modal-dialog-centered">
     <!--begin::Modal content-->
     <div class="modal-content">
       <!--begin::Modal header-->
@@ -382,8 +382,17 @@
                         <div class="list-header">
                           <div class="row text-light-dark bg-primary">
                             <div class="col-1">#</div>
-                            <div class="col-5">Sample Library</div>
-                            <div class="col-6">Sequencing Run</div>
+                            <div class="col-1">Patient</div>
+                            <div class="col-1">Sample Lib</div>
+                            <div class="col-1">Barcode</div>
+                            <div class="col-1">NA Type</div>
+                            <div class="col-1">Area Type</div>
+                            <div class="col-1">Sequencing Run</div>
+                            <div class="col-1">Footprint</div>
+                            <div class="col-1">File</div>
+                            <div class="col-1">Path</div>
+                            <div class="col-1">Matching Normal SL</div>
+                            <div class="col-1">Error</div>
                           </div>
                         </div>
                         <div class="list-body">
@@ -397,7 +406,11 @@
                 <div class="flex-column" data-kt-stepper-element="content">
                     <form id="form-analysis-run" method="post" enctype="multipart/form-data">
                         {% csrf_token %}
-                        {{ form }}
+                        <div class="row">
+                            <div class="col-6">
+                                {{ form }}
+                            </div>
+                        </div>
                     </form>
                 </div>
                 <!--end::Step 2-->

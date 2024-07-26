@@ -878,66 +878,73 @@ var KTDatatablesServerSide = function () {
           }
 
           function populateTable(data) {
-              const listBody = document.querySelector('#analysis-sheet-list .list-body');
-              let rowIndex = 1;
-
-              for (const sequencingRunName in data) {
-                  const sampleLibs = data[sequencingRunName];
-
-                  sampleLibs.forEach(sampleLib => {
-                      // Create elements for the row and its columns
-                      var row = document.createElement("div");
-                      row.classList.add("row","mt-1");
-
-                      var col1 = document.createElement("div");
-                      col1.classList.add("col-1");
-                      var checkDiv = document.createElement("div");
-                      checkDiv.classList.add("form-check", "form-check-sm");
-                      var input = document.createElement("input");
-                      input.type = "checkbox";
-                      input.classList.add("form-check-input");
-                      input.value = sampleLib.id;
-                      input.checked = true;
-                      checkDiv.append(input);
-                      col1.appendChild(checkDiv);
-
-                      var col2 = document.createElement("div");
-                      col2.classList.add("col-5");
-                      var span = document.createElement("span");
-                      span.textContent = sampleLib.name;
-                      col2.appendChild(span);
-
-                      var col3 = document.createElement("div");
-                      col3.classList.add("col-6");
-                      var span = document.createElement("span");
-                      span.textContent = sequencingRunName;
-                      col3.appendChild(span)
-
-                      // Append columns to the row
-                      row.appendChild(col1);
-                      row.appendChild(col2);
-                      row.appendChild(col3);
-
-                      // Append the row to the list
-                      listBody.appendChild(row);
-                  });
+              function createCheckboxColumn() {
+                  const col = document.createElement("div");
+                  col.classList.add("col-1");
+                  const checkDiv = document.createElement("div");
+                  checkDiv.classList.add("form-check", "form-check-sm");
+                  const input = document.createElement("input");
+                  input.type = "checkbox";
+                  input.classList.add("form-check-input");
+                  input.checked = true;
+                  checkDiv.append(input);
+                  col.appendChild(checkDiv);
+                  return col;
               }
+
+              function createColumn(content, className = "col-1") {
+                  const col = document.createElement("div");
+                  col.classList.add(className);
+                  const span = document.createElement("span");
+                  span.textContent = content;
+                  col.appendChild(span);
+                  return col;
+              }
+
+              const listBody = document.querySelector('#analysis-sheet-list .list-body');
+
+              data.forEach(item => {
+                  const row = document.createElement("div");
+                  row.classList.add("row", "mt-1");
+
+                  row.appendChild(createCheckboxColumn());
+                  row.appendChild(createColumn(item.patient));
+                  row.appendChild(createColumn(item.sample_lib));
+                  row.appendChild(createColumn(item.barcode));
+                  row.appendChild(createColumn(item.na_type));
+                  row.appendChild(createColumn(item.area_type));
+                  row.appendChild(createColumn(item.sequencing_run));
+                  row.appendChild(createColumn(item.footprint));
+                  row.appendChild(createColumn(item.file));
+                  row.appendChild(createColumn(item.path));
+                  row.appendChild(createColumn(item.matching_normal_sl));
+                  row.appendChild(createColumn(item.err));
+
+                  listBody.appendChild(row);
+            });
           }
 
           function generateCSV() {
+              // Extract header text
+              const headerCells = document.querySelectorAll('#analysis-sheet-list .list-header .row div');
+              const headers = Array.from(headerCells).map(header => header.textContent.trim());
+              let csvContent = headers.join(',') + '\n';
+
+              // Extract row data
               const rows = document.querySelectorAll('#analysis-sheet-list .list-body .row');
-              let csvContent = "ID,Name,Sequencing Run Name\n";
 
               rows.forEach(row => {
                   const checkbox = row.querySelector('input[type="checkbox"]');
                   if (checkbox.checked) {
-                      const id = checkbox.value;
-                      const name = row.querySelector('.col-5 span').textContent;
-                      const sequencingRunName = row.querySelector('.col-6 span').textContent;
-                      csvContent += `${id},${name},${sequencingRunName}\n`;
+                      const columns = row.querySelectorAll('div:not(.col-1) span');
+                      console.log(columns);
+                      const rowData = Array.from(columns).map(col => col.textContent.trim()).join(',');
+                      console.log("xx: ",rowData);
+                      csvContent += `${rowData}\n`;
                   }
               });
 
+              // Set the CSV content to the hidden input field
               const sheetContent = document.querySelector('input[name="sheet_content"]');
               sheetContent.value = csvContent;
           }
