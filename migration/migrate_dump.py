@@ -328,6 +328,7 @@ class MigrateDump():
             SELECT n.*, nl.*, a.name FROM AREAS a
             LEFT JOIN area_na_link nl on nl.area_id = a.ar_id
             LEFT JOIN nuc_acids n on n.nu_id = nl.nucacid_id
+            WHERE nucacid_id is not NULL
             order by n.name
         '''
         sql2 = '''
