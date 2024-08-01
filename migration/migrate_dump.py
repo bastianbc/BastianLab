@@ -21,8 +21,8 @@ from psycopg2 import OperationalError
 
 
 class MigrateDump():
-    database_name = "migration_dump3"
-    database_user = "cbagi"
+    database_name = "migration3_dump"
+    database_user = "testuser"
     database_password = '1235'
     database_host = "localhost"
     database_port = "5432"
@@ -93,6 +93,7 @@ class MigrateDump():
             try:
                 # print(row)
                 # print(row[0])
+                # patient = Patients.objects.get(pat_id=row[0])
                 patient, created = Patients.objects.get_or_create(
                     pat_id=row[0]
                 )
@@ -109,8 +110,7 @@ class MigrateDump():
                 # patient.pa_id = row[7]
                 patient.pat_ip_id = row[9] or ""
                 patient.save()
-                # patient = get_or_create(Patients, pat_id=row[0])
-                print(patient)
+                # print(patient, "saved")
             except Exception as e:
                 print(row[0], e)
 
@@ -564,6 +564,7 @@ if __name__ == "__main__":
     # m = MigrateDump.register_areas()
     # m = MigrateDump.register_nuc_acids()
     # m = MigrateDump.register_samplelib()
-    m = MigrateDump.register_captured_lib_and_so()
+    # m = MigrateDump.register_captured_lib_and_so()
+    m = MigrateDump.register_patients()
     print("===FIN===")
     # res = m.cursor("SELECT * FROM patients")
