@@ -234,7 +234,9 @@ class MigrateDump():
             try:
                 if row[0] != None:
                     block = Blocks.objects.get(name=row[-2].strip())
-                    area, _ = Areas.objects.get_or_create(name=row[1], block=block)
+                    area, _ = Areas.objects.get_or_create(name=row[1])
+                    area.block = block
+                    area.save()
                     if row[2] != None:
                         area.area_type = MigrateDump.get_area_type(row[2])
                     area.image = row[4]
