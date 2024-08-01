@@ -196,8 +196,8 @@ class MigrateDump():
                 block.gross = row[18]
                 block.clinical = row[19]
                 block.old_body_site = row[21]
-                if row[22] != None:
-                    block.collection = MigrateDump.get_collection(row[22])
+                # if row[22] != None:
+                #     block.collection = MigrateDump.get_collection(row[22])
                 block.path_note = row[23]
                 block.ip_dx = row[24]
                 if row[-3] != None:
@@ -561,10 +561,11 @@ class MigrateDump():
 
 
 if __name__ == "__main__":
+    # m = MigrateDump.register_patients()
+    m = MigrateDump.register_blocks()
     # m = MigrateDump.register_areas()
     # m = MigrateDump.register_nuc_acids()
     # m = MigrateDump.register_samplelib()
     # m = MigrateDump.register_captured_lib_and_so()
-    m = MigrateDump.register_patients()
     print("===FIN===")
     # res = m.cursor("SELECT * FROM patients")
