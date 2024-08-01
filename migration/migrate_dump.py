@@ -345,7 +345,7 @@ class MigrateDump():
         '''
         rows = MigrateDump().cursor(sql)
         # rows2 = MigrateDump().cursor(sql2)
-        # rows3 = MigrateDump().cursor(sql3)
+        rows3 = MigrateDump().cursor(sql3)
         for row in rows:
             try:
                 # print(row)
@@ -391,13 +391,13 @@ class MigrateDump():
         #         nuc_acid.save()
         #     except Exception as e:
         #         print(e, row[1])
-        # for row in rows3:
-        #     try:
-        #         area = Areas.objects.get(name=row[-2])
-        #         na = NucAcids.objects.get(name=row[-1])
-        #         link = AREA_NA_LINK.objects.get_or_create(area=area, nucacid=na)
-        #     except Exception as e:
-        #         print(e,row[1],row[-1])
+        for row in rows3:
+            try:
+                area = Areas.objects.get(name=row[-2])
+                na = NucAcids.objects.get(name=row[-1])
+                link = AREA_NA_LINK.objects.get_or_create(area=area, nucacid=na)
+            except Exception as e:
+                print(e,row[1],row[-1])
 
     @staticmethod
     def get_barcode(sl):
