@@ -347,7 +347,7 @@ class MigrateDump():
         rows2 = MigrateDump().cursor(sql2)
         rows3 = MigrateDump().cursor(sql3)
         for row in rows:
-            try:
+            # try:
                 # print(row)
                 if row[-1] != None:
                     area = Areas.objects.get(name=row[-1])
@@ -370,8 +370,8 @@ class MigrateDump():
                     nuc_acid.vol_remain = row[6]
                 nuc_acid.notes = row[7]
                 nuc_acid.save()
-            except Exception as e:
-                print(e, row[1], row[-1])
+            # except Exception as e:
+            #     print(e, row[1], row[-1])
         for row in rows2:
             try:
                 if row[3] != None:
@@ -419,7 +419,7 @@ class MigrateDump():
     def register_barcode(row, sl):
         try:
             if row[12]:
-                barcode = Barcode.objects.get(name=row[12].strip())
+                barcode= Barcode.objects.get(name=row[12].strip())
                 sl.barcode = barcode or None
                 sl.save()
             else:
@@ -427,7 +427,7 @@ class MigrateDump():
                 sl.barcode = barcode or None
                 sl.save()
         except:
-            print(f"Barcode not found for {sl.name}")
+            print(f"{row[12].strip()} Barcode not found for {sl.name}")
 
 
     @staticmethod
@@ -450,57 +450,45 @@ class MigrateDump():
         for row in rows:
             try:
                 nas = row[-1].split(',')
-                sl = SampleLib.objects.get(name=row[-2])
+                sl,_ = SampleLib.objects.get_or_create(name=row[-2])
                 for na in nas:
                     nuc_acid = NucAcids.objects.get(name=na.strip())
                     NA_SL_LINK.objects.get_or_create(sample_lib=sl, nucacid=nuc_acid)
             except Exception as e:
-                print(e)
+                print(e, nas)
 
-        # for row in rows2:
-        #     try:
-        #         if "uffy" in row[1]:
-        #             sl = SampleLib.objects.get(name="Buffy_Coat")
-        #         elif row[1].startswith("H12_") or row[1].startswith("T12_"):
-        #             continue
-        #         else:
-        #             sl, _ = SampleLib.objects.get_or_create(name=row[1].strip())
-        #         if row[2]:
-        #             sl.date = row[2]
-        #         sl.qubit = row[3] or 0
-        #         sl.shear_volume = row[4] or 0
-        #         sl.qpcr_conc = row[5] or 0
-        #         sl.pcr_cycles = row[6] or 0
-        #         sl.amount_in = row[7] or 0
-        #         sl.amount_final = row[8] or 0
-        #         sl.vol_init = row[9] or 0
-        #         sl.vol_remain = row[10] or 0
-        #         if row[11]:
-        #             sl.notes = row[11]
-        #         else:
-        #             sl.notes = ""
-        #         sl.save()
-        #         if not " migration_dump" in sl.notes:
-        #             sl.notes = sl.notes + " migration_dump"
-        #         sl.save()
-        #         MigrateDump.register_barcode(row, sl)
-        #     except Exception as e:
-        #         print(e, row[1],row[-3])
-        # for row in rows3:
-        #     try:
-        #         if "uffy" in row[-2]:
-        #             sl = SampleLib.objects.get(name="Buffy_Coat")
-        #         elif row[-2].startswith("H12_") or row[-2].startswith("T12_"):
-        #             continue
-        #         else:
-        #             sl, _ = SampleLib.objects.get_or_create(name=row[-2].strip())
-        #         na = NucAcids.objects.get(name=row[-3])
-        #         link, _ = NA_SL_LINK.objects.get_or_create(sample_lib=sl, nucacid=na)
-        #         link.input_vol = row[1] or 0
-        #         link.input_amount = row[2] or 0
-        #         link.save()
-        #     except Exception as e:
-        #         print(e, row[-2],row[-3])
+        for row in rows2:
+            try:
+                if "uffy" in row[1]:
+                    sl = SampleLib.objects.get(name="Buffy_Coat")
+                elif row[1].startswith("H12_") or row[1].startswith("T12_"):
+                    continue
+                else:
+                    sl, _ = SampleLib.objects.get_or_create(name=row[1].strip())
+                if row[2]:
+                    sl.date = row[2]
+                sl.qubit = row[3] or 0
+                sl.shear_volume = row[4] or 0
+                sl.qpcr_conc = row[5] or 0
+                sl.pcr_cycles = row[6] or 0
+                sl.amount_in = row[7] or 0
+                sl.amount_final = row[8] or 0
+                sl.vol_init = row[9] or 0
+                sl.vol_remain = row[10] or 0
+                if row[11]:
+                    sl.notes = row[11]
+                else:
+                    sl.notes = ""
+                sl.save()
+                if not " migration_dump" in sl.notes:
+                    sl.notes = sl.notes + " migration_dump"
+                sl.save()
+                if row[12] != None:
+                    MigrateDump.register_barcode(row, sl)
+            except Exception as e:
+                print(e, row[1],row[-3])
+
+
 
     @staticmethod
     def register_captured_lib_and_so():
@@ -575,8 +563,8 @@ if __name__ == "__main__":
     # m = MigrateDump.register_patients()
     # m = MigrateDump.register_blocks()
     # m = MigrateDump.register_areas()
-    m = MigrateDump.register_nuc_acids()
-    # m = MigrateDump.register_samplelib()
+    # m = MigrateDump.register_nuc_acids()
+    m = MigrateDump.register_samplelib()
     # m = MigrateDump.register_captured_lib_and_so()
     print("===FIN===")
     # res = m.cursor("SELECT * FROM patients")
