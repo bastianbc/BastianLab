@@ -226,6 +226,10 @@ class MigrateDump():
         LEFT JOIN blocks b on l.block = b.bl_id
         '''
         rows = MigrateDump().cursor(sql)
+
+        sql2 = '''SELECT * FROM AREAS'''
+        rows2 = MigrateDump().cursor(sql2)
+
         for row in rows:
             try:
                 if row[0] != None:
@@ -247,9 +251,9 @@ class MigrateDump():
                     if row[2] != None:
                         area.area_type = MigrateDump.get_area_type(row[2])
                     area.image = row[4]
-                    area.notes = row[5] + " additional blocks: " + row[6]
+                    area.notes = str(row[5]) + " additional blocks: " + str(row[6])
                     area.save()
-                    print(block)
+                    print(block,"^^^^")
                 except Exception as e:
                     print(e)
         # for row in rows2:
@@ -260,48 +264,50 @@ class MigrateDump():
         #         area.image = row[4]
         #         area.notes = row[5]
         #         area.save()
-                # if not area:
-                #     print(row[1], " - ", row[-1])
-                #     block = Blocks.objects.get(name=row[-1].strip())
-                #     # if "," in row[-1]:
-                #     #     for i in row[-1].split(","):
-                #     #         print(i)
-                #     #         block = Blocks.objects.get(name=i)
-                #     area, _ = Areas.objects.get_or_create(name=row[1],block=block)
-                #     if row[2] != None:
-                #         area.area_type = MigrateDump.get_area_type(row[2])
-                #     area.image = row[4]
-                #     area.notes = row[5]
-                #     if row[2] != None:
-                #         area.area_type = MigrateDump.get_area_type(row[2])
-                #     area.image = row[4]
-                #     area.notes = row[5]
-                #     area.save()
-                # else:
-                #     if "," in row[-1]:
-                #         for i in row[-1].split(","):
-                #             # print("%%%",i)
-                #             block = Blocks.objects.get(name=i)
-                #             area = Areas.objects.get(name=row[1])
-                #             area.block=block
-                #             if row[2] != None:
-                #                 area.area_type = MigrateDump.get_area_type(row[2])
-                #             area.image = row[4]
-                #             area.notes = row[5]
-                #             area.save()
-                #     else:
-                #         # print("iii")
-                #         block = MigrateDump.get_or_none(Blocks, name=row[-1])
-                #         if not block:
-                #             block = MigrateDump.get_or_none(Blocks, name="BB"+row[-1])
-                #         if block:
-                #             area = Areas.objects.get(name=row[1])
-                #             area.block = block
-                #             if row[2] != None:
-                #                 area.area_type = MigrateDump.get_area_type(row[2])
-                #             area.image = row[4]
-                #             area.notes = row[5]
-                #             area.save()
+        #         if not area:
+        #             print(row[1], " - ", row[-1])
+        #             block = Blocks.objects.get(name=row[-1].strip())
+        #             # if "," in row[-1]:
+        #             #     for i in row[-1].split(","):
+        #             #         print(i)
+        #             #         block = Blocks.objects.get(name=i)
+        #             area, _ = Areas.objects.get_or_create(name=row[1],block=block)
+        #             if row[2] != None:
+        #                 area.area_type = MigrateDump.get_area_type(row[2])
+        #             area.image = row[4]
+        #             area.notes = row[5]
+        #             if row[2] != None:
+        #                 area.area_type = MigrateDump.get_area_type(row[2])
+        #             area.image = row[4]
+        #             area.notes = row[5]
+        #             area.save()
+        #         else:
+        #             print(row)
+        #             print(row[-1])
+        #             if "," in row[-1]:
+        #                 for i in row[-1].split(","):
+        #                     # print("%%%",i)
+        #                     block = Blocks.objects.get(name=i)
+        #                     area = Areas.objects.get(name=row[1])
+        #                     area.block=block
+        #                     if row[2] != None:
+        #                         area.area_type = MigrateDump.get_area_type(row[2])
+        #                     area.image = row[4]
+        #                     area.notes = row[5]
+        #                     area.save()
+        #             else:
+        #                 # print("iii")
+        #                 block = MigrateDump.get_or_none(Blocks, name=row[-1])
+        #                 if not block:
+        #                     block = MigrateDump.get_or_none(Blocks, name="BB"+row[-1])
+        #                 if block:
+        #                     area = Areas.objects.get(name=row[1])
+        #                     area.block = block
+        #                     if row[2] != None:
+        #                         area.area_type = MigrateDump.get_area_type(row[2])
+        #                     area.image = row[4]
+        #                     area.notes = row[5]
+        #                     area.save()
             # except Exception as e:
             #     print("{} area:{}, block{}".format(e, row[1], row[-1]))
 
@@ -562,8 +568,8 @@ class MigrateDump():
 
 if __name__ == "__main__":
     # m = MigrateDump.register_patients()
-    m = MigrateDump.register_blocks()
-    # m = MigrateDump.register_areas()
+    # m = MigrateDump.register_blocks()
+    m = MigrateDump.register_areas()
     # m = MigrateDump.register_nuc_acids()
     # m = MigrateDump.register_samplelib()
     # m = MigrateDump.register_captured_lib_and_so()
