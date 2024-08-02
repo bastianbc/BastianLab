@@ -50,4 +50,5 @@ urlpatterns = [
     path("upload_file_tree_all_md5_3", views.upload_file_tree_all_md5_3, name="upload_file_tree_all_md5_3"),
     path("match_seq_runs_with_dffq", views.match_seq_runs_with_dffq, name="match_seq_runs_with_dffq"),
     path('match_sl_fastq_file', views.match_sl_fastq_file, name='match_sl_fastq_file'),
+    path('generate_file_set', views.generate_file_set, name='generate_file_set'),
 ]
