@@ -3540,3 +3540,33 @@ def import_bait(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
     df = pd.read_csv(file)
     df.apply(lambda row: im_bait(row), axis=1)
+
+def match_respectively_via_names(sl,match):
+    if sl.name.startswith(tuple(["16","19","20","21","22","23","24","25"])):
+        if sl.name.startswith(tuple(["21_5","24_5_Norm","28"])):
+            return
+        # print(sl.name)
+        for file in match:
+            print(match, sl)
+            file_set = file.sequencing_file_set
+            print(file_set.sample_lib,file_set.sequencing_run, file_set.path)
+            file_set.sample_lib = sl
+            file_set.save()
+
+def match_sl_fastq_file(request):
+    sls = SampleLib.objects.filter(sequencing_file_sets__isnull=True).order_by("name")
+    data=[]
+    for sl in sls:
+        match = SequencingFile.objects.filter(name__icontains=sl.name)
+        if match:
+            match_respectively_via_names(sl,match)
+            row = {
+                "sample_lib": sl.name,
+                "file": match
+            }
+            data.append(row)
+
+
+    df = pd.DataFrame(data)
+    df.to_csv("result.csv",index=False)
+    print("--FIN--")

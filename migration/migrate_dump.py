@@ -517,6 +517,22 @@ class MigrateDump():
             cl = CapturedLib.objects.get(name="SGPC-04")
             link, _ = SL_CL_LINK.objects.get_or_create(captured_lib=cl, sample_lib=sl)
 
+    @staticmethod
+    def find_seq_runs_for_non_sl_cl_relation():
+        file = Path(Path(__file__).parent.parent / "uploads" / "data-1722566158414.csv")
+        df = pd.read_csv(file)
+        df = df.reset_index()  # make sure indexes pair with number of rows
+        file = Path(Path(__file__).parent.parent / "uploads" / "df_fq.csv")
+        df_fq = pd.read_csv(file)
+        df_fq = df_fq.reset_index()  # make sure indexes pair with number of rows
+
+        for index, row in df.iterrows():
+            try:
+                sl = SampleLib.objects.get(name=row['sample_lib'])
+                s = df_fq[df_fq['file'].str.contains(row['sample_lib'])]["path"].values[0]
+                print(s.split('/')[1])
+            except Exception as e:
+                print(e)
 
     @staticmethod
     def register_captured_lib_and_so():
@@ -593,7 +609,8 @@ if __name__ == "__main__":
     # m = MigrateDump.register_areas()
     # m = MigrateDump.register_nuc_acids()
     # m = MigrateDump.register_samplelib()
-    m = MigrateDump.register_capturedlib()
+    # m = MigrateDump.register_capturedlib()
+    m = MigrateDump.find_seq_runs_for_non_sl_cl_relation()
     # m = MigrateDump.register_captured_lib_and_so()
     print("===FIN===")
     # res = m.cursor("SELECT * FROM patients")
