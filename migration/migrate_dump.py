@@ -18,6 +18,8 @@ import random
 import re
 import psycopg2
 from psycopg2 import OperationalError
+from pathlib import Path
+import pandas as pd
 
 
 class MigrateDump():
@@ -489,6 +491,32 @@ class MigrateDump():
                 print(e, row[1],row[-3])
 
 
+    @staticmethod
+    def register_capturedlib():
+        file = Path(Path(__file__).parent.parent / "uploads" / "sl-cl-match_from_AT_CD.csv")
+        df = pd.read_csv(file)
+        df = df.reset_index()  # make sure indexes pair with number of rows
+
+        for index, row in df.iterrows():
+            try:
+                # print(row['sample_lib'], row['CL from Air Table'], row['CL from Consolidated Data'])
+                sl = SampleLib.objects.get(name=row['sample_lib'])
+                if not pd.isnull(row['CL from Consolidated Data']) and pd.isnull(row['CL from Air Table']):
+                    cl, _ = CapturedLib.objects.get_or_create(name=row['CL from Consolidated Data'])
+                    link, _ = SL_CL_LINK.objects.get_or_create(captured_lib=cl, sample_lib=sl)
+                    # print("#"*100)
+                elif not pd.isnull(row['CL from Air Table']):
+                    for i in row['CL from Air Table'].split(","):
+                        cl, _ = CapturedLib.objects.get_or_create(name=i)
+                        link, _ = SL_CL_LINK.objects.get_or_create(captured_lib=cl, sample_lib=sl)
+                        # print("-"*10)
+                sls = SampleLib.objects.filter(name__startswith="FKP")
+            except Exception as e:
+                print(e, row)
+        for sl in sls:
+            cl = CapturedLib.objects.get(name="SGPC-04")
+            link, _ = SL_CL_LINK.objects.get_or_create(captured_lib=cl, sample_lib=sl)
+
 
     @staticmethod
     def register_captured_lib_and_so():
@@ -564,7 +592,8 @@ if __name__ == "__main__":
     # m = MigrateDump.register_blocks()
     # m = MigrateDump.register_areas()
     # m = MigrateDump.register_nuc_acids()
-    m = MigrateDump.register_samplelib()
+    # m = MigrateDump.register_samplelib()
+    m = MigrateDump.register_capturedlib()
     # m = MigrateDump.register_captured_lib_and_so()
     print("===FIN===")
     # res = m.cursor("SELECT * FROM patients")
