@@ -3541,42 +3541,42 @@ def import_bait(request):
     df = pd.read_csv(file)
     df.apply(lambda row: im_bait(row), axis=1)
 
-def match_respectively_via_names(sl,match):
+def match_respectively_via_names(sl,files):
     l = ["16","19","20","21","22","23","24","25","28","89","AGLP","AM-",
          "CCRLP-","CGH","FKP","EXLP","IRLP","JJS","NMLP","OMLP","SGLP","VMRLP","XuRLP"]
     if sl.name.startswith(tuple(l)):
         if sl.name.startswith(tuple(["21_5","24_5_Norm","28"])):
             return
         # print(sl.name)
-        for file in match:
+        for file in files:
             file_set = file.sequencing_file_set
             # file_set.sample_lib = sl
             # file_set.save()
             print("saved = ", sl)
-#
-# def match_sl_fastq_file(request):
-#     sls = SampleLib.objects.filter(sequencing_file_sets__isnull=True).order_by("name")
-#     data=[]
-#     for sl in sls:
-#         match = SequencingFile.objects.filter(name__icontains=sl.name)
-#         if match:
-#             match_respectively_via_names(sl,match)
-#             row = {
-#                 "sample_lib": sl.name,
-#                 "file": match.values_list('name')
-#             }
-#             data.append(row)
-#     df = pd.DataFrame(data)
-#     response = HttpResponse(content_type='text/csv')
-#     response['Content-Disposition'] = 'attachment; filename="result.csv"'
-#
-#     # Write DataFrame to the response as a CSV
-#     df.to_csv(path_or_buf=response, index=False)
-#
-#     print("--FIN--")
-#     return response
 
-def match_sl_fastq_file(request):
+def match_sl_fastq_file_1(request):
+    sls = SampleLib.objects.filter(sequencing_file_sets__isnull=True).order_by("name")
+    data=[]
+    for sl in sls:
+        match = SequencingFile.objects.filter(name__icontains=sl.name)
+        if match:
+            match_respectively_via_names(sl,match)
+            row = {
+                "sample_lib": sl.name,
+                "file": match.values_list('name')
+            }
+            data.append(row)
+    df = pd.DataFrame(data)
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="result.csv"'
+
+    # Write DataFrame to the response as a CSV
+    df.to_csv(path_or_buf=response, index=False)
+
+    print("--FIN--")
+    return response
+
+def match_sl_fastq_file_2(request):
     sls = SampleLib.objects.filter(sequencing_file_sets__isnull=True).order_by("name")
     print(sls.count())
     data=[]
@@ -3584,12 +3584,14 @@ def match_sl_fastq_file(request):
         pattern = r'^(\w+)-(\d{1,3})$'
         match = re.match(pattern, sl.name)
         if match:
-            search_value = fr'^{match.group(1)}-(?<!0){match.group(1)}(_|$)'
-            if SequencingFile.objects.filter(name__regex=search_value):
-                match_respectively_via_names(sl,match)
+            search_value = fr'^{match.group(1)}-(?<!0){match.group(2)}(_|$)'
+            files = SequencingFile.objects.filter(name__regex=search_value)
+            print(files)
+            if files:
+                match_respectively_via_names(sl,files)
                 row = {
                     "sample_lib": sl.name,
-                    "file": match.values_list('name')
+                    "file": files.values_list('name')
                 }
                 data.append(row)
     df = pd.DataFrame(data)
