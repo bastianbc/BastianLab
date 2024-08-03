@@ -3613,11 +3613,11 @@ def match_sl_fastq_file_2(request):
                 search_value = search_func(match)
                 filter_kwargs = {'name__regex': search_value} if description == 'Regex Match' else {
                     'name__startswith': search_value} if description == 'Starts with 21_5' else {
-                    'name__icontains': search_value} if description == 'Startswith 26' else {
-                    'name__icontains': search_value} if description == 'Startswith 28' else {
-                    'name__startswith': search_value} if description == 'Buffy_Coat' else {
-                    'name__startswith': search_value} if description == 'Regex Match ChIP1_' else {
-                    'name__regex': search_value}
+                    'name__startswith': search_value} if description == 'Startswith 26' else {
+                    'name__startswith': search_value} if description == 'Startswith 28' else {
+                    'name__icontains': search_value} if description == 'Buffy_Coat' else {
+                    'name__regex': search_value} if description == 'Regex Match ChIP1_' else {
+                    'name__icontains': search_value}
                 files = SequencingFile.objects.filter(**filter_kwargs)
                 if files:
                     process_files(sl, files, description)
