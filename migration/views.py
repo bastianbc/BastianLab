@@ -3578,7 +3578,7 @@ def match_respectively_via_names(sl,match):
 
 def match_sl_fastq_file(request):
     sls = SampleLib.objects.filter(sequencing_file_sets__isnull=True).order_by("name")
-    print(sls)
+    print(sls.count())
     # data=[]
     # for sl in sls:
     #     pattern = r'^(\w+)-(\d{1,3})$'
