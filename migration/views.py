@@ -3628,6 +3628,7 @@ def find_path_seq_run_for_file_sets(request):
                 (r'.*VisiumCytAssit_MW.*', "", "saved__VisiumCytAssit_MW_"),
                 (r'.*Public ChIp-seq data.*', "", "saved__Public ChIp-seq data_"),
                 (r'.*VisiumCytAssit_MW.*', "", "saved__VisiumCytAssit_MW_"),
+                (r'.*RNA-seq.*', "", "saved__RNA-seq_"),
             ]
 
             for pattern, prefix, message in patterns:
