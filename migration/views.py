@@ -3543,7 +3543,8 @@ def import_bait(request):
 
 def match_respectively_via_names(sl,files):
     l = ["16","19","20","21","22","23","24","25","28","89","AGLP","AM-",
-         "CCRLP-","CGH","FKP","EXLP","IRLP","JJS","NMLP","OMLP","SGLP","VMRLP","XuRLP"]
+         "CCRLP-","CGH","FKP","DPN","EXLP","H12","Ivanka","JBU","IRLP",
+         "JJS","NMLP","OMLP","Rob","SGLP","VMRLP","UM","XD","XuRLP"]
     if sl.name.startswith(tuple(l)):
         if sl.name.startswith(tuple(["21_5","24_5_Norm","28"])):
             return
