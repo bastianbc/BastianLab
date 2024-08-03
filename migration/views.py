@@ -3586,10 +3586,14 @@ def match_sl_fastq_file_2(request):
         if match:
             search_value = fr'^{match.group(1)}-(?<!0){match.group(2)}(_|$)'
             files = SequencingFile.objects.filter(name__regex=search_value)
-            print(files)
+            # print(files)
             if files:
                 for file in files:
                     print(sl.name,"---",file)
+                    file_set = file.sequencing_file_set
+                    file_set.sample_lib = sl
+                    file_set.save()
+                    print("saved = ", sl)
 
 def generate_file_set(file):
     match = re.match(r'.*[-_]([ACTG]{6,8})[-_]', file)
