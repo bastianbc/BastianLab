@@ -3612,7 +3612,7 @@ def find_path_seq_run_for_file_sets(request):
             file_set.path = path
             file_set.save()
             sr = path.split("/")[1]
-            pattern = r'BCB(\d+)'
+            pattern = r'.*BCB(\d+).*'
             match = re.match(pattern, sr)
             print(sr)
             if match:
