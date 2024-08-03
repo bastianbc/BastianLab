@@ -3619,13 +3619,19 @@ def find_path_seq_run_for_file_sets(request):
                 sequencing_run_kind = "BCB"+match.group(1)
                 file_set.sequencing_run, _ = SequencingRun.objects.get_or_create(name=sequencing_run_kind)
                 file_set.save()
+                print("saved__BCB"*10)
             pattern = r'.*BB(\d+).*'
             match = re.match(pattern, sr)
-            print(match)
             if match:
                 file_set.sequencing_run, _ = SequencingRun.objects.get_or_create(name=sr)
                 file_set.save()
-                print("saved__"*10)
+                print("saved__BB"*10)
+            pattern = r'.*SGPC-(\d+).*'
+            match = re.match(pattern, sr)
+            if match:
+                file_set.sequencing_run, _ = SequencingRun.objects.get_or_create(name=sr)
+                file_set.save()
+                print("saved__SGPC"*10)
         except Exception as e:
             print(e)
 
