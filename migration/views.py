@@ -3583,7 +3583,7 @@ def match_sl_fastq_file(request):
         pattern = r'^(\w+)-(\d{1,3})$'
         match = re.match(pattern, sl.name)
         if match:
-            search_value = fr'^{match.group(1)}-\d{{{len(match.group(2))}}}'
+            search_value = fr'^{match.group(1)}-(?<!0){match.group(1)}(_|$)'
             match = SequencingFile.objects.filter(name__regex=search_value)
             if match:
                 match_respectively_via_names(sl,match)
