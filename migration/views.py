@@ -3608,31 +3608,31 @@ def find_path_seq_run_for_file_sets(request):
     df = df.reset_index()  # make sure indexes pair with number of rows
     for file_set in fs:
         try:
-            print("prefix = ",file_set.prefix)
+            # Print the prefix
+            print("prefix = ", file_set.prefix)
+
             path = df[df['HiSeqData/'].str.contains(file_set.prefix)]["path"].values[0]
             file_set.path = path
             file_set.save()
+
             sr = path.split("/")[1]
-            pattern = r'.*BCB(\d+).*'
-            match = re.match(pattern, sr)
             print(sr)
-            if match:
-                sequencing_run_kind = "BCB"+match.group(1)
-                file_set.sequencing_run, _ = SequencingRun.objects.get_or_create(name=sequencing_run_kind)
-                file_set.save()
-                print("saved__BCB"*10)
-            pattern = r'.*BB(\d+).*'
-            match = re.match(pattern, sr)
-            if match:
-                file_set.sequencing_run, _ = SequencingRun.objects.get_or_create(name=sr)
-                file_set.save()
-                print("saved__BB"*10)
-            pattern = r'.*SGPC-(\d+).*'
-            match = re.match(pattern, sr)
-            if match:
-                file_set.sequencing_run, _ = SequencingRun.objects.get_or_create(name=sr)
-                file_set.save()
-                print("saved__SGPC"*10)
+
+            patterns = [
+                (r'.*BCB(\d+).*', "BCB", "saved__BCB"),
+                (r'.*BB(\d+).*', "", "saved__BB"),
+                (r'.*SGPC-(\d+).*', "", "saved__SGPC"),
+                (r'.*AGEX-(\d+).*', "", "saved__AGEX"),
+                (r'.*Hunter_RNAseq.*', "", "saved__Hunter_RNAseq")
+            ]
+
+            for pattern, prefix, message in patterns:
+                match = re.match(pattern, sr)
+                if match:
+                    sequencing_run_name = prefix + match.group(1) if prefix else sr
+                    file_set.sequencing_run, _ = SequencingRun.objects.get_or_create(name=sequencing_run_name)
+                    file_set.save()
+                    print(message * 10)
         except Exception as e:
             print(e)
 
