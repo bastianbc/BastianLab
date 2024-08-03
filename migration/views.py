@@ -3550,8 +3550,8 @@ def match_respectively_via_names(sl,match):
         # print(sl.name)
         for file in match:
             file_set = file.sequencing_file_set
-            file_set.sample_lib = sl
-            file_set.save()
+            # file_set.sample_lib = sl
+            # file_set.save()
             print("saved = ", sl)
 #
 # def match_sl_fastq_file(request):
@@ -3577,35 +3577,30 @@ def match_respectively_via_names(sl,match):
 #     return response
 
 def match_sl_fastq_file(request):
-    l = ["16", "19", "20", "21", "22", "23", "24", "25", "28", "89", "AGLP", "AM-",
-     "CCRLP-", "CGH", "FKP", "EXLP", "IRLP", "JJS", "NMLP", "OMLP", "SGLP", "VMRLP", "XuRLP"]
-    for i in l:
-        SequencingFileSet.objects.filter(sample_lib__name__startswith=i).update(sample_lib=None)
     sls = SampleLib.objects.filter(sequencing_file_sets__isnull=True).order_by("name")
     print(sls.count())
-    # data=[]
-    # for sl in sls:
-    #     pattern = r'^(\w+)-(\d{1,3})$'
-    #     match = re.match(pattern, sl.name)
-    #     if match:
-    #         search_value = fr'^{match.group(1)}-(?<!0){match.group(1)}(_|$)'
-    #         match = SequencingFile.objects.filter(name__regex=search_value)
-    #         if match:
-    #             match_respectively_via_names(sl,match)
-    #             row = {
-    #                 "sample_lib": sl.name,
-    #                 "file": match.values_list('name')
-    #             }
-    #             data.append(row)
-    # df = pd.DataFrame(data)
-    # response = HttpResponse(content_type='text/csv')
-    # response['Content-Disposition'] = 'attachment; filename="result.csv"'
-    #
-    # # Write DataFrame to the response as a CSV
-    # df.to_csv(path_or_buf=response, index=False)
-    #
-    # print("--FIN--")
-    # return response
+    data=[]
+    for sl in sls:
+        pattern = r'^(\w+)-(\d{1,3})$'
+        match = re.match(pattern, sl.name)
+        if match:
+            search_value = fr'^{match.group(1)}-(?<!0){match.group(1)}(_|$)'
+            if SequencingFile.objects.filter(name__regex=search_value):
+                match_respectively_via_names(sl,match)
+                row = {
+                    "sample_lib": sl.name,
+                    "file": match.values_list('name')
+                }
+                data.append(row)
+    df = pd.DataFrame(data)
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="result.csv"'
+
+    # Write DataFrame to the response as a CSV
+    df.to_csv(path_or_buf=response, index=False)
+
+    print("--FIN--")
+    return response
 
 def generate_file_set(file):
     match = re.match(r'.*[-_]([ACTG]{6,8})[-_]', file)
