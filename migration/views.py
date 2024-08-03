@@ -3619,10 +3619,11 @@ def find_path_seq_run_for_file_sets(request):
             print(sr)
 
             patterns = [
-                (r'.*BCB(\d+).*', "BCB", "saved__BCB"),
-                (r'.*BB(\d+).*', "", "saved__BB"),
-                (r'.*SGPC-(\d+).*', "", "saved__SGPC"),
-                (r'.*AGEX-(\d+).*', "", "saved__AGEX"),
+                (r'.*BCB(\d+).*', "BCB", "_saved__BCB_"),
+                (r'.*BB(\d+).*', "", "_saved__BB_"),
+                (r'.*SGPC-(\d+).*', "", "_saved__SGPC_"),
+                (r'.*AGEX-(\d+).*', "", "_saved__AGEX_"),
+                (r'.*IYEH(\d+).*', "", "_saved__IYEH_"),
                 (r'.*Hunter_RNAseq.*', "", "saved__Hunter_RNAseq")
             ]
 
@@ -3632,7 +3633,7 @@ def find_path_seq_run_for_file_sets(request):
                     sequencing_run_name = prefix + match.group(1) if prefix else sr
                     file_set.sequencing_run, _ = SequencingRun.objects.get_or_create(name=sequencing_run_name)
                     file_set.save()
-                    print(message * 10)
+                    print(message * 4)
         except Exception as e:
             print(e)
 
