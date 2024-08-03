@@ -3608,6 +3608,7 @@ def find_path_seq_run_for_file_sets(request):
     df = df.reset_index()  # make sure indexes pair with number of rows
     for file_set in fs:
         try:
+            print("prefix = ",file_set.prefix)
             path = df[df['HiSeqData/'].str.contains(file_set.prefix)]["path"].values[0]
             file_set.path = path
             file_set.save()
