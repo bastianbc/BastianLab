@@ -3543,7 +3543,7 @@ def import_bait(request):
 
 def match_respectively_via_names(sl,match):
     l = ["16","19","20","21","22","23","24","25","28","89","AGLP","AM-",
-         "CCRLP-","CGH","FKP","EXLP","IRLP","JJS","NMLP","OMLP","SGLP","VMRLP","XuRLP",]
+         "CCRLP-","CGH","FKP","EXLP","IRLP","JJS","NMLP","OMLP","SGLP","VMRLP","XuRLP"]
     if sl.name.startswith(tuple(l)):
         if sl.name.startswith(tuple(["21_5","24_5_Norm","28"])):
             return
@@ -3558,12 +3558,12 @@ def match_sl_fastq_file(request):
     sls = SampleLib.objects.filter(sequencing_file_sets__isnull=True).order_by("name")
     data=[]
     for sl in sls:
-        match = SequencingFile.objects.filter(name__icontains=sl.name).values_list('name')
+        match = SequencingFile.objects.filter(name__icontains=sl.name)
         if match:
             match_respectively_via_names(sl,match)
             row = {
                 "sample_lib": sl.name,
-                "file": match
+                "file": match.values_list('name')
             }
             data.append(row)
     df = pd.DataFrame(data)
