@@ -3617,7 +3617,7 @@ def find_path_seq_run_for_file_sets(request):
             sr = path.split("/")[1]
             pattern = r'BCB(\d+)'
             match = re.match(pattern, sr)
-            print(sr, match)
+            print(sr)
             if match:
                 sequencing_run_kind = "BCB"+match.group(1)
                 file_set.sequencing_run, _ = SequencingRun.objects.get_or_create(name=sequencing_run_kind)
