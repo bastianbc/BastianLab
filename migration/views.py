@@ -3577,6 +3577,10 @@ def match_respectively_via_names(sl,match):
 #     return response
 
 def match_sl_fastq_file(request):
+    l = ["16", "19", "20", "21", "22", "23", "24", "25", "28", "89", "AGLP", "AM-",
+     "CCRLP-", "CGH", "FKP", "EXLP", "IRLP", "JJS", "NMLP", "OMLP", "SGLP", "VMRLP", "XuRLP"]
+    for i in l:
+        SequencingFileSet.objects.filter(sample_lib__name__startswith=i).update(sample_lib=None)
     sls = SampleLib.objects.filter(sequencing_file_sets__isnull=True).order_by("name")
     print(sls.count())
     # data=[]
