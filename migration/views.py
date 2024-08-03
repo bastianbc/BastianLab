@@ -3578,23 +3578,45 @@ def match_sl_fastq_file_1(request):
     return response
 
 def match_sl_fastq_file_2(request):
+    def process_files(sl, files, description):
+        """
+        Process the matched files by updating the sample_lib field
+        and print debug information.
+        """
+        print(f"{description}: {sl.name}, Files Found: {files.count()}")
+        for file in files:
+            print(f"{sl.name} --- {file.name}")
+            file_set = file.sequencing_file_set
+            file_set.sample_lib = sl
+            # file_set.save()
+            print(f"Saved Sample Library: {sl.name}")
+
+
     sls = SampleLib.objects.filter(sequencing_file_sets__isnull=True).order_by("name")
     print(sls.count())
     data=[]
+    patterns = [
+        (re.compile(r'^(\w+)-(\d{1,3})$'), lambda match: fr'^{match.group(1)}-(?<!0){match.group(2)}(_|$)',
+         'Regex Match'),
+        (re.compile(r'^21_5.*'), lambda _: '21_5', 'Starts with 21_5'),
+        (re.compile(r'24_5_Norm'), lambda _: '24_5_Norm', 'Contains 24_5_Norm'),
+        (re.compile(r'^26\d*_(\w+)$'), lambda _: sl.name, 'Startswith 26'),
+    ]
+
     for sl in sls:
-        pattern = r'^(\w+)-(\d{1,3})$'
-        match = re.match(pattern, sl.name)
-        if match:
-            search_value = fr'^{match.group(1)}-(?<!0){match.group(2)}(_|$)'
-            files = SequencingFile.objects.filter(name__regex=search_value)
-            print(search_value, sl.name, files)
-            if files:
-                for file in files:
-                    print(sl.name,"---",file)
-                    file_set = file.sequencing_file_set
-                    # file_set.sample_lib = sl
-                    # file_set.save()
-                    print("saved = ", sl)
+        for pattern, search_func, description in patterns:
+            match = pattern.match(sl.name)
+            if match:
+                search_value = search_func(match)
+                filter_kwargs = {'name__regex': search_value} if description == 'Regex Match' else {
+                    'name__startswith': search_value} if description == 'Starts with 21_5' else {
+                    'name__icontains': search_value} if description == 'Startswith 26' else {
+                    'name__icontains': search_value}
+                files = SequencingFile.objects.filter(**filter_kwargs)
+                if files:
+                    process_files(sl, files, description)
+
+
 
 def generate_file_set(file):
     match = re.match(r'.*[-_]([ACTG]{6,8})[-_]', file)
