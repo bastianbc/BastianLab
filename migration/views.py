@@ -3547,11 +3547,10 @@ def match_respectively_via_names(sl,match):
             return
         # print(sl.name)
         for file in match:
-            print(match, sl)
             file_set = file.sequencing_file_set
-            print(file_set.sample_lib,file_set.sequencing_run, file_set.path)
             file_set.sample_lib = sl
             file_set.save()
+            print("saved = ", sl)
 
 def match_sl_fastq_file(request):
     sls = SampleLib.objects.filter(sequencing_file_sets__isnull=True).order_by("name")
@@ -3566,8 +3565,14 @@ def match_sl_fastq_file(request):
             }
             data.append(row)
     df = pd.DataFrame(data)
-    df.to_csv("result.csv",index=False)
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="result.csv"'
+
+    # Write DataFrame to the response as a CSV
+    df.to_csv(path_or_buf=response, index=False)
+
     print("--FIN--")
+    return response
 
 def generate_file_set(file):
     match = re.match(r'.*[-_]([ACTG]{6,8})[-_]', file)
