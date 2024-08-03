@@ -3571,6 +3571,7 @@ def match_sl_fastq_file(request):
 
 def generate_file_set(request):
     files = SequencingFile.objects.filter(sequencing_file_set__isnull=True).order_by('name')
+    print(files)
     for file in files:
         file = file.name
         match = re.match(r'.*[-_]([ACTG]{6,8})[-_]', file)
@@ -3597,10 +3598,10 @@ def generate_file_set(request):
         if prefix is None:
             prefix = file.split(".")[0]
         print(prefix,"------", file)
-        file_set,_ = SequencingFileSet.objects.get_or_create(prefix=prefix)
-        f = SequencingFile.objects.get(name=file)
-        f.sequencing_file_set = file_set
-        f.save()
+        # file_set,_ = SequencingFileSet.objects.get_or_create(prefix=prefix)
+        # f = SequencingFile.objects.get(name=file)
+        # f.sequencing_file_set = file_set
+        # f.save()
     print("--FIN--")
 
 
