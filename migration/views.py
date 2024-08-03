@@ -3616,7 +3616,7 @@ def find_path_seq_run_for_file_sets(request):
             file_set.save()
 
             sr = path.split("/")[1]
-            print(sr)
+            print("seq_run = ", sr)
 
             patterns = [
                 (r'.*BCB(\d+).*', "BCB", "_saved__BCB_"),
@@ -3624,7 +3624,8 @@ def find_path_seq_run_for_file_sets(request):
                 (r'.*SGPC-(\d+).*', "", "_saved__SGPC_"),
                 (r'.*AGEX-(\d+).*', "", "_saved__AGEX_"),
                 (r'.*IYEH(\d+).*', "", "_saved__IYEH_"),
-                (r'.*Hunter_RNAseq.*', "", "saved__Hunter_RNAseq")
+                (r'.*Hunter_RNAseq.*', "", "saved__Hunter_RNAseq_")
+                (r'.*VisiumCytAssit_MW.*', "", "saved__VisiumCytAssit_MW_")
             ]
 
             for pattern, prefix, message in patterns:
