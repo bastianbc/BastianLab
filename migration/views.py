@@ -3597,7 +3597,7 @@ def match_sl_fastq_file_2(request):
     data=[]
     patterns = [
         (re.compile(r'^ChIP1_(\d{1,2})$'), lambda match: fr'^ChIP1_-(?<!0){match.group(1)}(_|$)',
-         'Regex Match'),
+         'Regex Match ChIP1_'),
         (re.compile(r'^(\w+)-(\d{1,3})$'), lambda match: fr'^{match.group(1)}-(?<!0){match.group(2)}(_|$)',
          'Regex Match'),
         (re.compile(r'24_5_Norm'), lambda _: '24_5_Norm', 'Contains 24_5_Norm'),
@@ -3616,7 +3616,8 @@ def match_sl_fastq_file_2(request):
                     'name__icontains': search_value} if description == 'Startswith 26' else {
                     'name__icontains': search_value} if description == 'Startswith 28' else {
                     'name__startswith': search_value} if description == 'Buffy_Coat' else {
-                    'name__startswith': search_value}
+                    'name__startswith': search_value} if description == 'Regex Match ChIP1_' else {
+                    'name__regex': search_value}
                 files = SequencingFile.objects.filter(**filter_kwargs)
                 if files:
                     process_files(sl, files, description)
