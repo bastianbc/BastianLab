@@ -3588,21 +3588,8 @@ def match_sl_fastq_file_2(request):
             files = SequencingFile.objects.filter(name__regex=search_value)
             print(files)
             if files:
-                match_respectively_via_names(sl,files)
-                row = {
-                    "sample_lib": sl.name,
-                    "file": files.values_list('name')
-                }
-                data.append(row)
-    df = pd.DataFrame(data)
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="result.csv"'
-
-    # Write DataFrame to the response as a CSV
-    df.to_csv(path_or_buf=response, index=False)
-
-    print("--FIN--")
-    return response
+                for file in files:
+                    print(sl.name,"---",file)
 
 def generate_file_set(file):
     match = re.match(r'.*[-_]([ACTG]{6,8})[-_]', file)
