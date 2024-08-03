@@ -3615,12 +3615,14 @@ def find_path_seq_run_for_file_sets(request):
             file_set.path = path
             file_set.save()
             sr = path.split("/")[1]
-            pattern = r'BCB(\d+)'
-            match = re.match(pattern, sr)
             print(sr)
-            if match:
-                sequencing_run_kind = "BCB"+match.group(1)
+            if re.match(r'BCB(\d+)', sr):
+                sequencing_run_kind = "BCB"+re.match(r'BCB(\d+)', sr).group(1)
                 file_set.sequencing_run, _ = SequencingRun.objects.get_or_create(name=sequencing_run_kind)
+                file_set.save()
+                print("saved")
+            if re.match(r'BB(\d+)', sr):
+                file_set.sequencing_run, _ = SequencingRun.objects.get_or_create(name=sr)
                 file_set.save()
                 print("saved")
         except Exception as e:
