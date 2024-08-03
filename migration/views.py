@@ -3543,7 +3543,7 @@ def import_bait(request):
 
 def match_respectively_via_names(sl,files):
     l = ["16","19","20","21","22","23","24","25","28","89","AGLP","AM-",
-         "CCRLP-","CGH","FKP","DPN","EXLP","H12","Ivanka","JBU","IRLP",
+         "CCRLP-","CGH","CGP","FKP","DPN","EXLP","H12","Ivanka","JBU","IRLP",
          "JJS","NMLP","OMLP","Rob","SGLP","VMRLP","UM","XD","XuRLP"]
     if sl.name.startswith(tuple(l)):
         if sl.name.startswith(tuple(["21_5","24_5_Norm","28"])):
@@ -3596,11 +3596,14 @@ def match_sl_fastq_file_2(request):
     print(sls.count())
     data=[]
     patterns = [
+        (re.compile(r'^ChIP1_(\d{1,2})$'), lambda match: fr'^ChIP1_-(?<!0){match.group(1)}(_|$)',
+         'Regex Match'),
         (re.compile(r'^(\w+)-(\d{1,3})$'), lambda match: fr'^{match.group(1)}-(?<!0){match.group(2)}(_|$)',
          'Regex Match'),
-        (re.compile(r'^21_5.*'), lambda _: '21_5', 'Starts with 21_5'),
         (re.compile(r'24_5_Norm'), lambda _: '24_5_Norm', 'Contains 24_5_Norm'),
         (re.compile(r'^26\d*_(\w+)$'), lambda _: sl.name, 'Startswith 26'),
+        (re.compile(r'^28_'), lambda _: sl.name, 'Startswith 28'),
+        (re.compile(r'^Buffy_Coat'), lambda _: sl.name, 'Buffy_Coat'),
     ]
 
     for sl in sls:
@@ -3611,7 +3614,9 @@ def match_sl_fastq_file_2(request):
                 filter_kwargs = {'name__regex': search_value} if description == 'Regex Match' else {
                     'name__startswith': search_value} if description == 'Starts with 21_5' else {
                     'name__icontains': search_value} if description == 'Startswith 26' else {
-                    'name__icontains': search_value}
+                    'name__icontains': search_value} if description == 'Startswith 28' else {
+                    'name__startswith': search_value} if description == 'Buffy_Coat' else {
+                    'name__startswith': search_value}
                 files = SequencingFile.objects.filter(**filter_kwargs)
                 if files:
                     process_files(sl, files, description)
