@@ -3565,8 +3565,6 @@ def match_sl_fastq_file(request):
                 "file": match
             }
             data.append(row)
-
-
     df = pd.DataFrame(data)
     df.to_csv("result.csv",index=False)
     print("--FIN--")
@@ -3604,3 +3602,39 @@ def generate_file_set(request):
         f.sequencing_file_set = file_set
         f.save()
     print("--FIN--")
+
+
+def find_path_seq_run_for_file_sets(request):
+    fs = SequencingFileSet.objects.filter(sequencing_run__isnull=True)
+    file = Path(Path(__file__).parent.parent / "uploads" / "df_fq_new.csv")
+    df = pd.read_csv(file)
+    df = df.reset_index()  # make sure indexes pair with number of rows
+    for file_set in fs:
+        try:
+            path = df[df['HiSeqData/'].str.contains(file_set.prefix)]["path"].values[0]
+            file_set.path = path
+            file_set.save()
+            sr = path.split("/")[1]
+            pattern = r'BCB(\d+)'
+            match = re.match(pattern, sr)
+            print(sr, match)
+            if match:
+                sequencing_run_kind = "BCB"+match.group(1)
+                file_set.sequencing_run, _ = SequencingRun.objects.get_or_create(name=sequencing_run_kind)
+                file_set.save()
+                print("saved")
+        except Exception as e:
+            print(e)
+
+    # for index, row in df.iterrows():
+    #     file = SequencingFile.objects.get(name=row['file'])
+    #     file_set = file.sequencing_file_set
+    #     path = row['path']
+    #     file_set.path = path
+    #     file_set.save()
+    #     try:
+    #         seq_run = SequencingRun.objects.get(name=path.split("/")[1])
+    #         file_set.sequencing_run = seq_run
+    #         file_set.save()
+    #     except Exception as e:
+    #         print(e)
