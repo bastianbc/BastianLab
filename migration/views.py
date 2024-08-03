@@ -3550,8 +3550,8 @@ def match_respectively_via_names(sl,files):
         # print(sl.name)
         for file in files:
             file_set = file.sequencing_file_set
-            # file_set.sample_lib = sl
-            # file_set.save()
+            file_set.sample_lib = sl
+            file_set.save()
             print("saved = ", sl)
 
 def match_sl_fastq_file_1(request):
