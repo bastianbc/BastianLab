@@ -3553,19 +3553,45 @@ def match_respectively_via_names(sl,match):
             file_set.sample_lib = sl
             file_set.save()
             print("saved = ", sl)
+#
+# def match_sl_fastq_file(request):
+#     sls = SampleLib.objects.filter(sequencing_file_sets__isnull=True).order_by("name")
+#     data=[]
+#     for sl in sls:
+#         match = SequencingFile.objects.filter(name__icontains=sl.name)
+#         if match:
+#             match_respectively_via_names(sl,match)
+#             row = {
+#                 "sample_lib": sl.name,
+#                 "file": match.values_list('name')
+#             }
+#             data.append(row)
+#     df = pd.DataFrame(data)
+#     response = HttpResponse(content_type='text/csv')
+#     response['Content-Disposition'] = 'attachment; filename="result.csv"'
+#
+#     # Write DataFrame to the response as a CSV
+#     df.to_csv(path_or_buf=response, index=False)
+#
+#     print("--FIN--")
+#     return response
 
 def match_sl_fastq_file(request):
     sls = SampleLib.objects.filter(sequencing_file_sets__isnull=True).order_by("name")
     data=[]
     for sl in sls:
-        match = SequencingFile.objects.filter(name__icontains=sl.name)
+        pattern = r'^(\w+)-(\d{1,3})$'
+        match = re.match(pattern, sl.name)
         if match:
-            match_respectively_via_names(sl,match)
-            row = {
-                "sample_lib": sl.name,
-                "file": match.values_list('name')
-            }
-            data.append(row)
+            search_value = fr'^{match.group(1)}-\d{{{len(match.group(2))}}}'
+            match = SequencingFile.objects.filter(name__regex=search_value)
+            if match:
+                match_respectively_via_names(sl,match)
+                row = {
+                    "sample_lib": sl.name,
+                    "file": match.values_list('name')
+                }
+                data.append(row)
     df = pd.DataFrame(data)
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="result.csv"'
