@@ -3581,7 +3581,7 @@ def match_sl_fastq_file_2(request):
     print(sls.count())
     data=[]
     for sl in sls:
-        pattern = r'^(\w+)-(\d{1,2,3})$'
+        pattern = r'^(\w+)-(\d{1,3})$'
         match = re.match(pattern, sl.name)
         if match:
             search_value = fr'^{match.group(1)}-(?<!0){match.group(2)}(_|$)'
