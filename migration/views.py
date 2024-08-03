@@ -3602,7 +3602,7 @@ def generate_file_set(file):
 
 def find_path_seq_run_for_file_sets(request):
     q = Q(Q(sequencing_run__isnull=True) | Q(path__isnull=True))
-    fs = SequencingFileSet.objects.filter(q)
+    fs = SequencingFileSet.objects.filter(q).order_by('prefix')
     file = Path(Path(__file__).parent.parent / "uploads" / "df_fq_new.csv")
     df = pd.read_csv(file)
     df = df.reset_index()  # make sure indexes pair with number of rows
