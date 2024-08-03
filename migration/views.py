@@ -3542,7 +3542,7 @@ def import_bait(request):
     df.apply(lambda row: im_bait(row), axis=1)
 
 def match_respectively_via_names(sl,match):
-    if sl.name.startswith(tuple(["16","19","20","21","22","23","24","25"])):
+    if sl.name.startswith(tuple(["16","19","20","21","22","23","24","25","28","89","AGLP","AM-","CCRLP-","CGH"])):
         if sl.name.startswith(tuple(["21_5","24_5_Norm","28"])):
             return
         # print(sl.name)
