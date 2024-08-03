@@ -3620,11 +3620,10 @@ def find_path_seq_run_for_file_sets(request):
                 sequencing_run_kind = "BCB"+re.match(r'BCB(\d+)', sr).group(1)
                 file_set.sequencing_run, _ = SequencingRun.objects.get_or_create(name=sequencing_run_kind)
                 file_set.save()
-                print("saved")
             if re.match(r'BB(\d+)', sr):
                 file_set.sequencing_run, _ = SequencingRun.objects.get_or_create(name=sr)
                 file_set.save()
-                print("saved")
+                print("saved__"*10)
         except Exception as e:
             print(e)
 
