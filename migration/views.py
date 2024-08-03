@@ -3624,10 +3624,10 @@ def find_path_seq_run_for_file_sets(request):
                 (r'.*SGPC-(\d+).*', "", "_saved__SGPC_"),
                 (r'.*AGEX-(\d+).*', "", "_saved__AGEX_"),
                 (r'.*IYEH(\d+).*', "", "_saved__IYEH_"),
-                (r'.*Hunter_RNAseq.*', "", "saved__Hunter_RNAseq_")
-                (r'.*VisiumCytAssit_MW.*', "", "saved__VisiumCytAssit_MW_")
-                (r'.*Public ChIp-seq data.*', "", "saved__Public ChIp-seq data_")
-                (r'.*VisiumCytAssit_MW.*', "", "saved__VisiumCytAssit_MW_")
+                (r'.*Hunter_RNAseq.*', "", "saved__Hunter_RNAseq_"),
+                (r'.*VisiumCytAssit_MW.*', "", "saved__VisiumCytAssit_MW_"),
+                (r'.*Public ChIp-seq data.*', "", "saved__Public ChIp-seq data_"),
+                (r'.*VisiumCytAssit_MW.*', "", "saved__VisiumCytAssit_MW_"),
             ]
 
             for pattern, prefix, message in patterns:
