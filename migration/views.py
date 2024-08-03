@@ -3569,40 +3569,35 @@ def match_sl_fastq_file(request):
     df.to_csv("result.csv",index=False)
     print("--FIN--")
 
-def generate_file_set(request):
-    files = SequencingFile.objects.filter(sequencing_file_set__isnull=True).order_by('name')
-    print(files)
-    for file in files:
-        file = file.name
-        match = re.match(r'.*[-_]([ACTG]{6,8})[-_]', file)
-        if "fastq" in file:
-            prefix = file.split("_L0")[0] if "_L0" in file else file.split("_001")[0] if "_001" in file else None
-        elif ".sorted" in file:
-            prefix = file.split(".sorted")[0]
-        elif ".sort" in file:
-            prefix = file.split(".sort")[0]
-        elif ".removedupes" in file:
-            prefix = file.split(".removedupes")[0]
-        elif ".recal" in file:
-            prefix = file.split(".recal")[0]
-        elif "deduplicated.realign.bam" in file:
-            prefix = file.split(".deduplicated.realign.bam")[0]
-        elif file.endswith(".bai"):
-            prefix = file.split(".bai")[0]
-        elif file.endswith(".bam"):
-            prefix = file.split(".bam")[0]
-        if match:
-            dna = match.group(1)
-            prefix = file.split(dna)[0] + dna
-        # prefix = file.split("_L0")[0] if "_L0" in file else prefix
-        if prefix is None:
-            prefix = file.split(".")[0]
-        print(prefix,"------", file)
-        # file_set,_ = SequencingFileSet.objects.get_or_create(prefix=prefix)
-        # f = SequencingFile.objects.get(name=file)
-        # f.sequencing_file_set = file_set
-        # f.save()
-    print("--FIN--")
+def generate_file_set(file):
+    match = re.match(r'.*[-_]([ACTG]{6,8})[-_]', file)
+    if "fastq" in file:
+        prefix = file.split("_L0")[0] if "_L0" in file else file.split("_001")[0] if "_001" in file else None
+    elif ".sorted" in file:
+        prefix = file.split(".sorted")[0]
+    elif ".sort" in file:
+        prefix = file.split(".sort")[0]
+    elif ".removedupes" in file:
+        prefix = file.split(".removedupes")[0]
+    elif ".recal" in file:
+        prefix = file.split(".recal")[0]
+    elif "deduplicated.realign.bam" in file:
+        prefix = file.split(".deduplicated.realign.bam")[0]
+    elif file.endswith(".bai"):
+        prefix = file.split(".bai")[0]
+    elif file.endswith(".bam"):
+        prefix = file.split(".bam")[0]
+    if match:
+        dna = match.group(1)
+        prefix = file.split(dna)[0] + dna
+    if prefix is None:
+        prefix = file.split(".")[0]
+    file_set,_ = SequencingFileSet.objects.get_or_create(prefix=prefix)
+    f, _ = SequencingFile.objects.get_or_create(name=file)
+    f.sequencing_file_set = file_set
+    f.save()
+    print("file_set generated", prefix, "------", file)
+    return file_set
 
 
 def find_path_seq_run_for_file_sets(request):
@@ -3633,6 +3628,17 @@ def find_path_seq_run_for_file_sets(request):
                 print("saved__"*10)
         except Exception as e:
             print(e)
+
+def register_new_fastq_files(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "df_fq_new.csv")
+    df = pd.read_csv(file)
+    df = df.reset_index()  # make sure indexes pair with number of rows
+    for index, row in df.iterrows():
+        try:
+            SequencingFile.objects.get(name=row['file'])
+        except Exception as e:
+            print(e, row['file'])
+            generate_file_set(row['file'])
 
     # for index, row in df.iterrows():
     #     file = SequencingFile.objects.get(name=row['file'])
