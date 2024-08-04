@@ -3543,8 +3543,8 @@ def import_bait(request):
 
 def match_respectively_via_names(sl,files):
     l = ["16","19","20","21","22","23","24","25","28","89","AGLP","AM-",
-         "CCRLP-","CGH","CGP","FKP","DPN","DM","EXLP","H12","Ivanka","JBU","IRLP",
-         "JJS","NMLP","OMLP","Rob","SGLP","VMRLP","UM","XD","XuRLP"]
+         "CCRLP-","CGH","ChIP","CGP","FKP","DPN","DM","EXLP","H12","Ivanka","JBU","IRLP",
+         "JJS","Kit","NMLP","OMLP","Rob","SGLP","VMRLP","UM","T12","XD","XuRLP"]
     if sl.name.startswith(tuple(l)):
         if sl.name.startswith(tuple(["21_5","24_5_Norm","28"])):
             return
@@ -3601,10 +3601,8 @@ def match_sl_fastq_file_2(request):
         (re.compile(r'^26\d*_(\w+)$'), lambda _: sl.name, 'Startswith 26'),
         (re.compile(r'^28_'), lambda _: sl.name, 'Startswith 28'),
         (re.compile(r'^Buffy_Coat'), lambda _: sl.name, 'Buffy_Coat'),
-        (re.compile(r'^ChIP1_(\d{1,2})$'), lambda match: fr'^ChIP1_-(?<!0){match.group(1)}(_|$)',
-         'Regex Match ChIP1_'),
-        (re.compile(r'^KAM(.*?)(_kapa)?$'), lambda match:(f'^KAM{match.group(1)}' + (match.group(2) or '')),
-         'Regex Match KAM'),
+        (re.compile(r'^ChIP1_(\d{1,2})$'), lambda match: fr'^ChIP1_-(?<!0){match.group(1)}(_|$)', 'Regex Match ChIP1_'),
+        (re.compile(r'^KAM(.*?)(_kapa)?$'), lambda match:(f'^KAM{match.group(1)}' + (match.group(2) or '')), 'Regex Match KAM'),
     ]
 
     for sl in sls:
