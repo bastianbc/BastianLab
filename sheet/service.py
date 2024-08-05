@@ -120,7 +120,7 @@ class CustomSampleLibSerializer(serializers.ModelSerializer):
 
     def get_seq_run(self, obj):
         try:
-            seq_run = SequencingRun.objects.get(id=obj.seq_run)
+            seq_run = SequencingRun.objects.get(id=obj.seq_run2)
             return seq_run.name
         except SequencingRun.DoesNotExist:
             return None
