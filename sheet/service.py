@@ -120,7 +120,7 @@ class CustomSampleLibSerializer(serializers.ModelSerializer):
 
     def get_seq_run(self, obj):
         try:
-            seq_run = SequencingRun.objects.get(id=obj.seq_run2)
+            seq_run = SequencingRun.objects.get(id=obj.seq_run)
             return seq_run.name
         except SequencingRun.DoesNotExist:
             return None
@@ -229,7 +229,7 @@ def generate_file(data, file_name):
             report.path_fastq = _get_path(sl)
 
         # seq_run = report.path_fastq.split("/")[1] if report.path_fastq != "" and report.path_fastq != None else ""
-        report.seq_run = row.seq_run  # ✓
+        report.seq_run = row.seq_run2  # ✓
         concat = f"{report.sample_lib}_{report.seq_run}"
         concat_files = f"{report.fastq}{report.bam}{report.bai}".replace("None","").strip()
         # Only add report if it hasn't been added before
