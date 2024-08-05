@@ -7,6 +7,7 @@ from sequencingrun.models import SequencingRun
 from sequencingfile.models import SequencingFile,SequencingFileSet
 from lab.models import Patients
 import json
+import re
 
 class SequencingFileSetSerializerManual(serializers.ModelSerializer):
     class Meta:
@@ -203,6 +204,7 @@ def generate_file(data, file_name):
         report.patient = row.patient
         report.sample_lib = row.name.strip().replace(" ", "_") # ✓
         report.barcode = row.barcode_name # ✓
+
         report.na_type = row.na_type # ✓
         report.area_type = row.area_type # ✓
         report.matching_normal_sl = row.matching_normal_sl.replace(" ", "_") if row.matching_normal_sl else ""
@@ -232,6 +234,11 @@ def generate_file(data, file_name):
         report.seq_run = row.seq_run2  # ✓
         concat = f"{report.sample_lib}_{report.seq_run}"
         concat_files = f"{report.fastq}{report.bam}{report.bai}".replace("None","").strip()
+        if not row.barcode_name or row.barcode_name == "":
+            pattern = r'([ACGT]{6,8}(?:-[ACGT]{6,8})?)'
+            match = re.match(pattern, concat_files)
+            if match:
+                report.barcode = match.group(1)
         # Only add report if it hasn't been added before
         if concat_files != "":
             # seen.add(concat)

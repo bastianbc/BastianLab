@@ -218,7 +218,7 @@ class MigrateDump():
             if value.lower() == x[1].lower():
                 return x[0]
             else:
-                return value[:29]
+                return value[:29].lower()
 
         return None
 
