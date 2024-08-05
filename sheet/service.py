@@ -8,6 +8,9 @@ from sequencingfile.models import SequencingFile,SequencingFileSet
 from lab.models import Patients
 import json
 import re
+from barcodeset.models import Barcode
+from django.db.models import Q
+
 
 class SequencingFileSetSerializerManual(serializers.ModelSerializer):
     class Meta:
@@ -235,10 +238,19 @@ def generate_file(data, file_name):
         concat = f"{report.sample_lib}_{report.seq_run}"
         concat_files = f"{report.fastq}{report.bam}{report.bai}".replace("None","").strip()
         if not row.barcode_name or row.barcode_name == "":
-            pattern = r'([ACGT]{6,8}(?:-[ACGT]{6,8})?)'
-            match = re.match(pattern, concat_files)
+            pattern = r'(?<![ACGT])[ACGT]{6,8}(?![ACGT])'
+            match = re.findall(pattern, concat_files)
+
             if match:
-                report.barcode = match.group(1)
+                report.barcode = match[0]
+                print(match[0])
+                sl =  SampleLib.objects.get(name=report.sample_lib)
+                if sl.barcode is None:
+                    barcode = Barcode.objects.filter(Q(i5=match) | Q(i7=match))[0]
+                    sl.barcode = barcode
+                    sl.save()
+                    print("saved")
+
         # Only add report if it hasn't been added before
         if concat_files != "":
             # seen.add(concat)
