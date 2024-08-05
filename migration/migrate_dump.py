@@ -426,7 +426,6 @@ class MigrateDump():
             barcode= Barcode.objects.get(name=row[12].strip())
             sl.barcode = barcode
             sl.save()
-            print(sl.name, row[12], sl.barcode.name)
         except:
             print(f"{row[12].strip()} Barcode not found for {sl.name}")
 
@@ -488,7 +487,6 @@ class MigrateDump():
                     sl.notes = sl.notes + " migration_dump"
                 sl.save()
                 if row[12] != None:
-                    print(row[1], row[12], sl.barcode)
                     MigrateDump.register_barcode(row, sl)
             except Exception as e:
                 print(e, row[1],row[-3])
