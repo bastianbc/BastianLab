@@ -3697,15 +3697,33 @@ def find_path_seq_run_for_file_sets(request):
             print(e)
 
 def register_new_fastq_files(request):
-    file = Path(Path(__file__).parent.parent / "uploads" / "df_fq_new.csv")
+    file = Path(Path(__file__).parent.parent / "uploads" / "cl_seql_missing.csv")
     df = pd.read_csv(file)
     df = df.reset_index()  # make sure indexes pair with number of rows
     for index, row in df.iterrows():
         try:
-            SequencingFile.objects.get(name=row['file'])
+            sl = SampleLib.objects.get(name=row['sample_lib'])
+            cl, _ = CapturedLib.objects.get_or_create(name=row['SeqRun']+"_CL")
+            seql, _ = SequencingLib.objects.get_or_create(name=row['SeqRun']+"_SeqL")
+            seq_run = SequencingRun.objects.get(name=row['SeqRun'])
+            SL_CL_LINK.objects.create(sample_lib=sl, captured_lib=cl)
+            CL_SEQL_LINK.objects.create(captured_lib=cl, sequencing_lib=seql)
+            seq_run.sequencing_libs.add(seql)
+            seq_run.save()
+            print(sl,cl,seql,seq_run)
+
         except Exception as e:
             print(e, row['file'])
             generate_file_set(row['file'])
+    # file = Path(Path(__file__).parent.parent / "uploads" / "df_fq_new.csv")
+    # df = pd.read_csv(file)
+    # df = df.reset_index()  # make sure indexes pair with number of rows
+    # for index, row in df.iterrows():
+    #     try:
+    #         SequencingFile.objects.get(name=row['file'])
+    #     except Exception as e:
+    #         print(e, row['file'])
+    #         generate_file_set(row['file'])
 
     # for index, row in df.iterrows():
     #     file = SequencingFile.objects.get(name=row['file'])
