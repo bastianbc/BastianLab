@@ -19,7 +19,7 @@ def _get_authorizated_queryset(seq_runs):
             sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=seq_runs
         ).annotate(
         na_type=F('na_sl_links__nucacid__na_type'),
-        seq_run=F('sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs'),
+        seq_run=F('sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__name'),
         patient=F('na_sl_links__nucacid__area_na_links__area__block__patient__pat_id'),
         sex=Subquery(
             Patients.objects.filter(
