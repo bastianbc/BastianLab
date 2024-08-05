@@ -490,6 +490,7 @@ class MigrateDump():
                 sl.save()
                 if row[12] != None:
                     MigrateDump.register_barcode(row, sl)
+                print(row[12], sl.barcode)
             except Exception as e:
                 print(e, row[1],row[-3])
 
