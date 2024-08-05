@@ -452,15 +452,15 @@ class MigrateDump():
         rows = MigrateDump().cursor(sql)
         rows2 = MigrateDump().cursor(sql2)
         rows3 = MigrateDump().cursor(sql3)
-        for row in rows:
-            try:
-                nas = row[-1].split(',')
-                sl,_ = SampleLib.objects.get_or_create(name=row[-2])
-                for na in nas:
-                    nuc_acid = NucAcids.objects.get(name=na.strip())
-                    NA_SL_LINK.objects.get_or_create(sample_lib=sl, nucacid=nuc_acid)
-            except Exception as e:
-                print(e, nas)
+        # for row in rows:
+        #     try:
+        #         nas = row[-1].split(',')
+        #         sl,_ = SampleLib.objects.get_or_create(name=row[-2])
+        #         for na in nas:
+        #             nuc_acid = NucAcids.objects.get(name=na.strip())
+        #             NA_SL_LINK.objects.get_or_create(sample_lib=sl, nucacid=nuc_acid)
+        #     except Exception as e:
+        #         print(e, nas)
 
         for row in rows2:
             try:
@@ -484,10 +484,10 @@ class MigrateDump():
                     sl.notes = row[11]
                 else:
                     sl.notes = ""
-                sl.save()
+                # sl.save()
                 if not " migration_dump" in sl.notes:
                     sl.notes = sl.notes + " migration_dump"
-                sl.save()
+                # sl.save()
                 if row[12] != None:
                     MigrateDump.register_barcode(row, sl)
                 print(row[12], sl.barcode)
