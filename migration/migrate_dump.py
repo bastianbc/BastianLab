@@ -426,6 +426,7 @@ class MigrateDump():
             barcode= Barcode.objects.get(name=row[12].strip())
             sl.barcode = barcode
             sl.save()
+            print(sl.name, row[12], sl.barcode.name)
         except:
             print(f"{row[12].strip()} Barcode not found for {sl.name}")
 
@@ -467,12 +468,7 @@ class MigrateDump():
 
         for row in rows2:
             try:
-                if "uffy" in row[1]:
-                    sl = SampleLib.objects.get(name="Buffy_Coat")
-                elif row[1].startswith("H12_") or row[1].startswith("T12_"):
-                    continue
-                else:
-                    sl, _ = SampleLib.objects.get_or_create(name=row[1].strip())
+                sl, _ = SampleLib.objects.get_or_create(name=row[1].strip())
                 if row[2]:
                     sl.date = row[2]
                 sl.qubit = row[3] or 0
@@ -487,13 +483,13 @@ class MigrateDump():
                     sl.notes = row[11]
                 else:
                     sl.notes = ""
-                # sl.save()
+                sl.save()
                 if not " migration_dump" in sl.notes:
                     sl.notes = sl.notes + " migration_dump"
-                # sl.save()
+                sl.save()
                 if row[12] != None:
+                    print(row[1], row[12], sl.barcode)
                     MigrateDump.register_barcode(row, sl)
-                    # print(sl.name, row[12], sl.barcode)
             except Exception as e:
                 print(e, row[1],row[-3])
 
