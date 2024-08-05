@@ -217,6 +217,9 @@ class MigrateDump():
         for x in Areas.AREA_TYPE_TYPES:
             if value.lower() == x[1].lower():
                 return x[0]
+            else:
+                return value
+
         return None
 
     @staticmethod
@@ -235,10 +238,10 @@ class MigrateDump():
         for row in rows:
             try:
                 if row[0] != None:
-                    block = Blocks.objects.get(name=row[-2].strip())
+                    # block = Blocks.objects.get(name=row[-2].strip())
                     area, _ = Areas.objects.get_or_create(name=row[1])
-                    area.block = block
-                    area.save()
+                    # area.block = block
+                    # area.save()
                     if row[2] != None:
                         area.area_type = MigrateDump.get_area_type(row[2])
                     area.image = row[4]
@@ -252,8 +255,8 @@ class MigrateDump():
                         for i in row[-6].split(","):
                             block, _ = Blocks.objects.get_or_create(name=i)
                     area, _ = Areas.objects.get_or_create(name=row[1])
-                    area.block = block
-                    area.save()
+                    # area.block = block
+                    # area.save()
                     if row[2] != None:
                         area.area_type = MigrateDump.get_area_type(row[2])
                     area.image = row[4]
