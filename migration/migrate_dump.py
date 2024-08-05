@@ -423,14 +423,9 @@ class MigrateDump():
     @staticmethod
     def register_barcode(row, sl):
         try:
-            if row[12]:
-                barcode= Barcode.objects.get(name=row[12].strip())
-                sl.barcode = barcode or None
-                sl.save()
-            else:
-                barcode = MigrateDump.get_barcode(sl)
-                sl.barcode = barcode or None
-                sl.save()
+            barcode= Barcode.objects.get(name=row[12].strip())
+            sl.barcode = barcode
+            sl.save()
         except:
             print(f"{row[12].strip()} Barcode not found for {sl.name}")
 
@@ -449,9 +444,17 @@ class MigrateDump():
             LEFT JOIN sample_lib s on l.sample_lib_id = s.id
             LEFT JOIN nuc_acids n on n.nu_id = l.nucacid_id
         '''
+        sql4 = '''
+            SELECT name FROM sample_lib where barcode_id is Null
+        '''
         rows = MigrateDump().cursor(sql)
         rows2 = MigrateDump().cursor(sql2)
         rows3 = MigrateDump().cursor(sql3)
+        rows4 = MigrateDump().cursor(sql4)
+        md = set([i[0] for i in rows4])
+        db = set([i["name"] for i in SampleLib.objects.filter(barcode__isnull=True).values("name")])
+        print(db-md)
+
         # for row in rows:
         #     try:
         #         nas = row[-1].split(',')
@@ -490,7 +493,7 @@ class MigrateDump():
                 # sl.save()
                 if row[12] != None:
                     MigrateDump.register_barcode(row, sl)
-                print(row[12], sl.barcode)
+                    # print(sl.name, row[12], sl.barcode)
             except Exception as e:
                 print(e, row[1],row[-3])
 
