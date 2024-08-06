@@ -3626,21 +3626,30 @@ def match_sl_fastq_file_2(request):
 
 def generate_file_set(file):
     match = re.match(r'.*[-_]([ACTG]{6,8})[-_]', file)
+    file_type = ""
     if "fastq" in file:
+        file_type = "fastq"
         prefix = file.split("_L0")[0] if "_L0" in file else file.split("_001")[0] if "_001" in file else None
     elif ".sorted" in file:
+        file_type = "bam"
         prefix = file.split(".sorted")[0]
     elif ".sort" in file:
+        file_type = "bam"
         prefix = file.split(".sort")[0]
     elif ".removedupes" in file:
+        file_type = "bam"
         prefix = file.split(".removedupes")[0]
     elif ".recal" in file:
+        file_type = "bam"
         prefix = file.split(".recal")[0]
     elif "deduplicated.realign.bam" in file:
+        file_type = "bam"
         prefix = file.split(".deduplicated.realign.bam")[0]
     elif file.endswith(".bai"):
+        file_type = "bai"
         prefix = file.split(".bai")[0]
     elif file.endswith(".bam"):
+        file_type = "bam"
         prefix = file.split(".bam")[0]
     if match:
         dna = match.group(1)
@@ -3648,7 +3657,7 @@ def generate_file_set(file):
     if prefix is None:
         prefix = file.split(".")[0]
     file_set,_ = SequencingFileSet.objects.get_or_create(prefix=prefix)
-    f, _ = SequencingFile.objects.get_or_create(name=file)
+    f, _ = SequencingFile.objects.get_or_create(name=file, type=file_type)
     f.sequencing_file_set = file_set
     f.save()
     print("file_set generated", prefix, "------", file)

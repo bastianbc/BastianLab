@@ -232,10 +232,10 @@ def generate_file(data, file_name):
         else:
             report.fastq = _get_file(sl)
             report.path_fastq = _get_path(sl)
-
+        if report.fastq:
+            report.bam, report.bai, report.path_bai, report.path_bam = "","","",""
         # seq_run = report.path_fastq.split("/")[1] if report.path_fastq != "" and report.path_fastq != None else ""
         report.seq_run = row.seq_run2  # ✓
-        concat = f"{report.sample_lib}_{report.seq_run}"
         concat_files = f"{report.fastq}{report.bam}{report.bai}".replace("None","").strip()
         if not row.barcode_name or row.barcode_name == "":
             pattern = r'(?<![ACGT])[ACGT]{6,8}(?![ACGT])'
