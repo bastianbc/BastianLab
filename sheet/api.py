@@ -71,7 +71,7 @@ def _get_authorizated_queryset(seq_runs):
        bait=F("sl_cl_links__captured_lib__bait__name")
     ).filter(
         Exists(seq_run_subquery)
-    ).distinct().order_by('name')
+    ).order_by('name')
 
 def _get_authorizated_queryset_2(seq_runs):
     seq_run_subquery = SequencingFileSet.objects.filter(
