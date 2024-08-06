@@ -11,7 +11,7 @@ from sequencingrun.models import SequencingRun
 
 
 def _get_authorizated_queryset(seq_runs):
-    seq_run_subquery = SequencingFileSet.objects.filter(
+    seq_run_subquery = SequencingFileSet.objects.filter(prefix__icontains="DM",
         sample_lib=OuterRef('pk'),
         sequencing_run__id__in=seq_runs
     ).values('sequencing_run__id')
