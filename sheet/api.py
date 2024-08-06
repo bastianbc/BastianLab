@@ -69,8 +69,6 @@ def _get_authorizated_queryset(seq_runs):
            distinct=True
        ),
        bait=F("sl_cl_links__captured_lib__bait__name")
-    ).filter(
-        Exists(seq_run_subquery)
     ).order_by('name')
 
 def _get_authorizated_queryset_2(seq_runs):
