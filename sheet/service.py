@@ -235,7 +235,7 @@ def generate_file(data, file_name):
         if not report.fastq:
             files = SequencingFile.objects.filter(
                 sequencing_file_set__sample_lib__name=row.name,type='fastq'
-            ).values("name", "sequencing_file_set__path")
+            )
             if files:
                 report.fastq = ", ".join([file.name for file in files])
                 report.path_fastq = files.first().sequencing_file_set.path
