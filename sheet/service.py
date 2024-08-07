@@ -232,13 +232,15 @@ def generate_file(data, file_name):
         else:
             report.fastq = _get_file(sl)
             report.path_fastq = _get_path(sl)
-        if report.fastq:
-            report.bam, report.bai, report.path_bai, report.path_bam = "","","",""
-        else:
-            files = SequencingFile.objects.filter(sequencing_file_set__sample_lib__name=row.name,type='fastq').values("name", "sequencing_file_set__path")
+        if not report.fastq:
+            files = SequencingFile.objects.filter(
+                sequencing_file_set__sample_lib__name=row.name,type='fastq'
+            ).values("name", "sequencing_file_set__path")
             if files:
                 report.fastq = ", ".join([file.name for file in files])
                 report.path_fastq = files.first().sequencing_file_set.path
+        if report.fastq:
+            report.bam, report.bai, report.path_bai, report.path_bam = "","","",""
         # seq_run = report.path_fastq.split("/")[1] if report.path_fastq != "" and report.path_fastq != None else ""
         report.seq_run = row.seq_run2  # ✓
         concat_files = f"{report.fastq}{report.bam}{report.bai}".replace("None","").strip()
