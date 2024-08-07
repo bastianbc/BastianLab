@@ -14,10 +14,10 @@ def _get_authorizated_queryset(seq_runs):
     seq_run_subquery = SequencingFileSet.objects.filter(
         sample_lib=OuterRef('pk'),
         sequencing_run__id__in=seq_runs
-    ).prefetch_related('sequencing_file_sets').values('sequencing_run__id')
+    ).values('sequencing_run__id')
     return SampleLib.objects.filter(
             sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=seq_runs
-        ).annotate(
+        ).prefetch_related('sequencing_file_sets').annotate(
         na_type=F('na_sl_links__nucacid__na_type'),
         seq_run2=F('sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__name'),
         seq_run=F('sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs'),
