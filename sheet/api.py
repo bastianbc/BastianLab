@@ -135,9 +135,6 @@ def query_by_args(user, seq_runs, **kwargs):
                 order_column = '-' + order_column
                
             queryset = _get_authorizated_queryset(seq_runs)
-            for i in queryset:
-                print("queryset_"*10)
-                print(i.file)
             total = queryset.count()
 
             search_value = _parse_value(search_value)
