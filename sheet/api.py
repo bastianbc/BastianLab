@@ -11,10 +11,10 @@ from sequencingrun.models import SequencingRun
 
 
 def _get_authorizated_queryset(seq_runs):
-    seq_run_subquery = SequencingFileSet.objects.filter(prefix__icontains="DM",
+    seq_run_subquery = SequencingFileSet.objects.filter(
         sample_lib=OuterRef('pk'),
         sequencing_run__id__in=seq_runs
-    ).values('sequencing_run__id')
+    ).prefetch_related('sequencing_file_sets').values('sequencing_run__id')
     return SampleLib.objects.filter(
             sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=seq_runs
         ).annotate(
@@ -69,20 +69,55 @@ def _get_authorizated_queryset(seq_runs):
            distinct=True
        ),
        bait=F("sl_cl_links__captured_lib__bait__name")
-    ).order_by('name')
+    ).filter(
+        Exists(seq_run_subquery)
+    ).distinct().order_by('name')
 
 def _get_authorizated_queryset_2(seq_runs):
-    seq_run_subquery = SequencingFileSet.objects.filter(
-        sample_lib=OuterRef('pk'),
-        sequencing_run__id__in=seq_runs
-    ).values('sequencing_run')
+    # Subquery to filter based on sequencing runs
+    sls = SampleLib.objects.filter(
+        Q(name__icontains="DM1_T")  # Filters SampleLib entries where name includes 'DM1_T'
+    ).prefetch_related('sequencing_file_sets').annotate(
+        seq_run=F('sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs'),
+        patient=F('na_sl_links__nucacid__area_na_links__area__block__patient__pat_id'),
+        sex=Subquery(
+            Patients.objects.filter(
+                patient_blocks__block_areas__area_na_links__nucacid__na_sl_links__sample_lib=OuterRef('pk')
+            ).values('sex')[:1]
+        ),
+        area_type=Subquery(
+            Areas.objects.filter(
+                area_na_links__nucacid__na_sl_links__sample_lib=OuterRef('pk')
+            ).annotate(
+                simplified_area_type=Case(
+                    When(area_type='normal', then=Value('normal')),
+                    When(area_type__isnull=True, then=Value(None)),  # Exclude None explicitly if needed
+                    default=Value('tumor'),
+                    output_field=CharField(),
+                )
+            ).values('simplified_area_type')[:1]
+        ),
+        matching_normal_sl=Case(
+            When(
+                area_type=Value('normal'),
+                then=Value(None)
+            ),
+            default=Subquery(
+                SampleLib.objects.filter(
+                    na_sl_links__nucacid__area_na_links__area__area_type='normal',
+                    na_sl_links__nucacid__area_na_links__area__block__patient=OuterRef(
+                        "na_sl_links__nucacid__area_na_links__area__block__patient")
+                ).values('name')[:1]
+            ),
+            output_field=CharField()
+        )
+    ).distinct()
 
-    # Main query to filter SampleLib objects and annotate with the sequencing runs from the subquery
-    return SampleLib.objects.filter(
-        sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=seq_runs
-    ).annotate(
-        seq_run=Subquery(seq_run_subquery)
-    ).distinct().order_by('name')
+    # Convert to a list of dictionaries for viewing duplicated entries
+    duplicated_entries = list(sls)
+    for i in sls:
+        print("%"*10,i,sep='\n')
+    return sls
 
 
 def _parse_value(search_value):
@@ -128,6 +163,8 @@ def query_by_args(user, seq_runs, **kwargs):
                 order_column = '-' + order_column
                
             queryset = _get_authorizated_queryset(seq_runs)
+            print("queryset"*100)
+            print(queryset)
             total = queryset.count()
 
             search_value = _parse_value(search_value)
