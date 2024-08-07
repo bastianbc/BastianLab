@@ -87,6 +87,7 @@ INSTALLED_APPS = [
     'gene',
     'sheet',
     'wiki',
+    'analysisrun',
 
 ]
 CRISPY_TEMPLATE_PACK = 'bootstrap4'

@@ -816,6 +816,7 @@ var KTDatatablesServerSide = function () {
           const stepperElement = document.getElementById("modal_stepper");
           // const exportButton = document.getElementById("export_button");
           let stepper = null;
+          const form = document.getElementById("form-analysis-run");
 
           initGenerateAnalysisSheetButton(modal);
           initStepper(stepperElement);
@@ -878,6 +879,7 @@ var KTDatatablesServerSide = function () {
           }
 
           function populateTable(data) {
+
               function createCheckboxColumn() {
                   const col = document.createElement("div");
                   col.classList.add("col-1");
@@ -937,9 +939,7 @@ var KTDatatablesServerSide = function () {
                   const checkbox = row.querySelector('input[type="checkbox"]');
                   if (checkbox.checked) {
                       const columns = row.querySelectorAll('div:not(.col-1) span');
-                      console.log(columns);
                       const rowData = Array.from(columns).map(col => col.textContent.trim()).join(',');
-                      console.log("xx: ",rowData);
                       csvContent += `${rowData}\n`;
                   }
               });
@@ -952,7 +952,7 @@ var KTDatatablesServerSide = function () {
           function submitForm() {
               generateCSV();
 
-              const formData = new FormData(document.getElementById('form-analysis-run'));
+              const formData = new FormData(form);
 
               $.ajax({
                   url: "/sequencingrun/save_analysis_run",
@@ -998,6 +998,9 @@ var KTDatatablesServerSide = function () {
               modalElement.addEventListener('hide.bs.modal', function(){
                   const listBody = document.querySelector('#analysis-sheet-list .list-body');
                   listBody.innerHTML = "";
+                  stepper.goFirst();
+                  form.reset();
+                  dt.draw();
               });
 
               // submit button

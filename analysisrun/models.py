@@ -1,58 +1,27 @@
 from django.db import models
-from datetime import datetime
-from django.db.models import Q, Count
-import json
-from core.validators import validate_name_contains_space
 from django.contrib.auth.models import User
+import json
 
-class SequencingRun(models.Model):
-    FACILITY_TYPES = (
-        ("cat","CAT"),
-        ("ihg","IHG"),
-        ("broad-institute","Broad Institute"),
-        ("other","Other"),
+class AnalysisRun(models.Model):
+    PIPELINE_CHOICES = (
+        ("v1", "V1"),
     )
 
-    SEQUENCER_TYPES = (
-        ("novaseq-6000-sp","NovaSeq 6000 SP"),
-        ("novaseq-6000-s1","NovaSeq 6000 S1"),
-        ("novaseq-6000-s2","NovaSeq 6000 S2"),
-        ("novaseq-6000-s4","NovaSeq 6000 S4"),
-        ("novaseq-x","NovaSeq X"),
-        ("hiseq-2500","HiSeq 2500"),
-        ("hiseq-4000","HiSeq 4000"),
-        ("iseq100","iSeq 100"),
+    GENOME_CHOICES = (
+        ("hg19", "Hg19"),
     )
-
-    PE_TYPES = (
-        ("PE 50", "PE 50"),
-        ("PE 100", "PE 100"),
-        ("PE 150", "PE 150"),
-        ("SE 150", "SE 150"),
-    )
-
-    name = models.CharField(max_length=50, unique=True, validators=[validate_name_contains_space], verbose_name="Name")
-    date_run = models.DateTimeField(default=datetime.now, verbose_name="Date Run")
-    date = models.DateTimeField(default=datetime.now, verbose_name="Date")
-    facility = models.CharField(max_length=20, choices=FACILITY_TYPES, blank=True, null=True, verbose_name="Facility")
-    sequencer = models.CharField(max_length=20, choices=SEQUENCER_TYPES, verbose_name="Sequencer",blank=True, null=True)
-    pe = models.CharField(max_length=20, choices=PE_TYPES, verbose_name="PE",blank=True, null=True)
-    amp_cycles = models.IntegerField(default=0, verbose_name="AMP Cycles")
-    notes = models.TextField(blank=True, null=True, verbose_name="Notes")
-    sequencing_libs = models.ManyToManyField("sequencinglib.SequencingLib", blank=True, related_name="sequencing_runs")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="analysis_runs")
+    pipeline = models.CharField(max_length=10, choices=PIPELINE_CHOICES, verbose_name = "Pipeline Version")
+    genome = models.CharField(max_length=10, choices=GENOME_CHOICES, verbose_name = "Reference Genome")
+    date = models.DateTimeField(auto_now_add=True)
+    sheet = models.FileField(upload_to="files/")
 
     class Meta:
-        db_table = "sequencing_run"
-
-    def __str__(self):
-        return self.name
+        db_table = "analysis_run"
 
     def query_by_args(self, user, **kwargs):
         def _get_authorizated_queryset():
-            return SequencingRun.objects.all().annotate(
-                num_file_sets=Count('sequencing_file_sets', distinct=True),
-                num_sequencinglibs=Count("sequencing_libs", distinct=True),
-            )
+            return AnalysisRun.objects.all()
 
         def _parse_value(search_value):
             '''
@@ -81,13 +50,10 @@ class SequencingRun(models.Model):
         try:
             ORDER_COLUMN_CHOICES = {
                 "0": "id",
-                "1": "name",
-                "2": "date",
-                "3": "facility",
-                "4": "sequencer",
-                "5": "pe",
-                "6": "amp_cycles",
-                "7": "date_run"
+                "1": "pipeline",
+                "2": "genome",
+                "3": "date",
+                "4": "sheet",
             }
             draw = int(kwargs.get('draw', None)[0])
             length = int(kwargs.get('length', None)[0])
@@ -109,15 +75,12 @@ class SequencingRun(models.Model):
             is_initial = _is_initial_value(search_value)
             search_value = _parse_value(search_value)
             if is_initial:
-                if search_value["model"] == "seqlib":
-                    queryset = queryset.filter(Q(sequencing_libs__id=search_value["id"]))
+                pass
             elif search_value:
                 queryset = queryset.filter(
-                    Q(name__icontains=search_value) |
+                    Q(pipeline__icontains=search_value) |
                     Q(date__icontains=search_value) |
-                    Q(sequencer__icontains=search_value) |
-                    Q(facility__icontains=search_value) |
-                    Q(date_run__icontains=search_value)
+                    Q(genome__icontains=search_value)
                 )
 
             count = queryset.count()

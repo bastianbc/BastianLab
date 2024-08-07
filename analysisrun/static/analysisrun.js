@@ -6,11 +6,10 @@ var KTDatatablesServerSide = function () {
     var table;
     var dt;
     var filterPayment;
-    var editor;
     var selectedRows = [];
 
     // Private functions
-    var initDatatable = function ( initialValue ) {
+    var initDatatable = function () {
 
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
 
@@ -29,11 +28,10 @@ var KTDatatablesServerSide = function () {
             keys: {
               columns: ':not(:first-child)',
               keys: [ 9 ],
-              editor: editor,
               editOnFocus: true
             },
             ajax: {
-              url: '/variant/filter_variants',
+              url: '/analysisrun/filter_analysisruns',
               type: 'GET',
               error: function (xhr, ajaxOptions, thrownError) {
                   if (xhr.status == 403) {
@@ -53,14 +51,14 @@ var KTDatatablesServerSide = function () {
             },
             columns: [
                 { data: 'id' },
-                { data: 'sample_lib' },
-                { data: 'sequencing_run' },
-                { data: 'block' },
-                { data: 'area' },
-                { data: 'ref' },
-                { data: 'pos' },
-                { data: 'alt' },
-                { data: 'gene' },
+                { data: 'pipeline' },
+                { data: 'genome' },
+                { data: 'sheet' },
+                { data: 'date',
+                  render: function (data) {
+                    return moment(data).format('MM/DD/YYYY');
+                  }
+                },
                 { data: null },
             ],
             columnDefs: [
@@ -75,20 +73,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 8,
-                    className: 'text-center',
-                    orderable: false,
-                    render: function (data, type, row) {
-                        if (data > 0) {
-                          let id = row["id"];
-                          return `
-                              <a href="javascript:;" class="detail-link">${data}</a>`;
-                        }
-                        return data;
-                    }
-                },
-                {
-                    targets: 9,
+                    targets: 5,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -108,24 +93,32 @@ var KTDatatablesServerSide = function () {
                             <!--begin::Menu-->
                             <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4" data-kt-menu="true">
                                 <!--begin::Menu item-->
-                                <div class="menu-item px-3">
-                                    <a href="#" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
+                                <div class="menu-item">
+                                    <a href="/sequencingrun/edit/`+ row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
                                         Edit
                                     </a>
                                 </div>
                                 <!--end::Menu item-->
 
                                 <!--begin::Menu item-->
-                                <div class="menu-item px-2">
-                                    <a href="javascript:;" class="menu-link px-3 detail-link" data-kt-docs-table-filter="detail_row">
+                                <div class="menu-item">
+                                    <a href="javascript:;" class="menu-link detail-link" data-kt-docs-table-filter="detail_row">
                                         Used Library(s)
                                     </a>
                                 </div>
                                 <!--end::Menu item-->
 
                                 <!--begin::Menu item-->
-                                <div class="menu-item px-3">
-                                    <a href="#" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
+                                <div class="menu-item">
+                                    <a href="javascript:;" class="menu-link sequencing-files-link text-start" data-kt-docs-table-filter="detail_row">
+                                        Get Sequencing Files
+                                    </a>
+                                </div>
+                                <!--end::Menu item-->
+
+                                <!--begin::Menu item-->
+                                <div class="menu-item">
+                                    <a href="/sequencingrun/delete/` + row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
                                         Delete
                                     </a>
                                 </div>
@@ -140,7 +133,6 @@ var KTDatatablesServerSide = function () {
             createdRow: function (row, data, dataIndex) {
                 $(row).find('td:eq(4)').attr('data-filter', data.CreditCardType);
             },
-            oSearch: {sSearch: "_initial:" + initialValue}
         });
 
         table = dt.$;
@@ -153,7 +145,7 @@ var KTDatatablesServerSide = function () {
             toggleToolbars();
             handleDeleteRows();
             handleResetForm();
-            // initRowActions();
+            initRowActions();
             handleSelectedRows.init();
             KTMenu.createInstances();
         });
@@ -252,7 +244,7 @@ var KTDatatablesServerSide = function () {
                 const id = parent.querySelectorAll('td')[0].querySelector(".form-check-input").value;
 
                 $.ajax({
-                    url: "/sequencingrun/check_can_deleted_async",
+                    url: "/analysisrun/check_can_deleted_async",
                     type: "GET",
                     data: {
                       "id": id,
@@ -407,210 +399,9 @@ var KTDatatablesServerSide = function () {
         }
     }
 
-    var initEditor = function () {
-
-      var facilityOptions = [];
-      var sequencerOptions = [];
-      var peOptions = [];
-
-      Promise.all([
-
-        getFacilityOptions(),
-        getSequencerOptions(),
-        getPeOptions()
-
-      ]).then(function () {
-
-        editor = new $.fn.dataTable.Editor({
-          ajax: {
-            url: "/sequencingrun/edit_sequencingrun_async",
-            type: "POST",
-            headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
-            success: function (data) {
-
-              if ( !data.success ) {
-
-                Swal.fire({
-                    text: data.message,
-                    icon: "error",
-                    buttonsStyling: false,
-                    confirmButtonText: "Ok, got it!",
-                    customClass: {
-                        confirmButton: "btn fw-bold btn-primary",
-                    }
-                });
-
-              }
-
-              dt.draw();
-
-            },
-            error: function (xhr, ajaxOptions, thrownError) {
-                swal("Error updating!", "Please try again!", "error");
-            }
-          },
-          table: ".table",
-          fields: [ {
-                 label: "Name:",
-                 name: "name"
-             }, {
-                 label: "Date:",
-                 name: "date",
-                 type: "datetime",
-                 displayFormat: "M/D/YYYY",
-                 wireFormat: 'YYYY-MM-DD'
-             }, {
-                 label: "Facility:",
-                 name: "facility",
-                 type: "select",
-                 options: facilityOptions
-             }, {
-                 label: "Sequencer:",
-                 name: "sequencer",
-                 type: "select",
-                 options: sequencerOptions
-             }, {
-                 label: "PE:",
-                 name: "pe",
-                 type: "select",
-                 options: peOptions
-             }, {
-                 label: "AMP Cycles:",
-                 name: "amp_cycles"
-             }, {
-                 label: "Date Run:",
-                 name: "date_run",
-                 type: "datetime",
-                 displayFormat: "M/D/YYYY",
-                 wireFormat: 'YYYY-MM-DD'
-             },
-         ],
-         formOptions: {
-            inline: {
-              onBlur: 'submit'
-            }
-         }
-        });
-
-      });
-
-     $('.table').on( 'click', 'tbody td:not(:first-child)', function (e) {
-       editor.inline( dt.cell( this ).index(), {
-           onBlur: 'submit'
-       });
-     });
-
-     $('.table').on( 'key-focus', function ( e, datatable, cell ) {
-          editor.inline( cell.index() );
-     });
-
-     function getFacilityOptions() {
-
-       $.ajax({
-           url: "/sequencingrun/get_facilities",
-           type: "GET",
-           async: false,
-           success: function (data) {
-
-            // var options = [];
-            data.forEach((item, i) => {
-
-              facilityOptions.push({
-                "label":item["label"],
-                "value":item["value"]
-              })
-
-            });
-           }
-       });
-
-     }
-
-     function getSequencerOptions() {
-
-       $.ajax({
-           url: "/sequencingrun/get_sequencers",
-           type: "GET",
-           async: false,
-           success: function (data) {
-
-            // var options = [];
-            data.forEach((item, i) => {
-
-              sequencerOptions.push({
-                "label":item["label"],
-                "value":item["value"]
-              })
-
-            });
-           }
-       });
-
-     }
-
-     function getPeOptions() {
-
-       $.ajax({
-           url: "/sequencingrun/get_pes",
-           type: "GET",
-           async: false,
-           success: function (data) {
-
-            // var options = [];
-            data.forEach((item, i) => {
-
-              peOptions.push({
-                "label":item["label"],
-                "value":item["value"]
-              })
-
-            });
-           }
-       });
-
-     }
-
-    }
-
-    // Redirects from other pages
-    var handleInitialValue = () => {
-
-      // Remove parameters in URL
-      function cleanUrl() {
-        window.history.replaceState(null, null, window.location.pathname);
-      }
-
-      const params = new URLSearchParams(window.location.search);
-      const x = params.get('initial');
-
-      cleanUrl();
-
-      return x;
-
-    }
-
     var handleSelectedRows = ((e) => {
 
       const container = document.querySelector('.table');
-
-      function getSelectedRows() {
-
-        const selectedRows = container.querySelectorAll('tbody [type="checkbox"]:checked');
-
-        const selectedIds = [];
-
-        selectedRows.forEach((p) => {
-          // Select parent row
-          const parent = p.closest('tr');
-          // Get customer name
-          const id = parent.querySelector('input[type=checkbox]').value;
-
-          selectedIds.push(id)
-
-        });
-
-        return JSON.stringify(selectedIds);
-      }
 
       function uncheckedFirstCheckBox() {
 
@@ -657,9 +448,9 @@ var KTDatatablesServerSide = function () {
 
                         $.ajax({
                             type: "GET",
-                            url: "/sequencingrun/batch_delete",
+                            url: "/analysisrun/batch_delete",
                             data: {
-                              "selected_ids": getSelectedRows(),
+                              "selected_ids": JSON.stringify(selectedRows),
                             },
                             error: function (xhr, ajaxOptions, thrownError) {
                                 swal("Error deleting!", "Please try again", "error");
@@ -704,6 +495,8 @@ var KTDatatablesServerSide = function () {
 
       }
 
+
+
       return {
         init: function () {
           handleBatchDelete(), uncheckedFirstCheckBox();
@@ -714,162 +507,20 @@ var KTDatatablesServerSide = function () {
 
     var initRowActions = () => {
 
-      const el = document.getElementById("modal_used_sequencinglibs");
-      const modal = new bootstrap.Modal(el);
 
-      var data = {};
-
-      initModal();
-
-      function initModal() {
-
-        el.addEventListener('hide.bs.modal', function(){
-
-          var listEl = document.querySelector(".list-body");
-
-          listEl.innerHTML = "";
-
-          data = {};
-
-        });
-
-        var detailLinks = document.querySelectorAll(".detail-link");
-
-        for (var detail of detailLinks) {
-
-          detail.addEventListener("click", function (e) {
-            e.preventDefault();
-            // Select parent row
-            const parent = this.closest('tr');
-            // Get customer name
-            const id = parent.querySelector('input[type=checkbox]').value;
-
-            $.ajax({
-                url: "/sequencingrun/" + id + "/used_sequencinglibs",
-                type: "GET",
-                success: function (retval) {
-
-                  data = retval;
-
-                  fillElements(id);
-
-                  modal.show();
-
-                },
-                error: function (xhr, ajaxOptions, thrownError) {
-
-                }
-            });
-
-          });
-
-        }
-
-      }
-
-      function fillElements(id) {
-
-        var listEl = document.querySelector(".list-body");
-
-        for (var i = 0; i < data.length; i++) {
-
-          var row = `<div class="row mb-1 detail-row">
-              <div class="col-6 align-self-center" data-id="${ data[i].id }"><a href="/sequencinglib/edit/${ data[i].id }">${ data[i].name }</a></div>
-              <div class="col-3 align-self-center">${ data[i].buffer }</div>
-              <div class="col-3 align-self-center text-center">${ data[i].nmol }</div>
-            </div>`;
-          listEl.innerHTML += row;
-
-        }
-
-      }
 
     }
-
-    var handleImportFile = ((e) => {
-        // Fetch CSRF token from cookies
-        function getCSRFToken() {
-            const cookieValue = document.cookie
-                .split('; ')
-                .find(cookie => cookie.startsWith('csrftoken='))
-                .split('=')[1];
-            return cookieValue;
-        }
-
-        document.querySelector("button[name='import_file']").addEventListener("click", function () {
-            let input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.txt'; // Restrict to CSV files
-            input.multiple = true; // Allow only one file to be selected
-            input.onchange = _ => {
-                let formData = new FormData();
-                Array.from(input.files).forEach(file => {
-                    formData.append('file', file);
-                });
-
-                // Append CSRF token to FormData
-                formData.append('csrfmiddlewaretoken', getCSRFToken());
-
-                fetch('/variant/import_variants', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => {
-                    if (response.ok) {
-                        // Handle success
-                        console.log('Files uploaded successfully');
-                        return response.json();
-                    } else {
-                        // Handle error
-                        console.error('Error uploading files');
-                    }
-                })
-                .then(data => {
-                    if (data.success) {
-                      Swal.fire({
-                          html: `<p>Variants imported succesfully</p><p>${data.sample_libs}</p>`,
-                          imageUrl: `data:image/png;base64, ${data.graphic}`,
-                          imageWidth: 400,
-                          imageHeight: 200,
-                          imageAlt: "Normalization curve",
-                          icon: "info",
-                          buttonsStyling: false,
-                          confirmButtonText: "Ok, got it!",
-                          customClass: {
-                              confirmButton: "btn fw-bold btn-success",
-                          }
-                      })
-                    }
-                    else {
-                      Swal.fire({
-                          text: `Variants could not imported. ${data.message}`,
-                          icon: "error",
-                          buttonsStyling: false,
-                          confirmButtonText: "Ok, got it!",
-                          customClass: {
-                              confirmButton: "btn fw-bold btn-danger",
-                          }
-                      })
-                    };
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-            };
-            input.click();
-        });
-    })();
 
     // Public methods
     return {
         init: function () {
-            initDatatable( handleInitialValue() );
+            initDatatable();
             handleSearchDatatable();
             initToggleToolbar();
             handleFilterDatatable();
             handleDeleteRows();
             handleResetForm();
-            initEditor();
+
         }
     }
 }();

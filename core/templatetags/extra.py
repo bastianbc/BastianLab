@@ -4,6 +4,9 @@ register = template.Library()
 
 @register.filter(name='is_admin_area')
 def is_admin_area(path):
+    """
+    Checks if a django application is located in the admin area. If the application is located in the admin area, some content in master.html will not be visible.
+    """
     admin_area_apps = [
         "group",
         "account",
@@ -16,6 +19,7 @@ def is_admin_area(path):
         "sequencingfile",
         "gene",
         "wiki",
+        'analysisrun',
     ]
 
     app_name = path.split("/")[1]

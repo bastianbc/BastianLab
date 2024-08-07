@@ -23,13 +23,14 @@ def filter_variants(request):
 
     return JsonResponse(result)
 
-def upload_file(request):
-    if request.method == 'POST' and request.FILES['file']:
-        file = request.FILES['file']
+def import_variants(request):
+    success = False
 
-        # parsing and saving data into the database
-        variant_file_parser(file)
+    if request.method == 'POST' and request.FILES:
+        files = request.FILES.getlist("file")
+        for file in files:
+            # parsing and saving data into the database
+            variant_file_parser(file)
+            success = True
 
-        return redirect('success_url')  # Redirect to a success page or another view
-
-    return render(request, 'upload.html')  # Render the upload form
+    return JsonResponse({"success":success})

@@ -16,6 +16,7 @@ import sequencingrun.helper as helper
 from django.core.files.base import ContentFile
 from capturedlib.models import SL_CL_LINK
 import json
+from analysisrun.forms import AnalysisRunForm
 
 @permission_required("sequencingrun.view_sequencingrun",raise_exception=True)
 def sequencingruns(request):
@@ -314,24 +315,3 @@ def get_sample_libs_async(request):
     # print(json.dumps(data))
 
     return JsonResponse(data, safe=False)
-
-def save_analysis_run(request):
-    """
-    """
-    if request.method == "POST":
-        form = AnalysisRunForm(request.POST)
-        if form.is_valid():
-            analysis_run = form.save(commit=False)
-
-            sheet_content = form.cleaned_data['sheet_content']
-
-            # convert to csv
-            csv_file = ContentFile(sheet_content.encode('utf-8'))
-            file_name = f"{analysis_run.user.username}_analysis_sheet.csv"
-
-            analysis_run.sheet.save(file_name, csv_file, save=False)
-
-            analysis_run.save()
-
-            return JsonResponse({"success": True})
-    return JsonResponse({"success": False})
