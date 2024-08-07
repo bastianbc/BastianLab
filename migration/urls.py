@@ -49,4 +49,8 @@ urlpatterns = [
     path("import_bait", views.import_bait, name="import_bait"),
     path("upload_file_tree_all_md5_3", views.upload_file_tree_all_md5_3, name="upload_file_tree_all_md5_3"),
     path("match_seq_runs_with_dffq", views.match_seq_runs_with_dffq, name="match_seq_runs_with_dffq"),
+    path('match_sl_fastq_file_1', views.match_sl_fastq_file_1, name='match_sl_fastq_file_1'),
+    path('match_sl_fastq_file_2', views.match_sl_fastq_file_2, name='match_sl_fastq_file_2'),
+    path('find_path_seq_run_for_file_sets', views.find_path_seq_run_for_file_sets, name='find_path_seq_run_for_file_sets'),
+    path('register_new_fastq_files', views.register_new_fastq_files, name='register_new_fastq_files'),
 ]

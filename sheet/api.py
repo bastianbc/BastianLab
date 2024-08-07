@@ -12,13 +12,15 @@ from sequencingrun.models import SequencingRun
 
 def _get_authorizated_queryset(seq_runs):
     seq_run_subquery = SequencingFileSet.objects.filter(
+
         sample_lib=OuterRef('pk'),
         sequencing_run__id__in=seq_runs
     ).values('sequencing_run__id')
     return SampleLib.objects.filter(
             sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=seq_runs
-        ).annotate(
+        ).prefetch_related('sequencing_file_sets').annotate(
         na_type=F('na_sl_links__nucacid__na_type'),
+        seq_run2=F('sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__name'),
         seq_run=F('sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs'),
         patient=F('na_sl_links__nucacid__area_na_links__area__block__patient__pat_id'),
         sex=Subquery(
@@ -76,13 +78,16 @@ def _get_authorizated_queryset_2(seq_runs):
     seq_run_subquery = SequencingFileSet.objects.filter(
         sample_lib=OuterRef('pk'),
         sequencing_run__id__in=seq_runs
-    ).values('sequencing_run')
-
-    # Main query to filter SampleLib objects and annotate with the sequencing runs from the subquery
-    return SampleLib.objects.filter(
+    ).values('sequencing_run__id')
+    return SampleLib.objects.filter(name__icontains="DM1_",
         sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=seq_runs
-    ).annotate(
-        seq_run=Subquery(seq_run_subquery)
+    ).prefetch_related('sequencing_file_sets').annotate(
+
+        file=ArrayAgg(
+            'sequencing_file_sets__sequencing_files__name',
+        )
+    ).filter(
+        Exists(seq_run_subquery)
     ).distinct().order_by('name')
 
 
@@ -96,6 +101,7 @@ def _is_initial_value(search_value):
 
 
 def query_by_args(user, seq_runs, **kwargs):
+
     try:
         ORDER_COLUMN_CHOICES = {
             "0": "id",

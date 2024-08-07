@@ -7,6 +7,10 @@ from sequencingrun.models import SequencingRun
 from sequencingfile.models import SequencingFile,SequencingFileSet
 from lab.models import Patients
 import json
+import re
+from barcodeset.models import Barcode
+from django.db.models import Q
+
 
 class SequencingFileSetSerializerManual(serializers.ModelSerializer):
     class Meta:
@@ -203,6 +207,7 @@ def generate_file(data, file_name):
         report.patient = row.patient
         report.sample_lib = row.name.strip().replace(" ", "_") # ✓
         report.barcode = row.barcode_name # ✓
+
         report.na_type = row.na_type # ✓
         report.area_type = row.area_type # ✓
         report.matching_normal_sl = row.matching_normal_sl.replace(" ", "_") if row.matching_normal_sl else ""
@@ -227,11 +232,19 @@ def generate_file(data, file_name):
         else:
             report.fastq = _get_file(sl)
             report.path_fastq = _get_path(sl)
-
-        seq_run = report.path_fastq.split("/")[1] if report.path_fastq != "" and report.path_fastq != None else ""
-        report.seq_run = seq_run  # ✓
-        concat = f"{report.sample_lib}_{report.seq_run}"
+        if not report.fastq:
+            report.fastq = _get_file(sl)
+            report.path_fastq = _get_path(sl)
+        if report.fastq:
+            report.bam, report.bai, report.path_bai, report.path_bam = "","","",""
+        # seq_run = report.path_fastq.split("/")[1] if report.path_fastq != "" and report.path_fastq != None else ""
+        report.seq_run = row.seq_run2  # ✓
         concat_files = f"{report.fastq}{report.bam}{report.bai}".replace("None","").strip()
+        if not row.barcode_name or row.barcode_name == "":
+            pattern = r'(?<![ACGT])[ACGT]{6,8}(?![ACGT])'
+            match = re.findall(pattern, concat_files)
+            if match:
+                report.barcode = match[0]
         # Only add report if it hasn't been added before
         if concat_files != "":
             # seen.add(concat)

@@ -3036,7 +3036,8 @@ def patients(row):
 def check_patient(request):
     from .migrate_dump import MigrateDump
     # SampleLib.objects.filter().delete()
-    MigrateDump.register_barcodes()
+    # MigrateDump.register_patients()
+    MigrateDump.register_samplelib()
     # for na in NucAcids.objects.all():
     #     print(na)
     #     obj, created = AREA_NA_LINK.objects.get_or_create(nucacid=na,area=na.area)
@@ -3539,3 +3540,209 @@ def import_bait(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
     df = pd.read_csv(file)
     df.apply(lambda row: im_bait(row), axis=1)
+
+def match_respectively_via_names(sl,files):
+    l = ["16","19","20","21","22","23","24","25","28","89","AGLP","AM-",
+         "CCRLP-","CGH","ChIP","CGP","FKP","DPN","DM","EXLP","H12","Ivanka","JBU","IRLP",
+         "JJS","Kit","NMLP","OMLP","Rob","SGLP","VMRLP","UM","T12","XD","XuRLP"]
+    if sl.name.startswith(tuple(l)):
+        if sl.name.startswith(tuple(["21_5","24_5_Norm","28"])):
+            return
+        # print(sl.name)
+        for file in files:
+            file_set = file.sequencing_file_set
+            file_set.sample_lib = sl
+            file_set.save()
+            print("saved = ", sl)
+
+def match_sl_fastq_file_1(request):
+    sls = SampleLib.objects.filter(sequencing_file_sets__isnull=True).order_by("name")
+    data=[]
+    for sl in sls:
+        match = SequencingFile.objects.filter(name__icontains=sl.name)
+        if match:
+            match_respectively_via_names(sl,match)
+            row = {
+                "sample_lib": sl.name,
+                "file": match.values_list('name')
+            }
+            data.append(row)
+    df = pd.DataFrame(data)
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="result.csv"'
+
+    # Write DataFrame to the response as a CSV
+    df.to_csv(path_or_buf=response, index=False)
+
+    print("--FIN--")
+    return response
+
+def match_sl_fastq_file_2(request):
+    def process_files(sl, files, description):
+        """
+        Process the matched files by updating the sample_lib field
+        and print debug information.
+        """
+        print(f"{description}: {sl.name}, Files Found: {files.count()}")
+        for file in files:
+            print(f"{sl.name} --- {file.name}")
+            file_set = file.sequencing_file_set
+            file_set.sample_lib = sl
+            file_set.save()
+            print(f"Saved Sample Library: {sl.name}")
+
+
+    sls = SampleLib.objects.filter(sequencing_file_sets__isnull=True).order_by("name")
+    print(sls.count())
+    data=[]
+    patterns = [
+        (re.compile(r'^(\w+)-(\d{1,3})$'), lambda match: fr'^{match.group(1)}-(?<!0){match.group(2)}(_|$)',
+         'Regex Match'),
+        (re.compile(r'^26\d*_(\w+)$'), lambda _: sl.name, 'Startswith 26'),
+        (re.compile(r'^28_'), lambda _: sl.name, 'Startswith 28'),
+        (re.compile(r'^Buffy_Coat'), lambda _: sl.name, 'Buffy_Coat'),
+        (re.compile(r'^ChIP1_(\d{1,2})$'), lambda match: fr'^ChIP1_-(?<!0){match.group(1)}(_|$)', 'Regex Match ChIP1_'),
+        (re.compile(r'^KAM(.*?)(_kapa)?$'), lambda match:(f'^KAM{match.group(1)}' + (match.group(2) or '')), 'Regex Match KAM'),
+    ]
+
+    for sl in sls:
+        for pattern, search_func, description in patterns:
+            match = pattern.match(sl.name)
+            print(sl.name, match)
+            if match:
+                search_value = search_func(match)
+                filter_kwargs = {'name__regex': search_value} if description == 'Regex Match' else {
+                    'name__startswith': search_value} if description == 'Startswith 26' else {
+                    'name__startswith': search_value} if description == 'Startswith 28' else {
+                    'name__icontains': search_value} if description == 'Buffy_Coat' else {
+                    'name__regex': search_value} if description == 'Regex Match ChIP1_' else {
+                    'name__regex': search_value}
+                print(filter_kwargs)
+                files = SequencingFile.objects.filter(**filter_kwargs)
+                if files:
+                    process_files(sl, files, description)
+
+
+
+def generate_file_set(file):
+    match = re.match(r'.*[-_]([ACTG]{6,8})[-_]', file)
+    file_type = ""
+    if "fastq" in file:
+        file_type = "fastq"
+        prefix = file.split("_L0")[0] if "_L0" in file else file.split("_001")[0] if "_001" in file else None
+    elif ".sorted" in file:
+        file_type = "bam"
+        prefix = file.split(".sorted")[0]
+    elif ".sort" in file:
+        file_type = "bam"
+        prefix = file.split(".sort")[0]
+    elif ".removedupes" in file:
+        file_type = "bam"
+        prefix = file.split(".removedupes")[0]
+    elif ".recal" in file:
+        file_type = "bam"
+        prefix = file.split(".recal")[0]
+    elif "deduplicated.realign.bam" in file:
+        file_type = "bam"
+        prefix = file.split(".deduplicated.realign.bam")[0]
+    elif file.endswith(".bai"):
+        file_type = "bai"
+        prefix = file.split(".bai")[0]
+    elif file.endswith(".bam"):
+        file_type = "bam"
+        prefix = file.split(".bam")[0]
+    if match:
+        dna = match.group(1)
+        prefix = file.split(dna)[0] + dna
+    if prefix is None:
+        prefix = file.split(".")[0]
+    file_set,_ = SequencingFileSet.objects.get_or_create(prefix=prefix)
+    f, _ = SequencingFile.objects.get_or_create(name=file, type=file_type)
+    f.sequencing_file_set = file_set
+    f.save()
+    print("file_set generated", prefix, "------", file)
+    return file_set
+
+
+def find_path_seq_run_for_file_sets(request):
+    q = Q(Q(sequencing_run__isnull=True) | Q(path__isnull=True))
+    fs = SequencingFileSet.objects.filter(q).order_by('prefix')
+    file = Path(Path(__file__).parent.parent / "uploads" / "df_fq_new.csv")
+    df = pd.read_csv(file)
+    df = df.reset_index()  # make sure indexes pair with number of rows
+    for file_set in fs:
+        try:
+            # Print the prefix
+            print("prefix = ", file_set.prefix)
+
+            path = df[df['HiSeqData/'].str.contains(file_set.prefix)]["path"].values[0]
+            file_set.path = path
+            file_set.save()
+
+            sr = path.split("/")[1]
+            print("seq_run = ", sr)
+
+            patterns = [
+                (r'.*BCB(\d+).*', "BCB", "_saved__BCB_"),
+                (r'.*BB(\d+).*', "", "_saved__BB_"),
+                (r'.*SGPC-(\d+).*', "", "_saved__SGPC_"),
+                (r'.*AGEX-(\d+).*', "", "_saved__AGEX_"),
+                (r'.*IYEH(\d+).*', "", "_saved__IYEH_"),
+                (r'.*Hunter_RNAseq.*', "", "saved__Hunter_RNAseq_"),
+                (r'.*VisiumCytAssit_MW.*', "", "saved__VisiumCytAssit_MW_"),
+                (r'.*Public ChIp-seq data.*', "", "saved__Public ChIp-seq data_"),
+                (r'.*VisiumCytAssit_MW.*', "", "saved__VisiumCytAssit_MW_"),
+                (r'.*RNA-seq.*', "", "saved__RNA-seq_"),
+            ]
+
+            for pattern, prefix, message in patterns:
+                match = re.match(pattern, sr)
+                if match:
+                    sequencing_run_name = prefix + match.group(1) if prefix else sr
+                    file_set.sequencing_run, _ = SequencingRun.objects.get_or_create(name=sequencing_run_name)
+                    file_set.save()
+                    print(message * 4)
+        except Exception as e:
+            print(e)
+
+def register_new_fastq_files(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "cl_seql_missing.csv")
+    df = pd.read_csv(file)
+    df = df.reset_index()  # make sure indexes pair with number of rows
+    for index, row in df.iterrows():
+        try:
+            sl = SampleLib.objects.get(name=row['sample_lib'])
+            cl, _ = CapturedLib.objects.get_or_create(name=row['SeqRun']+"_CL")
+            seql, _ = SequencingLib.objects.get_or_create(name=row['SeqRun']+"_SeqL")
+            seq_run = SequencingRun.objects.get(name=row['SeqRun'])
+            SL_CL_LINK.objects.create(sample_lib=sl, captured_lib=cl)
+            CL_SEQL_LINK.objects.create(captured_lib=cl, sequencing_lib=seql)
+            seq_run.sequencing_libs.add(seql)
+            seq_run.save()
+            print(sl,cl,seql,seq_run)
+
+        except Exception as e:
+            print(e, row['file'])
+            generate_file_set(row['file'])
+    # file = Path(Path(__file__).parent.parent / "uploads" / "df_fq_new.csv")
+    # df = pd.read_csv(file)
+    # df = df.reset_index()  # make sure indexes pair with number of rows
+    # for index, row in df.iterrows():
+    #     try:
+    #         SequencingFile.objects.get(name=row['file'])
+    #     except Exception as e:
+    #         print(e, row['file'])
+    #         generate_file_set(row['file'])
+
+    # for index, row in df.iterrows():
+    #     file = SequencingFile.objects.get(name=row['file'])
+    #     file_set = file.sequencing_file_set
+    #     path = row['path']
+    #     file_set.path = path
+    #     file_set.save()
+    #     try:
+    #         seq_run = SequencingRun.objects.get(name=path.split("/")[1])
+    #         file_set.sequencing_run = seq_run
+    #         file_set.save()
+    #     except Exception as e:
+    #         print(e)

@@ -15,10 +15,16 @@ class SequencingFileSerializer(serializers.ModelSerializer):
     #    return getattr(obj, 'id')
     #
     def get_sequencing_file_set(self,obj):
-        return obj.sequencing_file_set.prefix
+        if obj.sequencing_file_set:
+            return obj.sequencing_file_set.prefix
+        else:
+            return
 
     def get_path(self,obj):
-        return obj.sequencing_file_set.path
+        if obj.sequencing_file_set:
+            return obj.sequencing_file_set.path
+        else:
+            return
 
 class SequencingFileSetSerializer(serializers.ModelSerializer):
     num_sequencing_files = serializers.IntegerField()
