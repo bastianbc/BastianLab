@@ -91,19 +91,11 @@ var KTDatatablesServerSide = function () {
                                 </span>
                             </a>
                             <!--begin::Menu-->
-                            <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4" data-kt-menu="true">
-                                <!--begin::Menu item-->
-                                <div class="menu-item">
-                                    <a href="/sequencingrun/edit/`+ row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
-                                        Edit
-                                    </a>
-                                </div>
-                                <!--end::Menu item-->
-
+                            <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-200px py-4" data-kt-menu="true">
                                 <!--begin::Menu item-->
                                 <div class="menu-item">
                                     <a href="javascript:;" class="menu-link detail-link" data-kt-docs-table-filter="detail_row">
-                                        Used Library(s)
+                                        Used Sequencing Run(s)
                                     </a>
                                 </div>
                                 <!--end::Menu item-->
@@ -111,14 +103,14 @@ var KTDatatablesServerSide = function () {
                                 <!--begin::Menu item-->
                                 <div class="menu-item">
                                     <a href="javascript:;" class="menu-link sequencing-files-link text-start" data-kt-docs-table-filter="detail_row">
-                                        Get Sequencing Files
+                                        Get Variants
                                     </a>
                                 </div>
                                 <!--end::Menu item-->
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item">
-                                    <a href="/sequencingrun/delete/` + row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
+                                    <a href="#` + row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
                                         Delete
                                     </a>
                                 </div>

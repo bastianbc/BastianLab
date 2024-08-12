@@ -6,6 +6,7 @@ from .serializers import *
 from sequencinglib.models import *
 from .forms import *
 from django.contrib import messages
+from django.core.files.base import ContentFile
 
 @permission_required("sequencingrun.view_sequencingrun",raise_exception=True)
 def analysisruns(request):

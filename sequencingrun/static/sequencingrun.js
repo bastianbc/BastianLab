@@ -955,7 +955,7 @@ var KTDatatablesServerSide = function () {
               const formData = new FormData(form);
 
               $.ajax({
-                  url: "/sequencingrun/save_analysis_run",
+                  url: "/analysisrun/save_analysis_run",
                   type: "POST",
                   headers: {
                       'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value
@@ -974,6 +974,7 @@ var KTDatatablesServerSide = function () {
                                   confirmButton: "btn fw-bold btn-primary",
                               }
                           });
+                          modal.hide();
                       }
                       else {
                           Swal.fire({
@@ -1000,6 +1001,7 @@ var KTDatatablesServerSide = function () {
                   listBody.innerHTML = "";
                   stepper.goFirst();
                   form.reset();
+                  selectedRows = [];
                   dt.draw();
               });
 
