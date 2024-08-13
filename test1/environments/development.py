@@ -261,6 +261,6 @@ LOGGING = {
 }
 }
 
-smb_directory = "/mnt/smb_volume"
+SMB_DIRECTORY = "/mnt/smb_volume"
 SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(BASE_DIR,"uploads", "files", "ProcessedData")
 SEQUENCING_FILES_DESTINATION_DIRECTORY = os.path.join(BASE_DIR,"uploads", "dest")

@@ -24,13 +24,25 @@ def filter_variants(request):
     return JsonResponse(result)
 
 def import_variants(request):
-    success = False
+    import os
+    from django.conf import settings
 
-    if request.method == 'POST' and request.FILES:
-        files = request.FILES.getlist("file")
-        for file in files:
+    analysis_run = AnalysisRun.objects.get(id=id)
+
+    folder_path = os.path.join(settings.SMB_DIRECTORY, analysis_run.name)
+
+    # Check if the folder exists
+    if os.path.exists(folder_path):
+        # Get variant files in the folder
+        files = os.listdir(folder_path)
+
+        for file_name in files:
             # parsing and saving data into the database
             variant_file_parser(file)
-            success = True
 
-    return JsonResponse({"success":success})
+        # Return a success response
+        return JsonResponse({"success": True, "message": "Files processed successfully"})
+
+    else:
+        # Return an error response if the folder doesn't exist
+        return JsonResponse({"success": False, "message": "Couldn't find the folder you searched for"})

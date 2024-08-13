@@ -19,10 +19,25 @@ def get_log2r():
 def get_normal_sample_lib(sample_lib):
     return None
 
-def get_hg():
+def get_hg(filename):
+    """
+    AM2-063.HS_Final.annovar.hg19_multianno_Filtered.txt
+    [sample_lib.name].[Caller name]_Final.annovar.[assembly]_multianno_Filtered.txt
+    """
+    match = re.search(r'\.hg\d+_', filename)
+    if match:
+        assembly = match.group(0)[1:-1]  # İlk ve son karakterleri ('.' ve '_') çıkarıyoruz
+        return assembly
     return None
 
-def get_sample_lib():
+def get_sample_lib(filename):
+    """
+    AM2-063.HS_Final.annovar.hg19_multianno_Filtered.txt
+    [sample_lib.name].[Caller name]_Final.annovar.[assembly]_multianno_Filtered.txt
+    """
+    match = re.match(r'^[^.]+', filename)
+    if match:
+        return match.group(0)
     return None
 
 def get_sequencing_run():
@@ -31,7 +46,7 @@ def get_sequencing_run():
 def get_run_analysis():
     return None
 
-def parse_and_create_variants(g_variant, aachange, func, gene_detail):
+def create_c_and_p_variants(g_variant, aachange, func, gene_detail):
     entries = aachange.split(',')
     for entry in entries:
         gene, nm_id, exon, c_var, p_var = entry.split(':')
@@ -91,8 +106,7 @@ def variant_file_parser(file):
             avsnp150=row['avsnp150']
         )
 
-        # Parse AAChange.refGene and create variants
-        parse_and_create_variants(
+        create_c_and_p_variants(
             g_variant=g_variant,
             aachange=row['AAChange.refGene'],
             func=row['Func.refGene'],
