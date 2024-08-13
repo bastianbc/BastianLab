@@ -20,6 +20,19 @@ class AnalysisRun(models.Model):
     class Meta:
         db_table = "analysis_run"
 
+    def generate_name():
+        last_run = AnalysisRun.objects.all().order_by('id').last()
+        if last_run:
+            last_id = int(last_run.name.replace('AR', ''))
+            return f"AR{last_id + 1:04d}"
+        else:
+            return "AR1"
+
+    def save(self, *args, **kwargs):
+        if not self.name:
+            self.name = self.generate_name()
+        super(AnalysisRun, self).save(*args, **kwargs)
+
     def query_by_args(self, user, **kwargs):
         def _get_authorizated_queryset():
             return AnalysisRun.objects.all()
