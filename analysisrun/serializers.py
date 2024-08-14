@@ -6,7 +6,7 @@ class AnalysisRunSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AnalysisRun
-        fields = ("id", "pipeline", "genome", "date", "sheet", "DT_RowId", )
+        fields = ("id", "name", "pipeline", "genome", "date", "sheet", "DT_RowId", )
 
     def get_DT_RowId(self, obj):
        return getattr(obj, 'id')

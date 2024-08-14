@@ -23,13 +23,11 @@ def filter_variants(request):
 
     return JsonResponse(result)
 
-def import_variants(request):
+def import_variants(request,name):
     import os
     from django.conf import settings
 
-    analysis_run = AnalysisRun.objects.get(id=id)
-
-    folder_path = os.path.join(settings.SMB_DIRECTORY, analysis_run.name)
+    folder_path = os.path.join(settings.SMB_DIRECTORY, name)
 
     # Check if the folder exists
     if os.path.exists(folder_path):

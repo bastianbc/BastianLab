@@ -51,6 +51,7 @@ var KTDatatablesServerSide = function () {
             },
             columns: [
                 { data: 'id' },
+                { data: 'name' },
                 { data: 'pipeline' },
                 { data: 'genome' },
                 { data: 'sheet' },
@@ -73,7 +74,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 5,
+                    targets: 6,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -94,15 +95,7 @@ var KTDatatablesServerSide = function () {
                             <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-200px py-4" data-kt-menu="true">
                                 <!--begin::Menu item-->
                                 <div class="menu-item">
-                                    <a href="javascript:;" class="menu-link detail-link" data-kt-docs-table-filter="detail_row">
-                                        Used Sequencing Run(s)
-                                    </a>
-                                </div>
-                                <!--end::Menu item-->
-
-                                <!--begin::Menu item-->
-                                <div class="menu-item">
-                                    <a href="javascript:;" class="menu-link sequencing-files-link text-start" data-kt-docs-table-filter="detail_row">
+                                    <a href="javascript:;" class="menu-link variants-link text-start" data-kt-docs-table-filter="detail_row">
                                         Get Variants
                                     </a>
                                 </div>
@@ -499,7 +492,40 @@ var KTDatatablesServerSide = function () {
 
     var initRowActions = () => {
 
+        document.querySelectorAll(".variants-link").forEach((item, i) => {
+            item.addEventListener("click", function (e) {
+                const parent = e.target.closest('tr');
+                var analysisRunName = parent.querySelectorAll('td')[1].innerText;
 
+                $.ajax({
+                    url: `/variant/import_variants/${analysisRunName}`,
+                    type: "GET",
+                }).done(function (data) {
+                    if (data.success) {
+                        Swal.fire({
+                            text: data.message,
+                            icon: "info",
+                            buttonsStyling: false,
+                            confirmButtonText: "Ok, got it!",
+                            customClass: {
+                                confirmButton: "btn fw-bold btn-success",
+                            }
+                        });
+                    }
+                    else {
+                        Swal.fire({
+                            text: data.message,
+                            icon: "error",
+                            buttonsStyling: false,
+                            confirmButtonText: "Ok, got it!",
+                            customClass: {
+                                confirmButton: "btn fw-bold btn-success",
+                            }
+                        });
+                    }
+                });
+            });
+        });
 
     }
 

@@ -20,7 +20,7 @@ class AnalysisRun(models.Model):
     class Meta:
         db_table = "analysis_run"
 
-    def generate_name():
+    def generate_name(self):
         last_run = AnalysisRun.objects.all().order_by('id').last()
         if last_run:
             last_id = int(last_run.name.replace('AR', ''))
@@ -64,10 +64,11 @@ class AnalysisRun(models.Model):
         try:
             ORDER_COLUMN_CHOICES = {
                 "0": "id",
-                "1": "pipeline",
-                "2": "genome",
-                "3": "date",
-                "4": "sheet",
+                "1": "name",
+                "2": "pipeline",
+                "3": "genome",
+                "4": "date",
+                "5": "sheet",
             }
             draw = int(kwargs.get('draw', None)[0])
             length = int(kwargs.get('length', None)[0])

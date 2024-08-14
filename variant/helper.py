@@ -3,7 +3,7 @@ from django.db import transaction
 from .models import VariantCall, GVariant, CVariant, PVariant
 import re
 
-def extract_caller_from_filename(filename):
+def get_caller(filename):
     caller_match = re.match(r'.*?(\w+)_Final', filename)
     return caller_match.group(1) if caller_match else None
 
@@ -14,10 +14,24 @@ def parse_p_var(p_var):
     return None, None, None
 
 def get_log2r():
+    """
+    Note: We need to write some code for this later
+    """
     return None
 
 def get_normal_sample_lib(sample_lib):
-    return None
+    """
+    This relates to any SL from a normal area for Tumor/Normal sequencing
+    (i.e. where the DNA from the tumor AND the normal DNA was sequenced).
+    By definition, no normal exists for Tumor only sequencing
+    """
+    from samplelib.models import SampleLib
+
+    return SampleLib.objects.filter(
+            na_sl_links__nucacid__na_type='dna',
+            na_sl_links__nucacid__area_na_links__area__area_type='normal',
+            na_sl_links__nucacid__na_sl_links__sample_lib=sample_lib
+        ).exclude(pk=sample_lib.pk).values_list('name', flat=True).distinct()
 
 def get_hg(filename):
     """
@@ -40,11 +54,11 @@ def get_sample_lib(filename):
         return match.group(0)
     return None
 
-def get_sequencing_run():
+def get_sequencing_run(filename):
     return None
 
-def get_run_analysis():
-    return None
+def get_analysis_run(name):
+    return AnalysisRun.objects.get(name=name)
 
 def create_c_and_p_variants(g_variant, aachange, func, gene_detail):
     entries = aachange.split(',')
@@ -73,23 +87,20 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail):
             )
 
 @transaction.atomic
-def variant_file_parser(file):
+def variant_file_parser(file, analysis_run_name):
     df = pd.read_csv(file, sep='\t')
 
-    run_analysis = get_run_analysis()
-    sample_lib = get_sample_lib()
-    sequencing_run = get_sequencing_run()
-    caller = extract_caller_from_filename(file.name)
+    sample_lib = get_sample_lib(file.name)
 
     for _, row in df.iterrows():
         variant_call = VariantCall.objects.create(
-            run_analysis=run_analysis,
+            run_analysis=get_analysis_run(analysis_run_name),
             sample_lib=sample_lib,
-            sequencing_run=sequencing_run,
+            sequencing_run=get_sequencing_run(file.name),
             coverage=row['Depth'],
             log2r=get_log2r(),
-            caller=get_caller(),
-            normal_sl=get_normal_sample_lib(),
+            caller=get_caller(file.name),
+            normal_sl=get_normal_sample_lib(sample_lib),
             label="",
             ref_read=row['Ref_reads'],
             alt_read=row['Alt_reads'],
@@ -97,7 +108,7 @@ def variant_file_parser(file):
 
         g_variant = GVariant.objects.create(
             variant_call=variant_call,
-            hg=get_hg(),
+            hg=get_hg(file.name),
             chrom=row['Chr'],
             start=row['Start'],
             end=row['End'],
