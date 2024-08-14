@@ -213,12 +213,12 @@ def generate_file(data, file_name):
         report.matching_normal_sl = row.matching_normal_sl.replace(" ", "_") if row.matching_normal_sl else ""
         fastq, bam, bai = [], [], []
         report.footprint = row.bait
-
         files = _get_files(row.name, row.seq_run)
         if files:
             for file in files:
                 if file.type == "fastq":
                     fastq.append(file.name)
+                    print("$$$", row.path, row.name)
                     report.path_fastq = row.path if row.path else ""
                 if file.type == "bam":
                     bam.append(file.name)
