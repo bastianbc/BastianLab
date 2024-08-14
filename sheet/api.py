@@ -63,7 +63,7 @@ def _get_authorizated_queryset(seq_runs):
        ),
        file=ArrayAgg(
            'sequencing_file_sets__sequencing_files__name',
-           distinct=True
+           distinct=True,
        ),
        checksum=ArrayAgg(
            'sequencing_file_sets__sequencing_files__checksum',

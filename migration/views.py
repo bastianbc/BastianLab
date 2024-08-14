@@ -3537,9 +3537,13 @@ def im_bait(row):
 
 
 def import_bait(request):
-    file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
-    df = pd.read_csv(file)
-    df.apply(lambda row: im_bait(row), axis=1)
+    sf = SequencingFileSet.objects.filter(sequencing_files__isnull=True)
+    print(sf)
+    for s in sf:
+        s.delete()
+    # file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
+    # df = pd.read_csv(file)
+    # df.apply(lambda row: im_bait(row), axis=1)
 
 def match_respectively_via_names(sl,files):
     l = ["16","19","20","21","22","23","24","25","28","89","AGLP","AM-",

@@ -168,7 +168,7 @@ def _get_file(file):
 def _get_files(sample_lib, sequencing_run):
     try:
         return SequencingFile.objects.filter(sequencing_file_set__sample_lib__name=sample_lib,
-                                             sequencing_file_set__sequencing_run__id=sequencing_run)
+                                             sequencing_file_set__sequencing_run__id=sequencing_run).order_by('-type')
     except:
         return
 
@@ -198,10 +198,15 @@ def generate_file(data, file_name):
         path_bai = ""
 
     res = []
-    seen = set()
+    seen = []
     for index, row in enumerate(data):
         sl = SampleLib.objects.get(name=row.name)
         # print("%%%",row.file)
+        sl_seq_run = f"{sl.name}-{row.seq_run}"
+        if sl_seq_run not in seen:
+            seen.append(sl_seq_run)
+        else:
+            continue
         report = Report()
         report.no = index + 1
         report.patient = row.patient
@@ -215,29 +220,33 @@ def generate_file(data, file_name):
         report.footprint = row.bait
         files = _get_files(row.name, row.seq_run)
         if files:
+            print(row.name, files)
             for file in files:
                 if file.type == "fastq":
+                    print(1)
                     fastq.append(file.name)
-                    print("$$$", row.path, row.name)
                     report.path_fastq = row.path if row.path else ""
-                if file.type == "bam":
+                    continue
+                if file.type == "bam" and not report.path_fastq:
+                    print(2)
                     bam.append(file.name)
                     report.path_bam = row.path if row.path else ""
-                if file.type == "bai":
+                if file.type == "bai" and not report.path_fastq:
+                    print(3)
                     bai.append(file.name)
                     report.path_bai = row.path if row.path else ""
-            report.fastq = {f: _get_file(f).checksum for f in fastq} or ""
-            report.bam = {f: _get_file(f).checksum for f in bam} or ""
-            report.bai = {f: _get_file(f).checksum for f in bai} or ""
-        else:
-            report.fastq = _get_file(sl)
-            report.path_fastq = _get_path(sl)
-        if not report.fastq:
-            report.fastq = _get_file(sl)
-            report.path_fastq = _get_path(sl)
-        if report.fastq:
-            report.bam, report.bai, report.path_bai, report.path_bam = "","","",""
-        # seq_run = report.path_fastq.split("/")[1] if report.path_fastq != "" and report.path_fastq != None else ""
+        report.fastq = {f: _get_file(f).checksum for f in fastq} if fastq else ""
+        report.bam = {f: _get_file(f).checksum for f in bam} if bam else ""
+        report.bai = {f: _get_file(f).checksum for f in bai} if bai else ""
+        # else:
+        #     report.fastq = _get_file(sl)
+        #     report.path_fastq = _get_path(sl)
+        # if not report.fastq:
+        #     report.fastq = _get_file(sl)
+        #     report.path_fastq = _get_path(sl)
+        # if report.fastq:
+        #     report.bam, report.bai, report.path_bai, report.path_bam = "","","",""
+        seq_run = report.path_fastq.split("/")[1] if report.path_fastq != "" and report.path_fastq != None else ""
         report.seq_run = row.seq_run2  # ✓
         concat_files = f"{report.fastq}{report.bam}{report.bai}".replace("None","").strip()
         if not row.barcode_name or row.barcode_name == "":
