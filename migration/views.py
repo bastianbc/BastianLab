@@ -3537,7 +3537,7 @@ def im_bait(row):
 
 
 def import_bait(request):
-    q = Q(Q(prefix__startswith="SGLP-0") & Q(sequencing_run__name="SGPC-05") & ~Q(prefix__icontains="_S"))
+    q = Q(Q(prefix__startswith="SGLP-0") & Q(sequencing_run__name="SGPC-02") & ~Q(prefix__icontains="_S"))
     sf = SequencingFileSet.objects.filter(q)
     print(sf)
     for s in sf:
