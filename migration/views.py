@@ -3539,7 +3539,7 @@ def im_bait(row):
 def import_bait(request):
     q = Q(Q(prefix__startswith="SGLP-0") & Q(sequencing_run__name="SGPC-01") & ~Q(prefix__icontains="_S"))
     sf = SequencingFileSet.objects.filter(q)
-    print(sf)
+    print(sf.sample_lib, sf.prefix)
     for s in sf:
         print(s.prefix)
         files = SequencingFile.objects.filter(sequencing_file_set=s)
