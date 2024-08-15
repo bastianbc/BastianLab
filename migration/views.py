@@ -3537,7 +3537,7 @@ def im_bait(row):
 
 
 def import_bait(request):
-    files = SequencingFile.objects.filter(name__icontains="NGv3-PE100-NGv3")
+    files = SequencingFile.objects.filter(name__icontains="NGv3-PE100-NGv3").delete()
     print(files, files.count())
     # file = Path(Path(__file__).parent.parent / "uploads" / "df_fq_new.csv")
     # df = pd.read_csv(file)
