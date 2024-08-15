@@ -3542,11 +3542,11 @@ def import_bait(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "df_fq_new.csv")
     df = pd.read_csv(file)
     for file in files:
-        print(file)
         path = df[df['HiSeqData/'].str.contains(file.name)]["path"].values[0]
         sr = path.split("/")[1]
 
 
+        print(file,sr)
         try:
             seqr = SequencingRun.objects.get(name=sr)
             sl = SampleLib.objects.get(name=file.name.split(".")[0])
