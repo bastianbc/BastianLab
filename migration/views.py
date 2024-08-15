@@ -3538,8 +3538,13 @@ def im_bait(row):
 
 def import_bait(request):
     files = SequencingFile.objects.filter(sequencing_file_set__isnull=True)
+    file = Path(Path(__file__).parent.parent / "uploads" / "df_fq_new.csv")
+    df = pd.read_csv(file)
     for file in files:
-        print(file.name)
+        path = df[df['HiSeqData/'].str.contains(file.name)]["path"].values[0]
+        sr = path.split("/")[1]
+        print(file.name,sr)
+        print()
     # q = Q(Q(prefix__startswith="SGLP-0") & Q(sequencing_run__name="BCB004") & ~Q(prefix__icontains="_S"))
     # sf = SequencingFileSet.objects.filter(q)
     # print(sf)
