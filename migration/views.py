@@ -3550,7 +3550,7 @@ def import_bait(request):
         try:
             seqr = SequencingRun.objects.get(name=sr)
             sl = SampleLib.objects.get(name=file.name.split(".")[0])
-            sf = SequencingFileSet.objects.get_or_none(sample_lib=sl,sequencing_run=seqr)
+            sf = SequencingFileSet.objects.get(sample_lib=sl,sequencing_run=seqr)
             file.sequencing_file_set = sf
             file.save()
 
