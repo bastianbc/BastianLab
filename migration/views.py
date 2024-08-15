@@ -3546,11 +3546,13 @@ def import_bait(request):
         sr = path.split("/")[1]
 
 
-        print(file,sr)
+
         try:
             seqr = SequencingRun.objects.get(name=sr)
             sl = SampleLib.objects.get(name=file.name.split(".")[0])
-            sf = SequencingFileSet.objects.get(sample_lib=sl,sequencing_run=seqr)
+            sf = SequencingFileSet.objects.filter(sample_lib=sl,sequencing_files__type="fastq")
+            if not sf:
+                print(file, sr, "FALSE")
             file.sequencing_file_set = sf
             file.save()
 
