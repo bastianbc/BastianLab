@@ -3542,6 +3542,7 @@ def import_bait(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "df_fq_new.csv")
     df = pd.read_csv(file)
     for file in files:
+        print(file)
         path = df[df['HiSeqData/'].str.contains(file.name)]["path"].values[0]
         sr = path.split("/")[1]
         seqr = SequencingRun.objects.get(name=sr)
@@ -3551,6 +3552,7 @@ def import_bait(request):
             sf = SequencingFileSet.objects.get_or_none(sample_lib=sl,sequencing_run=seqr)
             file.sequencing_file_set = sf
             file.save()
+
         except:
             pass
     # q = Q(Q(prefix__startswith="SGLP-0") & Q(sequencing_run__name="BCB004") & ~Q(prefix__icontains="_S"))
