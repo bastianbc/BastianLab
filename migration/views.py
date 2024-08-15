@@ -3538,6 +3538,7 @@ def im_bait(row):
 
 def import_bait(request):
     files = SequencingFile.objects.filter(sequencing_file_set__isnull=True)
+    print(files, files.count)
     file = Path(Path(__file__).parent.parent / "uploads" / "df_fq_new.csv")
     df = pd.read_csv(file)
     for file in files:
@@ -3545,7 +3546,7 @@ def import_bait(request):
         sr = path.split("/")[1]
         seqr = SequencingRun.objects.get(name=sr)
         sl = SampleLib.objects.get(name=file.name.split(".")[0])
-        print(file.name,seqr,sl)
+
         try:
             sf = SequencingFileSet.objects.get_or_none(sample_lib=sl,sequencing_run=seqr)
             file.sequencing_file_set = sf
