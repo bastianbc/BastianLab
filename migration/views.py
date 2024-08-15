@@ -3537,22 +3537,25 @@ def im_bait(row):
 
 
 def import_bait(request):
-    q = Q(Q(prefix__startswith="SGLP-0") & Q(sequencing_run__name="BCB004") & ~Q(prefix__icontains="_S"))
-    sf = SequencingFileSet.objects.filter(q)
-    print(sf)
-    for s in sf:
-        print(s.sample_lib, s.prefix)
-        files = SequencingFile.objects.filter(sequencing_file_set=s)
-        print(files)
-        sl = s.sample_lib
-        sr = s.sequencing_run
-        s.delete()
-        print("deleted")
-        new_sf = SequencingFileSet.objects.get(sequencing_run=sr, sample_lib=sl)
-        for file in files:
-            file.sequencing_file_set = new_sf
-            file.save()
-            print("saved")
+    files = SequencingFile.objects.filter(sequencing_file_set__isnull=True)
+    for file in files:
+        print(file.name)
+    # q = Q(Q(prefix__startswith="SGLP-0") & Q(sequencing_run__name="BCB004") & ~Q(prefix__icontains="_S"))
+    # sf = SequencingFileSet.objects.filter(q)
+    # print(sf)
+    # for s in sf:
+    #     print(s.sample_lib, s.prefix)
+    #     files = SequencingFile.objects.filter(sequencing_file_set=s)
+    #     print(files)
+    #     sl = s.sample_lib
+    #     sr = s.sequencing_run
+    #     s.delete()
+    #     print("deleted")
+    #     new_sf = SequencingFileSet.objects.get(sequencing_run=sr, sample_lib=sl)
+    #     for file in files:
+    #         file.sequencing_file_set = new_sf
+    #         file.save()
+    #         print("saved")
     # file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
     # df = pd.read_csv(file)
     # df.apply(lambda row: im_bait(row), axis=1)
