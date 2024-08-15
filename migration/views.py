@@ -3545,10 +3545,11 @@ def import_bait(request):
         print(file)
         path = df[df['HiSeqData/'].str.contains(file.name)]["path"].values[0]
         sr = path.split("/")[1]
-        seqr = SequencingRun.objects.get(name=sr)
-        sl = SampleLib.objects.get(name=file.name.split(".")[0])
+
 
         try:
+            seqr = SequencingRun.objects.get(name=sr)
+            sl = SampleLib.objects.get(name=file.name.split(".")[0])
             sf = SequencingFileSet.objects.get_or_none(sample_lib=sl,sequencing_run=seqr)
             file.sequencing_file_set = sf
             file.save()
