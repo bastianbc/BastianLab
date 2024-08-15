@@ -3554,8 +3554,8 @@ def import_bait(request):
             file.sequencing_file_set = sf
             file.save()
 
-        except:
-            pass
+        except Exception as e:
+            print(e)
     # q = Q(Q(prefix__startswith="SGLP-0") & Q(sequencing_run__name="BCB004") & ~Q(prefix__icontains="_S"))
     # sf = SequencingFileSet.objects.filter(q)
     # print(sf)
