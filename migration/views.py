@@ -3546,9 +3546,12 @@ def import_bait(request):
         seqr = SequencingRun.objects.get(name=sr)
         sl = SampleLib.objects.get(name=file.name.split(".")[0])
         print(file.name,seqr,sl)
-
-        sf = SequencingFileSet.objects.get_or_none(sample_lib=sl,sequencing_run=seqr)
-
+        try:
+            sf = SequencingFileSet.objects.get_or_none(sample_lib=sl,sequencing_run=seqr)
+            file.sequencing_file_set = sf
+            file.save()
+        except:
+            pass
     # q = Q(Q(prefix__startswith="SGLP-0") & Q(sequencing_run__name="BCB004") & ~Q(prefix__icontains="_S"))
     # sf = SequencingFileSet.objects.filter(q)
     # print(sf)
