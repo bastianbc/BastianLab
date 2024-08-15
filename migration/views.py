@@ -3538,7 +3538,7 @@ def im_bait(row):
 
 def import_bait(request):
     files = SequencingFile.objects.filter(sequencing_file_set__isnull=True)
-    print(files, files.count())
+    # print(files, files.count())
     file = Path(Path(__file__).parent.parent / "uploads" / "df_fq_new.csv")
     df = pd.read_csv(file)
     for file in files:
@@ -3550,11 +3550,11 @@ def import_bait(request):
         try:
             seqr = SequencingRun.objects.get(name=sr)
             sl = SampleLib.objects.get(name=file.name.split(".")[0])
-            sf = SequencingFileSet.objects.filter(sample_lib=sl,sequencing_files__type="fastq")
+            sf = SequencingFileSet.objects.filter(sample_lib=sl, sequencing_files__type="fastq")
             if not sf:
                 print(file, sr, "FALSE")
-            file.sequencing_file_set = sf
-            file.save()
+            # file.sequencing_file_set = sf
+            # file.save()
 
         except Exception as e:
             print(e)
