@@ -3537,7 +3537,7 @@ def im_bait(row):
 
 
 def import_bait(request):
-    fs = SequencingFileSet.objects.filter(sample_lib__isnull=True)
+    fs = SequencingFileSet.objects.filter(sample_lib__isnull=True).order_by("prefix")
     for i in fs:
         print(i.prefix, i.sequencing_run.name)
     # print(files, files.count())
