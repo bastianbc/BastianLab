@@ -3537,7 +3537,9 @@ def im_bait(row):
 
 
 def import_bait(request):
-    files = SequencingFile.objects.filter(name__icontains="NGv3-PE100-NGv3").delete()
+    fs = SequencingFileSet.objects.filter(sample_lib__isnull=True)
+    for i in fs:
+        print(i.prefix, i.sequencing_run.name)
     # print(files, files.count())
     # for file in files:
     #     sl = file.sequencing_file_set.sample_lib
