@@ -23,9 +23,10 @@ def filter_variants(request):
 
     return JsonResponse(result)
 
-def import_variants(request,name):
+def import_variants(request, name):
     import os
     from django.conf import settings
+    from .helper import variant_file_parser
 
     folder_path = os.path.join(settings.SMB_DIRECTORY, name)
 
@@ -34,13 +35,12 @@ def import_variants(request,name):
         # Get variant files in the folder
         files = os.listdir(folder_path)
 
-        for file_name in files:
+        for filename in files:
             # parsing and saving data into the database
-            variant_file_parser(file)
+            file_path = os.path.join(folder_path, filename)
+            variant_file_parser(file_path, name)
 
-        # Return a success response
         return JsonResponse({"success": True, "message": "Files processed successfully"})
 
     else:
-        # Return an error response if the folder doesn't exist
         return JsonResponse({"success": False, "message": "Couldn't find the folder you searched for"})
