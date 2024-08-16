@@ -285,7 +285,8 @@ def get_sample_libs_async(request):
                         # The patients who has sample libraries that area type is "Normal"
                         matching_normal_sl = []
                         if patient:
-                            normal_sample_libs = SampleLib.objects.filter(method__patient=patient, block_area_links__area__area_type='Normal')
+                            normal_sample_libs = SampleLib.objects.filter(method__patient=patient,
+                                                                          na_sl_links__nucacid__area_na_links__area__area_type='normal')
                             matching_normal_sl = list(normal_sample_libs.values_list('name', flat=True))
 
                             item["patient"] = patient.pat_id
