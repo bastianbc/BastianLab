@@ -3537,22 +3537,47 @@ def im_bait(row):
 
 
 def import_bait(request):
-    q = Q(Q(prefix__startswith="SGLP-0") & Q(sequencing_run__name="SGPC-01") & ~Q(prefix__icontains="_S"))
-    sf = SequencingFileSet.objects.filter(q)
-    print(sf)
-    for s in sf:
-        print(s.prefix)
-        files = SequencingFile.objects.filter(sequencing_file_set=s)
-        print(files)
-        sl = s.sample_lib
-        sr = s.sequencing_run
-        s.delete()
-        print("deleted")
-        new_sf = SequencingFileSet.objects.get(sequencing_run=sr, sample_lib=sl)
-        for file in files:
-            file.sequencing_file_set = new_sf
-            file.save()
-            print("saved")
+    files = SequencingFile.objects.filter(name__icontains="NGv3-PE100-NGv3").delete()
+    # print(files, files.count())
+    # for file in files:
+    #     sl = file.sequencing_file_set.sample_lib
+    #     sl.delete()
+
+    # file = Path(Path(__file__).parent.parent / "uploads" / "df_fq_new.csv")
+    # df = pd.read_csv(file)
+    # for file in files:
+    #     path = df[df['HiSeqData/'].str.contains(file.name)]["path"].values[0]
+    #     sr = path.split("/")[1]
+    #
+    #
+    #
+    #     try:
+    #         seqr = SequencingRun.objects.get(name=sr)
+    #         sl = SampleLib.objects.get(name=file.name.split(".")[0])
+    #         sf = SequencingFileSet.objects.filter(sample_lib=sl, sequencing_files__type="fastq")
+    #         if not sf:
+    #             print(file, sr, "FALSE")
+    #         # file.sequencing_file_set = sf
+    #         # file.save()
+    #
+    #     except Exception as e:
+    #         print(e)
+    # q = Q(Q(prefix__startswith="SGLP-0") & Q(sequencing_run__name="BCB004") & ~Q(prefix__icontains="_S"))
+    # sf = SequencingFileSet.objects.filter(q)
+    # print(sf)
+    # for s in sf:
+    #     print(s.sample_lib, s.prefix)
+    #     files = SequencingFile.objects.filter(sequencing_file_set=s)
+    #     print(files)
+    #     sl = s.sample_lib
+    #     sr = s.sequencing_run
+    #     s.delete()
+    #     print("deleted")
+    #     new_sf = SequencingFileSet.objects.get(sequencing_run=sr, sample_lib=sl)
+    #     for file in files:
+    #         file.sequencing_file_set = new_sf
+    #         file.save()
+    #         print("saved")
     # file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
     # df = pd.read_csv(file)
     # df.apply(lambda row: im_bait(row), axis=1)
