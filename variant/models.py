@@ -5,7 +5,7 @@ class VariantCall(models.Model):
     sample_lib = models.ForeignKey("samplelib.SampleLib", on_delete=models.CASCADE, related_name="variant_calls", blank=True, null=True)
     sequencing_run = models.ForeignKey("sequencingrun.SequencingRun", on_delete=models.CASCADE, related_name="variant_calls", blank=True, null=True)
     coverage = models.IntegerField(default=0)
-    # run_analysis = models.ForeignKey(RunAnalysis, on_delete=models.CASCADE, related_name="variant_calls")
+    analysis_run = models.ForeignKey("analysisrun.AnalysisRun", on_delete=models.CASCADE, related_name="variant_calls")
     log2r = models.FloatField(default=0.0)
     caller = models.CharField(max_length=30, blank=True, null=True)
     normal_sl = models.ForeignKey("samplelib.SampleLib", on_delete=models.CASCADE, related_name="variant_calls_for_normal", blank=True, null=True)

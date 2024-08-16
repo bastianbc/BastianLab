@@ -60,6 +60,7 @@ var KTDatatablesServerSide = function () {
                     return moment(data).format('MM/DD/YYYY');
                   }
                 },
+                { data: 'status' },
                 { data: null },
             ],
             columnDefs: [
@@ -74,7 +75,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 6,
+                    targets: 7,
                     data: null,
                     orderable: false,
                     className: 'text-end',
