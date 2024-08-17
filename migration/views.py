@@ -3603,17 +3603,13 @@ def create_sl_for_cl(request):
     for cl in CapturedLib.objects.filter(cl_seql_links__isnull=True).order_by('name'):
         print(cl.name)
         sl = SampleLib.objects.filter(sl_cl_links__captured_lib=cl)
-        # print(sl)
-        # sf = SequencingFileSet.objects.get(sequencing_run__sequencing_libs__cl_seql_links__captured_lib=cl)
         try:
             sr = SequencingRun.objects.get(name__icontains=cl.name.replace('_CL', ''))
-            sfs = SequencingFileSet.objects.filter(sequencing_run=sr)
-            # print([SL_CL_LINK.objects.get_or_create(sample_lib=sl, captured_lib=cl) for sf in sfs])
-            map(lambda sf: SL_CL_LINK.objects.get_or_create(sample_lib=sl, captured_lib=cl), sfs)
-            # print(sr)
+
+            # sfs = SequencingFileSet.objects.filter(sequencing_run=sr)
+            # map(lambda sf: SL_CL_LINK.objects.get_or_create(sample_lib=sl, captured_lib=cl), sfs)
         except Exception as e:
             print(e)
-        # print(sf)
 
 
 
