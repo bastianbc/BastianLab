@@ -3537,14 +3537,15 @@ def im_bait(row):
 
 
 def import_bait(request):
-    fs = SequencingFileSet.objects.filter(prefix__startswith="MRLP-").order_by("prefix")
+    # fs = SequencingFileSet.objects.filter(prefix__startswith="MRLP-").order_by("prefix")
+    fs = SequencingFileSet.objects.filter(sample_lib__isnull=True).order_by("prefix")
     for i in fs:
-        try:
-            i.sample_lib = SampleLib.objects.get(name=i.prefix)
-            i.save()
-            print(i.prefix, i.sequencing_run.name)
-        except Exception as e:
-            print(e)
+        print(i.prefix, i.sequencing_run.name)
+        # try:
+        #     i.sample_lib = SampleLib.objects.get(name=i.prefix)
+        #     i.save()
+        # except Exception as e:
+        #     print(e)
     # print(files, files.count())
     # for file in files:
     #     sl = file.sequencing_file_set.sample_lib
