@@ -3537,8 +3537,10 @@ def im_bait(row):
 
 
 def import_bait(request):
-    fs = SequencingFileSet.objects.filter(sample_lib__isnull=True).order_by("prefix")
+    fs = SequencingFileSet.objects.filter(prefix__startswith="CNLP-").order_by("prefix")
     for i in fs:
+        i.sample_lib = SampleLib.objects.get(name=i.prefix.split("_S")[0])
+        i.save()
         print(i.prefix, i.sequencing_run.name)
     # print(files, files.count())
     # for file in files:
