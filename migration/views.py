@@ -3545,8 +3545,11 @@ def import_bait(request):
     for i in fs:
         print(i.prefix, i.sequencing_run.name)
         try:
-            i.sample_lib = SampleLib.objects.get(name=i.prefix)
-            i.save()
+            match = re.match(r'(.*)_([ACTG])', i.prefix)
+            if match:
+                i.sample_lib = SampleLib.objects.get(name=match.group(1).replace("_","-"))
+                i.save()
+                print("saved")
         except Exception as e:
             print(e)
     # print(files, files.count())
