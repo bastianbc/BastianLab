@@ -3537,39 +3537,69 @@ def im_bait(row):
 
 
 def create_seql_for_seq_run(request):
-    for seqL in SequencingLib.objects.filter(Q(Q(name__icontains='SeqL') & ~Q(name__icontains="_SeqL"))):
-        print(seqL)
-        name = seqL.name.replace("SeqL", "_SeqL")
-        seqL.name = name
-        seqL.save()
+    file = Path(Path(__file__).parent.parent / "uploads" / "Captured Library and Sequencing Run-Grid view.csv")
+    df = pd.read_csv(file)
+    df = df.reset_index()
+    df['Sequencing_run_ID'] = df['Sequencing_run_ID'].fillna('')
+    file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view.csv")
+    df2 = pd.read_csv(file)
+    df2 = df2.reset_index()
+    df2['Sequencing Run_ID'] = df2['Sequencing Run_ID'].fillna('')
+    for sr in SequencingRun.objects.filter(sequencing_libs__isnull=True).order_by('name'):
+        match = df2[df2['Sequencing Run_ID'].str.contains(sr.name)]
+        match2 = df[df['Sequencing_run_ID'].str.contains(sr.name)]
+        if not match.empty:
+            print(match['CL_ID'].values[0])
+            try:
+                cl,_ = CapturedLib.objects.get_or_create(name=match['CL_ID'].values[0])
+                seqL = SequencingLib.objects.get(cl_seql_links__captured_lib=cl)
+                sr.sequencing_libs.add(seqL)
+                print(sr.name)
+            except Exception as e:
+                print(e)
+        if not match2.empty:
+            print(match)
+            print(sr.name)
 
-    # file = Path(Path(__file__).parent.parent / "uploads" / "Captured Library and Sequencing Run-Grid view.csv")
-    # df = pd.read_csv(file)
-    # df = df.reset_index()
-    # df['Sequencing_run_ID'] = df['Sequencing_run_ID'].fillna('')
-    # file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view.csv")
-    # df2 = pd.read_csv(file)
-    # df2 = df2.reset_index()
-    # df2['Sequencing Run_ID'] = df2['Sequencing Run_ID'].fillna('')
-    # for sr in SequencingRun.objects.filter(sequencing_libs__isnull=True).order_by('name'):
-    #     match = df2[df2['Sequencing Run_ID'].str.contains(sr.name)]
-    #     match2 = df[df['Sequencing_run_ID'].str.contains(sr.name)]
-    #     if not match.empty:
-    #         print(match['CL_ID'].values[0])
-    #         try:
-    #             cl,_ = CapturedLib.objects.get_or_create(name=match['CL_ID'].values[0])
-    #             seqL = SequencingLib.objects.get(cl_seql_links__captured_lib=cl)
-    #             sr.sequencing_libs.add(seqL)
-    #             print(sr.name)
-    #         except Exception as e:
-    #             print(e)
-    #     if not match2.empty:
-    #         print(match)
-    #         print(sr.name)
-    #
-    #     seqL,_ = SequencingLib.objects.get_or_create(name=sr.name+"_SeqL")
-    #     sr.sequencing_libs.add(seqL)
-    #     print('saved')
+        seqL,_ = SequencingLib.objects.get_or_create(name=sr.name+"_SeqL")
+        sr.sequencing_libs.add(seqL)
+        print('saved')
+
+
+def create_cl_for_seqL(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "Captured Library and Sequencing Run-Grid view.csv")
+    df = pd.read_csv(file)
+    df = df.reset_index()
+    df['Sequencing_run_ID'] = df['Sequencing_run_ID'].fillna('')
+    file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view.csv")
+    df2 = pd.read_csv(file)
+    df2 = df2.reset_index()
+    df2['Sequencing Run_ID'] = df2['Sequencing Run_ID'].fillna('')
+    for seqL in SequencingLib.objects.filter(cl_seql_links__isnull=True).order_by('name'):
+        match = df2[df2['Sequencing Run_ID'].str.contains(seqL.name.replace("_SeqL",""))]
+        match2 = df[df['Sequencing_run_ID'].str.contains(seqL.name.replace("_SeqL",""))]
+        if not match.empty:
+            print('match1')
+            print(match['CL_ID'].values[0])
+            try:
+                cl = CapturedLib.objects.get(name=match['CL_ID'].values[0])
+                CL_SEQL_LINK.objects.get_or_create(captured_lib=cl, sequencing_lib=seqL)
+            except Exception as e:
+                print(e)
+        if not match2.empty:
+            print('match2')
+            print(match2['CL_ID'].values[0])
+            try:
+                cl = CapturedLib.objects.get(name=match2['CL_ID'].values[0])
+                CL_SEQL_LINK.objects.get_or_create(captured_lib=cl, sequencing_lib=seqL)
+                print(cl)
+            except Exception as e:
+                print(e)
+
+        cl,_ = CapturedLib.objects.get_or_create(name=seqL.name+'_CL')
+        CL_SEQL_LINK.objects.get_or_create(captured_lib=cl, sequencing_lib=seqL)
+
+
 
 
 
