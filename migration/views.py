@@ -3538,8 +3538,9 @@ def im_bait(row):
 
 def import_bait(request):
     from django.db.models import F, Value
+    from django.db.models.functions import Replace
     fs = SequencingFileSet.objects.filter(prefix__startswith="NGS").order_by("prefix")
-    SampleLib.objects.filter(name__startswith="NGS").update(F('name'), Value(' '), Value("-"))
+    SampleLib.objects.filter(name__startswith="NGS").update(name=Replace(F('name'), Value(' '), Value("-")))
     # fs = SequencingFileSet.objects.filter(sample_lib__isnull=True).order_by("prefix")
     for i in fs:
         print(i.prefix, i.sequencing_run.name)
