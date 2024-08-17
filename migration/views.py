@@ -3537,21 +3537,25 @@ def im_bait(row):
 
 
 def import_bait(request):
-    from django.db.models import F, Value
-    from django.db.models.functions import Replace
-    fs = SequencingFileSet.objects.filter(prefix__startswith="NGS").order_by("prefix")
-    SampleLib.objects.filter(name__startswith="NGS").update(name=Replace(F('name'), Value(' '), Value("-")))
-    # fs = SequencingFileSet.objects.filter(sample_lib__isnull=True).order_by("prefix")
-    for i in fs:
-        print(i.prefix, i.sequencing_run.name)
-        try:
-            match = re.match(r'(.*)_([ACTG])', i.prefix)
-            if match:
-                i.sample_lib = SampleLib.objects.get(name=match.group(1).replace("_","-"))
-                i.save()
-                print("saved")
-        except Exception as e:
-            print(e)
+    fsets = SequencingFileSet.objects.filter(sample_lib__isnull=True).order_by("prefix")
+    for fs in fsets:
+        SequencingFile.objects.filter(sequencing_file_set=fs).delete()
+        fs.delete()
+    # from django.db.models import F, Value
+    # from django.db.models.functions import Replace
+    # fs = SequencingFileSet.objects.filter(prefix__startswith="NGS").order_by("prefix")
+    # SampleLib.objects.filter(name__startswith="NGS").update(name=Replace(F('name'), Value(' '), Value("-")))
+    # # fs = SequencingFileSet.objects.filter(sample_lib__isnull=True).order_by("prefix")
+    # for i in fs:
+    #     print(i.prefix, i.sequencing_run.name)
+    #     try:
+    #         match = re.match(r'(.*)_([ACTG])', i.prefix)
+    #         if match:
+    #             i.sample_lib = SampleLib.objects.get(name=match.group(1).replace("_","-"))
+    #             i.save()
+    #             print("saved")
+    #     except Exception as e:
+    #         print(e)
     # print(files, files.count())
     # for file in files:
     #     sl = file.sequencing_file_set.sample_lib
