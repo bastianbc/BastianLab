@@ -3537,74 +3537,8 @@ def im_bait(row):
 
 
 def import_bait(request):
-    fs = SequencingFileSet.objects.filter(sample_lib__isnull=True).order_by("prefix")
-    for i in fs:
-        print(i.prefix, i.sequencing_run.name)
-    fs = SequencingFileSet.objects.filter(sequencing_run__isnull=True).order_by("prefix")
-    for i in fs:
-        print(i.prefix, i.sequencing_run.name)
-    # fsets = SequencingFileSet.objects.filter(sample_lib__isnull=True).order_by("prefix")
-    # for fs in fsets:
-    #     SequencingFile.objects.filter(sequencing_file_set=fs).delete()
-    #     fs.delete()
-    # from django.db.models import F, Value
-    # from django.db.models.functions import Replace
-    # fs = SequencingFileSet.objects.filter(prefix__startswith="NGS").order_by("prefix")
-    # SampleLib.objects.filter(name__startswith="NGS").update(name=Replace(F('name'), Value(' '), Value("-")))
-    # # fs = SequencingFileSet.objects.filter(sample_lib__isnull=True).order_by("prefix")
-    # for i in fs:
-    #     print(i.prefix, i.sequencing_run.name)
-    #     try:
-    #         match = re.match(r'(.*)_([ACTG])', i.prefix)
-    #         if match:
-    #             i.sample_lib = SampleLib.objects.get(name=match.group(1).replace("_","-"))
-    #             i.save()
-    #             print("saved")
-    #     except Exception as e:
-    #         print(e)
-    # print(files, files.count())
-    # for file in files:
-    #     sl = file.sequencing_file_set.sample_lib
-    #     sl.delete()
-
-    # file = Path(Path(__file__).parent.parent / "uploads" / "df_fq_new.csv")
-    # df = pd.read_csv(file)
-    # for file in files:
-    #     path = df[df['HiSeqData/'].str.contains(file.name)]["path"].values[0]
-    #     sr = path.split("/")[1]
-    #
-    #
-    #
-    #     try:
-    #         seqr = SequencingRun.objects.get(name=sr)
-    #         sl = SampleLib.objects.get(name=file.name.split(".")[0])
-    #         sf = SequencingFileSet.objects.filter(sample_lib=sl, sequencing_files__type="fastq")
-    #         if not sf:
-    #             print(file, sr, "FALSE")
-    #         # file.sequencing_file_set = sf
-    #         # file.save()
-    #
-    #     except Exception as e:
-    #         print(e)
-    # q = Q(Q(prefix__startswith="SGLP-0") & Q(sequencing_run__name="BCB004") & ~Q(prefix__icontains="_S"))
-    # sf = SequencingFileSet.objects.filter(q)
-    # print(sf)
-    # for s in sf:
-    #     print(s.sample_lib, s.prefix)
-    #     files = SequencingFile.objects.filter(sequencing_file_set=s)
-    #     print(files)
-    #     sl = s.sample_lib
-    #     sr = s.sequencing_run
-    #     s.delete()
-    #     print("deleted")
-    #     new_sf = SequencingFileSet.objects.get(sequencing_run=sr, sample_lib=sl)
-    #     for file in files:
-    #         file.sequencing_file_set = new_sf
-    #         file.save()
-    #         print("saved")
-    # file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
-    # df = pd.read_csv(file)
-    # df.apply(lambda row: im_bait(row), axis=1)
+    for sr in SequencingRun.objects.filter(sequencing_libs__isnull=True):
+        print(sr.name)
 
 def match_respectively_via_names(sl,files):
     l = ["16","19","20","21","22","23","24","25","28","89","AGLP","AM-",
