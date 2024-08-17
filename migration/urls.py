@@ -48,6 +48,7 @@ urlpatterns = [
     path("import_area_types", views.import_area_types, name="import_area_types"),
     path("create_seql_for_seq_run", views.create_seql_for_seq_run, name="create_seql_for_seq_run"),
     path("create_cl_for_seqL", views.create_cl_for_seqL, name="create_cl_for_seqL"),
+    path("create_sl_for_cl", views.create_sl_for_cl, name="create_sl_for_cl"),
     path("upload_file_tree_all_md5_3", views.upload_file_tree_all_md5_3, name="upload_file_tree_all_md5_3"),
     path("match_seq_runs_with_dffq", views.match_seq_runs_with_dffq, name="match_seq_runs_with_dffq"),
     path('match_sl_fastq_file_1', views.match_sl_fastq_file_1, name='match_sl_fastq_file_1'),
