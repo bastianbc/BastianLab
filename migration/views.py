@@ -3537,10 +3537,16 @@ def im_bait(row):
 
 
 def import_bait(request):
-    fsets = SequencingFileSet.objects.filter(sample_lib__isnull=True).order_by("prefix")
-    for fs in fsets:
-        SequencingFile.objects.filter(sequencing_file_set=fs).delete()
-        fs.delete()
+    fs = SequencingFileSet.objects.filter(sample_lib__isnull=True).order_by("prefix")
+    for i in fs:
+        print(i.prefix, i.sequencing_run.name)
+    fs = SequencingFileSet.objects.filter(sequencing_run__isnull=True).order_by("prefix")
+    for i in fs:
+        print(i.prefix, i.sequencing_run.name)
+    # fsets = SequencingFileSet.objects.filter(sample_lib__isnull=True).order_by("prefix")
+    # for fs in fsets:
+    #     SequencingFile.objects.filter(sequencing_file_set=fs).delete()
+    #     fs.delete()
     # from django.db.models import F, Value
     # from django.db.models.functions import Replace
     # fs = SequencingFileSet.objects.filter(prefix__startswith="NGS").order_by("prefix")
