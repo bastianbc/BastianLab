@@ -3537,7 +3537,7 @@ def im_bait(row):
 
 
 def import_bait(request):
-    for sr in SequencingRun.objects.filter(sequencing_libs__isnull=True):
+    for sr in SequencingRun.objects.filter(sequencing_libs__isnull=True).order_by('name'):
         print(sr.name)
 
 def match_respectively_via_names(sl,files):
