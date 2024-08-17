@@ -3561,6 +3561,11 @@ def import_bait(request):
             print(match)
             print(sr.name)
 
+        seqL,_ = SequencingLib.objects.get_or_create(name=sr.name+"SeqL")
+        sr.sequencing_libs.add(seqL)
+        print('saved')
+
+
 
 def match_respectively_via_names(sl,files):
     l = ["16","19","20","21","22","23","24","25","28","89","AGLP","AM-",
