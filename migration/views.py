@@ -3606,7 +3606,7 @@ def create_sl_for_cl(request):
         print(sl)
         # sf = SequencingFileSet.objects.get(sequencing_run__sequencing_libs__cl_seql_links__captured_lib=cl)
         try:
-            sr = SequencingRun.objects.get(name=cl.name.replace('_CL', ''))
+            sr = SequencingRun.objects.get(name__icontains=cl.name.replace('_CL', ''))
             sfs = SequencingFileSet.objects.filter(sequencing_run=sr)
             print([sf.sample_lib for sf in sfs])
             # print(sr)
