@@ -30,7 +30,7 @@ class AnalysisRun(models.Model):
         last_run = AnalysisRun.objects.all().order_by('id').last()
         if last_run:
             last_id = int(last_run.name.replace('AR', ''))
-            return f"AR{last_id + 1:04d}"
+            return f"AR{last_id + 1}"
         else:
             return "AR1"
 
