@@ -3536,53 +3536,83 @@ def im_bait(row):
         print(e, row["Bait"])
 
 
-def import_bait(request):
-    fs = SequencingFileSet.objects.filter(sample_lib__isnull=True).order_by("prefix")
-    for i in fs:
-        print(i.prefix, i.sequencing_run.name)
-    # print(files, files.count())
-    # for file in files:
-    #     sl = file.sequencing_file_set.sample_lib
-    #     sl.delete()
+def create_seql_for_seq_run(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "Captured Library and Sequencing Run-Grid view.csv")
+    df = pd.read_csv(file)
+    df = df.reset_index()
+    df['Sequencing_run_ID'] = df['Sequencing_run_ID'].fillna('')
+    file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view.csv")
+    df2 = pd.read_csv(file)
+    df2 = df2.reset_index()
+    df2['Sequencing Run_ID'] = df2['Sequencing Run_ID'].fillna('')
+    for sr in SequencingRun.objects.filter(sequencing_libs__isnull=True).order_by('name'):
+        match = df2[df2['Sequencing Run_ID'].str.contains(sr.name)]
+        match2 = df[df['Sequencing_run_ID'].str.contains(sr.name)]
+        if not match.empty:
+            print(match['CL_ID'].values[0])
+            try:
+                cl,_ = CapturedLib.objects.get_or_create(name=match['CL_ID'].values[0])
+                seqL = SequencingLib.objects.get(cl_seql_links__captured_lib=cl)
+                sr.sequencing_libs.add(seqL)
+                print(sr.name)
+            except Exception as e:
+                print(e)
+        if not match2.empty:
+            print(match)
+            print(sr.name)
 
-    # file = Path(Path(__file__).parent.parent / "uploads" / "df_fq_new.csv")
-    # df = pd.read_csv(file)
-    # for file in files:
-    #     path = df[df['HiSeqData/'].str.contains(file.name)]["path"].values[0]
-    #     sr = path.split("/")[1]
-    #
-    #
-    #
-    #     try:
-    #         seqr = SequencingRun.objects.get(name=sr)
-    #         sl = SampleLib.objects.get(name=file.name.split(".")[0])
-    #         sf = SequencingFileSet.objects.filter(sample_lib=sl, sequencing_files__type="fastq")
-    #         if not sf:
-    #             print(file, sr, "FALSE")
-    #         # file.sequencing_file_set = sf
-    #         # file.save()
-    #
-    #     except Exception as e:
-    #         print(e)
-    # q = Q(Q(prefix__startswith="SGLP-0") & Q(sequencing_run__name="BCB004") & ~Q(prefix__icontains="_S"))
-    # sf = SequencingFileSet.objects.filter(q)
-    # print(sf)
-    # for s in sf:
-    #     print(s.sample_lib, s.prefix)
-    #     files = SequencingFile.objects.filter(sequencing_file_set=s)
-    #     print(files)
-    #     sl = s.sample_lib
-    #     sr = s.sequencing_run
-    #     s.delete()
-    #     print("deleted")
-    #     new_sf = SequencingFileSet.objects.get(sequencing_run=sr, sample_lib=sl)
-    #     for file in files:
-    #         file.sequencing_file_set = new_sf
-    #         file.save()
-    #         print("saved")
-    # file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
-    # df = pd.read_csv(file)
-    # df.apply(lambda row: im_bait(row), axis=1)
+        seqL,_ = SequencingLib.objects.get_or_create(name=sr.name+"_SeqL")
+        sr.sequencing_libs.add(seqL)
+        print('saved')
+
+
+def create_cl_for_seqL(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "Captured Library and Sequencing Run-Grid view.csv")
+    df = pd.read_csv(file)
+    df = df.reset_index()
+    df['Sequencing_run_ID'] = df['Sequencing_run_ID'].fillna('')
+    file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view.csv")
+    df2 = pd.read_csv(file)
+    df2 = df2.reset_index()
+    df2['Sequencing Run_ID'] = df2['Sequencing Run_ID'].fillna('')
+    for seqL in SequencingLib.objects.filter(cl_seql_links__isnull=True).order_by('name'):
+        match = df2[df2['Sequencing Run_ID'].str.contains(seqL.name.replace("_SeqL",""))]
+        match2 = df[df['Sequencing_run_ID'].str.contains(seqL.name.replace("_SeqL",""))]
+        if not match.empty:
+            print('match1')
+            print(match['CL_ID'].values[0])
+            try:
+                cl = CapturedLib.objects.get(name=match['CL_ID'].values[0])
+                CL_SEQL_LINK.objects.get_or_create(captured_lib=cl, sequencing_lib=seqL)
+            except Exception as e:
+                print(e)
+        if not match2.empty:
+            print('match2')
+            print(match2['CL_ID'].values[0])
+            try:
+                cl = CapturedLib.objects.get(name=match2['CL_ID'].values[0])
+                CL_SEQL_LINK.objects.get_or_create(captured_lib=cl, sequencing_lib=seqL)
+                print(cl)
+            except Exception as e:
+                print(e)
+
+        cl,_ = CapturedLib.objects.get_or_create(name=seqL.name+'_CL')
+        CL_SEQL_LINK.objects.get_or_create(captured_lib=cl, sequencing_lib=seqL)
+
+def create_sl_for_cl(request):
+    for cl in CapturedLib.objects.filter(cl_seql_links__isnull=True).order_by('name'):
+        print(cl.name)
+        sl = SampleLib.objects.filter(sl_cl_links__captured_lib=cl)
+        try:
+            sr = SequencingRun.objects.get(name__icontains=cl.name.replace('_CL', ''))
+
+            # sfs = SequencingFileSet.objects.filter(sequencing_run=sr)
+            # map(lambda sf: SL_CL_LINK.objects.get_or_create(sample_lib=sl, captured_lib=cl), sfs)
+        except Exception as e:
+            print(e)
+
+
+
 
 def match_respectively_via_names(sl,files):
     l = ["16","19","20","21","22","23","24","25","28","89","AGLP","AM-",
