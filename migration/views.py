@@ -3605,10 +3605,11 @@ def create_sl_for_cl(request):
             seqL = SequencingLib.objects.filter(cl_seql_links__captured_lib=cl)
             sr = SequencingRun.objects.filter(sequencing_libs__in=seqL)
             sfs = SequencingFileSet.objects.filter(sequencing_run__in=sr)
-            # print(cl.name, sfs)
+            print(cl.name)
             for sf in sfs:
-                print(sf.prefix, sf.sequencing_run.name)
-                SL_CL_LINK.objects.get_or_create(sample_lib=sf.sample_lib, captured_lib=cl)
+                pass
+                # print(sf.prefix, sf.sequencing_run.name)
+                # SL_CL_LINK.objects.get_or_create(sample_lib=sf.sample_lib, captured_lib=cl)
             # map(lambda sf: SL_CL_LINK.objects.get_or_create(sample_lib=sf.sl, captured_lib=cl), sfs)
             # print("@@@ cl", cl.name)
         except Exception as e:
