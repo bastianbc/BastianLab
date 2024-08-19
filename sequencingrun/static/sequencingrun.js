@@ -819,7 +819,6 @@ var KTDatatablesServerSide = function () {
           const form = document.getElementById("form-analysis-run");
 
           initGenerateAnalysisSheetButton(modal);
-          initStepper(stepperElement);
 
           function initGenerateAnalysisSheetButton(modal) {
               menuItem.addEventListener("click", function () {
@@ -827,7 +826,7 @@ var KTDatatablesServerSide = function () {
               });
           }
 
-          function initStepper(stepperElement) {
+          function initStepper() {
               stepper = new KTStepper(stepperElement);
 
               if (!isStepperEmpty()) {
@@ -1003,6 +1002,10 @@ var KTDatatablesServerSide = function () {
                   form.reset();
                   selectedRows = [];
                   dt.draw();
+              });
+
+              modalElement.addEventListener('shown.bs.modal', function(){
+                  initStepper();
               });
 
               // submit button

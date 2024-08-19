@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 import json
+from .storage import CustomFileSystemStorage
 
 class AnalysisRun(models.Model):
     PIPELINE_CHOICES = (
@@ -20,7 +21,7 @@ class AnalysisRun(models.Model):
     pipeline = models.CharField(max_length=10, choices=PIPELINE_CHOICES, verbose_name = "Pipeline Version")
     genome = models.CharField(max_length=10, choices=GENOME_CHOICES, verbose_name = "Reference Genome")
     date = models.DateTimeField(auto_now_add=True)
-    sheet = models.FileField(upload_to="files/")
+    sheet = models.FileField(storage=CustomFileSystemStorage(), upload_to='')
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=STATUS_CHOICES[0][0], verbose_name = "Status")
 
     class Meta:
