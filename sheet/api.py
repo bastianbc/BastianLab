@@ -12,10 +12,12 @@ from sequencingrun.models import SequencingRun
 
 def _get_authorizated_queryset(seq_runs):
     seq_run_subquery = SequencingFileSet.objects.filter(
-
         sample_lib=OuterRef('pk'),
         sequencing_run__id__in=seq_runs
     ).values('sequencing_run__id')
+    matching_normal_sl_subquery = SequencingRun.objects.filter(
+        sequencing_lib__cl_seql_links__captured_lib__sl_cl_links__sample_lib=OuterRef('pk')
+    )
     return SampleLib.objects.filter(
             sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=seq_runs
         ).prefetch_related('sequencing_file_sets').annotate(
@@ -50,6 +52,8 @@ def _get_authorizated_queryset(seq_runs):
                     na_sl_links__nucacid__area_na_links__area__area_type='normal',
                     na_sl_links__nucacid__area_na_links__area__block__patient=OuterRef(
                         "na_sl_links__nucacid__area_na_links__area__block__patient")
+                ).filter(
+                    Exists(matching_normal_sl_subquery)
                 ).values('name')[:1]
             ),
             output_field=CharField()
