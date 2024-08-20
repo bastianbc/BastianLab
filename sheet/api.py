@@ -52,7 +52,7 @@ def _get_authorizated_queryset(seq_runs):
                     na_sl_links__nucacid__area_na_links__area__area_type='normal',
                     na_sl_links__nucacid__area_na_links__area__block__patient=OuterRef(
                         "na_sl_links__nucacid__area_na_links__area__block__patient"),
-                    sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__is_null=False
+                    sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__isnull=False
                 ).values('name')[:1]
             ),
             output_field=CharField()
