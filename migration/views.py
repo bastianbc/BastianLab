@@ -3784,7 +3784,7 @@ def register_new_fastq_files(request):
     df = pd.read_csv(file)
     df = df.reset_index()  # make sure indexes pair with number of rows
     for index, row in df.iterrows():
-        try:
+        # try:
             file, created = SequencingFile.objects.get_or_create(name=row['file'])
             if pd.isnull(row['file'])==False:
                 print(row['file'].split('.')[0])
@@ -3798,8 +3798,8 @@ def register_new_fastq_files(request):
                 file.sequencing_file_set = file_set
                 file.checksum = row['_md5_']
                 file.save()
-        except Exception as e:
-            print(e)
+        # except Exception as e:
+        #     print(e)
 
 
     # file = Path(Path(__file__).parent.parent / "uploads" / "cl_seql_missing.csv")
