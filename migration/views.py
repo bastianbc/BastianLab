@@ -3733,7 +3733,9 @@ def generate_file_set(file, seq_run, sample_lib):
         prefix = file.split(dna)[0] + dna
     if prefix is None:
         prefix = file.split(".")[0]
-    file_set, _ = SequencingFileSet.objects.get_or_create(prefix=prefix, sequencing_run=seq_run, sample_lib=sample_lib)
+    file_set, _ = SequencingFileSet.objects.get_or_create(prefix=prefix,
+                                                          sequencing_run=seq_run,
+                                                          sample_lib=sample_lib)
     print("file_set generated", prefix, "------", file)
     return file_set
 
@@ -3782,11 +3784,11 @@ def find_path_seq_run_for_file_sets(request):
 def register_new_fastq_files(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "df_fq_bcb0079.csv")
     df = pd.read_csv(file)
-    df = df.reset_index()  # make sure indexes pair with number of rows
+    df = df.reset_index()
     for index, row in df.iterrows():
         # try:
-            file, created = SequencingFile.objects.get_or_create(name=row['file'])
-            if pd.isnull(row['file'])==False:
+            if pd.isnull(row['file']) == False:
+                file, created = SequencingFile.objects.get_or_create(name=row['file'])
                 print(row['file'].split('.')[0])
                 sl = SampleLib.objects.get(name=row['file'].split('.')[0])
                 sr = SequencingRun.objects.get(name=row['path'].split('/')[1])
@@ -3795,9 +3797,15 @@ def register_new_fastq_files(request):
                 else:
                     file_set = generate_file_set(file.name, sr, sl)
                 print(file_set.prefix, sl.name, file.name)
-            file.sequencing_file_set = file_set
-            file.checksum = row['_md5_']
-            file.save()
+                file_set.path = row['path']
+                file_set.save()
+                file.sequencing_file_set = file_set
+                file.save()
+            else:
+                file = SequencingFile.objects.get(name=row['BCB079_BroadInstitute_WES_4/'].split(".md5")[0])
+                file.checksum = row['_md5_']
+                file.save()
+
         # except Exception as e:
         #     print(e)
 
