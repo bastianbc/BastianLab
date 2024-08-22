@@ -201,7 +201,7 @@ def generate_file(data, file_name):
     seen = []
     for index, row in enumerate(data):
         sl = SampleLib.objects.get(name=row.name)
-        # print("%%%",row.file)
+        print("%%%",sl.name)
         sl_seq_run = f"{sl.name}-{row.seq_run}"
         if sl_seq_run not in seen:
             seen.append(sl_seq_run)
@@ -215,6 +215,7 @@ def generate_file(data, file_name):
 
         report.na_type = row.na_type # ✓
         report.area_type = row.area_type # ✓
+        report.matching_normal_sl = ''
         if row.matching_normal_sl:
             if SequencingFileSet.objects.filter(sample_lib=SampleLib.objects.get(name=row.matching_normal_sl)):
                 report.matching_normal_sl = row.matching_normal_sl.replace(" ", "_") if row.matching_normal_sl else ""
