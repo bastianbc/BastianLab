@@ -3793,7 +3793,7 @@ def register_new_fastq_files(request):
                 if SequencingFileSet.objects.filter(sequencing_run=sr, sample_lib=sl):
                     file_set = SequencingFileSet.objects.get(sequencing_run=sr, sample_lib=sl)
                 else:
-                    file_set = generate_file_set(file, sr, sl)
+                    file_set = generate_file_set(file.name, sr, sl)
                 print(file_set.prefix, sl.name, file.name)
             file.sequencing_file_set = file_set
             file.checksum = row['_md5_']
