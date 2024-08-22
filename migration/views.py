@@ -3795,9 +3795,9 @@ def register_new_fastq_files(request):
                 else:
                     file_set = generate_file_set(file, sr, sl)
                 print(file_set.prefix, sl.name, file.name)
-                file.sequencing_file_set = file_set
-                file.checksum = row['_md5_']
-                file.save()
+            file.sequencing_file_set = file_set
+            file.checksum = row['_md5_']
+            file.save()
         # except Exception as e:
         #     print(e)
 
