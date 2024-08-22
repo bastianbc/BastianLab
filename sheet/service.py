@@ -215,8 +215,9 @@ def generate_file(data, file_name):
 
         report.na_type = row.na_type # ✓
         report.area_type = row.area_type # ✓
-        if SequencingFileSet.objects.filter(sample_lib=SampleLib.objects.filter(name=row.matching_normal_sl)):
-            report.matching_normal_sl = row.matching_normal_sl.replace(" ", "_") if row.matching_normal_sl else ""
+        if row.matching_normal_sl:
+            if SequencingFileSet.objects.filter(sample_lib=SampleLib.objects.filter(name=row.matching_normal_sl)):
+                report.matching_normal_sl = row.matching_normal_sl.replace(" ", "_") if row.matching_normal_sl else ""
         fastq, bam, bai = [], [], []
         report.footprint = row.bait
         files = _get_files(row.name, row.seq_run)
