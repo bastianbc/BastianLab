@@ -3789,7 +3789,7 @@ def register_new_fastq_files(request):
             if pd.isnull(row['file'])==False:
                 print(row['file'].split('.')[0])
                 sl = SampleLib.objects.get(name=row['file'].split('.')[0])
-                sr = SequencingRun.objects.get(name=row['path'].split['/'][1])
+                sr = SequencingRun.objects.get(name=row['path'].split('/')[1])
                 if SequencingFileSet.objects.filter(sequencing_run=sr, sample_lib=sl):
                     file_set = SequencingFileSet.objects.get(sequencing_run=sr, sample_lib=sl)
                 else:
