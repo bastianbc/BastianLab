@@ -3790,6 +3790,13 @@ def register_new_fastq_files(request):
             if pd.isnull(row['file']) == False:
                 file, created = SequencingFile.objects.get_or_create(name=row['file'])
                 print(row['file'].split('.')[0])
+                bam = row['bam']
+                bai = row['bai']
+                if any(file_type[0] == "bam" for file_type in SequencingFile.FILE_TYPES):
+                    file.type = 'bam'
+                if any(file_type[0] == "bai" for file_type in SequencingFile.FILE_TYPES):
+                    file.type = 'bai'
+                file.save()
                 sl = SampleLib.objects.get(name=row['file'].split('.')[0])
                 sr = SequencingRun.objects.get(name=row['path'].split('/')[1])
                 if SequencingFileSet.objects.filter(sequencing_run=sr, sample_lib=sl):
