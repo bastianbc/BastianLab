@@ -22,7 +22,7 @@ var KTDatatablesServerSide = function () {
             // searchDelay: 500,
             processing: true,
             serverSide: true,
-            order: [[5, 'asc']],
+            order: [[5, 'desc']],
             stateSave: false,
             destroy: true,
             pageLength: 100,
