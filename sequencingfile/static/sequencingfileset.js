@@ -22,7 +22,7 @@ var KTDatatablesServerSide = function () {
             // searchDelay: 500,
             processing: true,
             serverSide: true,
-            order: [[0, 'desc']],
+            order: [[5, 'asc']],
             stateSave: false,
             destroy: true,
             pageLength: 100,
@@ -62,6 +62,7 @@ var KTDatatablesServerSide = function () {
               { data: 'sample_lib' },
               { data: 'sequencing_run' },
               { data: 'num_sequencing_files'},
+              { data: 'date_added'},
             ],
             columnDefs: [
                 {
@@ -90,6 +91,12 @@ var KTDatatablesServerSide = function () {
                 },
                 {
                     targets: 5,
+                    orderable: true,
+                    visible: false,
+                    searchable: false,
+                },
+                {
+                    targets: 6,
                     data: null,
                     orderable: false,
                     className: 'text-end',

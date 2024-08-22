@@ -44,6 +44,7 @@ class SequencingFileSet(models.Model):
                 "0": "set_id",
                 "1": "prefix",
                 "2": "path",
+                "5": "date_added",
             }
             draw = int(kwargs.get('draw', None)[0])
             length = int(kwargs.get('length', None)[0])
@@ -56,7 +57,7 @@ class SequencingFileSet(models.Model):
             # django orm '-' -> desc
             if order == 'desc':
                 order_column = '-' + order_column
-
+            print("*"*100, order, order_column)
             queryset = _get_authorizated_queryset()
 
             total = queryset.count()
