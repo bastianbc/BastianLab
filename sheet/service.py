@@ -222,7 +222,6 @@ def generate_file(data, file_name):
         report.footprint = row.bait
         files = _get_files(row.name, row.seq_run)
         if files:
-            print(row.name, files)
             for file in files:
                 if file.type == "fastq":
                     print(1)
@@ -251,6 +250,7 @@ def generate_file(data, file_name):
         seq_run = report.path_fastq.split("/")[1] if report.path_fastq != "" and report.path_fastq != None else ""
         report.seq_run = row.seq_run2  # ✓
         concat_files = f"{report.fastq}{report.bam}{report.bai}".replace("None","").strip()
+        print("concat_files", concat_files)
         if not row.barcode_name or row.barcode_name == "":
             pattern = r'(?<![ACGT])[ACGT]{6,8}(?![ACGT])'
             match = re.findall(pattern, concat_files)
