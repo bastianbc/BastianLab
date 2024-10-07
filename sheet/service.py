@@ -199,6 +199,7 @@ def generate_file(data, file_name):
 
     res = []
     seen = []
+    print("*"*100, data)
     for index, row in enumerate(data):
         sl = SampleLib.objects.get(name=row.name)
         print("%%%",sl.name)

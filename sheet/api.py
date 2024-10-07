@@ -2,6 +2,7 @@ import json
 from django.db.models import Q, F, Count, OuterRef,Exists, Subquery, Value, Case, When, CharField
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.db.models.functions import Coalesce, Concat
+from django.db.models import Prefetch
 
 from samplelib.models import SampleLib, NA_SL_LINK
 from lab.models import Patients
