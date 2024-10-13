@@ -237,11 +237,11 @@ LOGIN_REDIRECT_URL = '/projects'
 TECHNICIAN_GROUP_NAME = "Technicians"
 RESEARCHER_GROUP_NAME = "Researchers"
 
-smb_directory = "/mnt/smb_volume"
+smb_directory = "/mnt/labshare"
 SEQUENCING_FILES_SOURCE_DIRECTORY = Path(Path(smb_directory) / "BastianRaid-02")
 TEMP_DIRECTORY = Path(Path(smb_directory) / "BastianRaid-02" / "TEMP")
 
 
-SMB_DIRECTORY = "/home/bazo/Documents/PROJELER/UCSF/variants"
-SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(BASE_DIR,"uploads", "files", "ProcessedData")
-SEQUENCING_FILES_DESTINATION_DIRECTORY = os.path.join(BASE_DIR,"uploads", "dest")
+SMB_DIRECTORY = "/mnt/sequencingdata"
+SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(SMB_DIRECTORY, "ProcessedData")
+SEQUENCING_FILES_DESTINATION_DIRECTORY = SEQUENCING_FILES_SOURCE_DIRECTORY
