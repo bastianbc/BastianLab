@@ -57,7 +57,6 @@ class SequencingFileSet(models.Model):
             # django orm '-' -> desc
             if order == 'desc':
                 order_column = '-' + order_column
-            print("*"*100, order, order_column)
             queryset = _get_authorizated_queryset()
 
             total = queryset.count()

@@ -199,10 +199,8 @@ def generate_file(data, file_name):
 
     res = []
     seen = []
-    print("*"*100, data)
     for index, row in enumerate(data):
         sl = SampleLib.objects.get(name=row.name)
-        print("%%%",sl.name)
         sl_seq_run = f"{sl.name}-{row.seq_run}"
         if sl_seq_run not in seen:
             seen.append(sl_seq_run)
@@ -226,16 +224,13 @@ def generate_file(data, file_name):
         if files:
             for file in files:
                 if file.type == "fastq":
-                    print(1)
                     fastq.append(file.name)
                     report.path_fastq = row.path if row.path else ""
                     continue
                 if file.type == "bam" and not report.path_fastq:
-                    print(2)
                     bam.append(file.name)
                     report.path_bam = row.path if row.path else ""
                 if file.type == "bai" and not report.path_fastq:
-                    print(3)
                     bai.append(file.name)
                     report.path_bai = row.path if row.path else ""
         report.fastq = {f: _get_file(f).checksum for f in fastq} if fastq else ""
@@ -252,7 +247,6 @@ def generate_file(data, file_name):
         seq_run = report.path_fastq.split("/")[1] if report.path_fastq != "" and report.path_fastq != None else ""
         report.seq_run = row.seq_run2  # ✓
         concat_files = f"{report.fastq}{report.bam}{report.bai}".replace("None","").strip()
-        print("concat_files", concat_files)
         if not row.barcode_name or row.barcode_name == "":
             pattern = r'(?<![ACGT])[ACGT]{6,8}(?![ACGT])'
             match = re.findall(pattern, concat_files)

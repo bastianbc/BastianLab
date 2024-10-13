@@ -54,8 +54,6 @@ class SequencingLib(models.Model):
             length = int(kwargs.get('length', None)[0])
             start = int(kwargs.get('start', None)[0])
             search_value = kwargs.get('search[value]', None)[0]
-            print("search_value:", "$" * 100)
-            print(search_value)
             order_column = kwargs.get('order[0][column]', None)[0]
             order = kwargs.get('order[0][dir]', None)[0]
 
@@ -70,8 +68,6 @@ class SequencingLib(models.Model):
 
             is_initial = _is_initial_value(search_value)
             search_value = _parse_value(search_value)
-            print("search_value:", "*"*100)
-            print(search_value)
             if is_initial:
                 if search_value["model"] == "sequencing_run":
                     queryset = queryset.filter(Q(sequencing_runs__id=search_value["id"]))

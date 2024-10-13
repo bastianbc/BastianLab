@@ -240,7 +240,6 @@ def get_sample_libs_async(request):
     selected_ids = json.loads(request.GET.get("selected_ids"))
 
     selected_sequencing_runs = SequencingRun.objects.filter(id__in=selected_ids).prefetch_related('sequencing_libs')
-
     # Function to get the related sequencing files for each sequencing run
     def get_sequencing_files(sequencing_file_set):
         files = SequencingFile.objects.filter(sequencing_file_set=sequencing_file_set).values('name', 'checksum')
@@ -299,7 +298,6 @@ def get_sample_libs_async(request):
                     item["err"] = "not found na_sl_link"
             else:
                 item["err"] = "not found samplelib"
-
             sl_cl_link = sample_lib.sl_cl_links.first()
 
             if sl_cl_link:

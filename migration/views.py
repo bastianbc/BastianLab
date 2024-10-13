@@ -3262,7 +3262,6 @@ def upload_file_tree_all_md5_3(request):
                     if substring.startswith("CGH11"):
                         file.checksum = v["BB09_"+substring]
                         file.save()
-                        print("^&"*100)
                     else:
                         file.checksum = v[substring]
                         file.save()

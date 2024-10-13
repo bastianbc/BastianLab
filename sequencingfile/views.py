@@ -69,7 +69,6 @@ def file_get_or_create_from_report(row):
     d["read2_checksum"] = ""
     sl = get_or_create_sample_lib(row["sample_lib"])
     d["sample_lib"]=sl
-    print("SLLLL:",sl)
     for k,v in row["fastq_file"].items():
         file=k.strip()
         d["folder_name"] = row["sequencing_run"]
