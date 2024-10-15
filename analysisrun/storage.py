@@ -5,7 +5,7 @@ import os
 class CustomFileSystemStorage(FileSystemStorage):
     def __init__(self, *args, **kwargs):
         # Default directory to store files
-        kwargs['location'] = settings.SMB_DIRECTORY
+        kwargs['location'] = settings.SMB_DIRECTORY_SEQUENCINGDATA
         super(CustomFileSystemStorage, self).__init__(*args, **kwargs)
 
     def get_available_name(self, name, max_length=None):

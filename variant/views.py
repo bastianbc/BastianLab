@@ -23,22 +23,22 @@ def filter_variants(request):
 
     return JsonResponse(result)
 
-def import_variants(request, name):
+def import_variants(request):
     import os
     from django.conf import settings
     from .helper import variant_file_parser
-
-    folder_path = os.path.join(settings.SMB_DIRECTORY, name)
-
+    name = 'SGLP-0774'
+    folder_path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, name)
     # Check if the folder exists
     if os.path.exists(folder_path):
         # Get variant files in the folder
         files = os.listdir(folder_path)
-
+        analysisrun_name = [file_name for file_name in files if "analysis_sheet" in file_name]
         for filename in files:
             # parsing and saving data into the database
             file_path = os.path.join(folder_path, filename)
-            variant_file_parser(file_path, name)
+            if ".txt" in filename:
+                variant_file_parser(file_path, analysisrun_name[0])
 
         return JsonResponse({"success": True, "message": "Files processed successfully"})
 

@@ -63,7 +63,7 @@ def get_sequencing_run(filename):
     return None
 
 def get_analysis_run(name):
-    return AnalysisRun.objects.get(name=name)
+    return AnalysisRun.objects.get(sheet=name)
 
 def create_c_and_p_variants(g_variant, aachange, func, gene_detail):
     entries = aachange.split(',')
@@ -96,6 +96,7 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail):
 
 @transaction.atomic
 def variant_file_parser(file_path, analysis_run_name):
+    print("&"*100)
     df = pd.read_csv(file_path, sep='\t')
 
     # Extract the filename from the file path
@@ -103,7 +104,7 @@ def variant_file_parser(file_path, analysis_run_name):
 
     sample_lib = get_sample_lib(filename)
     analysis_run = get_analysis_run(analysis_run_name)
-
+    print(df['Depth'])
     for _, row in df.iterrows():
         try:
             variant_call = VariantCall.objects.create(
