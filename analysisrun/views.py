@@ -11,6 +11,11 @@ from .forms import *
 from django.contrib import messages
 from django.core.files.base import ContentFile
 from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+
+
+
+
 
 @permission_required("sequencingrun.view_sequencingrun",raise_exception=True)
 def analysisruns(request):
