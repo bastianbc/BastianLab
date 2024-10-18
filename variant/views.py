@@ -28,7 +28,7 @@ def import_variants(request):
     from django.conf import settings
     from .helper import variant_file_parser
     name = 'SGLP-0774'
-    folder_path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, name)
+    folder_path = os.path.join(settings.SEQUENCING_FILES_SOURCE_DIRECTORY, name)
     # Check if the folder exists
     if os.path.exists(folder_path):
         # Get variant files in the folder
