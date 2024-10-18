@@ -37,18 +37,20 @@ def filter_analysisruns(request):
 def save_analysis_run(request):
     if request.method == "POST":
         form = AnalysisRunForm(request.POST)
-        if form.is_valid():
-            analysis_run = form.save(commit=False)
+        try:
+            if form.is_valid():
+                analysis_run = form.save(commit=False)
 
-            sheet_content = form.cleaned_data['sheet_content']
+                sheet_content = form.cleaned_data['sheet_content']
 
-            # convert to csv
-            csv_file = ContentFile(sheet_content.encode('utf-8'))
-            file_name = f"{analysis_run.user.username}_analysis_sheet.csv"
-
-            analysis_run.sheet.save(file_name, csv_file, save=False)
-
-            analysis_run.save()
-
+                # convert to csv
+                csv_file = ContentFile(sheet_content.encode('utf-8'))
+                file_name = f"{analysis_run.user.username}_analysis_sheet.csv"
+                analysis_run.save()
+                analysis_run.sheet.save(file_name, csv_file, save=False)
+                analysis_run.save()
+        except:
             return JsonResponse({"success": True})
     return JsonResponse({"success": True})
+
+
