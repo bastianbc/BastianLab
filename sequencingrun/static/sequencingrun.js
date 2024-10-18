@@ -18,7 +18,7 @@ var KTDatatablesServerSide = function () {
             // searchDelay: 500,
             processing: true,
             serverSide: true,
-            order: [[0, 'desc']],
+            order: [[2, 'desc']],
             stateSave: false,
             destroy: true,
             select: {
@@ -1336,6 +1336,8 @@ var KTDatatablesServerSide = function () {
 
     }
 
+
+
     // Public methods
     return {
         init: function () {
@@ -1346,6 +1348,7 @@ var KTDatatablesServerSide = function () {
             handleDeleteRows();
             handleResetForm();
             initEditor();
+
 
         }
     }
