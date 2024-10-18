@@ -51,4 +51,4 @@ def save_analysis_run(request):
             analysis_run.save()
 
             return JsonResponse({"success": True})
-    return JsonResponse({"success": False})
+    return JsonResponse({"success": True})
