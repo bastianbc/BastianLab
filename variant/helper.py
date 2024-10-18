@@ -63,7 +63,7 @@ def get_sequencing_run(filename):
     return None
 
 def get_analysis_run(name):
-    return AnalysisRun.objects.get(sheet=name)
+    return AnalysisRun.objects.get(sheet_name=name)
 
 def create_c_and_p_variants(g_variant, aachange, func, gene_detail):
     entries = aachange.split(',')

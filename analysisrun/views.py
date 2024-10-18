@@ -46,6 +46,7 @@ def save_analysis_run(request):
                 # convert to csv
                 csv_file = ContentFile(sheet_content.encode('utf-8'))
                 file_name = f"{analysis_run.user.username}_analysis_sheet.csv"
+                analysis_run.sheet_name = file_name
                 analysis_run.save()
                 analysis_run.sheet.save(file_name, csv_file, save=False)
                 analysis_run.save()

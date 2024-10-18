@@ -22,6 +22,7 @@ class AnalysisRun(models.Model):
     genome = models.CharField(max_length=10, choices=GENOME_CHOICES, verbose_name = "Reference Genome")
     date = models.DateTimeField(auto_now_add=True)
     sheet = models.FileField(storage=CustomFileSystemStorage(), upload_to='')
+    sheet_name = models.CharField(max_length=200, blank=True, null=True, verbose_name="Sheet Name")
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=STATUS_CHOICES[0][0], verbose_name = "Status")
 
     class Meta:
