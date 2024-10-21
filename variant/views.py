@@ -34,10 +34,12 @@ def import_variants(request):
         # Get variant files in the folder
         files = os.listdir(folder_path)
         analysisrun_name = [file_name for file_name in files if "analysis_sheet" in file_name]
+        print("&"*30, analysisrun_name)
         for filename in files:
             # parsing and saving data into the database
             file_path = os.path.join(folder_path, filename)
             if ".txt" in filename:
+                print(filename)
                 variant_file_parser(file_path, analysisrun_name[0])
 
         return JsonResponse({"success": True, "message": "Files processed successfully"})
