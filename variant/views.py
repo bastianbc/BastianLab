@@ -29,6 +29,7 @@ def import_variants(request):
     from .helper import variant_file_parser
     name = 'SGLP-0774'
     folder_path = os.path.join(settings.SEQUENCING_FILES_SOURCE_DIRECTORY, name)
+    print("&" * 30, folder_path)
     # Check if the folder exists
     if os.path.exists(folder_path):
         # Get variant files in the folder
