@@ -225,11 +225,12 @@ TECHNICIAN_GROUP_NAME = "Technicians"
 RESEARCHER_GROUP_NAME = "Researchers"
 
 
-smb_directory = "/Volumes/labshare/BastianRaid-02/"
-SEQUENCING_FILES_SOURCE_DIRECTORY = Path(Path(smb_directory))
-TEMP_DIRECTORY = Path(Path(smb_directory) / "TEMP")
+
+smb_directory_labshare = "/Users/cbagci/Documents/"
+SEQUENCING_FILES_SOURCE_DIRECTORY = Path(Path(smb_directory_labshare) / "BastianRaid-02")
+TEMP_DIRECTORY = Path(Path(smb_directory_labshare) / "BastianRaid-02" / "TEMP")
 
 
-SMB_DIRECTORY = "/Users/cbagci/Documents/"
-SEQUENCING_FILES_SOURCE_DIRECTORY = SMB_DIRECTORY
+SMB_DIRECTORY_SEQUENCINGDATA = "/Users/cbagci/Documents/"
+SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
 SEQUENCING_FILES_DESTINATION_DIRECTORY = SEQUENCING_FILES_SOURCE_DIRECTORY
