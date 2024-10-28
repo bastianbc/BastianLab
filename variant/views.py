@@ -31,7 +31,7 @@ def import_variants(request, name):
     Import all variant files from a folder.
     If any file fails to process, all transactions are rolled back.
     """
-    folder_path = os.path.join(settings.SMB_DIRECTORY, name)
+    folder_path = os.path.join(settings.SEQUENCING_FILES_SOURCE_DIRECTORY, name)
 
     # Check if the folder exists
     if not os.path.exists(folder_path):
