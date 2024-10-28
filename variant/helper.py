@@ -1,142 +1,156 @@
 import pandas as pd
 from django.db import transaction
+from django.core.exceptions import ObjectDoesNotExist
 from .models import VariantCall, GVariant, CVariant, PVariant
 from analysisrun.models import AnalysisRun
 from samplelib.models import SampleLib
 import re
 import os
 
+def check_file(file_path):
+    """Check if file exists and is readable"""
+    if not os.path.exists(file_path):
+        return False, f"File not found: {file_path}"
+    if not file_path.endswith('.txt'):
+        return False, "Invalid file format. Expected .txt file"
+    return True, ""
+
 def get_caller(filename):
     caller_match = re.match(r'.*?(\w+)_Final', filename)
-    return caller_match.group(1) if caller_match else None
+    if not caller_match:
+        return None
+    return caller_match.group(1)
 
 def parse_p_var(p_var):
+    if not p_var:
+        return None, None, None
     match = re.match(r'p\.([A-Za-z])(\d+)([A-Za-z])', p_var)
     if match:
-        return match.group(1), match.group(2), match.group(3)  # ref, pos, alt
+        return match.group(1), match.group(2), match.group(3)
     return None, None, None
 
-def get_log2r():
-    """
-    Note: We need to write some code for this later
-    """
-    return 0.0
-
-def get_normal_sample_lib(sample_lib):
-    """
-    This relates to any SL from a normal area for Tumor/Normal sequencing
-    (i.e. where the DNA from the tumor AND the normal DNA was sequenced).
-    By definition, no normal exists for Tumor only sequencing
-    """
-    return SampleLib.objects.filter(
-            na_sl_links__nucacid__na_type='dna',
-            na_sl_links__nucacid__area_na_links__area__area_type='normal',
-            na_sl_links__nucacid__na_sl_links__sample_lib=sample_lib
-        ).exclude(pk=sample_lib.pk).distinct().first()
-
-def get_hg(filename):
-    """
-    AM2-063.HS_Final.annovar.hg19_multianno_Filtered.txt
-    [sample_lib.name].[Caller name]_Final.annovar.[assembly]_multianno_Filtered.txt
-    """
-    match = re.search(r'\.hg(\d+)_', filename)
-    if match:
-        assembly = match.group(1)  # get just numbers
-        return assembly
-    return None
-
 def get_sample_lib(filename):
-    """
-    AM2-063.HS_Final.annovar.hg19_multianno_Filtered.txt
-    [sample_lib.name].[Caller name]_Final.annovar.[assembly]_multianno_Filtered.txt
-    """
     match = re.match(r'^[^.]+', filename)
-    if match:
-        name = match.group(0)
-        try:
-            return SampleLib.objects.get(name=name)
-        except Exception as e:
-            return None
-    return None
+    if not match:
+        return None
+    name = match.group(0)
+    try:
+        return SampleLib.objects.get(name=name)
+    except ObjectDoesNotExist:
+        return None
 
-def get_sequencing_run(filename):
-    return None
+def check_required_fields(row):
+    """Check if all required fields exist in row"""
+    required_fields = ['Chr', 'Start', 'End', 'Ref', 'Alt', 'Depth',
+                      'Ref_reads', 'Alt_reads', 'AAChange.refGene']
 
-def get_analysis_run(name):
-    return AnalysisRun.objects.get(name=name)
-
-def create_c_and_p_variants(g_variant, aachange, func, gene_detail):
-    entries = aachange.split(',')
-    for entry in entries:
-        try:
-            gene, nm_id, exon, c_var, p_var = entry.split(':')
-
-            # Create CVariant instance
-            c_variant = CVariant.objects.create(
-                g_variant=g_variant,
-                gene=gene,
-                nm_id=nm_id,
-                exon=exon,
-                c_var=c_var,
-                func=func,
-                gene_detail=gene_detail
-            )
-
-            # Create PVariant instance if p_var is present
-            if p_var:
-                p_ref, p_pos, p_alt = parse_p_var(p_var)
-                PVariant.objects.create(
-                    c_variant=c_variant,
-                    ref=p_ref,
-                    pos=p_pos,
-                    alt=p_alt
-                )
-        except Exception as e:
-            print(f"Unexpected data structure for 'AAChange.refGene': '{entry}'")
+    for field in required_fields:
+        if field not in row or pd.isna(row[field]):
+            return False, f"Missing field: {field}"
+    return True, ""
 
 @transaction.atomic
 def variant_file_parser(file_path, analysis_run_name):
-    df = pd.read_csv(file_path, sep='\t')
+    """
+    Parse variant file and save to database.
+    Returns error message if fails.
 
-    # Extract the filename from the file path
-    filename = os.path.basename(file_path)
+    Returns:
+        tuple: (success, message, statistics)
+    """
+    # File check
+    is_valid, error_msg = check_file(file_path)
+    if not is_valid:
+        return False, error_msg, {}
 
-    sample_lib = get_sample_lib(filename)
-    analysis_run = get_analysis_run(analysis_run_name)
+    try:
+        # Read file
+        df = pd.read_csv(file_path, sep='\t')
+        if df.empty:
+            return False, "File is empty", {}
 
-    for _, row in df.iterrows():
+        filename = os.path.basename(file_path)
+
+        # Sample library check
+        sample_lib = get_sample_lib(filename)
+        if not sample_lib:
+            return False, f"Sample library not found: {filename}", {}
+
+        # Analysis run check
         try:
-            variant_call = VariantCall.objects.create(
-                analysis_run=analysis_run,
-                sample_lib=sample_lib,
-                sequencing_run=get_sequencing_run(filename),
-                coverage=row['Depth'],
-                log2r=get_log2r(),
-                caller=get_caller(filename),
-                normal_sl=get_normal_sample_lib(sample_lib),
-                label="",
-                ref_read=row['Ref_reads'],
-                alt_read=row['Alt_reads'],
-            )
+            analysis_run = get_analysis_run(analysis_run_name)
+        except ObjectDoesNotExist:
+            return False, f"Analysis run not found: {analysis_run_name}", {}
 
-            g_variant = GVariant.objects.create(
-                variant_call=variant_call,
-                hg=get_hg(filename),
-                chrom=row['Chr'],
-                start=row['Start'],
-                end=row['End'],
-                ref=row['Ref'],
-                alt=row['Alt'],
-                avsnp150=row['avsnp150']
-            )
+        stats = {
+            "total_rows": len(df),
+            "successful": 0,
+            "failed": 0,
+            "errors": []
+        }
 
-            create_c_and_p_variants(
-                g_variant=g_variant,
-                aachange=row['AAChange.refGene'],
-                func=row['Func.refGene'],
-                gene_detail=row['GeneDetail.refGene']
-            )
-        except Exception as e:
-            print("An error occurred while processing the variant file")
-            print(row)
-            raise
+        # Process each row
+        for index, row in df.iterrows():
+            try:
+                # Check required fields
+                fields_valid, field_error = check_required_fields(row)
+                if not fields_valid:
+                    stats["errors"].append(f"Row {index + 1}: {field_error}")
+                    stats["failed"] += 1
+                    continue
+
+                # Caller check
+                caller = get_caller(filename)
+                if not caller:
+                    stats["errors"].append(f"Row {index + 1}: Could not determine caller")
+                    stats["failed"] += 1
+                    continue
+
+                with transaction.atomic():
+                    variant_call = VariantCall.objects.create(
+                        analysis_run=analysis_run,
+                        sample_lib=sample_lib,
+                        sequencing_run=get_sequencing_run(filename),
+                        coverage=row['Depth'],
+                        log2r=get_log2r(),
+                        caller=caller,
+                        normal_sl=get_normal_sample_lib(sample_lib),
+                        label="",
+                        ref_read=row['Ref_reads'],
+                        alt_read=row['Alt_reads'],
+                    )
+
+                    g_variant = GVariant.objects.create(
+                        variant_call=variant_call,
+                        hg=get_hg(filename),
+                        chrom=row['Chr'],
+                        start=row['Start'],
+                        end=row['End'],
+                        ref=row['Ref'],
+                        alt=row['Alt'],
+                        avsnp150=row.get('avsnp150', '')
+                    )
+
+                    create_c_and_p_variants(
+                        g_variant=g_variant,
+                        aachange=row['AAChange.refGene'],
+                        func=row['Func.refGene'],
+                        gene_detail=row.get('GeneDetail.refGene', '')
+                    )
+
+                    stats["successful"] += 1
+
+            except Exception as e:
+                stats["errors"].append(f"Row {index + 1}: {str(e)}")
+                stats["failed"] += 1
+
+        # Create result message
+        if stats["failed"] == stats["total_rows"]:
+            return False, "No variants could be processed", stats
+        elif stats["failed"] > 0:
+            return True, f"{stats['successful']} variants processed successfully, {stats['failed']} variants failed", stats
+        else:
+            return True, "All variants processed successfully", stats
+
+    except Exception as e:
+        return False, f"Critical error: {str(e)}", {}

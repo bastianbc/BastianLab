@@ -809,55 +809,82 @@ var KTDatatablesServerSide = function () {
 
       }
 
+      // Closure to keep track of initialization state
+      let isModalInitialized = false;
+      let modal, stepper, form, listBody, menuItem;
+
+      stepper = new KTStepper(document.getElementById("modal_stepper"));
+
       function handleGenerateAnalysisSheet() {
-          const modalElement = document.getElementById("modal_analysis_sheet");
-          const modal = new bootstrap.Modal(modalElement);
-          const menuItem = document.querySelector('[data-kt-docs-table-select="generate_analysis_sheet"]');
-          const stepperElement = document.getElementById("modal_stepper");
-          // const exportButton = document.getElementById("export_button");
-          let stepper = null;
-          const form = document.getElementById("form-analysis-run");
+          console.log("handleGenerateAnalysisSheet");
 
-          initGenerateAnalysisSheetButton(modal);
+          // Initialize modal and related elements only once
+          if (!isModalInitialized) {
+              initializeModalElements();
+          }
 
-          function initGenerateAnalysisSheetButton(modal) {
-              menuItem.addEventListener("click", function () {
-                  fetchData();
+          initGenerateAnalysisSheetButton();
+
+          function initializeModalElements() {
+              modal = new bootstrap.Modal(document.getElementById("modal_analysis_sheet"));
+              menuItem = document.querySelector('[data-kt-docs-table-select="generate_analysis_sheet"]');
+              const stepperElement = document.getElementById("modal_stepper");
+              form = document.getElementById("form-analysis-run");
+              listBody = document.querySelector('#analysis-sheet-list .list-body');
+
+              // Initialize modal events only once
+              initModalEvents();
+
+              isModalInitialized = true;
+          }
+
+          function initGenerateAnalysisSheetButton() {
+              // Remove existing event listener if any
+              menuItem.removeEventListener("click", fetchData);
+              // Add new event listener
+              menuItem.addEventListener("click", fetchData);
+          }
+
+          function initModalEvents() {
+              const modalElement = document.getElementById("modal_analysis_sheet");
+
+              modalElement.addEventListener('hide.bs.modal', function(){
+                  console.log("modal hide");
+                  resetModal();
               });
+
+              modalElement.addEventListener('shown.bs.modal', function(){
+                  console.log("modal show");
+                  initStepper();
+              });
+
+              document.querySelector('[data-kt-stepper-action="submit"]').addEventListener("click", submitForm);
+          }
+
+          function resetModal() {
+              listBody.innerHTML = "";
+              if (stepper) {
+                  stepper.goFirst();
+                  stepper = null;
+              }
+              form.reset();
+              selectedRows = [];
+              dt.draw();
           }
 
           function initStepper() {
-              stepper = new KTStepper(stepperElement);
+              if (stepper) {
 
-              if (!isStepperEmpty()) {
-                  stepper.on("kt.stepper.next", function () {
-                      handleNextStep();
-                  });
+                stepper.on("kt.stepper.next", function (stepper) {
+                    stepper.goNext(); // go next step
+                });
 
-                  stepper.on("kt.stepper.previous", function () {
-                      handlePreviousStep();
-                  });
+                stepper.on("kt.stepper.previous", function (stepper) {
+                    stepper.goPrevious(); // go previous step
+                });
+
               }
-          }
 
-          function isStepperEmpty() {
-              return Object.keys(stepper).length === 0;
-          }
-
-          function handleNextStep() {
-              stepper.goNext(); // Go to next step
-
-              if (stepper.currentStepIndex === 2) {
-                  // exportButton.classList.remove("d-none");
-              }
-          }
-
-          function handlePreviousStep() {
-              stepper.goPrevious(); // Go to previous step
-
-              if (stepper.currentStepIndex === 1) {
-                  // exportButton.classList.add("d-none");
-              }
           }
 
           function fetchData() {
@@ -865,7 +892,7 @@ var KTDatatablesServerSide = function () {
                   type: "GET",
                   url: "/sequencingrun/get_sample_libs_async",
                   data: {
-                    "selected_ids": JSON.stringify(selectedRows),
+                      "selected_ids": JSON.stringify(selectedRows),
                   },
                   error: function (xhr, ajaxOptions, thrownError) {
                       swal("Error getting records!", "Please try again", "error");
@@ -873,36 +900,13 @@ var KTDatatablesServerSide = function () {
               }).done(function (result) {
                   populateTable(result);
                   modal.show();
-                  initModalEvents();
               });
           }
 
           function populateTable(data) {
-
-              function createCheckboxColumn() {
-                  const col = document.createElement("div");
-                  col.classList.add("col-1");
-                  const checkDiv = document.createElement("div");
-                  checkDiv.classList.add("form-check", "form-check-sm");
-                  const input = document.createElement("input");
-                  input.type = "checkbox";
-                  input.classList.add("form-check-input");
-                  input.checked = true;
-                  checkDiv.append(input);
-                  col.appendChild(checkDiv);
-                  return col;
-              }
-
-              function createColumn(content, className = "col-1") {
-                  const col = document.createElement("div");
-                  col.classList.add(className);
-                  const span = document.createElement("span");
-                  span.textContent = content;
-                  col.appendChild(span);
-                  return col;
-              }
-
-              const listBody = document.querySelector('#analysis-sheet-list .list-body');
+              console.log("populate:");
+              console.log(data);
+              listBody.innerHTML = ''; // Clear existing content
 
               data.forEach(item => {
                   const row = document.createElement("div");
@@ -922,16 +926,37 @@ var KTDatatablesServerSide = function () {
                   row.appendChild(createColumn(item.err));
 
                   listBody.appendChild(row);
-            });
+              });
+          }
+
+          function createCheckboxColumn() {
+              const col = document.createElement("div");
+              col.classList.add("col-1");
+              const checkDiv = document.createElement("div");
+              checkDiv.classList.add("form-check", "form-check-sm");
+              const input = document.createElement("input");
+              input.type = "checkbox";
+              input.classList.add("form-check-input");
+              input.checked = true;
+              checkDiv.append(input);
+              col.appendChild(checkDiv);
+              return col;
+          }
+
+          function createColumn(content, className = "col-1") {
+              const col = document.createElement("div");
+              col.classList.add(className);
+              const span = document.createElement("span");
+              span.textContent = content;
+              col.appendChild(span);
+              return col;
           }
 
           function generateCSV() {
-              // Extract header text
               const headerCells = document.querySelectorAll('#analysis-sheet-list .list-header .row div');
               const headers = Array.from(headerCells).map(header => header.textContent.trim());
               let csvContent = headers.join(',') + '\n';
 
-              // Extract row data
               const rows = document.querySelectorAll('#analysis-sheet-list .list-body .row');
 
               rows.forEach(row => {
@@ -943,7 +968,6 @@ var KTDatatablesServerSide = function () {
                   }
               });
 
-              // Set the CSV content to the hidden input field
               const sheetContent = document.querySelector('input[name="sheet_content"]');
               sheetContent.value = csvContent;
           }
@@ -977,7 +1001,7 @@ var KTDatatablesServerSide = function () {
                       }
                       else {
                           Swal.fire({
-                              text: "An error occurred.The operation could not be performed.",
+                              text: "An error occurred. The operation could not be performed.",
                               icon: "error",
                               buttonsStyling: false,
                               confirmButtonText: "Ok, got it!",
@@ -988,32 +1012,20 @@ var KTDatatablesServerSide = function () {
                       }
                   },
                   error: function (xhr, ajaxOptions, thrownError) {
-
+                      Swal.fire({
+                          text: "An error occurred. The operation could not be performed.",
+                          icon: "error",
+                          buttonsStyling: false,
+                          confirmButtonText: "Ok, got it!",
+                          customClass: {
+                              confirmButton: "btn fw-bold btn-primary",
+                          }
+                      });
                   }
               });
           }
-
-          function initModalEvents() {
-              // clean data when it closed
-              modalElement.addEventListener('hide.bs.modal', function(){
-                  const listBody = document.querySelector('#analysis-sheet-list .list-body');
-                  listBody.innerHTML = "";
-                  stepper.goFirst();
-                  form.reset();
-                  selectedRows = [];
-                  dt.draw();
-              });
-
-              modalElement.addEventListener('shown.bs.modal', function(){
-                  initStepper();
-              });
-
-              // submit button
-              document.querySelector('[data-kt-stepper-action="submit"]').addEventListener("click", function () {
-                  submitForm();
-              });
-          }
       }
+
 
       return {
         init: function () {

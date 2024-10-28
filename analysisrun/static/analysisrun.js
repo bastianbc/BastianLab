@@ -408,7 +408,6 @@ var KTDatatablesServerSide = function () {
 
         // Deleted selected rows
         deleteSelected.addEventListener('click', function () {
-            // SweetAlert2 pop up --- official docs reference: https://sweetalert2.github.io/
             Swal.fire({
                 text: "Are you sure you want to delete selected records?",
                 icon: "warning",
@@ -498,32 +497,88 @@ var KTDatatablesServerSide = function () {
                 const parent = e.target.closest('tr');
                 var analysisRunName = parent.querySelectorAll('td')[1].innerText;
 
+                // Show loading message
+                Swal.fire({
+                    title: 'Processing...',
+                    text: 'Importing variant files',
+                    icon: 'info',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                });
+
                 $.ajax({
                     url: `/variant/import_variants/${analysisRunName}`,
                     type: "GET",
                 }).done(function (data) {
+                    // Close loading dialog
+                    Swal.close();
+
                     if (data.success) {
+                        let html = `<p>${data.message}</p>`;
+
+                        // Add statistics if available
+                        if (data.statistics) {
+                            html += `
+                                <div class="mt-3">
+                                    <p><strong>Statistics:</strong></p>
+                                    <ul class="text-start">
+                                        <li>Files Processed: ${data.statistics.files_processed} / ${data.statistics.total_files}</li>
+                                        <li>Variants Processed: ${data.statistics.total_variants_processed}</li>
+                                    </ul>
+                                </div>
+                            `;
+                        }
+
                         Swal.fire({
-                            text: data.message,
-                            icon: "info",
+                            html: html,
+                            icon: "success",
                             buttonsStyling: false,
                             confirmButtonText: "Ok, got it!",
                             customClass: {
                                 confirmButton: "btn fw-bold btn-success",
+                                htmlContainer: 'text-start'
                             }
                         });
                     }
                     else {
+                        let html = `<p class="text-center">${data.message}</p>`;
+
+                        // Add errors if available
+                        if (data.errors && data.errors.length > 0) {
+                            html += `
+                                <div class="mt-3">
+                                    <p><strong>Errors:</strong></p>
+                                    <ul class="text-start text-danger">
+                                        ${data.errors.map(error => `<li>${error}</li>`).join('')}
+                                    </ul>
+                                </div>
+                            `;
+                        }
+
                         Swal.fire({
-                            text: data.message,
+                            html: html,
                             icon: "error",
                             buttonsStyling: false,
                             confirmButtonText: "Ok, got it!",
                             customClass: {
-                                confirmButton: "btn fw-bold btn-success",
+                                confirmButton: "btn fw-bold btn-primary",
+                                htmlContainer: 'text-start'
                             }
                         });
                     }
+
+                }).fail(function(jqXHR, textStatus, errorThrown) {
+                    Swal.close();
+
+                    Swal.fire({
+                        text: "An error occurred during import",
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn fw-bold btn-primary",
+                        }
+                    });
                 });
             });
         });
