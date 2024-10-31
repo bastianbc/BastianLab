@@ -98,6 +98,7 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail):
 def variant_file_parser(file_path, analysis_run_name):
     print("&"*100)
     print(file_path, analysis_run_name)
+    print(file_path, analysis_run_name)
     df = pd.read_csv(file_path, sep='\t')
 
     # Extract the filename from the file path
