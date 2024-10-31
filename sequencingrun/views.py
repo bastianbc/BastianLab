@@ -296,15 +296,20 @@ def get_sample_libs_async(request):
                         item["err"] = "not found area_na_link"
                 else:
                     item["err"] = "not found na_sl_link"
+
+                if sample_lib.sl_cl_links is not None:
+                    sl_cl_link = sample_lib.sl_cl_links.first()
+
+                    if sl_cl_link:
+                        captured_lib = sl_cl_link.captured_lib
+                        item["footprint"] = captured_lib.bait.name
+                    else:
+                        item["err"] = "not found sl_cl_link"
+                else:
+                    item["err"] = "not found sl_cl_links of a sample_lib"
             else:
                 item["err"] = "not found samplelib"
-            sl_cl_link = sample_lib.sl_cl_links.first()
 
-            if sl_cl_link:
-                captured_lib = sl_cl_link.captured_lib
-                item["footprint"] = captured_lib.bait.name
-            else:
-                item["err"] = "not found sl_cl_link"
 
             item["files"] = get_sequencing_files(sequencing_file_set)
             item["path"] = sequencing_file_set.path if sequencing_file_set.path else f"HiSeqData/{seq_run.name}"
