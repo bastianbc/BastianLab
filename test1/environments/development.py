@@ -210,55 +210,27 @@ RESEARCHER_GROUP_NAME = "Researchers"
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse',
-        },
-        'require_debug_true': {
-            '()': 'django.utils.log.RequireDebugTrue',
-        },
-    },
     'formatters': {
-        'django.server': {
-            '()': 'django.utils.log.ServerFormatter',
-            'format': '[%(server_time)s] %(message)s',
-        }
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
     },
     'handlers': {
-        'console': {
-            'level': 'INFO',
-            'filters': ['require_debug_true'],
-            'class': 'logging.StreamHandler',
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'variant-debug.log',
+            'formatter': 'verbose',
         },
-        # Custom handler which we will use with logger 'django'.
-        # We want errors/warnings to be logged when DEBUG=False
-        'console_on_not_debug': {
-            'level': 'WARNING',
-            'filters': ['require_debug_false'],
-            'class': 'logging.StreamHandler',
-        },
-        'django.server': {
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',
-            'formatter': 'django.server',
-        },
-        'mail_admins': {
-            'level': 'ERROR',
-            'filters': ['require_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler'
-        }
     },
     'loggers': {
-        'django': {
-            'handlers': ['console', 'mail_admins', 'console_on_not_debug'],
-            'level': 'INFO',
+        'variant_parser': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
         },
-        'django.server': {
-            'handlers': ['django.server'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-    }
+    },
 }
 
 SMB_DIRECTORY = "/home/bazo/Documents/PROJELER/UCSF/variants"
