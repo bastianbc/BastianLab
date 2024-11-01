@@ -347,7 +347,7 @@ def variant_file_parser(file_path, analysis_run_name):
 def import_variants():
 
     SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
-    file_path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "VariantFiles/BCB002.NMLP-001.FB_Final.annovar.hg19_multianno_Filtered.txt")
+    file_path = os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "VariantFiles/BCB002.NMLP-001.FB_Final.annovar.hg19_multianno_Filtered.txt")
     success, message, stats = variant_file_parser(file_path, "AR_ALL")
 
 
