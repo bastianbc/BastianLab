@@ -3835,3 +3835,6 @@ def register_new_fastq_files(request):
     #         print(e, row['file'])
     #         generate_file_set(row['file'])
 
+def call_import_variants(request):
+    from .variants_import import import_variants
+    import_variants()
