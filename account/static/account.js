@@ -24,7 +24,10 @@ var KTDatatablesServerSide = function () {
                 { data: 'group' },
                 { data: 'last_login',
                   render: function (data) {
-                    return moment(data).format('MM/DD/YYYY HH:mm');
+                      if (data) {
+                          return moment(data).format('MM/DD/YYYY HH:mm');
+                      }
+                      return null;
                   }
                 },
                 { data: null }

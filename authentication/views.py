@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required,permission_required
 from account.models import User
 from django.contrib.auth.forms import SetPasswordForm,PasswordChangeForm
+from .forms import LoginForm
 import logging
 
 logger = logging.getLogger(__name__)
@@ -33,6 +34,9 @@ def log_in(request):
         except Exception as e:
             messages.error(request, "Unexpected Error!")
             print(e)
+    else:
+        form = LoginForm()
+        
     return render(request, "sign-in.html", locals())
 
 def log_out(request):

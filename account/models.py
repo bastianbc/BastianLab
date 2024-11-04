@@ -17,9 +17,9 @@ class User(User):
     def query_by_args(self, **kwargs):
         try:
             ORDER_COLUMN_CHOICES = {
-                '1': 'username',
-                '2': 'first_name',
-                '3': 'last_name',
+                '0': 'username',
+                '1': 'first_name',
+                '2': 'last_name',
                 '4': 'last_login',
             }
             draw = int(kwargs.get('draw', None)[0])
