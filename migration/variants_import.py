@@ -307,13 +307,15 @@ def import_variants():
     file = Path(Path(__file__).parent.parent / "uploads" / "variant_files_df.csv")
     df = pd.read_csv(file)
 
-    df.apply(lambda row: VariantFile.objects.get_or_create(name=row['File'], directory=row['Dir']), axis=1)
     SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
     file_path = os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "VariantFiles")
 
+    files = os.listdir(file_path)
 
-
-
+    for file in files:
+        print(os.path.join(file_path,file))
+        print(os.path.exists(os.path.join(file_path,file)))
+    pass
     # success, message, stats = variant_file_parser(file_path, "AR_ALL")
 
 
