@@ -2,61 +2,17 @@ import os
 import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "test1.settings")
 django.setup()
-from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from django.db import IntegrityError
-from datetime import datetime
-import csv
-from io import StringIO
-from blocks.models import Blocks
-from projects.models import Projects
-from account.models import User
-from areas.models import Areas
-from libprep.models import NucAcids, AREA_NA_LINK
-from method.models import Method
-from samplelib.models import SampleLib, NA_SL_LINK
-from capturedlib.models import CapturedLib, SL_CL_LINK
-from bait.models import Bait
-from barcodeset.models import Barcodeset,Barcode
 from sequencingrun.models import SequencingRun
-from sequencinglib.models import SequencingLib,CL_SEQL_LINK
-from sequencingfile.models import SequencingFile, SequencingFileSet
-from variant.models import *
-from gene.models import *
-from body.models import *
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-import json
-import xlrd
-import string
-import random
-from itertools import groupby,chain
-import ast
-from pathlib import Path
-import pandas as pd
-import uuid
-import numpy as np
-from django.utils import timezone
-import pandas as pd
-from django.db import transaction
-from django.core.exceptions import ObjectDoesNotExist
-from variant.models import VariantCall, GVariant, CVariant, PVariant
-from analysisrun.models import AnalysisRun
-from samplelib.models import SampleLib
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required,permission_required
-from core.decorators import permission_required_for_async
-from variant.models import *
-from django.http import JsonResponse
-from django.db import transaction
 from django.conf import settings
 import pandas as pd
 from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist
-from variant.models import VariantCall, GVariant, CVariant, PVariant
+from variant.models import VariantCall, GVariant, CVariant, PVariant, VariantFile
 from analysisrun.models import AnalysisRun
 from samplelib.models import SampleLib
 import re
 import logging
+from pathlib import Path
 
 logger = logging.getLogger("file")
 
@@ -343,12 +299,22 @@ def variant_file_parser(file_path, analysis_run_name):
         logger.critical(f"Critical error in variant file parser: {str(e)}", exc_info=True)
         return False, f"Critical error: {str(e)}", {}
 
+def create_variant_file(row):
+    VariantFile.objects.get_or_create(name=row['File'], directory=row['Dir'])
+
 # Parse and save data into the database
 def import_variants():
+    file = Path(Path(__file__).parent.parent / "uploads" / "variant_files_df.csv")
+    df = pd.read_csv(file)
 
+    df.apply(lambda row: VariantFile.objects.get_or_create(name=row['File'], directory=row['Dir']), axis=1)
     SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
-    file_path = os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "VariantFiles/BCB002.NMLP-001.FB_Final.annovar.hg19_multianno_Filtered.txt")
-    success, message, stats = variant_file_parser(file_path, "AR_ALL")
+    file_path = os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "VariantFiles")
+
+
+
+
+    # success, message, stats = variant_file_parser(file_path, "AR_ALL")
 
 
 
