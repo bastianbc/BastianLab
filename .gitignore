@@ -78,7 +78,7 @@ target/
 thumbnails/
 media/
 venv/
-
+staticfiles/
 # environment options
 environment.py
 development.py
