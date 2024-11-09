@@ -95,7 +95,7 @@ def get_sample_lib(filename):
         logger.debug(f"Extracted sample lib name: {name}")
         try:
             sample_lib = SampleLib.objects.get(name=name)
-            print(sample_lib)
+            print("sample_lib: ",sample_lib)
             logger.info(f"Found sample lib: {sample_lib}")
             return sample_lib
         except Exception as e:
@@ -112,7 +112,7 @@ def get_sequencing_run(filename):
         logger.debug(f"Extracted sequencing name: {name}")
         try:
             seq_run = SequencingRun.objects.get(name=name)
-            print(seq_run)
+            print("seq_run: ",seq_run)
             logger.info(f"Found sample lib: {seq_run}")
             return seq_run
         except Exception as e:
@@ -129,6 +129,17 @@ def get_analysis_run(name):
         return analysis_run
     except ObjectDoesNotExist:
         logger.error(f"Analysis run not found: {name}")
+        return None
+
+def get_variant_file(file_path):
+    logger.debug(f"Getting variant file: {file_path}")
+    try:
+        variant_file = VariantFile.objects.get(name=file_path.split("/")[-1])
+        print("variant_file: ", variant_file.name)
+        logger.info(f"Found variant file: {variant_file}")
+        return variant_file
+    except ObjectDoesNotExist:
+        logger.error(f"Variant file not found: {file_path}")
         return None
 
 def check_required_fields(row):
@@ -213,6 +224,13 @@ def variant_file_parser(file_path, analysis_run_name):
             logger.error(f"Analysis run not found: {analysis_run_name}")
             return False, f"Analysis run not found: {analysis_run_name}", {}
 
+        variant_file = get_variant_file(file_path)
+        variant_file.call = True
+        variant_file.save()
+        if not variant_file:
+            logger.error(f"Variant file not found: {file_path}")
+            return False, f"Variant file not found: {file_path}", {}
+
         stats = {
             "total_rows": len(df),
             "successful": 0,
@@ -247,6 +265,7 @@ def variant_file_parser(file_path, analysis_run_name):
                         analysis_run=analysis_run,
                         sample_lib=sample_lib,
                         sequencing_run=get_sequencing_run(filename),
+                        variant_file=variant_file,
                         coverage=row['Depth'],
                         log2r=get_log2r(),
                         caller=caller,
@@ -313,11 +332,10 @@ def import_variants():
     files = os.listdir(file_path)
 
     for file in files:
-        print(os.path.join(file_path,file))
-        print(os.path.exists(os.path.join(file_path,file)))
-    pass
-    # success, message, stats = variant_file_parser(file_path, "AR_ALL")
-
+        # print(os.path.join(file_path,file))
+        # print(os.path.exists(os.path.join(file_path,file)))
+        if "_Filtered" in os.path.join(file_path,file):
+            variant_file_parser(os.path.join(file_path,file), "AR_ALL")
 
 
 
