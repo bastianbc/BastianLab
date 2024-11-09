@@ -95,7 +95,6 @@ def get_sample_lib(filename):
         logger.debug(f"Extracted sample lib name: {name}")
         try:
             sample_lib = SampleLib.objects.get(name=name)
-            print("sample_lib: ",sample_lib)
             logger.info(f"Found sample lib: {sample_lib}")
             return sample_lib
         except Exception as e:
@@ -112,7 +111,6 @@ def get_sequencing_run(filename):
         logger.debug(f"Extracted sequencing name: {name}")
         try:
             seq_run = SequencingRun.objects.get(name=name)
-            print("seq_run: ",seq_run)
             logger.info(f"Found sample lib: {seq_run}")
             return seq_run
         except Exception as e:
