@@ -78,6 +78,7 @@ target/
 thumbnails/
 media/
 venv/
+/uploads
 
 # environment options
 environment.py
