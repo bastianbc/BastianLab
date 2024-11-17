@@ -1,9 +1,12 @@
 from django.db import models
 from django.db.models import Q, Count
+from datetime import datetime
+
 
 class VariantCall(models.Model):
     sample_lib = models.ForeignKey("samplelib.SampleLib", on_delete=models.CASCADE, related_name="variant_calls", blank=True, null=True)
     sequencing_run = models.ForeignKey("sequencingrun.SequencingRun", on_delete=models.CASCADE, related_name="variant_calls", blank=True, null=True)
+    variant_file = models.ForeignKey("variant.VariantFile", on_delete=models.CASCADE, related_name="variant_calls", blank=True, null=True)
     coverage = models.IntegerField(default=0)
     analysis_run = models.ForeignKey("analysisrun.AnalysisRun", on_delete=models.CASCADE, related_name="variant_calls")
     log2r = models.FloatField(default=0.0)
@@ -113,3 +116,13 @@ class PVariant(models.Model):
 
     class Meta:
         db_table = "p_variant"
+
+
+class VariantFile(models.Model):
+    name = models.CharField(max_length=150, blank=True, null=True)
+    directory = models.CharField(max_length=200, blank=True, null=True)
+    date = models.DateTimeField(default=datetime.now, verbose_name="Date")
+    call = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = "variant_file"

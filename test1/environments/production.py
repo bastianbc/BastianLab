@@ -241,7 +241,6 @@ smb_directory_labshare = "/mnt/labshare"
 SEQUENCING_FILES_SOURCE_DIRECTORY = Path(Path(smb_directory_labshare) / "BastianRaid-02")
 TEMP_DIRECTORY = Path(Path(smb_directory_labshare) / "BastianRaid-02" / "TEMP")
 
-
 SMB_DIRECTORY_SEQUENCINGDATA = "/mnt/sequencingdata"
 SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
 SEQUENCING_FILES_DESTINATION_DIRECTORY = SEQUENCING_FILES_SOURCE_DIRECTORY

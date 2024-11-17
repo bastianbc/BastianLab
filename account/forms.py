@@ -4,11 +4,13 @@ from django.db import transaction
 from django.db.models import Max
 from django.contrib.auth.models import Permission
 from django.db.models import Q
+from core.forms import BaseForm
+
 
 
 User = get_user_model()
 
-class CreateAccountForm(forms.ModelForm):
+class CreateAccountForm(BaseForm):
     class Meta:
         model = get_user_model()
         fields = ("username","password","first_name","last_name","groups")

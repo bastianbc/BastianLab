@@ -80,6 +80,7 @@ media/
 venv/
 /uploads
 
+staticfiles/
 # environment options
 environment.py
 development.py
