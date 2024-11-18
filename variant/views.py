@@ -71,10 +71,10 @@ def import_variants(request, name):
 
                 # Parse and save data into the database
                 success, message, stats = variant_file_parser(file_path, name)
-
+                
                 if not success:
                     # Raise exception to trigger rollback
-                    raise Exception(f"Error processing {filename}: {message}")
+                    raise Exception(f"Error processing {message}")
 
                 # Update statistics
                 processing_stats["processed_files"] += 1

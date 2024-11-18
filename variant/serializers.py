@@ -48,4 +48,4 @@ class VariantSerializer(serializers.ModelSerializer):
             return None
 
     def get_sample_lib(self,obj):
-        return obj.sample_lib.name        
+        return obj.sample_lib.name
