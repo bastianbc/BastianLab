@@ -171,7 +171,6 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail):
                 gene_detail=gene_detail
             )
             logger.info(f"Created CVariant: {c_variant}")
-            print(f"Created CVariant: {c_variant}")
 
             # Create PVariant instance if p_var is present
             if p_var:
@@ -184,7 +183,6 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail):
                         alt=p_alt
                     )
                     logger.info(f"Created PVariant: {p_variant}")
-                    print(f"Created PVariant: {p_variant}")
                 else:
                     logger.warning(f"Skipped PVariant creation due to invalid p_var: {p_var}")
         except Exception as e:
@@ -261,7 +259,6 @@ def variant_file_parser(file_path, analysis_run_name):
 
                 with transaction.atomic():
                     logger.debug(f"Creating VariantCall for row {index + 1}")
-                    print(f"Creating VariantCall for row {index + 1}")
                     variant_call = VariantCall.objects.create(
                         analysis_run=analysis_run,
                         sample_lib=sample_lib,
@@ -277,7 +274,6 @@ def variant_file_parser(file_path, analysis_run_name):
                     )
 
                     logger.debug(f"Creating GVariant for row {index + 1}")
-                    print(f"Creating GVariant for row {index + 1}")
                     g_variant = GVariant.objects.create(
                         variant_call=variant_call,
                         hg=get_hg(filename),
@@ -290,7 +286,6 @@ def variant_file_parser(file_path, analysis_run_name):
                     )
 
                     logger.debug(f"Creating C and P variants for row {index + 1}")
-                    print(f"Creating C and P variants for row {index + 1}")
                     create_c_and_p_variants(
                         g_variant=g_variant,
                         aachange=row['AAChange.refGene'],
@@ -335,8 +330,6 @@ def import_variants():
     files = os.listdir(file_path)
 
     for file in files:
-        # print(os.path.join(file_path,file))
-        # print(os.path.exists(os.path.join(file_path,file)))
         if "_Filtered" in os.path.join(file_path,file):
             variant_file_parser(os.path.join(file_path,file), "AR_ALL")
 
@@ -345,11 +338,12 @@ def import_variants():
 def import_BCB002_test():
     file = Path(Path(__file__).parent.parent / "uploads" / "variant_files_df.csv")
     df = pd.read_csv(file)
-
+    VariantCall.objects.filter().delete()
     SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
     file_path = os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "VariantFiles")
 
     variant_file_parser(os.path.join(file_path,"BCB002.NMLP-001.MT2_Final.annovar.hg19_multianno_Filtered.txt"), "AR_ALL")
+    print("end"*100)
 
 
 
