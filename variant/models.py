@@ -10,9 +10,9 @@ class VariantCall(models.Model):
     coverage = models.IntegerField(default=0)
     analysis_run = models.ForeignKey("analysisrun.AnalysisRun", on_delete=models.CASCADE, related_name="variant_calls")
     log2r = models.FloatField(default=0.0)
-    caller = models.CharField(max_length=30, blank=True, null=True)
+    caller = models.CharField(max_length=80, blank=True, null=True)
     normal_sl = models.ForeignKey("samplelib.SampleLib", on_delete=models.CASCADE, related_name="variant_calls_for_normal", blank=True, null=True)
-    label = models.CharField(max_length=30, blank=True, null=True)
+    label = models.CharField(max_length=80, blank=True, null=True)
     ref_read = models.IntegerField(default=0)
     alt_read = models.IntegerField(default=0)
 
@@ -86,33 +86,33 @@ class VariantCall(models.Model):
 class GVariant(models.Model):
     variant_call = models.ForeignKey(VariantCall, on_delete=models.CASCADE, related_name="g_variants")
     hg = models.IntegerField(default=0)
-    chrom = models.CharField(max_length=30, blank=True, null=True)
+    chrom = models.CharField(max_length=80, blank=True, null=True)
     start = models.IntegerField(default=0)
     end = models.IntegerField(default=0)
-    ref = models.CharField(max_length=30, blank=True, null=True)
-    alt = models.CharField(max_length=30, blank=True, null=True)
-    avsnp150 = models.CharField(max_length=30, blank=True, null=True)
+    ref = models.CharField(max_length=80, blank=True, null=True)
+    alt = models.CharField(max_length=80, blank=True, null=True)
+    avsnp150 = models.CharField(max_length=80, blank=True, null=True)
 
     class Meta:
         db_table = "g_variant"
 
 class CVariant(models.Model):
     g_variant = models.ForeignKey(GVariant, on_delete=models.CASCADE, related_name="c_variants", blank=True, null=True)
-    gene = models.CharField(max_length=30, blank=True, null=True)
-    nm_id = models.CharField(max_length=30, blank=True, null=True)
-    c_var = models.CharField(max_length=30, blank=True, null=True)
-    exon = models.CharField(max_length=30, blank=True, null=True)
-    func = models.CharField(max_length=30, blank=True, null=True)
-    gene_detail = models.CharField(max_length=30)
+    gene = models.CharField(max_length=80, blank=True, null=True)
+    nm_id = models.CharField(max_length=80, blank=True, null=True)
+    c_var = models.CharField(max_length=80, blank=True, null=True)
+    exon = models.CharField(max_length=80, blank=True, null=True)
+    func = models.CharField(max_length=80, blank=True, null=True)
+    gene_detail = models.CharField(max_length=80)
 
     class Meta:
         db_table = "c_variant"
 
 class PVariant(models.Model):
     c_variant = models.ForeignKey(CVariant, on_delete=models.CASCADE, related_name="p_variants")
-    ref = models.CharField(max_length=30, blank=True, null=True)
-    pos = models.CharField(max_length=30, blank=True, null=True)
-    alt = models.CharField(max_length=30, blank=True, null=True)
+    ref = models.CharField(max_length=80, blank=True, null=True)
+    pos = models.CharField(max_length=80, blank=True, null=True)
+    alt = models.CharField(max_length=80, blank=True, null=True)
 
     class Meta:
         db_table = "p_variant"
