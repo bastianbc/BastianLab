@@ -16,7 +16,7 @@ var KTDatatablesServerSide = function () {
     var initDatatable = function ( initialValue ) {
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
 
-        dt = $(".table").DataTable({
+        dt = $("#area_datatable").DataTable({
             // searchDelay: 500,
             processing: true,
             serverSide: true,
@@ -168,6 +168,12 @@ var KTDatatablesServerSide = function () {
                                     </a>
                                 </div>
                                 <!--end::Menu item-->
+
+                                <!--begin::Menu item-->
+                                <div class="menu-item px-3">
+                                    <a href="#" class="menu-link px-3" data-bs-toggle="modal" data-bs-target="#variant_layout">View Variants</a>
+                                </div>
+                                <!--end::Menu item-->
                             </div>
                             <!--end::Menu-->
                         `;
@@ -197,7 +203,7 @@ var KTDatatablesServerSide = function () {
 
     var initRowSelection = function () {
         // Select all checkboxes
-        const allCheckboxes = document.querySelectorAll('.table tbody [type="checkbox"]');
+        const allCheckboxes = document.querySelectorAll('#area_datatable tbody [type="checkbox"]');
         allCheckboxes.forEach(c => {
             // Checkbox on Change event
             c.addEventListener("change", function () {
@@ -226,7 +232,7 @@ var KTDatatablesServerSide = function () {
     }
 
     var handleRestoreRowSelection = function () {
-        const allCheckboxes = document.querySelectorAll('.table tbody [type="checkbox"]');
+        const allCheckboxes = document.querySelectorAll('#area_datatable tbody [type="checkbox"]');
         allCheckboxes.forEach(c => {
             if ( selectedRows.indexOf(c.value) > -1 ) {
                 c.checked = true;
@@ -409,7 +415,7 @@ var KTDatatablesServerSide = function () {
     var handleBatchDeleteRows = function () {
         // Toggle selected action toolbar
         // Select all checkboxes
-        const container = document.querySelector('.table');
+        const container = document.querySelector('#area_datatable');
         const checkboxes = container.querySelectorAll('[type="checkbox"]');
 
         // Select elements
@@ -502,62 +508,25 @@ var KTDatatablesServerSide = function () {
 
     // Functions in selected rows
     var handleSelectedRows = function (e) {
+        const nucleicAcidModal = document.getElementById("modal_extract_nucleic_acid");
+        const variantModal = document.getElementById("variant_layout");
+        const nucleicAcidInstance = new bootstrap.Modal(nucleicAcidModal);
+        const variantInstance = new bootstrap.Modal(variantModal);
 
-      const el = document.getElementById("modal_extract_nucleic_acid");
-      const modal = new bootstrap.Modal(el);
+        const btnExtractNucleicAcid = document.querySelector('[data-kt-docs-table-select="event_extract_nucleic_acid"]');
+        const btnVariant = document.querySelector('[data-kt-docs-table-select="event_variant"]');
+        const btnNucleicAcidContinue = document.getElementById("btn_continue");
+        const btnVariantContinue = document.getElementById("btn_variant_continue");
 
-      /*
-      * Serializes the form.
-      * @return {String} A list of object as a string.
-      */
-      function getExtractionOptions() {
+        function getFormOptions(formId) {
+            var data = new FormData(document.getElementById(formId));
+            var options = Object.fromEntries(data.entries());
+            return JSON.stringify(options);
+        }
 
-        var data = new FormData(document.getElementById('frm_extraction_options'));
-        var options = Object.fromEntries(data.entries());
-
-        return JSON.stringify(options);
-      }
-
-      // Opens the modal
-      function openModal() {
-
-        modal.show();
-
-      }
-
-      // Closes the modal.
-      function closeModal() {
-
-        modal.hide();
-
-      }
-
-      // Select element
-      const btnExtractNucleicAcid = document.querySelector('[data-kt-docs-table-select="event_extract_nucleic_acid"]');
-
-      // Open modal for extraction options
-      btnExtractNucleicAcid.addEventListener('click', function () {
-
-        openModal();
-
-      });
-
-      const btnContinue = document.getElementById("btn_continue");
-
-      // create nucacids
-      btnContinue.addEventListener('click', function () {
-
-        $.ajax({
-          type: "GET",
-          url: "/libprep/new_async",
-          data: {
-            "selected_ids": JSON.stringify(selectedRows),
-            "options": getExtractionOptions()
-          },
-        }).done(function(result) {
-          if (result.success) {
+        function handleSuccess(message) {
             Swal.fire({
-                text: "Nucleic acid(s) created succesfully.",
+                text: message,
                 icon: "info",
                 buttonsStyling: false,
                 confirmButtonText: "Ok, got it!",
@@ -565,12 +534,13 @@ var KTDatatablesServerSide = function () {
                     confirmButton: "btn fw-bold btn-success",
                 }
             }).then(function(){
-              dt.draw();
+                dt.draw();
             });
-          }
-          else {
+        }
+
+        function handleError(message) {
             Swal.fire({
-                text: "Area(s) could not be created.",
+                text: message,
                 icon: "error",
                 buttonsStyling: false,
                 confirmButtonText: "Ok, got it!",
@@ -578,19 +548,148 @@ var KTDatatablesServerSide = function () {
                     confirmButton: "btn fw-bold btn-danger",
                 }
             });
-          }
+        }
 
-          closeModal();
-
+        btnExtractNucleicAcid.addEventListener('click', () => nucleicAcidInstance.show());
+        btnNucleicAcidContinue.addEventListener('click', function () {
+            $.ajax({
+                type: "GET",
+                url: "/libprep/new_async",
+                data: {
+                    "selected_ids": JSON.stringify(selectedRows),
+                    "options": getFormOptions('frm_extraction_options')
+                },
+            }).done(function(result) {
+                if (result.success) {
+                    handleSuccess("Nucleic acid(s) created successfully.");
+                } else {
+                    handleError("Area(s) could not be created.");
+                }
+                nucleicAcidInstance.hide();
+            });
         });
 
-      });
+        btnVariant.addEventListener('click', () => variantInstance.show());
+        btnVariantContinue.addEventListener('click', function () {
+            $.ajax({
+                type: "GET",
+                url: "/variant/new_async",
+                data: {
+                    "selected_ids": JSON.stringify(selectedRows),
+                    "options": getFormOptions('frm_variant_options')
+                },
+            }).done(function(result) {
+                if (result.success) {
+                    handleSuccess("Variant(s) created successfully.");
+                } else {
+                    handleError("Variant(s) could not be created.");
+                }
+                variantInstance.hide();
+            });
+        });
+
+        function getVariantData() {
+            fetch('/variant/get_variant_by_area')
+                .then(response => response.json())
+                .then(data => {
+                    initializeModal(data);
+                    $('#variant_layout').modal('show');
+                });
+        }
+
+        function initializeModal(data) {
+            // Clear previous data
+            clearModalData();
+
+            // Initialize tabs
+            const tabContainer = document.querySelector('.nav-tabs');
+            const tabContent = document.querySelector('.tab-content');
+
+            data.analyses.forEach((analysis, index) => {
+                // Create tab
+                const isActive = index === 0;
+                const tabId = `analysis_${index}`;
+
+                createTab(tabContainer, tabId, `Analysis Run ${index + 1}`, isActive);
+                createTabPane(tabContent, tabId, analysis.variants, isActive);
+
+                // Initialize DataTable
+                $(`#variant_datatable_${index}`).DataTable({
+                    data: analysis.variants,
+                    columns: [
+                        { data: 'sampleLibrary' },
+                        { data: 'gene' },
+                        { data: 'pVariant' },
+                        { data: 'coverage' },
+                        { data: 'vaf' },
+                        {
+                            data: null,
+                            render: function(data, type, row) {
+                                return '<button class="btn btn-sm btn-light">View</button>';
+                            }
+                        }
+                    ]
+                });
+            });
+        }
+
+        function createTab(container, id, text, isActive) {
+            const li = document.createElement('li');
+            li.className = 'nav-item';
+            li.innerHTML = `
+                <a class="nav-link text-active-primary pb-4 ${isActive ? 'active' : ''}"
+                   data-bs-toggle="tab"
+                   href="#${id}">
+                   ${text}
+                </a>`;
+            container.appendChild(li);
+        }
+
+        function createTabPane(container, id, data, isActive) {
+            const div = document.createElement('div');
+            div.className = `tab-pane fade ${isActive ? 'show active' : ''}`;
+            div.id = id;
+            div.innerHTML = `
+                <div class="card card-flush py-4 flex-row-fluid overflow-hidden">
+                    <div class="card-body pt-0">
+                        <div class="table-responsive">
+                            <table id="variant_datatable_${id}" class="table align-middle table-row-dashed fs-6 gy-5">
+                                <thead>
+                                    <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
+                                        <th>Sample Library</th>
+                                        <th>Gene</th>
+                                        <th>P Variant</th>
+                                        <th>Coverage</th>
+                                        <th>VAF</th>
+                                        <th class="text-end min-w-100px">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-gray-600 fw-semibold"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>`;
+            container.appendChild(div);
+        }
+
+        function clearModalData() {
+            // Destroy existing DataTables
+            $('.table').each(function() {
+                if ($.fn.DataTable.isDataTable(this)) {
+                    $(this).DataTable().destroy();
+                }
+            });
+
+            // Clear tabs and content
+            document.querySelector('.nav-tabs').innerHTML = '';
+            document.querySelector('.tab-content').innerHTML = '';
+        }
     }
 
     // Toggle toolbars
     var toggleToolbars = function () {
         // Define variables
-        const container = document.querySelector('.table');
+        const container = document.querySelector('#area_datatable');
         const toolbarBase = document.querySelector('[data-kt-docs-table-toolbar="base"]');
         const toolbarSelected = document.querySelector('[data-kt-docs-table-toolbar="selected"]');
         const selectedCount = document.querySelector('[data-kt-docs-table-select="selected_count"]');
@@ -645,7 +744,7 @@ var KTDatatablesServerSide = function () {
               swal("Error updating!", "Please try again!", "error");
           }
         },
-        table: ".table",
+        table: "#area_datatable",
         fields: [
             {
              label: "Name:",
@@ -677,13 +776,13 @@ var KTDatatablesServerSide = function () {
 
       });
 
-      $('.table').on( 'click', 'tbody td:not(:first-child)', function (e) {
+      $('#area_datatable').on( 'click', 'tbody td:not(:first-child)', function (e) {
         editor.inline( dt.cell( this ).index(), {
             onBlur: 'submit'
         } );
       } );
 
-      $('.table').on( 'key-focus', function ( e, datatable, cell ) {
+      $('#area_datatable').on( 'key-focus', function ( e, datatable, cell ) {
         editor.inline( cell.index() );
       });
 
