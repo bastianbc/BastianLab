@@ -3837,4 +3837,4 @@ def register_new_fastq_files(request):
 
 def call_import_variants(request):
     from .variants_import import import_variants, import_BCB002_test
-    import_BCB002_test()
+    import_variants()
