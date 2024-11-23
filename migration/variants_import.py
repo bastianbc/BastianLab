@@ -41,9 +41,10 @@ def get_caller(filename):
 
 def parse_p_var(p_var):
     logger.debug(f"Parsing p_var: {p_var}")
-    if not p_var:
+    if not p_var or p_var.endswith("?") or p_var.endswith("*"):
+        print("*"*10, p_var)
         logger.debug("p_var is empty")
-        return None, None, None
+        return None
     match = re.match(r'p\.([A-Za-z])(\d+)([A-Za-z])', p_var)
     if match:
         result = (match.group(1), match.group(2), match.group(3))
@@ -179,6 +180,8 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail):
 
             # Create PVariant instance if p_var is present
             if p_var:
+                if not parse_p_var(p_var):
+                    continue
                 if len(parse_p_var(p_var))==3:
                     p_ref, p_pos, p_alt = parse_p_var(p_var)
                     p_variant = PVariant.objects.create(
@@ -241,8 +244,9 @@ def variant_file_parser(file_path, analysis_run_name):
             return False, f"Analysis run not found: {analysis_run_name}", {}
 
         variant_file = get_variant_file(file_path)
-        variant_file.call = True
-        variant_file.save()
+        if variant_file.call:
+            return
+
         if not variant_file:
             logger.error(f"Variant file not found: {file_path}")
             return False, f"Variant file not found: {file_path}", {}
@@ -298,8 +302,8 @@ def variant_file_parser(file_path, analysis_run_name):
                         chrom=row['Chr'],
                         start=row['Start'],
                         end=row['End'],
-                        ref=row['Ref'],
-                        alt=row['Alt'],
+                        ref=row['Ref'][:99],
+                        alt=row['Alt'][:99],
                         avsnp150=row.get('avsnp150', '')
                     )
 
@@ -318,6 +322,9 @@ def variant_file_parser(file_path, analysis_run_name):
                 logger.error(f"Error processing row {index + 1}: {str(e)}", exc_info=True)
                 stats["errors"].append(f"Row {index + 1}: {str(e)}")
                 stats["failed"] += 1
+
+        variant_file.call = True
+        variant_file.save()
 
         # Create result message
         if stats["failed"] == stats["total_rows"]:
@@ -340,6 +347,7 @@ def create_variant_file(row):
 # Parse and save data into the database
 def import_variants():
     VariantCall.objects.filter().delete()
+    VariantFile.objects.all().update(call=False)
     SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
     file_path = os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "VariantFiles")
 
@@ -355,10 +363,11 @@ def import_BCB002_test():
     file = Path(Path(__file__).parent.parent / "uploads" / "variant_files_df.csv")
     df = pd.read_csv(file)
     VariantCall.objects.filter().delete()
+    VariantFile.objects.all().update(call=False)
     SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
     file_path = os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "VariantFiles")
 
-    # variant_file_parser(os.path.join(file_path,"BCB002.NMLP-001.FB_Final.annovar.hg19_multianno_Filtered.txt"), "AR_ALL")
+    variant_file_parser(os.path.join(file_path,"BCB002.NMLP-003.FB_Final.annovar.hg19_multianno_Filtered.txt"), "AR_ALL")
     print("end"*100)
 
 
