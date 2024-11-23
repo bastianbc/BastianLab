@@ -49,6 +49,11 @@ def parse_p_var(p_var):
         result = (match.group(1), match.group(2), match.group(3))
         logger.debug(f"Parsed p_var successfully: {result}")
         return result
+    match2 = re.match(r'p\.([A-Za-z]+)?(\d+)_?([A-Za-z]*)?(\d+)?(delins)?([A-Za-z]*)?', p_var)
+    if match2:
+        result = (match2.group(1), match2.group(2), match2.group(3), match2.group(4), match2.group(5), match2.group(6))
+        logger.debug(f"Parsed p_var successfully: {result}")
+        return result
     logger.warning(f"Failed to parse p_var: {p_var}")
     return None, None, None
 
@@ -174,17 +179,30 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail):
 
             # Create PVariant instance if p_var is present
             if p_var:
-                p_ref, p_pos, p_alt = parse_p_var(p_var)
-                if all([p_ref, p_pos, p_alt]):
+                if len(parse_p_var(p_var))==3:
+                    p_ref, p_pos, p_alt = parse_p_var(p_var)
                     p_variant = PVariant.objects.create(
                         c_variant=c_variant,
-                        ref=p_ref,
-                        pos=p_pos,
-                        alt=p_alt
+                        start=p_pos,
+                        end=p_pos,
+                        reference_residues=p_ref,
+                        inserted_residues=p_alt,
+                        change_type=""
                     )
-                    logger.info(f"Created PVariant: {p_variant}")
                 else:
-                    logger.warning(f"Skipped PVariant creation due to invalid p_var: {p_var}")
+                    start_AA, start, end_AA, end, modification_type, inserted_sequence = parse_p_var(p_var)
+                    p_variant = PVariant.objects.create(
+                        c_variant=c_variant,
+                        start=start,
+                        end=end,
+                        reference_residues=start_AA+end_AA,
+                        inserted_residues=inserted_sequence,
+                        change_type=modification_type
+                    )
+                # if all([p_ref, p_pos, p_alt]):
+                #     logger.info(f"Created PVariant: {p_variant}")
+                # else:
+                #     logger.warning(f"Skipped PVariant creation due to invalid p_var: {p_var}")
         except Exception as e:
             logger.error(f"Error processing AAChange entry '{entry}': {str(e)}")
 
@@ -240,6 +258,7 @@ def variant_file_parser(file_path, analysis_run_name):
         # Process each row
         for index, row in df.iterrows():
             logger.debug(f"Processing row {index + 1}")
+            print(f"Processing row {index + 1}, {row['Start']}")
             try:
                 # Check required fields
                 fields_valid, field_error = check_required_fields(row)
@@ -321,9 +340,7 @@ def create_variant_file(row):
 
 # Parse and save data into the database
 def import_variants():
-    file = Path(Path(__file__).parent.parent / "uploads" / "variant_files_df.csv")
-    df = pd.read_csv(file)
-
+    VariantCall.objects.filter().delete()
     SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
     file_path = os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "VariantFiles")
 
@@ -342,7 +359,7 @@ def import_BCB002_test():
     SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
     file_path = os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "VariantFiles")
 
-    variant_file_parser(os.path.join(file_path,"BCB002.NMLP-001.MT2_Final.annovar.hg19_multianno_Filtered.txt"), "AR_ALL")
+    # variant_file_parser(os.path.join(file_path,"BCB002.NMLP-001.FB_Final.annovar.hg19_multianno_Filtered.txt"), "AR_ALL")
     print("end"*100)
 
 
@@ -350,6 +367,5 @@ def import_BCB002_test():
 if __name__ == "__main__":
     # import_variants()
     print("start")
-    VariantCall.objects.filter(variant_file__name='BCB002.NMLP-001.MT2_Final.annovar.hg19_multianno_Filtered.txt').delete()
     import_BCB002_test()
     print("end")

@@ -110,9 +110,11 @@ class CVariant(models.Model):
 
 class PVariant(models.Model):
     c_variant = models.ForeignKey(CVariant, on_delete=models.CASCADE, related_name="p_variants")
-    ref = models.CharField(max_length=100, blank=True, null=True)
-    pos = models.CharField(max_length=100, blank=True, null=True)
-    alt = models.CharField(max_length=100, blank=True, null=True)
+    start = models.IntegerField(default=0)
+    end = models.IntegerField(default=0)
+    reference_residues = models.CharField(max_length=100, blank=True, null=True)
+    inserted_residues = models.CharField(max_length=100, blank=True, null=True)
+    change_type = models.CharField(max_length=100, blank=True, null=True)
 
     class Meta:
         db_table = "p_variant"
