@@ -226,7 +226,7 @@ def variant_file_parser(file_path, analysis_run_name):
         logger.debug("Reading file with pandas")
         df = pd.read_csv(file_path, sep='\t')
         if df.empty:
-            logger.error("File is empty")
+            logger.error(f"File is empty {file_path}")
             return False, "File is empty", {}
 
         filename = os.path.basename(file_path)
@@ -362,12 +362,12 @@ def import_variants():
 def import_BCB002_test():
     file = Path(Path(__file__).parent.parent / "uploads" / "variant_files_df.csv")
     df = pd.read_csv(file)
-    VariantCall.objects.filter().delete()
-    VariantFile.objects.all().update(call=False)
+    VariantCall.objects.filter(variant_file__name="BCB006.NMLP-001.FB_Final.annovar.hg19_multianno_Filtered.txt").delete()
+    VariantFile.objects.filter(name="BCB006.NMLP-001.FB_Final.annovar.hg19_multianno_Filtered.txt").update(call=False)
     SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
     file_path = os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "VariantFiles")
 
-    variant_file_parser(os.path.join(file_path,"BCB002.NMLP-003.FB_Final.annovar.hg19_multianno_Filtered.txt"), "AR_ALL")
+    variant_file_parser(os.path.join(file_path,"BCB006.NMLP-001.FB_Final.annovar.hg19_multianno_Filtered.txt"), "AR_ALL")
     print("end"*100)
 
 
