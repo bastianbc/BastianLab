@@ -346,8 +346,6 @@ def create_variant_file(row):
 
 # Parse and save data into the database
 def import_variants():
-    VariantCall.objects.filter().delete()
-    VariantFile.objects.all().update(call=False)
     SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
     file_path = os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "VariantFiles")
 
