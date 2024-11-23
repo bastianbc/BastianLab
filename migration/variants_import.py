@@ -258,7 +258,6 @@ def variant_file_parser(file_path, analysis_run_name):
         # Process each row
         for index, row in df.iterrows():
             logger.debug(f"Processing row {index + 1}")
-            print(f"Processing row {index + 1}, {row['Start']}")
             try:
                 # Check required fields
                 fields_valid, field_error = check_required_fields(row)
