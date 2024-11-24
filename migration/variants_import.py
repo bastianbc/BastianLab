@@ -42,7 +42,6 @@ def get_caller(filename):
 def parse_p_var(p_var):
     logger.debug(f"Parsing p_var: {p_var}")
     if not p_var or p_var.endswith("?") or p_var.endswith("*"):
-        print("*"*10, p_var)
         logger.debug("p_var is empty")
         return None
     match = re.match(r'p\.([A-Za-z])(\d+)([A-Za-z])', p_var)
@@ -360,12 +359,12 @@ def import_variants():
 def import_BCB002_test():
     file = Path(Path(__file__).parent.parent / "uploads" / "variant_files_df.csv")
     df = pd.read_csv(file)
-    VariantCall.objects.filter(variant_file__name="BCB006.NMLP-001.FB_Final.annovar.hg19_multianno_Filtered.txt").delete()
-    VariantFile.objects.filter(name="BCB006.NMLP-001.FB_Final.annovar.hg19_multianno_Filtered.txt").update(call=False)
+    VariantCall.objects.filter(variant_file__name="BCB006.NMLP-034.FB_Final.annovar.hg19_multianno_Filtered.txt").delete()
+    VariantFile.objects.filter(name="BCB006.NMLP-034.FB_Final.annovar.hg19_multianno_Filtered.txt").update(call=False)
     SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
     file_path = os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "VariantFiles")
 
-    variant_file_parser(os.path.join(file_path,"BCB006.NMLP-001.FB_Final.annovar.hg19_multianno_Filtered.txt"), "AR_ALL")
+    variant_file_parser(os.path.join(file_path,"BCB006.NMLP-034.FB_Final.annovar.hg19_multianno_Filtered.txt"), "AR_ALL")
     print("end"*100)
 
 
