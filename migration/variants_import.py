@@ -322,17 +322,20 @@ def variant_file_parser(file_path, analysis_run_name):
                 stats["errors"].append(f"Row {index + 1}: {str(e)}")
                 stats["failed"] += 1
 
-        variant_file.call = True
-        variant_file.save()
+
 
         # Create result message
         if stats["failed"] == stats["total_rows"]:
             logger.error("No variants could be processed")
             return False, "No variants could be processed", stats
         elif stats["failed"] > 0:
+            variant_file.call = True
+            variant_file.save()
             logger.warning(f"{stats['successful']} variants processed successfully, {stats['failed']} variants failed")
             return True, f"{stats['successful']} variants processed successfully, {stats['failed']} variants failed", stats
         else:
+            variant_file.call = True
+            variant_file.save()
             logger.info("All variants processed successfully")
             return True, "All variants processed successfully", stats
 
@@ -345,14 +348,20 @@ def create_variant_file(row):
 
 # Parse and save data into the database
 def import_variants():
-    SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
-    file_path = os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "VariantFiles")
-
-    files = os.listdir(file_path)
-
+    files = VariantFile.objects.filter(call=False)
+    print(len(files))
     for file in files:
-        if "_Filtered" in os.path.join(file_path,file):
-            variant_file_parser(os.path.join(file_path,file), "AR_ALL")
+        file_path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA,file.directory)
+        if "_Filtered" in os.path.join(file_path, file.name):
+            variant_file_parser(os.path.join(file_path,file.name), "AR_ALL")
+    # SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
+    # file_path = os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "VariantFiles")
+    #
+    # files = os.listdir(file_path)
+
+    # for file in files:
+    #     if "_Filtered" in os.path.join(file_path,file):
+    #         variant_file_parser(os.path.join(file_path,file), "AR_ALL")
 
 
 # Parse and save data into the database
@@ -372,5 +381,5 @@ def import_BCB002_test():
 if __name__ == "__main__":
     # import_variants()
     print("start")
-    import_BCB002_test()
+    import_variants()
     print("end")
