@@ -3836,5 +3836,5 @@ def register_new_fastq_files(request):
     #         generate_file_set(row['file'])
 
 def call_import_variants(request):
-    from .variants_import import import_variants
+    from .variants_import import import_variants, import_BCB002_test
     import_variants()
