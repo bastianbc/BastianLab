@@ -256,6 +256,108 @@
 </div>
 <!--end::Modal -->
 
+<!--begin::Modal - Variant Layout-->
+<div class="modal fade" id="variant_layout" tabindex="-1" aria-hidden="true">
+    <!--begin::Modal dialog-->
+    <div class="modal-dialog modal-fullscreen p-9">
+        <!--begin::Modal content-->
+        <div class="modal-content modal-rounded">
+            <!--begin::Modal header-->
+            <div class="modal-header">
+                <!--begin::Modal title-->
+                <h2>Variant Layout</h2>
+                <!--end::Modal title-->
+                <!--begin::Close-->
+                <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
+                    <!--begin::Svg Icon | path: icons/duotune/arrows/arr061.svg-->
+                    <span class="svg-icon svg-icon-1">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect opacity="0.5" x="6" y="17.3137" width="16" height="2" rx="1" transform="rotate(-45 6 17.3137)" fill="currentColor" />
+                            <rect x="7.41422" y="6" width="16" height="2" rx="1" transform="rotate(45 7.41422 6)" fill="currentColor" />
+                        </svg>
+                    </span>
+                    <!--end::Svg Icon-->
+                </div>
+                <!--end::Close-->
+            </div>
+            <!--end::Modal header-->
+            <!--begin::Modal body-->
+            <div class="modal-body scroll-y m-5">
+                <div class="row">
+                    <div class="col-3">
+                        <!--begin::Order summary-->
+                        <div class="d-flex flex-column flex-xl-row gap-7 gap-lg-10">
+                            <!--begin::Order details-->
+                            <div class="card card-flush py-4 flex-row-fluid">
+                                <!--begin::Card header-->
+                                <div class="card-header">
+                                    <div class="card-title">
+                                        <h2>Block Details</h2>
+                                    </div>
+                                </div>
+                                <!--end::Card header-->
+                                <!--begin::Card body-->
+                                <div class="card-body pt-0">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="fv-row mb-8">
+                                                <label class="d-flex align-items-center fs-6 fw-semibold form-label mb-2">
+                                                    <span>Block Name</span>
+                                                </label>
+                                                <input type="text" class="form-control form-control-solid" name="block_name" />
+                                            </div>
+                                            <div class="fv-row mb-8">
+                                                <label class="d-flex align-items-center fs-6 fw-semibold form-label mb-2">
+                                                    <span>Body Site</span>
+                                                </label>
+                                                <input type="text" class="form-control form-control-solid" name="body_site" />
+                                            </div>
+                                            <div class="fv-row mb-8">
+                                                <label class="fs-6 fw-semibold mb-2">Diagnosis</label>
+                                                <textarea class="form-control form-control-solid" rows="3" name="diagnosis"></textarea>
+                                            </div>
+                                            <div class="text-muted fw-semibold fs-4">If you need more info, please view
+                                            <a href="javascript:;" target="_blank" class="link-primary" name="he_image">HE Image</a></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--end::Card body-->
+                            </div>
+                            <!--end::Order details-->
+
+                        </div>
+                        <!--end::Order summary-->
+                    </div>
+                    <div class="col-9">
+                        <!--begin::Order details page-->
+                        <div class="d-flex flex-column gap-7 gap-lg-10">
+                            <div class="d-flex flex-wrap flex-stack gap-5 gap-lg-10">
+                                <!--begin:::Tabs-->
+                                <ul class="nav nav-custom nav-tabs nav-line-tabs nav-line-tabs-2x border-0 fs-4 fw-semibold mb-lg-n2 me-auto" id="variantTabList">
+
+                                </ul>
+                                <!--end:::Tabs-->
+                            </div>
+                            <!--begin::Tab content-->
+                            <div class="tab-content" id="variantTabContent">
+
+                            </div>
+                            <!--end::Tab content-->
+                        </div>
+                        <!--end::Order details page-->
+                    </div>
+                </div>
+
+
+            </div>
+            <!--end::Modal body-->
+        </div>
+        <!--end::Modal content-->
+    </div>
+    <!--end::Modal dialog-->
+</div>
+<!--end::Modal - Variant Layout-->
+
 {% endblock %}
 
 {% block scripts %}

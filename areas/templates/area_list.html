@@ -323,26 +323,26 @@
                                                 <label class="d-flex align-items-center fs-6 fw-semibold form-label mb-2">
                                                     <span>Area Name</span>
                                                 </label>
-                                                <input type="text" class="form-control form-control-solid" placeholder="Enter Project Name" value="StockPro Mobile App" name="settings_name" />
+                                                <input type="text" class="form-control form-control-solid" name="area_name" />
                                             </div>
                                             <div class="fv-row mb-8">
                                                 <label class="d-flex align-items-center fs-6 fw-semibold form-label mb-2">
                                                     <span>Block Name</span>
                                                 </label>
-                                                <input type="text" class="form-control form-control-solid" placeholder="Enter Project Name" value="StockPro Mobile App" name="settings_name" />
+                                                <input type="text" class="form-control form-control-solid" name="block_name" />
                                             </div>
                                             <div class="fv-row mb-8">
                                                 <label class="d-flex align-items-center fs-6 fw-semibold form-label mb-2">
                                                     <span>Body Site</span>
                                                 </label>
-                                                <input type="text" class="form-control form-control-solid" placeholder="Enter Project Name" value="StockPro Mobile App" name="settings_name" />
+                                                <input type="text" class="form-control form-control-solid" name="body_site" />
                                             </div>
                                             <div class="fv-row mb-8">
                                                 <label class="fs-6 fw-semibold mb-2">Diagnosis</label>
-                                                <textarea class="form-control form-control-solid" rows="3" placeholder="Enter Project Description" name="settings_description">Experience share market at your fingertips with TICK PRO stock investment mobile trading app</textarea>
+                                                <textarea class="form-control form-control-solid" rows="3" name="diagnosis"></textarea>
                                             </div>
-                                            <div class="text-muted fw-semibold fs-4">If you need more info, please check
-                                            <a href="#" class="link-primary">HE Image</a></div>
+                                            <div class="text-muted fw-semibold fs-4">If you need more info, please view
+                                            <a href="javascript:;" target="_blank" class="link-primary" name="he_image">HE Image</a></div>
                                         </div>
                                     </div>
                                 </div>
@@ -358,90 +358,14 @@
                         <div class="d-flex flex-column gap-7 gap-lg-10">
                             <div class="d-flex flex-wrap flex-stack gap-5 gap-lg-10">
                                 <!--begin:::Tabs-->
-                                <ul class="nav nav-custom nav-tabs nav-line-tabs nav-line-tabs-2x border-0 fs-4 fw-semibold mb-lg-n2 me-auto">
-                                    <!--begin:::Tab item-->
-                                    <li class="nav-item">
-                                        <a class="nav-link text-active-primary pb-4 active" data-bs-toggle="tab" href="#kt_ecommerce_sales_order_summary">Analysis Run 1</a>
-                                    </li>
-                                    <!--end:::Tab item-->
-                                    <!--begin:::Tab item-->
-                                    <li class="nav-item">
-                                        <a class="nav-link text-active-primary pb-4" data-bs-toggle="tab" href="#kt_ecommerce_sales_order_history">Analysis Run 2</a>
-                                    </li>
-                                    <!--end:::Tab item-->
+                                <ul class="nav nav-custom nav-tabs nav-line-tabs nav-line-tabs-2x border-0 fs-4 fw-semibold mb-lg-n2 me-auto" id="variantTabList">
+
                                 </ul>
                                 <!--end:::Tabs-->
                             </div>
                             <!--begin::Tab content-->
-                            <div class="tab-content">
-                                <!--begin::Tab pane-->
-                                <div class="tab-pane fade show active" id="kt_ecommerce_sales_order_summary" role="tab-panel">
-                                    <!--begin::Orders-->
-                                    <div class="d-flex flex-column gap-7 gap-lg-10">
-                                        <!--begin::Product List-->
-                                        <div class="card card-flush py-4 flex-row-fluid overflow-hidden">
-                                            <!--begin::Card body-->
-                                            <div class="card-body pt-0">
-                                                <div class="table-responsive">
-                                                    <!--begin::Datatable-->
-                                                    <table id="variant_datatable" class="table align-middle table-row-dashed fs-6 gy-5">
-                                                        <thead>
-                                                            <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
-                                                                <th>Sample Library</th>
-                                                                <th>Gene</th>
-                                                                <th>P Variant</th>
-                                                                <th>Coverage</th>
-                                                                <th>VAF</th>
-                                                                <th class="text-end min-w-100px">Actions</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody class="text-gray-600 fw-semibold">
-                                                        </tbody>
-                                                    </table>
-                                                    <!--end::Datatable-->
-                                                </div>
-                                            </div>
-                                            <!--end::Card body-->
-                                        </div>
-                                        <!--end::Product List-->
-                                    </div>
-                                    <!--end::Orders-->
-                                </div>
-                                <!--end::Tab pane-->
-                                <!--begin::Tab pane-->
-                                <div class="tab-pane fade" id="kt_ecommerce_sales_order_history" role="tab-panel">
-                                    <!--begin::Orders-->
-                                    <div class="d-flex flex-column gap-7 gap-lg-10">
-                                        <!--begin::Order history-->
-                                        <div class="card card-flush py-4 flex-row-fluid">
-                                            <!--begin::Card body-->
-                                            <div class="card-body pt-0">
-                                                <div class="table-responsive">
-                                                    <!--begin::Datatable-->
-                                                    <table id="variant_datatable" class="table align-middle table-row-dashed fs-6 gy-5">
-                                                        <thead>
-                                                            <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
-                                                                <th>Sample Library</th>
-                                                                <th>Gene</th>
-                                                                <th>P Variant</th>
-                                                                <th>Coverage</th>
-                                                                <th>VAF</th>
-                                                                <th class="text-end min-w-100px">Actions</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody class="text-gray-600 fw-semibold">
-                                                        </tbody>
-                                                    </table>
-                                                    <!--end::Datatable-->
-                                                </div>
-                                            </div>
-                                            <!--end::Card body-->
-                                        </div>
-                                        <!--end::Order history-->
-                                    </div>
-                                    <!--end::Orders-->
-                                </div>
-                                <!--end::Tab pane-->
+                            <div class="tab-content" id="variantTabContent">
+
                             </div>
                             <!--end::Tab content-->
                         </div>

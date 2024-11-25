@@ -171,7 +171,7 @@ var KTDatatablesServerSide = function () {
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="#" class="menu-link px-3" data-bs-toggle="modal" data-bs-target="#variant_layout">View Variants</a>
+                                    <a href="#" class="menu-link px-3 variant-link">View Variants</a>
                                 </div>
                                 <!--end::Menu item-->
                             </div>
@@ -197,6 +197,7 @@ var KTDatatablesServerSide = function () {
             toggleToolbars();
             handleDeleteRows();
             handleResetForm();
+            handleRowActions();
             KTMenu.createInstances();
         });
     }
@@ -509,14 +510,10 @@ var KTDatatablesServerSide = function () {
     // Functions in selected rows
     var handleSelectedRows = function (e) {
         const nucleicAcidModal = document.getElementById("modal_extract_nucleic_acid");
-        const variantModal = document.getElementById("variant_layout");
         const nucleicAcidInstance = new bootstrap.Modal(nucleicAcidModal);
-        const variantInstance = new bootstrap.Modal(variantModal);
 
         const btnExtractNucleicAcid = document.querySelector('[data-kt-docs-table-select="event_extract_nucleic_acid"]');
-        const btnVariant = document.querySelector('[data-kt-docs-table-select="event_variant"]');
         const btnNucleicAcidContinue = document.getElementById("btn_continue");
-        const btnVariantContinue = document.getElementById("btn_variant_continue");
 
         function getFormOptions(formId) {
             var data = new FormData(document.getElementById(formId));
@@ -568,28 +565,27 @@ var KTDatatablesServerSide = function () {
                 nucleicAcidInstance.hide();
             });
         });
+    }
 
-        btnVariant.addEventListener('click', () => variantInstance.show());
-        btnVariantContinue.addEventListener('click', function () {
-            $.ajax({
-                type: "GET",
-                url: "/variant/new_async",
-                data: {
-                    "selected_ids": JSON.stringify(selectedRows),
-                    "options": getFormOptions('frm_variant_options')
-                },
-            }).done(function(result) {
-                if (result.success) {
-                    handleSuccess("Variant(s) created successfully.");
-                } else {
-                    handleError("Variant(s) could not be created.");
-                }
-                variantInstance.hide();
+    var handleRowActions = function () {
+        const variantModal = document.getElementById("variant_layout");
+        const variantInstance = new bootstrap.Modal(variantModal);
+
+        document.querySelectorAll('.variant-link').forEach((item, i) => {
+
+            item.addEventListener('click', function () {
+                // Select parent row
+                const parent = this.closest('tr');
+                // Get customer name
+                const id = parent.querySelector('input[type=checkbox]').value;
+                // Open modal
+                variantInstance.show();
+                getVariantData( id );
             });
         });
 
-        function getVariantData() {
-            fetch('/variant/get_variant_by_area')
+        function getVariantData( area_id ) {
+            fetch(`/variant/get_variants_by_area?area_id=${area_id}`)
                 .then(response => response.json())
                 .then(data => {
                     initializeModal(data);
@@ -598,39 +594,66 @@ var KTDatatablesServerSide = function () {
         }
 
         function initializeModal(data) {
-            // Clear previous data
-            clearModalData();
-
             // Initialize tabs
-            const tabContainer = document.querySelector('.nav-tabs');
-            const tabContent = document.querySelector('.tab-content');
+            const tabContainer = document.getElementById('variantTabList');
+            const tabContent = document.getElementById('variantTabContent');
+
+            // Clear modal first
+            tabContainer.innerHTML = "";
+            tabContent.innerHTML = "";
+
+            // Fill the data
+            populateAreaDetails(data.area);
+
+            // Check if there are any analyses
+            if (!data.analyses || data.analyses.length === 0) {
+                showNoDataMessage(tabContent, "No analysis runs found for this area.");
+                return;
+            }
+
+            // Check if any analysis has variants
+            const hasVariants = data.analyses.some(analysis => analysis.variants && analysis.variants.length > 0);
+            if (!hasVariants) {
+                showNoDataMessage(tabContent, "No variants found in any analysis runs.");
+                return;
+            }
 
             data.analyses.forEach((analysis, index) => {
                 // Create tab
                 const isActive = index === 0;
                 const tabId = `analysis_${index}`;
 
-                createTab(tabContainer, tabId, `Analysis Run ${index + 1}`, isActive);
+                createTab(tabContainer, tabId, analysis.analysis_name, isActive);
                 createTabPane(tabContent, tabId, analysis.variants, isActive);
 
-                // Initialize DataTable
-                $(`#variant_datatable_${index}`).DataTable({
-                    data: analysis.variants,
-                    columns: [
-                        { data: 'sampleLibrary' },
-                        { data: 'gene' },
-                        { data: 'pVariant' },
-                        { data: 'coverage' },
-                        { data: 'vaf' },
-                        {
-                            data: null,
-                            render: function(data, type, row) {
-                                return '<button class="btn btn-sm btn-light">View</button>';
-                            }
-                        }
-                    ]
-                });
             });
+        }
+
+        function showNoDataMessage(container, message) {
+            container.innerHTML = `
+                <div class="card">
+                    <div class="card-body p-10 text-center">
+                        <i class="ki-duotone ki-information-5 fs-5x text-primary mb-5">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                            <span class="path3"></span>
+                        </i>
+                        <p class="fs-3 fw-semibold text-gray-800 mb-2">${message}</p>
+                        <p class="fs-6 text-gray-600">Please select a different area or check if analysis has been completed.</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function populateAreaDetails( data ) {
+            document.querySelector('input[name="area_name"]').value = data.name;
+            document.querySelector('input[name="block_name"]').value = data.block_name;
+            document.querySelector('input[name="body_site"]').value = data.body_site;
+            document.querySelector('textarea[name="diagnosis"]').textContent = data.diagnosis;
+
+            if (data.he_image) {
+                document.querySelector('a[name="he_image"]').href = data.he_image;
+            }
         }
 
         function createTab(container, id, text, isActive) {
@@ -670,20 +693,62 @@ var KTDatatablesServerSide = function () {
                     </div>
                 </div>`;
             container.appendChild(div);
+
+            // Initialize DataTable
+            initializeDataTable(`variant_datatable_${id}`, data);
         }
 
-        function clearModalData() {
-            // Destroy existing DataTables
-            $('.table').each(function() {
-                if ($.fn.DataTable.isDataTable(this)) {
-                    $(this).DataTable().destroy();
-                }
+        function initializeDataTable(tableId, variants) {
+            $(`#${tableId}`).DataTable({
+                data: variants,
+                columns: [
+                    {
+                        data: 'sampleLibrary',
+                        className: 'text-gray-800 text-hover-primary'
+                    },
+                    {
+                        data: 'gene',
+                        className: 'text-gray-800'
+                    },
+                    {
+                        data: 'pVariant',
+                        className: 'text-gray-800'
+                    },
+                    {
+                        data: 'coverage',
+                        className: 'text-gray-800'
+                    },
+                    {
+                        data: 'vaf',
+                        className: 'text-gray-800',
+                    },
+                    {
+                        data: null,
+                        className: 'text-end',
+                        render: function() {
+                            return `
+                                <button type="button"
+                                        class="btn btn-icon btn-light-primary btn-sm"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="top"
+                                        title="View Details">
+                                    <i class="ki-duotone ki-eye fs-2">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                        <span class="path3"></span>
+                                    </i>
+                                </button>
+                            `;
+                        }
+                    }
+                ],
+                order: [[1, 'asc']],  // Sort by gene by default
+                pageLength: 10,
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                responsive: true
             });
-
-            // Clear tabs and content
-            document.querySelector('.nav-tabs').innerHTML = '';
-            document.querySelector('.tab-content').innerHTML = '';
         }
+
     }
 
     // Toggle toolbars
@@ -750,6 +815,16 @@ var KTDatatablesServerSide = function () {
              label: "Name:",
              name: "name"
             }, {
+              label: "Block",
+              name: "num_blocks",
+              type: "readonly",
+              attr: { disabled:true }
+            }, {
+              label: "Project",
+              name: "num_projects",
+              type: "readonly",
+              attr: { disabled:true }
+            }, {
               label: "Area Type:",
               name: "area_type",
               type: "select",
@@ -765,7 +840,17 @@ var KTDatatablesServerSide = function () {
               name: "investigator",
               type: "readonly",
               attr: { disabled:true }
-            }
+          }, {
+            label: "Nucleic Acids",
+            name: "num_nucacids",
+            type: "readonly",
+            attr: { disabled:true }
+          }, {
+            label: "Sample Libraries",
+            name: "num_samplelibs",
+            type: "readonly",
+            attr: { disabled:true }
+          },
        ],
        formOptions: {
           inline: {
