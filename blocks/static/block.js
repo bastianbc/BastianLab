@@ -166,11 +166,18 @@ var KTDatatablesServerSide = function () {
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
+                                    <a href="#" class="menu-link px-3 variant-link">View Variants</a>
+                                </div>
+                                <!--end::Menu item-->
+
+                                <!--begin::Menu item-->
+                                <div class="menu-item px-3">
                                     <a href="/blocks/delete/` + row["bl_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
                                         Delete
                                     </a>
                                 </div>
                                 <!--end::Menu item-->
+
                             </div>
                             <!--end::Menu-->
                         `;
@@ -195,6 +202,7 @@ var KTDatatablesServerSide = function () {
             handleDeleteRows();
             handleResetForm();
             initShowScanImage();
+            handleRowActions();
             KTMenu.createInstances();
         });
     }
@@ -888,6 +896,194 @@ var KTDatatablesServerSide = function () {
       }
 
       return null;
+
+    }
+
+    var handleRowActions = function () {
+        const variantModal = document.getElementById("variant_layout");
+        const variantInstance = new bootstrap.Modal(variantModal);
+
+        document.querySelectorAll('.variant-link').forEach((item, i) => {
+
+            item.addEventListener('click', function () {
+                // Select parent row
+                const parent = this.closest('tr');
+                // Get customer name
+                const id = parent.querySelector('input[type=checkbox]').value;
+                // Open modal
+                variantInstance.show();
+                getVariantData( id );
+            });
+        });
+
+        function getVariantData( block_id ) {
+            fetch(`/variant/get_variants_by_block?block_id=${block_id}`)
+                .then(response => response.json())
+                .then(data => {
+                    initializeModal(data);
+                    $('#variant_layout').modal('show');
+                });
+        }
+
+        function initializeModal( data ) {
+            // Initialize tabs
+            const tabContainer = document.getElementById('variantTabList');
+            const tabContent = document.getElementById('variantTabContent');
+
+            // Clear modal first
+            tabContainer.innerHTML = "";
+            tabContent.innerHTML = "";
+
+            // Fill the data
+            populateBlockDetails(data.block);
+
+            // Check if there are any analyses
+            if (!data.analyses || data.analyses.length === 0) {
+                showNoDataMessage(tabContent, "No analysis runs found for this area.");
+                return;
+            }
+
+            // Check if any analysis has variants
+            const hasVariants = data.analyses.some(analysis => analysis.variants && analysis.variants.length > 0);
+            if (!hasVariants) {
+                showNoDataMessage(tabContent, "No variants found in any analysis runs.");
+                return;
+            }
+
+            data.analyses.forEach((analysis, index) => {
+                // Create tab
+                const isActive = index === 0;
+                const tabId = `analysis_${index}`;
+
+                createTab(tabContainer, tabId, analysis.analysis_name, isActive);
+                createTabPane(tabContent, tabId, analysis.variants, isActive);
+
+            });
+        }
+
+        function showNoDataMessage(container, message) {
+            container.innerHTML = `
+                <div class="card">
+                    <div class="card-body p-10 text-center">
+                        <i class="ki-duotone ki-information-5 fs-5x text-primary mb-5">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                            <span class="path3"></span>
+                        </i>
+                        <p class="fs-3 fw-semibold text-gray-800 mb-2">${message}</p>
+                        <p class="fs-6 text-gray-600">Please select a different area or check if analysis has been completed.</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function populateBlockDetails( data ) {
+            document.querySelector('input[name="block_name"]').value = data.name;
+            document.querySelector('input[name="body_site"]').value = data.body_site;
+            document.querySelector('textarea[name="diagnosis"]').textContent = data.diagnosis;
+
+            if (data.he_image) {
+                document.querySelector('a[name="he_image"]').href = data.he_image;
+            }
+        }
+
+        function createTab(container, id, text, isActive) {
+            const li = document.createElement('li');
+            li.className = 'nav-item';
+            li.innerHTML = `
+                <a class="nav-link text-active-primary pb-4 ${isActive ? 'active' : ''}"
+                   data-bs-toggle="tab"
+                   href="#${id}">
+                   ${text}
+                </a>`;
+            container.appendChild(li);
+        }
+
+        function createTabPane(container, id, data, isActive) {
+            const div = document.createElement('div');
+            div.className = `tab-pane fade ${isActive ? 'show active' : ''}`;
+            div.id = id;
+            div.innerHTML = `
+                <div class="card card-flush py-4 flex-row-fluid overflow-hidden">
+                    <div class="card-body pt-0">
+                        <div class="table-responsive">
+                            <table id="variant_datatable_${id}" class="table align-middle table-row-dashed fs-6 gy-5">
+                                <thead>
+                                    <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
+                                        <th>Area</th>
+                                        <th>Sample Library</th>
+                                        <th>Gene</th>
+                                        <th>P Variant</th>
+                                        <th>Coverage</th>
+                                        <th>VAF</th>
+                                        <th class="text-end min-w-100px">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-gray-600 fw-semibold"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>`;
+            container.appendChild(div);
+
+            // Initialize DataTable
+            initializeDataTable(`variant_datatable_${id}`, data);
+        }
+
+        function initializeDataTable(tableId, variants) {
+            $(`#${tableId}`).DataTable({
+                data: variants,
+                columns: [
+                    {
+                        data: 'areaName',
+                        className: 'text-gray-800 text-hover-primary'
+                    },
+                    {
+                        data: 'sampleLibrary',
+                        className: 'text-gray-800 text-hover-primary'
+                    },
+                    {
+                        data: 'gene',
+                        className: 'text-gray-800'
+                    },
+                    {
+                        data: 'pVariant',
+                        className: 'text-gray-800'
+                    },
+                    {
+                        data: 'coverage',
+                        className: 'text-gray-800'
+                    },
+                    {
+                        data: 'vaf',
+                        className: 'text-gray-800',
+                    },
+                    {
+                        data: null,
+                        className: 'text-end',
+                        render: function() {
+                            return `
+                                <button type="button"
+                                        class="btn btn-icon btn-light-primary btn-sm"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="top"
+                                        title="View Details">
+                                    <i class="ki-duotone ki-eye fs-2">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                        <span class="path3"></span>
+                                    </i>
+                                </button>
+                            `;
+                        }
+                    }
+                ],
+                order: [[1, 'asc']],  // Sort by gene by default
+                pageLength: 10,
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                responsive: true
+            });
+        }
 
     }
 

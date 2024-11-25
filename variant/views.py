@@ -9,6 +9,9 @@ from .helper import variant_file_parser
 from django.db import transaction
 from django.conf import settings
 import os
+from django.db.models import Prefetch
+from areas.models import Areas
+from blocks.models import Blocks
 
 def variants(request):
     filter = FilterForm()
@@ -71,7 +74,7 @@ def import_variants(request, name):
 
                 # Parse and save data into the database
                 success, message, stats = variant_file_parser(file_path, name)
-                
+
                 if not success:
                     # Raise exception to trigger rollback
                     raise Exception(f"Error processing {message}")
@@ -109,3 +112,132 @@ def import_variants(request, name):
             "statistics": processing_stats,
             "errors": processing_stats["errors"]
         })
+
+def get_variants_by_area(request):
+    area_id = request.GET.get('area_id')
+
+    # Get the area and its associated sample libraries through NA links
+    area = Areas.objects.get(pk=area_id)
+
+    # Get all NA links for this area
+    na_links = area.area_na_links.all()
+
+    # Get all sample libraries linked to these NAs
+    sample_libs = []
+    for na_link in na_links:
+        sample_libs.extend(na_link.nucacid.na_sl_links.all().values_list('sample_lib', flat=True))
+
+    # Get all variant calls for these sample libraries
+    variant_calls = VariantCall.objects.filter(
+        sample_lib__id__in=sample_libs
+    ).prefetch_related(
+        'sample_lib',
+        Prefetch('g_variants', queryset=GVariant.objects.all()),
+        Prefetch('g_variants__c_variants', queryset=CVariant.objects.all()),
+        Prefetch('g_variants__c_variants__p_variants', queryset=PVariant.objects.all())
+    ).select_related('analysis_run')
+
+    # Group variants by analysis run
+    analysis_runs = {}
+    for vc in variant_calls:
+        analysis_key = vc.analysis_run_id
+
+        # Initialize analysis run entry if not exists
+        if analysis_key not in analysis_runs:
+            analysis_runs[analysis_key] = {
+                'analysis_id': vc.analysis_run_id,
+                'analysis_name': vc.analysis_run.name,  # Assuming AnalysisRun model has a name field
+                'variants': []
+            }
+
+        for g_variant in vc.g_variants.all():
+            for c_variant in g_variant.c_variants.all():
+                # Format variant data for datatable
+                variant_data = {
+                    'sampleLibrary': vc.sample_lib.name,
+                    'gene': c_variant.gene,
+                    'pVariant': c_variant.p_variants.first().ref + str(c_variant.p_variants.first().pos) + c_variant.p_variants.first().alt if c_variant.p_variants.first() else '',
+                    'coverage': vc.coverage,
+                    'vaf': round((vc.alt_read / (vc.ref_read + vc.alt_read)) * 100, 2) if (vc.ref_read + vc.alt_read) > 0 else 0
+                }
+                analysis_runs[analysis_key]['variants'].append(variant_data)
+
+    # Format response
+    response_data = {
+        "area": {
+            "name": area.name,
+            "block_name": area.block.name,
+            "body_site": area.block.body_site,
+            "diagnosis": area.block.diagnosis,
+            "he_image": area.image.url if area.image else None
+        },
+        "analyses": list(analysis_runs.values())
+    }
+
+    return JsonResponse(response_data)
+
+def get_variants_by_block(request):
+    block_id = request.GET.get('block_id')
+
+    # Get the area and its associated sample libraries through NA links
+    block = Blocks.objects.get(pk=block_id)
+
+    # Get area associated with this block
+    area = Areas.objects.get(block_id=block_id)
+
+    # Get all NA links for this area
+    na_links = area.area_na_links.all()
+
+    # Get all sample libraries linked to these NAs
+    sample_libs = []
+    for na_link in na_links:
+        sample_libs.extend(na_link.nucacid.na_sl_links.all().values_list('sample_lib', flat=True))
+
+    # Get all variant calls for these sample libraries
+    variant_calls = VariantCall.objects.filter(
+        sample_lib__id__in=sample_libs
+    ).prefetch_related(
+        'sample_lib',
+        Prefetch('g_variants', queryset=GVariant.objects.all()),
+        Prefetch('g_variants__c_variants', queryset=CVariant.objects.all()),
+        Prefetch('g_variants__c_variants__p_variants', queryset=PVariant.objects.all())
+    ).select_related('analysis_run')
+
+    # Group variants by analysis run
+    analysis_runs = {}
+    for vc in variant_calls:
+        analysis_key = vc.analysis_run_id
+
+        # Initialize analysis run entry if not exists
+        if analysis_key not in analysis_runs:
+            analysis_runs[analysis_key] = {
+                'analysis_id': vc.analysis_run_id,
+                'analysis_name': vc.analysis_run.name,  # Assuming AnalysisRun model has a name field
+                'variants': []
+            }
+
+        for g_variant in vc.g_variants.all():
+            for c_variant in g_variant.c_variants.all():
+                # Format variant data for datatable
+                variant_data = {
+                    'areaName': area.name,
+                    'sampleLibrary': vc.sample_lib.name,
+                    'gene': c_variant.gene,
+                    'pVariant': c_variant.p_variants.first().ref + str(c_variant.p_variants.first().pos) + c_variant.p_variants.first().alt if c_variant.p_variants.first() else '',
+                    'coverage': vc.coverage,
+                    'vaf': round((vc.alt_read / (vc.ref_read + vc.alt_read)) * 100, 2) if (vc.ref_read + vc.alt_read) > 0 else 0
+                }
+                analysis_runs[analysis_key]['variants'].append(variant_data)
+
+    # Format response
+    response_data = {
+        'block': {
+            'name': block.name,
+            'body_site': block.body_site.name if block.body_site else '',
+            'diagnosis': block.diagnosis.name if block.diagnosis else '',
+            "he_image": area.image.url if area.image else None
+        },
+        "analyses": list(analysis_runs.values())
+    }
+
+    return JsonResponse(response_data)
