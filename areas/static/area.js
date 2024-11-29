@@ -673,7 +673,7 @@ var KTDatatablesServerSide = function () {
             div.className = `tab-pane fade ${isActive ? 'show active' : ''}`;
             div.id = id;
             div.innerHTML = `
-                <div class="card card-flush py-4 flex-row-fluid overflow-hidden">
+                <div class="card card-flush mt-2 flex-row-fluid overflow-hidden">
                     <div class="card-body pt-0">
                         <div class="table-responsive">
                             <table id="variant_datatable_${id}" class="table align-middle table-row-dashed fs-6 gy-5">

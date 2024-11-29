@@ -300,9 +300,7 @@ var KTDatatablesServerSide = function () {
     // Delete customer
     var handleDeleteRows = () => {
         // Select all delete buttons
-        console.log("delete_row");
         const deleteButtons = document.querySelectorAll('[data-kt-docs-table-filter="delete_row"]');
-        console.log(deleteButtons);
         deleteButtons.forEach(d => {
             // Delete button on click
             d.addEventListener('click', function (e) {
@@ -1004,7 +1002,7 @@ var KTDatatablesServerSide = function () {
             div.className = `tab-pane fade ${isActive ? 'show active' : ''}`;
             div.id = id;
             div.innerHTML = `
-                <div class="card card-flush py-4 flex-row-fluid overflow-hidden">
+                <div class="card card-flush mt-2 flex-row-fluid overflow-hidden">
                     <div class="card-body pt-0">
                         <div class="table-responsive">
                             <table id="variant_datatable_${id}" class="table align-middle table-row-dashed fs-6 gy-5">

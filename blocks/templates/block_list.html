@@ -283,71 +283,53 @@
             <!--end::Modal header-->
             <!--begin::Modal body-->
             <div class="modal-body scroll-y m-5">
-                <div class="row">
-                    <div class="col-3">
-                        <!--begin::Order summary-->
-                        <div class="d-flex flex-column flex-xl-row gap-7 gap-lg-10">
-                            <!--begin::Order details-->
-                            <div class="card card-flush py-4 flex-row-fluid">
-                                <!--begin::Card header-->
-                                <div class="card-header">
-                                    <div class="card-title">
-                                        <h2>Block Details</h2>
-                                    </div>
+
+                <div class="d-flex flex-column">
+                    <div class="d-flex flex-wrap flex-stack gap-5 gap-lg-10">
+                        <ul class="nav nav-custom nav-tabs nav-line-tabs nav-line-tabs-2x border-0 fs-4 fw-semibold mb-lg-n2 me-auto" id="variantTabList">
+
+                        </ul>
+                    </div>
+
+                    <div class="d-flex flex-column">
+                        <div class="card card-flush flex-row-fluid">
+                            <div class="card-header">
+                                <div class="card-title">
+                                    <h2>Block Details</h2>
                                 </div>
-                                <!--end::Card header-->
-                                <!--begin::Card body-->
-                                <div class="card-body pt-0">
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <div class="fv-row mb-8">
-                                                <label class="d-flex align-items-center fs-6 fw-semibold form-label mb-2">
-                                                    <span>Block Name</span>
-                                                </label>
-                                                <input type="text" class="form-control form-control-solid" name="block_name" />
+                            </div>
+                            <div class="card-body pt-0">
+                                <div class="row border border-dashed rounded p-2">
+                                    <div class="col-12">
+                                        <div class="row">
+                                            <div class="col-4">
+                                                <input type="text" class="form-control" name="block_name" disabled/>
                                             </div>
-                                            <div class="fv-row mb-8">
-                                                <label class="d-flex align-items-center fs-6 fw-semibold form-label mb-2">
-                                                    <span>Body Site</span>
-                                                </label>
-                                                <input type="text" class="form-control form-control-solid" name="body_site" />
+                                            <div class="col-4">
+                                                <input type="text" class="form-control" name="body_site" disabled/>
                                             </div>
-                                            <div class="fv-row mb-8">
-                                                <label class="fs-6 fw-semibold mb-2">Diagnosis</label>
-                                                <textarea class="form-control form-control-solid" rows="3" name="diagnosis"></textarea>
+                                            <div class="col-4">
+                                                <div class="text-muted fw-semibold fs-4 pt-4">If you need more info, please view
+                                                    <a href="javascript:;" target="_blank" class="link-primary" name="he_image"> HE Image</a>
+                                                </div>
                                             </div>
-                                            <div class="text-muted fw-semibold fs-4">If you need more info, please view
-                                            <a href="javascript:;" target="_blank" class="link-primary" name="he_image">HE Image</a></div>
+                                        </div>
+                                        <div class="row mt-2">
+                                            <div class="col-12">
+                                                <textarea class="form-control" rows="3" name="diagnosis" disabled></textarea>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                <!--end::Card body-->
                             </div>
-                            <!--end::Order details-->
-
                         </div>
-                        <!--end::Order summary-->
                     </div>
-                    <div class="col-9">
-                        <!--begin::Order details page-->
-                        <div class="d-flex flex-column gap-7 gap-lg-10">
-                            <div class="d-flex flex-wrap flex-stack gap-5 gap-lg-10">
-                                <!--begin:::Tabs-->
-                                <ul class="nav nav-custom nav-tabs nav-line-tabs nav-line-tabs-2x border-0 fs-4 fw-semibold mb-lg-n2 me-auto" id="variantTabList">
 
-                                </ul>
-                                <!--end:::Tabs-->
-                            </div>
-                            <!--begin::Tab content-->
-                            <div class="tab-content" id="variantTabContent">
+                    <div class="tab-content" id="variantTabContent">
 
-                            </div>
-                            <!--end::Tab content-->
-                        </div>
-                        <!--end::Order details page-->
                     </div>
+
                 </div>
-
 
             </div>
             <!--end::Modal body-->
