@@ -4,7 +4,7 @@ from .models import Patients
 class PatientForm(forms.ModelForm):
     class Meta:
         model = Patients
-        fields = ('pat_id', 'dob', 'sex', 'race', 'source', 'notes',)
+        fields = ('pat_id', 'dob', 'sex', 'race', 'source', 'notes', 'consent')
 
 
 class FilterForm(forms.Form):
