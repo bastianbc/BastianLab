@@ -5,17 +5,33 @@ from areas.models import Areas
 from blocks.models import Blocks
 
 class VariantSerializer(serializers.ModelSerializer):
+    DT_RowId = serializers.SerializerMethodField()
+    patient = serializers.SerializerMethodField()
     block = serializers.SerializerMethodField()
     area = serializers.SerializerMethodField()
-    ref = serializers.SerializerMethodField()
-    pos = serializers.SerializerMethodField()
-    alt = serializers.SerializerMethodField()
     gene = serializers.SerializerMethodField()
+    p_variant = serializers.SerializerMethodField()
+    c_variant = serializers.SerializerMethodField()
+    g_variant = serializers.SerializerMethodField()
     sample_lib = serializers.SerializerMethodField()
+    sequencing_run = serializers.SerializerMethodField()
 
     class Meta:
         model = VariantCall
-        fields = ("id", "sample_lib", "sequencing_run", "block", "area", "ref", "pos", "alt", "gene",)
+        fields = ("id", "patient", "sample_lib", "sequencing_run", "block", "area", "gene", "p_variant", "c_variant", "g_variant", "DT_RowId",)
+
+    def get_DT_RowId(self, obj):
+       return getattr(obj, 'id')
+
+    def get_patient(self,obj):
+        block = Blocks.objects.filter(block_area_links__area__area_na_links__nucacid__na_sl_links__sample_lib=obj.sample_lib).first()
+        return block.name if block else None
+
+    def get_sample_lib(self,obj):
+        return obj.sample_lib.name
+
+    def get_sequencing_run(self,obj):
+        return obj.sequencing_run.name
 
     def get_block(self,obj):
         return Blocks.objects.filter(block_area_links__area__area_na_links__nucacid__na_sl_links__sample_lib=obj.sample_lib).first()
@@ -23,29 +39,26 @@ class VariantSerializer(serializers.ModelSerializer):
     def get_area(self,obj):
         return Areas.objects.filter(block__block_area_links__area__area_na_links__nucacid__na_sl_links__sample_lib=obj.sample_lib).first()
 
-    def get_ref(self,obj):
+    def get_p_variant(self,obj):
         try:
-            return PVariant.objects.get(c_variant__g_variant__variant_call=obj).ref
+            return PVariant.objects.get(c_variant__g_variant__variant_call=obj).id
         except Exception as e:
             return None
 
-    def get_pos(self,obj):
+    def get_c_variant(self,obj):
         try:
-            return PVariant.objects.get(c_variant__g_variant__variant_call=obj).pos
+            return CVariant.objects.get(g_variant__variant_call=obj).id
         except Exception as e:
             return None
 
-    def get_alt(self,obj):
+    def get_g_variant(self,obj):
         try:
-            return PVariant.objects.get(c_variant__g_variant__variant_call=obj).alt
+            return PVariant.objects.get(c_variant__g_variant__variant_call=obj).id
         except Exception as e:
             return None
 
     def get_gene(self,obj):
         try:
-            return CVariant.objects.get(g_variant__variant_call=obj).gene
+            return CVariant.objects.get(g_variant__variant_call=obj).gene.name
         except Exception as e:
             return None
-
-    def get_sample_lib(self,obj):
-        return obj.sample_lib.name

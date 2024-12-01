@@ -44,6 +44,9 @@
       <div class="px-7 py-5">
         <!--begin::Input group-->
         <div class="mb-10">
+            <div class="row mb-2">
+              <div class="col-sm-12">{{ filter.patient|as_crispy_field }}</div>
+            </div>
           <!--begin::Options-->
           <div class="row mb-2">
             <div class="col-sm-12">{{ filter.sample_lib|as_crispy_field }}</div>
@@ -155,14 +158,15 @@
                 <input class="form-check-input" type="checkbox" data-kt-check="true" data-kt-check-target=".table .form-check-input" value="1"/>
             </div>
         </th>
+        <th>Patient</th>
         <th>Sample Library</th>
         <th>Sequencing Run</th>
         <th>Block</th>
         <th>Area</th>
-        <th>Ref</th>
-        <th>Pos</th>
-        <th>Alt</th>
         <th>Gene</th>
+        <th>pVariant</th>
+        <th>cVariant</th>
+        <th>gVariant</th>
         <th class="text-end min-w-100px">Actions</th>
     </tr>
     {% csrf_token %}

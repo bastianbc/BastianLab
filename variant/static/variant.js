@@ -10,7 +10,7 @@ var KTDatatablesServerSide = function () {
     var selectedRows = [];
 
     // Private functions
-    var initDatatable = function ( initialValue ) {
+    var initDatatable = function ( initialValue, filterPatient=null, filterSampleLib=null, filterArea=null, filterBlock=null ) {
 
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
 
@@ -35,6 +35,12 @@ var KTDatatablesServerSide = function () {
             ajax: {
               url: '/variant/filter_variants',
               type: 'GET',
+              data:{
+                "patient": filterPatient,
+                "sample_lib": filterSampleLib,
+                "area": filterArea,
+                "block": filterBlock,
+              },
               error: function (xhr, ajaxOptions, thrownError) {
                   if (xhr.status == 403) {
 
@@ -53,14 +59,15 @@ var KTDatatablesServerSide = function () {
             },
             columns: [
                 { data: 'id' },
+                { data: 'patient' },
                 { data: 'sample_lib' },
                 { data: 'sequencing_run' },
                 { data: 'block' },
                 { data: 'area' },
-                { data: 'ref' },
-                { data: 'pos' },
-                { data: 'alt' },
                 { data: 'gene' },
+                { data: 'p_variant' },
+                { data: 'c_variant' },
+                { data: 'g_variant' },
                 { data: null },
             ],
             columnDefs: [
@@ -75,20 +82,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 8,
-                    className: 'text-center',
-                    orderable: false,
-                    render: function (data, type, row) {
-                        if (data > 0) {
-                          let id = row["id"];
-                          return `
-                              <a href="javascript:;" class="detail-link">${data}</a>`;
-                        }
-                        return data;
-                    }
-                },
-                {
-                    targets: 9,
+                    targets: 10,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -111,14 +105,6 @@ var KTDatatablesServerSide = function () {
                                 <div class="menu-item px-3">
                                     <a href="#" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
                                         Edit
-                                    </a>
-                                </div>
-                                <!--end::Menu item-->
-
-                                <!--begin::Menu item-->
-                                <div class="menu-item px-2">
-                                    <a href="javascript:;" class="menu-link px-3 detail-link" data-kt-docs-table-filter="detail_row">
-                                        Used Library(s)
                                     </a>
                                 </div>
                                 <!--end::Menu item-->
@@ -209,30 +195,21 @@ var KTDatatablesServerSide = function () {
 
     // Filter Datatable
     var handleFilterDatatable = () => {
-        // Select filter options
-        filterPayment = document.querySelectorAll('[data-kt-docs-table-filter="payment_type"] [name="payment_type"]');
+
         const filterButton = document.querySelector('[data-kt-docs-table-filter="filter"]');
 
         // Filter datatable on submit
         filterButton.addEventListener('click', function () {
-            // Get filter values
-            let paymentValue = '';
 
-            // Get payment value
-            filterPayment.forEach(r => {
-                if (r.checked) {
-                    paymentValue = r.value;
-                }
+          var patient = document.getElementById("id_patient").value;
+          var sampleLib = document.getElementById("id_sample_lib").value;
+          var area = document.getElementById("id_area").value;
+          var block = document.getElementById("id_block").value;
 
-                // Reset payment value if "All" is selected
-                if (paymentValue === 'all') {
-                    paymentValue = '';
-                }
-            });
+          initDatatable(null,patient,sampleLib,area,block)
 
-            // Filter datatable --- official docs reference: https://datatables.net/reference/api/search()
-            dt.search(paymentValue).draw();
         });
+
     }
 
     // Delete customer
@@ -361,8 +338,11 @@ var KTDatatablesServerSide = function () {
 
         // Reset datatable
         resetButton.addEventListener('click', function () {
-            // Reset payment type
-            filterPayment[0].checked = true;
+
+            document.getElementById("id_patient").value = "";
+            document.getElementById("id_sample_lib").value = "";
+            document.getElementById("id_area").value = "";
+            document.getElementById("id_block").value = "";
 
             // Reset datatable --- official docs reference: https://datatables.net/reference/api/search()
             dt.search('').draw();

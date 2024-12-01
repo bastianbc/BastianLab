@@ -2,7 +2,6 @@ from django.db import models
 from django.db.models import Q, Count
 from datetime import datetime
 
-
 class VariantCall(models.Model):
     sample_lib = models.ForeignKey("samplelib.SampleLib", on_delete=models.CASCADE, related_name="variant_calls", blank=True, null=True)
     sequencing_run = models.ForeignKey("sequencingrun.SequencingRun", on_delete=models.CASCADE, related_name="variant_calls", blank=True, null=True)
@@ -36,9 +35,6 @@ class VariantCall(models.Model):
         try:
             ORDER_COLUMN_CHOICES = {
                 "0": "id",
-                "1": "ref",
-                "2": "pos",
-                "3": "alt",
             }
             draw = int(kwargs.get('draw', None)[0])
             length = int(kwargs.get('length', None)[0])
@@ -46,6 +42,10 @@ class VariantCall(models.Model):
             search_value = kwargs.get('search[value]', None)[0]
             order_column = kwargs.get('order[0][column]', None)[0]
             order = kwargs.get('order[0][dir]', None)[0]
+            patient_name = kwargs.get('patient', None)[0]
+            sample_lib_name = kwargs.get('sample_lib', None)[0]
+            block_name = kwargs.get('block', None)[0]
+            area_name = kwargs.get('area', None)[0]
 
             order_column = ORDER_COLUMN_CHOICES[order_column]
             # django orm '-' -> desc
@@ -58,6 +58,18 @@ class VariantCall(models.Model):
 
             is_initial = _is_initial_value(search_value)
             search_value = _parse_value(search_value)
+
+            if sample_lib_name:
+                queryset = queryset.filter(Q(sample_lib__name__icontains=sample_lib_name))
+
+            if area_name:
+                queryset = queryset.filter(Q(sample_lib__na_sl_links__nucacid__area_na_links__area__name__icontains=block_name))
+
+            if block_name:
+                queryset = queryset.filter(Q(sample_lib__na_sl_links__nucacid__area_na_links__area__block_area_links__block__name__icontains=block_name))
+
+            if patient_name:
+                queryset = queryset.filter(Q(sample_lib__na_sl_links__nucacid__area_na_links__area__block_area_links__block__patient__name__icontains=patient_name))
 
             if is_initial:
                 # filter = [sequencing_run.id for sequencing_run in SequencingRun.objects.filter(id=search_value)]
@@ -98,7 +110,7 @@ class GVariant(models.Model):
 
 class CVariant(models.Model):
     g_variant = models.ForeignKey(GVariant, on_delete=models.CASCADE, related_name="c_variants", blank=True, null=True)
-    gene = models.CharField(max_length=100, blank=True, null=True)
+    gene = models.ForeignKey("gene.Gene", on_delete=models.CASCADE, related_name="c_variants")
     nm_id = models.CharField(max_length=100, blank=True, null=True) # add table
     c_var = models.CharField(max_length=100, blank=True, null=True)
     exon = models.CharField(max_length=100, blank=True, null=True) # add table
@@ -118,7 +130,6 @@ class PVariant(models.Model):
 
     class Meta:
         db_table = "p_variant"
-
 
 class VariantFile(models.Model):
     name = models.CharField(max_length=150, blank=True, null=True)
