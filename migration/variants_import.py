@@ -366,7 +366,7 @@ def import_variants():
     for file in files:
         file_path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA,file.directory)
         if "_Filtered" in os.path.join(file_path, file.name):
-            variant_file_parser(os.path.join(file_path,file.name), "AR_ALL")
+            find_and_match_genes(os.path.join(file_path,file.name), "AR_ALL") #TODO change here
 
 
 def create_genes(row):
