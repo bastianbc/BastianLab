@@ -150,7 +150,7 @@ def get_variant_file(file_path):
 def get_gene(name):
     logger.debug(f"Getting gene: {name}")
     try:
-        gene = Gene.objects.get(name=name)
+        gene = Gene.objects.filter(name=name).first()
         logger.info(f"Found gene: {name}")
         return gene
     except ObjectDoesNotExist:
@@ -360,33 +360,14 @@ def create_variant_file(row):
 
 # Parse and save data into the database
 def import_variants():
-    files = VariantFile.objects.filter(call=False)
-    print(len(files))
+    files = VariantFile.objects.filter().update(call=False)
+    files = VariantFile.objects.filter()
+    VariantCall.objects.filter().delete()
     for file in files:
         file_path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA,file.directory)
         if "_Filtered" in os.path.join(file_path, file.name):
             variant_file_parser(os.path.join(file_path,file.name), "AR_ALL")
-    # SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
-    # file_path = os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "VariantFiles")
-    #
-    # files = os.listdir(file_path)
 
-    # for file in files:
-    #     if "_Filtered" in os.path.join(file_path,file):
-    #         variant_file_parser(os.path.join(file_path,file), "AR_ALL")
-
-
-# Parse and save data into the database
-def import_BCB002_test():
-    file = Path(Path(__file__).parent.parent / "uploads" / "variant_files_df.csv")
-    df = pd.read_csv(file)
-    VariantCall.objects.filter(variant_file__name="BCB006.NMLP-034.FB_Final.annovar.hg19_multianno_Filtered.txt").delete()
-    VariantFile.objects.filter(name="BCB006.NMLP-034.FB_Final.annovar.hg19_multianno_Filtered.txt").update(call=False)
-    SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
-    file_path = os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "VariantFiles")
-
-    variant_file_parser(os.path.join(file_path,"BCB006.NMLP-034.FB_Final.annovar.hg19_multianno_Filtered.txt"), "AR_ALL")
-    print("end"*100)
 
 def create_genes(row):
     gene = Gene.objects.create(
@@ -407,6 +388,6 @@ def import_genes():
 
 if __name__ == "__main__":
     print("start")
-    import_genes()
+    import_variants()
     print("end")
 
