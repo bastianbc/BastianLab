@@ -56,4 +56,5 @@ urlpatterns = [
     path('find_path_seq_run_for_file_sets', views.find_path_seq_run_for_file_sets, name='find_path_seq_run_for_file_sets'),
     path('register_new_fastq_files', views.register_new_fastq_files, name='register_new_fastq_files'),
     path('call_import_variants', views.call_import_variants, name='call_import_variants'),
+    path('import_genes', views.import_genes, name='import_genes'),
 ]

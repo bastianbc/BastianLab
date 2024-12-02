@@ -13,6 +13,8 @@ from samplelib.models import SampleLib
 import re
 import logging
 from pathlib import Path
+from gene.models import Gene
+
 
 logger = logging.getLogger("file")
 
@@ -145,6 +147,16 @@ def get_variant_file(file_path):
         logger.error(f"Variant file not found: {file_path}")
         return None
 
+def get_gene(name):
+    logger.debug(f"Getting gene: {name}")
+    try:
+        gene = Gene.objects.get(name=name)
+        logger.info(f"Found gene: {name}")
+        return gene
+    except ObjectDoesNotExist:
+        logger.error(f"Gene not found: {name}")
+        return None
+
 def check_required_fields(row):
     logger.debug("Checking required fields in row")
     required_fields = ['Chr', 'Start', 'End', 'Ref', 'Alt', 'Depth',
@@ -164,7 +176,7 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail):
         try:
             logger.debug(f"Processing entry: {entry}")
             gene, nm_id, exon, c_var, p_var = entry.split(':')
-
+            gene = get_gene(gene)
             # Create CVariant instance
             c_variant = CVariant.objects.create(
                 g_variant=g_variant,
@@ -376,10 +388,23 @@ def import_BCB002_test():
     variant_file_parser(os.path.join(file_path,"BCB006.NMLP-034.FB_Final.annovar.hg19_multianno_Filtered.txt"), "AR_ALL")
     print("end"*100)
 
+def create_genes(row):
+    gene = Gene.objects.create(
+        name = row['Symbol'],
+        chr = str(row['chromosome']),
+        start = int(row['start_position_on_the_genomic_accession']) if not pd.isnull(row['start_position_on_the_genomic_accession']) else 0,
+        end = int(row['end_position_on_the_genomic_accession']) if not pd.isnull(row['end_position_on_the_genomic_accession']) else 0,
+    )
+    print("Gene: ", gene.name)
 
+def import_genes():
+    Gene.objects.filter(id__gt=1).delete()
+    file = Path(Path(__file__).parent.parent / "uploads" / "gene_result.txt")
+    df = pd.read_csv(file, sep='\t')
+    df = df.reset_index()
+    df.apply(create_genes, axis=1)
 
 if __name__ == "__main__":
-    # import_variants()
     print("start")
-    import_variants()
+    import_genes()
     print("end")
