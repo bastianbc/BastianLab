@@ -360,7 +360,7 @@ def create_variant_file(row):
 
 # Parse and save data into the database
 def import_variants():
-    files = VariantFile.objects.filter().update(call=False)
+    VariantFile.objects.filter().update(call=False)
     files = VariantFile.objects.filter()
     VariantCall.objects.filter().delete()
     for file in files:
@@ -385,6 +385,167 @@ def import_genes():
     df = pd.read_csv(file, sep='\t')
     df = df.reset_index()
     df.apply(create_genes, axis=1)
+
+
+@transaction.atomic
+def find_and_match_genes(file_path, analysis_run_name):
+    logger.info(f"Starting variant file parser for {file_path}")
+    logger.info(f"Analysis run name: {analysis_run_name}")
+
+    # File check
+    is_valid, error_msg = check_file(file_path)
+    if not is_valid:
+        logger.error(f"File validation failed: {error_msg}")
+        return False, error_msg, {}
+
+    try:
+        # Read file
+        logger.debug("Reading file with pandas")
+        df = pd.read_csv(file_path, sep='\t')
+        if df.empty:
+            logger.error(f"File is empty {file_path}")
+            return False, "File is empty", {}
+
+        filename = os.path.basename(file_path)
+        logger.debug(f"Processing filename: {filename}")
+
+        # Sample library check
+        sample_lib = get_sample_lib(filename)
+        if not sample_lib:
+            logger.error(f"Sample library not found: {filename}")
+            return False, f"Sample library not found: {filename}", {}
+
+        analysis_run = get_analysis_run(analysis_run_name)
+        if not analysis_run:
+            logger.error(f"Analysis run not found: {analysis_run_name}")
+            return False, f"Analysis run not found: {analysis_run_name}", {}
+
+        variant_file = get_variant_file(file_path)
+        if variant_file.call:
+            return
+
+        if not variant_file:
+            logger.error(f"Variant file not found: {file_path}")
+            return False, f"Variant file not found: {file_path}", {}
+
+        stats = {
+            "total_rows": len(df),
+            "successful": 0,
+            "failed": 0,
+            "errors": []
+        }
+        logger.info(f"Starting to process {stats['total_rows']} rows")
+
+        # Process each row
+        for index, row in df.iterrows():
+            logger.debug(f"Processing row {index + 1}")
+            try:
+                # Check required fields
+                fields_valid, field_error = check_required_fields(row)
+                if not fields_valid:
+                    logger.error(f"Row {index + 1}: {field_error}")
+                    stats["errors"].append(f"Row {index + 1}: {field_error}")
+                    stats["failed"] += 1
+                    continue
+
+                # Caller check
+                caller = get_caller(filename)
+                if not caller:
+                    logger.error(f"Row {index + 1}: Could not determine caller")
+                    stats["errors"].append(f"Row {index + 1}: Could not determine caller")
+                    stats["failed"] += 1
+                    continue
+
+                with transaction.atomic():
+                    logger.debug(f"Creating VariantCall for row {index + 1}")
+                    variant_call = VariantCall.objects.get(
+                        analysis_run=analysis_run,
+                        sample_lib=sample_lib,
+                        sequencing_run=get_sequencing_run(filename),
+                        variant_file=variant_file,
+                        coverage=row['Depth'],
+                        caller=caller,
+                        normal_sl=get_normal_sample_lib(sample_lib),
+                        label="",
+                        ref_read=row['Ref_reads'],
+                        alt_read=row['Alt_reads'],
+                    )
+                    g_variant = GVariant.objects.get(
+                        variant_call=variant_call,
+                        hg=get_hg(filename),
+                        chrom=row['Chr'],
+                        start=row['Start'],
+                        end=row['End'],
+                        ref=row['Ref'][:99],
+                        alt=row['Alt'][:99],
+                        avsnp150=row.get('avsnp150', '')
+                    )
+                    logger.debug(f"Creating GVariant for row {index + 1}")
+
+                    logger.debug(f"Creating C and P variants for row {index + 1}")
+
+                    def _create_c_and_p_variants(g_variant, aachange, func, gene_detail):
+                        logger.debug(f"Creating C and P variants for aachange: {aachange}")
+                        entries = aachange.split(',')
+                        for entry in entries:
+                            try:
+                                logger.debug(f"Processing entry: {entry}")
+                                gene, nm_id, exon, c_var, p_var = entry.split(':')
+                                gene = get_gene(gene)
+                                # Create CVariant instance
+                                c_variant = CVariant.objects.get(
+                                    g_variant=g_variant,
+                                    nm_id=nm_id,
+                                    exon=exon,
+                                    c_var=c_var,
+                                    func=func,
+                                    gene_detail=gene_detail
+                                )
+                                c_variant.gene = gene
+                                c_variant.save()
+                                logger.info(f"Created CVariant: {c_variant}")
+                                print("Gene_saved")
+                            except Exception as e:
+                                logger.error(f"Error processing AAChange entry '{entry}': {str(e)}")
+
+                    _create_c_and_p_variants(
+                        g_variant=g_variant,
+                        aachange=row['AAChange.refGene'],
+                        func=row['Func.refGene'],
+                        gene_detail=row.get('GeneDetail.refGene', '')
+                    )
+
+                    stats["successful"] += 1
+                    logger.info(f"Successfully processed row {index + 1}")
+
+            except Exception as e:
+                logger.error(f"Error processing row {index + 1}: {str(e)}", exc_info=True)
+                stats["errors"].append(f"Row {index + 1}: {str(e)}")
+                stats["failed"] += 1
+
+        # Create result message
+        if stats["failed"] == stats["total_rows"]:
+            logger.error("No variants could be processed")
+            return False, "No variants could be processed", stats
+        elif stats["failed"] > 0:
+            variant_file.call = True
+            variant_file.save()
+            logger.warning(
+                f"{stats['successful']} variants processed successfully, {stats['failed']} variants failed")
+            return True, f"{stats['successful']} variants processed successfully, {stats['failed']} variants failed", stats
+        else:
+            variant_file.call = True
+            variant_file.save()
+            logger.info("All variants processed successfully")
+            return True, "All variants processed successfully", stats
+
+    except Exception as e:
+        logger.critical(f"Critical error in variant file parser: {str(e)}", exc_info=True)
+        return False, f"Critical error: {str(e)}", {}
+
+
+
+
 
 if __name__ == "__main__":
     print("start")
