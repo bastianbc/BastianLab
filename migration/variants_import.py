@@ -379,7 +379,7 @@ def create_genes(row):
     print("Gene: ", gene.name)
 
 def import_genes():
-    Gene.objects.filter(id__gt=1).delete()
+    # Gene.objects.filter(id__gt=1).delete()
     SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
     file = os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "gene_result.txt")
     df = pd.read_csv(file, sep='\t')
