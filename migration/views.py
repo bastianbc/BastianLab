@@ -3840,6 +3840,7 @@ def call_import_variants(request):
     import_genes()
 
 
+
 def import_genes(request):
     file = Path(Path(__file__).parent.parent / "uploads" / "gene_result.txt")
     df = pd.read_csv(file, sep='\t')
