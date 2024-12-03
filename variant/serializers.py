@@ -41,20 +41,24 @@ class VariantSerializer(serializers.ModelSerializer):
 
     def get_p_variant(self,obj):
         try:
-            return PVariant.objects.get(c_variant__g_variant__variant_call=obj).id
+            p_variant = PVariant.objects.get(c_variant__g_variant__variant_call=obj)
+            return f"p.{p_variant.change_type}-{p_variant.start}-{p_variant.end}" # TODO: format as expected
         except Exception as e:
             return None
 
     def get_c_variant(self,obj):
         try:
-            return CVariant.objects.get(g_variant__variant_call=obj).id
+            c_variant = CVariant.objects.get(g_variant__variant_call=obj)
+            return f"{c_variant.c_var}-{c_variant.nm_id}" # TODO: format as expected
         except Exception as e:
             return None
 
     def get_g_variant(self,obj):
         try:
-            return PVariant.objects.get(c_variant__g_variant__variant_call=obj).id
+            g_variant = GVariant.objects.get(variant_call=obj)
+            return f"{g_variant.chrom}-{g_variant.start}-{g_variant.end}-{g_variant.avsnp150}" # TODO: format as expected
         except Exception as e:
+            print(str(e))
             return None
 
     def get_gene(self,obj):
