@@ -13,6 +13,8 @@ from samplelib.models import SampleLib
 import re
 import logging
 from pathlib import Path
+from gene.models import Gene
+
 
 logger = logging.getLogger("file")
 
@@ -41,15 +43,25 @@ def get_caller(filename):
 
 def parse_p_var(p_var):
     logger.debug(f"Parsing p_var: {p_var}")
-    if not p_var or p_var.endswith("?") or p_var.endswith("*"):
+    if not p_var or p_var.endswith("?"):
         logger.debug("p_var is empty")
         return None
+    if "delins" in p_var and p_var.endswith("*"):
+        match = re.match(r'p\.\*(\d+)(delins)([A-Z]+)\*', p_var)
+        result = (match.group(1), match.group(2), match.group(3))
+        logger.debug(f"Parsed p_var successfully: {result}")
+        return result
+    if "delins" not in p_var and p_var.endswith("*"):
+        match = re.match(r'p\.([A-Za-z])(\d+)(\*)', p_var)
+        result = (match.group(1), match.group(2), match.group(3))
+        logger.debug(f"Parsed p_var successfully: {result}")
+        return result
     match = re.match(r'p\.([A-Za-z])(\d+)([A-Za-z])', p_var)
     if match:
         result = (match.group(1), match.group(2), match.group(3))
         logger.debug(f"Parsed p_var successfully: {result}")
         return result
-    match2 = re.match(r'p\.([A-Za-z]+)?(\d+)_?([A-Za-z]*)?(\d+)?(delins)?([A-Za-z]*)?', p_var)
+    match2 = re.match(r'p\.([A-Za-z]+)?(\d+)_?([A-Za-z]*)?(\d+)?([A-Za-z]*)?', p_var)
     if match2:
         result = (match2.group(1), match2.group(2), match2.group(3), match2.group(4), match2.group(5), match2.group(6))
         logger.debug(f"Parsed p_var successfully: {result}")
@@ -145,6 +157,18 @@ def get_variant_file(file_path):
         logger.error(f"Variant file not found: {file_path}")
         return None
 
+def get_gene(name):
+    logger.debug(f"Getting gene: {name}")
+    try:
+        if "NOTCH2NL" in name:
+            return Gene.objects.filter(name__icontains="NOTCH2NL").first()
+        gene = Gene.objects.filter(name=name).first()
+        logger.info(f"Found gene: {name}")
+        return gene
+    except ObjectDoesNotExist:
+        logger.error(f"Gene not found: {name}")
+        return None
+
 def check_required_fields(row):
     logger.debug("Checking required fields in row")
     required_fields = ['Chr', 'Start', 'End', 'Ref', 'Alt', 'Depth',
@@ -164,7 +188,7 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail):
         try:
             logger.debug(f"Processing entry: {entry}")
             gene, nm_id, exon, c_var, p_var = entry.split(':')
-
+            gene = get_gene(gene)
             # Create CVariant instance
             c_variant = CVariant.objects.create(
                 g_variant=g_variant,
@@ -189,7 +213,7 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail):
                         end=p_pos,
                         reference_residues=p_ref,
                         inserted_residues=p_alt,
-                        change_type=""
+                        change_type="delins" if "delins" in p_var else ""
                     )
                 else:
                     start_AA, start, end_AA, end, modification_type, inserted_sequence = parse_p_var(p_var)
@@ -348,38 +372,195 @@ def create_variant_file(row):
 
 # Parse and save data into the database
 def import_variants():
-    files = VariantFile.objects.filter(call=False)
-    print(len(files))
+    VariantFile.objects.filter().update(call=False)
+    files = VariantFile.objects.filter()
+    VariantCall.objects.filter().delete()
     for file in files:
         file_path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA,file.directory)
         if "_Filtered" in os.path.join(file_path, file.name):
             variant_file_parser(os.path.join(file_path,file.name), "AR_ALL")
-    # SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
-    # file_path = os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "VariantFiles")
-    #
-    # files = os.listdir(file_path)
-
-    # for file in files:
-    #     if "_Filtered" in os.path.join(file_path,file):
-    #         variant_file_parser(os.path.join(file_path,file), "AR_ALL")
 
 
-# Parse and save data into the database
-def import_BCB002_test():
-    file = Path(Path(__file__).parent.parent / "uploads" / "variant_files_df.csv")
-    df = pd.read_csv(file)
-    VariantCall.objects.filter(variant_file__name="BCB006.NMLP-034.FB_Final.annovar.hg19_multianno_Filtered.txt").delete()
-    VariantFile.objects.filter(name="BCB006.NMLP-034.FB_Final.annovar.hg19_multianno_Filtered.txt").update(call=False)
+def create_genes(row):
+    gene = Gene.objects.create(
+        name = row['Symbol'],
+        chr = str(row['chromosome']),
+        start = int(row['start_position_on_the_genomic_accession']) if not pd.isnull(row['start_position_on_the_genomic_accession']) else 0,
+        end = int(row['end_position_on_the_genomic_accession']) if not pd.isnull(row['end_position_on_the_genomic_accession']) else 0,
+    )
+    print("Gene: ", gene.name)
+
+def import_genes():
+    # Gene.objects.filter(id__gt=1).delete()
     SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
-    file_path = os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "VariantFiles")
+    file = os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "gene_result.txt")
+    df = pd.read_csv(file, sep='\t')
+    df = df.reset_index()
+    df.apply(create_genes, axis=1)
 
-    variant_file_parser(os.path.join(file_path,"BCB006.NMLP-034.FB_Final.annovar.hg19_multianno_Filtered.txt"), "AR_ALL")
-    print("end"*100)
+
+@transaction.atomic
+def find_and_match_genes(file_path, analysis_run_name):
+    logger.info(f"Starting variant file parser for {file_path}")
+    logger.info(f"Analysis run name: {analysis_run_name}")
+
+    # File check
+    is_valid, error_msg = check_file(file_path)
+    if not is_valid:
+        logger.error(f"File validation failed: {error_msg}")
+        return False, error_msg, {}
+
+    try:
+        # Read file
+        logger.debug("Reading file with pandas")
+        df = pd.read_csv(file_path, sep='\t')
+        if df.empty:
+            logger.error(f"File is empty {file_path}")
+            return False, "File is empty", {}
+
+        filename = os.path.basename(file_path)
+        logger.debug(f"Processing filename: {filename}")
+
+        # Sample library check
+        sample_lib = get_sample_lib(filename)
+        if not sample_lib:
+            logger.error(f"Sample library not found: {filename}")
+            return False, f"Sample library not found: {filename}", {}
+
+        analysis_run = get_analysis_run(analysis_run_name)
+        if not analysis_run:
+            logger.error(f"Analysis run not found: {analysis_run_name}")
+            return False, f"Analysis run not found: {analysis_run_name}", {}
+
+        variant_file = get_variant_file(file_path)
+        if variant_file.call:
+            return
+
+        if not variant_file:
+            logger.error(f"Variant file not found: {file_path}")
+            return False, f"Variant file not found: {file_path}", {}
+
+        stats = {
+            "total_rows": len(df),
+            "successful": 0,
+            "failed": 0,
+            "errors": []
+        }
+        logger.info(f"Starting to process {stats['total_rows']} rows")
+
+        # Process each row
+        for index, row in df.iterrows():
+            logger.debug(f"Processing row {index + 1}")
+            try:
+                # Check required fields
+                fields_valid, field_error = check_required_fields(row)
+                if not fields_valid:
+                    logger.error(f"Row {index + 1}: {field_error}")
+                    stats["errors"].append(f"Row {index + 1}: {field_error}")
+                    stats["failed"] += 1
+                    continue
+
+                # Caller check
+                caller = get_caller(filename)
+                if not caller:
+                    logger.error(f"Row {index + 1}: Could not determine caller")
+                    stats["errors"].append(f"Row {index + 1}: Could not determine caller")
+                    stats["failed"] += 1
+                    continue
+
+                with transaction.atomic():
+                    logger.debug(f"Creating VariantCall for row {index + 1}")
+                    variant_call = VariantCall.objects.get(
+                        analysis_run=analysis_run,
+                        sample_lib=sample_lib,
+                        sequencing_run=get_sequencing_run(filename),
+                        variant_file=variant_file,
+                        coverage=row['Depth'],
+                        caller=caller,
+                        normal_sl=get_normal_sample_lib(sample_lib),
+                        label="",
+                        ref_read=row['Ref_reads'],
+                        alt_read=row['Alt_reads'],
+                    )
+                    g_variant = GVariant.objects.get(
+                        variant_call=variant_call,
+                        hg=get_hg(filename),
+                        chrom=row['Chr'],
+                        start=row['Start'],
+                        end=row['End'],
+                        ref=row['Ref'][:99],
+                        alt=row['Alt'][:99],
+                        avsnp150=row.get('avsnp150', '')
+                    )
+                    logger.debug(f"Creating GVariant for row {index + 1}")
+
+                    logger.debug(f"Creating C and P variants for row {index + 1}")
+
+                    def _create_c_and_p_variants(g_variant, aachange, func, gene_detail):
+                        logger.debug(f"Creating C and P variants for aachange: {aachange}")
+                        entries = aachange.split(',')
+                        for entry in entries:
+                            try:
+                                logger.debug(f"Processing entry: {entry}")
+                                gene, nm_id, exon, c_var, p_var = entry.split(':')
+                                gene = get_gene(gene)
+                                # Create CVariant instance
+                                c_variant = CVariant.objects.get(
+                                    g_variant=g_variant,
+                                    nm_id=nm_id,
+                                    exon=exon,
+                                    c_var=c_var,
+                                    func=func,
+                                    gene_detail=gene_detail
+                                )
+                                c_variant.gene = gene
+                                c_variant.save()
+                                logger.info(f"Created CVariant: {c_variant}")
+                                print("Gene_saved")
+                            except Exception as e:
+                                logger.error(f"Error processing AAChange entry '{entry}': {str(e)}")
+
+                    _create_c_and_p_variants(
+                        g_variant=g_variant,
+                        aachange=row['AAChange.refGene'],
+                        func=row['Func.refGene'],
+                        gene_detail=row.get('GeneDetail.refGene', '')
+                    )
+
+                    stats["successful"] += 1
+                    logger.info(f"Successfully processed row {index + 1}")
+
+            except Exception as e:
+                logger.error(f"Error processing row {index + 1}: {str(e)}", exc_info=True)
+                stats["errors"].append(f"Row {index + 1}: {str(e)}")
+                stats["failed"] += 1
+
+        # Create result message
+        if stats["failed"] == stats["total_rows"]:
+            logger.error("No variants could be processed")
+            return False, "No variants could be processed", stats
+        elif stats["failed"] > 0:
+            variant_file.call = True
+            variant_file.save()
+            logger.warning(
+                f"{stats['successful']} variants processed successfully, {stats['failed']} variants failed")
+            return True, f"{stats['successful']} variants processed successfully, {stats['failed']} variants failed", stats
+        else:
+            variant_file.call = True
+            variant_file.save()
+            logger.info("All variants processed successfully")
+            return True, "All variants processed successfully", stats
+
+    except Exception as e:
+        logger.critical(f"Critical error in variant file parser: {str(e)}", exc_info=True)
+        return False, f"Critical error: {str(e)}", {}
+
+
 
 
 
 if __name__ == "__main__":
-    # import_variants()
     print("start")
     import_variants()
     print("end")
+

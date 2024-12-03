@@ -3836,5 +3836,15 @@ def register_new_fastq_files(request):
     #         generate_file_set(row['file'])
 
 def call_import_variants(request):
-    from .variants_import import import_variants, import_BCB002_test
+    from .variants_import import import_variants, import_genes
     import_variants()
+
+
+
+def import_genes(request):
+    file = Path(Path(__file__).parent.parent / "uploads" / "gene_result.txt")
+    df = pd.read_csv(file, sep='\t')
+    df = df.reset_index()
+    pass
+
+

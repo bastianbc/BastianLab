@@ -42,7 +42,7 @@ class VariantCall(models.Model):
             search_value = kwargs.get('search[value]', None)[0]
             order_column = kwargs.get('order[0][column]', None)[0]
             order = kwargs.get('order[0][dir]', None)[0]
-            patient_name = kwargs.get('patient', None)[0]
+            patient_name = "kwargs.get('patient', None)[0]"
             sample_lib_name = kwargs.get('sample_lib', None)[0]
             block_name = kwargs.get('block', None)[0]
             area_name = kwargs.get('area', None)[0]
@@ -68,8 +68,8 @@ class VariantCall(models.Model):
             if block_name:
                 queryset = queryset.filter(Q(sample_lib__na_sl_links__nucacid__area_na_links__area__block_area_links__block__name__icontains=block_name))
 
-            if patient_name:
-                queryset = queryset.filter(Q(sample_lib__na_sl_links__nucacid__area_na_links__area__block_area_links__block__patient__name__icontains=patient_name))
+            # if patient_name:
+            #     queryset = queryset.filter(Q(sample_lib__na_sl_links__nucacid__area_na_links__area__block_area_links__block__patient__name__icontains=patient_name))
 
             if is_initial:
                 # filter = [sequencing_run.id for sequencing_run in SequencingRun.objects.filter(id=search_value)]
