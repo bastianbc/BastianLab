@@ -155,7 +155,7 @@ def get_variants_by_area(request):
                 # Format variant data for datatable
                 variant_data = {
                     'sampleLibrary': vc.sample_lib.name,
-                    'gene': c_variant.gene,
+                    'gene': c_variant.gene.name,
                     'pVariant': c_variant.p_variants.first().reference_residues + str(c_variant.p_variants.first().start) + c_variant.p_variants.first().inserted_residues if c_variant.p_variants.first() else '',
                     'coverage': vc.coverage,
                     'vaf': round((vc.alt_read / (vc.ref_read + vc.alt_read)) * 100, 2) if (vc.ref_read + vc.alt_read) > 0 else 0
@@ -222,7 +222,7 @@ def get_variants_by_block(request):
                 variant_data = {
                     'areaName': area.name,
                     'sampleLibrary': vc.sample_lib.name,
-                    'gene': c_variant.gene,
+                    'gene': c_variant.gene.name,
                     'pVariant': c_variant.p_variants.first().reference_residues + str(c_variant.p_variants.first().start) + c_variant.p_variants.first().inserted_residues if c_variant.p_variants.first() else '',
                     'coverage': vc.coverage,
                     'vaf': round((vc.alt_read / (vc.ref_read + vc.alt_read)) * 100, 2) if (vc.ref_read + vc.alt_read) > 0 else 0
