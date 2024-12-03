@@ -25,7 +25,7 @@ class VariantSerializer(serializers.ModelSerializer):
 
     def get_patient(self,obj):
         block = Blocks.objects.filter(block_area_links__area__area_na_links__nucacid__na_sl_links__sample_lib=obj.sample_lib).first()
-        return block.name if block else None
+        return block.patient.name if block else ""
 
     def get_sample_lib(self,obj):
         return obj.sample_lib.name
@@ -34,23 +34,27 @@ class VariantSerializer(serializers.ModelSerializer):
         return obj.sequencing_run.name
 
     def get_block(self,obj):
-        return Blocks.objects.filter(block_area_links__area__area_na_links__nucacid__na_sl_links__sample_lib=obj.sample_lib).first()
+        block = Blocks.objects.filter(block_area_links__area__area_na_links__nucacid__na_sl_links__sample_lib=obj.sample_lib).first()
+        return block.name if block else ""
 
     def get_area(self,obj):
-        return Areas.objects.filter(block__block_area_links__area__area_na_links__nucacid__na_sl_links__sample_lib=obj.sample_lib).first()
+        area = Areas.objects.filter(block__block_area_links__area__area_na_links__nucacid__na_sl_links__sample_lib=obj.sample_lib).first()
+        return area.name if area else ""
 
     def get_p_variant(self,obj):
         try:
             p_variant = PVariant.objects.get(c_variant__g_variant__variant_call=obj)
             return f"p.{p_variant.change_type}-{p_variant.start}-{p_variant.end}" # TODO: format as expected
         except Exception as e:
+            print(str(e))
             return None
 
     def get_c_variant(self,obj):
         try:
             c_variant = CVariant.objects.get(g_variant__variant_call=obj)
-            return f"{c_variant.c_var}-{c_variant.nm_id}" # TODO: format as expected
+            return f"{c_variant.c_var}" # TODO: format as expected
         except Exception as e:
+            print(str(e))
             return None
 
     def get_g_variant(self,obj):
