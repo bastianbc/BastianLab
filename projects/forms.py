@@ -15,6 +15,17 @@ class ProjectForm(BaseForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        instance = kwargs.get('instance', None)
+        print("*"*100, instance)
+        if instance:
+            self.fields['blocks'].queryset = Blocks.objects.filter(project=instance)
+            print("#"*100)
+            # Preselect the blocks already associated with the project
+            self.fields['blocks'].initial = instance.project_blocks.all()
+        else:
+            # Default queryset for new projects
+            self.fields['blocks'].queryset = Blocks.objects.all()
+
         self.fields["technician"].queryset = User.objects.filter(groups__name=settings.TECHNICIAN_GROUP_NAME)
         self.fields['technician'].label_from_instance = lambda obj: "%s" % obj.get_full_name()
         self.fields["researcher"].queryset = User.objects.filter(groups__name=settings.RESEARCHER_GROUP_NAME)
