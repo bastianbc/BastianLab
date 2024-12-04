@@ -11,7 +11,7 @@ class Projects(models.Model):
 
     BORIS = 'BB'
     IWEI = 'IY'
-    AHS = 'AHS'
+    AHS = 'AH'
     PI_CHOICES = [
         (BORIS, 'Boris Bastian'),
         (IWEI, 'Iwei Yeh'),
