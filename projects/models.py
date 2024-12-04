@@ -11,9 +11,11 @@ class Projects(models.Model):
 
     BORIS = 'BB'
     IWEI = 'IY'
+    AHS = 'AHS'
     PI_CHOICES = [
         (BORIS, 'Boris Bastian'),
         (IWEI, 'Iwei Yeh'),
+        (AHS, 'Alan Hunter Shain'),
     ]
     name = models.CharField(max_length=100, blank=False, null=False, validators=[validate_name_contains_space], verbose_name="Name")
     abbreviation = models.CharField(max_length=7, blank=False, null=False, unique=True, default='XY', verbose_name="Abbreviation", help_text="Requires a unique identifier for each Project.")

@@ -12,11 +12,9 @@ class ProjectForm(BaseForm):
     blocks = forms.ModelMultipleChoiceField(queryset=Blocks.objects.all(),
                                           label="Blocks"
                                           )
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         instance = kwargs.get('instance', None)
-        print("*"*100, instance)
         if instance:
             self.fields['blocks'].queryset = Blocks.objects.filter(project=instance)
             print("#"*100)

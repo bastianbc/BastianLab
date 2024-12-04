@@ -116,6 +116,7 @@ class CVariant(models.Model):
     exon = models.CharField(max_length=100, blank=True, null=True)
     func = models.CharField(max_length=100, blank=True, null=True)
     gene_detail = models.CharField(max_length=100)
+    name_meta = models.CharField(max_length=100)
 
     class Meta:
         db_table = "c_variant"
@@ -127,6 +128,7 @@ class PVariant(models.Model):
     reference_residues = models.CharField(max_length=100, blank=True, null=True)
     inserted_residues = models.CharField(max_length=100, blank=True, null=True)
     change_type = models.CharField(max_length=100, blank=True, null=True)
+    name_meta = models.CharField(max_length=100)
 
     class Meta:
         db_table = "p_variant"

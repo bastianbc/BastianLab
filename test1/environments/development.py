@@ -206,6 +206,7 @@ LOGIN_REDIRECT_URL = '/projects'
 
 TECHNICIAN_GROUP_NAME = "Technicians"
 RESEARCHER_GROUP_NAME = "Researchers"
+PI_GROUP_NAME = "Primary Investigators"
 
 LOGGING = {
     'version': 1,

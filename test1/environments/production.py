@@ -236,6 +236,7 @@ LOGIN_REDIRECT_URL = '/projects'
 
 TECHNICIAN_GROUP_NAME = "Technicians"
 RESEARCHER_GROUP_NAME = "Researchers"
+PI_GROUP_NAME = "Primary Investigators"
 
 smb_directory_labshare = "/mnt/labshare"
 SEQUENCING_FILES_SOURCE_DIRECTORY = Path(Path(smb_directory_labshare) / "BastianRaid-02")
