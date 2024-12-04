@@ -1,0 +1,51 @@
+{% extends "master.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<form method="post" action="{% if id %} {% url 'edit-body' id %} {% else %} {% url 'new-body' %} {% endif %}">
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Body Site</h3>
+    </div>
+    <div class="card-body">
+      {% csrf_token %}
+      <div class="row">
+        {{form|crispy}}
+      </div>
+        <br>
+        <b>Note:</b>
+        <p>Body Sites should start with number (1-, 2-, 3- or 4-)</p>
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th scope="col">Tier-1</th>
+              <th scope="col">Tier-2</th>
+              <th scope="col">Tier-3</th>
+              <th scope="col">Tier-4</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1-HEAD</td>
+              <td>2-FACE</td>
+              <td>3-LIP</td>
+              <td>4-LIP, LOWER MID</td>
+            </tr>
+            <tr>
+              <td>1-LEG</td>
+              <td>2-LOWER LEG</td>
+              <td>3-SHIN</td>
+              <td>4-TIBIA</td>
+            </tr>
+          </tbody>
+        </table>
+    </div>
+    <div class="card-footer">
+      <a href="/body" class="btn btn-secondary">Cancel</a>
+      <button type="submit" class="btn btn-success">Save</button>
+    </div>
+  </div>
+</form>
+{% endblock %}

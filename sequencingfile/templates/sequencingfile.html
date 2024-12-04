@@ -1,0 +1,32 @@
+{% extends "master.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<form method="post" action="{% if id %} {% url 'edit-sequencingfile' id %} {% else %} {% url 'new-sequencingfile' %} {% endif %}" novalidate>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Sequencing File</h3>
+    </div>
+    <div class="card-body">
+      {% csrf_token %}
+      <div class="row">
+        <div class="col-12">{{ form.sequencing_file_set|as_crispy_field }}</div>
+        <div class="col-12">{{ form.name|as_crispy_field }}</div>
+        <div class="col-5">{{ form.checksum|as_crispy_field }}</div>
+        <div class="col-5">{{ form.type|as_crispy_field }}</div>
+      </div>
+    </div>
+    <div class="card-footer">
+      <a href="/sequencingfile" class="btn btn-secondary">Cancel</a>
+      <button type="submit" class="btn btn-success">Save</button>
+    </div>
+  </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/assets/js/custom/documentation/forms/flatpickr.js"></script>
+<script src="/samplelib/static/init.dateinput.samplelib.js"></script>
+{% endblock %}

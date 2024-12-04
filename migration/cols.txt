@@ -1,0 +1,36 @@
+0:
+1: Unnamed: 0
+2: pat_id_airtable
+3: patient
+4: block
+5: area
+6: nucacid
+7: sample_lib
+8: air_table.1
+9: captured_lib
+10: bait
+11: sequencing_lib
+12: sequencing_run
+13: fastq_file
+14: path
+15: na_type
+16: area_type
+17: matching_normal_sl
+18: dept_number
+19: specimen
+20: dx_text
+21: site_code
+22: icd9
+23: note
+24: micro
+25: gender
+26: pat_age
+27: p_stage
+28: thickness
+29: subtype
+30: prim
+31: md5
+32: bam
+33: bai
+34: path_bam
+35: path_bai

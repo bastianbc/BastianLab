@@ -1,0 +1,44 @@
+{% extends "master.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block head %}
+    <link href="/static/assets/plugins/custom/passwordeye/password-eye.css" rel="stylesheet" type="text/css" />  
+{% endblock %}
+
+{% block content %}
+{{form.media}}
+<form method="post" action="{% if id %} {% url 'edit-account' id %} {% else %} {% url 'new-account' %} {% endif %}">
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">New Account</h3>
+    </div>
+    <div class="card-body">
+      {% csrf_token %}
+      <div class="row">
+        {{ form.username|as_crispy_field}}
+
+        <div class="fv-row mb-3">
+            <div class="password-input-container">
+                {{ form.password }}
+                <div class="toggle-password">
+                  <i class="bi bi-eye d-none"></i>
+                </div>
+            </div>
+        </div>
+
+        {{ form.first_name|as_crispy_field}}
+        {{ form.last_name|as_crispy_field}}
+        {{ form.groups|as_crispy_field}}
+      </div>
+    </div>
+    <div class="card-footer">
+      <a href="/account" class="btn btn-secondary">Cancel</a>
+      <button type="submit" class="btn btn-success">Save</button>
+    </div>
+  </div>
+</form>
+{% endblock %}
+{% block scripts %}
+<script src="/static/assets/plugins/custom/passwordeye/password-eye.js"></script>
+{% endblock %}

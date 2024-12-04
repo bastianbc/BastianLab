@@ -1,0 +1,42 @@
+{% extends "master.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<form method="post" action="{% if id %} {% url 'edit-samplelib' id %} {% else %} {% url 'new-samplelib' %} {% endif %}" novalidate>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Sample Library</h3>
+    </div>
+    <div class="card-body">
+      {% csrf_token %}
+      <div class="row">
+        <div class="col-6">{{ form.nuc_acid|as_crispy_field }}</div>
+        <div class="col-6">{{ form.name|as_crispy_field }}</div>
+        <div class="col-6">{{ form.barcode|as_crispy_field }}</div>
+        <div class="col-6">{{ form.date|as_crispy_field }}</div>
+        <div class="col-6">{{ form.method|as_crispy_field }}</div>
+        <div class="col-6">{{ form.qubit|as_crispy_field }}</div>
+        <div class="col-6">{{ form.shear_volume|as_crispy_field }}</div>
+        <div class="col-6">{{ form.qpcr_conc|as_crispy_field }}</div>
+        <div class="col-6">{{ form.pcr_cycles|as_crispy_field }}</div>
+        <div class="col-6">{{ form.vol_init|as_crispy_field }}</div>
+        <div class="col-6">{{ form.vol_remain|as_crispy_field }}</div>
+        <div class="col-6">{{ form.amount_in|as_crispy_field }}</div>
+        <div class="col-6">{{ form.amount_final|as_crispy_field }}</div>
+        <div class="col-12">{{ form.notes|as_crispy_field }}</div>
+      </div>
+    </div>
+    <div class="card-footer">
+      <a href="/samplelib" class="btn btn-secondary">Cancel</a>
+      <button type="submit" class="btn btn-success">Save</button>
+    </div>
+  </div>
+</form>
+{% endblock %}
+
+
+{% block scripts %}
+<script src="/samplelib/static/samplelib.form.js"></script>
+{% endblock %}

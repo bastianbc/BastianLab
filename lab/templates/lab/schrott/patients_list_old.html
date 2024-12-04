@@ -1,0 +1,28 @@
+
+{% block title %}All Patients{% endblock %}
+{% block content %}
+    <h1>Patients</h1>
+
+    <table style="border-collapse:collapse">
+        <tr class="patientshdr"><th>ID</th><th>Age
+    </th>
+            <th>Source</th><th>Sex</th>
+            <th>Race</th><th>Project</th>
+        </tr>
+    <ul>
+        {% for patients in all_patients %}
+            <tr>
+            <!-- {% if not forloop.first %} -->
+            <!-- <tr class="patientsrow {% cycle '' 'altrow' %}"> -->
+            <td><a href="{{ patients.pat_id }}">{{ patients.pat_id }}</a></td>
+            <td>{{ patients.age}}</td>
+            <td>{{ patients.source }}</td>
+            <td>{{ patients.sex }}</td>
+            <td>{{ patients.race }}</td>
+            <td>{{ patients.project }}</td>
+            <!-- {% endif %} -->
+            </tr>
+        {% endfor %}
+    </ul>
+    {% include "pagination.html" with page=page_obj %}
+{% endblock %}

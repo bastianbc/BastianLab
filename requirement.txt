@@ -1,0 +1,13 @@
+asgiref==3.5.2
+Django==3.2.15
+django-crispy-forms==1.14.0
+django-debug-toolbar==3.5.0
+django-extensions==3.2.0
+django-tables2==2.4.1
+django-widget-tweaks==1.4.12
+djangorestframework==3.13.1
+Pillow==9.2.0
+#psycopg2==2.9.3
+pytz==2022.2.1
+sqlparse==0.4.2
+xlrd==1.2.0

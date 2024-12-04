@@ -1,0 +1,32 @@
+{% extends "master.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="row">
+  <form method="post" action="/migration/" enctype="multipart/form-data">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Migration</h3>
+      </div>
+      <div class="card-body">
+        {% csrf_token %}
+        <div class="row">
+          {{form|crispy}}
+        </div>
+      </div>
+      <div class="card-footer">
+        <a href="/buffer" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-success">Save</button>
+      </div>
+    </div>
+  </form>
+</div>
+<div class="row">
+  <div class="col-2">
+    <a href="/migration/report" class="btn btn-info">Get report</a>
+  </div>
+</div>
+
+{% endblock %}

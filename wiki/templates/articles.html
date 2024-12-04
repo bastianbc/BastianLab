@@ -1,0 +1,83 @@
+{% extends "master.html" %}
+
+{% block head %}
+<style>
+    .tree, .tree ul {
+        list-style-type: none;
+    }
+    .tree ul {
+        margin-left: 20px;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="card card-dashed">
+    <div class="card-header">
+        <h3 class="card-title">Wikis</h3>
+        <div class="card-toolbar">
+            <div class="d-flex flex-stack flex-wrap mb-5">
+              <!--begin::Search-->
+              <div class="d-flex align-items-center position-relative my-1 mb-2 mb-md-0">
+                <!--begin::Svg Icon | path: icons/duotune/general/gen021.svg-->
+                <span class="svg-icon svg-icon-1 position-absolute ms-6">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect opacity="0.5" x="17.0365" y="15.1223" width="8.15546" height="2" rx="1" transform="rotate(45 17.0365 15.1223)" fill="currentColor" />
+                    <path d="M11 19C6.55556 19 3 15.4444 3 11C3 6.55556 6.55556 3 11 3C15.4444 3 19 6.55556 19 11C19 15.4444 15.4444 19 11 19ZM11 5C7.53333 5 5 7.53333 5 11C5 14.4667 7.53333 17 11 17C14.4667 17 17 14.4667 17 11C17 7.53333 14.4667 5 11 5Z" fill="currentColor" />
+                  </svg>
+                </span>
+                <!--end::Svg Icon-->
+                <form class="" action="/wiki" method="get">
+                    <input type="text" data-kt-docs-table-filter="search" name="search" class="form-control form-control-solid w-250px ps-15" placeholder="Search Wikis"/>
+                </form>
+              </div>
+              <!--end::Search-->
+              <!--begin::Toolbar-->
+              <div class="d-flex justify-content-end" data-kt-docs-table-toolbar="base">
+                <!--begin::Add record-->
+                <button type="button" class="btn btn-primary" onclick="window.location.href = '/wiki/new';">
+                  <!--begin::Svg Icon | path: icons/duotune/arrows/arr075.svg-->
+                  <span class="svg-icon svg-icon-2">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect opacity="0.5" x="11.364" y="20.364" width="16" height="2" rx="1" transform="rotate(-90 11.364 20.364)" fill="currentColor" />
+                      <rect x="4.36396" y="11.364" width="16" height="2" rx="1" fill="currentColor" />
+                    </svg>
+                  </span>
+                  <!--end::Svg Icon-->
+                  Create Wiki
+              </button>
+                <!--end::Add record-->
+              </div>
+              <!--end::Toolbar-->
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12">
+                <ul class="tree list-group">
+                    {% for article in articles %}
+                        {% include 'tree_partial.html' with article=article %}
+                    {% empty %}
+                    <div class="d-flex justify-content-center align-items-center full-height">
+                            <div class="text-center">
+                                <div class="text-gray-800 mb-4">Not found about "{{ search_query }}"</div>
+                                <a href="/wiki" class="btn btn-secondary">
+                                    <span class="svg-icon svg-icon-muted">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <rect opacity="0.5" x="6" y="11" width="13" height="2" rx="1" fill="currentColor"/>
+                                            <path d="M8.56569 11.4343L12.75 7.25C13.1642 6.83579 13.1642 6.16421 12.75 5.75C12.3358 5.33579 11.6642 5.33579 11.25 5.75L5.70711 11.2929C5.31658 11.6834 5.31658 12.3166 5.70711 12.7071L11.25 18.25C11.6642 18.6642 12.3358 18.6642 12.75 18.25C13.1642 17.8358 13.1642 17.1642 12.75 16.75L8.56569 12.5657C8.25327 12.2533 8.25327 11.7467 8.56569 11.4343Z" fill="currentColor"/>
+                                        </svg>
+                                    </span>
+                                    Back to list
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

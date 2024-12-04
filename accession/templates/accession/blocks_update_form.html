@@ -1,0 +1,50 @@
+{% extends "__base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block body_title %}
+<h2>Block {{blocks.old_block_id}}</h2> 
+{% endblock body_title %}
+{% block content %}
+
+<form method="post" >
+{% csrf_token %}
+
+    <div class="container">
+        
+        
+            <div class="row justify-content-start">
+                <div class="col-6">{{ form.diagnosis|as_crispy_field }}</div>
+                <div class="col-6">{{ form.body_site|as_crispy_field }}</div>
+                <div class="col-2">{{ form.icd9|as_crispy_field }}</div>
+                <div class="col-2">{{ form.age|as_crispy_field }}</div>
+                <div class="w-100"></div>
+                <div class="col-6">{{ form.notes|as_crispy_field }}</div>
+                <div class="col-6">{{ form.micro|as_crispy_field }}</div>
+                <div class="col-6">{{ form.gross|as_crispy_field }}</div>
+                <div class="w-100"></div>
+                <div class= "col-6"> {{form.subtype|as_crispy_field}}</div>
+                <div class= "col-3"> {{form.prim|as_crispy_field}}</div>
+                <div class= "col-3"> {{form.p_stage|as_crispy_field}}</div>
+                <div class="col-3">{{ form.mitoses|as_crispy_field }}</div>
+                <div class= "col-3"> {{form.thickness|as_crispy_field}}</div>
+            </div>
+            <br>
+    
+        <button type="submit" class="btn btn-success">Update Block</button>
+        {% if request.GET.projectid %}
+            <a href="{% url 'block-delete' blocks.bl_id %}?projectid={{blocks.project.pr_id}}" class="btn btn-danger" role="button"> Delete Block</a>
+            <a href="{% url 'add-areas' blocks.bl_id %}?projectid={{blocks.project.pr_id}}" class="btn btn-primary" role="button"> Add Areas</a>
+        {% elif request.GET.patientid %}
+            <a href="{% url 'block-delete' blocks.bl_id %}?patientid={{blocks.patient.pa_id}}" class="btn btn-danger" role="button"> Delete Block</a>
+            <a href="{% url 'add-areas' blocks.bl_id %}?patientid={{blocks.patient.pa_id}}" class="btn btn-primary" role="button"> Add Areas</a>
+        {% else %}
+            <a href="{% url 'block-delete' blocks.bl_id %}" class="btn btn-danger" role="button"> Delete Block</a>
+            <a href="{% url 'add-areas' blocks.bl_id %}" class="btn btn-primary" role="button"> Add Areas</a>
+
+        {% endif %}
+
+    </div>
+        
+</form>
+    {% endblock %}

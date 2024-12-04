@@ -1,0 +1,97 @@
+{% extends '__base.html' %}
+
+{% block page_title %}Editing blocks for {{ patients.pat_id }}{% endblock %}
+
+{% block body_title %}Editing blocks for <a href="{{ patients.get_absolute_url }}">{{ patients.pat_id }}</a>{% endblock %}
+
+
+{% block content %}
+  <form action="" method="post" enctype="multipart/form-data">
+
+    {% for hidden_field in form.hidden_fields %}
+      {{ hidden_field.errors }}
+      {{ hidden_field }}
+    {% endfor %}
+
+    {% csrf_token %}
+
+    {{ form.management_form }}
+    {{ form.non_form_errors }}
+
+    {% for block_form in form.forms %}
+
+      <hr>
+
+      <h2>
+        {% if block_form.instance.id %}
+          Block #{{ block_form.instance.id }}</h2>
+        {% else %}
+          {% if form.forms|length > 1 %}
+            Add another block
+          {% else %}
+            Add a block
+          {% endif %}
+        {% endif %}
+      </h2>
+
+      {% for hidden_field in block_form.hidden_fields %}
+        {{ hidden_field.errors }}
+      {% endfor %}
+
+      <table>
+        {{ block_form.as_table }}
+      </table>
+
+      {% if block_form.nested %}
+        <div class="indent">
+
+          <h3>Images</h3>
+
+          {{ block_form.nested.management_form }}
+          {{ block_form.nested.non_form_errors }}
+
+          <table>
+            {% for area_form in book_form.nested.forms %}
+
+              <tr>
+                <td>
+                  <em>
+                    {% if area_form.instance.id %}
+                      area {{ area_form.instance.id }}
+                    {% else %}
+                      Add an image
+                    {% endif %}
+                  </em>
+                </td>
+                <td>
+                  {% for hidden_field in area_form.hidden_fields %}
+                    {{ hidden_field.errors }}
+                  {% endfor %}
+
+                  <table>
+                    {{ area_form.as_table }}
+                  </table>
+                </td>
+                <td>
+                  {% if area_form.instance.image %}
+                    <img src="{{ area_form.instance.image.url }}" height="100" alt="{{ nested.form.instance.area_id }}">
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </table>
+        </div>
+      {% endif %}
+
+    {% endfor %}
+
+    <hr>
+
+    <p>
+      <input type="submit" value="Update blocks">
+      &nbsp; &nbsp;
+      <a href="{{ request.scheme }}://{{ request.get_host }}{% url 'patients-list' %}">Cancel</a>
+    </p>
+  </form>
+
+{% endblock content %}
