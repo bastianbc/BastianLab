@@ -49,6 +49,7 @@ def edit_project(request,id):
     if request.method=="POST":
         form = ProjectForm(request.POST,instance=project)
         if form.is_valid():
+            print("^"*100, form)
             project = form.save()
             messages.success(request,"Project %s updated successfully." % project.pr_id)
             return redirect("projects")

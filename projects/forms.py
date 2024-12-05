@@ -9,15 +9,13 @@ from blocks.models import Blocks
 User = get_user_model()
 
 class ProjectForm(BaseForm):
-    blocks = forms.ModelMultipleChoiceField(queryset=Blocks.objects.all(),
-                                          label="Blocks"
-                                          )
+    blocks = forms.ModelMultipleChoiceField(queryset=Blocks.objects.all(), label="Blocks")
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         instance = kwargs.get('instance', None)
         if instance:
             self.fields['blocks'].queryset = Blocks.objects.filter(project=instance)
-            print("#"*100)
             # Preselect the blocks already associated with the project
             self.fields['blocks'].initial = instance.project_blocks.all()
         else:
@@ -32,7 +30,8 @@ class ProjectForm(BaseForm):
     class Meta:
         model = Projects
         fields = [
-            'pr_id', 'name', 'abbreviation', 'blocks', 'description', 'speedtype', 'pi', 'date_start', 'technician', 'researcher',
+            'pr_id', 'name', 'abbreviation', 'blocks', 'description', 'speedtype',
+            'pi', 'date_start', 'technician', 'researcher',
         ]
         widgets = {'description': forms.Textarea(attrs={'rows': 4, 'cols': 40})}
 
@@ -44,6 +43,13 @@ class ProjectForm(BaseForm):
         for block in self.cleaned_data['blocks']:
             block.project = instance
             block.save()
+
+        print(self.cleaned_data['researcher'], self.cleaned_data['technician'])
+        if 'researcher' in self.cleaned_data:
+            instance.researcher.set(self.cleaned_data['researcher'])  # Set many-to-many field
+        if 'technician' in self.cleaned_data:
+            instance.technician.set(self.cleaned_data['technician'])  # Set many-to-many field
+
         return instance
 
 class FilterForm(forms.Form):
