@@ -377,10 +377,10 @@ def import_variants():
     VariantFile.objects.filter().update(call=False)
     files = VariantFile.objects.filter()
     VariantCall.objects.filter().delete()
-    for file in files:
-        file_path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA,file.directory)
-        if "_Filtered" in os.path.join(file_path, file.name):
-            variant_file_parser(os.path.join(file_path,file.name), "AR_ALL")
+    # for file in files:
+    #     file_path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA,file.directory)
+    #     if "_Filtered" in os.path.join(file_path, file.name):
+    #         variant_file_parser(os.path.join(file_path,file.name), "AR_ALL")
 
 
 def create_genes(row):
