@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Q, Count
+from django.db.models import Q, Count, F
 from datetime import datetime
 
 class VariantCall(models.Model):
@@ -21,7 +21,12 @@ class VariantCall(models.Model):
     def query_by_args(user, **kwargs):
 
         def _get_authorizated_queryset():
-            return VariantCall.objects.all().annotate()
+            return VariantCall.objects.filter().annotate(
+                blocks=F('sample_lib__na_sl_links__nucacid__area_na_links__area__block__name'),
+                areas=F('sample_lib__na_sl_links__nucacid__area_na_links__area__name'),
+                genes=F('g_variants__c_variants__gene__name'),
+                patients=F('sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__pat_id'),
+            )
 
         def _parse_value(search_value):
             if "_initial:" in search_value:
@@ -127,6 +132,7 @@ class PVariant(models.Model):
     reference_residues = models.CharField(max_length=100, blank=True, null=True)
     inserted_residues = models.CharField(max_length=100, blank=True, null=True)
     change_type = models.CharField(max_length=100, blank=True, null=True)
+    name_meta = models.CharField(max_length=100, blank=True, null=True)
 
     class Meta:
         db_table = "p_variant"
