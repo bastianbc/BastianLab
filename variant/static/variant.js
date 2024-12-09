@@ -9,8 +9,18 @@ var KTDatatablesServerSide = function () {
     var editor;
     var selectedRows = [];
 
+
     // Private functions
-    var initDatatable = function ( initialValue, filterPatient=null, filterSampleLib=null, filterArea=null, filterBlock=null ) {
+    var initDatatable = function (
+        initialValue,
+        filterPatient = null,
+        filterSampleLib = null,
+        filterArea = null,
+        filterBlock = null,
+        filterCoverage = null,
+        filterLog2r = null,
+        filterRefRead = null,
+        filterAltRead = null) {
 
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
 
@@ -40,6 +50,10 @@ var KTDatatablesServerSide = function () {
                 "sample_lib": filterSampleLib,
                 "area": filterArea,
                 "block": filterBlock,
+                "coverage": filterCoverage,
+                "log2r": filterLog2r,
+                "ref_read": filterRefRead,
+                "alt_read": filterAltRead
               },
               error: function (xhr, ajaxOptions, thrownError) {
                   if (xhr.status == 403) {
@@ -138,7 +152,6 @@ var KTDatatablesServerSide = function () {
             initToggleToolbar();
             toggleToolbars();
             handleDeleteRows();
-            handleResetForm();
             // initRowActions();
             handleSelectedRows.init();
             KTMenu.createInstances();
@@ -202,11 +215,18 @@ var KTDatatablesServerSide = function () {
         filterButton.addEventListener('click', function () {
 
           var patient = document.getElementById("id_patient").value;
-          var sampleLib = document.getElementById("id_sample_lib").value;
+          var sampleLib = document.getElementById("id_sample_lib").text;
           var area = document.getElementById("id_area").value;
           var block = document.getElementById("id_block").value;
+          var coverage = document.getElementById("id_coverage").value;
+          var log2r = document.getElementById("id_log2r").value;
+          var refRead = document.getElementById("id_ref_read").value;
+          var altRead = document.getElementById("id_alt_read").value;
 
-          initDatatable(null,patient,sampleLib,area,block)
+        // DataTable'ı başlat
+        initDatatable(null, patient, sampleLib, area, block, coverage, log2r, refRead, altRead);
+
+
 
         });
 
@@ -343,9 +363,19 @@ var KTDatatablesServerSide = function () {
             document.getElementById("id_sample_lib").value = "";
             document.getElementById("id_area").value = "";
             document.getElementById("id_block").value = "";
+            document.getElementById("id_coverage").value = "";
+            document.getElementById("id_log2r").value = "";
+            document.getElementById("id_ref_read").value = "";
+            document.getElementById("id_alt_read").value = "";
 
-            // Reset datatable --- official docs reference: https://datatables.net/reference/api/search()
-            dt.search('').draw();
+            console.log("Tekrar ediyor mu");
+
+
+        // Optionally reinitialize the table with default parameters (empty filters)
+        initDatatable(null, null, null, null, null, null, null, null, null);
+
+
+
         });
     }
 

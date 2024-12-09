@@ -29,6 +29,10 @@ class FilterForm(forms.Form):
         label="Patients"
     )
 
+    coverage = forms.IntegerField(label="Coverage")
+    log2r = forms.FloatField(label="Log2r")
+    ref_read = forms.IntegerField(label="Ref Read")
+    alt_read = forms.IntegerField(label="Alt Read")
 
     def __init__(self, *args, **kwargs):
         super(FilterForm, self).__init__(*args, **kwargs)
@@ -42,4 +46,7 @@ class FilterForm(forms.Form):
         self.fields["sample_lib"].widget.attrs["data-control"] = "select2"
         self.fields["area"].widget.attrs.update({'class': 'form-control-sm'})
         self.fields["area"].widget.attrs["data-control"] = "select2"
-
+        self.fields["coverage"].widget.attrs.update({'class':'form-control-sm'})
+        self.fields["log2r"].widget.attrs.update({'class':'form-control-sm'})
+        self.fields["ref_read"].widget.attrs.update({'class':'form-control-sm'})
+        self.fields["alt_read"].widget.attrs.update({'class':'form-control-sm'})
