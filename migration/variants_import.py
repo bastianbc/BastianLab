@@ -44,19 +44,23 @@ def get_caller(filename):
 def parse_p_var(p_var):
     logger.debug(f"Parsing p_var: {p_var}")
     if not p_var or p_var.endswith("?"):
-        print("p_var is empty")
+        print(f"p_var is empty: {p_var}")
         return None
     match = re.match(r'p\.([A-Za-z])(\d+)([A-Za-z])', p_var)
     if match:
         start, end, reference_residues, inserted_residues, change_type = (match.group(2), match.group(2), match.group(1), match.group(3), "")
         logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
         return start, end, reference_residues, inserted_residues, change_type
-    match3 = re.match(r'p\.([A-Za-z]+)?(\d+)_?([A-Za-z]*)?(\d+)?(delins|del|ins)?([A-Za-z]*)?', p_var.split(':')[-1])
+    match2 = re.match(r'p\.([A-Z])(\d+)\*', p_var)
+    if match2:
+        start, end, reference_residues, inserted_residues, change_type = (match2.group(2), match2.group(2), match2.group(1), "", "")
+        logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
+        return start, end, reference_residues, inserted_residues, change_type
+    match3 = re.match(r'p\.([A-Za-z]+)?(\d+)_?([A-Za-z]*)?(\d+)?(delins|del|ins)?([A-Za-z]*)?', p_var)
     if match3:
         start, end, reference_residues, inserted_residues, change_type  = (match3.group(2), match3.group(4), match3.group(1)+match3.group(3), match3.group(6), match3.group(5))
+        logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
         return start, end, reference_residues, inserted_residues, change_type
-        logger.debug(f"Parsed p_var successfully: {result}")
-        return result
     match = re.match(r'p\.\*(\d+)(?:delins([A-Z]+))?\*?', p_var)
     if match:
         start = match.group(1)  # Start position
