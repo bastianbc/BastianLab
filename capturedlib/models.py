@@ -80,6 +80,7 @@ class CapturedLib(models.Model):
             search_value = kwargs.get('search[value]', None)[0]
             order_column = kwargs.get('order[0][column]', None)[0]
             order = kwargs.get('order[0][dir]', None)[0]
+            normal_area = kwargs.get('normal_area', None)[0]
 
             order_column = ORDER_COLUMN_CHOICES[order_column]
             # django orm '-' -> desc
@@ -106,6 +107,12 @@ class CapturedLib(models.Model):
                     Q(name__icontains=search_value) |
                     Q(date__icontains=search_value)
                 )
+
+            if normal_area:
+                 queryset = queryset.filter(
+                    Q(sl_cl_links__sample_lib__na_sl_links__nucacid__na_type='dna') &
+                    Q(sl_cl_links__sample_lib__na_sl_links__nucacid__area_na_links__area__area_type='normal')
+            )
 
             count = queryset.count()
             queryset = queryset.order_by(order_column)[start:start + length]
