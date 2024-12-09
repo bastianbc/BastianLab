@@ -46,9 +46,14 @@ def parse_p_var(p_var):
     if not p_var or p_var.endswith("?"):
         print(f"p_var is empty: {p_var}")
         return None
-    match = re.match(r'p\.([A-Za-z])(\d+)([A-Za-z])', p_var)
+    match = re.match(r'p\.([A-Z])(\d+)([A-Z])', p_var)
     if match:
         start, end, reference_residues, inserted_residues, change_type = (match.group(2), match.group(2), match.group(1), match.group(3), "")
+        logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
+        return start, end, reference_residues, inserted_residues, change_type
+    match = re.match(r'p\.([A-Z])(\d+)(delins|del|ins)', p_var)
+    if match:
+        start, end, reference_residues, inserted_residues, change_type = (match.group(2), match.group(2), match.group(1), "", match.group(3))
         logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
         return start, end, reference_residues, inserted_residues, change_type
     match2 = re.match(r'p\.([A-Z])(\d+)\*', p_var)
@@ -56,7 +61,7 @@ def parse_p_var(p_var):
         start, end, reference_residues, inserted_residues, change_type = (match2.group(2), match2.group(2), match2.group(1), "", "")
         logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
         return start, end, reference_residues, inserted_residues, change_type
-    match3 = re.match(r'p\.([A-Za-z]+)?(\d+)_?([A-Za-z]*)?(\d+)?(delins|del|ins)?([A-Za-z]*)?', p_var)
+    match3 = re.match(r'p\.([A-Z]+)?(\d+)_?([A-Z]*)?(\d+)?(delins|del|ins)?([A-Z]*)?', p_var)
     if match3:
         start, end, reference_residues, inserted_residues, change_type  = (match3.group(2), match3.group(4), match3.group(1)+match3.group(3), match3.group(6), match3.group(5))
         logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
