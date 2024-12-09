@@ -12,7 +12,7 @@ var KTDatatablesServerSide = function () {
 
     // Private functions
     var initDatatable = function (  
-      initialValue, 
+    initialValue, 
     filterPatient = null, 
     filterSampleLib = null, 
     filterArea = null, 
@@ -366,10 +366,7 @@ var KTDatatablesServerSide = function () {
             document.getElementById("id_coverage").value = "";
             document.getElementById("id_log2r").value = "";
             document.getElementById("id_ref_read").value = "";
-            document.getElementById("id_alt_read").value = "";
-
-            console.log("Tekrar ediyor mu");
-            
+            document.getElementById("id_alt_read").value = "";   
 
         // Optionally reinitialize the table with default parameters (empty filters)
         initDatatable(null, null, null, null, null, null, null, null, null);

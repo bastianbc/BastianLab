@@ -82,7 +82,7 @@ class VariantCall(models.Model):
                 queryset = queryset.filter(ref_read=ref_read_value)
             
             if alt_read_value:
-                queryset = queryset.filter(alt_read=alt_read_value)
+                queryset = queryset.filter(alt_read=alt_read_value) 
             
             # if patient_name:
             #     queryset = queryset.filter(Q(sample_lib__na_sl_links__nucacid__area_na_links__area__block_area_links__block__patient__name__icontains=patient_name))
