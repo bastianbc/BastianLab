@@ -47,15 +47,18 @@
             <div class="row mb-2">
               <div class="col-sm-12">{{ filter.patient|as_crispy_field }}</div>
             </div>
+            <div class="row mb-2">
+              <div class="col-sm-12">{{ filter.area|as_crispy_field }}</div>
+            </div>
           <!--begin::Options-->
+          <div class="row mb-2">
+            <div class="col-sm-12">{{ filter.block|as_crispy_field }}</div>
+          </div>
           <div class="row mb-2">
             <div class="col-sm-12">{{ filter.sample_lib|as_crispy_field }}</div>
           </div>
           <div class="row mb-2">
-            <div class="col-sm-12">{{ filter.area|as_crispy_field }}</div>
-          </div>
-          <div class="row mb-2">
-            <div class="col-sm-12">{{ filter.block|as_crispy_field }}</div>
+            <div class="col-sm-12">{{ filter.sequencing_run|as_crispy_field }}</div>
           </div>
           <!--end::Options-->
         </div>

@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Q, Count
+from django.db.models import Q, Count, F
 from datetime import datetime
 
 class VariantCall(models.Model):
@@ -21,7 +21,12 @@ class VariantCall(models.Model):
     def query_by_args(user, **kwargs):
 
         def _get_authorizated_queryset():
-            return VariantCall.objects.all().annotate()
+            return VariantCall.objects.filter().annotate(
+                blocks=F('sample_lib__na_sl_links__nucacid__area_na_links__area__block__name'),
+                areas = F('sample_lib__na_sl_links__nucacid__area_na_links__area__name'),
+                genes = F('g_variants__c_variants__gene__name'),
+                patients = F('sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__pat_id')
+            )
 
         def _parse_value(search_value):
             if "_initial:" in search_value:
@@ -42,10 +47,10 @@ class VariantCall(models.Model):
             search_value = kwargs.get('search[value]', None)[0]
             order_column = kwargs.get('order[0][column]', None)[0]
             order = kwargs.get('order[0][dir]', None)[0]
-            patient_name = "kwargs.get('patient', None)[0]"
-            sample_lib_name = kwargs.get('sample_lib', None)[0]
-            block_name = kwargs.get('block', None)[0]
-            area_name = kwargs.get('area', None)[0]
+            patient = kwargs.get('patient', None)[0]
+            sample_lib = kwargs.get('sample_lib', None)[0]
+            block = kwargs.get('block', None)[0]
+            area = kwargs.get('area', None)[0]
 
             order_column = ORDER_COLUMN_CHOICES[order_column]
             # django orm '-' -> desc
@@ -59,17 +64,21 @@ class VariantCall(models.Model):
             is_initial = _is_initial_value(search_value)
             search_value = _parse_value(search_value)
 
-            if sample_lib_name:
-                queryset = queryset.filter(Q(sample_lib__name__icontains=sample_lib_name))
 
-            if area_name:
-                queryset = queryset.filter(Q(sample_lib__na_sl_links__nucacid__area_na_links__area__name__icontains=block_name))
+            if sample_lib:
+                queryset = queryset.filter(Q(sample_lib__id=sample_lib))
 
-            if block_name:
-                queryset = queryset.filter(Q(sample_lib__na_sl_links__nucacid__area_na_links__area__block_area_links__block__name__icontains=block_name))
+            if area:
+                queryset = queryset.filter(
+                    Q(sample_lib__na_sl_links__nucacid__area_na_links__area__ar_id=block))
 
-            # if patient_name:
-            #     queryset = queryset.filter(Q(sample_lib__na_sl_links__nucacid__area_na_links__area__block_area_links__block__patient__name__icontains=patient_name))
+            if block:
+                queryset = queryset.filter(
+                    Q(sample_lib__na_sl_links__nucacid__area_na_links__area__block_area_links__block__bl_id=block))
+
+            if patient:
+                queryset = queryset.filter(
+                    Q(sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__pa_id=patient))
 
             if is_initial:
                 # filter = [sequencing_run.id for sequencing_run in SequencingRun.objects.filter(id=search_value)]
@@ -116,7 +125,6 @@ class CVariant(models.Model):
     exon = models.CharField(max_length=100, blank=True, null=True)
     func = models.CharField(max_length=100, blank=True, null=True)
     gene_detail = models.CharField(max_length=100)
-    name_meta = models.CharField(max_length=100)
 
     class Meta:
         db_table = "c_variant"

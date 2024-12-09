@@ -44,28 +44,32 @@ def get_caller(filename):
 def parse_p_var(p_var):
     logger.debug(f"Parsing p_var: {p_var}")
     if not p_var or p_var.endswith("?"):
-        logger.debug("p_var is empty")
+        print(f"p_var is empty: {p_var}")
         return None
-    # if "delins" in p_var and p_var.endswith("*"):
-    #     match = re.match(r'p\.\*(\d+)(delins)([A-Z]+)\*', p_var)
-    #     result = (match.group(1), match.group(2), match.group(3))
-    #     logger.debug(f"Parsed p_var successfully: {result}")
-    #     return result
-    if "delins" not in p_var and p_var.endswith("*"):
-        match = re.match(r'p\.([A-Za-z])(\d+)(\*)', p_var)
-        result = (match.group(1), match.group(2), match.group(3))
-        logger.debug(f"Parsed p_var successfully: {result}")
-        return result
-    match = re.match(r'p\.([A-Za-z])(\d+)([A-Za-z])', p_var)
+    match = re.match(r'p\.([A-Z])(\d+)([A-Z])', p_var)
     if match:
-        result = (match.group(1), match.group(2), match.group(3))
-        logger.debug(f"Parsed p_var successfully: {result}")
-        return result
-    match2 = re.match(r'p\.([A-Za-z]+)?(\d+)_?([A-Za-z]*)?(\d+)?(delins)?([A-Za-z]*)?', p_var)
+        start, end, reference_residues, inserted_residues, change_type = (
+        match.group(2), match.group(2), match.group(1), match.group(3), "")
+        logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
+        return start, end, reference_residues, inserted_residues, change_type
+    match2 = re.match(r'p\.([A-Z])(\d+)(delins|del|ins)', p_var)
     if match2:
-        result = (match2.group(1), match2.group(2), match2.group(3), match2.group(4), match2.group(5), match2.group(6))
-        logger.debug(f"Parsed p_var successfully: {result}")
-        return result
+        start, end, reference_residues, inserted_residues, change_type = (
+        match2.group(2), match2.group(2), match2.group(1), "", match2.group(3))
+        logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
+        return start, end, reference_residues, inserted_residues, change_type
+    match3 = re.match(r'p\.([A-Z])(\d+)\*', p_var)
+    if match3:
+        start, end, reference_residues, inserted_residues, change_type = (
+        match3.group(2), match3.group(2), match3.group(1), "", "")
+        logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
+        return start, end, reference_residues, inserted_residues, change_type
+    match4 = re.match(r'p\.([A-Z]+)?(\d+)_?([A-Z]*)?(\d+)?(delins|del|ins)?([A-Z]*)?', p_var)
+    if match4:
+        start, end, reference_residues, inserted_residues, change_type = (
+        match4.group(2), match4.group(4), match4.group(1) + match4.group(3), match4.group(6), match4.group(5))
+        logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
+
     logger.warning(f"Failed to parse p_var: {p_var}")
     return None, None, None
 
@@ -205,30 +209,18 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail):
             if p_var:
                 if not parse_p_var(p_var):
                     continue
-                if len(parse_p_var(p_var))==3:
-                    p_ref, p_pos, p_alt = parse_p_var(p_var)
-                    p_variant = PVariant.objects.create(
-                        c_variant=c_variant,
-                        start=p_pos,
-                        end=p_pos,
-                        reference_residues=p_ref,
-                        inserted_residues=p_alt,
-                        change_type="delins" if "delins" in p_var else ""
-                    )
                 else:
-                    start_AA, start, end_AA, end, modification_type, inserted_sequence = parse_p_var(p_var)
+                    start, end, reference_residues, inserted_residues, change_type = parse_p_var(p_var)
+                    inserted_residues = f"{inserted_residues[:98]}*" if p_var.endswith("*") else inserted_residues[:99]
                     p_variant = PVariant.objects.create(
                         c_variant=c_variant,
                         start=start,
                         end=end,
-                        reference_residues=start_AA+end_AA,
-                        inserted_residues=inserted_sequence,
-                        change_type=modification_type
+                        reference_residues=reference_residues,
+                        inserted_residues=inserted_residues,
+                        change_type=change_type,
+                        name_meta=p_var[:99]
                     )
-                # if all([p_ref, p_pos, p_alt]):
-                #     logger.info(f"Created PVariant: {p_variant}")
-                # else:
-                #     logger.warning(f"Skipped PVariant creation due to invalid p_var: {p_var}")
         except Exception as e:
             logger.error(f"Error processing AAChange entry '{entry}': {str(e)}")
 
