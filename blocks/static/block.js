@@ -271,6 +271,23 @@ var KTDatatablesServerSide = function () {
 
     }
 
+    function getSelectedRows() {
+        const container = document.querySelector('.table');
+        const selectedRows = container.querySelectorAll('tbody [type="checkbox"]:checked');
+        const selectedIds = [];
+    
+        selectedRows.forEach((p) => {
+            // Select parent row
+            const parent = p.closest('tr');
+            // Get customer ID
+            const id = parent.querySelector('input[type="checkbox"]').value;
+    
+            selectedIds.push(id);
+        });
+    
+        return JSON.stringify(selectedIds);
+    }
+
     // Search Datatable --- official docs reference: https://datatables.net/reference/api/search()
     var handleSearchDatatable = function () {
         const filterSearch = document.querySelector('[data-kt-docs-table-filter="search"]');

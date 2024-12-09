@@ -47,10 +47,14 @@ class VariantCall(models.Model):
             search_value = kwargs.get('search[value]', None)[0]
             order_column = kwargs.get('order[0][column]', None)[0]
             order = kwargs.get('order[0][dir]', None)[0]
-            patient = kwargs.get('patient', None)[0]
-            sample_lib = kwargs.get('sample_lib', None)[0]
-            block = kwargs.get('block', None)[0]
-            area = kwargs.get('area', None)[0]
+            patient_name = "kwargs.get('patient', None)[0]"
+            sample_lib_name = kwargs.get('sample_lib', None)[0]
+            block_name = kwargs.get('block', None)[0]
+            area_name = kwargs.get('area', None)[0]
+            coverage_value = kwargs.get('coverage', None)[0]
+            log2r_value = kwargs.get('log2r', None)[0]
+            ref_read_value = kwargs.get('ref_read', None)[0]
+            alt_read_value = kwargs.get('alt_read', None)[0]
 
             order_column = ORDER_COLUMN_CHOICES[order_column]
             # django orm '-' -> desc
@@ -64,17 +68,29 @@ class VariantCall(models.Model):
             is_initial = _is_initial_value(search_value)
             search_value = _parse_value(search_value)
 
-            if sample_lib:
-                queryset = queryset.filter(Q(sample_lib__id=sample_lib))
+            if sample_lib_name:
+                queryset = queryset.filter(Q(sample_lib__name__icontains=sample_lib_name))
 
-            if area:
-                queryset = queryset.filter(Q(sample_lib__na_sl_links__nucacid__area_na_links__area__ar_id=block))
+            if area_name:
+                queryset = queryset.filter(Q(sample_lib__na_sl_links__nucacid__area_na_links__area__name=area_name))
 
-            if block:
-                queryset = queryset.filter(Q(sample_lib__na_sl_links__nucacid__area_na_links__area__block_area_links__block__bl_id=block))
+            if block_name:
+                queryset = queryset.filter(Q(sample_lib__na_sl_links__nucacid__area_na_links__area__block_area_links__block__name__icontains=block_name))
 
-            if patient:
-                queryset = queryset.filter(Q(sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__pa_id=patient))
+            if coverage_value:
+                queryset = queryset.filter(coverage=coverage_value)
+
+            if log2r_value:
+                queryset = queryset.filter(log2r=log2r_value)
+
+            if ref_read_value:
+                queryset = queryset.filter(ref_read=ref_read_value)
+
+            if alt_read_value:
+                queryset = queryset.filter(alt_read=alt_read_value)
+
+            # if patient_name:
+            #     queryset = queryset.filter(Q(sample_lib__na_sl_links__nucacid__area_na_links__area__block_area_links__block__patient__name__icontains=patient_name))
 
             if is_initial:
                 # filter = [sequencing_run.id for sequencing_run in SequencingRun.objects.filter(id=search_value)]
@@ -103,11 +119,11 @@ class VariantCall(models.Model):
 class GVariant(models.Model):
     variant_call = models.ForeignKey(VariantCall, on_delete=models.CASCADE, related_name="g_variants")
     hg = models.IntegerField(default=0)
-    chrom = models.CharField(max_length=100, blank=True, null=True) # add table
-    start = models.IntegerField(default=0) # add table
+    chrom = models.CharField(max_length=100, blank=True, null=True)
+    start = models.IntegerField(default=0)
     end = models.IntegerField(default=0)
-    ref = models.CharField(max_length=100, blank=True, null=True) # add table
-    alt = models.CharField(max_length=100, blank=True, null=True) # add table
+    ref = models.CharField(max_length=100, blank=True, null=True)
+    alt = models.CharField(max_length=100, blank=True, null=True)
     avsnp150 = models.CharField(max_length=100, blank=True, null=True)
 
     class Meta:
@@ -116,10 +132,10 @@ class GVariant(models.Model):
 class CVariant(models.Model):
     g_variant = models.ForeignKey(GVariant, on_delete=models.CASCADE, related_name="c_variants", blank=True, null=True)
     gene = models.ForeignKey("gene.Gene", on_delete=models.CASCADE, related_name="c_variants")
-    nm_id = models.CharField(max_length=100, blank=True, null=True) # add table
+    nm_id = models.CharField(max_length=100, blank=True, null=True)
     c_var = models.CharField(max_length=100, blank=True, null=True)
-    exon = models.CharField(max_length=100, blank=True, null=True) # add table
-    func = models.CharField(max_length=100, blank=True, null=True) # add table
+    exon = models.CharField(max_length=100, blank=True, null=True)
+    func = models.CharField(max_length=100, blank=True, null=True)
     gene_detail = models.CharField(max_length=100)
 
     class Meta:
