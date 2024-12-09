@@ -60,14 +60,14 @@ var KTDatatablesServerSide = function () {
             columns: [
                 { data: 'id' },
                 { data: 'patients' },
+                { data: 'areas' },
+                { data: 'blocks' },
                 { data: 'sample_lib' },
                 { data: 'sequencing_run' },
-                { data: 'blocks' },
-                { data: 'areas' },
                 { data: 'genes' },
-                { data: 'p_variant' },
-                { data: 'c_variant' },
                 { data: 'g_variant' },
+                { data: 'c_variant' },
+                { data: 'p_variant' },
                 { data: null },
             ],
             columnDefs: [
