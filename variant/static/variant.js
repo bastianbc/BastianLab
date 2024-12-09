@@ -223,11 +223,8 @@ var KTDatatablesServerSide = function () {
           var refRead = document.getElementById("id_ref_read").value;
           var altRead = document.getElementById("id_alt_read").value;
 
-        // DataTable'ı başlat
-        initDatatable(null, patient, sampleLib, area, block, coverage, log2r, refRead, altRead);
-
-
-
+          // DataTable'ı başlat
+          initDatatable(null, patient, sampleLib, area, block, coverage, log2r, refRead, altRead);
         });
 
     }
@@ -368,14 +365,7 @@ var KTDatatablesServerSide = function () {
             document.getElementById("id_ref_read").value = "";
             document.getElementById("id_alt_read").value = "";
 
-            console.log("Tekrar ediyor mu");
-
-
-        // Optionally reinitialize the table with default parameters (empty filters)
-        initDatatable(null, null, null, null, null, null, null, null, null);
-
-
-
+            initDatatable();
         });
     }
 

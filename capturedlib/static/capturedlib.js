@@ -10,7 +10,7 @@ var KTDatatablesServerSide = function () {
     var selectedRows = [];
 
     // Private functions
-    var initDatatable = function ( initialValue ) {
+    var initDatatable = function ( initialValue ,normalArea = null) {
 
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
 
@@ -35,6 +35,9 @@ var KTDatatablesServerSide = function () {
             ajax: {
               url: '/capturedlib/filter_capturedlibs',
               type: 'GET',
+              data: function (d) {
+                d.normal_area = normalArea;  // Filtre parametresini backend'e gönder
+            },
               error: function (xhr, ajaxOptions, thrownError) {
                   if (xhr.status == 403) {
 
@@ -200,7 +203,6 @@ var KTDatatablesServerSide = function () {
             initToggleToolbar();
             toggleToolbars();
             handleDeleteRows();
-            handleResetForm();
             initRowActions();
             handleSelectedRows.init();
             KTMenu.createInstances();
@@ -257,29 +259,14 @@ var KTDatatablesServerSide = function () {
 
     // Filter Datatable
     var handleFilterDatatable = () => {
-        // Select filter options
-        filterPayment = document.querySelectorAll('[data-kt-docs-table-filter="payment_type"] [name="payment_type"]');
-        const filterButton = document.querySelector('[data-kt-docs-table-filter="filter"]');
+      const filterButton = document.querySelector('[data-kt-docs-table-filter="filter"]');
 
-        // Filter datatable on submit
-        filterButton.addEventListener('click', function () {
-            // Get filter values
-            let paymentValue = '';
-
-            // Get payment value
-            filterPayment.forEach(r => {
-                if (r.checked) {
-                    paymentValue = r.value;
-                }
-
-                // Reset payment value if "All" is selected
-                if (paymentValue === 'all') {
-                    paymentValue = '';
-                }
-            });
-
-            // Filter datatable --- official docs reference: https://datatables.net/reference/api/search()
-            dt.search(paymentValue).draw();
+      filterButton.addEventListener('click', function () {
+        // Get filter values
+        const normalArea = document.getElementById("normal_area_checkbox").checked? true : null
+    
+        // DataTable'ı başlat
+        initDatatable(null, normalArea);
         });
     }
 
@@ -407,14 +394,13 @@ var KTDatatablesServerSide = function () {
         // Select reset button
         const resetButton = document.querySelector('[data-kt-docs-table-filter="reset"]');
 
-        // Reset datatable
         resetButton.addEventListener('click', function () {
-            // Reset payment type
-            filterPayment[0].checked = true;
-
-            // Reset datatable --- official docs reference: https://datatables.net/reference/api/search()
-            dt.search('').draw();
-        });
+         
+          document.getElementById("normal_area_checkbox").checked = false;
+  
+          
+          initDatatable(null, null);
+      });
     }
 
     // Init toggle toolbar
