@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Q, Count, F
+from django.db.models import Q, Count, F, OuterRef, Subquery, Func, Value, CharField
 from datetime import datetime
 
 class VariantCall(models.Model):
@@ -21,11 +21,37 @@ class VariantCall(models.Model):
     def query_by_args(user, **kwargs):
 
         def _get_authorizated_queryset():
+            c_variant_subquery = CVariant.objects.filter(
+                g_variant__variant_call=OuterRef('pk')  # Reference the current VariantCall
+            ).values('c_var')[:1]
+
+            p_variant_subquery = PVariant.objects.filter(
+                c_variant__g_variant__variant_call=OuterRef('pk')  # Reference the current VariantCall
+            ).values('name_meta')[:1]
+            g_variant_subquery = GVariant.objects.filter(
+                variant_call=OuterRef('pk')  # Reference the current VariantCall
+            ).values('chrom', 'start', 'end', 'avsnp150')[:1]
+
+            # Concatenate fields to match the required format
+            g_variant_annotation = Func(
+                Subquery(g_variant_subquery.values('chrom')[:1]),
+                Value('-'),
+                Subquery(g_variant_subquery.values('start')[:1]),
+                Value('-'),
+                Subquery(g_variant_subquery.values('end')[:1]),
+                Value('-'),
+                Subquery(g_variant_subquery.values('avsnp150')[:1]),
+                function='CONCAT',
+                output_field=CharField()
+            )
             return VariantCall.objects.filter().annotate(
                 blocks=F('sample_lib__na_sl_links__nucacid__area_na_links__area__block__name'),
                 areas = F('sample_lib__na_sl_links__nucacid__area_na_links__area__name'),
                 genes = F('g_variants__c_variants__gene__name'),
-                patients = F('sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__pat_id')
+                patients = F('sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__pat_id'),
+                cvariant = Subquery(c_variant_subquery),
+                pvariant = Subquery(p_variant_subquery),
+                gvariant=g_variant_annotation
             )
 
         def _parse_value(search_value):
