@@ -32,7 +32,7 @@ class VariantSerializer(serializers.ModelSerializer):
 
     def get_p_variant(self,obj):
         try:
-            p_variant = PVariant.objects.get(c_variant__g_variant__variant_call=obj).first()
+            p_variant = PVariant.objects.filter(c_variant__g_variant__variant_call=obj).first()
             return f"{p_variant.name_meta}" # TODO: format as expected
         except Exception as e:
             print(str(e))
@@ -40,7 +40,7 @@ class VariantSerializer(serializers.ModelSerializer):
 
     def get_c_variant(self,obj):
         try:
-            c_variant = CVariant.objects.get(g_variant__variant_call=obj).first()
+            c_variant = CVariant.objects.filter(g_variant__variant_call=obj).first()
             return f"{c_variant.c_var}" # TODO: format as expected
         except Exception as e:
             print(str(e))
