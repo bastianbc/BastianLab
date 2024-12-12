@@ -44,8 +44,9 @@ def get_caller(filename):
 def parse_p_var(p_var):
     logger.debug(f"Parsing p_var: {p_var}")
     if not p_var or p_var.endswith("?"):
-        logger.debug("p_var is empty")
+        print(f"p_var is empty: {p_var}")
         return None
+<<<<<<< HEAD
     # if "delins" in p_var and p_var.endswith("*"):
     #     match = re.match(r'p\.\*(\d+)(delins)([A-Z]+)\*', p_var)
     #     result = (match.group(1), match.group(2), match.group(3))
@@ -62,10 +63,43 @@ def parse_p_var(p_var):
         logger.debug(f"Parsed p_var successfully: {result}")
         return result
     match2 = re.match(r'p\.([A-Za-z]+)?(\d+)_?([A-Za-z]*)?(\d+)?(delins)?([A-Za-z]*)?', p_var)
+=======
+    match = re.match(r'p\.([A-Z])(\d+)([A-Z])', p_var)
+    if match:
+        start, end, reference_residues, inserted_residues, change_type = (match.group(2), match.group(2), match.group(1), match.group(3), "")
+        logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
+        return start, end, reference_residues, inserted_residues, change_type
+    match = re.match(r'p\.([A-Z])(\d+)(delins|del|ins)', p_var)
+    if match:
+        start, end, reference_residues, inserted_residues, change_type = (match.group(2), match.group(2), match.group(1), "", match.group(3))
+        logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
+        return start, end, reference_residues, inserted_residues, change_type
+    match2 = re.match(r'p\.([A-Z])(\d+)\*', p_var)
+>>>>>>> 45a2fb98c08f89358498a01db2377b5af0f0dfae
     if match2:
-        result = (match2.group(1), match2.group(2), match2.group(3), match2.group(4), match2.group(5), match2.group(6))
+        start, end, reference_residues, inserted_residues, change_type = (match2.group(2), match2.group(2), match2.group(1), "", "")
+        logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
+        return start, end, reference_residues, inserted_residues, change_type
+    match3 = re.match(r'p\.([A-Z]+)?(\d+)_?([A-Z]*)?(\d+)?(delins|del|ins)?([A-Z]*)?', p_var)
+    if match3:
+        start, end, reference_residues, inserted_residues, change_type  = (match3.group(2), match3.group(4), match3.group(1)+match3.group(3), match3.group(6), match3.group(5))
+        logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
+        return start, end, reference_residues, inserted_residues, change_type
+    match = re.match(r'p\.\*(\d+)(?:delins([A-Z]+))?\*?', p_var)
+    if match:
+        start = match.group(1)  # Start position
+        end = match.group(1)  # End position (same as start for this format)
+        reference_residues = ""  # Sequence after 'delins' if present
+        inserted_residues = match.group(2) if match.group(2) else ""  # No inserted residues in this case
+        change_type = "delins" if match.group(2) else ""  # Change type is 'delins' if it exists
+
+        # Construct result
+        result = (start, end, reference_residues, inserted_residues, change_type)
         logger.debug(f"Parsed p_var successfully: {result}")
         return result
+
+
+
     logger.warning(f"Failed to parse p_var: {p_var}")
     return None, None, None
 
@@ -205,25 +239,17 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail):
             if p_var:
                 if not parse_p_var(p_var):
                     continue
-                if len(parse_p_var(p_var))==3:
-                    p_ref, p_pos, p_alt = parse_p_var(p_var)
-                    p_variant = PVariant.objects.create(
-                        c_variant=c_variant,
-                        start=p_pos,
-                        end=p_pos,
-                        reference_residues=p_ref,
-                        inserted_residues=p_alt,
-                        change_type="delins" if "delins" in p_var else ""
-                    )
                 else:
-                    start_AA, start, end_AA, end, modification_type, inserted_sequence = parse_p_var(p_var)
+                    start, end, reference_residues, inserted_residues, change_type = parse_p_var(p_var)
+                    inserted_residues = f"{inserted_residues[:98]}*" if p_var.endswith("*") else inserted_residues[:99]
                     p_variant = PVariant.objects.create(
                         c_variant=c_variant,
                         start=start,
                         end=end,
-                        reference_residues=start_AA+end_AA,
-                        inserted_residues=inserted_sequence,
-                        change_type=modification_type
+                        reference_residues=reference_residues,
+                        inserted_residues=inserted_residues,
+                        change_type=change_type,
+                        name_meta=p_var[:99]
                     )
                 # if all([p_ref, p_pos, p_alt]):
                 #     logger.info(f"Created PVariant: {p_variant}")
@@ -390,6 +416,7 @@ def create_genes(row):
     )
     print("Gene: ", gene.name)
 
+
 def import_genes():
     # Gene.objects.filter(id__gt=1).delete()
     SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
@@ -399,6 +426,42 @@ def import_genes():
     df.apply(create_genes, axis=1)
 
 
+<<<<<<< HEAD
+=======
+def logs():
+    import pandas as pd
+    from pathlib import Path
+
+    file = Path(Path(__file__).parent.parent / "uploads" / "logs.csv")
+    df = pd.read_csv(file, )
+    df['variant'] = df['log'].apply(
+        lambda x: re.search(r"'(.*?)'", str(x)).group(1).replace(": no such group", "") if x and re.search(r"'(.*?)'", str(x)) else None
+    )
+    df["file"] = ""
+    temp = None  # Temporary variable to hold the current file name
+    for index, row in df.iterrows():
+        if pd.notnull(row['log']) and row['log'].startswith("variant_file"):
+            # Update temp with the current file name
+            temp = row['log']
+        elif pd.notnull(row['log']):
+            # Update the 'file' column in the DataFrame
+            df.at[index, 'file'] = temp.replace("variant_file: ", "")
+    df = df[df['file'] != '']
+    df = df[df['variant'].notna()]
+    df = df.drop(['Unnamed: 1'], axis=1)
+    keys = ["start", "end", "reference_residues", "inserted_residues", "change_type"]
+    for index, row in df.iterrows():
+        if "p." in row['variant']:
+            p = row['variant'].split("p.")[1]
+            start, end, reference_residues, inserted_residues, change_type = parse_p_var(f"p.{p}")
+            print(dict(zip(keys, (start, end, reference_residues, inserted_residues, change_type))))
+
+        else:
+            print("^^^^^^^^^^^", row['variant'])
+
+    pass
+
+>>>>>>> 45a2fb98c08f89358498a01db2377b5af0f0dfae
 
 if __name__ == "__main__":
     print("start")

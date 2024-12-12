@@ -19,6 +19,12 @@
     <input type="text" data-kt-docs-table-filter="search" class="form-control form-control-solid w-250px ps-15" placeholder="Search variants" />
   </div>
   <!--end::Search-->
+
+
+
+
+
+
   <!--begin::Toolbar-->
   <div class="d-flex justify-content-end" data-kt-docs-table-toolbar="base">
     <!--begin::Filter-->
@@ -31,31 +37,55 @@
     </span>
     <!--end::Svg Icon-->Filter</button>
     <!--begin::Menu 1-->
-    <div class="menu menu-sub menu-sub-dropdown w-300px w-md-325px" data-kt-menu="true" id="kt-toolbar-filter">
+    <div class="menu menu-sub menu-sub-dropdown w-600px" data-kt-menu="true" id="kt-toolbar-filter">
       <!--begin::Header-->
       <div class="px-7 py-5">
         <div class="fs-4 text-dark fw-bold">Filter Options</div>
       </div>
       <!--end::Header-->
-      <!--begin::Separator-->
       <div class="separator border-gray-200"></div>
-      <!--end::Separator-->
       <!--begin::Content-->
       <div class="px-7 py-5">
         <!--begin::Input group-->
         <div class="mb-10">
-            <div class="row mb-2">
-              <div class="col-sm-12">{{ filter.patient|as_crispy_field }}</div>
+          <div class="row mb-4">
+
+            <div class="col-sm-6">
+                <div class="row mb-2">
+                  <div class="col-sm-12">{{ filter.patient|as_crispy_field }}</div>
+                </div>
+                <div class="row mb-2">
+                <div class="col-sm-12">{{ filter.sample_lib|as_crispy_field }}</div>
+                </div>
+                <div class="row mb-2">
+                <div class="col-sm-12">{{ filter.area|as_crispy_field }}</div>
+                </div>
+                <div class="row mb-2">
+                <div class="col-sm-12">{{ filter.block|as_crispy_field }}</div>
+                </div>
+                <div class="row mb-2">
+                <div class="col-sm-12">{{ filter.sequencing_run|as_crispy_field }}</div>
+                </div>
+                <div class="row mb-2">
+                <div class="col-sm-12">{{ filter.sample_lib|as_crispy_field }}</div>
+                </div>
             </div>
-          <!--begin::Options-->
-          <div class="row mb-2">
-            <div class="col-sm-12">{{ filter.sample_lib|as_crispy_field }}</div>
-          </div>
-          <div class="row mb-2">
-            <div class="col-sm-12">{{ filter.area|as_crispy_field }}</div>
-          </div>
-          <div class="row mb-2">
-            <div class="col-sm-12">{{ filter.block|as_crispy_field }}</div>
+
+            <div class="col-sm-6">
+              <div class="row mb-2">
+                <div class="col-sm-12">{{ filter.coverage|as_crispy_field }}</div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-sm-12">{{ filter.log2r|as_crispy_field }}</div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-sm-12">{{ filter.ref_read|as_crispy_field }}</div>
+              </div>
+              <div class="row mb-2">
+                <div class="col-sm-12">{{ filter.alt_read|as_crispy_field }}</div>
+              </div>
+            </div>
+
           </div>
           <!--end::Options-->
         </div>
@@ -82,10 +112,19 @@
       </span>
       <!--end::Svg Icon-->
       Add Variant
-  </button>
+    </button>
     <!--end::Add record-->
   </div>
   <!--end::Toolbar-->
+
+
+
+
+
+
+
+
+
   <!--begin::Group actions-->
   <div class="d-flex justify-content-end align-items-center d-none" data-kt-docs-table-toolbar="selected">
     <div class="fw-bold me-5">

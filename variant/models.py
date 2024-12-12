@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Q, Count
+from django.db.models import Q, Count, F
 from datetime import datetime
 
 class VariantCall(models.Model):
@@ -21,7 +21,12 @@ class VariantCall(models.Model):
     def query_by_args(user, **kwargs):
 
         def _get_authorizated_queryset():
-            return VariantCall.objects.all().annotate()
+            return VariantCall.objects.filter().annotate(
+                blocks=F('sample_lib__na_sl_links__nucacid__area_na_links__area__block__name'),
+                areas=F('sample_lib__na_sl_links__nucacid__area_na_links__area__name'),
+                genes=F('g_variants__c_variants__gene__name'),
+                patients=F('sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__pat_id'),
+            )
 
         def _parse_value(search_value):
             if "_initial:" in search_value:
@@ -46,6 +51,10 @@ class VariantCall(models.Model):
             sample_lib_name = kwargs.get('sample_lib', None)[0]
             block_name = kwargs.get('block', None)[0]
             area_name = kwargs.get('area', None)[0]
+            coverage_value = kwargs.get('coverage', None)[0]
+            log2r_value = kwargs.get('log2r', None)[0]
+            ref_read_value = kwargs.get('ref_read', None)[0]
+            alt_read_value = kwargs.get('alt_read', None)[0]
 
             order_column = ORDER_COLUMN_CHOICES[order_column]
             # django orm '-' -> desc
@@ -63,10 +72,22 @@ class VariantCall(models.Model):
                 queryset = queryset.filter(Q(sample_lib__name__icontains=sample_lib_name))
 
             if area_name:
-                queryset = queryset.filter(Q(sample_lib__na_sl_links__nucacid__area_na_links__area__name__icontains=block_name))
+                queryset = queryset.filter(Q(sample_lib__na_sl_links__nucacid__area_na_links__area__name=area_name))
 
             if block_name:
                 queryset = queryset.filter(Q(sample_lib__na_sl_links__nucacid__area_na_links__area__block_area_links__block__name__icontains=block_name))
+
+            if coverage_value:
+                queryset = queryset.filter(coverage=coverage_value)
+
+            if log2r_value:
+                queryset = queryset.filter(log2r=log2r_value)
+
+            if ref_read_value:
+                queryset = queryset.filter(ref_read=ref_read_value)
+
+            if alt_read_value:
+                queryset = queryset.filter(alt_read=alt_read_value)
 
             # if patient_name:
             #     queryset = queryset.filter(Q(sample_lib__na_sl_links__nucacid__area_na_links__area__block_area_links__block__patient__name__icontains=patient_name))
@@ -128,7 +149,11 @@ class PVariant(models.Model):
     reference_residues = models.CharField(max_length=100, blank=True, null=True)
     inserted_residues = models.CharField(max_length=100, blank=True, null=True)
     change_type = models.CharField(max_length=100, blank=True, null=True)
+<<<<<<< HEAD
     name_meta = models.CharField(max_length=100)
+=======
+    name_meta = models.CharField(max_length=100, blank=True, null=True)
+>>>>>>> 45a2fb98c08f89358498a01db2377b5af0f0dfae
 
     class Meta:
         db_table = "p_variant"

@@ -95,3 +95,4 @@ vent/share/python-wheels/
 
 *.sql
 *.csv
+migrations/
