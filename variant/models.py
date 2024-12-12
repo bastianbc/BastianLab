@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Q, Count
+from django.db.models import Q, Count, F
 from datetime import datetime
 
 class VariantCall(models.Model):
@@ -21,7 +21,12 @@ class VariantCall(models.Model):
     def query_by_args(user, **kwargs):
 
         def _get_authorizated_queryset():
-            return VariantCall.objects.all().annotate()
+            return VariantCall.objects.filter().annotate(
+                blocks=F('sample_lib__na_sl_links__nucacid__area_na_links__area__block__name'),
+                areas=F('sample_lib__na_sl_links__nucacid__area_na_links__area__name'),
+                genes=F('g_variants__c_variants__gene__name'),
+                patients=F('sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__pat_id'),
+            )
 
         def _parse_value(search_value):
             if "_initial:" in search_value:
@@ -67,23 +72,23 @@ class VariantCall(models.Model):
                 queryset = queryset.filter(Q(sample_lib__name__icontains=sample_lib_name))
 
             if area_name:
-                queryset = queryset.filter(Q(sample_lib__na_sl_links__nucacid__area_na_links__area__name__icontains=block_name))
+                queryset = queryset.filter(Q(sample_lib__na_sl_links__nucacid__area_na_links__area__name=area_name))
 
             if block_name:
                 queryset = queryset.filter(Q(sample_lib__na_sl_links__nucacid__area_na_links__area__block_area_links__block__name__icontains=block_name))
-            
+
             if coverage_value:
                 queryset = queryset.filter(coverage=coverage_value)
-            
+
             if log2r_value:
                 queryset = queryset.filter(log2r=log2r_value)
-            
+
             if ref_read_value:
                 queryset = queryset.filter(ref_read=ref_read_value)
-            
+
             if alt_read_value:
-                queryset = queryset.filter(alt_read=alt_read_value) 
-            
+                queryset = queryset.filter(alt_read=alt_read_value)
+
             # if patient_name:
             #     queryset = queryset.filter(Q(sample_lib__na_sl_links__nucacid__area_na_links__area__block_area_links__block__patient__name__icontains=patient_name))
 
@@ -143,6 +148,7 @@ class PVariant(models.Model):
     reference_residues = models.CharField(max_length=100, blank=True, null=True)
     inserted_residues = models.CharField(max_length=100, blank=True, null=True)
     change_type = models.CharField(max_length=100, blank=True, null=True)
+    name_meta = models.CharField(max_length=100, blank=True, null=True)
 
     class Meta:
         db_table = "p_variant"
