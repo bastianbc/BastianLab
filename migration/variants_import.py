@@ -73,7 +73,7 @@ def parse_p_var(p_var):
         match3.group(2), match3.group(2), match3.group(1), "", "")
         logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
         return start, end, reference_residues, inserted_residues, change_type
-    match4 = re.match(r'p\.([A-Z]+)(\d+)_([A-Z]+)(\d+)(delins)([A-Z]+)', p_var)
+    match4 = re.match(r'p\.([A-Z]+)(\d+)_([A-Z]+)(\d+)(delins|del|ins)([A-Z]+)', p_var)
     if match4:
         start, end, reference_residues, inserted_residues, change_type = (
         match4.group(2), match4.group(4), match4.group(1) + match4.group(3), match4.group(6), match4.group(5))
