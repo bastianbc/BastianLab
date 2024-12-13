@@ -43,9 +43,6 @@ def get_caller(filename):
 
 def parse_p_var(p_var):
     logger.debug(f"Parsing p_var: {p_var}")
-    if not p_var or p_var.endswith("?"):
-        print(f"p_var is empty: {p_var}")
-        return None
     if "M1?" in p_var:
         start, end, reference_residues, inserted_residues, change_type = (1, 1, "M", "", "substitution")
         return start, end, reference_residues, inserted_residues, change_type
