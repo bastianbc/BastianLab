@@ -388,10 +388,10 @@ def create_genes(row):
 
 def import_genes():
     gene_instance = Gene.objects.get(id=1)  # Get the Gene instance
-    CVariant.objects.filter().update(gene=gene_instance)
-    Gene.objects.filter(id__gt=1).delete()
+    # CVariant.objects.filter().update(gene=gene_instance)
+    # Gene.objects.filter(id__gt=1).delete()
     SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
-    file = os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "MANE_hg19_final_filtered.csv")
+    file = os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "MANE.GRCh38.filtered.csv")
     # file = Path(Path(__file__).parent.parent / "uploads" / "MANE_hg19_final_filtered.csv")
     df = pd.read_csv(file, index_col=False)
     df = df.reset_index()
