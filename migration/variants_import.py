@@ -46,6 +46,10 @@ def parse_p_var(p_var):
     if not p_var or p_var.endswith("?"):
         print(f"p_var is empty: {p_var}")
         return None
+    if "p.M1?" in p_var:
+        start, end, reference_residues, inserted_residues, change_type = (1, 1, "M", "", "substitution")
+        return start, end, reference_residues, inserted_residues, change_type
+    match = re.match(r'p\.([A-Z])(\d+)([A-Z])', p_var)
     if "fs" in p_var:
         start, end, reference_residues, inserted_residues, change_type = (0, 0, "", "", "fs")
         return start, end, reference_residues, inserted_residues, change_type
