@@ -4,11 +4,12 @@ from django.db.models import Q, Count
 class Gene(models.Model):
     gene_id = models.IntegerField(default=0)
     name = models.CharField(max_length=30, verbose_name="Name", unique=True)
-    full_name = models.CharField(max_length=30, verbose_name="Name", blank=True, null=True)
+    full_name = models.CharField(max_length=250, verbose_name="Name", blank=True, null=True)
     chr = models.CharField(max_length=30, verbose_name="Chromosome", blank=True, null=True)
     start = models.IntegerField(default=0)
     end = models.IntegerField(default=0)
     hg = models.CharField(max_length=30, verbose_name="HG", blank=True, null=True)
+    nm_canonical = models.CharField(max_length=30, verbose_name="HG", blank=True, null=True)
 
     class Meta:
         db_table = "gene"
