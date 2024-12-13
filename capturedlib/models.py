@@ -133,7 +133,7 @@ class CapturedLib(models.Model):
             return
         self.nm = round(self.conc/(660 * float(self.frag_size)) * 10**6,2)
 
-
+ 
 
     def update_volume(self, volume):
         self.vol_remain = 0 if volume > self.vol_remain else round(self.vol_remain - volume,2)
