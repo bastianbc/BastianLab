@@ -61,6 +61,12 @@ def parse_p_var(p_var):
         match2.group(2), match2.group(2), match2.group(1), "", match2.group(3))
         logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
         return start, end, reference_residues, inserted_residues, change_type
+    match5 = re.match(r'p\.([A-Z])(\d+)_([A-Z])(\d+)(delins|del|ins)', p_var)
+    if match5:
+        start, end, reference_residues, inserted_residues, change_type = (
+        match5.group(2), match5.group(4), match5.group(1)+match5.group(3), "", match5.group(5))
+        logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
+        return start, end, reference_residues, inserted_residues, change_type
     match3 = re.match(r'p\.([A-Z])(\d+)\*', p_var)
     if match3:
         start, end, reference_residues, inserted_residues, change_type = (
