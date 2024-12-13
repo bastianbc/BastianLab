@@ -386,6 +386,8 @@ def create_genes(row):
     print("Gene: ", gene.name)
 
 def import_genes():
+    gene_instance = Gene.objects.get(id=1)  # Get the Gene instance
+    CVariant.objects.filter().update(gene=gene_instance)
     Gene.objects.filter(id__gt=1).delete()
     # SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
     # file = os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "MANE_hg19_final_filtered.csv")
