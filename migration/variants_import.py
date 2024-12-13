@@ -46,6 +46,9 @@ def parse_p_var(p_var):
     if not p_var or p_var.endswith("?"):
         print(f"p_var is empty: {p_var}")
         return None
+    if "fs" in p_var:
+        start, end, reference_residues, inserted_residues, change_type = (0, 0, "", "", "fs")
+        return start, end, reference_residues, inserted_residues, change_type
     match = re.match(r'p\.([A-Z])(\d+)([A-Z])', p_var)
     if match:
         start, end, reference_residues, inserted_residues, change_type = (
@@ -161,12 +164,10 @@ def get_variant_file(file_path):
         logger.error(f"Variant file not found: {file_path}")
         return None
 
-def get_gene(name):
+def get_gene(name, canonical):
     logger.debug(f"Getting gene: {name}")
     try:
-        if "NOTCH2NL" in name:
-            return Gene.objects.filter(name__icontains="NOTCH2NL").first()
-        gene = Gene.objects.filter(name=name).first()
+        gene = Gene.objects.filter(name=name, nm_canonical=canonical).first()
         logger.info(f"Found gene: {name}")
         return gene
     except ObjectDoesNotExist:
@@ -192,7 +193,7 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail):
         try:
             logger.debug(f"Processing entry: {entry}")
             gene, nm_id, exon, c_var, p_var = entry.split(':')
-            gene = get_gene(gene)
+            gene = get_gene(gene, nm_id)
             # Create CVariant instance
             c_variant = CVariant.objects.create(
                 g_variant=g_variant,
