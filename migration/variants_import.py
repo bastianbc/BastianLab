@@ -375,25 +375,29 @@ def import_variants():
 
 def create_genes(row):
     gene = Gene.objects.create(
-        name = row['Symbol'],
+        gene_id = row['gene_id'],
+        name = row['name'],
+        full_name = row['full_name'],
         chr = str(row['chromosome']),
-        start = int(row['start_position_on_the_genomic_accession']) if not pd.isnull(row['start_position_on_the_genomic_accession']) else 0,
-        end = int(row['end_position_on_the_genomic_accession']) if not pd.isnull(row['end_position_on_the_genomic_accession']) else 0,
+        start = int(row['start']) if not pd.isnull(row['start']) else 0,
+        end = int(row['end']) if not pd.isnull(row['end']) else 0,
+        hg = row['hg']
     )
     print("Gene: ", gene.name)
 
 def import_genes():
-    # Gene.objects.filter(id__gt=1).delete()
-    SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
-    file = os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "gene_result.txt")
+    Gene.objects.filter(id__gt=1).delete()
+    # SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
+    # file = os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "MANE_hg19_final_filtered.csv")
+    file = Path(Path(__file__).parent.parent / "uploads" / "MANE_hg19_final_filtered.csv")
     df = pd.read_csv(file, sep='\t')
     df = df.reset_index()
     df.apply(create_genes, axis=1)
-
+    pass
 
 
 if __name__ == "__main__":
     print("start")
-    import_variants()
+    import_genes()
     print("end")
 
