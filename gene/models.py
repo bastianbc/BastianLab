@@ -9,7 +9,6 @@ class Gene(models.Model):
     start = models.IntegerField(default=0)
     end = models.IntegerField(default=0)
     hg = models.CharField(max_length=30, verbose_name="HG", blank=True, null=True)
-    type = models.CharField(max_length=10, blank=True, null=True)
 
     class Meta:
         db_table = "gene"
