@@ -67,12 +67,12 @@ def parse_p_var(p_var):
         match3.group(2), match3.group(2), match3.group(1), "", "")
         logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
         return start, end, reference_residues, inserted_residues, change_type
-    match4 = re.match(r'p\.([A-Z]+)?(\d+)_?([A-Z]*)?(\d+)?(delins|del|ins)?([A-Z]*)?', p_var)
+    match4 = re.match(r'p\.([A-Z]+)(\d+)_([A-Z]+)(\d+)(delins)([A-Z]+)', p_var)
     if match4:
         start, end, reference_residues, inserted_residues, change_type = (
         match4.group(2), match4.group(4), match4.group(1) + match4.group(3), match4.group(6), match4.group(5))
         logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
-
+        return start, end, reference_residues, inserted_residues, change_type
     logger.warning(f"Failed to parse p_var: {p_var}")
     return None, None, None
 
@@ -168,6 +168,8 @@ def get_gene(name, canonical):
     logger.debug(f"Getting gene: {name}")
     try:
         gene = Gene.objects.filter(nm_canonical=canonical).first()
+        if not gene:
+            return Gene.objects.filter(name=name).first()
         logger.info(f"Found gene: {name}")
         return gene
     except ObjectDoesNotExist:
@@ -226,7 +228,7 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail):
             logger.error(f"Error processing AAChange entry '{entry}': {str(e)}")
 
 
-@transaction.atomic
+
 def variant_file_parser(file_path, analysis_run_name):
     logger.info(f"Starting variant file parser for {file_path}")
     logger.info(f"Analysis run name: {analysis_run_name}")
@@ -295,44 +297,44 @@ def variant_file_parser(file_path, analysis_run_name):
                     stats["failed"] += 1
                     continue
 
-                with transaction.atomic():
-                    logger.debug(f"Creating VariantCall for row {index + 1}")
-                    variant_call = VariantCall.objects.create(
-                        analysis_run=analysis_run,
-                        sample_lib=sample_lib,
-                        sequencing_run=get_sequencing_run(filename),
-                        variant_file=variant_file,
-                        coverage=row['Depth'],
-                        log2r=get_log2r(),
-                        caller=caller,
-                        normal_sl=get_normal_sample_lib(sample_lib),
-                        label="",
-                        ref_read=row['Ref_reads'],
-                        alt_read=row['Alt_reads'],
-                    )
 
-                    logger.debug(f"Creating GVariant for row {index + 1}")
-                    g_variant = GVariant.objects.create(
-                        variant_call=variant_call,
-                        hg=get_hg(filename),
-                        chrom=row['Chr'],
-                        start=row['Start'],
-                        end=row['End'],
-                        ref=row['Ref'][:99],
-                        alt=row['Alt'][:99],
-                        avsnp150=row.get('avsnp150', '')
-                    )
+                logger.debug(f"Creating VariantCall for row {index + 1}")
+                variant_call = VariantCall.objects.create(
+                    analysis_run=analysis_run,
+                    sample_lib=sample_lib,
+                    sequencing_run=get_sequencing_run(filename),
+                    variant_file=variant_file,
+                    coverage=row['Depth'],
+                    log2r=get_log2r(),
+                    caller=caller,
+                    normal_sl=get_normal_sample_lib(sample_lib),
+                    label="",
+                    ref_read=row['Ref_reads'],
+                    alt_read=row['Alt_reads'],
+                )
 
-                    logger.debug(f"Creating C and P variants for row {index + 1}")
-                    create_c_and_p_variants(
-                        g_variant=g_variant,
-                        aachange=row['AAChange.refGene'],
-                        func=row['Func.refGene'],
-                        gene_detail=row.get('GeneDetail.refGene', '')
-                    )
+                logger.debug(f"Creating GVariant for row {index + 1}")
+                g_variant = GVariant.objects.create(
+                    variant_call=variant_call,
+                    hg=get_hg(filename),
+                    chrom=row['Chr'],
+                    start=row['Start'],
+                    end=row['End'],
+                    ref=row['Ref'][:99],
+                    alt=row['Alt'][:99],
+                    avsnp150=row.get('avsnp150', '')
+                )
 
-                    stats["successful"] += 1
-                    logger.info(f"Successfully processed row {index + 1}")
+                logger.debug(f"Creating C and P variants for row {index + 1}")
+                create_c_and_p_variants(
+                    g_variant=g_variant,
+                    aachange=row['AAChange.refGene'],
+                    func=row['Func.refGene'],
+                    gene_detail=row.get('GeneDetail.refGene', '')
+                )
+
+                stats["successful"] += 1
+                logger.info(f"Successfully processed row {index + 1}")
 
             except Exception as e:
                 logger.error(f"Error processing row {index + 1}: {str(e)}", exc_info=True)
@@ -402,6 +404,6 @@ def import_genes():
 
 if __name__ == "__main__":
     print("start")
-    import_genes()
+    import_variants()
     print("end")
 
