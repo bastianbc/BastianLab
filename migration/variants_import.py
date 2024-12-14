@@ -374,9 +374,9 @@ def create_variant_file(row):
 
 # Parse and save data into the database
 def import_variants():
-    VariantFile.objects.filter(name='BCB002.NMLP-013.FB_Final.annovar.hg19_multianno_Filtered.txt').update(call=False)
-    files = VariantFile.objects.filter(call=False)
-    VariantCall.objects.filter(variant_file__name="'BCB002.NMLP-013.FB_Final.annovar.hg19_multianno_Filtered.txt'").delete()
+    VariantFile.objects.filter().update(call=False)
+    files = VariantFile.objects.filter()
+    VariantCall.objects.filter().delete()
     for file in files:
         file_path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA,file.directory)
         if "_Filtered" in os.path.join(file_path, file.name):
