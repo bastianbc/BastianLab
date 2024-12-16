@@ -171,11 +171,12 @@ def get_variant_file(file_path):
         logger.error(f"Variant file not found: {file_path}")
         return None
 
-def get_gene(name, canonical):
+def get_gene(name, canonical, filename):
     logger.debug(f"Getting gene: {name}")
     try:
         gene = Gene.objects.filter(nm_canonical=canonical).first()
         if not gene:
+            print(f"object not found gene: {name}, nm_id: {canonical}, file: {filename}")
             return Gene.objects.filter(name=name).first()
         logger.info(f"Found gene: {name}")
         return gene
@@ -195,14 +196,14 @@ def check_required_fields(row):
     logger.debug("All required fields present")
     return True, ""
 
-def create_c_and_p_variants(g_variant, aachange, func, gene_detail):
+def create_c_and_p_variants(g_variant, aachange, func, gene_detail, filename):
     logger.debug(f"Creating C and P variants for aachange: {aachange}")
     entries = aachange.split(',')
     for entry in entries:
         try:
             logger.debug(f"Processing entry: {entry}")
             gene, nm_id, exon, c_var, p_var = entry.split(':')
-            gene = get_gene(gene, nm_id)
+            gene = get_gene(gene, nm_id, filename)
             # Create CVariant instance
             c_variant = CVariant.objects.create(
                 g_variant=g_variant,
@@ -337,7 +338,8 @@ def variant_file_parser(file_path, analysis_run_name):
                     g_variant=g_variant,
                     aachange=row['AAChange.refGene'],
                     func=row['Func.refGene'],
-                    gene_detail=row.get('GeneDetail.refGene', '')
+                    gene_detail=row.get('GeneDetail.refGene', ''),
+                    filename = filename
                 )
 
                 stats["successful"] += 1
