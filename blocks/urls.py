@@ -9,6 +9,7 @@ urlpatterns = [
     path('add_block_to_patient_async', views.add_block_to_patient_async, name='add-block-to-patient-async'),
     path('add_block_to_project_async', views.add_block_to_project_async, name='add-block-to-project-async'),
     path('remove_block_from_project_async', views.remove_block_from_project_async, name='remove-block-from-project-async'),
+    path('remove_block_from_patient_async', views.remove_block_from_patient_async, name='remove-block-from-patient-async'),
     path('edit/<str:id>', views.edit_block, name='edit-block'),
     path("edit_block_async", views.edit_block_async, name="edit-block-async"),
     path('delete/<str:id>', views.delete_block, name='delete-block'),

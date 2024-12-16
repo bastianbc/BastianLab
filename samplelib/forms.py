@@ -59,7 +59,7 @@ class FilterForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(FilterForm, self).__init__(*args, **kwargs)
         self.fields["sequencing_run"].widget.attrs.update({'class':'form-control-sm'})
-        self.fields["sequencing_run"].widget.attrs["data-control"] = "select2"
+        #self.fields["sequencing_run"].widget.attrs["data-control"] = "select2"
         # self.fields["patient"].widget.attrs.update({'class':'form-control-sm'})
         self.fields["barcode"].widget.attrs.update({'class':'form-control-sm'})
         self.fields["i5"].widget.attrs.update({'class':'form-control-sm'})

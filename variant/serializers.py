@@ -42,7 +42,7 @@ class VariantSerializer(serializers.ModelSerializer):
     def get_p_variant(self,obj):
         try:
             p_variant = PVariant.objects.filter(c_variant__g_variant__variant_call=obj)
-            return ", ".join([p.name_meta for p in p_variant]) # TODO: format as expected
+            return ", ".join([p.name_meta for p in p_variant if p.name_meta is not None]) # TODO: format as expected
         except Exception as e:
             print(str(e))
             return None
@@ -50,7 +50,7 @@ class VariantSerializer(serializers.ModelSerializer):
     def get_c_variant(self,obj):
         try:
             c_variant = CVariant.objects.filter(g_variant__variant_call=obj)
-            return ", ".join([c.c_var for c in c_variant]) # TODO: format as expected
+            return ", ".join([c.c_var for c in c_variant if c.c_var is not None]) # TODO: format as expected
         except Exception as e:
             print(str(e))
             return None

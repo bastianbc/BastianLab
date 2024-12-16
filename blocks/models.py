@@ -140,7 +140,8 @@ class Blocks(models.Model):
             return queryset.filter(Q(project__pr_id=value))
 
         def _filter_by_patient(value):
-            return queryset.filter(Q(patient__pat_id=value))
+            print("//////////////==========")
+            return queryset.filter(Q(patient__pa_id=value))
 
         def _filter_by_area(value):
             return queryset.filter(Q(block_areas__ar_id=value))

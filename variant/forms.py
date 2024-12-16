@@ -37,15 +37,15 @@ class FilterForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(FilterForm, self).__init__(*args, **kwargs)
         self.fields["patient"].widget.attrs.update({'class': 'form-control-sm'})
-        self.fields["patient"].widget.attrs["data-control"] = "select2"
+        #self.fields["patient"].widget.attrs["data-control"] = "select2"
         self.fields["block"].widget.attrs.update({'class': 'form-control-sm'})
-        self.fields["block"].widget.attrs["data-control"] = "select2"
+        #self.fields["block"].widget.attrs["data-control"] = "select2"
         self.fields["sequencing_run"].widget.attrs.update({'class': 'form-control-sm'})
-        self.fields["sequencing_run"].widget.attrs["data-control"] = "select2"
+        #self.fields["sequencing_run"].widget.attrs["data-control"] = "select2"
         self.fields["sample_lib"].widget.attrs.update({'class': 'form-control-sm'})
-        self.fields["sample_lib"].widget.attrs["data-control"] = "select2"
+        #self.fields["sample_lib"].widget.attrs["data-control"] = "select2"
         self.fields["area"].widget.attrs.update({'class': 'form-control-sm'})
-        self.fields["area"].widget.attrs["data-control"] = "select2"
+        #self.fields["area"].widget.attrs["data-control"] = "select2"
         self.fields["coverage"].widget.attrs.update({'class':'form-control-sm'})
         self.fields["log2r"].widget.attrs.update({'class':'form-control-sm'})
         self.fields["ref_read"].widget.attrs.update({'class':'form-control-sm'})

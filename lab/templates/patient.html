@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<form method="post" action="{% if id %} {% url 'edit-patient' id %} {% else %} {% url 'new-patient' %} {% endif %}">
+<form method="post" action="{% if id %} {% url 'edit-patient' id %} {% else %} {% url 'new-patient' %} {% endif %}" novalidate>
   <div class="card">
     <div class="card-header">
       <h3 class="card-title">Patient</h3>
@@ -18,13 +18,22 @@
         <div class="col-6">{{ form.race|as_crispy_field }}</div>
         <div class="col-6">{{ form.source|as_crispy_field }}</div>
         <div class="col-6">{{ form.consent|as_crispy_field }}</div>
+        <div class="col-6">{{ form.blocks|as_crispy_field }}</div>
         <div class= "col-12"> {{form.notes|as_crispy_field}}</div>
       </div>
     </div>
     <div class="card-footer">
       <a href="/lab" class="btn btn-secondary">Cancel</a>
       <button type="submit" class="btn btn-success">Save</button>
+      {% if id %}
+      <a href="/blocks?model=patient&id={{ id }}&initial=false" class="btn btn-primary">Add Block(s)</a>
+      {% endif %}
     </div>
   </div>
 </form>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/assets/js/custom/documentation/forms/select2.js"></script>
+
 {% endblock %}

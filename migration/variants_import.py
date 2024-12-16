@@ -46,24 +46,6 @@ def parse_p_var(p_var):
     if not p_var or p_var.endswith("?"):
         print(f"p_var is empty: {p_var}")
         return None
-<<<<<<< HEAD
-    # if "delins" in p_var and p_var.endswith("*"):
-    #     match = re.match(r'p\.\*(\d+)(delins)([A-Z]+)\*', p_var)
-    #     result = (match.group(1), match.group(2), match.group(3))
-    #     logger.debug(f"Parsed p_var successfully: {result}")
-    #     return result
-    if "delins" not in p_var and p_var.endswith("*"):
-        match = re.match(r'p\.([A-Za-z])(\d+)(\*)', p_var)
-        result = (match.group(1), match.group(2), match.group(3))
-        logger.debug(f"Parsed p_var successfully: {result}")
-        return result
-    match = re.match(r'p\.([A-Za-z])(\d+)([A-Za-z])', p_var)
-    if match:
-        result = (match.group(1), match.group(2), match.group(3))
-        logger.debug(f"Parsed p_var successfully: {result}")
-        return result
-    match2 = re.match(r'p\.([A-Za-z]+)?(\d+)_?([A-Za-z]*)?(\d+)?(delins)?([A-Za-z]*)?', p_var)
-=======
     match = re.match(r'p\.([A-Z])(\d+)([A-Z])', p_var)
     if match:
         start, end, reference_residues, inserted_residues, change_type = (match.group(2), match.group(2), match.group(1), match.group(3), "")
@@ -75,7 +57,6 @@ def parse_p_var(p_var):
         logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
         return start, end, reference_residues, inserted_residues, change_type
     match2 = re.match(r'p\.([A-Z])(\d+)\*', p_var)
->>>>>>> 45a2fb98c08f89358498a01db2377b5af0f0dfae
     if match2:
         start, end, reference_residues, inserted_residues, change_type = (match2.group(2), match2.group(2), match2.group(1), "", "")
         logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
@@ -424,44 +405,6 @@ def import_genes():
     df = pd.read_csv(file, sep='\t')
     df = df.reset_index()
     df.apply(create_genes, axis=1)
-
-
-<<<<<<< HEAD
-=======
-def logs():
-    import pandas as pd
-    from pathlib import Path
-
-    file = Path(Path(__file__).parent.parent / "uploads" / "logs.csv")
-    df = pd.read_csv(file, )
-    df['variant'] = df['log'].apply(
-        lambda x: re.search(r"'(.*?)'", str(x)).group(1).replace(": no such group", "") if x and re.search(r"'(.*?)'", str(x)) else None
-    )
-    df["file"] = ""
-    temp = None  # Temporary variable to hold the current file name
-    for index, row in df.iterrows():
-        if pd.notnull(row['log']) and row['log'].startswith("variant_file"):
-            # Update temp with the current file name
-            temp = row['log']
-        elif pd.notnull(row['log']):
-            # Update the 'file' column in the DataFrame
-            df.at[index, 'file'] = temp.replace("variant_file: ", "")
-    df = df[df['file'] != '']
-    df = df[df['variant'].notna()]
-    df = df.drop(['Unnamed: 1'], axis=1)
-    keys = ["start", "end", "reference_residues", "inserted_residues", "change_type"]
-    for index, row in df.iterrows():
-        if "p." in row['variant']:
-            p = row['variant'].split("p.")[1]
-            start, end, reference_residues, inserted_residues, change_type = parse_p_var(f"p.{p}")
-            print(dict(zip(keys, (start, end, reference_residues, inserted_residues, change_type))))
-
-        else:
-            print("^^^^^^^^^^^", row['variant'])
-
-    pass
-
->>>>>>> 45a2fb98c08f89358498a01db2377b5af0f0dfae
 
 if __name__ == "__main__":
     print("start")
