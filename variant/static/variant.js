@@ -13,14 +13,15 @@ var KTDatatablesServerSide = function () {
     // Private functions
     var initDatatable = function (
         initialValue,
-        filterPatient = null,
-        filterSampleLib = null,
-        filterArea = null,
-        filterBlock = null,
-        filterCoverage = null,
-        filterLog2r = null,
-        filterRefRead = null,
-        filterAltRead = null) {
+        filterPatient,
+        filterArea,
+        filterBlock,
+        filterSampleLib,
+        filterSequencingRun,
+        filterCoverage,
+        filterLog2r,
+        filterRefRead,
+        filterAltRead) {
 
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
 
@@ -47,9 +48,10 @@ var KTDatatablesServerSide = function () {
               type: 'GET',
               data:{
                 "patient": filterPatient,
-                "sample_lib": filterSampleLib,
                 "area": filterArea,
                 "block": filterBlock,
+                "sample_lib": filterSampleLib,
+                "sequencing_run":filterSequencingRun,
                 "coverage": filterCoverage,
                 "log2r": filterLog2r,
                 "ref_read": filterRefRead,
@@ -96,6 +98,21 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
+                  targets: 7,
+                  orderable: false,
+                
+                },
+                {
+                  targets: 8,
+                  orderable: false,
+                
+                },
+                {
+                  targets: 9,
+                  orderable: false,
+                
+                },
+                {
                     targets: 10,
                     data: null,
                     orderable: false,
@@ -136,6 +153,7 @@ var KTDatatablesServerSide = function () {
                     },
                 },
             ],
+            
             // Add data-filter attribute
             createdRow: function (row, data, dataIndex) {
                 $(row).find('td:eq(4)').attr('data-filter', data.CreditCardType);
@@ -215,16 +233,20 @@ var KTDatatablesServerSide = function () {
         filterButton.addEventListener('click', function () {
 
           var patient = document.getElementById("id_patient").value;
-          var sampleLib = document.getElementById("id_sample_lib").text;
+          var sequencingRun = document.getElementById("id_sequencing_run").value
+          var sampleLib = document.getElementById("id_sample_lib").value;
           var area = document.getElementById("id_area").value;
           var block = document.getElementById("id_block").value;
           var coverage = document.getElementById("id_coverage").value;
           var log2r = document.getElementById("id_log2r").value;
           var refRead = document.getElementById("id_ref_read").value;
           var altRead = document.getElementById("id_alt_read").value;
-
+          
+          console.log(sampleLib);
+         
           // DataTable'ı başlat
-          initDatatable(null, patient, sampleLib, area, block, coverage, log2r, refRead, altRead);
+          initDatatable(null, patient, area, block, sampleLib, sequencingRun ,coverage, log2r, refRead, altRead);
+          
         });
 
     }
@@ -357,6 +379,7 @@ var KTDatatablesServerSide = function () {
         resetButton.addEventListener('click', function () {
 
             document.getElementById("id_patient").value = "";
+            document.getElementById("id_sequencing_run").value= ""
             document.getElementById("id_sample_lib").value = "";
             document.getElementById("id_area").value = "";
             document.getElementById("id_block").value = "";
@@ -365,7 +388,7 @@ var KTDatatablesServerSide = function () {
             document.getElementById("id_ref_read").value = "";
             document.getElementById("id_alt_read").value = "";
 
-            initDatatable();
+            initDatatable(null ,null,null,null,null,null,null,null,null,null);
         });
     }
 
@@ -789,7 +812,7 @@ var KTDatatablesServerSide = function () {
     // Public methods
     return {
         init: function () {
-            initDatatable( handleInitialValue() );
+            initDatatable( handleInitialValue() ,null,null,null,null,null,null,null,null,null);
             handleSearchDatatable();
             initToggleToolbar();
             handleFilterDatatable();

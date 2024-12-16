@@ -55,9 +55,6 @@
                   <div class="col-sm-12">{{ filter.patient|as_crispy_field }}</div>
                 </div>
                 <div class="row mb-2">
-                <div class="col-sm-12">{{ filter.sample_lib|as_crispy_field }}</div>
-                </div>
-                <div class="row mb-2">
                 <div class="col-sm-12">{{ filter.area|as_crispy_field }}</div>
                 </div>
                 <div class="row mb-2">
@@ -198,14 +195,15 @@
             </div>
         </th>
         <th>Patient</th>
+        <th>Area</th>
+        <th>Block</th>
         <th>Sample Library</th>
         <th>Sequencing Run</th>
-        <th>Block</th>
-        <th>Area</th>
         <th>Gene</th>
-        <th>pVariant</th>
-        <th>cVariant</th>
         <th>gVariant</th>
+        <th>cVariant</th>
+        <th>pVariant</th>
+        
         <th class="text-end min-w-100px">Actions</th>
     </tr>
     {% csrf_token %}

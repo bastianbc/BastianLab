@@ -39,7 +39,16 @@ class VariantCall(models.Model):
 
         try:
             ORDER_COLUMN_CHOICES = {
-                "0": "id",
+                 '0': 'id',
+                 '1': 'patients',
+                 '2': 'areas',
+                 '3': 'blocks',
+                 '4': 'sample_lib',
+                 '5': 'sequencing_run',
+                 '6': 'genes',
+                # '7': 'g_variant',
+                # '8': 'c_variant',
+                # '9': 'p_variant',
             }
             draw = int(kwargs.get('draw', None)[0])
             length = int(kwargs.get('length', None)[0])
@@ -69,14 +78,13 @@ class VariantCall(models.Model):
             search_value = _parse_value(search_value)
 
             if sample_lib_name:
-                queryset = queryset.filter(Q(sample_lib__name__icontains=sample_lib_name))
+                queryset = queryset.filter(Q(sample_lib__id=sample_lib_name))
 
             if area_name:
                 queryset = queryset.filter(Q(sample_lib__na_sl_links__nucacid__area_na_links__area__name=area_name))
 
-            if block_name:
-                queryset = queryset.filter(Q(sample_lib__na_sl_links__nucacid__area_na_links__area__block_area_links__block__name__icontains=block_name))
-
+            if block_name:                   
+                queryset = queryset.filter(Q(sample_lib__na_sl_links__nucacid__area_na_links__area__block_area_links__block__bl_id=block_name))
             if coverage_value:
                 queryset = queryset.filter(coverage=coverage_value)
 
@@ -149,11 +157,7 @@ class PVariant(models.Model):
     reference_residues = models.CharField(max_length=100, blank=True, null=True)
     inserted_residues = models.CharField(max_length=100, blank=True, null=True)
     change_type = models.CharField(max_length=100, blank=True, null=True)
-<<<<<<< HEAD
-    name_meta = models.CharField(max_length=100)
-=======
     name_meta = models.CharField(max_length=100, blank=True, null=True)
->>>>>>> 45a2fb98c08f89358498a01db2377b5af0f0dfae
 
     class Meta:
         db_table = "p_variant"

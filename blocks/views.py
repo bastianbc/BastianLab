@@ -26,12 +26,12 @@ def blocks(request):
     model = request.GET.get("model")
     filter = FilterForm()
     form = AreaCreationForm()
-
     if model=="project" and id:
         project = Projects.objects.get(pr_id=id)
     elif model=="patient" and id:
-        patient = Patients.objects.get(pat_id=id)
-
+        patient = Patients.objects.get(pa_id=id)
+        print(patient)
+       
     return render(request,"block_list.html",locals())
 
 @permission_required("blocks.add_blocks",raise_exception=True)
@@ -52,12 +52,31 @@ def new_block(request):
 @permission_required_for_async("blocks.add_blocks")
 def add_block_to_patient_async(request):
     selected_ids = json.loads(request.GET.get("selected_ids"))
+    patient_id = request.GET.get("patient_id")
+
+    try:
+        patient = Patients.objects.get(pa_id=patient_id)
+        for id in selected_ids:
+            """Blocks.objects.create(patient=patient)"""
+            block = Blocks.objects.get(bl_id=id)
+            block.patient = patient
+            block.save()
+    except Exception as e:
+        return JsonResponse({"success":False})
+
+    return JsonResponse({"success":True})
+
+@permission_required_for_async("blocks.change_blocks")
+def remove_block_from_patient_async(request):
+    selected_ids = json.loads(request.GET.get("selected_ids"))
 
     try:
         for id in selected_ids:
-            patient = Patients.objects.get(pa_id=id)
-            Blocks.objects.create(patient=patient)
+            block = Blocks.objects.get(bl_id=id)
+            block.patient = None
+            block.save()
     except Exception as e:
+        print(str(e))
         return JsonResponse({"success":False})
 
     return JsonResponse({"success":True})
