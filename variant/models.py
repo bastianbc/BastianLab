@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Q, Count, F
+from django.db.models import Q, Count, F, OuterRef, Subquery, Func, Value, CharField
 from datetime import datetime
 
 class VariantCall(models.Model):
@@ -21,11 +21,37 @@ class VariantCall(models.Model):
     def query_by_args(user, **kwargs):
 
         def _get_authorizated_queryset():
+            c_variant_subquery = CVariant.objects.filter(
+                g_variant__variant_call=OuterRef('pk')  # Reference the current VariantCall
+            ).values('c_var')[:1]
+
+            p_variant_subquery = PVariant.objects.filter(
+                c_variant__g_variant__variant_call=OuterRef('pk')  # Reference the current VariantCall
+            ).values('name_meta')[:1]
+            g_variant_subquery = GVariant.objects.filter(
+                variant_call=OuterRef('pk')  # Reference the current VariantCall
+            ).values('chrom', 'start', 'end', 'avsnp150')[:1]
+
+            # Concatenate fields to match the required format
+            g_variant_annotation = Func(
+                Subquery(g_variant_subquery.values('chrom')[:1]),
+                Value('-'),
+                Subquery(g_variant_subquery.values('start')[:1]),
+                Value('-'),
+                Subquery(g_variant_subquery.values('end')[:1]),
+                Value('-'),
+                Subquery(g_variant_subquery.values('avsnp150')[:1]),
+                function='CONCAT',
+                output_field=CharField()
+            )
             return VariantCall.objects.filter().annotate(
                 blocks=F('sample_lib__na_sl_links__nucacid__area_na_links__area__block__name'),
-                areas=F('sample_lib__na_sl_links__nucacid__area_na_links__area__name'),
-                genes=F('g_variants__c_variants__gene__name'),
-                patients=F('sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__pat_id'),
+                areas = F('sample_lib__na_sl_links__nucacid__area_na_links__area__name'),
+                genes = F('g_variants__c_variants__gene__name'),
+                patients = F('sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__pat_id'),
+                cvariant = Subquery(c_variant_subquery),
+                pvariant = Subquery(p_variant_subquery),
+                gvariant=g_variant_annotation
             )
 
         def _parse_value(search_value):
@@ -39,16 +65,7 @@ class VariantCall(models.Model):
 
         try:
             ORDER_COLUMN_CHOICES = {
-                 '0': 'id',
-                 '1': 'patients',
-                 '2': 'areas',
-                 '3': 'blocks',
-                 '4': 'sample_lib',
-                 '5': 'sequencing_run',
-                 '6': 'genes',
-                # '7': 'g_variant',
-                # '8': 'c_variant',
-                # '9': 'p_variant',
+                "0": "id",
             }
             draw = int(kwargs.get('draw', None)[0])
             length = int(kwargs.get('length', None)[0])
@@ -56,14 +73,15 @@ class VariantCall(models.Model):
             search_value = kwargs.get('search[value]', None)[0]
             order_column = kwargs.get('order[0][column]', None)[0]
             order = kwargs.get('order[0][dir]', None)[0]
-            patient_name = "kwargs.get('patient', None)[0]"
-            sample_lib_name = kwargs.get('sample_lib', None)[0]
-            block_name = kwargs.get('block', None)[0]
-            area_name = kwargs.get('area', None)[0]
+            patient = kwargs.get('patient', None)[0]
+            sample_lib = kwargs.get('sample_lib', None)[0]
+            block = kwargs.get('block', None)[0]
+            area = kwargs.get('area', None)[0]
             coverage_value = kwargs.get('coverage', None)[0]
             log2r_value = kwargs.get('log2r', None)[0]
             ref_read_value = kwargs.get('ref_read', None)[0]
             alt_read_value = kwargs.get('alt_read', None)[0]
+
 
             order_column = ORDER_COLUMN_CHOICES[order_column]
             # django orm '-' -> desc
@@ -77,28 +95,32 @@ class VariantCall(models.Model):
             is_initial = _is_initial_value(search_value)
             search_value = _parse_value(search_value)
 
-            if sample_lib_name:
-                queryset = queryset.filter(Q(sample_lib__id=sample_lib_name))
 
-            if area_name:
-                queryset = queryset.filter(Q(sample_lib__na_sl_links__nucacid__area_na_links__area__name=area_name))
+            if sample_lib:
+                queryset = queryset.filter(Q(sample_lib__id=sample_lib))
 
-            if block_name:                   
-                queryset = queryset.filter(Q(sample_lib__na_sl_links__nucacid__area_na_links__area__block_area_links__block__bl_id=block_name))
+            if area:
+                queryset = queryset.filter(
+                    Q(sample_lib__na_sl_links__nucacid__area_na_links__area__ar_id=block))
+
+            if block:
+                queryset = queryset.filter(
+                    Q(sample_lib__na_sl_links__nucacid__area_na_links__area__block_area_links__block__bl_id=block))
+
+            if patient:
+                queryset = queryset.filter(
+                    Q(sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__pa_id=patient))
             if coverage_value:
                 queryset = queryset.filter(coverage=coverage_value)
-
+            
             if log2r_value:
                 queryset = queryset.filter(log2r=log2r_value)
-
+            
             if ref_read_value:
                 queryset = queryset.filter(ref_read=ref_read_value)
-
+            
             if alt_read_value:
-                queryset = queryset.filter(alt_read=alt_read_value)
-
-            # if patient_name:
-            #     queryset = queryset.filter(Q(sample_lib__na_sl_links__nucacid__area_na_links__area__block_area_links__block__patient__name__icontains=patient_name))
+                queryset = queryset.filter(alt_read=alt_read_value) 
 
             if is_initial:
                 # filter = [sequencing_run.id for sequencing_run in SequencingRun.objects.filter(id=search_value)]
@@ -145,7 +167,6 @@ class CVariant(models.Model):
     exon = models.CharField(max_length=100, blank=True, null=True)
     func = models.CharField(max_length=100, blank=True, null=True)
     gene_detail = models.CharField(max_length=100)
-    name_meta = models.CharField(max_length=100)
 
     class Meta:
         db_table = "c_variant"
@@ -157,7 +178,7 @@ class PVariant(models.Model):
     reference_residues = models.CharField(max_length=100, blank=True, null=True)
     inserted_residues = models.CharField(max_length=100, blank=True, null=True)
     change_type = models.CharField(max_length=100, blank=True, null=True)
-    name_meta = models.CharField(max_length=100, blank=True, null=True)
+    name_meta = models.CharField(max_length=100)
 
     class Meta:
         db_table = "p_variant"

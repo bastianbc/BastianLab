@@ -43,44 +43,43 @@ def get_caller(filename):
 
 def parse_p_var(p_var):
     logger.debug(f"Parsing p_var: {p_var}")
-    if not p_var or p_var.endswith("?"):
-        print(f"p_var is empty: {p_var}")
-        return None
+    if "M1?" in p_var:
+        start, end, reference_residues, inserted_residues, change_type = (1, 1, "M", "", "substitution")
+        return start, end, reference_residues, inserted_residues, change_type
+    match = re.match(r'p\.([A-Z])(\d+)([A-Z])', p_var)
+    if "fs" in p_var:
+        start, end, reference_residues, inserted_residues, change_type = (0, 0, "", "", "fs")
+        return start, end, reference_residues, inserted_residues, change_type
     match = re.match(r'p\.([A-Z])(\d+)([A-Z])', p_var)
     if match:
-        start, end, reference_residues, inserted_residues, change_type = (match.group(2), match.group(2), match.group(1), match.group(3), "")
+        start, end, reference_residues, inserted_residues, change_type = (
+        match.group(2), match.group(2), match.group(1), match.group(3), "")
         logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
         return start, end, reference_residues, inserted_residues, change_type
-    match = re.match(r'p\.([A-Z])(\d+)(delins|del|ins)', p_var)
-    if match:
-        start, end, reference_residues, inserted_residues, change_type = (match.group(2), match.group(2), match.group(1), "", match.group(3))
-        logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
-        return start, end, reference_residues, inserted_residues, change_type
-    match2 = re.match(r'p\.([A-Z])(\d+)\*', p_var)
+    match2 = re.match(r'p\.([A-Z])(\d+)(delins|del|ins)', p_var)
     if match2:
-        start, end, reference_residues, inserted_residues, change_type = (match2.group(2), match2.group(2), match2.group(1), "", "")
+        start, end, reference_residues, inserted_residues, change_type = (
+        match2.group(2), match2.group(2), match2.group(1), "", match2.group(3))
         logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
         return start, end, reference_residues, inserted_residues, change_type
-    match3 = re.match(r'p\.([A-Z]+)?(\d+)_?([A-Z]*)?(\d+)?(delins|del|ins)?([A-Z]*)?', p_var)
+    match5 = re.match(r'p\.([A-Z])(\d+)_([A-Z])(\d+)(delins|del|ins)', p_var)
+    if match5:
+        start, end, reference_residues, inserted_residues, change_type = (
+        match5.group(2), match5.group(4), match5.group(1)+match5.group(3), "", match5.group(5))
+        logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
+        return start, end, reference_residues, inserted_residues, change_type
+    match3 = re.match(r'p\.([A-Z])(\d+)\*', p_var)
     if match3:
-        start, end, reference_residues, inserted_residues, change_type  = (match3.group(2), match3.group(4), match3.group(1)+match3.group(3), match3.group(6), match3.group(5))
+        start, end, reference_residues, inserted_residues, change_type = (
+        match3.group(2), match3.group(2), match3.group(1), "", "")
         logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
         return start, end, reference_residues, inserted_residues, change_type
-    match = re.match(r'p\.\*(\d+)(?:delins([A-Z]+))?\*?', p_var)
-    if match:
-        start = match.group(1)  # Start position
-        end = match.group(1)  # End position (same as start for this format)
-        reference_residues = ""  # Sequence after 'delins' if present
-        inserted_residues = match.group(2) if match.group(2) else ""  # No inserted residues in this case
-        change_type = "delins" if match.group(2) else ""  # Change type is 'delins' if it exists
-
-        # Construct result
-        result = (start, end, reference_residues, inserted_residues, change_type)
-        logger.debug(f"Parsed p_var successfully: {result}")
-        return result
-
-
-
+    match4 = re.match(r'p\.([A-Z]+)(\d+)_([A-Z]+)(\d+)(delins|del|ins)([A-Z]+)', p_var)
+    if match4:
+        start, end, reference_residues, inserted_residues, change_type = (
+        match4.group(2), match4.group(4), match4.group(1) + match4.group(3), match4.group(6), match4.group(5))
+        logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
+        return start, end, reference_residues, inserted_residues, change_type
     logger.warning(f"Failed to parse p_var: {p_var}")
     return None, None, None
 
@@ -172,12 +171,12 @@ def get_variant_file(file_path):
         logger.error(f"Variant file not found: {file_path}")
         return None
 
-def get_gene(name):
+def get_gene(name, canonical):
     logger.debug(f"Getting gene: {name}")
     try:
-        if "NOTCH2NL" in name:
-            return Gene.objects.filter(name__icontains="NOTCH2NL").first()
-        gene = Gene.objects.filter(name=name).first()
+        gene = Gene.objects.filter(nm_canonical=canonical).first()
+        if not gene:
+            return Gene.objects.filter(name=name).first()
         logger.info(f"Found gene: {name}")
         return gene
     except ObjectDoesNotExist:
@@ -203,7 +202,7 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail):
         try:
             logger.debug(f"Processing entry: {entry}")
             gene, nm_id, exon, c_var, p_var = entry.split(':')
-            gene = get_gene(gene)
+            gene = get_gene(gene, nm_id)
             # Create CVariant instance
             c_variant = CVariant.objects.create(
                 g_variant=g_variant,
@@ -232,15 +231,11 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail):
                         change_type=change_type,
                         name_meta=p_var[:99]
                     )
-                # if all([p_ref, p_pos, p_alt]):
-                #     logger.info(f"Created PVariant: {p_variant}")
-                # else:
-                #     logger.warning(f"Skipped PVariant creation due to invalid p_var: {p_var}")
         except Exception as e:
             logger.error(f"Error processing AAChange entry '{entry}': {str(e)}")
 
 
-@transaction.atomic
+
 def variant_file_parser(file_path, analysis_run_name):
     logger.info(f"Starting variant file parser for {file_path}")
     logger.info(f"Analysis run name: {analysis_run_name}")
@@ -309,44 +304,44 @@ def variant_file_parser(file_path, analysis_run_name):
                     stats["failed"] += 1
                     continue
 
-                with transaction.atomic():
-                    logger.debug(f"Creating VariantCall for row {index + 1}")
-                    variant_call = VariantCall.objects.create(
-                        analysis_run=analysis_run,
-                        sample_lib=sample_lib,
-                        sequencing_run=get_sequencing_run(filename),
-                        variant_file=variant_file,
-                        coverage=row['Depth'],
-                        log2r=get_log2r(),
-                        caller=caller,
-                        normal_sl=get_normal_sample_lib(sample_lib),
-                        label="",
-                        ref_read=row['Ref_reads'],
-                        alt_read=row['Alt_reads'],
-                    )
 
-                    logger.debug(f"Creating GVariant for row {index + 1}")
-                    g_variant = GVariant.objects.create(
-                        variant_call=variant_call,
-                        hg=get_hg(filename),
-                        chrom=row['Chr'],
-                        start=row['Start'],
-                        end=row['End'],
-                        ref=row['Ref'][:99],
-                        alt=row['Alt'][:99],
-                        avsnp150=row.get('avsnp150', '')
-                    )
+                logger.debug(f"Creating VariantCall for row {index + 1}")
+                variant_call = VariantCall.objects.create(
+                    analysis_run=analysis_run,
+                    sample_lib=sample_lib,
+                    sequencing_run=get_sequencing_run(filename),
+                    variant_file=variant_file,
+                    coverage=row['Depth'],
+                    log2r=get_log2r(),
+                    caller=caller,
+                    normal_sl=get_normal_sample_lib(sample_lib),
+                    label="",
+                    ref_read=row['Ref_reads'],
+                    alt_read=row['Alt_reads'],
+                )
 
-                    logger.debug(f"Creating C and P variants for row {index + 1}")
-                    create_c_and_p_variants(
-                        g_variant=g_variant,
-                        aachange=row['AAChange.refGene'],
-                        func=row['Func.refGene'],
-                        gene_detail=row.get('GeneDetail.refGene', '')
-                    )
+                logger.debug(f"Creating GVariant for row {index + 1}")
+                g_variant = GVariant.objects.create(
+                    variant_call=variant_call,
+                    hg=get_hg(filename),
+                    chrom=row['Chr'],
+                    start=row['Start'],
+                    end=row['End'],
+                    ref=row['Ref'][:99],
+                    alt=row['Alt'][:99],
+                    avsnp150=row.get('avsnp150', '')
+                )
 
-                    stats["successful"] += 1
-                    logger.info(f"Successfully processed row {index + 1}")
+                logger.debug(f"Creating C and P variants for row {index + 1}")
+                create_c_and_p_variants(
+                    g_variant=g_variant,
+                    aachange=row['AAChange.refGene'],
+                    func=row['Func.refGene'],
+                    gene_detail=row.get('GeneDetail.refGene', '')
+                )
+
+                stats["successful"] += 1
+                logger.info(f"Successfully processed row {index + 1}")
 
             except Exception as e:
                 logger.error(f"Error processing row {index + 1}: {str(e)}", exc_info=True)
@@ -390,24 +385,31 @@ def import_variants():
 
 def create_genes(row):
     gene = Gene.objects.create(
-        name = row['Symbol'],
-        chr = str(row['chromosome']),
-        start = int(row['start_position_on_the_genomic_accession']) if not pd.isnull(row['start_position_on_the_genomic_accession']) else 0,
-        end = int(row['end_position_on_the_genomic_accession']) if not pd.isnull(row['end_position_on_the_genomic_accession']) else 0,
+        gene_id = row['gene_id'],
+        name = row['name'],
+        full_name = row['full_name'],
+        chr = str(row['chr']),
+        start = int(row['start']) if not pd.isnull(row['start']) else 0,
+        end = int(row['end']) if not pd.isnull(row['end']) else 0,
+        hg = row['hg'],
+        nm_canonical = row['NM_canonical']
     )
     print("Gene: ", gene.name)
 
-
 def import_genes():
+    # gene_instance = Gene.objects.get(id=1)  # Get the Gene instance
+    # CVariant.objects.filter().update(gene=gene_instance)
     # Gene.objects.filter(id__gt=1).delete()
     SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
-    file = os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "gene_result.txt")
-    df = pd.read_csv(file, sep='\t')
+    # file = os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "MANE.GRCh38.filtered.csv")
+    file = Path(Path(__file__).parent.parent / "uploads" / "MANE_hg19_final_filtered.csv")
+    df = pd.read_csv(file, index_col=False)
     df = df.reset_index()
-    df.apply(create_genes, axis=1)
+    # df.apply(create_genes, axis=1)
+    pass
+
 
 if __name__ == "__main__":
     print("start")
     import_variants()
     print("end")
-
