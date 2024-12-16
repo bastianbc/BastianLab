@@ -181,3 +181,25 @@ class VariantFile(models.Model):
 
     class Meta:
         db_table = "variant_file"
+
+
+class Cns(models.Model):
+    sample_lib = models.ForeignKey("samplelib.SampleLib", on_delete=models.CASCADE, related_name="variant_calls", blank=True, null=True)
+    sequencing_run = models.ForeignKey("sequencingrun.SequencingRun", on_delete=models.CASCADE, related_name="variant_calls", blank=True, null=True)
+    variant_file = models.ForeignKey("variant.VariantFile", on_delete=models.CASCADE, related_name="variant_calls", blank=True, null=True)
+    chromosome = models.CharField(max_length=20, blank=True, null=True)
+    start = models.IntegerField(default=0, blank=True, null=True)
+    end = models.IntegerField(default=0, blank=True, null=True)
+    gene = models.ForeignKey("gene.Gene", on_delete=models.CASCADE, related_name="c_variants")
+    depth = models.FloatField(default=0.0)
+    ci_hi = models.FloatField(default=0.0)
+    ci_lo = models.FloatField(default=0.0)
+    cn = models.FloatField(default=0.0)
+    log2 = models.FloatField(default=0.0)
+    p_bintest = models.FloatField(default=0.0)
+    p_ttest = models.FloatField(default=0.0)
+    probes = models.FloatField(default=0.0)
+    weight = models.FloatField(default=0.0)
+
+    class Meta:
+        db_table = "cns"
