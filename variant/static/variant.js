@@ -82,8 +82,8 @@ var KTDatatablesServerSide = function () {
                 { data: 'sequencing_run' },
                 { data: 'genes' },
                 { data: 'g_variant' },
-                { data: 'c_variant' },
                 { data: 'p_variant' },
+                { data: 'c_variant' },
                 { data: null },
             ],
             columnDefs: [

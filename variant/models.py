@@ -196,10 +196,16 @@ class PVariant(models.Model):
         db_table = "p_variant"
 
 class VariantFile(models.Model):
+    FILE_TYPES = [
+        ('cns', 'cns'),
+        ('variant', "variant")
+    ]
     name = models.CharField(max_length=150, blank=True, null=True)
     directory = models.CharField(max_length=200, blank=True, null=True)
     date = models.DateTimeField(default=datetime.now, verbose_name="Date")
     call = models.BooleanField(default=False)
+    type = models.CharField(max_length=10, choices=FILE_TYPES, blank=True, null=True)
+
 
     class Meta:
         db_table = "variant_file"
