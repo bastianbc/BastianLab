@@ -19,6 +19,10 @@ class FilterForm(forms.Form):
     patient=forms.ModelChoiceField(
         queryset=Patients.objects.filter(
     patient_blocks__block_areas__area_na_links__nucacid__na_sl_links__sample_lib__variant_calls__isnull=False).distinct(),label="Patients")
+    coverage = forms.IntegerField(label='coverage')
+    log2r = forms.FloatField(label='log2r')
+    ref_read = forms.IntegerField(label='ref_read')
+    alt_read = forms.IntegerField(label='alt_read')
 
 
     def __init__(self, *args, **kwargs):
