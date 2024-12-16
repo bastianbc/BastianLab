@@ -110,6 +110,17 @@ class VariantCall(models.Model):
             if patient:
                 queryset = queryset.filter(
                     Q(sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__pa_id=patient))
+            if coverage_value:
+                queryset = queryset.filter(coverage=coverage_value)
+            
+            if log2r_value:
+                queryset = queryset.filter(log2r=log2r_value)
+            
+            if ref_read_value:
+                queryset = queryset.filter(ref_read=ref_read_value)
+            
+            if alt_read_value:
+                queryset = queryset.filter(alt_read=alt_read_value) 
 
             if coverage_value:
                 queryset = queryset.filter(coverage=coverage_value)
