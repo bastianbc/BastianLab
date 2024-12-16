@@ -49,9 +49,9 @@ class VariantCall(models.Model):
                 areas = F('sample_lib__na_sl_links__nucacid__area_na_links__area__name'),
                 genes = F('g_variants__c_variants__gene__name'),
                 patients = F('sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__pat_id'),
-                cvariant = Subquery(c_variant_subquery),
-                pvariant = Subquery(p_variant_subquery),
-                gvariant=g_variant_annotation
+                c_variant = Subquery(c_variant_subquery),
+                p_variant = Subquery(p_variant_subquery),
+                g_variant=g_variant_annotation
             )
 
         def _parse_value(search_value):
@@ -77,6 +77,11 @@ class VariantCall(models.Model):
             sample_lib = kwargs.get('sample_lib', None)[0]
             block = kwargs.get('block', None)[0]
             area = kwargs.get('area', None)[0]
+            coverage_value = kwargs.get('coverage', None)[0]
+            log2r_value = kwargs.get('log2r', None)[0]
+            ref_read_value = kwargs.get('ref_read', None)[0]
+            alt_read_value = kwargs.get('alt_read', None)[0]
+
 
             order_column = ORDER_COLUMN_CHOICES[order_column]
             # django orm '-' -> desc
@@ -84,7 +89,7 @@ class VariantCall(models.Model):
                 order_column = '-' + order_column
 
             queryset = _get_authorizated_queryset()
-
+            
             total = queryset.count()
 
             is_initial = _is_initial_value(search_value)
@@ -105,6 +110,29 @@ class VariantCall(models.Model):
             if patient:
                 queryset = queryset.filter(
                     Q(sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__pa_id=patient))
+            if coverage_value:
+                queryset = queryset.filter(coverage=coverage_value)
+            
+            if log2r_value:
+                queryset = queryset.filter(log2r=log2r_value)
+            
+            if ref_read_value:
+                queryset = queryset.filter(ref_read=ref_read_value)
+            
+            if alt_read_value:
+                queryset = queryset.filter(alt_read=alt_read_value) 
+
+            if coverage_value:
+                queryset = queryset.filter(coverage=coverage_value)
+
+            if log2r_value:
+                queryset = queryset.filter(log2r=log2r_value)
+
+            if ref_read_value:
+                queryset = queryset.filter(ref_read=ref_read_value)
+
+            if alt_read_value:
+                queryset = queryset.filter(alt_read=alt_read_value)
 
             if is_initial:
                 # filter = [sequencing_run.id for sequencing_run in SequencingRun.objects.filter(id=search_value)]

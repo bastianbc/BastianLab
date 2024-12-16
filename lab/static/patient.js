@@ -99,9 +99,9 @@ var KTDatatablesServerSide = function () {
                     orderable: false,
                     render: function (data, type, row) {
                         if (data > 0) {
-                          let pat_id = row["pat_id"];
+                          let pa_id = row["pa_id"];
                           return `
-                              <a href="/blocks?model=patient&id=${pat_id}&initial=true">${data}</a>`;
+                              <a href="/blocks?model=patient&id=${pa_id}&initial=true">${data}</a>`;
                         }
                         return data;
                     }
@@ -125,11 +125,27 @@ var KTDatatablesServerSide = function () {
                                 </span>
                             </a>
                             <!--begin::Menu-->
-                            <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4" data-kt-menu="true">
+                            <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-150px py-4" data-kt-menu="true">
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
                                     <a href="/lab/edit/`+ row["pa_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
                                         Edit
+                                    </a>
+                                </div>
+                                <!--end::Menu item-->
+
+                                <!--begin::Menu item-->
+                                <div class="menu-item px-3">
+                                    <a href="/blocks?model=patient&id=`+ row["pa_id"] +`&initial=false" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
+                                        Add Block(s)
+                                    </a>
+                                </div>
+                                <!--end::Menu item-->
+
+                                <!--begin::Menu item-->
+                                <div class="menu-item px-3">
+                                    <a href="/blocks?model=patient&id=`+ row["pa_id"] +`&initial=true" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
+                                        Remove Block(s)
                                     </a>
                                 </div>
                                 <!--end::Menu item-->

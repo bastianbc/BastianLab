@@ -630,8 +630,12 @@ var KTDatatablesServerSide = function () {
       }
 
       const btnAddBlockToProject = document.querySelector('[data-kt-docs-table-select="event_add_block_to_project"]');
+      
+      const btnAddBlockToPatient = document.querySelector('[data-kt-docs-table-select="event_add_block_to_patient"]');
+
 
       const btnRemoveBlockFromProject = document.querySelector('[data-kt-docs-table-select="event_remove_block_from_project"]');
+      const btnRemoveBlockFromPatient = document.querySelector('[data-kt-docs-table-select="event_remove_block_from_patient"]');
 
       function getCreationOptions() {
 
@@ -682,6 +686,47 @@ var KTDatatablesServerSide = function () {
         });
 
       }
+      if (btnAddBlockToPatient) {
+
+        btnAddBlockToPatient.addEventListener('click', function () {
+    
+            $.ajax({
+                type: "GET",
+                url: "/blocks/add_block_to_patient_async", 
+                data: {
+                    "selected_ids": getSelectedRows(), 
+                    "patient_id": this.getAttribute('data-patient_id') 
+                },
+            }).done(function(result) {
+                if (result.success) {
+                    Swal.fire({
+                        text: "Block(s) added to the patient successfully.",
+                        icon: "info",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn fw-bold btn-success",
+                        }
+                    }).then(function(){
+                        window.location.href = "/lab"; 
+                    });
+                }
+                else {
+                    Swal.fire({
+                        text: "Block(s) could not be added to the patient.",
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn fw-bold btn-danger",
+                        }
+                    });
+                }
+            });
+    
+        });
+    
+    }
 
       if (btnRemoveBlockFromProject) {
 
@@ -706,6 +751,48 @@ var KTDatatablesServerSide = function () {
                   }
               }).then(function(){
                 window.location.href = "/projects";
+              });
+            }
+            else {
+              Swal.fire({
+                  text: "Block(s) could not be removed.",
+                  icon: "error",
+                  buttonsStyling: false,
+                  confirmButtonText: "Ok, got it!",
+                  customClass: {
+                      confirmButton: "btn fw-bold btn-danger",
+                  }
+              });
+            }
+          });
+
+        });
+
+      }
+
+      if (btnRemoveBlockFromPatient) {
+
+        btnRemoveBlockFromPatient.addEventListener('click', function () {
+
+          $.ajax({
+            type: "GET",
+            url: "/blocks/remove_block_from_patient_async",
+            data: {
+              "selected_ids": getSelectedRows(),
+              "project_id": this.getAttribute('data-patient_id')
+            },
+          }).done(function(result) {
+            if (result.success) {
+              Swal.fire({
+                  text: "Block(s) removed succesfully.",
+                  icon: "info",
+                  buttonsStyling: false,
+                  confirmButtonText: "Ok, got it!",
+                  customClass: {
+                      confirmButton: "btn fw-bold btn-success",
+                  }
+              }).then(function(){
+                window.location.href = "/lab";
               });
             }
             else {

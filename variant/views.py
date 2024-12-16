@@ -156,7 +156,11 @@ def get_variants_by_area(request):
                 variant_data = {
                     'sampleLibrary': vc.sample_lib.name,
                     'gene': c_variant.gene.name,
-                    'pVariant': c_variant.p_variants.first().reference_residues + str(c_variant.p_variants.first().start) + c_variant.p_variants.first().inserted_residues if c_variant.p_variants.first() else '',
+                    'pVariant': (
+                         (c_variant.p_variants.first().reference_residues or '') +
+                         str(c_variant.p_variants.first().start or '') +
+                          (c_variant.p_variants.first().inserted_residues or '')
+                            ) if c_variant.p_variants.first() else '',
                     'coverage': vc.coverage,
                     'vaf': round((vc.alt_read / (vc.ref_read + vc.alt_read)) * 100, 2) if (vc.ref_read + vc.alt_read) > 0 else 0
                 }
@@ -223,7 +227,11 @@ def get_variants_by_block(request):
                     'areaName': area.name,
                     'sampleLibrary': vc.sample_lib.name,
                     'gene': c_variant.gene.name,
-                    'pVariant': c_variant.p_variants.first().reference_residues + str(c_variant.p_variants.first().start) + c_variant.p_variants.first().inserted_residues if c_variant.p_variants.first() else '',
+                    'pVariant': (
+                         (c_variant.p_variants.first().reference_residues or '') +
+                         str(c_variant.p_variants.first().start or '') +
+                          (c_variant.p_variants.first().inserted_residues or '')
+                            ) if c_variant.p_variants.first() else '',
                     'coverage': vc.coverage,
                     'vaf': round((vc.alt_read / (vc.ref_read + vc.alt_read)) * 100, 2) if (vc.ref_read + vc.alt_read) > 0 else 0
                 }

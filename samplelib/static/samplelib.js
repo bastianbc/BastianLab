@@ -218,7 +218,6 @@ var KTDatatablesServerSide = function () {
             handleBatchDeleteRows();
             toggleToolbars();
             handleDeleteRows();
-            handleResetFilter();
             initModal();
             handleSelectedRows.init();
             KTMenu.createInstances();
