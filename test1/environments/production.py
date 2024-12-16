@@ -81,7 +81,7 @@ INSTALLED_APPS = [
     'barcodeset',
     'migration',
     'sequencingfile',
-    'variant',
+    'variant.apps.VariantConfig',
     'gene',
     'sheet',
     'wiki',
