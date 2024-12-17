@@ -7,20 +7,17 @@ class AreasSerializer(serializers.ModelSerializer):
     DT_RowId = serializers.SerializerMethodField()
     num_blocks = serializers.IntegerField()
     num_projects = serializers.IntegerField()
-    area_type_label = serializers.SerializerMethodField()
-    # collection_label = serializers.SerializerMethodField()
     investigator = serializers.SerializerMethodField()
     num_samplelibs = serializers.IntegerField()
+    completion_date = serializers.SerializerMethodField()
+    area_type_label = serializers.SerializerMethodField()
 
     class Meta:
         model = Areas
-        fields = ("ar_id", "name", "num_blocks", "num_projects", "area_type", "area_type_label", "completion_date", "investigator","num_nucacids", "num_samplelibs", "DT_RowId",)
-        # "collection","collection_label",
+        fields = ("ar_id", "name", "num_blocks", "num_projects", "area_type", "area_type_label", "completion_date", "investigator", "num_nucacids", "num_samplelibs", "DT_RowId",)
+
     def get_DT_RowId(self, obj):
         return getattr(obj, 'ar_id')
-
-    def get_area_type_label(self,obj):
-        return obj.get_area_type_display()
 
     def get_investigator(self, obj):
         return obj.block.project.pi if obj.block.project else None
@@ -36,3 +33,9 @@ class AreasSerializer(serializers.ModelSerializer):
 
     def get_project_name(self,obj):
         return obj.block.project.name if obj.block.project else None
+
+    def get_completion_date(self,obj):
+        return ""
+
+    def get_area_type_label(self,obj):
+        return obj.area_type.name if obj.area_type else None

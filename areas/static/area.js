@@ -58,11 +58,7 @@ var KTDatatablesServerSide = function () {
               { data: 'name' },
               { data: 'num_blocks' },
               { data: 'num_projects' },
-              { data: 'area_type',
-                render: function (val, type, row) {
-                  return row["area_type_label"];
-                }
-              },
+              { data: 'area_type_label' },
               { data: 'completion_date',
                 render: function (data) {
                   return moment(data).format('MM/DD/YYYY');
@@ -875,7 +871,7 @@ var KTDatatablesServerSide = function () {
       function getAreaTypeOptions() {
 
         $.ajax({
-            url: "/areas/get_area_types",
+            url: "/areatype/get_area_type_choices",
             type: "GET",
             async: false,
             success: function (data) {
@@ -883,7 +879,7 @@ var KTDatatablesServerSide = function () {
               data.forEach((item, i) => {
 
                areaTypeOptions.push({
-                 "label":item["label"],
+                 "label":item["name"],
                  "value":item["value"]
                })
 

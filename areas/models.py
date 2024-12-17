@@ -193,7 +193,7 @@ class Areas(models.Model):
                         Q(name__icontains=search_value) |
                         Q(block__name__icontains=search_value) |
                         Q(block__project__name__icontains=search_value) |
-                        Q(area_type__icontains=search_value) |
+                        Q(area_type__value__icontains=search_value) |
                         Q(notes__icontains=search_value)
                     )
 

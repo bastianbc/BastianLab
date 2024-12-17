@@ -48,12 +48,12 @@ def delete_areatype(request,id):
         messages.success(request, "Area Type deleted successfully")
     except Exception as e:
         messages.error(request, "Area Type could not be deleted!")
-    
+
     return redirect('/areatype')
 
 @permission_required("areatype.view_areatype",raise_exception=True)
 def filter_areatype(request):
-    
+
     areatypes = AreaType().query_by_args(**request.GET)
     serializer = AreaTypeSerializer(areatypes['items'], many=True)
     result = dict()
@@ -63,3 +63,8 @@ def filter_areatype(request):
     result['recordsFiltered'] = areatypes['count']
 
     return JsonResponse(result)
+
+@permission_required("areatype.view_areatype",raise_exception=True)
+def get_area_type_choices(request):
+    serializer = AreaTypeSerializer(AreaType.objects.all(), many=True)
+    return JsonResponse(serializer.data,safe=False)
