@@ -576,7 +576,7 @@ def report(request):
             report.patient = na_sl_link.nucacid.area.block.patient if na_sl_link.nucacid.area and na_sl_link.nucacid.area.block and na_sl_link.nucacid.area.block.patient else None
 
             if not report.area_type == "Normal":
-                report.matching_normal_sl = ",".join(list(NA_SL_LINK.objects.filter(nucacid__area__block__patient=report.patient,nucacid__area__area_type__in=["normal","normal2","normal3"]).values_list("sample_lib__name",flat=True)))
+                report.matching_normal_sl = ",".join(list(NA_SL_LINK.objects.filter(nucacid__area__block__patient=report.patient,nucacid__area__area_type__value__in=["normal","normal2","normal3"]).values_list("sample_lib__name",flat=True)))
 
         # from sample_lib to captured_lib..->sequencing_run
         for sl_cl_link in sample_lib.sl_cl_links.all():
@@ -589,7 +589,7 @@ def report(request):
                     report.sequencing_run = sequencing_run.name
 
 
-        NA_SL_LINK.objects.filter(nucacid__area__block__patient=report.patient).exclude(nucacid__area__area_type__in=["normal","normal2","normal3"]).values_list("sample_lib__name",flat=True)
+        NA_SL_LINK.objects.filter(nucacid__area__block__patient=report.patient).exclude(nucacid__area__area_type__value__in=["normal","normal2","normal3"]).values_list("sample_lib__name",flat=True)
 
         result.append(report)
 

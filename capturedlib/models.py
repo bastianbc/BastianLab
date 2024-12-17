@@ -111,7 +111,7 @@ class CapturedLib(models.Model):
             if normal_area:
                  queryset = queryset.filter(
                     Q(sl_cl_links__sample_lib__na_sl_links__nucacid__na_type='dna') &
-                    Q(sl_cl_links__sample_lib__na_sl_links__nucacid__area_na_links__area__area_type='normal')
+                    Q(sl_cl_links__sample_lib__na_sl_links__nucacid__area_na_links__area__area_type__value='normal')
             )
 
             count = queryset.count()
