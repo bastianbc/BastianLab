@@ -150,6 +150,7 @@ var KTDatatablesServerSide = function () {
                     },
                 },
             ],
+
             // Add data-filter attribute
             createdRow: function (row, data, dataIndex) {
                 $(row).find('td:eq(4)').attr('data-filter', data.CreditCardType);
@@ -237,6 +238,8 @@ var KTDatatablesServerSide = function () {
           var log2r = document.getElementById("id_log2r").value;
           var refRead = document.getElementById("id_ref_read").value;
           var altRead = document.getElementById("id_alt_read").value;
+
+          console.log(sampleLib);
 
           // DataTable'ı başlat
           initDatatable(null, patient, area, block, sampleLib, sequencingRun ,coverage, log2r, refRead, altRead);
