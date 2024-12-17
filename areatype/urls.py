@@ -8,5 +8,5 @@ urlpatterns = [
     path("edit/<int:id>", views.edit_areatype, name="edit-areatype"),
     path("delete/<int:id>", views.delete_areatype, name="delete-areatype"),
     path("filter_areatypes", views.filter_areatype, name="filter-areatype"),
-   
+    path("get_area_type_choices", views.get_area_type_choices, name="get-area-type-choices"),
 ] + staticfiles_urlpatterns()
