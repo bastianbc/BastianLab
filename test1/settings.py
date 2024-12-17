@@ -1,4 +1,5 @@
 from .environment import *
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 try:
     if ENVIRONMENT == "PRODUCTION":
