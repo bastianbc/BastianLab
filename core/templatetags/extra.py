@@ -12,6 +12,7 @@ def is_admin_area(path):
         "account",
         "bait",
         "buffer",
+        "areatype",
         "body",
         "method",
         "barcodeset",

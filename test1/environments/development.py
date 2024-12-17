@@ -79,6 +79,7 @@ INSTALLED_APPS = [
     'buffer',
     'bait',
     'body',
+    'areatype',
     'barcodeset',
     'method.apps.MethodConfig',
     'migration',
