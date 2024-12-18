@@ -69,6 +69,7 @@ INSTALLED_APPS = [
     'account.apps.AccountConfig',
     'blocks.apps.BlocksConfig',
     'areas.apps.AreasConfig',
+    'areatype.apps.AreatypeConfig',
     'core.apps.CoreConfig',
     'method.apps.MethodConfig',
     'samplelib.apps.SamplelibConfig',
@@ -86,9 +87,8 @@ INSTALLED_APPS = [
     'sheet',
     'wiki',
     'analysisrun',
-    'areatype',
-
 ]
+
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 CRISPY_FAIL_SILENTLY = not DEBUG
 
