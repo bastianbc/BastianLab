@@ -194,17 +194,20 @@ def check_required_fields(row):
     return True, ""
 
 def gene_nm_id(entries):
-    print("@ ",entries)
-    find = []
-    for entry in entries.split(","):
-        gene, nm_id, exon, c_var, p_var = entry.split(':')
-        gene = Gene.objects.filter(nm_canonical=nm_id)
-        # print(gene)
-        if gene:
-            find.append(True)
-        else:
-            find.append(False)
-    return find
+    try:
+        find = []
+        for entry in entries.split(","):
+            gene, nm_id, exon, c_var, p_var = entry.split(':')
+            gene = Gene.objects.filter(nm_canonical=nm_id)
+            # print(gene)
+            if gene:
+                find.append(True)
+            else:
+                find.append(False)
+        return find
+    except Exception as e:
+        logger.error(f"{e}")
+        return find
 
 
 def create_c_and_p_variants(g_variant, aachange, func, gene_detail, filename):
