@@ -175,9 +175,6 @@ def get_gene(name, canonical, filename):
     logger.debug(f"Getting gene: {name}")
     try:
         gene = Gene.objects.filter(nm_canonical=canonical).first()
-        if not gene:
-            print(f"object not found gene: {name}, nm_id: {canonical}, file: {filename}")
-            return Gene.objects.filter(name=name).first()
         logger.info(f"Found gene: {name}")
         return gene
     except ObjectDoesNotExist:
@@ -196,42 +193,58 @@ def check_required_fields(row):
     logger.debug("All required fields present")
     return True, ""
 
+def gene_nm_id(entries):
+    find = []
+    for entry in entries.split(","):
+        gene, nm_id, exon, c_var, p_var = entry.split(':')
+        gene = Gene.objects.filter(nm_canonical=nm_id)
+        # print(gene)
+        if gene:
+            find.append(True)
+        else:
+            find.append(False)
+    return find
+
+
 def create_c_and_p_variants(g_variant, aachange, func, gene_detail, filename):
     logger.debug(f"Creating C and P variants for aachange: {aachange}")
     entries = aachange.split(',')
+    if not any(gene_nm_id(entries)):
+        print(f"problematic gene: {aachange}, file: {filename}")
     for entry in entries:
         try:
             logger.debug(f"Processing entry: {entry}")
             gene, nm_id, exon, c_var, p_var = entry.split(':')
             gene = get_gene(gene, nm_id, filename)
             # Create CVariant instance
-            c_variant = CVariant.objects.create(
-                g_variant=g_variant,
-                gene=gene,
-                nm_id=nm_id,
-                exon=exon,
-                c_var=c_var,
-                func=func,
-                gene_detail=gene_detail
-            )
-            logger.info(f"Created CVariant: {c_variant}")
+            if gene:
+                c_variant = CVariant.objects.create(
+                    g_variant=g_variant,
+                    gene=gene,
+                    nm_id=nm_id,
+                    exon=exon,
+                    c_var=c_var,
+                    func=func,
+                    gene_detail=gene_detail
+                )
+                logger.info(f"Created CVariant: {c_variant}")
 
-            # Create PVariant instance if p_var is present
-            if p_var:
-                if not parse_p_var(p_var):
-                    continue
-                else:
-                    start, end, reference_residues, inserted_residues, change_type = parse_p_var(p_var)
-                    inserted_residues = f"{inserted_residues[:98]}*" if p_var.endswith("*") else inserted_residues[:99]
-                    p_variant = PVariant.objects.create(
-                        c_variant=c_variant,
-                        start=start,
-                        end=end,
-                        reference_residues=reference_residues,
-                        inserted_residues=inserted_residues,
-                        change_type=change_type,
-                        name_meta=p_var[:99]
-                    )
+                # Create PVariant instance if p_var is present
+                if p_var:
+                    if parse_p_var(p_var):
+                        continue
+                    else:
+                        start, end, reference_residues, inserted_residues, change_type = parse_p_var(p_var)
+                        inserted_residues = f"{inserted_residues[:98]}*" if p_var.endswith("*") else inserted_residues[:99]
+                        p_variant = PVariant.objects.create(
+                            c_variant=c_variant,
+                            start=start,
+                            end=end,
+                            reference_residues=reference_residues,
+                            inserted_residues=inserted_residues,
+                            change_type=change_type,
+                            name_meta=p_var[:99]
+                        )
         except Exception as e:
             logger.error(f"Error processing AAChange entry '{entry}': {str(e)}")
 
