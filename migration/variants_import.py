@@ -209,7 +209,7 @@ def gene_nm_id(entries):
 def create_c_and_p_variants(g_variant, aachange, func, gene_detail, filename):
     logger.debug(f"Creating C and P variants for aachange: {aachange}")
     entries = aachange.split(',')
-    if not any(gene_nm_id(entries)):
+    if not any(gene_nm_id(aachange)):
         print(f"problematic gene: {aachange}, file: {filename}")
     for entry in entries:
         try:
