@@ -57,7 +57,7 @@ class Areas(models.Model):
     ar_id = models.AutoField(primary_key=True)
     block = models.ForeignKey('blocks.Blocks', on_delete=models.CASCADE, db_column='block', related_name="block_areas")
     name = models.CharField(max_length=50, unique=True, validators=[validate_name_contains_space])
-    area_type = models.ForeignKey('areatype.AreaType',on_delete=models.CASCADE, db_column='area_type', related_name="areas")
+    area_type = models.ForeignKey('areatype.AreaType',on_delete=models.CASCADE, db_column='area_type', related_name="areas", null=True, blank=True)
     image = models.ImageField(null=True, blank=True, upload_to="images/%y/%m/%d")
     notes = models.TextField(blank=True, null=True)
     collection = models.CharField(max_length=2, choices=COLLECTION_CHOICES, default="SC")
