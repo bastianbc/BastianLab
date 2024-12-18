@@ -57,7 +57,7 @@ def get_normal_sample_lib(sample_lib):
     try:
         normal_sl = SampleLib.objects.filter(
             na_sl_links__nucacid__na_type='dna',
-            na_sl_links__nucacid__area_na_links__area__area_type='normal',
+            na_sl_links__nucacid__area_na_links__area__area_type__value='normal',
             na_sl_links__nucacid__na_sl_links__sample_lib=sample_lib
         ).exclude(pk=sample_lib.pk).distinct().first()
 

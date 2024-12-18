@@ -25,6 +25,7 @@ urlpatterns = [
     path('sequencinglib/', include('sequencinglib.urls')),
     path('sequencingrun/', include('sequencingrun.urls')),
     path('buffer/', include('buffer.urls')),
+    path('areatype/', include('areatype.urls')),
     path('bait/', include('bait.urls')),
     path('body/', include('body.urls')),
     path('barcodeset/', include('barcodeset.urls')),

@@ -139,9 +139,9 @@ class SampleLib(models.Model):
 
             if area_type_filter:
                 if area_type_filter == "normal":
-                    filter = [na_sl_link.sample_lib.name for na_sl_link in NA_SL_LINK.objects.filter(nucacid__area__area_type=area_type_filter)]
+                    filter = [na_sl_link.sample_lib.name for na_sl_link in NA_SL_LINK.objects.filter(nucacid__area__area_type__value=area_type_filter)]
                 else:
-                    filter = [na_sl_link.sample_lib.name for na_sl_link in NA_SL_LINK.objects.exclude(nucacid__area__area_type="normal")]
+                    filter = [na_sl_link.sample_lib.name for na_sl_link in NA_SL_LINK.objects.exclude(nucacid__area__area_type__value="normal")]
 
                 queryset = queryset.filter(Q(name__in=filter))
 
