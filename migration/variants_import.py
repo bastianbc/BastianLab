@@ -194,6 +194,7 @@ def check_required_fields(row):
     return True, ""
 
 def gene_nm_id(entries):
+    print("@ ",entries)
     find = []
     for entry in entries.split(","):
         gene, nm_id, exon, c_var, p_var = entry.split(':')
