@@ -107,7 +107,7 @@ def import_csn_calls():
         file_path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA,file.directory, file.name)
         df = pd.read_csv(file_path, index_col=False, sep='\t')
         df.apply(lambda row: create_csn(row, file), axis=1)
-    pass
+    print("%^&"*100, "finished")
 
 
 if __name__ == "__main__":

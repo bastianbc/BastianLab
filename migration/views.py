@@ -3837,8 +3837,8 @@ def register_new_fastq_files(request):
 
 def call_import_variants(request):
     from .variants_import import import_variants
-    from migration.cns_import import import_csn_files
-    import_csn_files()
+    from migration.cns_import import import_csn_files, import_csn_calls
+    import_csn_calls()
 
 
 
