@@ -15,6 +15,8 @@ import logging
 from pathlib import Path
 from gene.models import Gene
 from migration.variants_import import get_sample_lib, get_sequencing_run
+from areas.models import Areas
+from areatype.models import AreaType
 
 logger = logging.getLogger("file")
 
@@ -99,9 +101,9 @@ def create_csn(row, file):
         print(e)
 
 def import_csn_calls():
-    # col1 = ['chromosome', 'start', 'end', 'gene', 'log2', 'depth', 'weight', 'probes', 'p_bintest']
-    # col2 = ['chromosome', 'start', 'end', 'gene', 'log2', 'depth', 'weight', 'probes', 'cn', 'p_ttest']
-    # col3 = ['chromosome', 'start', 'end', 'gene', 'log2', 'depth', 'weight', 'probes',  'ci_lo', 'ci_hi']
+    col1 = ['chromosome', 'start', 'end', 'gene', 'log2', 'depth', 'weight', 'probes', 'p_bintest']
+    col2 = ['chromosome', 'start', 'end', 'gene', 'log2', 'depth', 'weight', 'probes', 'cn', 'p_ttest']
+    col3 = ['chromosome', 'start', 'end', 'gene', 'log2', 'depth', 'weight', 'probes',  'ci_lo', 'ci_hi']
     Cns.objects.filter().delete()
     for file in VariantFile.objects.filter(type='cns'):
         file_path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA,file.directory, file.name)
@@ -109,9 +111,30 @@ def import_csn_calls():
         df.apply(lambda row: create_csn(row, file), axis=1)
     print("%^&"*100, "finished")
 
+def create_area_types(row):
+    if not AreaType.objects.filter(name=row['area_type']):
+        area_type = AreaType.objects.create(
+            name=row['area_type'],
+            value=row['area_type']
+        )
+    else:
+        area_type = AreaType.objects.get(name=row['area_type'])
+    area = Areas.objects.get(ar_id=row['ar_id'])
+    area.area_type = area_type
+    area.save()
+
+def import_area_types():
+    SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
+    file_path = os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "areas.csv")
+    df = pd.read_csv(file_path, index_col=False)
+    df.apply(lambda row: create_area_types(row), axis=1)
+
+
+    print("%^&"*100, "finished")
+
 
 if __name__ == "__main__":
     print("start")
-    import_csn_calls()
+    import_area_types()
     print("end")
 
