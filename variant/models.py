@@ -218,7 +218,7 @@ class Cns(models.Model):
     chromosome = models.CharField(max_length=20, blank=True, null=True)
     start = models.IntegerField(default=0, blank=True, null=True)
     end = models.IntegerField(default=0, blank=True, null=True)
-    gene = models.ForeignKey("gene.Gene", on_delete=models.CASCADE, related_name="gene_cns")
+    gene = models.CharField(max_length=500, blank=True, null=True)
     depth = models.FloatField(default=0.0)
     ci_hi = models.FloatField(default=0.0)
     ci_lo = models.FloatField(default=0.0)
