@@ -7,14 +7,14 @@ from django.conf import settings
 import pandas as pd
 from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist
-from variant.models import VariantCall, GVariant, CVariant, PVariant, VariantFile
+from variant.models import VariantCall, GVariant, CVariant, PVariant, VariantFile, Cns
 from analysisrun.models import AnalysisRun
 from samplelib.models import SampleLib
 import re
 import logging
 from pathlib import Path
 from gene.models import Gene
-
+from migration.variants_import import get_sample_lib, get_sequencing_run
 
 logger = logging.getLogger("file")
 
@@ -69,22 +69,49 @@ def import_csn_files():
     file = os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "cns_files.csv")
     df = pd.read_csv(file, index_col=False)
     df = df.reset_index()
-    columns = set()
     df.apply(lambda row: register_files(row), axis=1)
-    for index, row in df.iterrows():
-        file_path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, row['Dir'], row['File'])
-        with open(file_path, "r", encoding="ascii") as f:
-            first_line = f.readline().strip().split("\t")
-            columns.update(set(first_line))
-            print(f"First line: {first_line}")
 
-    # df.apply(create_genes, axis=1)
+    pass
+
+def create_csn(row, file):
+
+    try:
+        csn = Cns.objects.create(
+            sample_lib=get_sample_lib(file.name),
+            sequencing_run=get_sequencing_run(file.name),
+            variant_file=file,
+            chromosome=row['chromosome'],
+            start=row['start'],
+            end=row['end'],
+            gene=row['gene'][:499],
+            depth=row['depth'],
+            ci_hi=row.get('ci_hi', 0),
+            ci_lo=row.get('ci_lo', 0),
+            cn=row.get('cn', 0),
+            log2=row['log2'],
+            p_bintest=row.get('p_bintest', 0),
+            p_ttest=row.get('p_ttest', 0),
+            probes=row['probes'],
+            weight=row['weight']
+        )
+        print("csn created")
+    except Exception as e:
+        print(e)
+
+def import_csn_calls():
+    # col1 = ['chromosome', 'start', 'end', 'gene', 'log2', 'depth', 'weight', 'probes', 'p_bintest']
+    # col2 = ['chromosome', 'start', 'end', 'gene', 'log2', 'depth', 'weight', 'probes', 'cn', 'p_ttest']
+    # col3 = ['chromosome', 'start', 'end', 'gene', 'log2', 'depth', 'weight', 'probes',  'ci_lo', 'ci_hi']
+    Cns.objects.filter().delete()
+    for file in VariantFile.objects.filter(type='cns'):
+        file_path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA,file.directory, file.name)
+        df = pd.read_csv(file_path, index_col=False, sep='\t')
+        df.apply(lambda row: create_csn(row, file), axis=1)
     pass
 
 
 if __name__ == "__main__":
     print("start")
-    # import_csn_files()
-    canonical()
+    import_csn_calls()
     print("end")
 
