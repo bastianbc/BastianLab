@@ -55,7 +55,13 @@ def canonical():
     # df.to_csv(os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "canonical_errors_with_AAChange.csv"))
     df.to_csv(os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "canonical_errors_with_AAChange_2.csv"))
 
-
+def register_files(row):
+    VariantFile.objects.create(
+        name=row['File'],
+        directory=row['Dir'],
+        call=False,
+        type="cns",
+    )
 
 
 def import_csn_files():
@@ -64,6 +70,7 @@ def import_csn_files():
     df = pd.read_csv(file, index_col=False)
     df = df.reset_index()
     columns = set()
+    df.apply(lambda row: register_files(row), axis=1)
     for index, row in df.iterrows():
         file_path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, row['Dir'], row['File'])
         with open(file_path, "r", encoding="ascii") as f:
