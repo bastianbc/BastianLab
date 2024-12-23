@@ -76,7 +76,7 @@ class Command(BaseCommand):
                         gene = Gene.objects.filter(nm_canonical=c_variant.gene.nm_id).first()
                         new_c_variant = CVariant.objects.using(target_db).create(
                             g_variant=new_g_variant,
-                            gene=gene,
+                            gene=gene if gene else None,
                             nm_id=c_variant.nm_id,
                             c_var=c_variant.c_var,
                             exon=c_variant.exon,
