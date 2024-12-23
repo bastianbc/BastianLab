@@ -31,3 +31,10 @@ class Command(BaseCommand):
             self.stdout.write(f"Successfully copied {source_objects.count()} records from {source_db} to {target_db}.")
 
         self.stdout.write("Data copy completed.")
+
+
+if __name__ == "__main__":
+    print("start")
+    c = Command()
+    c.handle()
+    print("end")
