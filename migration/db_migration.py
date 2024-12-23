@@ -1,10 +1,10 @@
 from django.db import transaction
 from django.core.management.base import BaseCommand
 from django.apps import apps
+from django.contrib.auth.models import User
 
-# List of tables to copy in order
 TABLES_TO_COPY = [
-    "django_content_type",  # Must be copied first
+    "django_content_type",
     "auth_permission",
     "auth_group",
     "auth_group_permissions",
@@ -20,34 +20,40 @@ class Command(BaseCommand):
         source_db = "labdb"  # Source database
         target_db = "default"  # Target database (labdbproduction)
 
-        # Loop through tables to copy
         for table_name in TABLES_TO_COPY:
             self.stdout.write(f"Copying data for table: {table_name}...")
 
             try:
-                # Handle special cases for table names
-                if table_name == "django_content_type":
+                if table_name == "auth_user_permissions":
+                    model = User.user_permissions.through
+                elif table_name == "django_content_type":
                     app_label, model_name = "contenttypes", "ContentType"
+                    model = apps.get_model(app_label, model_name)
                 else:
                     app_label, model_name = table_name.split("_", 1)
                     model_name = model_name.capitalize()
+                    model = apps.get_model(app_label, model_name)
 
-                # Get the model
-                model = apps.get_model(app_label, model_name)
-
-                # Fetch data from source database
                 source_objects = model.objects.using(source_db).all()
 
                 with transaction.atomic(using=target_db):
-                    # Copy data to target database
                     for obj in source_objects:
-                        obj.id = None  # Reset primary key for insertion
-                        obj.save(using=target_db)
+                        try:
+                            # Skip duplicates
+                            if table_name == "django_content_type":
+                                model.objects.using(target_db).get(
+                                    app_label=obj.app_label, model=obj.model
+                                )
+                            elif table_name == "auth_user":
+                                model.objects.using(target_db).get(username=obj.username)
+                            else:
+                                model.objects.using(target_db).get(pk=obj.pk)
+                            continue
+                        except model.DoesNotExist:
+                            obj.id = None  # Reset PK for insertion
+                            obj.save(using=target_db)
 
-                self.stdout.write(
-                    f"Successfully copied {source_objects.count()} records from {source_db} to {target_db}."
-                )
-
+                self.stdout.write(f"Successfully copied {source_objects.count()} records.")
             except Exception as e:
                 self.stdout.write(f"Error copying data for {table_name}: {e}")
 
