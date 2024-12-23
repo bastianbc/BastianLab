@@ -14,21 +14,22 @@ class Command(BaseCommand):
 
         try:
             # Get the Patient model
-            Patient = apps.get_model("lab", "Patient")
+            SourcePatient = apps.get_model("lab", "Patient")  # Source model
+            TargetPatient = apps.get_model("lab", "Patient")  # Target model (same in this case)
 
             # Fetch all Patient objects from the source database
-            source_patients = Patient.objects.using(source_db).all()
+            source_patients = SourcePatient.objects.using(source_db).all()
 
             with transaction.atomic(using=target_db):
                 for patient in source_patients:
                     try:
                         # Check if the Patient already exists in the target database using pat_id
-                        Patient.objects.using(target_db).get(pat_id=patient.pat_id)
+                        TargetPatient.objects.using(target_db).get(pat_id=patient.pat_id)
                         self.stdout.write(f"Patient {patient.pat_id} already exists, skipping.")
                         continue  # Skip if it already exists
-                    except Patient.DoesNotExist:
+                    except TargetPatient.DoesNotExist:
                         # Create the Patient in the target database
-                        Patient.objects.using(target_db).create(
+                        TargetPatient.objects.using(target_db).create(
                             pat_id=patient.pat_id,
                             sex=patient.sex,
                             consent=patient.consent,
