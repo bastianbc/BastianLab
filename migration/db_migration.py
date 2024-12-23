@@ -1,36 +1,45 @@
 from django.db import connections
 from django.apps import apps
 from django.core.management.base import BaseCommand
+from django.db import transaction
 
-# List of tables to copy
-TABLES_TO_COPY = ["auth_group"]
+# Tables to copy
+TABLES_TO_COPY = [
+    ("auth.Group", "labdb"),
+    ("auth.Permission", "labdb"),
+    ("auth.User", "labdb"),
+]
 
-class Command(BaseCommand):
-    help = "Copy data from labdb to labdbproduction."
+RELATED_TABLES = [
+    ("auth.User.groups.through", "labdb"),
+    ("auth.User.user_permissions.through", "labdb"),
+    ("auth.Group.permissions.through", "labdb"),
+]
 
-    def handle(self, *args, **kwargs):
-        source_db = "labdb"  # Source database
-        target_db = "default"  # Target database (labdbproduction)
+def copy_table_data(model_name, source_db, target_db="default"):
+    """
+    Copies data from source_db to target_db for the given model.
+    """
+    print(f"Copying data for {model_name} from {source_db} to {target_db}...")
+    model = None
 
-        # Loop through tables to copy
-        for table_name in TABLES_TO_COPY:
-            self.stdout.write(f"Copying data for table: {table_name}...")
+    try:
+        # Fetch model
+        app_label, model_name = model_name.split(".", 1)
+        model = apps.get_model(app_label, model_name)
 
-            # Get the model
-            app_label, model_name = table_name.split("_", 1)
-            model = apps.get_model(app_label, model_name)
+        # Fetch source data
+        source_objects = model.objects.using(source_db).all()
 
-            # Fetch data from source database
-            source_objects = model.objects.using(source_db).all()
-
-            # Copy data to target database
+        with transaction.atomic(using=target_db):
             for obj in source_objects:
-                obj.id = None  # Reset primary key for insertion
+                obj.reset_primary_key()
                 obj.save(using=target_db)
 
-            self.stdout.write(f"Successfully copied {source_objects.count()} records from {source_db} to {target_db}.")
+        print(f"Successfully copied {source_objects.count()} records.")
 
-        self.stdout.write("Data copy completed.")
+    except Exception as e:
+        print(f"Error copying {model_name}: {e}")
 
 def run():
     print("Starting migration script...")
@@ -38,8 +47,7 @@ def run():
     # Add your data migration logic here
     # For example:
     print("start")
-    c = Command()
-    c.handle()
+    copy_table_data()
     print("end")
 
 
