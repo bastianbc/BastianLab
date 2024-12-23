@@ -4,58 +4,42 @@ from django.apps import apps
 
 
 class Command(BaseCommand):
-    help = "Copy Body data from labdb to labdbproduction while handling parent relationships."
+    help = "Copy Buffer data from labdb to labdbproduction using the slug field."
 
     def handle(self, *args, **kwargs):
         source_db = "labdb"  # Source database
         target_db = "default"  # Target database (labdbproduction)
 
-        self.stdout.write("Starting data copy for Body...")
+        self.stdout.write("Starting data copy for Buffer...")
 
         try:
-            # Get the Body model
-            Body = apps.get_model("body", "Body")
+            # Get the Buffer model
+            Buffer = apps.get_model("buffer", "Buffer")
 
-            # Fetch all Body objects from the source database
-            source_bodies = Body.objects.using(source_db).all()
-
-            # Track a mapping of source Body IDs to target Body objects
-            body_mapping = {}
+            # Fetch all Buffer objects from the source database
+            source_buffers = Buffer.objects.using(source_db).all()
 
             with transaction.atomic(using=target_db):
-                # Copy all Body objects without setting parents
-                for body in source_bodies:
+                for buffer in source_buffers:
                     try:
-                        # Check if the Body already exists in the target database using the name
-                        target_body = Body.objects.using(target_db).get(name=body.name)
-                        body_mapping[body.id] = target_body
+                        # Check if the Buffer already exists in the target database using the slug
+                        Buffer.objects.using(target_db).get(slug=buffer.slug)
                         continue  # Skip if it already exists
-                    except Body.DoesNotExist:
-                        # Create the Body in the target database without the parent
-                        target_body = Body.objects.using(target_db).create(
-                            name=body.name,
-                            parent=None,  # Parent will be set later
+                    except Buffer.DoesNotExist:
+                        # Create the Buffer in the target database
+                        Buffer.objects.using(target_db).create(
+                            name=buffer.name,
+                            slug=buffer.slug,
                         )
-                        body_mapping[body.id] = target_body
-
-                # Set parent relationships
-                for body in source_bodies:
-                    if body.parent:
-                        parent_body = body_mapping.get(body.parent_id)
-                        target_body = body_mapping.get(body.id)
-
-                        if parent_body and target_body:
-                            target_body.parent = parent_body
-                            target_body.save(using=target_db)
 
             self.stdout.write(
-                f"Successfully copied {len(source_bodies)} Body objects from {source_db} to {target_db}."
+                f"Successfully copied {len(source_buffers)} Buffer objects from {source_db} to {target_db}."
             )
 
         except Exception as e:
-            self.stdout.write(f"Error copying data for Body: {e}")
+            self.stdout.write(f"Error copying data for Buffer: {e}")
 
-        self.stdout.write("Data copy for Body completed.")
+        self.stdout.write("Data copy for Buffer completed.")
 
 
 def run():
