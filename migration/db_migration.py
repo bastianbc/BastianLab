@@ -21,9 +21,9 @@ class Command(BaseCommand):
 
             # Open a connection to the source database
             with connections[source_db].cursor() as source_cursor:
-                # Execute the provided query
+                # Execute the updated query
                 source_cursor.execute("""
-                    SELECT na.*, m.name as method, a.name as area
+                    SELECT na.*, m.name as method, a.name as area, l.input_vol, l.input_amount, l.date as link_date
                     FROM nuc_acids na
                     LEFT JOIN method m ON m.id = na.method_id
                     LEFT JOIN area_na_link l ON l.nucacid_id = na.nu_id
@@ -46,7 +46,7 @@ class Command(BaseCommand):
                             self.stdout.write(f"Method {nucacid_data['method']} not found, skipping NucAcid {nucacid_data['name']}.")
                             continue
 
-                    # Check if the NucAcid already exists
+                    # Get or create the NucAcid object
                     nucacid, created = NucAcids.objects.using(target_db).get_or_create(
                         name=nucacid_data["name"],
                         defaults={
@@ -73,14 +73,14 @@ class Command(BaseCommand):
                             self.stdout.write(f"Area {nucacid_data['area']} not found, skipping AREA_NA_LINK for NucAcid {nucacid_data['name']}.")
                             continue
 
-                    # Check if the AREA_NA_LINK already exists
+                    # Create the AREA_NA_LINK only if both NucAcid and Area exist
                     if area and not AREA_NA_LINK.objects.using(target_db).filter(nucacid=nucacid, area=area).exists():
                         AREA_NA_LINK.objects.using(target_db).create(
-                            nucacid=nucacid,
+                            nucacid=nucacid,  # Ensure this has a primary key after saving
                             area=area,
                             input_vol=nucacid_data.get("input_vol"),
                             input_amount=nucacid_data.get("input_amount"),
-                            date=nucacid_data.get("date"),
+                            date=nucacid_data.get("link_date"),
                         )
                         self.stdout.write(f"Created AREA_NA_LINK for NucAcid {nucacid_data['name']} and Area {nucacid_data['area']}.")
                     elif area:
