@@ -4,81 +4,101 @@ from django.apps import apps
 
 
 class Command(BaseCommand):
-    help = "Link existing NucAcids with Methods and AREA_NA_LINK data from labdb to labdbproduction using direct DB connection."
+    help = "Copy SampleLib and NA_SL_LINK data from labdb to labdbproduction using Django ORM."
 
     def handle(self, *args, **kwargs):
         source_db = "labdb"  # Source database
         target_db = "default"  # Target database
 
-        self.stdout.write("Starting data copy for NucAcids, Method, and AREA_NA_LINK...")
+        self.stdout.write("Starting data copy for SampleLib and NA_SL_LINK...")
 
-        # Get the target models
-        NucAcids = apps.get_model("libprep", "NucAcids")
+        # Get the models
+        SampleLib = apps.get_model("sample_lib", "SampleLib")
+        NA_SL_LINK = apps.get_model("sample_lib", "NA_SL_LINK")
+        Barcode = apps.get_model("barcodeset", "Barcode")
         Method = apps.get_model("method", "Method")
-        Area = apps.get_model("areas", "Area")
-        AREA_NA_LINK = apps.get_model("libprep", "AREA_NA_LINK")
+        NucAcids = apps.get_model("libprep", "NucAcids")
 
-        # Open a connection to the source database
-        with connections[source_db].cursor() as source_cursor:
-            # Execute the query to fetch data for NucAcids, Method, and AREA_NA_LINK
-            source_cursor.execute("""
-                SELECT na.*, m.name AS method, a.name AS area, l.input_vol, l.input_amount, l.date AS link_date
-                FROM nuc_acids na
-                LEFT JOIN method m ON m.id = na.method_id
-                LEFT JOIN area_na_link l ON l.nucacid_id = na.nu_id
-                LEFT JOIN areas a ON a.ar_id = l.area_id
-            """)
-            rows = source_cursor.fetchall()
-
-            # Fetch column names
-            column_names = [col[0] for col in source_cursor.description]
+        # Fetch SampleLibs from the source database
+        sample_libs = SampleLib.objects.using(source_db).all()
 
         with transaction.atomic(using=target_db):
-            for row in rows:
-                nucacid_data = dict(zip(column_names, row))
+            for sample_lib in sample_libs:
+                # Check if the SampleLib already exists
+                existing_sample_lib = SampleLib.objects.using(target_db).filter(name=sample_lib.name).first()
+                if existing_sample_lib:
+                    self.stdout.write(f"SampleLib {sample_lib.name} already exists, skipping.")
+                    continue
 
-                # Fetch the existing NucAcid object
-                nucacid = NucAcids.objects.using(target_db).filter(name=nucacid_data["name"]).first()
-
-
-                # Get or create the Method object
-                method = None
-                if nucacid_data["method"]:
-                    method, created = Method.objects.using(target_db).get_or_create(
-                        name=nucacid_data["method"]
-                    )
-                    if created:
-                        self.stdout.write(f"Created Method {method.name}.")
-
-                # Update the method for the NucAcid
-                if method and nucacid.method != method:
-                    nucacid.method = method
-                    nucacid.save(using=target_db)
-                    self.stdout.write(f"Linked Method {method.name} to NucAcid {nucacid.name}.")
-
-                # Get the related Area object
-                area = None
-                if nucacid_data["area"]:
-                    area = Area.objects.using(target_db).filter(name=nucacid_data["area"]).first()
-                    if not area:
-                        self.stdout.write(f"Area {nucacid_data['area']} not found, skipping AREA_NA_LINK for NucAcid {nucacid_data['name']}.")
+                # Get the related Barcode and Method
+                barcode = None
+                if sample_lib.barcode:
+                    barcode = Barcode.objects.using(target_db).filter(name=sample_lib.barcode.name).first()
+                    if not barcode:
+                        self.stdout.write(f"Barcode {sample_lib.barcode.name} not found, skipping SampleLib {sample_lib.name}.")
                         continue
 
-                # Create the AREA_NA_LINK object
-                if area:
-                    if not AREA_NA_LINK.objects.using(target_db).filter(nucacid=nucacid, area=area).exists():
-                        AREA_NA_LINK.objects.using(target_db).create(
-                            nucacid=nucacid,
-                            area=area,
-                            input_vol=nucacid_data.get("input_vol"),
-                            input_amount=nucacid_data.get("input_amount"),
-                            date=nucacid_data.get("link_date"),
-                        )
-                        self.stdout.write(f"Created AREA_NA_LINK for NucAcid {nucacid.name} and Area {area.name}.")
-                    else:
-                        self.stdout.write(f"AREA_NA_LINK for NucAcid {nucacid.name} and Area {area.name} already exists, skipping.")
+                method = None
+                if sample_lib.method:
+                    method = Method.objects.using(target_db).filter(name=sample_lib.method.name).first()
+                    if not method:
+                        self.stdout.write(f"Method {sample_lib.method.name} not found, skipping SampleLib {sample_lib.name}.")
+                        continue
 
-        self.stdout.write("Data copy for NucAcids, Method, and AREA_NA_LINK completed.")
+                # Create the SampleLib object in the target database
+                new_sample_lib = SampleLib.objects.using(target_db).create(
+                    name=sample_lib.name,
+                    barcode=barcode,
+                    date=sample_lib.date,
+                    method=method,
+                    qubit=sample_lib.qubit,
+                    shear_volume=sample_lib.shear_volume,
+                    qpcr_conc=sample_lib.qpcr_conc,
+                    pcr_cycles=sample_lib.pcr_cycles,
+                    amount_in=sample_lib.amount_in,
+                    amount_final=sample_lib.amount_final,
+                    vol_init=sample_lib.vol_init,
+                    vol_remain=sample_lib.vol_remain,
+                    notes=sample_lib.notes,
+                )
+                self.stdout.write(f"Created SampleLib {new_sample_lib.name}.")
+
+        # Fetch NA_SL_LINK from the source database
+        na_sl_links = NA_SL_LINK.objects.using(source_db).all()
+
+        with transaction.atomic(using=target_db):
+            for link in na_sl_links:
+                # Check if the link already exists
+                existing_link = NA_SL_LINK.objects.using(target_db).filter(
+                    nucacid__name=link.nucacid.name, sample_lib__name=link.sample_lib.name
+                ).first()
+                if existing_link:
+                    self.stdout.write(f"NA_SL_LINK for NucAcid {link.nucacid.name} and SampleLib {link.sample_lib.name} already exists, skipping.")
+                    continue
+
+                # Get the related NucAcid and SampleLib in the target database
+                nucacid = NucAcids.objects.using(target_db).filter(name=link.nucacid.name).first()
+                if not nucacid:
+                    self.stdout.write(f"NucAcid {link.nucacid.name} not found, skipping NA_SL_LINK.")
+                    continue
+
+                sample_lib = SampleLib.objects.using(target_db).filter(name=link.sample_lib.name).first()
+                if not sample_lib:
+                    self.stdout.write(f"SampleLib {link.sample_lib.name} not found, skipping NA_SL_LINK.")
+                    continue
+
+                # Create the NA_SL_LINK object in the target database
+                NA_SL_LINK.objects.using(target_db).create(
+                    nucacid=nucacid,
+                    sample_lib=sample_lib,
+                    input_vol=link.input_vol,
+                    input_amount=link.input_amount,
+                    date=link.date,
+                )
+                self.stdout.write(f"Created NA_SL_LINK for NucAcid {nucacid.name} and SampleLib {sample_lib.name}.")
+
+        self.stdout.write("Data copy for SampleLib and NA_SL_LINK completed.")
+
 
 
 def run():
