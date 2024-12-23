@@ -64,7 +64,7 @@ var KTDatatablesServerSide = function () {
                 data: null,
                 defaultContent: ''
               },
-              { data: 'bl_id' },
+              { data: 'id' },
               { data: 'name'},
               { data: 'project'},
               { data: 'patient' },
@@ -89,8 +89,8 @@ var KTDatatablesServerSide = function () {
                     orderable: true,
                     render: function (data, type, row) {
                         if (data !== null) {
-                          let bl_id = row["bl_id"];
-                          return `<a href="/projects?model=block&id=${bl_id}&initial=true">${data}</a>`;
+                          let id = row["id"];
+                          return `<a href="/projects?model=block&id=${id}&initial=true">${data}</a>`;
                         }
                         return data;
                     }
@@ -100,8 +100,8 @@ var KTDatatablesServerSide = function () {
                     orderable: true,
                     render: function (data, type, row) {
                         if (data !== null) {
-                          let bl_id = row["bl_id"];
-                          return `<a href="/lab?model=block&id=${bl_id}&initial=true">${data}</a>`;
+                          let id = row["id"];
+                          return `<a href="/lab?model=block&id=${id}&initial=true">${data}</a>`;
                         }
                         return data;
                     }
@@ -121,9 +121,9 @@ var KTDatatablesServerSide = function () {
                     orderable: false,
                     render: function (data, type, row) {
                         if (data > 0) {
-                          let bl_id = row["bl_id"];
+                          let id = row["id"];
                           return `
-                              <a href="/areas?model=block&id=${bl_id}&initial=true">${data}</a>`;
+                              <a href="/areas?model=block&id=${id}&initial=true">${data}</a>`;
                         }
                         return data;
                     }
@@ -150,7 +150,7 @@ var KTDatatablesServerSide = function () {
                             <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-150px py-4" data-kt-menu="true">
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/blocks/edit/`+ row["bl_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
+                                    <a href="/blocks/edit/`+ row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
                                         Edit
                                     </a>
                                 </div>
@@ -158,7 +158,7 @@ var KTDatatablesServerSide = function () {
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                  <a href="javascript:;" class="menu-link px-3" data-block_id=` + row["bl_id"] + ` data-block_name=` + row["name"] + ` data-bs-toggle="modal" data-bs-target="#modal_area_options">
+                                  <a href="javascript:;" class="menu-link px-3" data-block_id=` + row["id"] + ` data-block_name=` + row["name"] + ` data-bs-toggle="modal" data-bs-target="#modal_area_options">
                                       Create Area(s)
                                   </a>
                                 </div>
@@ -172,7 +172,7 @@ var KTDatatablesServerSide = function () {
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/blocks/delete/` + row["bl_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
+                                    <a href="/blocks/delete/` + row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
                                         Delete
                                     </a>
                                 </div>
@@ -275,16 +275,16 @@ var KTDatatablesServerSide = function () {
         const container = document.querySelector('.table');
         const selectedRows = container.querySelectorAll('tbody [type="checkbox"]:checked');
         const selectedIds = [];
-    
+
         selectedRows.forEach((p) => {
             // Select parent row
             const parent = p.closest('tr');
             // Get customer ID
             const id = parent.querySelector('input[type="checkbox"]').value;
-    
+
             selectedIds.push(id);
         });
-    
+
         return JSON.stringify(selectedIds);
     }
 
@@ -630,7 +630,7 @@ var KTDatatablesServerSide = function () {
       }
 
       const btnAddBlockToProject = document.querySelector('[data-kt-docs-table-select="event_add_block_to_project"]');
-      
+
       const btnAddBlockToPatient = document.querySelector('[data-kt-docs-table-select="event_add_block_to_patient"]');
 
 
@@ -689,13 +689,13 @@ var KTDatatablesServerSide = function () {
       if (btnAddBlockToPatient) {
 
         btnAddBlockToPatient.addEventListener('click', function () {
-    
+
             $.ajax({
                 type: "GET",
-                url: "/blocks/add_block_to_patient_async", 
+                url: "/blocks/add_block_to_patient_async",
                 data: {
-                    "selected_ids": getSelectedRows(), 
-                    "patient_id": this.getAttribute('data-patient_id') 
+                    "selected_ids": getSelectedRows(),
+                    "patient_id": this.getAttribute('data-patient_id')
                 },
             }).done(function(result) {
                 if (result.success) {
@@ -708,7 +708,7 @@ var KTDatatablesServerSide = function () {
                             confirmButton: "btn fw-bold btn-success",
                         }
                     }).then(function(){
-                        window.location.href = "/lab"; 
+                        window.location.href = "/lab";
                     });
                 }
                 else {
@@ -723,9 +723,9 @@ var KTDatatablesServerSide = function () {
                     });
                 }
             });
-    
+
         });
-    
+
     }
 
       if (btnRemoveBlockFromProject) {

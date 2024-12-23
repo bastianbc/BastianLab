@@ -8,7 +8,7 @@ class AreaLinksSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_area(self, obj):
-        return (obj.area.ar_id, obj.area.name) if obj.area else None
+        return (obj.area.id, obj.area.name) if obj.area else None
 
 
 class NucacidsSerializer(serializers.ModelSerializer):
@@ -26,10 +26,10 @@ class NucacidsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = NucAcids
-        fields = ("nu_id", "name", "area_id", "area_na_links", "num_areas", "na_type", "na_type_label", "date", "method", "method_label", "conc", "vol_init", "vol_remain", "amount", "num_areas", "num_samplelibs", "DT_RowId",)
+        fields = ("id", "name", "area_id", "area_na_links", "num_areas", "na_type", "na_type_label", "date", "method", "method_label", "conc", "vol_init", "vol_remain", "amount", "num_areas", "num_samplelibs", "DT_RowId",)
 
     def get_DT_RowId(self, obj):
-       return getattr(obj, 'nu_id')
+       return getattr(obj, 'id')
 
     def get_method_label(self, obj):
         return obj.method.name if obj.method else None
@@ -43,7 +43,6 @@ class NucacidsSerializer(serializers.ModelSerializer):
         return None
 
     def get_area_id(self, obj):
-        # return obj.area.ar_id if obj.area else None
         return None
 
     def get_vol_remain(self, obj):

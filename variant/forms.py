@@ -1,10 +1,10 @@
 from django import forms
 from datetime import date
 from samplelib.models import SampleLib
-from areas.models import Areas
-from blocks.models import Blocks
+from areas.models import Area
+from blocks.models import Block
 from sequencingrun.models import SequencingRun
-from lab.models import Patients
+from lab.models import Patient
 
 class FilterForm(forms.Form):
     sequencing_run=forms.ModelChoiceField(
@@ -16,15 +16,15 @@ class FilterForm(forms.Form):
         label="Sample Library"
     )
     area=forms.ModelChoiceField(
-        queryset=Areas.objects.filter(area_na_links__nucacid__na_sl_links__sample_lib__variant_calls__isnull=False).distinct(),
+        queryset=Area.objects.filter(area_na_links__nucacid__na_sl_links__sample_lib__variant_calls__isnull=False).distinct(),
         label="Areas"
     )
     block=forms.ModelChoiceField(
-        queryset=Blocks.objects.filter(block_areas__area_na_links__nucacid__na_sl_links__sample_lib__variant_calls__isnull=False).distinct(),
+        queryset=Block.objects.filter(block_areas__area_na_links__nucacid__na_sl_links__sample_lib__variant_calls__isnull=False).distinct(),
         label="Blocks"
     )
     patient=forms.ModelChoiceField(
-        queryset=Patients.objects.filter(
+        queryset=Patient.objects.filter(
             patient_blocks__block_areas__area_na_links__nucacid__na_sl_links__sample_lib__variant_calls__isnull=False
         ).distinct(),
         label="Patients"

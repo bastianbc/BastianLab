@@ -10,8 +10,8 @@ from django.db import transaction
 from django.conf import settings
 import os
 from django.db.models import Prefetch
-from areas.models import Areas
-from blocks.models import Blocks
+from areas.models import Area
+from blocks.models import Block
 
 def variants(request):
     filter = FilterForm()
@@ -117,7 +117,7 @@ def get_variants_by_area(request):
     area_id = request.GET.get('area_id')
 
     # Get the area and its associated sample libraries through NA links
-    area = Areas.objects.get(pk=area_id)
+    area = Area.objects.get(pk=area_id)
 
     # Get all NA links for this area
     na_links = area.area_na_links.all()
@@ -184,10 +184,10 @@ def get_variants_by_block(request):
     block_id = request.GET.get('block_id')
 
     # Get the area and its associated sample libraries through NA links
-    block = Blocks.objects.get(pk=block_id)
+    block = Block.objects.get(pk=block_id)
 
     # Get area associated with this block
-    area = Areas.objects.get(block_id=block_id)
+    area = Area.objects.get(block_id=block_id)
 
     # Get all NA links for this area
     na_links = area.area_na_links.all()

@@ -54,7 +54,7 @@ var KTDatatablesServerSide = function () {
               }
             },
             columns: [
-              { data: 'ar_id' },
+              { data: 'id' },
               { data: 'name' },
               { data: 'num_blocks' },
               { data: 'num_projects' },
@@ -84,9 +84,8 @@ var KTDatatablesServerSide = function () {
                     orderable: false,
                     render: function (data, type, row) {
                         if (data > 0) {
-                          let ar_id = row["ar_id"];
                           return `
-                              <a href="/blocks?model=area&id=${ar_id}&initial=true">${data}</a>`;
+                              <a href="/blocks?model=area&id=${row["id"]}&initial=true">${data}</a>`;
                         }
                         return data;
                     }
@@ -96,9 +95,8 @@ var KTDatatablesServerSide = function () {
                     orderable: true,
                     render: function (data, type, row) {
                         if (data > 0) {
-                          let ar_id = row["ar_id"];
                           return `
-                              <a href="/projects?model=area&id=${ar_id}&initial=true">${data}</a>`;
+                              <a href="/projects?model=area&id=${row["id"]}&initial=true">${data}</a>`;
                         }
                         return data;
                     }
@@ -109,9 +107,8 @@ var KTDatatablesServerSide = function () {
                     className: "text-center",
                     render: function (data, type, row) {
                         if (data > 0) {
-                          let ar_id = row["ar_id"];
                           return `
-                              <a href="/libprep?model=area&id=${ar_id}&initial=true">${data}</a>`;
+                              <a href="/libprep?model=area&id=${row["id"]}&initial=true">${data}</a>`;
                         }
                         return data;
                     }
@@ -122,9 +119,8 @@ var KTDatatablesServerSide = function () {
                     className: "text-center",
                     render: function (data, type, row) {
                         if (data > 0) {
-                          let id = row["ar_id"];
                           return `
-                              <a href="/samplelib?model=area&id=${id}&initial=true">${data}</a>`;
+                              <a href="/samplelib?model=area&id=${row["id"]}&initial=true">${data}</a>`;
                         }
                         return data;
                     }
@@ -151,7 +147,7 @@ var KTDatatablesServerSide = function () {
                             <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4" data-kt-menu="true">
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/areas/edit/`+ row["ar_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
+                                    <a href="/areas/edit/`+ row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
                                         Edit
                                     </a>
                                 </div>
@@ -159,7 +155,7 @@ var KTDatatablesServerSide = function () {
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/areas/delete/` + row["ar_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
+                                    <a href="/areas/delete/` + row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
                                         Delete
                                     </a>
                                 </div>

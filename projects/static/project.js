@@ -62,7 +62,7 @@ var KTDatatablesServerSide = function () {
             },
 
             columns: [
-                { data: 'pr_id' },
+                { data: 'id' },
                 { data: 'abbreviation' },
                 { data: 'name' },
                 { data: 'pi' ,
@@ -94,9 +94,8 @@ var KTDatatablesServerSide = function () {
                     orderable: false,
                     render: function (data, type, row) {
                         if (data > 0) {
-                          let pr_id = row["pr_id"];
                           return `
-                              <a href="/blocks?model=project&id=${pr_id}&initial=true">${data}</a>`;
+                              <a href="/blocks?model=project&id=${row["id"]}&initial=true">${data}</a>`;
                         }
                         return data;
                     }
@@ -129,7 +128,7 @@ var KTDatatablesServerSide = function () {
                             <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-150px py-4" data-kt-menu="true">
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/projects/edit/`+ row["pr_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
+                                    <a href="/projects/edit/`+ row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
                                         Edit
                                     </a>
                                 </div>
@@ -137,7 +136,7 @@ var KTDatatablesServerSide = function () {
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/blocks?model=project&id=`+ row["pr_id"] +`&initial=false" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
+                                    <a href="/blocks?model=project&id=`+ row["id"] +`&initial=false" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
                                         Add Block(s)
                                     </a>
                                 </div>
@@ -145,7 +144,7 @@ var KTDatatablesServerSide = function () {
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/blocks?model=project&id=`+ row["pr_id"] +`&initial=true" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
+                                    <a href="/blocks?model=project&id=`+ row["id"] +`&initial=true" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
                                         Remove Block(s)
                                     </a>
                                 </div>
@@ -153,7 +152,7 @@ var KTDatatablesServerSide = function () {
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/projects/delete/` + row["pr_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
+                                    <a href="/projects/delete/` + row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
                                         Delete
                                     </a>
                                 </div>
@@ -181,6 +180,7 @@ var KTDatatablesServerSide = function () {
             toggleToolbars();
             handleDeleteRows();
             handleResetForm();
+            handleRowActions();
             KTMenu.createInstances();
         });
     };
@@ -568,23 +568,6 @@ var KTDatatablesServerSide = function () {
 
     };
 
-    // // Redirects from other pages
-    // var handleInitialValue = () => {
-    //
-    //   // Remove parameters in URL
-    //   function cleanUrl() {
-    //     window.history.replaceState(null, null, window.location.pathname);
-    //   }
-    //
-    //   const params = new URLSearchParams(window.location.search);
-    //   const x = params.get('initial');
-    //
-    //   cleanUrl();
-    //
-    //   return x;
-    //
-    // }
-
     // Redirects from other pages
     var handleInitialValue = () => {
 
@@ -610,6 +593,10 @@ var KTDatatablesServerSide = function () {
       }
 
       return null;
+
+    }
+
+    var handleRowActions = function () {
 
     }
 

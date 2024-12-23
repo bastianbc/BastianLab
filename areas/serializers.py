@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import *
-from lab.models import Patients
+from lab.models import Patient
 
 class AreasSerializer(serializers.ModelSerializer):
     num_nucacids = serializers.IntegerField()
@@ -13,20 +13,20 @@ class AreasSerializer(serializers.ModelSerializer):
     area_type_label = serializers.SerializerMethodField()
 
     class Meta:
-        model = Areas
-        fields = ("ar_id", "name", "num_blocks", "num_projects", "area_type", "area_type_label", "completion_date", "investigator", "num_nucacids", "num_samplelibs", "DT_RowId",)
+        model = Area
+        fields = ("id", "name", "num_blocks", "num_projects", "area_type", "area_type_label", "completion_date", "investigator", "num_nucacids", "num_samplelibs", "DT_RowId",)
 
     def get_DT_RowId(self, obj):
-        return getattr(obj, 'ar_id')
+        return getattr(obj, 'id')
 
     def get_investigator(self, obj):
-        return obj.block.project.pi if obj.block.project else None
+        return ", ".join([p.pi for p in obj.block.block_projects.all()])
 
     def get_block_name(self,obj):
         return obj.block.name if obj.block else None
 
     def get_block_id(self,obj):
-        return obj.block.bl_id if obj.block else None
+        return obj.block.id if obj.block else None
 
     def get_project_id(self,obj):
         return obj.block.project.pr_id if obj.block.project else None

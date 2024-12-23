@@ -1,28 +1,26 @@
 from rest_framework import serializers
 from .models import *
-from lab.models import Patients
+from lab.models import Patient
 
 class BlocksSerializer(serializers.ModelSerializer):
     num_areas = serializers.IntegerField()
     patient_id = serializers.SerializerMethodField()
     DT_RowId = serializers.SerializerMethodField()
-    project_id = serializers.SerializerMethodField()
+    # project_id = serializers.SerializerMethodField()
     body_site = serializers.SerializerMethodField()
     block_url = serializers.SerializerMethodField()
     patient = serializers.SerializerMethodField()
     project = serializers.SerializerMethodField()
 
     class Meta:
-        model = Blocks
-        fields = ("bl_id","name","project_id","patient_id","project","patient",
-                  "diagnosis","body_site","thickness","date_added","num_areas",
-                  "DT_RowId","block_url","scan_number")
+        model = Block
+        fields = ("id","name","patient_id","project","patient","diagnosis","body_site","thickness","date_added","num_areas","DT_RowId","block_url","scan_number",)
 
     def get_DT_RowId(self, obj):
-           return getattr(obj, 'bl_id')
+           return getattr(obj, 'id')
 
     def get_project(self, obj):
-        return obj.project.name if obj.project else None
+        return ", ".join([p.name for p in obj.block_projects.all()])
 
     def get_patient(self, obj):
         return obj.patient.pat_id if obj.patient else None
@@ -31,13 +29,10 @@ class BlocksSerializer(serializers.ModelSerializer):
         return obj.body_site.name if obj.body_site else None
 
     def get_patient_id(self,obj):
-        return obj.patient.pa_id if obj.patient else None
+        return obj.patient.id if obj.patient else None
 
     # def get_patient_name(self,obj):
     #     return obj.patient.pat_id if obj.patient else None
-
-    def get_project_id(self,obj):
-        return obj.project.pr_id if obj.project else None
 
     # def get_project_name(self,obj):
     #     return obj.project.name if obj.project else None
@@ -53,11 +48,11 @@ class SingleBlockSerializer(serializers.ModelSerializer):
     project = serializers.SerializerMethodField()
 
     class Meta:
-        model = Blocks
+        model = Block
         fields = "__all__"
 
     def get_patient(self,obj):
-        return obj.patient.pat_id
+        return obj.patient.pat_id if obj.patient else None
 
     def get_project(self,obj):
-        return obj.project.name
+        return ", ".join([p.name for p in obj.block_projects.all()])

@@ -101,7 +101,7 @@ class VariantCall(models.Model):
 
             if area:
                 queryset = queryset.filter(
-                    Q(sample_lib__na_sl_links__nucacid__area_na_links__area__ar_id=block))
+                    Q(sample_lib__na_sl_links__nucacid__area_na_links__area__id=block))
 
             if block:
                 queryset = queryset.filter(
@@ -109,7 +109,7 @@ class VariantCall(models.Model):
 
             if patient:
                 queryset = queryset.filter(
-                    Q(sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__pa_id=patient))
+                    Q(sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__id=patient))
             if coverage_value:
                 queryset = queryset.filter(coverage=coverage_value)
 

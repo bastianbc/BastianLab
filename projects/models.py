@@ -7,8 +7,7 @@ from core.validators import validate_name_contains_space
 
 User = get_user_model()
 
-class Projects(models.Model):
-
+class Project(models.Model):
     BORIS = 'BB'
     IWEI = 'IY'
     AHS = 'AH'
@@ -17,31 +16,29 @@ class Projects(models.Model):
         (IWEI, 'Iwei Yeh'),
         (AHS, 'Alan Hunter Shain'),
     ]
+
     name = models.CharField(max_length=100, blank=False, null=False, validators=[validate_name_contains_space], verbose_name="Name")
     abbreviation = models.CharField(max_length=7, blank=False, null=False, unique=True, default='XY', verbose_name="Abbreviation", help_text="Requires a unique identifier for each Project.")
     pi = models.CharField(max_length=2, choices=PI_CHOICES, default=BORIS, blank=True, null=True, verbose_name="Principal Investigator")
     speedtype = models.CharField(max_length=50, blank=True, null=True, verbose_name="Speed Type")
     description = models.CharField(max_length=255, blank=True, null=True, verbose_name="Description")
     date_start = models.DateTimeField(blank=True, null=True, default=datetime.now, verbose_name="Start Date")
-    pr_id = models.AutoField(primary_key=True, verbose_name="Project ID")
     technician = models.ManyToManyField(User, null=True, blank=True, related_name="technician_projects", verbose_name="Technician")
     researcher = models.ManyToManyField(User, null=True, blank=True, related_name="researcher_projects", verbose_name="Researcher")
     date = models.DateTimeField(default=datetime.now, verbose_name="Date")
-
+    blocks = models.ManyToManyField('blocks.Block', blank=True, related_name="block_projects", verbose_name="Blocks")
 
     class Meta:
-        managed = True
-        db_table = 'projects'
+        db_table = 'project'
         verbose_name = 'Project'
         verbose_name_plural = 'Projects'
 
     def __str__(self):
        return self.name
 
-
     def query_by_args(self, user, **kwargs):
         def _get_authorizated_queryset():
-            queryset = Projects.objects.all().annotate(num_blocks=Count('project_blocks'))
+            queryset = Project.objects.all().annotate(num_blocks=Count('blocks'))
             if not user.is_superuser:
                 return queryset.filter(Q(technician=user) | Q(researcher=user))
             return queryset
@@ -72,7 +69,7 @@ class Projects(models.Model):
 
         try:
             ORDER_COLUMN_CHOICES = {
-                '0': 'pr_id',
+                '0': 'id',
                 '1': 'abbreviation',
                 '2': 'name',
                 '3': 'technician',
@@ -124,12 +121,12 @@ class Projects(models.Model):
                 )
             if is_initial:
                 if search_value["model"] == "area":
-                    queryset = queryset.filter(Q(project_blocks__block_areas__ar_id=search_value["id"]))
+                    queryset = queryset.filter(Q(project_blocks__block_areas__id=search_value["id"]))
                 if search_value["model"] == "block":
                     queryset = queryset.filter(Q(project_blocks__bl_id=search_value["id"]))
             elif search_value:
                 queryset = queryset.filter(
-                    Q(pr_id__icontains=search_value) |
+                    Q(id__icontains=search_value) |
                     Q(name__icontains=search_value) |
                     Q(pi__icontains=search_value) |
                     Q(speedtype__icontains=search_value) |

@@ -1,14 +1,12 @@
 from django import forms
 from .models import NucAcids, AREA_NA_LINK
 from barcodeset.models import Barcode
-from areas.models import Areas
+from areas.models import Area
 from core.forms import BaseForm
 
 
 class NucAcidForm(BaseForm, forms.ModelForm):
-    area = forms.ModelMultipleChoiceField(queryset=Areas.objects.all(),
-                                          label="Area"
-                                          )
+    area = forms.ModelMultipleChoiceField(queryset=Area.objects.all(), label="Area")
     amount = forms.FloatField()
 
     class Meta:

@@ -62,7 +62,7 @@ var KTDatatablesServerSide = function () {
               }
             },
             columns: [
-                { data: 'nu_id' },
+                { data: 'id' },
                 { data: 'name' },
                 { data: 'num_areas'},
                 { data: 'na_type',
@@ -102,9 +102,9 @@ var KTDatatablesServerSide = function () {
                     orderable: true,
                     render: function (data, type, row) {
                         if (data > 0) {
-                          let nu_id = row["nu_id"];
+                          let id = row["id"];
                           return `
-                              <a href="/areas?model=nuc_acid&id=${nu_id}&initial=true">${data}</a>`;
+                              <a href="/areas?model=nuc_acid&id=${id}&initial=true">${data}</a>`;
                         }
                         return data;
                     }
@@ -135,7 +135,7 @@ var KTDatatablesServerSide = function () {
                     className: "text-center",
                     render: function (data, type, row) {
                         if (data > 0) {
-                          let id = row["nu_id"];
+                          let id = row["id"];
                           return `
                               <a href="/samplelib?model=nucacid&id=${id}&initial=true">${data}</a>`;
                         }
@@ -164,7 +164,7 @@ var KTDatatablesServerSide = function () {
                             <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4" data-kt-menu="true">
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/libprep/edit/`+ row["nu_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
+                                    <a href="/libprep/edit/`+ row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
                                         Edit
                                     </a>
                                 </div>
@@ -172,7 +172,7 @@ var KTDatatablesServerSide = function () {
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/libprep/delete/` + row["nu_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
+                                    <a href="/libprep/delete/` + row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
                                         Delete
                                     </a>
                                 </div>

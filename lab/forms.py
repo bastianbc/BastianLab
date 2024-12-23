@@ -1,21 +1,21 @@
 from django import forms
-from .models import Patients
-from blocks.models import Blocks
+from .models import Patient
+from blocks.models import Block
 
 class PatientForm(forms.ModelForm):
-    blocks = forms.ModelMultipleChoiceField(queryset=Blocks.objects.all(), label="Blocks", required=False)
+    blocks = forms.ModelMultipleChoiceField(queryset=Block.objects.all(), label="Blocks", required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         instance = kwargs.get('instance', None)
         if instance:
-            self.fields['blocks'].queryset = Blocks.objects.filter(patient=instance)
+            self.fields['blocks'].queryset = Block.objects.filter(patient=instance)
             self.fields['blocks'].initial = instance.patient_blocks.all()
         else:
-            self.fields['blocks'].queryset = Blocks.objects.all()
+            self.fields['blocks'].queryset = Block.objects.all()
 
     class Meta:
-        model = Patients
+        model = Patient
         fields = ('pat_id', 'dob', 'sex', 'race', 'source', 'blocks', 'notes', 'consent')
         widgets = {
             'notes': forms.Textarea(attrs={'rows': 4, 'cols': 40}),
@@ -30,15 +30,15 @@ class PatientForm(forms.ModelForm):
             block.patient = instance
             block.save()
         return instance
-    
+
 class FilterForm(forms.Form):
     race = forms.ChoiceField(
-        choices=[(0, '---------')] + list(Patients.RACE_TYPES),
+        choices=[(0, '---------')] + list(Patient.RACE_TYPES),
         label="Race",
         required=False
     )
     sex = forms.ChoiceField(
-        choices=[('', '---------')] + list(Patients.SEX_TYPES),
+        choices=[('', '---------')] + list(Patient.SEX_TYPES),
         label="Sex",
         required=False
     )

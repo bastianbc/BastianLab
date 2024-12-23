@@ -1,60 +1,40 @@
 from django import forms
-from .models import Projects
+from .models import Project
 from core.forms import BaseForm
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import CharField, Value
 from django.db.models.functions import Concat
-from blocks.models import Blocks
+from blocks.models import Block
+
 User = get_user_model()
 
 class ProjectForm(BaseForm):
-    blocks = forms.ModelMultipleChoiceField(queryset=Blocks.objects.all(), label="Blocks")
+    blocks = forms.ModelMultipleChoiceField(queryset=Block.objects.all(), label="Blocks")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        instance = kwargs.get('instance', None)
-        if instance:
-            self.fields['blocks'].queryset = Blocks.objects.filter(project=instance)
-            # Preselect the blocks already associated with the project
-            self.fields['blocks'].initial = instance.project_blocks.all()
-        else:
-            # Default queryset for new projects
-            self.fields['blocks'].queryset = Blocks.objects.all()
-
         self.fields["technician"].queryset = User.objects.filter(groups__name=settings.TECHNICIAN_GROUP_NAME)
         self.fields['technician'].label_from_instance = lambda obj: "%s" % obj.get_full_name()
         self.fields["researcher"].queryset = User.objects.filter(groups__name=settings.RESEARCHER_GROUP_NAME)
         self.fields['researcher'].label_from_instance = lambda obj: "%s" % obj.get_full_name()
 
     class Meta:
-        model = Projects
+        model = Project
         fields = [
-            'pr_id', 'name', 'abbreviation', 'blocks', 'description', 'speedtype',
-            'pi', 'date_start', 'technician', 'researcher',
+            'id', 'name', 'abbreviation', 'blocks', 'description', 'speedtype', 'pi', 'date_start', 'technician', 'researcher',
         ]
         widgets = {'description': forms.Textarea(attrs={'rows': 4, 'cols': 40})}
 
-    def save(self, commit=True):
-        instance = super(ProjectForm, self).save(commit=False)
-        if commit:
-            instance.save()
-        Blocks.objects.filter(project=instance)
-        for block in self.cleaned_data['blocks']:
-            block.project = instance
-            block.save()
-
-        print(self.cleaned_data['researcher'], self.cleaned_data['technician'])
-        if 'researcher' in self.cleaned_data:
-            instance.researcher.set(self.cleaned_data['researcher'])  # Set many-to-many field
-        if 'technician' in self.cleaned_data:
-            instance.technician.set(self.cleaned_data['technician'])  # Set many-to-many field
-
+    def save(self):
+        instance = super().save(commit=False)
+        instance.save()
+        self.save_m2m()
         return instance
 
 class FilterForm(forms.Form):
     date_range = forms.DateField(label="Start Date")
-    pi = forms.ChoiceField(choices=[('','---------' )] + Projects.PI_CHOICES, label="Private Investigator", required=False)
+    pi = forms.ChoiceField(choices=[('','---------' )] + Project.PI_CHOICES, label="Private Investigator", required=False)
     technician = forms.ModelChoiceField(queryset=User.objects.filter(
             groups__name='Technicians',
             technician_projects__isnull=False
@@ -77,4 +57,3 @@ class FilterForm(forms.Form):
         self.fields["researcher"].widget.attrs.update({'class':'form-control-sm'})
         self.fields["researcher"].widget.attrs["data-control"] = "select2"
         self.fields['researcher'].label_from_instance = lambda obj: f"{obj.first_name} {obj.last_name}"
-

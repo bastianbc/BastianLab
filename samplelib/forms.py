@@ -3,7 +3,7 @@ from .models import SampleLib, NA_SL_LINK
 from datetime import date
 from bait.models import Bait
 from barcodeset.models import Barcode
-from areas.models import Areas
+from areas.models import Area
 from core.forms import BaseForm
 from sequencingrun.models import SequencingRun
 from capturedlib.models import CapturedLib

@@ -5,11 +5,11 @@ from django.db import IntegrityError
 from datetime import datetime
 import csv
 from io import StringIO
-from lab.models import Patients
-from blocks.models import Blocks
-from projects.models import Projects
+from lab.models import Patient
+from blocks.models import Block
+from projects.models import Project
 from account.models import User
-from areas.models import Areas
+from areas.models import Area
 from libprep.models import NucAcids, AREA_NA_LINK
 from method.models import Method
 from samplelib.models import SampleLib, NA_SL_LINK
@@ -86,7 +86,7 @@ def migrate(request):
 
                             for l in lookup:
                                 if name.lower().strip() in [x.lower() for x in l[0]]:
-                                    # qs = Projects.objects.filter(abbreviation__startswith=l[1])
+                                    # qs = Project.objects.filter(abbreviation__startswith=l[1])
                                     # if qs.exists():
                                     #     return "%s-%d" % (l[1],len(qs))
                                     return l[1]
@@ -103,7 +103,7 @@ def migrate(request):
                             else:
                                 names.append(name)
 
-                            return Projects.IWEI if "Iwei" in names else Projects.BORIS
+                            return Project.IWEI if "Iwei" in names else Project.BORIS
 
                         def get_technician(name):
                             names = []
@@ -133,7 +133,7 @@ def migrate(request):
 
                             return qs.first() if qs.exists() else None
 
-                        project = Projects.objects.create(
+                        project = Project.objects.create(
                             name=row[1].strip(),
                             abbreviation=get_abbreviation(row[1]),
                             pi=get_pi(row[2]),
@@ -156,12 +156,12 @@ def migrate(request):
                             return value.lower() if value and len(value)==1 else None
 
                         def get_race(value):
-                            for x in Patients.RACE_TYPES:
+                            for x in Patient.RACE_TYPES:
                                 if value.lower() == x[1].lower():
                                     return x[0]
                             return 7
 
-                        patient = Patients.objects.create(
+                        patient = Patient.objects.create(
                             pat_id=row[0].strip(),
                             sex=get_sex(row[1].strip()),
                             race=get_race(row[3].strip()),
@@ -172,13 +172,13 @@ def migrate(request):
 
                         def get_patient(value):
                             try:
-                                return Patients.objects.get(pat_id=value)
+                                return Patient.objects.get(pat_id=value)
                             except Exception as e:
                                 return None
 
                         def get_project(value):
                             try:
-                                return Projects.objects.get(name=value)
+                                return Project.objects.get(name=value)
                             except Exception as e:
                                 return None
 
@@ -209,12 +209,12 @@ def migrate(request):
                             return int(value) if value and not value == "nan" else None
 
                         def get_collection(value):
-                            for x in Blocks.COLLECTION_CHOICES:
+                            for x in Block.COLLECTION_CHOICES:
                                 if value.lower() == x[1].lower():
                                     return x[0]
-                            return Blocks.SCRAPE
+                            return Block.SCRAPE
 
-                        Blocks.objects.create(
+                        Block.objects.create(
                             name=row[0].strip(),
                             patient=get_patient(row[1].strip()),
                             scan_number=get_value(row[2].strip()),
@@ -232,18 +232,18 @@ def migrate(request):
 
                         def get_block(value):
                             try:
-                                return Blocks.objects.get(name=value)
+                                return Block.objects.get(name=value)
                             except Exception as e:
                                 None
 
                         def get_collection(value):
-                            for x in Blocks.COLLECTION_CHOICES:
+                            for x in Block.COLLECTION_CHOICES:
                                 if value.lower() == x[1].lower():
                                     return x[0]
-                            return Blocks.SCRAPE
+                            return Block.SCRAPE
 
                         def get_area_type(value):
-                            for x in Areas.AREA_TYPE_TYPES:
+                            for x in Area.AREA_TYPE_TYPES:
                                 if value.lower() == x[1].lower():
                                     return x[0]
                             return None
@@ -251,7 +251,7 @@ def migrate(request):
                         def get_completion_date(value):
                             return datetime.strptime(value,'%m/%d/%Y') if value else datetime.now()
 
-                        Areas.objects.create(
+                        Area.objects.create(
                             name=row[0].strip(),
                             block=get_block(row[2].strip("\"\n\ ")),
                             area_type=get_area_type(row[4]),
@@ -259,7 +259,7 @@ def migrate(request):
                             notes=row[9],
                         )
 
-                        Blocks.objects.filter(name=row[2].strip("\"\n\ ")).update(collection=get_collection(row[3]))
+                        Block.objects.filter(name=row[2].strip("\"\n\ ")).update(collection=get_collection(row[3]))
                     elif app == "na":
 
                         def get_na_type(value):
@@ -270,7 +270,7 @@ def migrate(request):
 
                         def get_area(value):
                             try:
-                                return Areas.objects.get(name=value)
+                                return Area.objects.get(name=value)
                             except Exception as e:
                                 return None
 
@@ -995,21 +995,21 @@ def consolidated_data_old(request):
 
     def get_or_create_patient(**kwargs):
         try:
-            return Patients.objects.get(pat_id=kwargs["pat_id"])
+            return Patient.objects.get(pat_id=kwargs["pat_id"])
         except ObjectDoesNotExist as e:
-            return Patients.objects.create(**kwargs)
+            return Patient.objects.create(**kwargs)
 
     def get_or_create_block(**kwargs):
         try:
-            return Blocks.objects.get(name=kwargs["name"])
+            return Block.objects.get(name=kwargs["name"])
         except ObjectDoesNotExist as e:
-            return Blocks.objects.create(**kwargs)
+            return Block.objects.create(**kwargs)
 
     def get_or_create_area(**kwargs):
         try:
-            return Areas.objects.get(name=kwargs["name"])
+            return Area.objects.get(name=kwargs["name"])
         except ObjectDoesNotExist as e:
-            return Areas.objects.create(**kwargs)
+            return Area.objects.create(**kwargs)
 
     def get_or_create_nucacid(**kwargs):
         try:
@@ -1481,21 +1481,21 @@ def consolidated_data(request):
 
     def get_or_create_patient(**kwargs):
         try:
-            return Patients.objects.get(pat_id=kwargs["pat_id"])
+            return Patient.objects.get(pat_id=kwargs["pat_id"])
         except ObjectDoesNotExist as e:
-            return Patients.objects.create(**kwargs)
+            return Patient.objects.create(**kwargs)
 
     def get_or_create_block(**kwargs):
         try:
-            return Blocks.objects.get(name=kwargs["name"])
+            return Block.objects.get(name=kwargs["name"])
         except ObjectDoesNotExist as e:
-            return Blocks.objects.create(**kwargs)
+            return Block.objects.create(**kwargs)
 
     def get_or_create_area(**kwargs):
         try:
-            return Areas.objects.get(name=kwargs["name"])
+            return Area.objects.get(name=kwargs["name"])
         except ObjectDoesNotExist as e:
-            return Areas.objects.create(**kwargs)
+            return Area.objects.create(**kwargs)
 
     def get_or_create_nucacid(**kwargs):
         try:
@@ -1765,21 +1765,21 @@ def airtable_consolidated_data(request):
 
     def get_or_create_patient(**kwargs):
         try:
-            return Patients.objects.get(pat_id=kwargs["pat_id"])
+            return Patient.objects.get(pat_id=kwargs["pat_id"])
         except ObjectDoesNotExist as e:
-            return Patients.objects.create(**kwargs)
+            return Patient.objects.create(**kwargs)
 
     def get_or_create_block(**kwargs):
         try:
-            return Blocks.objects.get(name=kwargs["name"])
+            return Block.objects.get(name=kwargs["name"])
         except ObjectDoesNotExist as e:
-            return Blocks.objects.create(**kwargs)
+            return Block.objects.create(**kwargs)
 
     def get_or_create_area(**kwargs):
         try:
-            return Areas.objects.get(name=kwargs["name"])
+            return Area.objects.get(name=kwargs["name"])
         except ObjectDoesNotExist as e:
-            return Areas.objects.create(**kwargs)
+            return Area.objects.create(**kwargs)
 
     def get_or_create_nucacid(**kwargs):
         try:
@@ -1788,7 +1788,7 @@ def airtable_consolidated_data(request):
             return NucAcids.objects.create(**kwargs)
 
     def get_area_type(value):
-        for x in Areas.AREA_TYPE_TYPES:
+        for x in Area.AREA_TYPE_TYPES:
             if value and value.lower() == x[1].lower():
                 return x[0]
         return None
@@ -2303,22 +2303,22 @@ def get_baits(row):
         if block_name in l:
             match = re.match(r'\d{2}-(\d+)-(\w+)', row["Block_ID"])
             if match:
-                block = Blocks.objects.get(name=row["Block_ID"].split("-")[0]+"-"+match.group(1)+match.group(2))
+                block = Block.objects.get(name=row["Block_ID"].split("-")[0]+"-"+match.group(1)+match.group(2))
                 if not pd.isnull(row["Assigned Projects"]):
-                    project = Projects.objects.get(name=row['Assigned Projects'])
+                    project = Project.objects.get(name=row['Assigned Projects'])
                     block.project = project
                     block.save()
         elif "," in block_name:
             for bname in block_name.split(","):
-                block = Blocks.objects.get(name=bname.strip())
+                block = Block.objects.get(name=bname.strip())
                 if not pd.isnull(row["Assigned Projects"]):
-                    project = Projects.objects.get(name=row['Assigned Projects'])
+                    project = Project.objects.get(name=row['Assigned Projects'])
                     block.project = project
                     block.save()
         else:
-            block = Blocks.objects.get(name=block_name)
+            block = Block.objects.get(name=block_name)
             if not pd.isnull(row["Assigned Projects"]):
-                project = Projects.objects.get(name=row['Assigned Projects'])
+                project = Project.objects.get(name=row['Assigned Projects'])
                 block.project = project
                 block.save()
         l = ["436 common, sclerotic dermal component",
@@ -2343,41 +2343,41 @@ def get_baits(row):
             area_name = row['Area_ID'].replace('"', '').replace(';', ',').strip()
             if "," in area_name:
                 if area_name in l:
-                    area = Areas.objects.get(name=area_name.strip())
+                    area = Area.objects.get(name=area_name.strip())
                     block = area.block
                     if not pd.isnull(row["Assigned Projects"]):
-                        project = Projects.objects.get(name=row['Assigned Projects'])
+                        project = Project.objects.get(name=row['Assigned Projects'])
                         if block:
                             block.project = project
                             block.save()
                 else:
                     for area in area_name.split(","):
-                        area = Areas.objects.get(name=area.strip())
+                        area = Area.objects.get(name=area.strip())
                         block = area.block
                         if not pd.isnull(row["Assigned Projects"]):
-                            project = Projects.objects.get(name=row['Assigned Projects'])
+                            project = Project.objects.get(name=row['Assigned Projects'])
                             if block:
                                 block.project = project
                                 block.save()
             elif area_name.endswith("_NA"):
-                area = Areas.objects.get(name=area_name.strip().replace("_NA",""))
+                area = Area.objects.get(name=area_name.strip().replace("_NA",""))
                 block = area.block
                 if not pd.isnull(row["Assigned Projects"]):
-                    project = Projects.objects.get(name=row['Assigned Projects'])
+                    project = Project.objects.get(name=row['Assigned Projects'])
                     if block:
                         block.project = project
                         block.save()
             else:
-                area = Areas.objects.get(name=area_name.strip())
+                area = Area.objects.get(name=area_name.strip())
                 block = area.block
                 if not pd.isnull(row["Assigned Projects"]):
-                    project = Projects.objects.get(name=row['Assigned Projects'])
+                    project = Project.objects.get(name=row['Assigned Projects'])
                     if block:
                         block.project = project
                         block.save()
         #     block = area.block
         # if not pd.isnull(row["Assigned Projects"]):
-        #     project = Projects.objects.get(name=row['Assigned Projects'])
+        #     project = Project.objects.get(name=row['Assigned Projects'])
         #     if block:
         #         block.project = project
         #         block.save()
@@ -2400,10 +2400,10 @@ def get_baits(row):
         #             if match:
         #                 print(row["Block_ID"], row["Block_ID"].split("-")[0]+"-"+match.group(1)+match.group(2))
         #                 if ";" not in row["Block_ID"]:
-        #                     b = Blocks.objects.filter(name=row["Block_ID"].split("-")[0]+"-"+match.group(1)+match.group(2))
+        #                     b = Block.objects.filter(name=row["Block_ID"].split("-")[0]+"-"+match.group(1)+match.group(2))
         #                     print(b)
-        # block = Blocks.objects.get(name=row['Block_ID'])
-        # Areas.objects.create(name=row["Area_ID"].replace("_NA",""),
+        # block = Block.objects.get(name=row['Block_ID'])
+        # Area.objects.create(name=row["Area_ID"].replace("_NA",""),
         #                      area_type="normal" if "normal" in row["Area_ID"] else 'tumor',
         #                      block=block)
 
@@ -2454,7 +2454,7 @@ def get_block_scan(row):
     try:
         print(row["Block_ID"])
         dir, scan = row["HE image"].split("=")
-        Blocks.objects.filter(name=row["Block_ID"]).update(scan_number=scan)
+        Block.objects.filter(name=row["Block_ID"]).update(scan_number=scan)
         print("updated")
     except Exception as e:
         print(e)
@@ -2467,7 +2467,7 @@ def block_scan_number(request):
 
 
 def _files_from_file(row):
-    # b=Blocks.objects.filter(block_areas__nucacids__na_sl_links__sample_lib__name=row["sample_lib"])
+    # b=Block.objects.filter(block_areas__nucacids__na_sl_links__sample_lib__name=row["sample_lib"])
     try:
         bl = row['Block'].replace("-","_")
         print(bl)
@@ -2782,20 +2782,20 @@ def get_sex(value):
 
 
 def get_race(value):
-    for x in Patients.RACE_TYPES:
+    for x in Patient.RACE_TYPES:
         if value.lower() == x[1].lower():
             return x[0]
     return 7
 
 def get_or_create_patient(**kwargs):
     try:
-        return Patients.objects.get(pat_id=kwargs["pat_id"])
+        return Patient.objects.get(pat_id=kwargs["pat_id"])
     except ObjectDoesNotExist as e:
-        return Patients.objects.create(**kwargs)
+        return Patient.objects.create(**kwargs)
 
 
 def get_area_type(value):
-    for x in Areas.AREA_TYPE_TYPES:
+    for x in Area.AREA_TYPE_TYPES:
         if value.lower() == x[1].lower():
             return x[0]
     return None
@@ -2838,27 +2838,27 @@ def nas(row):
             area_name = row['Area ID'].replace('"','').strip()
             if "," in area_name:
                 if area_name in l:
-                    area = Areas.objects.get(name=area_name.strip())
+                    area = Area.objects.get(name=area_name.strip())
                     block = area.block
                     if not pd.isnull(row["Assigned Projects"]):
-                        project = Projects.objects.get(name=row['Assigned Projects'])
+                        project = Project.objects.get(name=row['Assigned Projects'])
                         if block:
                             block.project = project
                             block.save()
                 else:
                     for area in area_name.split(","):
-                        area = Areas.objects.get(name=area.strip())
+                        area = Area.objects.get(name=area.strip())
                         block = area.block
                         if not pd.isnull(row["Assigned Projects"]):
-                            project = Projects.objects.get(name=row['Assigned Projects'])
+                            project = Project.objects.get(name=row['Assigned Projects'])
                             if block:
                                 block.project = project
                                 block.save()
             else:
-                area = Areas.objects.get(name=area_name.strip())
+                area = Area.objects.get(name=area_name.strip())
             block = area.block
         if not pd.isnull(row["Assigned Projects"]):
-            project = Projects.objects.get(name=row['Assigned Projects'])
+            project = Project.objects.get(name=row['Assigned Projects'])
             if block:
                 block.project = project
                 block.save()
@@ -2868,20 +2868,20 @@ def nas(row):
         #     na = NucAcids.objects.get(name=row["NA_ID"])
         # if "," in row["Area ID"]:
         #     if "2409 SCC, in situ" in row["Area ID"]:
-        #         a = Areas.objects.get(name="2409 SCC, in situ")
+        #         a = Area.objects.get(name="2409 SCC, in situ")
         #         AREA_NA_LINK.objects.get_or_create(nucacid=na, area=a)
         #         return
         #     if "426 blue nevus, cellular,  DF like" in row["Area ID"]:
-        #         a = Areas.objects.get(name="426 blue nevus, cellular,  DF like")
+        #         a = Area.objects.get(name="426 blue nevus, cellular,  DF like")
         #         AREA_NA_LINK.objects.get_or_create(nucacid=na, area=a)
         #         return
         #     if "436 common, sclerotic dermal component" in row["Area ID"]:
-        #         a = Areas.objects.get(name="436 common, sclerotic dermal component")
+        #         a = Area.objects.get(name="436 common, sclerotic dermal component")
         #         AREA_NA_LINK.objects.get_or_create(nucacid=na, area=a)
         #         return
         #     for area in row["Area ID"].split(","):
         #         print(na, area)
-        #         a = Areas.objects.get(name=area.strip())
+        #         a = Area.objects.get(name=area.strip())
         #         AREA_NA_LINK.objects.get_or_create(nucacid=na, area=a)
     except Exception as e:
         print(e, row["Area ID"])
@@ -2906,10 +2906,10 @@ def nas2(row):
                 sl.barcode = barcode
                 sl.save()
         na, _ = NucAcids.objects.get_or_create(name=row['NA_id'])
-        b = Blocks.objects.get(name=row["Block"])
+        b = Block.objects.get(name=row["Block"])
         # print(b.patient)
         if not pd.isnull(row["pat_id"]):
-            patient = Patients.objects.get(pat_id=str(row["pat_id"]).replace(".0", ""))
+            patient = Patient.objects.get(pat_id=str(row["pat_id"]).replace(".0", ""))
             # print(patient)
             b.patient = patient
         _notes = f"SITE_CODE: {row['site_code']} / icd9: {row['icd9']} / DEPT_NUMBER: {row['dept_number']} / SPECIMEN: {row['specimen']} / DX_TEXT: {row['dx_text']}"
@@ -2923,7 +2923,7 @@ def nas2(row):
         b.prim = row["prim"] if not pd.isnull(row["prim"]) else b.prim
         b.subtype = row["subtype"] if not pd.isnull(row["subtype"]) else b.subtype
         b.save()
-        area, _ = Areas.objects.get_or_create(name=row["Area_id"], block=b)
+        area, _ = Area.objects.get_or_create(name=row["Area_id"], block=b)
         area.block = b
         area.area_type = get_area_type(row['Area'])
         area.save()
@@ -2959,14 +2959,14 @@ def check_na2(request):
     ).filter(num_areas=0).values("name")
     print(nuc_acids_without_areas)
 
-    areas_without_nucleic_acid = Areas.objects.annotate(
+    areas_without_nucleic_acid = Area.objects.annotate(
         num_nucleic_acids=Count('area_na_links')
     ).filter(num_nucleic_acids=0).order_by("name").values("name")
     # print(areas_without_nucleic_acid)
     # for i in areas_without_nucleic_acid:
     #     print(i['name'])
     # print(areas_without_nucleic_acid.count())
-    areas = Areas.objects.filter(block__name="UndefinedBlock")
+    areas = Area.objects.filter(block__name="UndefinedBlock")
     for i in areas:
         print(i.name)
     df[~df["NA_id"].isnull()].apply(lambda row: nas2(row), axis=1)
@@ -2988,9 +2988,9 @@ def nas3(row):
                 for na in row['NA_id'].replace(";", ",").split(","):
                     NucAcids.objects.get(name=na)
         if not pd.isnull(row['Area_id']):
-            area=Areas.objects.get(name=row["Area_id"])
+            area=Area.objects.get(name=row["Area_id"])
         if not pd.isnull(row['Area_ID']):
-            area=Areas.objects.get(name=row["Area_ID"])
+            area=Area.objects.get(name=row["Area_ID"])
         # link=AREA_NA_LINK.objects.get_or_create(area=area,nucacid=na)
     except Exception as e:
         print(e)
@@ -3006,7 +3006,7 @@ def check_na3(request):
         if c==1:
             print([na.name for na in NucAcids.objects.filter(name__icontains=na.name.replace("_NA",""))])
     # for na in NucAcids.objects.filter(area_na_links__area__name="UndefinedArea"):
-    #     b = Blocks.objects.filter(name__icontains=na.name.replace("_NA",""))
+    #     b = Block.objects.filter(name__icontains=na.name.replace("_NA",""))
     #     if len(b)==1:
     #         print(na.name, b.first().block_areas.all(),sep="------")
     #         if len(b.first().block_areas.all())==1:
@@ -3022,10 +3022,10 @@ def check_na3(request):
 def patients(row):
     try:
 
-        blocks = Blocks.objects.filter(patient__isnull=True)
+        blocks = Block.objects.filter(patient__isnull=True)
         for block in blocks:
             patient_id = "_G"
-            patient, created = Patients.objects.get_or_create(pat_id=patient_id)
+            patient, created = Patient.objects.get_or_create(pat_id=patient_id)
             block.patient = patient
             block.save()
             print("created")
@@ -3050,7 +3050,7 @@ def check_patient(request):
 def check_blocks(row):
     try:
         print(row["name"])
-        b = Blocks.objects.get(name=row["name"])
+        b = Block.objects.get(name=row["name"])
         b.age=row["pat_age"] if not pd.isnull(row["pat_age"]) else b.age
         b.thickness=row["thickness"] if not pd.isnull(row["thickness"]) else b.thickness
         b.mitoses=row["mitoses"] if not pd.isnull(row["mitoses"]) else b.mitoses
@@ -3071,10 +3071,10 @@ def check_block(request):
 
 
 def get_collection(value):
-    for x in Blocks.COLLECTION_CHOICES:
+    for x in Block.COLLECTION_CHOICES:
         if value.lower() == x[1].lower():
             return x[0]
-    return Blocks.SCRAPE
+    return Block.SCRAPE
 
 
 def check_blocks2(row):
@@ -3083,14 +3083,14 @@ def check_blocks2(row):
             'negative':False,
             'Present':True,
         }
-        b = Blocks.objects.get(name=row["Block_ID"])
+        b = Block.objects.get(name=row["Block_ID"])
         if not pd.isnull(row['Assigned project']):
-            project = Projects.objects.get(name=row['Assigned project'])
+            project = Project.objects.get(name=row['Assigned project'])
             b.project = project
             b.save()
             print(row["Block_ID"], "saved_1")
         if not pd.isnull(row['Pat_ID']):
-            patient = Patients.objects.get(pat_id=row['Pat_ID'])
+            patient = Patient.objects.get(pat_id=row['Pat_ID'])
             if not b.patient:
                 b.patient = patient
                 b.save()
@@ -3107,7 +3107,7 @@ def check_blocks2(row):
         b.slides_left=row["Slides left"] if not pd.isnull(row["Slides left"]) else b.slides_left
         b.ulceration=mapping_ulcreation[row["Ulceration"]] if not pd.isnull(row["Ulceration"]) else b.ulceration
 
-        project = Projects.objects.get(name=row['Assigned project'])
+        project = Project.objects.get(name=row['Assigned project'])
         b.project = project
 
         b.save()
@@ -3129,7 +3129,7 @@ def check_blocks3(row):
             'Present':True,
         }
         print(row["Block"])
-        b = Blocks.objects.get(name=row["Block"])
+        b = Block.objects.get(name=row["Block"])
         notes=b.notes
         _notes=f"SITE_CODE: {row['site_code']} / icd9: {row['icd9']} / DEPT_NUMBER: {row['dept_number']} / SPECIMEN: {row['specimen']} / DX_TEXT: {row['dx_text']}"
         b.age = row["pat_age"] if not pd.isnull(row["pat_age"]) else b.age
@@ -3275,7 +3275,7 @@ def get_sample_library(row):
         if pd.isnull(row["Sample"]) or pd.isnull(row["Area_id"]) or pd.isnull(row["NA_id"]):
             return
         sl=SampleLib.objects.get(name=row["Sample"])
-        area,_ = Areas.objects.get_or_create(name=row['Area_id'])
+        area,_ = Area.objects.get_or_create(name=row['Area_id'])
         na,_ = NucAcids.objects.get_or_create(name=row['NA_id'])
         AREA_NA_LINK.objects.get_or_create(area=area, nucacid=na)
         NA_SL_LINK.objects.get_or_create(sample_lib=sl, nucacid=na)
@@ -3350,11 +3350,11 @@ def check_dna_rna(request):
 def check_areas_airtable_get(row):
     try:
         if not pd.isnull(row['Assigned projects']):
-            project = Projects.objects.get(name=row['Assigned projects'])
-            block = Blocks.objects.get(name=row['Block_ID'])
+            project = Project.objects.get(name=row['Assigned projects'])
+            block = Block.objects.get(name=row['Block_ID'])
             block.project = project
             block.save()
-        # area = Areas.objects.get(name=row['Area_ID'])
+        # area = Area.objects.get(name=row['Area_ID'])
         # if area:
         #     area.area_type = get_area_type(row['Area type'])
         #     area.save()
@@ -3362,7 +3362,7 @@ def check_areas_airtable_get(row):
         print(f"{e}, area: {row['Area_ID']}, block: {row['Block_ID']}, project: {row['Assigned projects']}")
 
 def check_areas_airtable(request):
-    file = Path(Path(__file__).parent.parent / "uploads" / "Areas-Grid view (2).csv")
+    file = Path(Path(__file__).parent.parent / "uploads" / "Area-Grid view (2).csv")
     df = pd.read_csv(file)
     df.apply(lambda row: check_areas_airtable_get(row), axis=1)
 
@@ -3370,7 +3370,7 @@ def create_abbreviation(value):
     words = value.split()
     result = ''.join(word[0] for word in words)
     result_upper = result.upper()
-    projects = Projects.objects.filter(abbreviation=result_upper)
+    projects = Project.objects.filter(abbreviation=result_upper)
     if projects:
         words = value.split()
         result = ''.join(word[:2] for word in words)
@@ -3380,8 +3380,8 @@ def create_abbreviation(value):
 
 def check_projects_airtable_get(row):
     try:
-        if not Projects.objects.filter(name=row["Assigned project"]):
-            project, _ = Projects.objects.get_or_create(
+        if not Project.objects.filter(name=row["Assigned project"]):
+            project, _ = Project.objects.get_or_create(
                 name=row["Assigned project"],
                 abbreviation=create_abbreviation(row["Assigned project"]))
     except Exception as e:
@@ -3392,7 +3392,7 @@ def check_projects_airtable(request):
     from .migrate_dump import MigrateDump
     m = MigrateDump.register_captured_lib_and_so()
     # file = Path(Path(__file__).parent.parent / "uploads" / "Patients-Grid view (1).csv")
-    # file = Path(Path(__file__).parent.parent / "uploads" / "Areas-Grid view (3).csv")
+    # file = Path(Path(__file__).parent.parent / "uploads" / "Area-Grid view (3).csv")
     # file = Path(Path(__file__).parent.parent / "uploads" / "Nucleic Acids-Grid view (2).csv")
     # file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view (5).csv")
     # file = Path(Path(__file__).parent.parent / "uploads" / "Blocks-Grid view (3).csv")
@@ -3403,26 +3403,26 @@ def check_projects_airtable(request):
 
 def check_patients_airtable_get(row):
     try:
-        patient, _ = Patients.objects.get_or_create(pat_id=str(row["pat_id"]))
-        block = Blocks.objects.get(name=row['name'])
+        patient, _ = Patient.objects.get_or_create(pat_id=str(row["pat_id"]))
+        block = Block.objects.get(name=row['name'])
         block.patient = patient
         block.save()
         # print(block, patient)
         # if not pd.isnull(row['Block_ID']):
         #     for b in row['Block_ID'].replace(";",",").split(","):
-        #         block = Blocks.objects.get(name=b.strip())
+        #         block = Block.objects.get(name=b.strip())
         #         block.patient = patient
         #         block.save()
         # else:
         #     for a in row['Area_ID'].replace(";", ",").split(","):
-        #         area = Areas.objects.get(name=a.strip())
+        #         area = Area.objects.get(name=a.strip())
         #         block = area.block
         #         if block.name != "UndefinedBlock":
         #             block.patient = patient
         #             block.save()
-        # block = Blocks.objects.get(name=row['Block_ID'].strip())
+        # block = Block.objects.get(name=row['Block_ID'].strip())
         # if not pd.isnull(row['Pat_ID']):
-        #     patient = Patients.objects.get(pat_id=str(row["Pat_ID"]))
+        #     patient = Patient.objects.get(pat_id=str(row["Pat_ID"]))
         #     # print(block.strip())
         #     block.patient = patient
         #     block.save()
@@ -3432,7 +3432,7 @@ def check_patients_airtable_get(row):
 
 def check_patients_airtable(request):
     # file = Path(Path(__file__).parent.parent / "uploads" / "Patients-Grid view (1).csv")
-    # file = Path(Path(__file__).parent.parent / "uploads" / "Areas-Grid view (3).csv")
+    # file = Path(Path(__file__).parent.parent / "uploads" / "Area-Grid view (3).csv")
     # file = Path(Path(__file__).parent.parent / "uploads" / "Nucleic Acids-Grid view (2).csv")
     # file = Path(Path(__file__).parent.parent / "uploads" / "Sample Library with grid view, analysis view and more-Grid view (5).csv")
     # file = Path(Path(__file__).parent.parent / "uploads" / "Blocks-Grid view (3).csv")
@@ -3440,7 +3440,7 @@ def check_patients_airtable(request):
     # file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
     file = Path(Path(__file__).parent.parent / "uploads" / "Block_Patients_done.csv")
     df = pd.read_csv(file)
-    blocks = Blocks.objects.values_list('name', flat=True)
+    blocks = Block.objects.values_list('name', flat=True)
     blocks = list(blocks)
     blocks.sort()
     l = []
@@ -3451,7 +3451,7 @@ def check_patients_airtable(request):
     #         ma = [m for m in match]
     #         # print(bl, ma)
     #         for number in ma:
-    #             counts = Blocks.objects.filter(name__icontains=number).values_list('name', flat=True)
+    #             counts = Block.objects.filter(name__icontains=number).values_list('name', flat=True)
     #             if len(counts)>1:
     #                 d={
     #                     'Block_ID':bl,
@@ -3477,20 +3477,20 @@ def check_patients_airtable(request):
 
 def blocks_sl_at_get(row):
     try:
-        patient = Patients.objects.get(pat_id=str(row["Pat_ID"]))
+        patient = Patient.objects.get(pat_id=str(row["Pat_ID"]))
         if not pd.isnull(row['Block_ID']):
             for b in row['Block_ID'].replace(";",",").split(","):
-                block = Blocks.objects.get(name=b.strip())
+                block = Block.objects.get(name=b.strip())
                 block.patient = patient
                 block.save()
         else:
             for a in row['Area_ID'].replace(";", ",").split(","):
-                area = Areas.objects.get(name=a.strip())
+                area = Area.objects.get(name=a.strip())
                 block = area.block
                 if block.name != "UndefinedBlock":
                     block.patient = patient
                     block.save()
-        # block = Blocks.objects.get(name=row['Block_ID'].strip())
+        # block = Block.objects.get(name=row['Block_ID'].strip())
         # if not pd.isnull(row['Pat_ID']):
         #     patient = Patients.objects.get(pat_id=str(row["Pat_ID"]))
         #     # print(block.strip())
@@ -3510,7 +3510,7 @@ def blocks_sl_at(request):
 
 def im_ar_types(row):
     try:
-        area = Areas.objects.get(ar_id=int(row['data-1715715228037']))
+        area = Area.objects.get(id=int(row['data-1715715228037']))
         area.area_type = row["Unnamed: 2"].lower()
         area.save()
     except:
@@ -3846,5 +3846,3 @@ def import_genes(request):
     df = pd.read_csv(file, sep='\t')
     df = df.reset_index()
     pass
-
-

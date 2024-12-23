@@ -1,18 +1,18 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .models import Patients
+from .models import Patient
 from .forms import PatientForm, FilterForm
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required,permission_required
 from core.decorators import permission_required_for_async
-from blocks.models import Blocks
+from blocks.models import Block
 import pandas as pd
 
 @permission_required_for_async("lab.view_patients")
 def filter_patients(request):
     from .serializers import PatientsSerializer
     from django.http import JsonResponse
-    patients = Patients().query_by_args(**request.GET)
+    patients = Patient().query_by_args(**request.GET)
     serializer = PatientsSerializer(patients['items'], many=True)
     result = dict()
     result['data'] = serializer.data
@@ -44,7 +44,7 @@ def new_patient(request):
 
 @permission_required("lab.change_patients",raise_exception=True)
 def edit_patient(request,id):
-    patient = Patients.objects.get(pa_id=id)
+    patient = Patient.objects.get(id=id)
 
     if request.method=="POST":
         form = PatientForm(request.POST,instance=patient)
@@ -76,7 +76,7 @@ def edit_patient_async(request):
                 parameters[r.groups()[1]] = v
 
     try:
-        custom_update(Patients,pk=parameters["pk"],parameters=parameters)
+        custom_update(Patient,pk=parameters["pk"],parameters=parameters)
     except Exception as e:
         return JsonResponse({"success":False, "message": str(e)})
 
@@ -85,7 +85,7 @@ def edit_patient_async(request):
 @permission_required("lab.delete_patients",raise_exception=True)
 def delete_patient(request,id):
     try:
-        patient = Patients.objects.get(pat_id=id)
+        patient = Patient.objects.get(pat_id=id)
         patient.delete()
         messages.success(request,"Patient %s deleted successfully." % patient.pat_id)
         deleted = True
@@ -96,10 +96,10 @@ def delete_patient(request,id):
     return JsonResponse({ "deleted":True })
 
 def get_race_options(request):
-    return JsonResponse([{"label":"---------","value":""}] + [{ "label":c[1], "value":c[0] } for c in Patients.RACE_TYPES], safe=False)
+    return JsonResponse([{"label":"---------","value":""}] + [{ "label":c[1], "value":c[0] } for c in Patient.RACE_TYPES], safe=False)
 
 def get_sex_options(request):
-    return JsonResponse([{"label":"---------","value":""}] + [{ "label":c[1], "value":c[0] } for c in Patients.SEX_TYPES], safe=False)
+    return JsonResponse([{"label":"---------","value":""}] + [{ "label":c[1], "value":c[0] } for c in Patient.SEX_TYPES], safe=False)
 
 def export_csv_all_data(request):
     import csv
@@ -112,24 +112,24 @@ def export_csv_all_data(request):
         headers={'Content-Disposition': 'attachment; filename="patients.csv"'},
     )
 
-    field_names = [f.name for f in Patients._meta.fields]
+    field_names = [f.name for f in Patient._meta.fields]
     writer = csv.writer(response)
     writer.writerow(field_names)
-    for patient in Patients.objects.all():
+    for patient in Patient.objects.all():
         writer.writerow([getattr(patient, field) for field in field_names])
 
     return response
 
 
 def get_race(value):
-    for x in Patients.RACE_TYPES:
+    for x in Patient.RACE_TYPES:
         if value.lower() == x[1].lower():
             return x[0]
     return 7
 
 def _pat_get_or_create(fields:dict):
     try:
-        pat = Patients.objects.get(pat_id=fields.get("Pat_ID"))
+        pat = Patient.objects.get(pat_id=fields.get("Pat_ID"))
         pat.sex = fields.get("Gender","")
         pat.race = get_race(fields.get("Race",""))
         pat.source = fields.get("Source","")
@@ -140,7 +140,7 @@ def _pat_get_or_create(fields:dict):
 
 def _patient_get_or_create(value):
     if value:
-        obj, created = Patients.objects.get_or_create(
+        obj, created = Patient.objects.get_or_create(
             pat_id=value
         )
         return obj
@@ -148,7 +148,7 @@ def _patient_get_or_create(value):
 
 def _block_get_or_create(value):
     if value:
-        obj, created = Blocks.objects.get_or_create(
+        obj, created = Block.objects.get_or_create(
             name=value
         )
         return obj
@@ -156,8 +156,8 @@ def _block_get_or_create(value):
 
 def _pat_get_or_create_consolidated(row):
     try:
-        b = Blocks.objects.get(name=row["Block"])
-        b.patient = Patients.objects.get(pat_id=str(row["pat_id"]).replace(".0",""))
+        b = Block.objects.get(name=row["Block"])
+        b.patient = Patient.objects.get(pat_id=str(row["pat_id"]).replace(".0",""))
         b.save()
         print("saved")
     except Exception as e:
@@ -167,9 +167,9 @@ def _pat_done_import(row):
     try:
         if not pd.isnull(row["Block"]):
             try:
-                Blocks.objects.get(name=row["Block"])
+                Block.objects.get(name=row["Block"])
             except:
-                b = Blocks.objects.create(name=row["Block"])
+                b = Block.objects.create(name=row["Block"])
                 patient = _patient_get_or_create(row["pat_id"])
                 b.patient = patient
                 b.save()

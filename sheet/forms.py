@@ -2,7 +2,7 @@ from django import forms
 from bait.models import Bait
 from barcodeset.models import Barcode
 from sequencingrun.models import SequencingRun
-from lab.models import Patients
+from lab.models import Patient
 
 class FilterForm(forms.Form):
     sequencing_run = forms.ModelMultipleChoiceField(
@@ -10,7 +10,7 @@ class FilterForm(forms.Form):
         label="Sequencing Run"
     )
     patient = forms.ModelChoiceField(
-        queryset=Patients.objects.filter(
+        queryset=Patient.objects.filter(
             patient_blocks__block_areas__area_na_links__nucacid__na_sl_links__sample_lib__isnull=False
         ).distinct().order_by("pat_id"))
     barcode = forms.ModelChoiceField(queryset=Barcode.objects.filter())

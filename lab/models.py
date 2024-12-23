@@ -4,8 +4,7 @@ from django.db.models import Q, Count
 import json
 from core.validators import validate_name_contains_space, validate_birthyear_range
 
-class Patients(models.Model):
-
+class Patient(models.Model):
     RACE_TYPES = (
         (1, "American Indian or Alaska Native"),
         (2, "Asian"),
@@ -33,7 +32,6 @@ class Patients(models.Model):
     source = models.CharField(max_length=20, blank=True, null=True, verbose_name="Source")
     blocks_temp = models.CharField(max_length=100, blank=True, null=True, verbose_name="Blocks")
     notes = models.TextField(blank=True, null=True, verbose_name="Notes")
-    pa_id = models.AutoField(primary_key=True)
     pat_ip_id = models.CharField(max_length=20, blank=True, null=True, verbose_name="Intelipath Patient ID", help_text="Requires a unique identifier for each patient from intelipath.")
     date_added = models.DateTimeField(auto_now_add=True)
 
@@ -77,7 +75,7 @@ class Patients(models.Model):
 
         try:
             ORDER_COLUMN_CHOICES = {
-                '0': 'pa_id',
+                '0': 'id',
                 '1': 'pat_id',
                 '2': 'sex',
                 '3': 'race',
@@ -99,7 +97,7 @@ class Patients(models.Model):
             if order == 'desc':
                 order_column = '-' + order_column
 
-            queryset = Patients.objects.all().annotate(num_blocks=Count('patient_blocks'))
+            queryset = Patient.objects.all().annotate(num_blocks=Count('patient_blocks'))
             total = queryset.count()
             is_initial = _is_initial_value(search_value)
             search_value = _parse_value(search_value)

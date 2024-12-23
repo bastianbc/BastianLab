@@ -3,15 +3,15 @@ from .forms import *
 from django.http import JsonResponse
 import json
 from django.contrib import messages
-from lab.models import Patients
-from projects.models import Projects
+from lab.models import Patient
+from projects.models import Project
 from .serializers import BlocksSerializer, SingleBlockSerializer
 from django.contrib.auth.decorators import login_required,permission_required
 from core.decorators import permission_required_for_async
 
 @permission_required_for_async("blocks.view_blocks")
 def filter_blocks(request):
-    blocks = Blocks.query_by_args(request.user,**request.GET)
+    blocks = Block.query_by_args(request.user,**request.GET)
     serializer = BlocksSerializer(blocks['items'], many=True)
     result = dict()
     result['data'] = serializer.data
@@ -27,11 +27,11 @@ def blocks(request):
     filter = FilterForm()
     form = AreaCreationForm()
     if model=="project" and id:
-        project = Projects.objects.get(pr_id=id)
+        project = Project.objects.get(id=id)
     elif model=="patient" and id:
-        patient = Patients.objects.get(pa_id=id)
+        patient = Patient.objects.get(id=id)
         print(patient)
-       
+
     return render(request,"block_list.html",locals())
 
 @permission_required("blocks.add_blocks",raise_exception=True)
@@ -40,7 +40,7 @@ def new_block(request):
         form = BlockForm(request.POST)
         if form.is_valid():
             block = form.save()
-            messages.success(request,"Block %s created successfully." % block.bl_id)
+            messages.success(request,"Block %s created successfully." % block.id)
             return redirect("blocks")
         else:
             messages.error(request,"Block not created.")
@@ -55,10 +55,9 @@ def add_block_to_patient_async(request):
     patient_id = request.GET.get("patient_id")
 
     try:
-        patient = Patients.objects.get(pa_id=patient_id)
+        patient = Patient.objects.get(id=patient_id)
         for id in selected_ids:
-            """Blocks.objects.create(patient=patient)"""
-            block = Blocks.objects.get(bl_id=id)
+            block = Block.objects.get(bl_id=id)
             block.patient = patient
             block.save()
     except Exception as e:
@@ -72,7 +71,7 @@ def remove_block_from_patient_async(request):
 
     try:
         for id in selected_ids:
-            block = Blocks.objects.get(bl_id=id)
+            block = Block.objects.get(bl_id=id)
             block.patient = None
             block.save()
     except Exception as e:
@@ -87,11 +86,9 @@ def add_block_to_project_async(request):
     project_id = request.GET.get("project_id")
 
     try:
-        project = Projects.objects.get(pr_id=project_id)
-        for id in selected_ids:
-            block = Blocks.objects.get(bl_id=id)
-            block.project = project
-            block.save()
+        project = Project.objects.get(id=project_id)
+        blocks = Block.objects.filter(id__in=selected_ids)
+        project.blocks.add(*blocks)
     except Exception as e:
         print(str(e))
         return JsonResponse({"success":False})
@@ -100,15 +97,13 @@ def add_block_to_project_async(request):
 
 @permission_required_for_async("blocks.change_blocks")
 def remove_block_from_project_async(request):
-    selected_ids = json.loads(request.GET.get("selected_ids"))
+    selected_ids = ",".join(json.loads(request.GET.get("selected_ids")))
     project_id = request.GET.get("project_id")
 
     try:
-        project = Projects.objects.get(pr_id=project_id)
-        for id in selected_ids:
-            block = Blocks.objects.get(bl_id=id)
-            block.project = None
-            block.save()
+        project = Project.objects.get(id=project_id)
+        blocks = Block.objects.filter(id__in=selected_ids)
+        project.blocks.remove(*blocks)
     except Exception as e:
         print(str(e))
         return JsonResponse({"success":False})
@@ -117,7 +112,7 @@ def remove_block_from_project_async(request):
 
 @permission_required("blocks.change_blocks",raise_exception=True)
 def edit_block(request,id):
-    block = Blocks.objects.get(bl_id=id)
+    block = Block.objects.get(id=id)
 
     if request.method=="POST":
         form = BlockForm(request.POST,instance=block)
@@ -149,7 +144,7 @@ def edit_block_async(request):
                 parameters[r.groups()[1]] = v
 
     try:
-        custom_update(Blocks,pk=parameters["pk"],parameters=parameters)
+        custom_update(Block,pk=parameters["pk"],parameters=parameters)
     except Exception as e:
         return JsonResponse({"success":False, "message": str(e)})
 
@@ -158,7 +153,7 @@ def edit_block_async(request):
 @permission_required_for_async("blocks.delete_blocks")
 def delete_block(request,id):
     try:
-        block = Blocks.objects.get(bl_id=id)
+        block = Block.objects.get(bl_id=id)
         block.delete()
         messages.success(request,"Block %s deleted successfully." % block.name)
         deleted = True
@@ -172,7 +167,7 @@ def delete_block(request,id):
 def delete_batch_blocks(request):
     try:
         selected_ids = json.loads(request.GET.get("selected_ids"))
-        Blocks.objects.filter(bl_id__in=selected_ids).delete()
+        Block.objects.filter(bl_id__in=selected_ids).delete()
     except Exception as e:
         print(str(e))
         return JsonResponse({ "deleted":False })
@@ -182,7 +177,7 @@ def delete_batch_blocks(request):
 @permission_required_for_async("blocks.delete_blocks")
 def check_can_deleted_async(request):
     id = request.GET.get("id")
-    instance = Blocks.objects.get(bl_id=id)
+    instance = Block.objects.get(bl_id=id)
     related_objects = []
     for field in instance._meta.related_objects:
         relations = getattr(instance,field.related_name)
@@ -195,7 +190,7 @@ def check_can_deleted_async(request):
     return JsonResponse({"related_objects":related_objects})
 
 def get_block_async(request):
-    block = Blocks.objects.get(bl_id=request.GET["id"])
+    block = Block.objects.get(id=request.GET["id"])
     serializer = SingleBlockSerializer(block)
     return JsonResponse(serializer.data)
 
@@ -210,10 +205,10 @@ def export_csv_all_data(request):
         headers={'Content-Disposition': 'attachment; filename="blocks.csv"'},
     )
 
-    field_names = [f.name for f in Blocks._meta.fields]
+    field_names = [f.name for f in Block._meta.fields]
     writer = csv.writer(response)
     writer.writerow(field_names)
-    for patient in Blocks.objects.all():
+    for patient in Block.objects.all():
         writer.writerow([getattr(patient, field) for field in field_names])
 
     return response

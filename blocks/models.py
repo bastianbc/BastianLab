@@ -5,7 +5,7 @@ from django.db.models import Q, Count
 from django.utils.crypto import get_random_string
 import json
 
-class Blocks(models.Model):
+class Block(models.Model):
     P_STAGE_TYPES = (
         ("Tis", "Tis"),
         ("T1a", "T1a"),
@@ -43,10 +43,10 @@ class Blocks(models.Model):
         ("ethanol", "ethanol"),
     )
 
-    bl_id = models.AutoField(primary_key=True)
+    # bl_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50, blank=True, null=False, unique=True, validators=[validate_name_contains_space])
-    patient = models.ForeignKey('lab.Patients', on_delete=models.CASCADE, db_column='patient', blank=True, null=True, related_name="patient_blocks")
-    project = models.ForeignKey('projects.Projects', on_delete=models.DO_NOTHING, blank=True, null=True, related_name="project_blocks")
+    patient = models.ForeignKey('lab.Patient', on_delete=models.CASCADE, db_column='patient', blank=True, null=True, related_name="patient_blocks")
+    # project = models.ForeignKey('projects.Projects', on_delete=models.DO_NOTHING, blank=True, null=True, related_name="project_blocks")
     age = models.FloatField(blank=True, null=True, validators=[
         MinValueValidator((0.1), message='Minimum age is 0.1 years'),
         MaxValueValidator((120), message='Maximum age is 120 years'),
@@ -76,8 +76,7 @@ class Blocks(models.Model):
     ip_dx = models.TextField(blank=True, null=True)
 
     class Meta:
-        db_table = 'blocks'
-        managed = True
+        db_table = 'block'
 
     def __str__(self):
         return self.name
@@ -105,8 +104,8 @@ class Blocks(models.Model):
             Users can access to some entities depend on their authorize. While the user having admin role can access to all things,
             technicians or researchers can access own projects and other entities related to it.
             '''
-            queryset = Blocks.objects.all().annotate(num_areas=Count('block_areas'),
-                                                     project_num=Count("project"),
+            queryset = Block.objects.all().annotate(num_areas=Count('block_areas'),
+                                                     project_num=Count("block_projects"),
                                                      patient_num=Count('patient'))
             if not user.is_superuser:
                 return queryset.filter(Q(project__technician=user) | Q(project__researcher=user))
@@ -137,21 +136,20 @@ class Blocks(models.Model):
             return "_initial:" in search_value and search_value.split("_initial:")[1] != "null"
 
         def _filter_by_project(value):
-            return queryset.filter(Q(project__pr_id=value))
+            return queryset.filter(Q(block_projects=value))
 
         def _filter_by_patient(value):
-            print("//////////////==========")
-            return queryset.filter(Q(patient__pa_id=value))
+            return queryset.filter(Q(patient__id=value))
 
         def _filter_by_area(value):
-            return queryset.filter(Q(block_areas__ar_id=value))
+            return queryset.filter(Q(block_areas__id=value))
 
         def _filter_by_samplelib(value):
             return queryset.filter(Q(block_areas__area_na_links__nucacid__na_sl_links__sample_lib__id=value))
 
         try:
             ORDER_COLUMN_CHOICES = {
-                "1":"bl_id",
+                "1":"id",
                 "2":"name",
                 "3":"project",
                 "4":"patient",

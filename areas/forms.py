@@ -7,7 +7,7 @@ from core.forms import BaseForm
 
 class AreaForm(BaseForm, forms.ModelForm):
     class Meta:
-        model = Areas
+        model = Area
         fields = "__all__"
 
     def __init__(self, *args, **kwargs):

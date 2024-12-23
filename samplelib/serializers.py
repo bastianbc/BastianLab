@@ -62,7 +62,7 @@ class SampleLibSerializer(serializers.ModelSerializer):
     def get_area_id(self, obj):
         # Nuclecic Acids have to be from the SAME Area (never many areas) to be combined into one SL.
         # return obj.na_sl_links.first().nucacid.name if obj.na_sl_links.count() > 0 else None
-        # return obj.na_sl_links.all().nucacid.area.ar_id if obj.na_sl_links.count() > 0 and obj.na_sl_links.first().nucacid.area else None
+        # return obj.na_sl_links.all().nucacid.area.id if obj.na_sl_links.count() > 0 and obj.na_sl_links.first().nucacid.area else None
         return None
 
     def get_area_name(self,obj):
@@ -104,7 +104,7 @@ class UsedNuacidsSerializer(serializers.ModelSerializer):
         return obj.sample_lib.name
 
     def get_nucacid_id(self,obj):
-        return obj.nucacid.nu_id
+        return obj.nucacid.id
 
     def get_nucacid_name(self,obj):
         return obj.nucacid.name

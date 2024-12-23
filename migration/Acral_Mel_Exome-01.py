@@ -8,9 +8,8 @@ from samplelib.models import SampleLib, NA_SL_LINK
 from sequencingfile.models import SequencingFile
 from sequencingrun.models import SequencingRun
 from django.core import serializers
-from areas.models import Areas
+from areas.models import Area
 from libprep.models import NucAcids,AREA_NA_LINK
-from blocks.models import Blocks
 from capturedlib.models import CapturedLib, SL_CL_LINK
 # Specify the directory you want to start from
 directory = '/Volumes/labshare/BastianRaid-02/HiSeqData/Acral_Mel_Exome-01/bastianb-AGEX-01/@@md5checksum.txt'

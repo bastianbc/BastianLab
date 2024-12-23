@@ -17,7 +17,6 @@ class NucAcids(models.Model):
         (BOTH, "Both DNA and RNA"),
     ]
 
-    nu_id = models.AutoField(primary_key=True, verbose_name="NA ID")
     name = models.CharField(max_length=50, unique=True, validators=[validate_name_contains_space], verbose_name="Name")
     date = models.DateTimeField(default=datetime.now, verbose_name="Extraction Date")
     method = models.ForeignKey("method.Method",related_name="nuc_acids",on_delete=models.CASCADE, blank=True, null=True, verbose_name="Method")
@@ -88,7 +87,7 @@ class NucAcids(models.Model):
 
         try:
             ORDER_COLUMN_CHOICES = {
-                "0": "nu_id",
+                "0": "id",
                 "1": "name",
                 "2": "num_areas",
                 "3": "na_type",
@@ -134,12 +133,12 @@ class NucAcids(models.Model):
 
             if is_initial:
                 if search_value["model"] == "area":
-                    queryset = queryset.filter(Q(area_na_links__area__ar_id=search_value["id"]))
+                    queryset = queryset.filter(Q(area_na_links__area__id=search_value["id"]))
                 elif search_value["model"] == "sample_lib":
                     queryset = queryset.filter(Q(na_sl_links__sample_lib__id=search_value["id"]))
                 else:
                     queryset = queryset.filter(
-                            Q(area_na_links__area__ar_id=search_value)
+                            Q(area_na_links__area__id=search_value)
                         )
             elif search_value:
                 queryset = queryset.filter(
@@ -175,8 +174,8 @@ class NucAcids(models.Model):
         '''
         Checks that allow only the remaining volume to be changed after the SL is created. If there is a rule violation throws an exception.
         '''
-        if self.nu_id and self.na_sl_links.count() > 0:
-            existing_na = NucAcids.objects.get(nu_id=self.nu_id)
+        if self.id and self.na_sl_links.count() > 0:
+            existing_na = NucAcids.objects.get(id=self.id)
             if not self.conc == existing_na.conc or not self.vol_init == existing_na.vol_init:
                 raise Exception("This record cannot be changed as it is used to create SL.")
 
@@ -210,7 +209,7 @@ class NucAcids(models.Model):
 
 class AREA_NA_LINK(models.Model):
     nucacid = models.ForeignKey("libprep.NucAcids",on_delete=models.CASCADE, related_name="area_na_links", verbose_name="Nucleic Acid")
-    area = models.ForeignKey("areas.Areas", on_delete=models.CASCADE, related_name="area_na_links", verbose_name="Area")
+    area = models.ForeignKey("areas.Area", on_delete=models.CASCADE, related_name="area_na_links", verbose_name="Area")
     input_vol = models.FloatField(blank=True, null=True, verbose_name="Volume")
     input_amount = models.FloatField(blank=True, null=True, verbose_name="Amount")
     date = models.DateTimeField(default=datetime.now, verbose_name="Date")

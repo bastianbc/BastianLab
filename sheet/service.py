@@ -5,7 +5,7 @@ from django.db.models import OuterRef, Exists
 from django.http import HttpResponse
 from sequencingrun.models import SequencingRun
 from sequencingfile.models import SequencingFile,SequencingFileSet
-from lab.models import Patients
+from lab.models import Patient
 import json
 import re
 from barcodeset.models import Barcode
@@ -34,7 +34,7 @@ class SequencingFileSerializerManual(serializers.ModelSerializer):
 
 class PatientsSerializerManual(serializers.ModelSerializer):
     class Meta:
-        model = Patients
+        model = Patient
         fields = '__all__'
 
 class CustomSampleLibSerializer(serializers.ModelSerializer):
@@ -109,7 +109,7 @@ class CustomSampleLibSerializer(serializers.ModelSerializer):
 
 
     def get_patient(self, obj):
-        _patients = Patients.objects.filter(
+        _patients = Patient.objects.filter(
             patient_blocks__block_areas__area_na_links__nucacid__na_sl_links__sample_lib=obj
         ).distinct()
         _patients = PatientsSerializerManual(_patients, many=True).data

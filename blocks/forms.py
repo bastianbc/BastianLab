@@ -8,7 +8,7 @@ class BlockForm(BaseForm, forms.ModelForm):
     # mock_body_site = forms.ModelChoiceField(queryset = Body.objects.filter(parent=None), label="Body Site", required=False)
 
     class Meta:
-        model = Blocks
+        model = Block
         fields = "__all__"
         widgets = {
             "body_site": forms.HiddenInput(),
@@ -33,7 +33,7 @@ class BlockForm(BaseForm, forms.ModelForm):
         return self.cleaned_data
 
 class AreaCreationForm(forms.Form):
-    # area_type = forms.ChoiceField(choices=Areas.AREA_TYPE_TYPES)
+    # area_type = forms.ChoiceField(choices=Area.AREA_TYPE_TYPES)
     number = forms.IntegerField(initial=1, label="How many areas for block do you want to create?")
 
 
@@ -50,9 +50,9 @@ class BlockUrlForm(forms.ModelForm):
 
 
 class FilterForm(forms.Form):
-    p_stage = forms.ChoiceField(choices=[('','---------' )] + list(Blocks.P_STAGE_TYPES), label="P_STAGE", required=False)
-    prim = forms.ChoiceField(choices=[('','---------' )] + list(Blocks.PRIM_TYPES), label="PRIM", required=False)
-    # collection = forms.ChoiceField(choices=[('','---------' )] + list(Blocks.COLLECTION_CHOICES), label="COLLECTION", required=False)
+    p_stage = forms.ChoiceField(choices=[('','---------' )] + list(Block.P_STAGE_TYPES), label="P_STAGE", required=False)
+    prim = forms.ChoiceField(choices=[('','---------' )] + list(Block.PRIM_TYPES), label="PRIM", required=False)
+    # collection = forms.ChoiceField(choices=[('','---------' )] + list(Block.COLLECTION_CHOICES), label="COLLECTION", required=False)
     body_site = forms.ModelChoiceField(queryset=Body.objects.all())
 
 

@@ -2,10 +2,9 @@ import os
 import django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'test1.settings')
 django.setup()
-from lab.models import Patients
-from blocks.models import Blocks
-from projects.models import Projects
-from areas.models import Areas
+from lab.models import Patient
+from projects.models import Project
+from areas.models import Area
 from libprep.models import NucAcids, AREA_NA_LINK
 from samplelib.models import SampleLib, NA_SL_LINK
 from capturedlib.models import CapturedLib, SL_CL_LINK
@@ -82,7 +81,7 @@ class MigrateDump():
 
     @staticmethod
     def get_race(value):
-        for x in Patients.RACE_TYPES:
+        for x in Patient.RACE_TYPES:
             if value.lower() == x[1].lower():
                 return x[0]
         return 7
@@ -95,8 +94,8 @@ class MigrateDump():
             try:
                 # print(row)
                 # print(row[0])
-                # patient = Patients.objects.get(pat_id=row[0])
-                patient, created = Patients.objects.get_or_create(
+                # patient = Patient.objects.get(pat_id=row[0])
+                patient, created = Patient.objects.get_or_create(
                     pat_id=row[0]
                 )
 
@@ -109,7 +108,7 @@ class MigrateDump():
                     patient.race = MigrateDump().get_race(row[3])
                 patient.source = row[4] or ""
                 patient.notes = row[6] or ""
-                # patient.pa_id = row[7]
+                # patient.id = row[7]
                 patient.pat_ip_id = row[9] or ""
                 patient.save()
                 # print(patient, "saved")
@@ -118,10 +117,10 @@ class MigrateDump():
 
     @staticmethod
     def get_collection(value):
-        for x in Blocks.COLLECTION_CHOICES:
+        for x in Block.COLLECTION_CHOICES:
             if value.lower() == x[1].lower():
                 return x[0]
-        return Blocks.SCRAPE
+        return Block.SCRAPE
 
     @staticmethod
     def get_abbreviation(name):
@@ -150,7 +149,7 @@ class MigrateDump():
         ]
         for l in lookup:
             if name.lower().strip() in [x.lower() for x in l[0]]:
-                # qs = Projects.objects.filter(abbreviation__startswith=l[1])
+                # qs = Project.objects.filter(abbreviation__startswith=l[1])
                 # if qs.exists():
                 #     return "%s-%d" % (l[1],len(qs))
                 return l[1]
@@ -160,14 +159,14 @@ class MigrateDump():
     @staticmethod
     def register_blocks():
         rows = MigrateDump().cursor("SELECT * FROM blocks")
-        # print(Patients.objects.all().count())
+        # print(Patient.objects.all().count())
         count = 0
         for row in rows:
             count += 1
             try:
                 # print(row[-4])
-                patient = Patients.objects.get(pat_id=row[-4])
-                block, created = Blocks.objects.get_or_create(
+                patient = Patient.objects.get(pat_id=row[-4])
+                block, created = Block.objects.get_or_create(
                     name=row[1].strip()
                 )
                 block.patient = patient
@@ -178,7 +177,7 @@ class MigrateDump():
                 block.mitoses = row[5]
                 block.p_stage = row[6] if row[6] is not None else None
                 if row[7] != None:
-                    block.prim = row[7].lower() if row[7].lower() in [item[0].lower() for item in Blocks.PRIM_TYPES] else None
+                    block.prim = row[7].lower() if row[7].lower() in [item[0].lower() for item in Block.PRIM_TYPES] else None
                 block.subtype = row[8]
                 block.slides = row[9]
                 block.slides_left = row[10]
@@ -203,9 +202,9 @@ class MigrateDump():
                 block.path_note = row[23]
                 block.ip_dx = row[24]
                 if row[-3] != None:
-                    project = Projects.objects.filter(name=row[-3]).first()
+                    project = Project.objects.filter(name=row[-3]).first()
                     if not project:
-                        project = Projects.objects.create(name=row[-3], abbreviation=MigrateDump.get_abbreviation(row[-3]))
+                        project = Project.objects.create(name=row[-3], abbreviation=MigrateDump.get_abbreviation(row[-3]))
                     block.project = project
                 block.save()
                 print(count, block)
@@ -214,7 +213,7 @@ class MigrateDump():
 
     @staticmethod
     def get_area_type(value):
-        for x in Areas.AREA_TYPE_TYPES:
+        for x in Area.AREA_TYPE_TYPES:
             if value.lower() == x[1].lower():
                 return x[0]
             else:
@@ -225,9 +224,9 @@ class MigrateDump():
     @staticmethod
     def register_areas():
         sql = '''
-        SELECT a.*, l.*, b.name as block, b.bl_id 
-        FROM AREAS a 
-        LEFT JOIN block_area_link l on a.ar_id=l.area 
+        SELECT a.*, l.*, b.name as block, b.bl_id
+        FROM AREAS a
+        LEFT JOIN block_area_link l on a.id=l.area
         LEFT JOIN blocks b on l.block = b.bl_id
         '''
         rows = MigrateDump().cursor(sql)
@@ -238,8 +237,7 @@ class MigrateDump():
         for row in rows:
             try:
                 if row[0] != None:
-                    # block = Blocks.objects.get(name=row[-2].strip())
-                    area, _ = Areas.objects.get_or_create(name=row[1])
+                    area, _ = Area.objects.get_or_create(name=row[1])
                     # area.block = block
                     # area.save()
                     if row[2] != None:
@@ -253,8 +251,8 @@ class MigrateDump():
                 try:
                     if row[-6] is not None:
                         for i in row[-6].split(","):
-                            block, _ = Blocks.objects.get_or_create(name=i)
-                    area, _ = Areas.objects.get_or_create(name=row[1])
+                            block, _ = Block.objects.get_or_create(name=i)
+                    area, _ = Area.objects.get_or_create(name=row[1])
                     # area.block = block
                     # area.save()
                     if row[2] != None:
@@ -275,11 +273,11 @@ class MigrateDump():
         #         area.save()
         #         if not area:
         #             print(row[1], " - ", row[-1])
-        #             block = Blocks.objects.get(name=row[-1].strip())
+        #             block = Block.objects.get(name=row[-1].strip())
         #             # if "," in row[-1]:
         #             #     for i in row[-1].split(","):
         #             #         print(i)
-        #             #         block = Blocks.objects.get(name=i)
+        #             #         block = Block.objects.get(name=i)
         #             area, _ = Areas.objects.get_or_create(name=row[1],block=block)
         #             if row[2] != None:
         #                 area.area_type = MigrateDump.get_area_type(row[2])
@@ -296,7 +294,7 @@ class MigrateDump():
         #             if "," in row[-1]:
         #                 for i in row[-1].split(","):
         #                     # print("%%%",i)
-        #                     block = Blocks.objects.get(name=i)
+        #                     block = Block.objects.get(name=i)
         #                     area = Areas.objects.get(name=row[1])
         #                     area.block=block
         #                     if row[2] != None:
@@ -306,9 +304,9 @@ class MigrateDump():
         #                     area.save()
         #             else:
         #                 # print("iii")
-        #                 block = MigrateDump.get_or_none(Blocks, name=row[-1])
+        #                 block = MigrateDump.get_or_none(Block, name=row[-1])
         #                 if not block:
-        #                     block = MigrateDump.get_or_none(Blocks, name="BB"+row[-1])
+        #                     block = MigrateDump.get_or_none(Block, name="BB"+row[-1])
         #                 if block:
         #                     area = Areas.objects.get(name=row[1])
         #                     area.block = block
@@ -331,8 +329,8 @@ class MigrateDump():
     def register_nuc_acids():
         sql = '''
             SELECT n.*, nl.*, a.name FROM AREAS a
-            LEFT JOIN area_na_link nl on nl.area_id = a.ar_id
-            LEFT JOIN nuc_acids n on n.nu_id = nl.nucacid_id
+            LEFT JOIN area_na_link nl on nl.area_id = a.id
+            LEFT JOIN nuc_acids n on n.id = nl.nucacid_id
             WHERE nucacid_id is not NULL
             order by n.name
         '''
@@ -341,10 +339,10 @@ class MigrateDump():
         '''
         sql3 = '''
             SELECT nl.* ,
-            a.name as area, 
+            a.name as area,
             n.name as nuc_acid FROM area_na_link nl
-            LEFT JOIN nuc_acids n on n.nu_id = nl.nucacid_id
-            LEFT JOIN areas a on a.ar_id = nl.area_id
+            LEFT JOIN nuc_acids n on n.id = nl.nucacid_id
+            LEFT JOIN areas a on a.id = nl.area_id
             WHERE nucacid_id is not NULL AND
             area_id is not NULL
         '''
@@ -442,7 +440,7 @@ class MigrateDump():
             SELECT l.*, n.name as nucacid, s.name as samplelib, s.name
             FROM na_sl_link l
             LEFT JOIN sample_lib s on l.sample_lib_id = s.id
-            LEFT JOIN nuc_acids n on n.nu_id = l.nucacid_id
+            LEFT JOIN nuc_acids n on n.id = l.nucacid_id
         '''
         sql4 = '''
             SELECT name FROM sample_lib where barcode_id is Null

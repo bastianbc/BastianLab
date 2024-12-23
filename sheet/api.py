@@ -3,13 +3,11 @@ from django.db.models import Q, F, Count, OuterRef,Exists, Subquery, Value, Case
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.db.models.functions import Coalesce, Concat
 from django.db.models import Prefetch
-
 from samplelib.models import SampleLib, NA_SL_LINK
-from lab.models import Patients
-from areas.models import Areas
+from lab.models import Patient
+from areas.models import Area
 from sequencingfile.models import SequencingFile, SequencingFileSet
 from sequencingrun.models import SequencingRun
-
 
 def _get_authorizated_queryset(seq_runs):
     seq_run_subquery = SequencingFileSet.objects.filter(
@@ -24,12 +22,12 @@ def _get_authorizated_queryset(seq_runs):
         seq_run=F('sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs'),
         patient=F('na_sl_links__nucacid__area_na_links__area__block__patient__pat_id'),
         sex=Subquery(
-            Patients.objects.filter(
+            Patient.objects.filter(
                 patient_blocks__block_areas__area_na_links__nucacid__na_sl_links__sample_lib=OuterRef('pk')
             ).values('sex')[:1]
         ),
         area_type=Subquery(
-            Areas.objects.filter(
+            Area.objects.filter(
                 area_na_links__nucacid__na_sl_links__sample_lib=OuterRef('pk')
             ).annotate(
                 simplified_area_type=Case(
@@ -134,7 +132,7 @@ def query_by_args(user, seq_runs, **kwargs):
             order_column = ORDER_COLUMN_CHOICES[order_column]
             if order == 'desc':
                 order_column = '-' + order_column
-               
+
             queryset = _get_authorizated_queryset(seq_runs)
             total = queryset.count()
 
@@ -143,7 +141,7 @@ def query_by_args(user, seq_runs, **kwargs):
                 queryset = queryset.filter(Q(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=sequencing_run_filter))
 
             if patient_filter:
-                patient = Patients.objects.get(pa_id=patient_filter).pat_id
+                patient = Patient.objects.get(id=patient_filter).pat_id
                 queryset = queryset.filter(Q(patient=patient))
 
             if barcode_filter:

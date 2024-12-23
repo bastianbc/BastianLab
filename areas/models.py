@@ -1,10 +1,10 @@
 from django.db import models
-from django.db.models import Q, Count, Case, When, IntegerField
+from django.db.models import Q, Count, Case, When, IntegerField, Value
 from datetime import datetime
 import json
 from core.validators import validate_name_contains_space
 
-class Areas(models.Model):
+class Area(models.Model):
     AREA_TYPE_TYPES = [
         ("tumor","Tumor"),
         ("normal","Normal"),
@@ -54,9 +54,9 @@ class Areas(models.Model):
         ('FF', 'FFPE')
     ]
 
-    ar_id = models.AutoField(primary_key=True)
-    block = models.ForeignKey('blocks.Blocks', on_delete=models.CASCADE, db_column='block', related_name="block_areas")
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50, unique=True, validators=[validate_name_contains_space])
+    block = models.ForeignKey('blocks.Block', on_delete=models.CASCADE, db_column='block', related_name="block_areas")
     area_type = models.ForeignKey('areatype.AreaType',on_delete=models.CASCADE, db_column='area_type', related_name="areas", null=True, blank=True)
     image = models.ImageField(null=True, blank=True, upload_to="images/%y/%m/%d")
     notes = models.TextField(blank=True, null=True)
@@ -76,7 +76,7 @@ class Areas(models.Model):
         Returns:
             name (str): A string
         '''
-        count = Areas.objects.filter(block=self.block).count()
+        count = Area.objects.filter(block=self.block).count()
         return "%s_area%d" % (self.block.name, count + 1)
 
     def save(self,*args,**kwargs):
@@ -104,19 +104,18 @@ class Areas(models.Model):
             technicians or researchers can access own projects and other entities related to it.
             '''
 
-            queryset = Areas.objects.all().annotate(
+            queryset = Area.objects.all().annotate(
                 num_nucacids=Count('area_na_links', distinct=True),
                 num_samplelibs=Count('area_na_links__nucacid__na_sl_links__sample_lib', distinct=True),
                 num_blocks=Case(
-                    When(block__isnull=False, then=1),
-                    default=0,
+                    When(block__isnull=False, then=Value(1)),
+                    default=Value(0),
                     output_field=IntegerField()
                 ),
-                num_projects=Case(
-                    When(block__project__isnull=False, then=1),
-                    default=0,
-                    output_field=IntegerField()
-                ),
+                num_projects=Count(
+                    'block__block_projects',
+                    distinct=True
+                )
             )
 
             if not user.is_superuser:
@@ -149,7 +148,7 @@ class Areas(models.Model):
 
         try:
             ORDER_COLUMN_CHOICES = {
-                "0":"ar_id",
+                "0":"id",
                 "1":"name",
                 "2":"block",
                 "3":"block__project",
@@ -178,15 +177,15 @@ class Areas(models.Model):
             search_value = _parse_value(search_value)
             if is_initial:
                 if search_value["model"] == "block":
-                    queryset = queryset.filter(Q(block__bl_id=search_value["id"]))
+                    queryset = queryset.filter(Q(block__id=search_value["id"]))
                 elif search_value["model"] == "nuc_acid":
-                    queryset = queryset.filter(Q(area_na_links__nucacid__nu_id=search_value["id"]))
+                    queryset = queryset.filter(Q(area_na_links__nucacid__id=search_value["id"]))
                 elif search_value["model"] == "sample_lib":
                     queryset = queryset.filter(Q(area_na_links__nucacid__na_sl_links__sample_lib__id=search_value["id"]))
                 else:
                     queryset = queryset.filter(
-                        Q(block__bl_id=search_value) |
-                        Q(area_na_links__nucacid__nu_id=search_value)
+                        Q(block__id=search_value) |
+                        Q(area_na_links__nucacid__id=search_value)
                     )
             elif search_value:
                 queryset = queryset.filter(
@@ -211,22 +210,15 @@ class Areas(models.Model):
             raise
 
     @staticmethod
-    def get_area_types():
-        '''
-        Option list of Area Type for the datatables' select field.
-        '''
-        return [{"label":"---------","value":""}] + [{ "label":c[1], "value":c[0] } for c in Areas.AREA_TYPE_TYPES]
-
-    @staticmethod
     def get_collections():
         '''
         Option list of Collection for the datatables' select field.
         '''
-        return [{"label":"---------","value":""}] + [{ "label":c[1], "value":c[0] } for c in Areas.COLLECTION_CHOICES]
+        return [{"label":"---------","value":""}] + [{ "label":c[1], "value":c[0] } for c in Area.COLLECTION_CHOICES]
 
 class BLOCK_AREA_LINK(models.Model):
-    block = models.ForeignKey("blocks.Blocks",on_delete=models.CASCADE, related_name="block_area_links", verbose_name="Block")
-    area = models.ForeignKey("areas.Areas", on_delete=models.CASCADE, related_name="block_area_links", verbose_name="Area")
+    block = models.ForeignKey("blocks.Block",on_delete=models.CASCADE, related_name="block_area_links", verbose_name="Block")
+    area = models.ForeignKey("areas.Area", on_delete=models.CASCADE, related_name="block_area_links", verbose_name="Area")
     input_vol = models.FloatField(blank=True, null=True, verbose_name="Volume")
     input_amount = models.FloatField(blank=True, null=True, verbose_name="Amount")
     date = models.DateTimeField(default=datetime.now, verbose_name="Date")

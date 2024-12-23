@@ -57,7 +57,7 @@ var KTDatatablesServerSide = function () {
               }
             },
             columns: [
-                { data: 'pa_id' },
+                { data: 'id' },
                 { data: 'pat_id' },
                 { data: 'source' },
                 { data: 'sex' ,
@@ -99,9 +99,9 @@ var KTDatatablesServerSide = function () {
                     orderable: false,
                     render: function (data, type, row) {
                         if (data > 0) {
-                          let pa_id = row["pa_id"];
+                          let id = row["id"];
                           return `
-                              <a href="/blocks?model=patient&id=${pa_id}&initial=true">${data}</a>`;
+                              <a href="/blocks?model=patient&id=${id}&initial=true">${data}</a>`;
                         }
                         return data;
                     }
@@ -128,7 +128,7 @@ var KTDatatablesServerSide = function () {
                             <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-150px py-4" data-kt-menu="true">
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/lab/edit/`+ row["pa_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
+                                    <a href="/lab/edit/`+ row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
                                         Edit
                                     </a>
                                 </div>
@@ -136,7 +136,7 @@ var KTDatatablesServerSide = function () {
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/blocks?model=patient&id=`+ row["pa_id"] +`&initial=false" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
+                                    <a href="/blocks?model=patient&id=`+ row["id"] +`&initial=false" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
                                         Add Block(s)
                                     </a>
                                 </div>
@@ -144,7 +144,7 @@ var KTDatatablesServerSide = function () {
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/blocks?model=patient&id=`+ row["pa_id"] +`&initial=true" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
+                                    <a href="/blocks?model=patient&id=`+ row["id"] +`&initial=true" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
                                         Remove Block(s)
                                     </a>
                                 </div>
@@ -152,7 +152,7 @@ var KTDatatablesServerSide = function () {
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/lab/delete/` + row["pat_id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
+                                    <a href="/lab/delete/` + row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
                                         Delete
                                     </a>
                                 </div>

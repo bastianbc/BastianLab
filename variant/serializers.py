@@ -1,8 +1,7 @@
 from rest_framework import serializers
 from .models import *
 from sequencinglib.models import *
-from areas.models import Areas
-from blocks.models import Blocks
+from areas.models import Area
 
 class VariantSerializer(serializers.ModelSerializer):
     DT_RowId = serializers.SerializerMethodField()

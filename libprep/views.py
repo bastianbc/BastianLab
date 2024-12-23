@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import NucAcids, AREA_NA_LINK
 from .forms import *
-from areas.models import Areas
+from areas.models import Area
 from method.models import Method
 import re
 import json
@@ -59,7 +59,7 @@ def new_nucacid(request):
         form = NucAcidForm(request.POST)
         if form.is_valid():
             nucacid = form.save()
-            messages.success(request,"Nuclecic Acid %s created successfully." % nucacid.nu_id)
+            messages.success(request,"Nuclecic Acid %s created successfully." % nucacid.id)
             return redirect("nucacids")
         else:
             messages.error(request,"Nucleic Acid could not be created.")
@@ -85,7 +85,7 @@ def new_nucacid_async(request):
 
     try:
         for id in selected_ids:
-            area = Areas.objects.get(ar_id=id)
+            area = Area.objects.get(id=id)
             method = Method.objects.get(id=options["extraction_method"])
             if options["na_type"] == NucAcids.BOTH:
                 for na_type in [NucAcids.DNA,NucAcids.RNA]:
@@ -118,13 +118,13 @@ def new_nucacid_async(request):
 
 @permission_required("libprep.change_nucacids",raise_exception=True)
 def edit_nucacid(request,id):
-    nucacid = NucAcids.objects.get(nu_id=id)
+    nucacid = NucAcids.objects.get(id=id)
 
     if request.method=="POST":
         form = NucAcidForm(request.POST,instance=nucacid)
         if form.is_valid():
             nucacid = form.save()
-            messages.success(request,"Nuclecic Acid %s updated successfully." % nucacid.nu_id)
+            messages.success(request,"Nuclecic Acid %s updated successfully." % nucacid.id)
             return redirect("nucacids")
         else:
             messages.error(request,"Nucleic Acid could not be updated!")
@@ -136,7 +136,7 @@ def edit_nucacid(request,id):
 @permission_required("libprep.delete_nucacids",raise_exception=True)
 def delete_nucacid(request,id):
     try:
-        nucacid = NucAcids.objects.get(nu_id=id)
+        nucacid = NucAcids.objects.get(id=id)
         nucacid.delete()
         messages.success(request,"Nucleci Acid %s deleted successfully." % nucacid.name)
         deleted = True
@@ -150,7 +150,7 @@ def delete_nucacid(request,id):
 def delete_batch_nucacids(request):
     try:
         selected_ids = json.loads(request.GET.get("selected_ids"))
-        NucAcids.objects.filter(nu_id__in=selected_ids).delete()
+        NucAcids.objects.filter(id__in=selected_ids).delete()
     except Exception as e:
         print(str(e))
         return JsonResponse({ "deleted":False })
@@ -163,7 +163,7 @@ def get_na_types(request):
 @permission_required_for_async("blocks.delete_blocks")
 def check_can_deleted_async(request):
     id = request.GET.get("id")
-    instance = NucAcids.objects.get(nu_id=id)
+    instance = NucAcids.objects.get(id=id)
     related_objects = []
     for field in instance._meta.related_objects:
         relations = getattr(instance,field.related_name)
