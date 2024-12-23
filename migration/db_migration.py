@@ -52,3 +52,16 @@ class Command(BaseCommand):
                 self.stdout.write(f"Error copying data for {table_name}: {e}")
 
         self.stdout.write("Data copy completed.")
+
+def run():
+    print("Starting migration script...")
+
+    # Add your data migration logic here
+    # For example:
+    print("start")
+    c = Command()
+    c.handle()
+    print("end")
+
+
+
