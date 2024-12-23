@@ -2,13 +2,13 @@ from django.db import transaction
 from django.core.management.base import BaseCommand
 from django.apps import apps
 
-# Update TABLES_TO_COPY to include the area_type table
+# Update TABLES_TO_COPY to include the Article model
 TABLES_TO_COPY = [
-    "area_type",  # area_type table from areatype app
+    "article",  # Article table from wiki app
 ]
 
 class Command(BaseCommand):
-    help = "Copy area_type data from labdb to labdbproduction."
+    help = "Copy Article data from labdb to labdbproduction."
 
     def handle(self, *args, **kwargs):
         source_db = "labdb"  # Source database
@@ -19,7 +19,7 @@ class Command(BaseCommand):
 
             try:
                 # Handle app and model names
-                app_label, model_name = "areatype", "AreaType"  # Explicitly define app and model
+                app_label, model_name = "wiki", "Article"  # Explicitly define app and model
                 model = apps.get_model(app_label, model_name)
 
                 # Fetch all objects from the source database
@@ -40,6 +40,7 @@ class Command(BaseCommand):
                 self.stdout.write(f"Error copying data for {table_name}: {e}")
 
         self.stdout.write("Data copy completed.")
+
 
 
 
