@@ -32,10 +32,11 @@ class CapturedLib(models.Model):
         self.__vol_init = self.vol_init
 
     def save(self,*args,**kwargs):
-        if self.__vol_init != self.vol_init:
-            self.vol_remain = self.vol_init
+        if self.pk:
+            if self.__vol_init != self.vol_init:
+                self.vol_remain = self.vol_init
 
-        self._set_nm()
+            self._set_nm()
 
         super().save(*args, **kwargs)
 

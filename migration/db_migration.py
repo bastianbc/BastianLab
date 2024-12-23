@@ -4,64 +4,95 @@ from django.apps import apps
 
 
 class Command(BaseCommand):
-    help = "Copy NA_SL_LINK data from labdb to labdbproduction using a custom query."
+    help = "Copy CapturedLib and SL_CL_LINK data from labdb to labdbproduction using Django ORM."
 
     def handle(self, *args, **kwargs):
         source_db = "labdb"  # Source database
         target_db = "default"  # Target database
 
-        self.stdout.write("Starting data copy for NA_SL_LINK...")
+        self.stdout.write("Starting data copy for CapturedLib and SL_CL_LINK...")
 
         # Get the models
+        CapturedLib = apps.get_model("capturedlib", "CapturedLib")
+        SL_CL_LINK = apps.get_model("capturedlib", "SL_CL_LINK")
+        Bait = apps.get_model("bait", "Bait")
+        Buffer = apps.get_model("buffer", "Buffer")
         SampleLib = apps.get_model("samplelib", "SampleLib")
-        NucAcids = apps.get_model("libprep", "NucAcids")
-        NA_SL_LINK = apps.get_model("samplelib", "NA_SL_LINK")
 
-        # Open a connection to the source database
-        with connections[source_db].cursor() as source_cursor:
-            # Execute the query to fetch data for NA_SL_LINK
-            source_cursor.execute("""
-                SELECT nsl.*, sl.name AS sample_lib, n.name AS nuc_acid 
-                FROM na_sl_link nsl
-                LEFT JOIN sample_lib sl ON sl.id = nsl.sample_lib_id
-                LEFT JOIN nuc_acids n ON nsl.nucacid_id = n.nu_id
-            """)
-            rows = source_cursor.fetchall()
-
-            # Fetch column names
-            column_names = [col[0] for col in source_cursor.description]
+        # Fetch CapturedLibs from the source database
+        captured_libs = CapturedLib.objects.using(source_db).all()
 
         with transaction.atomic(using=target_db):
-            for row in rows:
-                link_data = dict(zip(column_names, row))
-
-                # Fetch the related SampleLib and NucAcids from the target database
-                sample_lib = SampleLib.objects.using(target_db).filter(name=link_data["sample_lib"]).first()
-                if not sample_lib:
-                    self.stdout.write(f"SampleLib {link_data['sample_lib']} not found, skipping NA_SL_LINK.")
+            for captured_lib in captured_libs:
+                # Check if the CapturedLib already exists
+                existing_captured_lib = CapturedLib.objects.using(target_db).filter(name=captured_lib.name).first()
+                if existing_captured_lib:
+                    self.stdout.write(f"CapturedLib {captured_lib.name} already exists, skipping.")
                     continue
 
-                nucacid = NucAcids.objects.using(target_db).filter(name=link_data["nuc_acid"]).first()
-                if not nucacid:
-                    self.stdout.write(f"NucAcid {link_data['nuc_acid']} not found, skipping NA_SL_LINK.")
-                    continue
+                # Get the related Bait and Buffer
+                bait = None
+                if captured_lib.bait:
+                    bait = Bait.objects.using(target_db).filter(name=captured_lib.bait.name).first()
+                    if not bait:
+                        self.stdout.write(f"Bait {captured_lib.bait.name} not found, skipping CapturedLib {captured_lib.name}.")
+                        continue
 
-                # Check if the NA_SL_LINK already exists
-                if NA_SL_LINK.objects.using(target_db).filter(nucacid=nucacid, sample_lib=sample_lib).exists():
-                    self.stdout.write(f"NA_SL_LINK for NucAcid {nucacid.name} and SampleLib {sample_lib.name} already exists, skipping.")
-                    continue
+                buffer = None
+                if captured_lib.buffer:
+                    buffer = Buffer.objects.using(target_db).filter(name=captured_lib.buffer.name).first()
+                    if not buffer:
+                        self.stdout.write(f"Buffer {captured_lib.buffer.name} not found, skipping CapturedLib {captured_lib.name}.")
+                        continue
 
-                # Create the NA_SL_LINK object in the target database
-                NA_SL_LINK.objects.using(target_db).create(
-                    nucacid=nucacid,
-                    sample_lib=sample_lib,
-                    input_vol=link_data.get("input_vol"),
-                    input_amount=link_data.get("input_amount"),
-                    date=link_data.get("date"),
+                # Create the CapturedLib object in the target database
+                CapturedLib.objects.using(target_db).create(
+                    name=captured_lib.name,
+                    date=captured_lib.date,
+                    bait=bait,
+                    frag_size=captured_lib.frag_size,
+                    conc=captured_lib.conc,
+                    amp_cycle=captured_lib.amp_cycle,
+                    buffer=buffer,
+                    nm=captured_lib.nm,
+                    vol_init=captured_lib.vol_init,
+                    vol_remain=captured_lib.vol_remain,
+                    pdf=captured_lib.pdf,
+                    notes=captured_lib.notes,
                 )
-                self.stdout.write(f"Created NA_SL_LINK for NucAcid {nucacid.name} and SampleLib {sample_lib.name}.")
+                self.stdout.write(f"Created CapturedLib {captured_lib.name}.")
 
-        self.stdout.write("Data copy for NA_SL_LINK completed.")
+        # Fetch SL_CL_LINK from the source database
+        sl_cl_links = SL_CL_LINK.objects.using(source_db).all()
+
+        with transaction.atomic(using=target_db):
+            for link in sl_cl_links:
+                # Get the related CapturedLib and SampleLib in the target database
+                captured_lib = CapturedLib.objects.using(target_db).filter(name=link.captured_lib.name).first()
+                if not captured_lib:
+                    self.stdout.write(f"CapturedLib {link.captured_lib.name} not found, skipping SL_CL_LINK.")
+                    continue
+
+                sample_lib = SampleLib.objects.using(target_db).filter(name=link.sample_lib.name).first()
+                if not sample_lib:
+                    self.stdout.write(f"SampleLib {link.sample_lib.name} not found, skipping SL_CL_LINK.")
+                    continue
+
+                # Check if the SL_CL_LINK already exists
+                if SL_CL_LINK.objects.using(target_db).filter(captured_lib=captured_lib, sample_lib=sample_lib).exists():
+                    self.stdout.write(f"SL_CL_LINK for CapturedLib {captured_lib.name} and SampleLib {sample_lib.name} already exists, skipping.")
+                    continue
+
+                # Create the SL_CL_LINK object in the target database
+                SL_CL_LINK.objects.using(target_db).create(
+                    captured_lib=captured_lib,
+                    sample_lib=sample_lib,
+                    volume=link.volume,
+                    date=link.date,
+                )
+                self.stdout.write(f"Created SL_CL_LINK for CapturedLib {captured_lib.name} and SampleLib {sample_lib.name}.")
+
+        self.stdout.write("Data copy for CapturedLib and SL_CL_LINK completed.")
 
 
 
