@@ -4,58 +4,77 @@ from django.apps import apps
 
 
 class Command(BaseCommand):
-    help = "Copy all Variant-related models data from labdb to labdbproduction."
+    help = "Copy Projects data from labdb to labdbproduction."
 
     def handle(self, *args, **kwargs):
         source_db = "labdb"  # Source database
         target_db = "default"  # Target database (labdbproduction)
 
-        self.stdout.write("Starting data copy for Variant-related models...")
+        self.stdout.write("Starting data copy for Projects...")
 
         try:
-            models_to_copy = [
-                ("variant", "VariantFile"),
-            ]
-            # Models in dependency order
+            # Get the Projects and related models
+            SourceProject = apps.get_model("projects", "Projects")
+            TargetProject = apps.get_model("projects", "Project")
+            User = apps.get_model("auth", "User")
+            Block = apps.get_model("blocks", "Block")
 
-            # Mapping of source objects to target objects for foreign key relationships
-            object_mappings = {model_name: {} for _, model_name in models_to_copy}
+            # Fetch all projects from the source database
+            source_projects = SourceProject.objects.using(source_db).all()
+
+            # Map for tracking Many-to-Many relationships
+            user_mapping = {user.pk: user for user in User.objects.using(target_db).all()}
+            block_mapping = {block.pk: block for block in Block.objects.using(target_db).all()}
 
             with transaction.atomic(using=target_db):
-                for app_label, model_name in models_to_copy:
-                    self.stdout.write(f"Copying {model_name}...")
-                    model = apps.get_model(app_label, model_name)
+                for project in source_projects:
+                    # Check if the project already exists in the target database using `abbreviation`
+                    try:
+                        target_project = TargetProject.objects.using(target_db).get(
+                            abbreviation=project.abbreviation
+                        )
+                        self.stdout.write(f"Project {project.name} already exists, skipping.")
+                        continue
+                    except TargetProject.DoesNotExist:
+                        # Create the project in the target database
+                        target_project = TargetProject.objects.using(target_db).create(
+                            name=project.name,
+                            abbreviation=project.abbreviation,
+                            pi=project.pi,
+                            speedtype=project.speedtype,
+                            description=project.description,
+                            date_start=project.date_start,
+                            date=project.date,
+                        )
 
-                    # Fetch all objects from the source database
-                    source_objects = model.objects.using(source_db).all()
+                    # Add Many-to-Many relationships
+                    # Add Technicians
+                    for technician in project.technician.all():
+                        target_technician = user_mapping.get(technician.pk)
+                        if target_technician:
+                            target_project.technician.add(target_technician)
 
-                    for obj in source_objects:
-                        # Handle foreign key fields and create object in the target database
-                        new_obj_data = {}
-                        for field in obj._meta.fields:
-                            if field.is_relation and field.remote_field:
-                                # ForeignKey: Use the mapping to link related objects
-                                related_model_name = field.remote_field.model._meta.object_name
-                                related_object = getattr(obj, field.name)
-                                if related_object:
-                                    new_obj_data[field.name] = object_mappings[related_model_name].get(
-                                        related_object.pk
-                                    )
-                            else:
-                                # Copy regular fields
-                                new_obj_data[field.name] = getattr(obj, field.name)
+                    # Add Researchers
+                    for researcher in project.researcher.all():
+                        target_researcher = user_mapping.get(researcher.pk)
+                        if target_researcher:
+                            target_project.researcher.add(target_researcher)
 
-                        # Create the object in the target database
-                        new_obj = model.objects.using(target_db).create(**new_obj_data)
-                        # Store the mapping
-                        object_mappings[model_name][obj.pk] = new_obj
+                    # Add Blocks
+                    for block in project.blocks.all():
+                        target_block = block_mapping.get(block.pk)
+                        if target_block:
+                            target_project.blocks.add(target_block)
 
-            self.stdout.write("Successfully copied all Variant-related models.")
+            self.stdout.write(
+                f"Successfully copied {len(source_projects)} Projects from {source_db} to {target_db}."
+            )
 
         except Exception as e:
-            self.stdout.write(f"Error copying Variant data: {e}")
+            self.stdout.write(f"Error copying Projects data: {e}")
 
-        self.stdout.write("Data copy for Variant-related models completed.")
+        self.stdout.write("Data copy for Projects completed.")
+
 
 
 
