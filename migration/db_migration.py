@@ -5,6 +5,7 @@ from django.db import transaction
 
 # List of tables to copy
 TABLES_TO_COPY = [
+    "django_content_type",
     "auth_group",
     "auth_user",
     "auth_permission",
