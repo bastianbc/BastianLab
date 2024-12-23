@@ -1,4 +1,4 @@
-from django.db import transaction
+from django.db import connections, transaction
 from django.core.management.base import BaseCommand
 from django.apps import apps
 
@@ -13,56 +13,60 @@ class Command(BaseCommand):
         self.stdout.write("Starting data copy for Projects...")
 
         try:
-            # Get the Projects and related models
-            SourceProject = apps.get_model("projects", "Projects")
-            TargetProject = apps.get_model("projects", "Project")
+            # Get the target Project model
+            Project = apps.get_model("projects", "Project")
             User = apps.get_model("auth", "User")
             Block = apps.get_model("blocks", "Block")
 
-            # Fetch all projects from the source database
-            source_projects = SourceProject.objects.using(source_db).all()
+            # Open a direct connection to the source database
+            with connections[source_db].cursor() as cursor:
+                # Fetch all projects from the source database
+                cursor.execute("SELECT * FROM projects")
+                source_projects = cursor.fetchall()
 
-            # Map for tracking Many-to-Many relationships
+                # Fetch column names for mapping
+                columns = [col[0] for col in cursor.description]
+
+            # Mapping of source IDs to target objects for M2M relationships
             user_mapping = {user.pk: user for user in User.objects.using(target_db).all()}
             block_mapping = {block.pk: block for block in Block.objects.using(target_db).all()}
 
             with transaction.atomic(using=target_db):
-                for project in source_projects:
-                    # Check if the project already exists in the target database using `abbreviation`
+                for row in source_projects:
+                    project_data = dict(zip(columns, row))
+
+                    # Check if the project already exists in the target database
                     try:
-                        target_project = TargetProject.objects.using(target_db).get(
-                            abbreviation=project.abbreviation
+                        target_project = Project.objects.using(target_db).get(
+                            abbreviation=project_data["abbreviation"]
                         )
-                        self.stdout.write(f"Project {project.name} already exists, skipping.")
+                        self.stdout.write(f"Project {project_data['name']} already exists, skipping.")
                         continue
-                    except TargetProject.DoesNotExist:
+                    except Project.DoesNotExist:
                         # Create the project in the target database
-                        target_project = TargetProject.objects.using(target_db).create(
-                            name=project.name,
-                            abbreviation=project.abbreviation,
-                            pi=project.pi,
-                            speedtype=project.speedtype,
-                            description=project.description,
-                            date_start=project.date_start,
-                            date=project.date,
+                        target_project = Project.objects.using(target_db).create(
+                            name=project_data["name"],
+                            abbreviation=project_data["abbreviation"],
+                            pi=project_data["pi"],
+                            speedtype=project_data["speedtype"],
+                            description=project_data["description"],
+                            date_start=project_data["date_start"],
+                            date=project_data["date"],
                         )
 
-                    # Add Many-to-Many relationships
-                    # Add Technicians
-                    for technician in project.technician.all():
-                        target_technician = user_mapping.get(technician.pk)
+                    # Add Many-to-Many relationships for technician, researcher, and blocks
+                    for technician_id in project_data.get("technician", []):
+                        target_technician = user_mapping.get(technician_id)
                         if target_technician:
                             target_project.technician.add(target_technician)
 
-                    # Add Researchers
-                    for researcher in project.researcher.all():
-                        target_researcher = user_mapping.get(researcher.pk)
+                    for researcher_id in project_data.get("researcher", []):
+                        target_researcher = user_mapping.get(researcher_id)
                         if target_researcher:
                             target_project.researcher.add(target_researcher)
 
-                    # Add Blocks
-                    for block in project.blocks.all():
-                        target_block = block_mapping.get(block.pk)
+                    for block_id in project_data.get("blocks", []):
+                        target_block = block_mapping.get(block_id)
                         if target_block:
                             target_project.blocks.add(target_block)
 
@@ -74,8 +78,6 @@ class Command(BaseCommand):
             self.stdout.write(f"Error copying Projects data: {e}")
 
         self.stdout.write("Data copy for Projects completed.")
-
-
 
 
 def run():
