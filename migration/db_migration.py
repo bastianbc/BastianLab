@@ -13,12 +13,12 @@ class Command(BaseCommand):
         self.stdout.write("Starting data copy for VariantCall and related models...")
 
         # Get the models
-        VariantCall = apps.get_model("variants", "VariantCall")
-        GVariant = apps.get_model("variants", "GVariant")
-        CVariant = apps.get_model("variants", "CVariant")
-        PVariant = apps.get_model("variants", "PVariant")
-        VariantFile = apps.get_model("variants", "VariantFile")
-        Cns = apps.get_model("variants", "Cns")
+        VariantCall = apps.get_model("variant", "VariantCall")
+        GVariant = apps.get_model("variant", "GVariant")
+        CVariant = apps.get_model("variant", "CVariant")
+        PVariant = apps.get_model("variant", "PVariant")
+        VariantFile = apps.get_model("variant", "VariantFile")
+        Cns = apps.get_model("variant", "Cns")
         SampleLib = apps.get_model("samplelib", "SampleLib")
         SequencingRun = apps.get_model("sequencingrun", "SequencingRun")
         AnalysisRun = apps.get_model("analysisrun", "AnalysisRun")
