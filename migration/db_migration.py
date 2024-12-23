@@ -1,83 +1,54 @@
-from django.db import connections, transaction
+from django.db import transaction
 from django.core.management.base import BaseCommand
 from django.apps import apps
 
 
 class Command(BaseCommand):
-    help = "Copy Projects data from labdb to labdbproduction."
+    help = "Copy Patient data from labdb to labdbproduction."
 
     def handle(self, *args, **kwargs):
         source_db = "labdb"  # Source database
         target_db = "default"  # Target database (labdbproduction)
 
-        self.stdout.write("Starting data copy for Projects...")
+        self.stdout.write("Starting data copy for Patient...")
 
         try:
-            # Get the target Project model
-            Project = apps.get_model("projects", "Project")
-            User = apps.get_model("auth", "User")
-            Block = apps.get_model("blocks", "Block")
+            # Get the Patient model
+            Patient = apps.get_model("lab", "Patient")
 
-            # Open a direct connection to the source database
-            with connections[source_db].cursor() as cursor:
-                # Fetch all projects from the source database
-                cursor.execute("SELECT * FROM projects")
-                source_projects = cursor.fetchall()
-
-                # Fetch column names for mapping
-                columns = [col[0] for col in cursor.description]
-
-            # Mapping of source IDs to target objects for M2M relationships
-            user_mapping = {user.pk: user for user in User.objects.using(target_db).all()}
-            block_mapping = {block.pk: block for block in Block.objects.using(target_db).all()}
+            # Fetch all Patient objects from the source database
+            source_patients = Patient.objects.using(source_db).all()
 
             with transaction.atomic(using=target_db):
-                for row in source_projects:
-                    project_data = dict(zip(columns, row))
-
-                    # Check if the project already exists in the target database
+                for patient in source_patients:
                     try:
-                        target_project = Project.objects.using(target_db).get(
-                            abbreviation=project_data["abbreviation"]
+                        # Check if the Patient already exists in the target database using pat_id
+                        Patient.objects.using(target_db).get(pat_id=patient.pat_id)
+                        self.stdout.write(f"Patient {patient.pat_id} already exists, skipping.")
+                        continue  # Skip if it already exists
+                    except Patient.DoesNotExist:
+                        # Create the Patient in the target database
+                        Patient.objects.using(target_db).create(
+                            pat_id=patient.pat_id,
+                            sex=patient.sex,
+                            consent=patient.consent,
+                            dob=patient.dob,
+                            race=patient.race,
+                            source=patient.source,
+                            blocks_temp=patient.blocks_temp,
+                            notes=patient.notes,
+                            pat_ip_id=patient.pat_ip_id,
+                            date_added=patient.date_added,
                         )
-                        self.stdout.write(f"Project {project_data['name']} already exists, skipping.")
-                        continue
-                    except Project.DoesNotExist:
-                        # Create the project in the target database
-                        target_project = Project.objects.using(target_db).create(
-                            name=project_data["name"],
-                            abbreviation=project_data["abbreviation"],
-                            pi=project_data["pi"],
-                            speedtype=project_data["speedtype"],
-                            description=project_data["description"],
-                            date_start=project_data["date_start"],
-                            date=project_data["date"],
-                        )
-
-                    # Add Many-to-Many relationships for technician, researcher, and blocks
-                    for technician_id in project_data.get("technician", []):
-                        target_technician = user_mapping.get(technician_id)
-                        if target_technician:
-                            target_project.technician.add(target_technician)
-
-                    for researcher_id in project_data.get("researcher", []):
-                        target_researcher = user_mapping.get(researcher_id)
-                        if target_researcher:
-                            target_project.researcher.add(target_researcher)
-
-                    for block_id in project_data.get("blocks", []):
-                        target_block = block_mapping.get(block_id)
-                        if target_block:
-                            target_project.blocks.add(target_block)
 
             self.stdout.write(
-                f"Successfully copied {len(source_projects)} Projects from {source_db} to {target_db}."
+                f"Successfully copied {len(source_patients)} Patients from {source_db} to {target_db}."
             )
 
         except Exception as e:
-            self.stdout.write(f"Error copying Projects data: {e}")
+            self.stdout.write(f"Error copying Patient data: {e}")
 
-        self.stdout.write("Data copy for Projects completed.")
+        self.stdout.write("Data copy for Patient completed.")
 
 
 def run():
