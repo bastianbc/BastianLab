@@ -39,8 +39,8 @@ class Command(BaseCommand):
                         self.stdout.write(f"NucAcid {nucacid_data['name']} already exists, skipping.")
                         continue
 
-                    # Create the NucAcid object
-                    NucAcids.objects.using(target_db).create(
+                    # Create the NucAcid object (without linking the Method yet)
+                    nucacid = NucAcids.objects.using(target_db).create(
                         name=nucacid_data["name"],
                         date=nucacid_data.get("date"),
                         na_type=nucacid_data.get("na_type"),
@@ -49,7 +49,16 @@ class Command(BaseCommand):
                         vol_remain=nucacid_data.get("vol_remain", 0),
                         notes=nucacid_data.get("notes"),
                     )
-                    self.stdout.write(f"Created NucAcid {nucacid_data['name']}.")
+
+                    # Link the Method after saving the NucAcid
+                    if nucacid_data["method"]:
+                        method = Method.objects.using(target_db).filter(name=nucacid_data["method"]).first()
+                        if method:
+                            nucacid.method = method
+                            nucacid.save(using=target_db)
+                            self.stdout.write(f"Linked Method {method.name} to NucAcid {nucacid_data['name']}.")
+                        else:
+                            self.stdout.write(f"Method {nucacid_data['method']} not found, skipping method linkage for NucAcid {nucacid_data['name']}.")
 
             self.stdout.write(f"Successfully copied {len(rows)} NucAcids from {source_db} to {target_db}.")
 
@@ -57,7 +66,6 @@ class Command(BaseCommand):
             self.stdout.write(f"Error copying NucAcids data: {e}")
 
         self.stdout.write("Data copy for NucAcids completed.")
-
 
 
 def run():
