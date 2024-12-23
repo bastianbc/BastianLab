@@ -4,13 +4,7 @@ from django.apps import apps
 from django.contrib.auth.models import User
 
 TABLES_TO_COPY = [
-    "django_content_type",
-    "auth_permission",
     "auth_group",
-    "auth_group_permissions",
-    "auth_user",
-    "auth_user_groups",
-    "auth_user_permissions",
 ]
 
 class Command(BaseCommand):
