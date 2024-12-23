@@ -6,9 +6,9 @@ from django.db import transaction
 # List of tables to copy
 TABLES_TO_COPY = [
     "auth_group",
-    "auth_group_permissions",
-    "auth_permission",
     "auth_user",
+    "auth_permission",
+    "auth_group_permissions",
     "auth_user_groups",
     "auth_user_permissions"
 ]
