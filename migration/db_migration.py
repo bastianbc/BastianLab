@@ -4,65 +4,44 @@ from django.apps import apps
 
 
 class Command(BaseCommand):
-    help = "Copy Article data from labdb to labdbproduction using slug or title."
+    help = "Copy Bait data from labdb to labdbproduction using unique fields."
 
     def handle(self, *args, **kwargs):
         source_db = "labdb"  # Source database
         target_db = "default"  # Target database (labdbproduction)
 
-        self.stdout.write("Starting data copy for articles...")
+        self.stdout.write("Starting data copy for Bait...")
 
         try:
-            # Get the Article model
-            app_label, model_name = "wiki", "Article"
+            # Get the Bait model
+            app_label, model_name = "bait", "Bait"
             model = apps.get_model(app_label, model_name)
 
-            # Fetch all articles from the source database
-            source_articles = model.objects.using(source_db).all()
-
-            # Track a mapping of source slugs to target articles
-            slug_mapping = {}
+            # Fetch all baits from the source database
+            source_baits = model.objects.using(source_db).all()
 
             with transaction.atomic(using=target_db):
-                for article in source_articles:
-                    # Check if the article already exists in the target database using slug or title
+                for bait in source_baits:
                     try:
-                        target_article = model.objects.using(target_db).get(
-                            slug=article.slug
-                        )
-                        slug_mapping[article.slug] = target_article
+                        # Check if the bait already exists in the target database using a unique field (e.g., name or slug)
+                        target_bait = model.objects.using(target_db).get(name=bait.name)
                         continue  # Skip if it already exists
                     except model.DoesNotExist:
-                        # Create a new article in the target database
-                        new_article = model.objects.using(target_db).create(
-                            title=article.title,
-                            content=article.content,
-                            slug=article.slug,
-                            created_at=article.created_at,
+                        # Create a new bait in the target database
+                        model.objects.using(target_db).create(
+                            name=bait.name,
+                            description=bait.description,  # Add other fields as needed
+                            created_at=bait.created_at,
                         )
-                        slug_mapping[article.slug] = new_article
-
-                # Handle parent relationships
-                for article in source_articles:
-                    if article.parent:
-                        parent_slug = article.parent.slug
-                        parent_article = slug_mapping.get(parent_slug)
-
-                        if parent_article:
-                            target_article = slug_mapping.get(article.slug)
-                            if target_article:
-                                target_article.parent = parent_article
-                                target_article.save(using=target_db)
 
             self.stdout.write(
-                f"Successfully copied {len(source_articles)} articles from {source_db} to {target_db}."
+                f"Successfully copied {len(source_baits)} baits from {source_db} to {target_db}."
             )
 
         except Exception as e:
-            self.stdout.write(f"Error copying data for articles: {e}")
+            self.stdout.write(f"Error copying data for Bait: {e}")
 
-        self.stdout.write("Data copy for articles completed.")
-
+        self.stdout.write("Data copy for Bait completed.")
 
 
 
