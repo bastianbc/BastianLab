@@ -4,7 +4,7 @@ from django.apps import apps
 
 
 class Command(BaseCommand):
-    help = "Copy Bait data from labdb to labdbproduction using unique fields."
+    help = "Copy Bait data from labdb to labdbproduction using slug or name."
 
     def handle(self, *args, **kwargs):
         source_db = "labdb"  # Source database
@@ -23,15 +23,16 @@ class Command(BaseCommand):
             with transaction.atomic(using=target_db):
                 for bait in source_baits:
                     try:
-                        # Check if the bait already exists in the target database using a unique field (e.g., name or slug)
-                        target_bait = model.objects.using(target_db).get(name=bait.name)
+                        # Check if the bait already exists in the target database using a unique field (e.g., slug)
+                        target_bait = model.objects.using(target_db).get(slug=bait.slug)
                         continue  # Skip if it already exists
                     except model.DoesNotExist:
                         # Create a new bait in the target database
                         model.objects.using(target_db).create(
                             name=bait.name,
-                            description=bait.description,  # Add other fields as needed
-                            created_at=bait.created_at,
+                            slug=bait.slug,
+                            target_bed=bait.target_bed,
+                            bait_bed=bait.bait_bed,
                         )
 
             self.stdout.write(
@@ -42,6 +43,7 @@ class Command(BaseCommand):
             self.stdout.write(f"Error copying data for Bait: {e}")
 
         self.stdout.write("Data copy for Bait completed.")
+
 
 
 
