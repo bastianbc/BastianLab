@@ -19,63 +19,11 @@ class Command(BaseCommand):
         Method = apps.get_model("method", "Method")
         NucAcids = apps.get_model("libprep", "NucAcids")
 
-        # Fetch SampleLibs from the source database
-        sample_libs = SampleLib.objects.using(source_db).all()
-
-        with transaction.atomic(using=target_db):
-            for sample_lib in sample_libs:
-                # Check if the SampleLib already exists
-                existing_sample_lib = SampleLib.objects.using(target_db).filter(name=sample_lib.name).first()
-                if existing_sample_lib:
-                    self.stdout.write(f"SampleLib {sample_lib.name} already exists, skipping.")
-                    continue
-
-                # Get the related Barcode and Method
-                barcode = None
-                if sample_lib.barcode:
-                    barcode = Barcode.objects.using(target_db).filter(name=sample_lib.barcode.name).first()
-                    if not barcode:
-                        self.stdout.write(f"Barcode {sample_lib.barcode.name} not found, skipping SampleLib {sample_lib.name}.")
-                        continue
-
-                method = None
-                if sample_lib.method:
-                    method = Method.objects.using(target_db).filter(name=sample_lib.method.name).first()
-                    if not method:
-                        self.stdout.write(f"Method {sample_lib.method.name} not found, skipping SampleLib {sample_lib.name}.")
-                        continue
-
-                # Create the SampleLib object in the target database
-                new_sample_lib = SampleLib.objects.using(target_db).create(
-                    name=sample_lib.name,
-                    barcode=barcode,
-                    date=sample_lib.date,
-                    method=method,
-                    qubit=sample_lib.qubit,
-                    shear_volume=sample_lib.shear_volume,
-                    qpcr_conc=sample_lib.qpcr_conc,
-                    pcr_cycles=sample_lib.pcr_cycles,
-                    amount_in=sample_lib.amount_in,
-                    amount_final=sample_lib.amount_final,
-                    vol_init=sample_lib.vol_init,
-                    vol_remain=sample_lib.vol_remain,
-                    notes=sample_lib.notes,
-                )
-                self.stdout.write(f"Created SampleLib {new_sample_lib.name}.")
-
         # Fetch NA_SL_LINK from the source database
         na_sl_links = NA_SL_LINK.objects.using(source_db).all()
 
         with transaction.atomic(using=target_db):
             for link in na_sl_links:
-                # Check if the link already exists
-                existing_link = NA_SL_LINK.objects.using(target_db).filter(
-                    nucacid__name=link.nucacid.name, sample_lib__name=link.sample_lib.name
-                ).first()
-                if existing_link:
-                    self.stdout.write(f"NA_SL_LINK for NucAcid {link.nucacid.name} and SampleLib {link.sample_lib.name} already exists, skipping.")
-                    continue
-
                 # Get the related NucAcid and SampleLib in the target database
                 nucacid = NucAcids.objects.using(target_db).filter(name=link.nucacid.name).first()
                 if not nucacid:
