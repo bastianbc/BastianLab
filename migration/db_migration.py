@@ -20,12 +20,6 @@ class Command(BaseCommand):
 
         with transaction.atomic(using=target_db):
             for gene in gene_records:
-                # Check if the Gene already exists
-                existing_gene = Gene.objects.using(target_db).filter(name=gene.name).first()
-                if existing_gene:
-                    self.stdout.write(f"Gene {gene.name} already exists, skipping.")
-                    continue
-
                 # Create the Gene object in the target database
                 Gene.objects.using(target_db).create(
                     gene_id=gene.gene_id,
