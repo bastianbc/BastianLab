@@ -1,7 +1,7 @@
 from django.db import connections, transaction
 from django.core.management.base import BaseCommand
 from django.apps import apps
-
+from gene.models import Gene
 
 class Command(BaseCommand):
     help = "Copy VariantCall and related data from labdb to labdbproduction using Django ORM, including CNS."
@@ -73,9 +73,10 @@ class Command(BaseCommand):
                     # Copy related CVariant
                     c_variants = CVariant.objects.using(source_db).filter(g_variant=g_variant)
                     for c_variant in c_variants:
+                        gene = Gene.objects.filter(nm_canonical=c_variant.gene.nm_id).first()
                         new_c_variant = CVariant.objects.using(target_db).create(
                             g_variant=new_g_variant,
-                            gene=c_variant.gene,
+                            gene=gene,
                             nm_id=c_variant.nm_id,
                             c_var=c_variant.c_var,
                             exon=c_variant.exon,

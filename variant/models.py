@@ -173,7 +173,7 @@ class GVariant(models.Model):
 
 class CVariant(models.Model):
     g_variant = models.ForeignKey(GVariant, on_delete=models.CASCADE, related_name="c_variants", blank=True, null=True)
-    gene = models.ForeignKey("gene.Gene", on_delete=models.CASCADE, related_name="c_variants")
+    gene = models.ForeignKey("gene.Gene", on_delete=models.CASCADE, related_name="c_variants", blank=True, null=True)
     nm_id = models.CharField(max_length=100, blank=True, null=True)
     c_var = models.CharField(max_length=100, blank=True, null=True)
     exon = models.CharField(max_length=100, blank=True, null=True)
