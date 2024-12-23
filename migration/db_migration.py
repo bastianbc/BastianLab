@@ -13,8 +13,8 @@ class Command(BaseCommand):
         self.stdout.write("Starting data copy for SampleLib and NA_SL_LINK...")
 
         # Get the models
-        SampleLib = apps.get_model("sample_lib", "SampleLib")
-        NA_SL_LINK = apps.get_model("sample_lib", "NA_SL_LINK")
+        SampleLib = apps.get_model("samplelib", "SampleLib")
+        NA_SL_LINK = apps.get_model("samplelib", "NA_SL_LINK")
         Barcode = apps.get_model("barcodeset", "Barcode")
         Method = apps.get_model("method", "Method")
         NucAcids = apps.get_model("libprep", "NucAcids")
