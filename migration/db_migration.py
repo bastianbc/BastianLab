@@ -73,7 +73,7 @@ class Command(BaseCommand):
                     # Copy related CVariant
                     c_variants = CVariant.objects.using(source_db).filter(g_variant=g_variant)
                     for c_variant in c_variants:
-                        gene = Gene.objects.filter(nm_canonical=c_variant.gene.nm_id).first()
+                        gene = Gene.objects.filter(nm_canonical=c_variant.gene.nm_canonical).first()
                         new_c_variant = CVariant.objects.using(target_db).create(
                             g_variant=new_g_variant,
                             gene=gene if gene else None,
