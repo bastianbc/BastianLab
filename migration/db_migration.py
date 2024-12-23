@@ -22,14 +22,14 @@ class Command(BaseCommand):
 
             with transaction.atomic(using=target_db):
                 for patient in source_patients:
-                    # Check if the Patient already exists in the target database using pat_id
+                    # Check if a Patient with the same `pat_id` exists in the target database
                     if TargetPatient.objects.using(target_db).filter(pat_id=patient.pat_id).exists():
-                        self.stdout.write(f"Patient {patient.pat_id} already exists, skipping.")
+                        self.stdout.write(f"Patient with pat_id {patient.pat_id} already exists, skipping.")
                         continue
 
-                    # Create the Patient in the target database
+                    # Create the Patient in the target database (auto-generate `id`)
                     TargetPatient.objects.using(target_db).create(
-                        pat_id=patient.pat_id,  # Unique identifier
+                        pat_id=patient.pat_id,
                         sex=patient.sex,
                         consent=patient.consent,
                         dob=patient.dob,
