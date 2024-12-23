@@ -32,9 +32,15 @@ class Command(BaseCommand):
 
         self.stdout.write("Data copy completed.")
 
+def run():
+    print("Starting migration script...")
 
-if __name__ == "__main__":
+    # Add your data migration logic here
+    # For example:
     print("start")
     c = Command()
     c.handle()
     print("end")
+
+
+
