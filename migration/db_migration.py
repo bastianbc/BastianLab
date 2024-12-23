@@ -34,14 +34,6 @@ class Command(BaseCommand):
                 for row in rows:
                     nucacid_data = dict(zip(column_names, row))
 
-                    # Get the related Method object
-                    method = None
-                    if nucacid_data["method"]:
-                        method = Method.objects.using(target_db).filter(name=nucacid_data["method"]).first()
-                        if not method:
-                            self.stdout.write(f"Method {nucacid_data['method']} not found, skipping NucAcid {nucacid_data['name']}.")
-                            continue
-
                     # Check if the NucAcid already exists
                     if NucAcids.objects.using(target_db).filter(name=nucacid_data["name"]).exists():
                         self.stdout.write(f"NucAcid {nucacid_data['name']} already exists, skipping.")
@@ -51,7 +43,6 @@ class Command(BaseCommand):
                     NucAcids.objects.using(target_db).create(
                         name=nucacid_data["name"],
                         date=nucacid_data.get("date"),
-                        method=method,
                         na_type=nucacid_data.get("na_type"),
                         conc=nucacid_data.get("conc", 0),
                         vol_init=nucacid_data.get("vol_init", 0),
