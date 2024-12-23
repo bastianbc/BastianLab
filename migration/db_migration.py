@@ -14,8 +14,8 @@ class Command(BaseCommand):
 
         try:
             # Get the models
-            Barcodeset = apps.get_model("barcode", "Barcodeset")
-            Barcode = apps.get_model("barcode", "Barcode")
+            Barcodeset = apps.get_model("barcodeset", "Barcodeset")
+            Barcode = apps.get_model("barcodeset", "Barcode")
 
             # Fetch all Barcodeset from the source database
             source_barcodesets = Barcodeset.objects.using(source_db).all()
