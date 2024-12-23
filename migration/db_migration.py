@@ -1,58 +1,61 @@
 from django.db import transaction
 from django.core.management.base import BaseCommand
-from django.apps import apps
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 
-TABLES_TO_COPY = [
-    "auth_user",
-    "auth_group",
-]
 
 class Command(BaseCommand):
-    help = "Copy data from labdb to labdbproduction."
+    help = "Copy data for auth_user_groups from labdb to labdbproduction using names."
 
     def handle(self, *args, **kwargs):
         source_db = "labdb"  # Source database
         target_db = "default"  # Target database (labdbproduction)
 
-        for table_name in TABLES_TO_COPY:
-            self.stdout.write(f"Copying data for table: {table_name}...")
+        self.stdout.write("Starting data copy for auth_user_groups...")
 
-            try:
-                if table_name == "auth_user_permissions":
-                    model = User.user_permissions.through
-                elif table_name == "django_content_type":
-                    app_label, model_name = "contenttypes", "ContentType"
-                    model = apps.get_model(app_label, model_name)
-                else:
-                    app_label, model_name = table_name.split("_", 1)
-                    model_name = model_name.capitalize()
-                    model = apps.get_model(app_label, model_name)
+        try:
+            # Fetch all users and groups from the target database
+            target_users = {user.username: user for user in User.objects.using(target_db).all()}
+            target_groups = {group.name: group for group in Group.objects.using(target_db).all()}
 
-                source_objects = model.objects.using(source_db).all()
+            # Fetch all user-group relationships from the source database
+            source_user_groups = User.groups.through.objects.using(source_db).all()
 
-                with transaction.atomic(using=target_db):
-                    for obj in source_objects:
-                        try:
-                            # Skip duplicates
-                            if table_name == "django_content_type":
-                                model.objects.using(target_db).get(
-                                    app_label=obj.app_label, model=obj.model
-                                )
-                            elif table_name == "auth_user":
-                                model.objects.using(target_db).get(username=obj.username)
-                            else:
-                                model.objects.using(target_db).get(pk=obj.pk)
-                            continue
-                        except model.DoesNotExist:
-                            obj.id = None  # Reset PK for insertion
-                            obj.save(using=target_db)
+            with transaction.atomic(using=target_db):
+                for user_group in source_user_groups:
+                    # Get user and group names from the source database
+                    source_user = User.objects.using(source_db).get(pk=user_group.user_id)
+                    source_group = Group.objects.using(source_db).get(pk=user_group.group_id)
 
-                self.stdout.write(f"Successfully copied {source_objects.count()} records.")
-            except Exception as e:
-                self.stdout.write(f"Error copying data for {table_name}: {e}")
+                    # Map source user and group names to target database objects
+                    target_user = target_users.get(source_user.username)
+                    target_group = target_groups.get(source_group.name)
 
-        self.stdout.write("Data copy completed.")
+                    if not target_user or not target_group:
+                        self.stdout.write(
+                            f"Skipping: User '{source_user.username}' or Group '{source_group.name}' not found in target database."
+                        )
+                        continue
+
+                    # Check if the relationship already exists in the target database
+                    if User.groups.through.objects.using(target_db).filter(
+                        user=target_user, group=target_group
+                    ).exists():
+                        continue
+
+                    # Create the relationship in the target database
+                    User.groups.through.objects.using(target_db).create(
+                        user=target_user, group=target_group
+                    )
+
+            self.stdout.write(
+                f"Successfully copied {len(source_user_groups)} relationships from {source_db} to {target_db}."
+            )
+
+        except Exception as e:
+            self.stdout.write(f"Error copying auth_user_groups: {e}")
+
+        self.stdout.write("Data copy for auth_user_groups completed.")
+
 
 def run():
     print("Starting migration script...")
