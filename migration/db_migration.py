@@ -39,9 +39,7 @@ class Command(BaseCommand):
 
                 # Fetch the existing NucAcid object
                 nucacid = NucAcids.objects.using(target_db).filter(name=nucacid_data["name"]).first()
-                if not nucacid:
-                    self.stdout.write(f"NucAcid {nucacid_data['name']} not found in target database, skipping.")
-                    continue
+
 
                 # Get or create the Method object
                 method = None
