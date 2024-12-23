@@ -1,60 +1,46 @@
 from django.db import transaction
 from django.core.management.base import BaseCommand
-from django.contrib.auth.models import User, Group
+from django.apps import apps
 
+# Update TABLES_TO_COPY to include the area_type table
+TABLES_TO_COPY = [
+    "area_type",  # area_type table from areatype app
+]
 
 class Command(BaseCommand):
-    help = "Copy data for auth_user_groups from labdb to labdbproduction using names."
+    help = "Copy area_type data from labdb to labdbproduction."
 
     def handle(self, *args, **kwargs):
         source_db = "labdb"  # Source database
         target_db = "default"  # Target database (labdbproduction)
 
-        self.stdout.write("Starting data copy for auth_user_groups...")
+        for table_name in TABLES_TO_COPY:
+            self.stdout.write(f"Copying data for table: {table_name}...")
 
-        try:
-            # Fetch all users and groups from the target database
-            target_users = {user.username: user for user in User.objects.using(target_db).all()}
-            target_groups = {group.name: group for group in Group.objects.using(target_db).all()}
+            try:
+                # Handle app and model names
+                app_label, model_name = "areatype", "AreaType"  # Explicitly define app and model
+                model = apps.get_model(app_label, model_name)
 
-            # Fetch all user-group relationships from the source database
-            source_user_groups = User.groups.through.objects.using(source_db).all()
+                # Fetch all objects from the source database
+                source_objects = model.objects.using(source_db).all()
 
-            with transaction.atomic(using=target_db):
-                for user_group in source_user_groups:
-                    # Get user and group names from the source database
-                    source_user = User.objects.using(source_db).get(pk=user_group.user_id)
-                    source_group = Group.objects.using(source_db).get(pk=user_group.group_id)
+                with transaction.atomic(using=target_db):
+                    for obj in source_objects:
+                        try:
+                            # Check if the object already exists in the target database
+                            model.objects.using(target_db).get(pk=obj.pk)
+                            continue  # Skip if it already exists
+                        except model.DoesNotExist:
+                            obj.id = None  # Reset PK for insertion
+                            obj.save(using=target_db)
 
-                    # Map source user and group names to target database objects
-                    target_user = target_users.get(source_user.username)
-                    target_group = target_groups.get(source_group.name)
+                self.stdout.write(f"Successfully copied {source_objects.count()} records from {source_db} to {target_db}.")
+            except Exception as e:
+                self.stdout.write(f"Error copying data for {table_name}: {e}")
 
-                    if not target_user or not target_group:
-                        self.stdout.write(
-                            f"Skipping: User '{source_user.username}' or Group '{source_group.name}' not found in target database."
-                        )
-                        continue
+        self.stdout.write("Data copy completed.")
 
-                    # Check if the relationship already exists in the target database
-                    if User.groups.through.objects.using(target_db).filter(
-                        user=target_user, group=target_group
-                    ).exists():
-                        continue
-
-                    # Create the relationship in the target database
-                    User.groups.through.objects.using(target_db).create(
-                        user=target_user, group=target_group
-                    )
-
-            self.stdout.write(
-                f"Successfully copied {len(source_user_groups)} relationships from {source_db} to {target_db}."
-            )
-
-        except Exception as e:
-            self.stdout.write(f"Error copying auth_user_groups: {e}")
-
-        self.stdout.write("Data copy for auth_user_groups completed.")
 
 
 def run():
