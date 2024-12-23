@@ -147,6 +147,15 @@ DATABASES = {
         'PORT': '5432',
         'DISABLE_SERVER_SIDE_CURSORS': True
    },
+    'labdb': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'labdb',
+        'USER': 'testuser',
+        'PASSWORD': '1235',
+        'HOST': '10.65.11.68',
+        'PORT': '5432',
+        'DISABLE_SERVER_SIDE_CURSORS': True
+    },
 }
 
 AUTH_PASSWORD_VALIDATORS = [
