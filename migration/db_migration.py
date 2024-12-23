@@ -32,7 +32,7 @@ class Command(BaseCommand):
                 sample_lib = SampleLib.objects.using(target_db).filter(name=variant_call.sample_lib.name).first() if variant_call.sample_lib else None
                 sequencing_run = SequencingRun.objects.using(target_db).filter(name=variant_call.sequencing_run.name).first() if variant_call.sequencing_run else None
                 variant_file = VariantFile.objects.using(target_db).filter(name=variant_call.variant_file.name).first() if variant_call.variant_file else None
-                analysis_run = AnalysisRun.objects.using(target_db).filter(id=variant_call.analysis_run.id).first()
+                analysis_run = AnalysisRun.objects.using(target_db).filter(name=variant_call.analysis_run.name).first()
 
                 # Skip if AnalysisRun is not found
                 if not analysis_run:
