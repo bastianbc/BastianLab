@@ -27,7 +27,7 @@ def projects(request):
     filter = FilterForm()
     return render(request,"project_list.html", locals())
 
-@permission_required("projects.add_projects",raise_exception=True)
+@permission_required("projects.add_project",raise_exception=True)
 def new_project(request):
     if request.method=="POST":
         form = ProjectForm(request.POST)
