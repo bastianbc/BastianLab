@@ -22,7 +22,7 @@ def filter_projects(request):
     result['recordsFiltered'] = projects['count']
     return JsonResponse(result)
 
-@permission_required("projects.view_projects",raise_exception=True)
+@permission_required("projects.view_project",raise_exception=True)
 def projects(request):
     filter = FilterForm()
     return render(request,"project_list.html", locals())
@@ -42,7 +42,7 @@ def new_project(request):
 
     return render(request,"project.html",locals())
 
-@permission_required("projects.change_projects",raise_exception=True)
+@permission_required("projects.change_project",raise_exception=True)
 def edit_project(request,id):
     project = Project.objects.get(id=id)
 
@@ -60,7 +60,7 @@ def edit_project(request,id):
 
     return render(request,"project.html",locals())
 
-@permission_required("projects.change_projects",raise_exception=True)
+@permission_required("projects.change_project",raise_exception=True)
 def edit_project_async(request):
     import re
     from core.utils import custom_update
@@ -83,7 +83,7 @@ def edit_project_async(request):
 
     return JsonResponse({"success":True})
 
-@permission_required("projects.delete_projects",raise_exception=True)
+@permission_required("projects.delete_project",raise_exception=True)
 def delete_project(request,id):
     try:
         project = Project.objects.get(id=id)
@@ -99,7 +99,7 @@ def get_pi_options(request):
     return JsonResponse([{"label":"---------","value":""}] + [{ "label":c[1], "value":c[0] } for c in Project.PI_CHOICES], safe=False)
 
 
-@permission_required("projects.delete_projects",raise_exception=True)
+@permission_required("projects.delete_project",raise_exception=True)
 def delete_batch_projects(request):
     try:
         selected_ids = json.loads(request.GET.get("selected_ids"))
