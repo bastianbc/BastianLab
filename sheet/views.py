@@ -4,7 +4,7 @@ from .service import get_sample_lib_list, generate_file
 from sequencingrun.models import SequencingRun
 import json
 from .forms import FilterForm, ReportForm
-from .api import query_by_args, _get_authorizated_queryset, _get_authorizated_queryset_2
+from .api import query_by_args, _get_authorizated_queryset
 from .service import CustomSampleLibSerializer
 
 
