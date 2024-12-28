@@ -143,7 +143,7 @@ WSGI_APPLICATION = 'test1.wsgi.application'
 # }
 
 DATABASES = {
-    'default': {
+    'ucsf': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'USER': 'testuser',
         'PASSWORD': '1235',
@@ -152,15 +152,15 @@ DATABASES = {
         'PORT': '5432',
         'DISABLE_SERVER_SIDE_CURSORS': True
    },
-    'ucsf': {
+    'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'USER': 'testuser',
         'PASSWORD': '1235',
-        'NAME': 'labdb',
+        'NAME': 'labdbproduction',
         'HOST': '10.65.11.68',
         'PORT': '5432',
         'DISABLE_SERVER_SIDE_CURSORS': True
-   }
+   },
 }
 
 
