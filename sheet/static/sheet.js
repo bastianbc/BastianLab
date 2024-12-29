@@ -91,19 +91,17 @@ var KTDatatablesServerSide = function () {
                         return namesList.join(", ");
                     }
                 },
-                // {
-                //     targets: 8,
-                //     render: function (data, type, row) {
-                //         let namesList = [];
-                //         if (Array.isArray(row["seq_run"])) {
-                //             row["seq_run"].forEach(sqr => {
-                //                 namesList.push(sqr.name);
-                //             });
-                //         }
-                //         // This will return the names list. Adjust based on your requirements
-                //         return namesList.join(", ");
-                //     }
-                // },
+                {
+                    targets: [11, 12, 13, 14],  // bam, path_bam, bai, path_bai
+                    render: function (data, type, row) {
+                        // If `row.fastq` is an array with length > 0, hide BAM/BAI content
+                        if (Array.isArray(row.fastq) && row.fastq.length > 0) {
+                            return '';  // Return empty string
+                        } else {
+                            return data; // Otherwise, show the existing data
+                        }
+                    }
+                },
 
 
             ],
