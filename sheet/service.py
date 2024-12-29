@@ -48,7 +48,8 @@ class CustomSampleLibSerializer(serializers.ModelSerializer):
     area_type = serializers.CharField(read_only=True)
     matching_normal_sl = serializers.CharField(read_only=True)
     barcode_name = serializers.CharField(read_only=True)
-    fastq = serializers.SerializerMethodField()
+    # fastq = serializers.SerializerMethodField()
+    fastq = serializers.CharField(read_only=True)
     bam = serializers.SerializerMethodField()
     bai = serializers.SerializerMethodField()
     path_fastq = serializers.SerializerMethodField()
@@ -63,13 +64,13 @@ class CustomSampleLibSerializer(serializers.ModelSerializer):
                   "path_fastq", "path_bam", "path_bai",
                   "matching_normal_sl", "seq_run",  "file_set")
 
-    def get_fastq(self, obj):
-        seq_files = SequencingFile.objects.filter(sequencing_file_set__sample_lib=obj, type='fastq')
-        if seq_files:
-            files = SequencingFileSerializerManual(seq_files, many=True).data
-            file_dict = {file['name']: file['checksum'] for file in files}
-            return json.dumps(file_dict)
-        return
+    # def get_fastq(self, obj):
+    #     seq_files = SequencingFile.objects.filter(sequencing_file_set__sample_lib=obj, type='fastq')
+    #     if seq_files:
+    #         files = SequencingFileSerializerManual(seq_files, many=True).data
+    #         file_dict = {file['name']: file['checksum'] for file in files}
+    #         return json.dumps(file_dict)
+    #     return
 
     def get_bam(self, obj):
         seq_files = SequencingFile.objects.filter(sequencing_file_set__sample_lib=obj, type='bam')
