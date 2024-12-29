@@ -12,6 +12,7 @@ def filter_sheet(request):
     seq_runs = SequencingRun.objects.filter()
     samplelibs = query_by_args(request.user, seq_runs, **request.GET)
     serializer = CustomSampleLibSerializer(samplelibs['items'], many=True)
+    print(serializer.data)
     result = dict()
     result['data'] = serializer.data
     result['draw'] = samplelibs['draw']
