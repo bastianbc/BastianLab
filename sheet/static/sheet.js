@@ -411,60 +411,144 @@ var KTDatatablesServerSide = function () {
 
     }
 
-    var handleAlternativeExport = () => {
-        // event listener
-        document.querySelector("button[name='alternative_export']").addEventListener("click", function () {
-            exportTableToCSV("alternative_export.csv")
+    // var handleAlternativeExport = () => {
+    //     // event listener
+    //     document.querySelector("button[name='alternative_export']").addEventListener("click", function () {
+    //         exportTableToCSV("alternative_export.csv")
+    //     });
+    //
+    //     function exportTableToCSV(filename) {
+    //         var data = [];
+    //
+    //         // Add header
+    //         var headers = [], headerCols = document.querySelectorAll("table thead tr th");
+    //         for (var i = 1; i < headerCols.length; i++) {
+    //             headers.push(headerCols[i].innerText.toLowerCase());
+    //         }
+    //         headers.unshift("no");
+    //         data.push(headers.join("\t"));
+    //         console.log(data);
+    //         var rowNumber = 1;
+    //         var rows = document.querySelectorAll("table tbody tr");
+    //         for (var i = 0; i < rows.length; i++) {
+    //             var row = [], cols = rows[i].querySelectorAll("td");
+    //
+    //             // exclude checked rows
+    //             if (cols.length > 0 && !cols[0].querySelector('input[type="checkbox"]').checked) {
+    //                 row.push(rowNumber);
+    //                 rowNumber++;
+    //                 for (var j = 1; j < cols.length; j++) {
+    //                     row.push(cols[j].innerText);
+    //                 }
+    //                 data.push(row.join("\t"));
+    //             }
+    //         }
+    //
+    //         downloadCSV(data.join("\n"), filename);
+    //     }
+    //
+    //     function downloadCSV(data, filename) {
+    //         // Create a temporary link element
+    //         var url = new Blob([data], {type: "text/csv"});
+    //         var link = document.createElement("a");
+    //         link.download = filename;
+    //         link.href = window.URL.createObjectURL(url);
+    //         link.style.display = "none";
+    //
+    //         // Append the link to the document body
+    //         document.body.appendChild(link);
+    //
+    //         // Click the link programmatically to trigger the download
+    //         link.click();
+    //
+    //         // Remove the link from the document body
+    //         document.body.removeChild(link);
+    //     }
+    // }
+
+    var handleAlternativeExport = function () {
+        // Grab the table container
+        const container = document.querySelector('.table');
+        // All checkboxes inside the table
+        const checkboxes = container.querySelectorAll('[type="checkbox"]');
+        // Button that triggers the export
+        const exportButton = document.querySelector("button[name='alternative_export']");
+
+        // Example function to toggle toolbars
+        function toggleToolbars() {
+            // Your logic here for showing/hiding toolbars...
+        }
+
+        // Listen for checkbox clicks, then toggle toolbars
+        checkboxes.forEach(c => {
+            c.addEventListener('click', function () {
+                setTimeout(function () {
+                    toggleToolbars();
+                }, 50);
+            });
         });
 
-        function exportTableToCSV(filename) {
-            var data = [];
-
-            // Add header
-            var headers = [], headerCols = document.querySelectorAll("table thead tr th");
-            for (var i = 1; i < headerCols.length; i++) {
-                headers.push(headerCols[i].innerText.toLowerCase());
-            }
-            headers.unshift("no");
-            data.push(headers.join("\t"));
-            console.log(data);
-            var rowNumber = 1;
-            var rows = document.querySelectorAll("table tbody tr");
-            for (var i = 0; i < rows.length; i++) {
-                var row = [], cols = rows[i].querySelectorAll("td");
-
-                // exclude checked rows
-                if (cols.length > 0 && !cols[0].querySelector('input[type="checkbox"]').checked) {
-                    row.push(rowNumber);
-                    rowNumber++;
-                    for (var j = 1; j < cols.length; j++) {
-                        row.push(cols[j].innerText);
-                    }
-                    data.push(row.join("\t"));
+        // ----------------------------------------------------------------
+        // Define a function that performs the AJAX call for exporting rows
+        // ----------------------------------------------------------------
+        function exportSelectedRows() {
+            // selectedRows should be an array of IDs you want to include
+            // for your backend to process. Make sure this array is maintained
+            // elsewhere based on which checkboxes are selected.
+            $.ajax({
+                type: "GET",
+                url: "/sheet/alternative_export",
+                data: {
+                    "selected_ids": JSON.stringify(selectedRows),  // e.g. [1, 2, 3]
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    swal("Error deleting!", "Please try again", "error");
                 }
+            }).done(function (result) {
+                if (result.deleted) {
+                    Swal.fire({
+                        text: "Sheet created successfully.",
+                        icon: "info",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn fw-bold btn-success",
+                        }
+                    }).then(function () {
+                        // Clear selected rows
+                        selectedRows = [];
+                        // Refresh DataTable if needed
+                        dt.draw();
+                    });
+                } else {
+                    Swal.fire({
+                        text: `Sheet cannot be created!\n${result.message}`,
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn fw-bold btn-success",
+                        }
+                    });
+                }
+            });
+
+            // Uncheck the header checkbox after export
+            const headerCheckbox = container.querySelector('[type="checkbox"]');
+            if (headerCheckbox) {
+                headerCheckbox.checked = false;
             }
-
-            downloadCSV(data.join("\n"), filename);
         }
 
-        function downloadCSV(data, filename) {
-            // Create a temporary link element
-            var url = new Blob([data], {type: "text/csv"});
-            var link = document.createElement("a");
-            link.download = filename;
-            link.href = window.URL.createObjectURL(url);
-            link.style.display = "none";
-
-            // Append the link to the document body
-            document.body.appendChild(link);
-
-            // Click the link programmatically to trigger the download
-            link.click();
-
-            // Remove the link from the document body
-            document.body.removeChild(link);
+        // ---------------------------------------------------------
+        // Wire up the export button to call exportSelectedRows()
+        // ---------------------------------------------------------
+        if (exportButton) {
+            exportButton.addEventListener("click", function () {
+                exportSelectedRows();
+            });
         }
-    }
+    };
 
     // Public methods
     return {

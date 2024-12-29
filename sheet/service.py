@@ -54,48 +54,8 @@ class CustomSampleLibSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SampleLib
-        fields = ("id", "name", "barcode_name",
-                  "na_type", "area_type", "patient", "bait", 'fastq',
-                  "bam", "bai",
-                  "path_fastq", "path_bam", "path_bai",
-                  "matching_normal_sl", "seq_run",)
-
-
-    # def get_bam(self, obj):
-    #     seq_files = SequencingFile.objects.filter(sequencing_file_set__sample_lib=obj, type='bam')
-    #     if seq_files:
-    #         files = SequencingFileSerializerManual(seq_files, many=True).data
-    #         file_dict = {file['name']: file['checksum'] for file in files}
-    #         return json.dumps(file_dict)
-    #     return
-    #
-    # def get_bai(self, obj):
-    #     seq_files = SequencingFile.objects.filter(sequencing_file_set__sample_lib=obj, type='bai')
-    #     if seq_files:
-    #         files = SequencingFileSerializerManual(seq_files, many=True).data
-    #         file_dict = {file['name']: file['checksum'] for file in files}
-    #         return json.dumps(file_dict)
-    #     return
-
-    # def get_file(self, obj):
-    #     seq_files = SequencingFile.objects.filter(sequencing_file_set__sample_lib=obj)
-    #     files = SequencingFileSerializerManual(seq_files, many=True).data
-    #     file_dict = {file['name']: file['checksum'] for file in files}
-    #     return json.dumps(file_dict)
-
-    # def get_file_set(self, obj):
-    #     seq_files = SequencingFileSet.objects.filter(sample_lib=obj)
-    #     files = SequencingFileSetSerializerManual(seq_files, many=True).data
-    #     return files
-
-    # def get_path_fastq(self, obj):
-    #     return obj.sequencing_file_sets.filter(sequencing_files__type='fastq')[0].path if obj.sequencing_file_sets.filter(sequencing_files__type='fastq') else None
-    #
-    # def get_path_bam(self, obj):
-    #     return obj.sequencing_file_sets.filter(sequencing_files__type='bam')[0].path if obj.sequencing_file_sets.filter(sequencing_files__type='bam') else None
-    #
-    # def get_path_bai(self, obj):
-    #     return obj.sequencing_file_sets.filter(sequencing_files__type='bai')[0].path if obj.sequencing_file_sets.filter(sequencing_files__type='bai') else None
+        fields = ("id", "name", "barcode_name", "na_type", "area_type", "patient", "bait", 'fastq',
+                  "bam", "bai", "path_fastq", "path_bam", "path_bai", "matching_normal_sl", "seq_run")
 
 
     def get_patient(self, obj):
@@ -105,12 +65,6 @@ class CustomSampleLibSerializer(serializers.ModelSerializer):
         _patients = PatientsSerializerManual(_patients, many=True).data
         return _patients
 
-    # def get_seq_run(self, obj):
-    #     _sequencing_runs = SequencingRun.objects.filter(
-    #         sequencing_libs__cl_seql_links__captured_lib__sl_cl_links__sample_lib=obj
-    #     )
-    #     sequencing_runs = SequencingRunSerializerManual(_sequencing_runs, many=True).data
-    #     return sequencing_runs
 
     def get_seq_run(self, obj):
         try:

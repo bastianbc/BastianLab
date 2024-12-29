@@ -35,6 +35,14 @@ def create_csv_sheet(request):
         print(e)
         return JsonResponse({'error': str(e)}, status=500)
 
+def alternative_export(request):
+    try:
+        print(request)
+        return
+    except Exception as e:
+        print(e)
+        return JsonResponse({'error': str(e)}, status=500)
+
 def sheet_seq_run(request):
     try:
         _seq_run = request.GET['seq_run']
