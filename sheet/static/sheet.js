@@ -97,7 +97,7 @@ var KTDatatablesServerSide = function () {
                         // If `row.fastq` is an array with length > 0, hide BAM/BAI content
                         console.log(row['fastq']);
                         console.log(typeof row['fastq']);
-                        if (row["fastq"].length > 0) {
+                        if (row["fastq"] !== "[]") {
                             return '';  // Return empty string
                         } else {
                             return data; // Otherwise, show the existing data
