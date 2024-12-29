@@ -9,19 +9,19 @@ from .service import CustomSampleLibSerializer
 
 
 def filter_sheet(request):
-    print("1")
     seq_runs = SequencingRun.objects.filter()
     print("2")
     samplelibs = query_by_args(request.user, seq_runs, **request.GET)
+    print(len(samplelibs))
     print("3")
     serializer = CustomSampleLibSerializer(samplelibs['items'], many=True)
-    print("4")
     result = dict()
     print("5")
     result['data'] = serializer.data
     result['draw'] = samplelibs['draw']
     result['recordsTotal'] = samplelibs['total']
     result['recordsFiltered'] = samplelibs['count']
+    print(result)
     print("6")
     return JsonResponse(result)
 
@@ -44,6 +44,7 @@ def create_csv_sheet(request):
 def alternative_export(request):
     try:
         print(request)
+        print(request.GET['selected_ids'])
         return
     except Exception as e:
         print(e)
