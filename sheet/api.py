@@ -143,7 +143,19 @@ def _get_authorizated_queryset(seq_runs):
                 filter=Q(sequencing_file_sets__sequencing_files__type='fastq'),
                 distinct=True
             ),
-            fastq_path=path_subquery,
+            path_fastq=path_subquery,
+            bam=ArrayAgg(
+                'sequencing_file_sets__sequencing_files__name',
+                filter=Q(sequencing_file_sets__sequencing_files__type='bam'),
+                distinct=True
+            ),
+            path_bam=path_subquery,
+            bai=ArrayAgg(
+                'sequencing_file_sets__sequencing_files__name',
+                filter=Q(sequencing_file_sets__sequencing_files__type='bai'),
+                distinct=True
+            ),
+            path_bai=path_subquery,
             checksum=ArrayAgg(
                 'sequencing_file_sets__sequencing_files__checksum',
                 distinct=True
