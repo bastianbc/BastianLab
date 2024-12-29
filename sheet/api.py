@@ -74,11 +74,20 @@ from sequencingrun.models import SequencingRun
 #     ).distinct().order_by('name')
 
 def _get_authorizated_queryset(seq_runs):
-    seq_run_subquery = SequencingFileSet.objects.filter(sequencing_files__name__icontains="DM",
+    seq_run_subquery = SequencingFileSet.objects.filter(
         sample_lib=OuterRef('pk'),
         sequencing_run__id__in=seq_runs
     ).values('sequencing_run__id')
+    fastq_subquery = SequencingFile.objects.filter(
+        sequencing_file_set__sample_lib=OuterRef('pk'),
+        type='fastq'
+    ).values('pk')  # Or .values('file_id'), doesn't matter as long as a row is returned
 
+    # Subquery: Does this SampleLib have any BAM or BAI file?
+    bam_bai_subquery = SequencingFile.objects.filter(
+        sequencing_file_set__sample_lib=OuterRef('pk'),
+        type__in=['bam', 'bai']
+    ).values('pk')
     path_subquery = Subquery(
         SequencingFileSet.objects
         .filter(
@@ -91,6 +100,11 @@ def _get_authorizated_queryset(seq_runs):
     return (
         SampleLib.objects.filter(
             sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=seq_runs
+        ).filter(
+            Q(
+                ~Exists(fastq_subquery),  # Condition B1: no FASTQ
+                Exists(bam_bai_subquery)  # Condition B2: has BAM/BAI
+            )
         )
         .prefetch_related('sequencing_file_sets')
         .annotate(
