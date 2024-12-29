@@ -135,34 +135,15 @@ def _get_authorizated_queryset(seq_runs):
                     sequencing_run=OuterRef('seq_run')
                 ).values('path')[:1]
             ),
-            # Annotate the count of FASTQ files
-            count_fastq=Count(
-                'sequencing_file_sets__sequencing_files',
-                filter=Q(sequencing_file_sets__sequencing_files__type='fastq'),
-                distinct=True
+            file=ArrayAgg(
+                'sequencing_file_sets__sequencing_files__name',
+                distinct=True,
             ),
-
-            # Aggregate all FASTQ files
             fastq_files=ArrayAgg(
                 'sequencing_file_sets__sequencing_files__name',
                 filter=Q(sequencing_file_sets__sequencing_files__type='fastq'),
                 distinct=True
             ),
-
-            # Aggregate all BAM/BAI files
-            bam_bai_files=ArrayAgg(
-                'sequencing_file_sets__sequencing_files__name',
-                filter=Q(sequencing_file_sets__sequencing_files__type__in=['bam', 'bai']),
-                distinct=True
-            ),
-
-            # Single annotation that picks FASTQ if it exists, else BAM/BAI
-            files=Case(
-                When(count_fastq__gt=0, then=F('fastq_files')),
-                default=F('bam_bai_files'),
-                output_field=ArrayAgg.output_field  # or ArrayField(CharField())
-            ),
-
             checksum=ArrayAgg(
                 'sequencing_file_sets__sequencing_files__checksum',
                 distinct=True
