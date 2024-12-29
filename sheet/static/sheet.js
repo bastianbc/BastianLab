@@ -156,6 +156,23 @@ var KTDatatablesServerSide = function () {
         });
     }
 
+    function getSelectedRows() {
+        const container = document.querySelector('.table');
+        const selectedRows = container.querySelectorAll('tbody [type="checkbox"]:checked');
+        const selectedIds = [];
+
+        selectedRows.forEach((p) => {
+            // Select parent row
+            const parent = p.closest('tr');
+            // Get customer ID
+            const id = parent.querySelector('input[type="checkbox"]').value;
+
+            selectedIds.push(id);
+        });
+
+        return JSON.stringify(selectedIds);
+    }
+
     // Delete customer
     var handleDeleteRows = () => {
         // Select all delete buttons
@@ -499,7 +516,7 @@ var KTDatatablesServerSide = function () {
                 type: "GET",
                 url: "/sheet/alternative_export",
                 data: {
-                    "selected_ids": JSON.stringify(selectedRows),  // e.g. [1, 2, 3]
+                    "selected_ids": getSelectedRows(),
                 },
                 error: function (xhr, ajaxOptions, thrownError) {
                     swal("Error deleting!", "Please try again", "error");
