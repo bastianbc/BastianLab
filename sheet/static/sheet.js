@@ -92,7 +92,7 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: [11, 12, 13, 14],  // bam, path_bam, bai, path_bai
+                    targets: [10, 11, 12, 13, 14],  // bam, path_bam, bai, path_bai
                     render: function (data, type, row) {
                         // If `row.fastq` is an array with length > 0, hide BAM/BAI content
                         console.log(row['fastq']);
