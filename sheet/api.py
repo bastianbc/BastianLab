@@ -139,7 +139,7 @@ def _get_authorizated_queryset(seq_runs):
                 'sequencing_file_sets__sequencing_files__name',
                 distinct=True,
             ),
-            fastq_files=ArrayAgg(
+            fastq=ArrayAgg(
                 'sequencing_file_sets__sequencing_files__name',
                 filter=Q(sequencing_file_sets__sequencing_files__type='fastq'),
                 distinct=True

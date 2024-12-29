@@ -48,7 +48,7 @@ class CustomSampleLibSerializer(serializers.ModelSerializer):
     area_type = serializers.CharField(read_only=True)
     matching_normal_sl = serializers.CharField(read_only=True)
     barcode_name = serializers.CharField(read_only=True)
-    # fastq = serializers.SerializerMethodField()
+    fastq = serializers.CharField(read_only=True)
     file = serializers.CharField(read_only=True)
     bam = serializers.SerializerMethodField()
     bai = serializers.SerializerMethodField()
@@ -59,7 +59,7 @@ class CustomSampleLibSerializer(serializers.ModelSerializer):
     class Meta:
         model = SampleLib
         fields = ("id", "name", "barcode_name",
-                  "na_type", "area_type", "patient", "bait",
+                  "na_type", "area_type", "patient", "bait", 'fastq',
                   "bam", "bai", "file",
                   "path_fastq", "path_bam", "path_bai",
                   "matching_normal_sl", "seq_run",  "file_set")
