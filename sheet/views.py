@@ -12,7 +12,7 @@ def filter_sheet(request):
     seq_runs = SequencingRun.objects.filter()
     print("2")
     samplelibs = query_by_args(request.user, seq_runs, **request.GET)
-    print(len(samplelibs))
+    print(len(samplelibs['items']))
     print("3")
     serializer = CustomSampleLibSerializer(samplelibs['items'], many=True)
     result = dict()

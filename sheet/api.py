@@ -145,8 +145,9 @@ def query_by_args(user, seq_runs, **kwargs):
             order_column = ORDER_COLUMN_CHOICES[order_column]
             if order == 'desc':
                 order_column = '-' + order_column
-
+            print("_get_authorizated_queryset_111111")
             queryset = _get_authorizated_queryset(seq_runs)
+            print("_get_authorizated_queryset_2222222")
             total = queryset.count()
 
             search_value = _parse_value(search_value)
