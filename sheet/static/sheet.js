@@ -60,7 +60,7 @@ var KTDatatablesServerSide = function () {
                 { data: 'area_type' },
                 { data: 'matching_normal_sl' },
                 { data: 'seq_run' },
-                { data: 'fastq' },
+                { data: 'file' },
                 { data: 'path_fastq' },
                 { data: 'bam' },
                 { data: 'path_bam' },
