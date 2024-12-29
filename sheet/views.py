@@ -62,6 +62,8 @@ def sheet_seq_run(request):
 
 
 def sheet_multiple(request):
+    print(request)
+    print(request.GET['selected_ids'])
     selected_ids = json.loads(request.POST.get("selected_ids"))
     seq_runs = SequencingRun.objects.filter(id__in=selected_ids)
     query_set = query_by_args(request.user, seq_runs, **request.GET)
