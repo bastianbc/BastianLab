@@ -73,7 +73,7 @@ var KTDatatablesServerSide = function () {
                     render: function (data) {
                         return `
                             <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                <input class="form-check-input m-1" type="checkbox" value="${data}" />
+                                <input class="form-check-input m-1" type="checkbox" value="${row['seq_run']}" />
                             </div>`;
                     }
                 },
@@ -514,7 +514,7 @@ var KTDatatablesServerSide = function () {
             // elsewhere based on which checkboxes are selected.
             $.ajax({
                 type: "GET",
-                url: "/sheet/alternative_export",
+                url: "/sheet/sheet_multiple",
                 data: {
                     "selected_ids": getSelectedRows(),
                 },
