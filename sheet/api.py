@@ -79,6 +79,15 @@ def _get_authorizated_queryset(seq_runs):
         sequencing_run__id__in=seq_runs
     ).values('sequencing_run__id')
 
+    path_subquery = Subquery(
+        SequencingFileSet.objects
+        .filter(
+            sample_lib=OuterRef('pk'),
+        )
+        .order_by('pk')        # optional ordering by primary key
+        .values('path')[:1]    # get only the path, limit to 1
+    )
+
     return (
         SampleLib.objects.filter(
             sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=seq_runs
@@ -129,21 +138,12 @@ def _get_authorizated_queryset(seq_runs):
                 output_field=CharField()
             ),
             barcode_name=Coalesce('barcode__i5', 'barcode__i7', default=Value(''), output_field=CharField()),
-            path=Subquery(
-                SequencingFileSet.objects.filter(
-                    sample_lib=OuterRef('pk'),
-                    sequencing_run=OuterRef('seq_run')
-                ).values('path')[:1]
-            ),
-            file=ArrayAgg(
-                'sequencing_file_sets__sequencing_files__name',
-                distinct=True,
-            ),
             fastq=ArrayAgg(
                 'sequencing_file_sets__sequencing_files__name',
                 filter=Q(sequencing_file_sets__sequencing_files__type='fastq'),
                 distinct=True
             ),
+            fastq_path=path_subquery,
             checksum=ArrayAgg(
                 'sequencing_file_sets__sequencing_files__checksum',
                 distinct=True
