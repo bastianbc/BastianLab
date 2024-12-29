@@ -9,85 +9,12 @@ from areas.models import Area
 from sequencingfile.models import SequencingFile, SequencingFileSet
 from sequencingrun.models import SequencingRun
 
-# def _get_authorizated_queryset(seq_runs):
-#     seq_run_subquery = SequencingFileSet.objects.filter(
-#         sample_lib=OuterRef('pk'),
-#         sequencing_run__id__in=seq_runs
-#     ).values('sequencing_run__id')
-#     return SampleLib.objects.filter(
-#             sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=seq_runs
-#         ).prefetch_related('sequencing_file_sets').annotate(
-#         na_type=F('na_sl_links__nucacid__na_type'),
-#         seq_run2=F('sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__name'),
-#         seq_run=F('sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs'),
-#         patient=F('na_sl_links__nucacid__area_na_links__area__block__patient__pat_id'),
-#         sex=Subquery(
-#             Patient.objects.filter(
-#                 patient_blocks__block_areas__area_na_links__nucacid__na_sl_links__sample_lib=OuterRef('pk')
-#             ).values('sex')[:1]
-#         ),
-#         area_type=Subquery(
-#             Area.objects.filter(
-#                 area_na_links__nucacid__na_sl_links__sample_lib=OuterRef('pk')
-#             ).annotate(
-#                 simplified_area_type=Case(
-#                     When(area_type='normal', then=Value('normal')),
-#                     When(area_type__isnull=True, then=Value(None)),  # Exclude None explicitly if needed
-#                     default=Value('tumor'),
-#                     output_field=CharField(),
-#                 )
-#             ).values('simplified_area_type')[:1]
-#         ),
-#         matching_normal_sl=Case(
-#             When(
-#                 area_type=Value('normal'),
-#                 then=Value(None)
-#             ),
-#             default=Subquery(
-#                 SampleLib.objects.filter(
-#                     sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__isnull=False,
-#                     na_sl_links__nucacid__area_na_links__area__area_type__value='normal',
-#                     na_sl_links__nucacid__area_na_links__area__block__patient=OuterRef(
-#                         "na_sl_links__nucacid__area_na_links__area__block__patient"),
-#                 ).values('name')[:1]
-#             ),
-#             output_field=CharField()
-#         ),
-#        barcode_name=Coalesce('barcode__i5', 'barcode__i7', default=Value(''), output_field=CharField()),
-#        path=Subquery(
-#            SequencingFileSet.objects.filter(
-#                sample_lib=OuterRef('pk'),
-#                sequencing_run=OuterRef('seq_run')
-#            ).values('path')[:1]
-#        ),
-#        file=ArrayAgg(
-#            'sequencing_file_sets__sequencing_files__name',
-#            distinct=True,
-#        ),
-#        checksum=ArrayAgg(
-#            'sequencing_file_sets__sequencing_files__checksum',
-#            distinct=True
-#        ),
-#        bait=F("sl_cl_links__captured_lib__bait__name")
-#     ).filter(
-#         Exists(seq_run_subquery)
-#     ).distinct().order_by('name')
 
 def _get_authorizated_queryset(seq_runs):
     seq_run_subquery = SequencingFileSet.objects.filter(
         sample_lib=OuterRef('pk'),
         sequencing_run__id__in=seq_runs
     ).values('sequencing_run__id')
-    fastq_subquery = SequencingFile.objects.filter(
-        sequencing_file_set__sample_lib=OuterRef('pk'),
-        type='fastq'
-    ).values('pk')  # Or .values('file_id'), doesn't matter as long as a row is returned
-
-    # Subquery: Does this SampleLib have any BAM or BAI file?
-    bam_bai_subquery = SequencingFile.objects.filter(
-        sequencing_file_set__sample_lib=OuterRef('pk'),
-        type__in=['bam', 'bai']
-    ).values('pk')
     path_subquery = Subquery(
         SequencingFileSet.objects
         .filter(
@@ -100,13 +27,7 @@ def _get_authorizated_queryset(seq_runs):
     return (
         SampleLib.objects.filter(
             sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=seq_runs
-        ).filter(
-            Q(
-                ~Exists(fastq_subquery),  # Condition B1: no FASTQ
-                Exists(bam_bai_subquery)  # Condition B2: has BAM/BAI
-            )
-        )
-        .prefetch_related('sequencing_file_sets')
+        ).prefetch_related('sequencing_file_sets')
         .annotate(
             na_type=F('na_sl_links__nucacid__na_type'),
             seq_run2=F('sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__name'),
@@ -133,8 +54,6 @@ def _get_authorizated_queryset(seq_runs):
                 .values('simplified_area_type')[:1]
             ),
             matching_normal_sl=Case(
-                # Here we are comparing the *annotated* field `area_type`,
-                # which returns 'normal' if area_type__value='normal'.
                 When(
                     area_type=Value('normal'),
                     then=Value(None)
@@ -142,7 +61,6 @@ def _get_authorizated_queryset(seq_runs):
                 default=Subquery(
                     SampleLib.objects.filter(
                         sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__isnull=False,
-                        # Fix here too, if you need actual filtering for normal area types
                         na_sl_links__nucacid__area_na_links__area__area_type__value='normal',
                         na_sl_links__nucacid__area_na_links__area__block__patient=OuterRef(
                             "na_sl_links__nucacid__area_na_links__area__block__patient"

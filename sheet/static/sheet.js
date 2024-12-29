@@ -14,7 +14,6 @@ var KTDatatablesServerSide = function () {
             // searchDelay: 500,
             processing: true,
             serverSide: true,
-            pageLength: 500,
             destroy: true,
             order: [[2, 'asc']],
             stateSave: false,
