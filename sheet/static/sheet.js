@@ -92,20 +92,26 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: [10, 11, 12, 13, 14],  // bam, path_bam, bai, path_bai
+                    targets: [9,10],
                     render: function (data, type, row) {
-                        // If `row.fastq` is an array with length > 0, hide BAM/BAI content
-                        console.log(row['fastq']);
-                        console.log(typeof row['fastq']);
+
                         if (row["fastq"] !== "[]") {
-                            return '';  // Return empty string
+                            return data;
                         } else {
-                            return data; // Otherwise, show the existing data
+                            return '';
                         }
                     }
                 },
-
-
+                {
+                    targets: [11, 12, 13, 14],
+                    render: function (data, type, row) {
+                        if (row["fastq"] !== "[]") {
+                            return '';
+                        } else {
+                            return data;
+                        }
+                    }
+                },
             ],
             // Add data-filter attribute
             createdRow: function (row, data, dataIndex) {
