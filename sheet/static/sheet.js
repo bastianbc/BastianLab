@@ -70,7 +70,7 @@ var KTDatatablesServerSide = function () {
                 {
                     targets: 0,
                     orderable: false,
-                    render: function (data) {
+                    render: function (data, type, row) {
                         return `
                             <div class="form-check form-check-sm form-check-custom form-check-solid">
                                 <input class="form-check-input m-1" type="checkbox" value="${row['seq_run']}" />
