@@ -164,6 +164,8 @@ def generate_file(data, file_name):
             if SequencingFileSet.objects.filter(sample_lib=SampleLib.objects.get(name=row.matching_normal_sl)):
                 report.matching_normal_sl = row.matching_normal_sl.replace(" ", "_") if row.matching_normal_sl else ""
         fastq, bam, bai = [], [], []
+        print(row.fastq)
+        print(type(row.fastq))
         report.footprint = row.bait
         # files = _get_files(row.name, row.seq_run)
         # if files:
@@ -192,7 +194,7 @@ def generate_file(data, file_name):
         seq_run = report.path_fastq.split("/")[1] if report.path_fastq != "" and report.path_fastq != None else ""
         report.seq_run = row.seq_run2  # ✓
         concat_files = f"{report.fastq}{report.bam}{report.bai}".replace("None","").strip()
-        print(concat_files)
+        # print(concat_files)
         if not row.barcode_name or row.barcode_name == "":
             pattern = r'(?<![ACGT])[ACGT]{6,8}(?![ACGT])'
             match = re.findall(pattern, concat_files)
