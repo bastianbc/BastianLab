@@ -65,6 +65,7 @@ def sheet_multiple(request):
     print(selected_names)
     print(json.dumps(selected_names))
     print(seq_runs)
+    print("%"*100)
     query_set = query_by_args(request.user, seq_runs, **request.GET)
     print("query_set_"*100)
     print(query_set)
