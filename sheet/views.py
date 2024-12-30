@@ -15,8 +15,10 @@ def filter_sheet(request):
     result = dict()
     result['data'] = serializer.data
     result['draw'] = samplelibs['draw']
-    result['recordsTotal'] = samplelibs['total']
-    result['recordsFiltered'] = samplelibs['count']
+    # result['recordsTotal'] = samplelibs['total']
+    # result['recordsFiltered'] = samplelibs['count']
+    result['recordsTotal'] = 4000
+    result['recordsFiltered'] = 10
     return JsonResponse(result)
 
 

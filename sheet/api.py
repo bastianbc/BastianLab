@@ -144,7 +144,7 @@ def query_by_args(user, seq_runs, **kwargs):
             queryset = _get_authorizated_queryset(seq_runs)
             print("_get_authorizated_queryset_2")
 
-            total = len(queryset)
+            # total = len(queryset)
             print("_get_authorizated_queryset_3")
             search_value = _parse_value(search_value)
             if sequencing_run_filter[0] != "":
@@ -174,12 +174,12 @@ def query_by_args(user, seq_runs, **kwargs):
 
             print(order_column, start, length)
             queryset = queryset.order_by(order_column)[start:start + length]
-            count = len(queryset)
+            # count = len(queryset)
             print("_get_authorizated_queryset_5")
             return {
                 'items': queryset,
-                'count': count,
-                'total': total,
+                # 'count': count,
+                # 'total': total,
                 'draw': draw
             }
         else:
