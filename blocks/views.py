@@ -30,7 +30,7 @@ def blocks(request):
         project = Project.objects.get(id=id)
     elif model=="patient" and id:
         patient = Patient.objects.get(id=id)
-        print(patient)
+
 
     return render(request,"block_list.html",locals())
 

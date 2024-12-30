@@ -38,89 +38,33 @@ class PatientsSerializerManual(serializers.ModelSerializer):
         fields = '__all__'
 
 class CustomSampleLibSerializer(serializers.ModelSerializer):
-    patient = serializers.SerializerMethodField()
+    patient = serializers.CharField(read_only=True)
     seq_run = serializers.SerializerMethodField()
-    # file = serializers.SerializerMethodField()
-    file_set = serializers.SerializerMethodField()
-    # path = serializers.SerializerMethodField()
     na_type = serializers.CharField(read_only=True)
     bait = serializers.CharField(read_only=True)
     area_type = serializers.CharField(read_only=True)
     matching_normal_sl = serializers.CharField(read_only=True)
     barcode_name = serializers.CharField(read_only=True)
-    fastq = serializers.SerializerMethodField()
-    bam = serializers.SerializerMethodField()
-    bai = serializers.SerializerMethodField()
-    path_fastq = serializers.SerializerMethodField()
-    path_bam = serializers.SerializerMethodField()
-    path_bai = serializers.SerializerMethodField()
+    fastq = serializers.CharField(read_only=True)
+    bam = serializers.CharField(read_only=True)
+    bai = serializers.CharField(read_only=True)
+    path_fastq = serializers.CharField(read_only=True)
+    path_bam = serializers.CharField(read_only=True)
+    path_bai = serializers.CharField(read_only=True)
 
     class Meta:
         model = SampleLib
-        fields = ("id", "name", "barcode_name",
-                  "na_type", "area_type", "patient", "bait",
-                  "fastq", "bam", "bai",
-                  "path_fastq", "path_bam", "path_bai",
-                  "matching_normal_sl", "seq_run",  "file_set")
-
-    def get_fastq(self, obj):
-        seq_files = SequencingFile.objects.filter(sequencing_file_set__sample_lib=obj, type='fastq')
-        if seq_files:
-            files = SequencingFileSerializerManual(seq_files, many=True).data
-            file_dict = {file['name']: file['checksum'] for file in files}
-            return json.dumps(file_dict)
-        return
-
-    def get_bam(self, obj):
-        seq_files = SequencingFile.objects.filter(sequencing_file_set__sample_lib=obj, type='bam')
-        if seq_files:
-            files = SequencingFileSerializerManual(seq_files, many=True).data
-            file_dict = {file['name']: file['checksum'] for file in files}
-            return json.dumps(file_dict)
-        return
-
-    def get_bai(self, obj):
-        seq_files = SequencingFile.objects.filter(sequencing_file_set__sample_lib=obj, type='bai')
-        if seq_files:
-            files = SequencingFileSerializerManual(seq_files, many=True).data
-            file_dict = {file['name']: file['checksum'] for file in files}
-            return json.dumps(file_dict)
-        return
-
-    def get_file(self, obj):
-        seq_files = SequencingFile.objects.filter(sequencing_file_set__sample_lib=obj)
-        files = SequencingFileSerializerManual(seq_files, many=True).data
-        file_dict = {file['name']: file['checksum'] for file in files}
-        return json.dumps(file_dict)
-
-    def get_file_set(self, obj):
-        seq_files = SequencingFileSet.objects.filter(sample_lib=obj)
-        files = SequencingFileSetSerializerManual(seq_files, many=True).data
-        return files
-
-    def get_path_fastq(self, obj):
-        return obj.sequencing_file_sets.filter(sequencing_files__type='fastq')[0].path if obj.sequencing_file_sets.filter(sequencing_files__type='fastq') else None
-
-    def get_path_bam(self, obj):
-        return obj.sequencing_file_sets.filter(sequencing_files__type='bam')[0].path if obj.sequencing_file_sets.filter(sequencing_files__type='bam') else None
-
-    def get_path_bai(self, obj):
-        return obj.sequencing_file_sets.filter(sequencing_files__type='bai')[0].path if obj.sequencing_file_sets.filter(sequencing_files__type='bai') else None
+        fields = ("id", "name", "barcode_name", "na_type", "area_type", "patient", "bait", 'fastq',
+                  "bam", "bai", "path_fastq", "path_bam", "path_bai", "matching_normal_sl", "seq_run")
 
 
-    def get_patient(self, obj):
-        _patients = Patient.objects.filter(
-            patient_blocks__block_areas__area_na_links__nucacid__na_sl_links__sample_lib=obj
-        ).distinct()
-        _patients = PatientsSerializerManual(_patients, many=True).data
-        return _patients
+    # def get_patient(self, obj):
+    #     _patients = Patient.objects.filter(
+    #         patient_blocks__block_areas__area_na_links__nucacid__na_sl_links__sample_lib=obj
+    #     ).distinct()
+    #     _patients = PatientsSerializerManual(_patients, many=True).data
+    #     return _patients
 
-    # def get_seq_run(self, obj):
-    #     _sequencing_runs = SequencingRun.objects.filter(
-    #         sequencing_libs__cl_seql_links__captured_lib__sl_cl_links__sample_lib=obj
-    #     )
-    #     sequencing_runs = SequencingRunSerializerManual(_sequencing_runs, many=True).data
-    #     return sequencing_runs
 
     def get_seq_run(self, obj):
         try:
@@ -151,8 +95,8 @@ def get_sample_lib_list(request):
     result['data'] = serializer.data
     return result
 
-def _get_file(sl):
-    seq_files = SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl).values('name', 'checksum').distinct()
+def _get_file(name):
+    seq_files = SequencingFile.objects.filter(name=name).values('name', 'checksum').distinct()
     file_dict = {item['name']: item['checksum'] for item in seq_files}
     return file_dict
 
@@ -200,6 +144,7 @@ def generate_file(data, file_name):
     res = []
     seen = []
     for index, row in enumerate(data):
+        print(index)
         sl = SampleLib.objects.get(name=row.name)
         sl_seq_run = f"{sl.name}-{row.seq_run}"
         if sl_seq_run not in seen:
@@ -218,33 +163,17 @@ def generate_file(data, file_name):
         if row.matching_normal_sl:
             if SequencingFileSet.objects.filter(sample_lib=SampleLib.objects.get(name=row.matching_normal_sl)):
                 report.matching_normal_sl = row.matching_normal_sl.replace(" ", "_") if row.matching_normal_sl else ""
-        fastq, bam, bai = [], [], []
+
         report.footprint = row.bait
-        files = _get_files(row.name, row.seq_run)
-        if files:
-            for file in files:
-                if file.type == "fastq":
-                    fastq.append(file.name)
-                    report.path_fastq = row.path if row.path else ""
-                    continue
-                if file.type == "bam" and not report.path_fastq:
-                    bam.append(file.name)
-                    report.path_bam = row.path if row.path else ""
-                if file.type == "bai" and not report.path_fastq:
-                    bai.append(file.name)
-                    report.path_bai = row.path if row.path else ""
-        report.fastq = {f: _get_file(f).checksum for f in fastq} if fastq else ""
-        report.bam = {f: _get_file(f).checksum for f in bam} if bam else ""
-        report.bai = {f: _get_file(f).checksum for f in bai} if bai else ""
-        # else:
-        #     report.fastq = _get_file(sl)
-        #     report.path_fastq = _get_path(sl)
-        # if not report.fastq:
-        #     report.fastq = _get_file(sl)
-        #     report.path_fastq = _get_path(sl)
-        # if report.fastq:
-        #     report.bam, report.bai, report.path_bai, report.path_bam = "","","",""
-        seq_run = report.path_fastq.split("/")[1] if report.path_fastq != "" and report.path_fastq != None else ""
+
+        report.fastq = {f: _get_file(f).checksum for f in row.fastq} if row.fastq else ""
+        report.path_fastq = row.path_fastq if report.fastq else ""
+        if not report.fastq:
+            report.bam = {f: _get_file(f).checksum for f in row.bam} if row.bam else ""
+            report.bai = {f: _get_file(f).checksum for f in row.bai} if row.bai else ""
+            report.path_bam = row.path_bam
+            report.path_bai = row.path_bai
+
         report.seq_run = row.seq_run2  # ✓
         concat_files = f"{report.fastq}{report.bam}{report.bai}".replace("None","").strip()
         if not row.barcode_name or row.barcode_name == "":
@@ -253,19 +182,23 @@ def generate_file(data, file_name):
             if match:
                 report.barcode = match[0]
         # Only add report if it hasn't been added before
+        # print(report.__dict__)
         if concat_files != "":
             # seen.add(concat)
             res.append(report)
         else:
             continue
-
+    # print(res)
     response = HttpResponse(
         content_type='text/csv',
         headers={'Content-Disposition': f'attachment; filename="{file_name}.csv"'},
     )
 
-    field_names = ["no", "patient", "sample_lib",  "barcode", "na_type", "area_type",
-                   "matching_normal_sl", "seq_run", "footprint", "fastq", "path_fastq", "bam", "path_bam", "bai", "path_bai"]
+    field_names = [
+        "no", "patient", "sample_lib",  "barcode", "na_type",
+        "area_type", "matching_normal_sl", "seq_run", "footprint",
+        "fastq", "path_fastq", "bam", "path_bam", "bai", "path_bai"
+    ]
 
     writer = csv.writer(response)
     writer.writerow(field_names)

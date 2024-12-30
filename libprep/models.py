@@ -187,10 +187,10 @@ class NucAcids(models.Model):
         '''
         Overrides the model's save method.
         '''
+        if self.pk:
+            self._check_changeability()
 
-        self._check_changeability()
-
-        self._set_init_volume()
+            self._set_init_volume()
 
         super().save(*args, **kwargs)
 

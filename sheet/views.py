@@ -4,7 +4,7 @@ from .service import get_sample_lib_list, generate_file
 from sequencingrun.models import SequencingRun
 import json
 from .forms import FilterForm, ReportForm
-from .api import query_by_args, _get_authorizated_queryset, _get_authorizated_queryset_2
+from .api import query_by_args, _get_authorizated_queryset
 from .service import CustomSampleLibSerializer
 
 
@@ -13,10 +13,14 @@ def filter_sheet(request):
     samplelibs = query_by_args(request.user, seq_runs, **request.GET)
     serializer = CustomSampleLibSerializer(samplelibs['items'], many=True)
     result = dict()
+    print("1")
     result['data'] = serializer.data
+    print("2")
     result['draw'] = samplelibs['draw']
-    result['recordsTotal'] = samplelibs['total']
-    result['recordsFiltered'] = samplelibs['count']
+    # result['recordsTotal'] = samplelibs['total']
+    # result['recordsFiltered'] = samplelibs['count']
+    result['recordsTotal'] = 4000
+    result['recordsFiltered'] = 10
     return JsonResponse(result)
 
 
@@ -35,6 +39,15 @@ def create_csv_sheet(request):
         print(e)
         return JsonResponse({'error': str(e)}, status=500)
 
+def alternative_export(request):
+    try:
+        print(request)
+        print(request.GET['selected_ids'])
+        return
+    except Exception as e:
+        print(e)
+        return JsonResponse({'error': str(e)}, status=500)
+
 def sheet_seq_run(request):
     try:
         _seq_run = request.GET['seq_run']
@@ -47,8 +60,8 @@ def sheet_seq_run(request):
 
 
 def sheet_multiple(request):
-    selected_ids = json.loads(request.POST.get("selected_ids"))
-    seq_runs = SequencingRun.objects.filter(id__in=selected_ids)
+    selected_names = request.GET['selected_ids']
+    seq_runs = SequencingRun.objects.filter(name__in=json.loads(selected_names))
     query_set = query_by_args(request.user, seq_runs, **request.GET)
-    serializer = CustomSampleLibSerializer(query_set['items'], many=True)
+    serializer = CustomSampleLibSerializer(query_set, many=True)
     return generate_file(data=serializer.data, file_name=("_".join([s.name for s in seq_runs]))[:50])

@@ -90,7 +90,7 @@ var KTDatatablesServerSide = function () {
                     render: function (data, type, row) {
                         if (data !== null) {
                           let id = row["id"];
-                          return `<a href="/projects?model=block&id=${id}&initial=true">${data}</a>`;
+                          return `<a href="/blocks/edit/${id}">${data}</a>`;
                         }
                         return data;
                     }

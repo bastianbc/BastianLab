@@ -10,7 +10,7 @@ from blocks.models import Block
 User = get_user_model()
 
 class ProjectForm(BaseForm):
-    blocks = forms.ModelMultipleChoiceField(queryset=Block.objects.all(), label="Blocks")
+    blocks = forms.ModelMultipleChoiceField(queryset=Block.objects.all(), label="Blocks", required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

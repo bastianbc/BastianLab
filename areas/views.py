@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required,permission_required
 from core.decorators import permission_required_for_async
 
 
-@permission_required_for_async("areas.view_areas")
+@permission_required_for_async("areas.view_area")
 def filter_areas(request):
     from .serializers import AreasSerializer
     areas = Area().query_by_args(request.user, **request.GET)
@@ -21,12 +21,12 @@ def filter_areas(request):
 
     return JsonResponse(result)
 
-@permission_required("areas.view_areas",raise_exception=True)
+@permission_required("areas.view_area",raise_exception=True)
 def areas(request):
     form = ExtractionOptionsForm()
     return render(request,"area_list.html",locals())
 
-@permission_required("areas.add_areas",raise_exception=True)
+@permission_required("areas.add_area",raise_exception=True)
 def new_area(request):
     if request.method=="POST":
         form = AreaForm(request.POST)
@@ -44,7 +44,7 @@ def new_area(request):
 
     return render(request,"area.html",locals())
 
-@permission_required("areas.add_areas",raise_exception=True)
+@permission_required("areas.add_area",raise_exception=True)
 def add_area_to_block_async(request):
     block_id = json.loads(request.GET.get("block_id"))
     options = json.loads(request.GET.get("options"))
@@ -62,7 +62,7 @@ def add_area_to_block_async(request):
 
     return JsonResponse({"success":True})
 
-@permission_required("areas.change_areas",raise_exception=True)
+@permission_required("areas.change_area",raise_exception=True)
 def edit_area(request,id):
     area = Area.objects.get(id=id)
 
@@ -79,7 +79,7 @@ def edit_area(request,id):
 
     return render(request,"area.html",locals())
 
-@permission_required("areas.change_areas",raise_exception=True)
+@permission_required("areas.change_area",raise_exception=True)
 def edit_area_async(request):
     import re
     from core.utils import custom_update
@@ -102,7 +102,7 @@ def edit_area_async(request):
 
     return JsonResponse({"success":True})
 
-@permission_required("areas.delete_areas",raise_exception=True)
+@permission_required("areas.delete_area",raise_exception=True)
 def delete_area(request,id):
     try:
         area = Area.objects.get(id=id)
@@ -116,7 +116,7 @@ def delete_area(request,id):
 
     return JsonResponse({ "deleted":True })
 
-@permission_required("areas.delete_areas",raise_exception=True)
+@permission_required("areas.delete_area",raise_exception=True)
 def delete_batch_areas(request):
     try:
         selected_ids = json.loads(request.GET.get("selected_ids"))
