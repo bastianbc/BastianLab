@@ -198,6 +198,7 @@ def generate_file(data, file_name):
             if match:
                 report.barcode = match[0]
         # Only add report if it hasn't been added before
+        print(report)
         if concat_files != "":
             # seen.add(concat)
             res.append(report)
