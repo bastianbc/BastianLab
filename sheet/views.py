@@ -13,7 +13,9 @@ def filter_sheet(request):
     samplelibs = query_by_args(request.user, seq_runs, **request.GET)
     serializer = CustomSampleLibSerializer(samplelibs['items'], many=True)
     result = dict()
-    result['data'] = serializer.data
+    print("1")
+    result['data'] = serializer['data']
+    print("2")
     result['draw'] = samplelibs['draw']
     # result['recordsTotal'] = samplelibs['total']
     # result['recordsFiltered'] = samplelibs['count']

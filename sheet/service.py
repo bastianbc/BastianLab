@@ -38,7 +38,7 @@ class PatientsSerializerManual(serializers.ModelSerializer):
         fields = '__all__'
 
 class CustomSampleLibSerializer(serializers.ModelSerializer):
-    patient = serializers.SerializerMethodField()
+    patient = serializers.CharField(read_only=True)
     seq_run = serializers.SerializerMethodField()
     na_type = serializers.CharField(read_only=True)
     bait = serializers.CharField(read_only=True)
@@ -58,12 +58,12 @@ class CustomSampleLibSerializer(serializers.ModelSerializer):
                   "bam", "bai", "path_fastq", "path_bam", "path_bai", "matching_normal_sl", "seq_run")
 
 
-    def get_patient(self, obj):
-        _patients = Patient.objects.filter(
-            patient_blocks__block_areas__area_na_links__nucacid__na_sl_links__sample_lib=obj
-        ).distinct()
-        _patients = PatientsSerializerManual(_patients, many=True).data
-        return _patients
+    # def get_patient(self, obj):
+    #     _patients = Patient.objects.filter(
+    #         patient_blocks__block_areas__area_na_links__nucacid__na_sl_links__sample_lib=obj
+    #     ).distinct()
+    #     _patients = PatientsSerializerManual(_patients, many=True).data
+    #     return _patients
 
 
     def get_seq_run(self, obj):
