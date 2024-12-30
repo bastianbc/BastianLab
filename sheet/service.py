@@ -167,7 +167,7 @@ def generate_file(data, file_name):
         report.footprint = row.bait
 
         report.fastq = {f: _get_file(f).checksum for f in row.fastq} if row.fastq else ""
-        report.path_fastq = row.path_fastq
+        report.path_fastq = row.path_fastq if report.fastq else ""
         if not report.fastq:
             report.bam = {f: _get_file(f).checksum for f in row.bam} if row.bam else ""
             report.bai = {f: _get_file(f).checksum for f in row.bai} if row.bai else ""
