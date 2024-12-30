@@ -14,7 +14,7 @@ def filter_sheet(request):
     serializer = CustomSampleLibSerializer(samplelibs['items'], many=True)
     result = dict()
     print("1")
-    result['data'] = serializer['data']
+    result['data'] = serializer.data
     print("2")
     result['draw'] = samplelibs['draw']
     # result['recordsTotal'] = samplelibs['total']
