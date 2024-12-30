@@ -61,7 +61,7 @@ def sheet_seq_run(request):
 
 def sheet_multiple(request):
     selected_names = request.GET['selected_ids']
-    seq_runs = SequencingRun.objects.filter(name__in=json.dumps(selected_names))
+    seq_runs = SequencingRun.objects.filter(name__in=json.loads(selected_names))
     print(selected_names)
     print(json.dumps(selected_names))
     print(seq_runs)
