@@ -165,19 +165,19 @@ def generate_file(data, file_name):
                 report.matching_normal_sl = row.matching_normal_sl.replace(" ", "_") if row.matching_normal_sl else ""
         fastq, bam, bai = [], [], []
         report.footprint = row.bait
-        files = _get_files(row.name, row.seq_run)
-        if files:
-            for file in files:
-                if file.type == "fastq":
-                    fastq.append(file.name)
-                    report.path_fastq = row.path if row.path else ""
-                    continue
-                if file.type == "bam" and not report.path_fastq:
-                    bam.append(file.name)
-                    report.path_bam = row.path if row.path else ""
-                if file.type == "bai" and not report.path_fastq:
-                    bai.append(file.name)
-                    report.path_bai = row.path if row.path else ""
+        # files = _get_files(row.name, row.seq_run)
+        # if files:
+        #     for file in files:
+        #         if file.type == "fastq":
+        #             fastq.append(file.name)
+        #             report.path_fastq = row.path if row.path else ""
+        #             continue
+        #         if file.type == "bam" and not report.path_fastq:
+        #             bam.append(file.name)
+        #             report.path_bam = row.path if row.path else ""
+        #         if file.type == "bai" and not report.path_fastq:
+        #             bai.append(file.name)
+        #             report.path_bai = row.path if row.path else ""
         report.fastq = {f: _get_file(f).checksum for f in fastq} if fastq else ""
         report.bam = {f: _get_file(f).checksum for f in bam} if bam else ""
         report.bai = {f: _get_file(f).checksum for f in bai} if bai else ""

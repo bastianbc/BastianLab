@@ -84,10 +84,6 @@ def _get_authorizated_queryset(seq_runs):
                 distinct=True
             ),
             path_bai=path_subquery,
-            checksum=ArrayAgg(
-                'sequencing_file_sets__sequencing_files__checksum',
-                distinct=True
-            ),
             bait=F("sl_cl_links__captured_lib__bait__name")
         )
         .filter(
