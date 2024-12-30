@@ -4,6 +4,7 @@ from django.db.models import Q, Count
 import json
 from core.validators import validate_name_contains_space
 from django.contrib.auth.models import User
+from projects.utils import get_user_projects
 
 class SequencingRun(models.Model):
     FACILITY_TYPES = (
@@ -49,10 +50,21 @@ class SequencingRun(models.Model):
 
     def query_by_args(self, user, **kwargs):
         def _get_authorizated_queryset():
-            return SequencingRun.objects.all().annotate(
+            '''
+            Users can access to some entities depend on their authorize. While the user having admin role can access to all things,
+            technicians or researchers can access own projects and other entities related to it.
+            '''
+            queryset = SequencingRun.objects.all().annotate(
                 num_file_sets=Count('sequencing_file_sets', distinct=True),
                 num_sequencinglibs=Count("sequencing_libs", distinct=True),
             )
+
+            if not user.is_superuser:
+                return queryset.filter(
+                    sequencing_libs__cl_seql_links__captured_lib__sl_cl_links__sample_lib__na_sl_links__nucacid__area_na_links__area__block__block_projects__in=get_user_projects(user)
+                )
+
+            return queryset
 
         def _parse_value(search_value):
             '''

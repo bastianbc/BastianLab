@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models import Q, Count, F, OuterRef, Subquery, Func, Value, CharField
 from datetime import datetime
+from projects.utils import get_user_projects
 
 class VariantCall(models.Model):
     sample_lib = models.ForeignKey("samplelib.SampleLib", on_delete=models.CASCADE, related_name="variant_calls", blank=True, null=True)
@@ -21,6 +22,10 @@ class VariantCall(models.Model):
     def query_by_args(user, **kwargs):
 
         def _get_authorizated_queryset():
+            '''
+            Users can access to some entities depend on their authorize. While the user having admin role can access to all things,
+            technicians or researchers can access own projects and other entities related to it.
+            '''
             c_variant_subquery = CVariant.objects.filter(
                 g_variant__variant_call=OuterRef('pk')  # Reference the current VariantCall
             ).values('c_var')[:1]
@@ -44,7 +49,7 @@ class VariantCall(models.Model):
                 function='CONCAT',
                 output_field=CharField()
             )
-            return VariantCall.objects.filter().annotate(
+            queryset = VariantCall.objects.filter().annotate(
                 blocks=F('sample_lib__na_sl_links__nucacid__area_na_links__area__block__name'),
                 areas = F('sample_lib__na_sl_links__nucacid__area_na_links__area__name'),
                 genes = F('g_variants__c_variants__gene__name'),
@@ -53,6 +58,13 @@ class VariantCall(models.Model):
                 p_variant = Subquery(p_variant_subquery),
                 g_variant=g_variant_annotation
             )
+
+            if not user.is_superuser:
+                return queryset.filter(
+                    sample_lib__na_sl_links__nucacid__area_na_links__area__block__block_projects__in=get_user_projects(user)
+                )
+
+            return queryset
 
         def _parse_value(search_value):
             if "_initial:" in search_value:
