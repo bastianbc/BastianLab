@@ -95,8 +95,8 @@ def get_sample_lib_list(request):
     result['data'] = serializer.data
     return result
 
-def _get_file(sl):
-    seq_files = SequencingFile.objects.filter(sequencing_file_set__sample_lib=sl).values('name', 'checksum').distinct()
+def _get_file(name):
+    seq_files = SequencingFile.objects.filter(name=name).values('name', 'checksum').distinct()
     file_dict = {item['name']: item['checksum'] for item in seq_files}
     return file_dict
 
