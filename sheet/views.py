@@ -10,19 +10,13 @@ from .service import CustomSampleLibSerializer
 
 def filter_sheet(request):
     seq_runs = SequencingRun.objects.filter()
-    print("2")
     samplelibs = query_by_args(request.user, seq_runs, **request.GET)
-    print(len(samplelibs['items']))
-    print("3")
     serializer = CustomSampleLibSerializer(samplelibs['items'], many=True)
     result = dict()
-    print("5")
     result['data'] = serializer.data
     result['draw'] = samplelibs['draw']
     result['recordsTotal'] = samplelibs['total']
     result['recordsFiltered'] = samplelibs['count']
-    print(result)
-    print("6")
     return JsonResponse(result)
 
 
@@ -64,6 +58,7 @@ def sheet_seq_run(request):
 def sheet_multiple(request):
     selected_names = request.GET['selected_ids']
     seq_runs = SequencingRun.objects.filter(name__in=json.dumps(selected_names))
+    print(seq_runs)
     query_set = query_by_args(request.user, seq_runs, **request.GET)
     serializer = CustomSampleLibSerializer(query_set['items'], many=True)
     file = generate_file(data=serializer.data, file_name=("_".join([s.name for s in seq_runs]))[:50])
