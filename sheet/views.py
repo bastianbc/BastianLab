@@ -66,6 +66,7 @@ def sheet_multiple(request):
     print(json.dumps(selected_names))
     print(seq_runs)
     query_set = query_by_args(request.user, seq_runs, **request.GET)
+    print(query_set)
     serializer = CustomSampleLibSerializer(query_set['items'], many=True)
-    file = generate_file(data=serializer.data, file_name=("_".join([s.name for s in seq_runs]))[:50])
+    print(serializer)
     return generate_file(data=serializer.data, file_name=("_".join([s.name for s in seq_runs]))[:50])
