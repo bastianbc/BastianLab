@@ -8,5 +8,5 @@ def get_user_projects(user):
     from projects.models import Project  # Import here to avoid circular imports
 
     return Project.objects.filter(
-        models.Q(researcher=user) | models.Q(technician=user)
+        Q(researcher=user) | Q(technician=user)
     ).distinct()

@@ -9,7 +9,7 @@ from .serializers import BlocksSerializer, SingleBlockSerializer
 from django.contrib.auth.decorators import login_required,permission_required
 from core.decorators import permission_required_for_async
 
-@permission_required_for_async("blocks.view_blocks")
+@permission_required_for_async("blocks.view_block")
 def filter_blocks(request):
     blocks = Block.query_by_args(request.user,**request.GET)
     serializer = BlocksSerializer(blocks['items'], many=True)
@@ -20,7 +20,7 @@ def filter_blocks(request):
     result['recordsFiltered'] = blocks['count']
     return JsonResponse(result)
 
-@permission_required("blocks.view_blocks",raise_exception=True)
+@permission_required("blocks.view_block",raise_exception=True)
 def blocks(request):
     id = request.GET.get("id")
     model = request.GET.get("model")
@@ -30,7 +30,6 @@ def blocks(request):
         project = Project.objects.get(id=id)
     elif model=="patient" and id:
         patient = Patient.objects.get(id=id)
-
 
     return render(request,"block_list.html",locals())
 
