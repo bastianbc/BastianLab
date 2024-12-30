@@ -144,7 +144,7 @@ def generate_file(data, file_name):
     res = []
     seen = []
     for index, row in enumerate(data):
-        print(index,row)
+        # print(index,row)
         sl = SampleLib.objects.get(name=row.name)
         sl_seq_run = f"{sl.name}-{row.seq_run}"
         if sl_seq_run not in seen:
@@ -203,7 +203,7 @@ def generate_file(data, file_name):
             res.append(report)
         else:
             continue
-
+    print(res)
     response = HttpResponse(
         content_type='text/csv',
         headers={'Content-Disposition': f'attachment; filename="{file_name}.csv"'},
