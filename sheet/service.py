@@ -208,8 +208,11 @@ def generate_file(data, file_name):
         headers={'Content-Disposition': f'attachment; filename="{file_name}.csv"'},
     )
 
-    field_names = ["no", "patient", "sample_lib",  "barcode", "na_type", "area_type",
-                   "matching_normal_sl", "seq_run", "footprint", "fastq", "path_fastq", "bam", "path_bam", "bai", "path_bai"]
+    field_names = [
+        "no", "patient", "sample_lib",  "barcode", "na_type",
+        "area_type", "matching_normal_sl", "seq_run", "footprint",
+        "fastq", "path_fastq", "bam", "path_bam", "bai", "path_bai"
+    ]
 
     writer = csv.writer(response)
     writer.writerow(field_names)
