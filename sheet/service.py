@@ -179,9 +179,9 @@ def generate_file(data, file_name):
         #         if file.type == "bai" and not report.path_fastq:
         #             bai.append(file.name)
         #             report.path_bai = row.path if row.path else ""
-        report.fastq = {f: _get_file(f).checksum for f in row.fastq} if fastq else ""
-        report.bam = {f: _get_file(f).checksum for f in row.bam} if bam else ""
-        report.bai = {f: _get_file(f).checksum for f in row.bai} if bai else ""
+        report.fastq = {f: _get_file(f).checksum for f in row.fastq} if row.fastq else ""
+        report.bam = {f: _get_file(f).checksum for f in row.bam} if row.bam else ""
+        report.bai = {f: _get_file(f).checksum for f in row.bai} if row.bai else ""
         print(report.fastq, report.bam, report.bai)
         # else:
         #     report.fastq = _get_file(sl)
