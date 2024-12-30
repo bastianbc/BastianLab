@@ -102,18 +102,17 @@ def _get_authorizated_queryset(seq_runs):
     )
 
 
-
 def _parse_value(search_value):
     if "_initial:" in search_value:
         return json.loads(search_value.split("_initial:")[1])
     return search_value
+
 
 def _is_initial_value(search_value):
     return "_initial:" in search_value and search_value.split("_initial:")[1] != "null"
 
 
 def query_by_args(user, seq_runs, **kwargs):
-
     try:
         ORDER_COLUMN_CHOICES = {
             "0": "id",
