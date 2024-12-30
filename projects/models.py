@@ -26,7 +26,7 @@ class Project(models.Model):
     technician = models.ManyToManyField(User, null=True, blank=True, related_name="technician_projects", verbose_name="Technician")
     researcher = models.ManyToManyField(User, null=True, blank=True, related_name="researcher_projects", verbose_name="Researcher")
     date = models.DateTimeField(default=datetime.now, verbose_name="Date")
-    blocks = models.ManyToManyField('blocks.Block', blank=True, related_name="block_projects", verbose_name="Blocks")
+    blocks = models.ManyToManyField('blocks.Block', blank=True, null=True, related_name="block_projects", verbose_name="Blocks")
 
     class Meta:
         db_table = 'project'

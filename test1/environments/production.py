@@ -133,7 +133,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'USER': 'testuser',
         'PASSWORD': '1235',
-        'NAME': 'labdb',
+        'NAME': 'labdbproduction',
         'HOST': '10.65.11.68',
         'PORT': '5432',
         'DISABLE_SERVER_SIDE_CURSORS': True
@@ -147,39 +147,16 @@ DATABASES = {
         'PORT': '5432',
         'DISABLE_SERVER_SIDE_CURSORS': True
    },
+    'labdb': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'labdb',
+        'USER': 'testuser',
+        'PASSWORD': '1235',
+        'HOST': '10.65.11.68',
+        'PORT': '5432',
+        'DISABLE_SERVER_SIDE_CURSORS': True
+    },
 }
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'USER': 'postgres',
-#         'PASSWORD': '12345678',
-#         'NAME': 'labdb',
-#         'HOST': 'north-california.cfemxhcomufe.us-west-1.rds.amazonaws.com',
-#         'PORT': '5432',
-#         'DISABLE_SERVER_SIDE_CURSORS': True
-#    }
-# }
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'USER': 'postgres',
-#         'PASSWORD': '12345678',
-#         'NAME': 'labdb',
-#         'HOST': 'development.c7oasmx9kbh5.us-east-1.rds.amazonaws.com',
-#         'PORT': '5432',
-#         'DISABLE_SERVER_SIDE_CURSORS': True
-#    }
-# }
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
-
-# Password validation
-# https://docs.djangoproject.com/en/dev/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {

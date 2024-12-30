@@ -29,7 +29,6 @@ def read_rows(row):
     # print(row.values[0].split(" "))
     try:
         checksum, file = row.values[0].split()
-        print(file)
         sl = file.split("_R")[0]
         d = {
             "Sequencing Run":"Acral melanoma lines_mRNA_Seq_AL1806051_R1",

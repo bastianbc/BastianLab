@@ -3,7 +3,7 @@ from django.db.models import Q, Count
 
 class Gene(models.Model):
     gene_id = models.IntegerField(default=0)
-    name = models.CharField(max_length=30, verbose_name="Name", unique=True)
+    name = models.CharField(max_length=30, verbose_name="Name")
     full_name = models.CharField(max_length=250, verbose_name="Name", blank=True, null=True)
     chr = models.CharField(max_length=30, verbose_name="Chromosome", blank=True, null=True)
     start = models.IntegerField(default=0)

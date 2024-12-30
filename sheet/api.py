@@ -1,93 +1,97 @@
 import json
-from django.db.models import Q, F, Count, OuterRef,Exists, Subquery, Value, Case, When, CharField
+from django.db.models import Q, F, OuterRef,Exists, Subquery, Value, Case, When, CharField
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.db.models.functions import Coalesce, Concat
-from django.db.models import Prefetch
-from samplelib.models import SampleLib, NA_SL_LINK
+from django.db.models.functions import Coalesce
+from samplelib.models import SampleLib
 from lab.models import Patient
 from areas.models import Area
-from sequencingfile.models import SequencingFile, SequencingFileSet
-from sequencingrun.models import SequencingRun
+from sequencingfile.models import SequencingFileSet
+
 
 def _get_authorizated_queryset(seq_runs):
     seq_run_subquery = SequencingFileSet.objects.filter(
         sample_lib=OuterRef('pk'),
         sequencing_run__id__in=seq_runs
     ).values('sequencing_run__id')
-    return SampleLib.objects.filter(
-            sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=seq_runs
-        ).prefetch_related('sequencing_file_sets').annotate(
-        na_type=F('na_sl_links__nucacid__na_type'),
-        seq_run2=F('sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__name'),
-        seq_run=F('sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs'),
-        patient=F('na_sl_links__nucacid__area_na_links__area__block__patient__pat_id'),
-        sex=Subquery(
-            Patient.objects.filter(
-                patient_blocks__block_areas__area_na_links__nucacid__na_sl_links__sample_lib=OuterRef('pk')
-            ).values('sex')[:1]
-        ),
-        area_type=Subquery(
-            Area.objects.filter(
-                area_na_links__nucacid__na_sl_links__sample_lib=OuterRef('pk')
-            ).annotate(
-                simplified_area_type=Case(
-                    When(area_type='normal', then=Value('normal')),
-                    When(area_type__isnull=True, then=Value(None)),  # Exclude None explicitly if needed
-                    default=Value('tumor'),
-                    output_field=CharField(),
-                )
-            ).values('simplified_area_type')[:1]
-        ),
-        matching_normal_sl=Case(
-            When(
-                area_type=Value('normal'),
-                then=Value(None)
-            ),
-            default=Subquery(
-                SampleLib.objects.filter(
-                    sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__isnull=False,
-                    na_sl_links__nucacid__area_na_links__area__area_type__value='normal',
-                    na_sl_links__nucacid__area_na_links__area__block__patient=OuterRef(
-                        "na_sl_links__nucacid__area_na_links__area__block__patient"),
-                ).values('name')[:1]
-            ),
-            output_field=CharField()
-        ),
-       barcode_name=Coalesce('barcode__i5', 'barcode__i7', default=Value(''), output_field=CharField()),
-       path=Subquery(
-           SequencingFileSet.objects.filter(
-               sample_lib=OuterRef('pk'),
-               sequencing_run=OuterRef('seq_run')
-           ).values('path')[:1]
-       ),
-       file=ArrayAgg(
-           'sequencing_file_sets__sequencing_files__name',
-           distinct=True,
-       ),
-       checksum=ArrayAgg(
-           'sequencing_file_sets__sequencing_files__checksum',
-           distinct=True
-       ),
-       bait=F("sl_cl_links__captured_lib__bait__name")
-    ).filter(
-        Exists(seq_run_subquery)
-    ).distinct().order_by('name')
-
-def _get_authorizated_queryset_2(seq_runs):
-    seq_run_subquery = SequencingFileSet.objects.filter(
-        sample_lib=OuterRef('pk'),
-        sequencing_run__id__in=seq_runs
-    ).values('sequencing_run__id')
-    return SampleLib.objects.filter(name__icontains="DM1_",
-        sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=seq_runs
-    ).prefetch_related('sequencing_file_sets').annotate(
-
-        file=ArrayAgg(
-            'sequencing_file_sets__sequencing_files__name',
+    path_subquery = Subquery(
+        SequencingFileSet.objects
+        .filter(
+            sample_lib=OuterRef('pk'),
         )
-    ).filter(
-        Exists(seq_run_subquery)
-    ).distinct().order_by('name')
+        .order_by('pk')
+        .values('path')[:1]
+    )
+    return (
+        SampleLib.objects.filter(
+            sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=seq_runs
+        ).prefetch_related('sequencing_file_sets')
+        .annotate(
+            na_type=F('na_sl_links__nucacid__na_type'),
+            seq_run2=F('sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__name'),
+            seq_run=F('sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs'),
+            patient=F('na_sl_links__nucacid__area_na_links__area__block__patient__pat_id'),
+            sex=Subquery(
+                Patient.objects.filter(
+                    patient_blocks__block_areas__area_na_links__nucacid__na_sl_links__sample_lib=OuterRef('pk')
+                ).values('sex')[:1]
+            ),
+            area_type=Subquery(
+                Area.objects.filter(
+                    area_na_links__nucacid__na_sl_links__sample_lib=OuterRef('pk')
+                )
+                .annotate(
+                    simplified_area_type=Case(
+                        When(area_type__value='normal', then=Value('normal')),
+                        When(area_type__isnull=True, then=Value(None)),
+                        default=Value('tumor'),
+                        output_field=CharField(),
+                    )
+                )
+                .values('simplified_area_type')[:1]
+            ),
+            matching_normal_sl=Case(
+                When(
+                    area_type=Value('normal'),
+                    then=Value(None)
+                ),
+                default=Subquery(
+                    SampleLib.objects.filter(
+                        sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__isnull=False,
+                        na_sl_links__nucacid__area_na_links__area__area_type__value='normal',
+                        na_sl_links__nucacid__area_na_links__area__block__patient=OuterRef(
+                            "na_sl_links__nucacid__area_na_links__area__block__patient"
+                        ),
+                    ).values('name')[:1]
+                ),
+                output_field=CharField()
+            ),
+            barcode_name=Coalesce('barcode__i5', 'barcode__i7', default=Value(''), output_field=CharField()),
+            fastq=ArrayAgg(
+                'sequencing_file_sets__sequencing_files__name',
+                filter=Q(sequencing_file_sets__sequencing_files__type='fastq'),
+                distinct=True
+            ),
+            path_fastq=path_subquery,
+            bam=ArrayAgg(
+                'sequencing_file_sets__sequencing_files__name',
+                filter=Q(sequencing_file_sets__sequencing_files__type='bam'),
+                distinct=True
+            ),
+            path_bam=path_subquery,
+            bai=ArrayAgg(
+                'sequencing_file_sets__sequencing_files__name',
+                filter=Q(sequencing_file_sets__sequencing_files__type='bai'),
+                distinct=True
+            ),
+            path_bai=path_subquery,
+            bait=F("sl_cl_links__captured_lib__bait__name")
+        )
+        .filter(
+            Exists(seq_run_subquery)
+        )
+        .distinct()
+        .order_by('name')
+    )
 
 
 def _parse_value(search_value):
@@ -95,12 +99,12 @@ def _parse_value(search_value):
         return json.loads(search_value.split("_initial:")[1])
     return search_value
 
+
 def _is_initial_value(search_value):
     return "_initial:" in search_value and search_value.split("_initial:")[1] != "null"
 
 
 def query_by_args(user, seq_runs, **kwargs):
-
     try:
         ORDER_COLUMN_CHOICES = {
             "0": "id",
@@ -132,10 +136,12 @@ def query_by_args(user, seq_runs, **kwargs):
             order_column = ORDER_COLUMN_CHOICES[order_column]
             if order == 'desc':
                 order_column = '-' + order_column
-
+            print("_get_authorizated_queryset_111111")
             queryset = _get_authorizated_queryset(seq_runs)
-            total = queryset.count()
+            print("_get_authorizated_queryset_2")
 
+            # total = len(queryset)
+            print("_get_authorizated_queryset_3")
             search_value = _parse_value(search_value)
             if sequencing_run_filter[0] != "":
                 queryset = queryset.filter(Q(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=sequencing_run_filter))
@@ -156,18 +162,20 @@ def query_by_args(user, seq_runs, **kwargs):
             if bait_filter:
                 queryset = queryset.filter(
                     Q(sl_cl_links__captured_lib__bait__id=bait_filter))
-
             elif search_value:
                 queryset = queryset.filter(
                     Q(name__icontains=search_value)
                 )
+            print("_get_authorizated_queryset_4")
 
-            count = queryset.count()
+            print(order_column, start, length)
             queryset = queryset.order_by(order_column)[start:start + length]
+            # count = len(queryset)
+            print("_get_authorizated_queryset_5")
             return {
                 'items': queryset,
-                'count': count,
-                'total': total,
+                # 'count': count,
+                # 'total': total,
                 'draw': draw
             }
         else:
