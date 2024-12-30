@@ -1,13 +1,11 @@
 import json
-from django.db.models import Q, F, Count, OuterRef,Exists, Subquery, Value, Case, When, CharField
+from django.db.models import Q, F, OuterRef,Exists, Subquery, Value, Case, When, CharField
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.db.models.functions import Coalesce, Concat
-from django.db.models import Prefetch
-from samplelib.models import SampleLib, NA_SL_LINK
+from django.db.models.functions import Coalesce
+from samplelib.models import SampleLib
 from lab.models import Patient
 from areas.models import Area
-from sequencingfile.models import SequencingFile, SequencingFileSet
-from sequencingrun.models import SequencingRun
+from sequencingfile.models import SequencingFileSet
 
 
 def _get_authorizated_queryset(seq_runs):
@@ -20,10 +18,9 @@ def _get_authorizated_queryset(seq_runs):
         .filter(
             sample_lib=OuterRef('pk'),
         )
-        .order_by('pk')        # optional ordering by primary key
-        .values('path')[:1]    # get only the path, limit to 1
+        .order_by('pk')
+        .values('path')[:1]
     )
-
     return (
         SampleLib.objects.filter(
             sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=seq_runs
@@ -38,15 +35,14 @@ def _get_authorizated_queryset(seq_runs):
                     patient_blocks__block_areas__area_na_links__nucacid__na_sl_links__sample_lib=OuterRef('pk')
                 ).values('sex')[:1]
             ),
-            # Fix here: compare against area_type__value:
             area_type=Subquery(
                 Area.objects.filter(
                     area_na_links__nucacid__na_sl_links__sample_lib=OuterRef('pk')
                 )
                 .annotate(
                     simplified_area_type=Case(
-                        When(area_type__value='normal', then=Value('normal')),  # changed
-                        When(area_type__isnull=True, then=Value(None)),         # changed
+                        When(area_type__value='normal', then=Value('normal')),
+                        When(area_type__isnull=True, then=Value(None)),
                         default=Value('tumor'),
                         output_field=CharField(),
                     )
