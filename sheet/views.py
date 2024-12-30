@@ -62,6 +62,7 @@ def sheet_seq_run(request):
 def sheet_multiple(request):
     selected_names = request.GET['selected_ids']
     seq_runs = SequencingRun.objects.filter(name__in=json.dumps(selected_names))
+    print(json.dumps(selected_names))
     print(seq_runs)
     query_set = query_by_args(request.user, seq_runs, **request.GET)
     serializer = CustomSampleLibSerializer(query_set['items'], many=True)
