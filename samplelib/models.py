@@ -4,6 +4,7 @@ from django.db.models import Q, Count, OuterRef, Subquery, Value
 import json
 from core.validators import validate_name_contains_space
 from capturedlib.models import SL_CL_LINK
+from projects.utils import get_user_projects
 
 class SampleLib(models.Model):
     name = models.CharField(max_length=50, unique=True, validators=[validate_name_contains_space], verbose_name="Name")
@@ -51,14 +52,24 @@ class SampleLib(models.Model):
     def query_by_args(user, **kwargs):
 
         def _get_authorizated_queryset():
-
-            return SampleLib.objects.all().annotate(
+            '''
+            Users can access to some entities depend on their authorize. While the user having admin role can access to all things,
+            technicians or researchers can access own projects and other entities related to it.
+            '''
+            queryset = SampleLib.objects.all().annotate(
                 num_nucacids=Count('na_sl_links',distinct=True),
                 num_files=Count('sequencing_file_sets__sequencing_files',distinct=True),
                 num_blocks=Count('na_sl_links', distinct=True),
                 num_capturedlibs=Count('sl_cl_links', distinct=True),
                 area_num=Count("na_sl_links__nucacid__area_na_links__area", distinct=True),
             )
+
+            if not user.is_superuser:
+                return queryset.filter(
+                    na_sl_links__nucacid__area_na_links__area__block__block_projects__in=get_user_projects(user)
+                )
+
+            return queryset
 
         def _parse_value(search_value):
             if "_initial:" in search_value:
