@@ -205,7 +205,7 @@ var KTDatatablesServerSide = function () {
             handleRowActions();
             KTMenu.createInstances();
         });
-        
+
     }
 
     var initRowSelection = function () {
@@ -263,7 +263,6 @@ var KTDatatablesServerSide = function () {
                     popupWindow = window.open('', '_blank', 'width=' + windowWidth + ',height=' + windowHeight + ',left=' + left + ',top=' + top);
                 }
 
-                // popupWindow.document.body.innerHTML = '<h1>'+ block +'</h1><img src="' + item.getAttribute("data-url") + '" style="max-width:100%;max-height:100%;" />';
                 popupWindow.location.href = item.getAttribute("data-url");
 
             });
@@ -1194,7 +1193,7 @@ var KTDatatablesServerSide = function () {
                 var tr = this.closest('tr');
                 var row = dt.row(tr);
                 var data = row.data();
-    
+
                 // Make AJAX request to get_block_async view
                 fetch(`/blocks/get_block_async?id=${data.id}`)
                     .then(response => response.json())
@@ -1202,14 +1201,14 @@ var KTDatatablesServerSide = function () {
                         // Populate modal with block details
                         var modalBody = document.querySelector('#blockDetailsTable tbody');
                         modalBody.innerHTML = format(blockData);
-    
+
                         // Show modal
                         var blockDetailsModal = new bootstrap.Modal(document.getElementById('blockDetailsModal'));
                         blockDetailsModal.show();
                     });
             });
         });
-    
+
         // Add event listener for modal close button
         document.querySelectorAll('#blockDetailsModal .btn-close, #blockDetailsModal .btn-secondary').forEach((item) => {
             item.addEventListener('click', function () {
@@ -1220,11 +1219,11 @@ var KTDatatablesServerSide = function () {
                 });
             });
         });
-    
+
         function format(d) {
             // `d` is the original data object for the row
             let details = '';
-    
+
             if (d.name) {
                 details += `
                     <tr>
@@ -1402,7 +1401,7 @@ var KTDatatablesServerSide = function () {
                         <td>${d.ip_dx}</td>
                     </tr>`;
             }
-    
+
             return details;
         }
 
