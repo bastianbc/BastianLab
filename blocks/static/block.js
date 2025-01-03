@@ -14,7 +14,7 @@ var KTDatatablesServerSide = function () {
     var initDatatable = function ( initialValue, p_stage, prim, collection , body_site ) {
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
 
-        dt = $(".table").DataTable({
+        dt = $("#block_datatable").DataTable({
             // searchDelay: 500,
             processing: true,
             serverSide: true,
@@ -205,11 +205,12 @@ var KTDatatablesServerSide = function () {
             handleRowActions();
             KTMenu.createInstances();
         });
+        
     }
 
     var initRowSelection = function () {
         // Select all checkboxes
-        const allCheckboxes = document.querySelectorAll('.table tbody [type="checkbox"]');
+        const allCheckboxes = document.querySelectorAll('#block_datatable tbody [type="checkbox"]');
         allCheckboxes.forEach(c => {
             // Checkbox on Change event
             c.addEventListener("change", function () {
@@ -238,7 +239,7 @@ var KTDatatablesServerSide = function () {
     }
 
     var handleRestoreRowSelection = function () {
-        const allCheckboxes = document.querySelectorAll('.table tbody [type="checkbox"]');
+        const allCheckboxes = document.querySelectorAll('#block_datatable tbody [type="checkbox"]');
         allCheckboxes.forEach(c => {
             if ( selectedRows.indexOf(c.value) > -1 ) {
                 c.checked = true;
@@ -272,7 +273,7 @@ var KTDatatablesServerSide = function () {
     }
 
     function getSelectedRows() {
-        const container = document.querySelector('.table');
+        const container = document.querySelector('#block_datatable');
         const selectedRows = container.querySelectorAll('tbody [type="checkbox"]:checked');
         const selectedIds = [];
 
@@ -453,7 +454,7 @@ var KTDatatablesServerSide = function () {
     var handleBatchDeleteRows = function () {
         // Toggle selected action toolbar
         // Select all checkboxes
-        const container = document.querySelector('.table');
+        const container = document.querySelector('#block_datatable');
         const checkboxes = container.querySelectorAll('[type="checkbox"]');
 
         // Select elements
@@ -823,7 +824,7 @@ var KTDatatablesServerSide = function () {
     // Toggle toolbars
     var toggleToolbars = function () {
         // Define variables
-        const container = document.querySelector('.table');
+        const container = document.querySelector('#block_datatable');
         const toolbarBase = document.querySelector('[data-kt-docs-table-toolbar="base"]');
         const toolbarSelected = document.querySelector('[data-kt-docs-table-toolbar="selected"]');
         const selectedCount = document.querySelector('[data-kt-docs-table-select="selected_count"]');
@@ -889,7 +890,7 @@ var KTDatatablesServerSide = function () {
                     swal("Error updating!", "Please try again!", "error");
                 }
             },
-            table: ".table",
+            table: "#block_datatable",
             fields: [
               {
                 label: "Name:",
@@ -961,13 +962,13 @@ var KTDatatablesServerSide = function () {
 
       }
 
-      $('.table').on( 'click', 'tbody td:not(:first-child)', function (e) {
+      $('#block_datatable').on( 'click', 'tbody td:not(:first-child)', function (e) {
         editor.inline( dt.cell( this ).index(), {
             onBlur: 'submit'
         });
       });
 
-      $('.table').on( 'key-focus', function ( e, datatable, cell ) {
+      $('#block_datatable').on( 'key-focus', function ( e, datatable, cell ) {
            editor.inline( cell.index() );
       });
 
@@ -1185,6 +1186,224 @@ var KTDatatablesServerSide = function () {
                 lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
                 responsive: true
             });
+        }
+
+        // Add event listener for dt-control click
+        document.querySelectorAll('#block_datatable tbody td.dt-control').forEach((item) => {
+            item.addEventListener('click', function () {
+                var tr = this.closest('tr');
+                var row = dt.row(tr);
+                var data = row.data();
+    
+                // Make AJAX request to get_block_async view
+                fetch(`/blocks/get_block_async?id=${data.id}`)
+                    .then(response => response.json())
+                    .then(blockData => {
+                        // Populate modal with block details
+                        var modalBody = document.querySelector('#blockDetailsTable tbody');
+                        modalBody.innerHTML = format(blockData);
+    
+                        // Show modal
+                        var blockDetailsModal = new bootstrap.Modal(document.getElementById('blockDetailsModal'));
+                        blockDetailsModal.show();
+                    });
+            });
+        });
+    
+        // Add event listener for modal close button
+        document.querySelectorAll('#blockDetailsModal .btn-close, #blockDetailsModal .btn-secondary').forEach((item) => {
+            item.addEventListener('click', function () {
+                var blockDetailsModal = bootstrap.Modal.getInstance(document.getElementById('blockDetailsModal'));
+                blockDetailsModal.hide();
+                document.querySelectorAll('.modal-backdrop').forEach((backdrop) => {
+                    backdrop.remove();
+                });
+            });
+        });
+    
+        function format(d) {
+            // `d` is the original data object for the row
+            let details = '';
+    
+            if (d.name) {
+                details += `
+                    <tr>
+                        <td>Full name:</td>
+                        <td>${d.name}</td>
+                    </tr>`;
+            }
+            if (d.patient) {
+                details += `
+                    <tr>
+                        <td>Patient:</td>
+                        <td>${d.patient}</td>
+                    </tr>`;
+            }
+            if (d.age) {
+                details += `
+                    <tr>
+                        <td>Age:</td>
+                        <td>${d.age}</td>
+                    </tr>`;
+            }
+            if (d.body_site) {
+                details += `
+                    <tr>
+                        <td>Body site:</td>
+                        <td>${d.body_site}</td>
+                    </tr>`;
+            }
+            if (d.ulceration !== null) {
+                details += `
+                    <tr>
+                        <td>Ulceration:</td>
+                        <td>${d.ulceration}</td>
+                    </tr>`;
+            }
+            if (d.thickness) {
+                details += `
+                    <tr>
+                        <td>Thickness:</td>
+                        <td>${d.thickness}</td>
+                    </tr>`;
+            }
+            if (d.mitoses) {
+                details += `
+                    <tr>
+                        <td>Mitoses:</td>
+                        <td>${d.mitoses}</td>
+                    </tr>`;
+            }
+            if (d.p_stage) {
+                details += `
+                    <tr>
+                        <td>P Stage:</td>
+                        <td>${d.p_stage}</td>
+                    </tr>`;
+            }
+            if (d.prim) {
+                details += `
+                    <tr>
+                        <td>Prim:</td>
+                        <td>${d.prim}</td>
+                    </tr>`;
+            }
+            if (d.subtype) {
+                details += `
+                    <tr>
+                        <td>Subtype:</td>
+                        <td>${d.subtype}</td>
+                    </tr>`;
+            }
+            if (d.slides) {
+                details += `
+                    <tr>
+                        <td>Slides:</td>
+                        <td>${d.slides}</td>
+                    </tr>`;
+            }
+            if (d.slides_left) {
+                details += `
+                    <tr>
+                        <td>Slides Left:</td>
+                        <td>${d.slides_left}</td>
+                    </tr>`;
+            }
+            if (d.fixation) {
+                details += `
+                    <tr>
+                        <td>Fixation:</td>
+                        <td>${d.fixation}</td>
+                    </tr>`;
+            }
+            if (d.storage) {
+                details += `
+                    <tr>
+                        <td>Storage:</td>
+                        <td>${d.storage}</td>
+                    </tr>`;
+            }
+            if (d.scan_number) {
+                details += `
+                    <tr>
+                        <td>Scan Number:</td>
+                        <td>${d.scan_number}</td>
+                    </tr>`;
+            }
+            if (d.icd10) {
+                details += `
+                    <tr>
+                        <td>ICD10:</td>
+                        <td>${d.icd10}</td>
+                    </tr>`;
+            }
+            if (d.diagnosis) {
+                details += `
+                    <tr>
+                        <td>Diagnosis:</td>
+                        <td>${d.diagnosis}</td>
+                    </tr>`;
+            }
+            if (d.notes) {
+                details += `
+                    <tr>
+                        <td>Notes:</td>
+                        <td>${d.notes}</td>
+                    </tr>`;
+            }
+            if (d.micro) {
+                details += `
+                    <tr>
+                        <td>Micro:</td>
+                        <td>${d.micro}</td>
+                    </tr>`;
+            }
+            if (d.gross) {
+                details += `
+                    <tr>
+                        <td>Gross:</td>
+                        <td>${d.gross}</td>
+                    </tr>`;
+            }
+            if (d.clinical) {
+                details += `
+                    <tr>
+                        <td>Clinical:</td>
+                        <td>${d.clinical}</td>
+                    </tr>`;
+            }
+            if (d.date_added) {
+                const date = new Date(d.date_added);
+                const formattedDate = `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}/${date.getFullYear()} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+                details += `
+                    <tr>
+                        <td>Date Added:</td>
+                        <td>${formattedDate}</td>
+                    </tr>`;
+            }
+            if (d.old_body_site) {
+                details += `
+                    <tr>
+                        <td>Old Body Site:</td>
+                        <td>${d.old_body_site}</td>
+                    </tr>`;
+            }
+            if (d.path_note) {
+                details += `
+                    <tr>
+                        <td>Path Note:</td>
+                        <td>${d.path_note}</td>
+                    </tr>`;
+            }
+            if (d.ip_dx) {
+                details += `
+                    <tr>
+                        <td>IP DX:</td>
+                        <td>${d.ip_dx}</td>
+                    </tr>`;
+            }
+    
+            return details;
         }
 
     }
