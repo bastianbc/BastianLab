@@ -262,7 +262,7 @@ var KTDatatablesServerSide = function () {
 
                     popupWindow = window.open('', '_blank', 'width=' + windowWidth + ',height=' + windowHeight + ',left=' + left + ',top=' + top);
                 }
-
+                // show image
                 popupWindow.location.href = item.getAttribute("data-url");
 
             });
