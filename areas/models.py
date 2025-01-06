@@ -3,6 +3,7 @@ from django.db.models import Q, Count, Case, When, IntegerField, Value
 from datetime import datetime
 import json
 from core.validators import validate_name_contains_space
+from projects.utils import get_user_projects
 
 class Area(models.Model):
     AREA_TYPE_TYPES = [
@@ -81,7 +82,8 @@ class Area(models.Model):
             )
 
             if not user.is_superuser:
-                return queryset.filter(Q(block__project__technician=user) | Q(block__project__researcher=user))
+                return queryset.filter(block__project=get_user_projects(user))
+
             return queryset
 
         def _parse_value(search_value):

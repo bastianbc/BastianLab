@@ -6,6 +6,7 @@ from django.db.models.functions import Coalesce
 from samplelib.models import NA_SL_LINK
 import json
 from core.validators import validate_name_contains_space
+from projects.utils import get_user_projects
 
 class NucAcids(models.Model):
     DNA = "dna"
@@ -58,7 +59,10 @@ class NucAcids(models.Model):
                 ), Value(0))
             )
             if not user.is_superuser:
-                return queryset.filter(Q(area_na_links__area__block__project__technician=user) | Q(area_na_links__area__block__project__researcher=user))
+                return queryset.filter(
+                    area_na_links__area__block__block_projects__in=get_user_projects(user)
+                )
+
             return queryset
 
         def _parse_value(search_value):

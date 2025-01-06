@@ -4,6 +4,7 @@ from django.db.models import Q, Count, Sum
 from core.validators import validate_name_contains_space
 from sequencinglib.models import CL_SEQL_LINK
 import json
+from projects.utils import get_user_projects
 
 class CapturedLib(models.Model):
     name = models.CharField(max_length=50, unique=True, validators=[validate_name_contains_space], verbose_name="Name")
@@ -50,10 +51,21 @@ class CapturedLib(models.Model):
     def query_by_args(self, user, **kwargs):
 
         def _get_authorizated_queryset():
-            return CapturedLib.objects.all().annotate(
+            '''
+            Users can access to some entities depend on their authorize. While the user having admin role can access to all things,
+            technicians or researchers can access own projects and other entities related to it.
+            '''
+            queryset = CapturedLib.objects.all().annotate(
                 num_samplelibs=Count('sl_cl_links'),
                 num_sequencinglibs=Count('cl_seql_links',distinct=True)
             )
+
+            if not user.is_superuser:
+                return queryset.filter(
+                    sl_cl_links__sample_lib__na_sl_links__nucacid__area_na_links__area__block__block_projects__in=get_user_projects(user)
+                )
+
+            return queryset
 
         def _parse_value(search_value):
             if "_initial:" in search_value:
@@ -134,7 +146,7 @@ class CapturedLib(models.Model):
             return
         self.nm = round(self.conc/(660 * float(self.frag_size)) * 10**6,2)
 
- 
+
 
     def update_volume(self, volume):
         self.vol_remain = 0 if volume > self.vol_remain else round(self.vol_remain - volume,2)

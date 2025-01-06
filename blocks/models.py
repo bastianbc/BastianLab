@@ -4,6 +4,7 @@ from core.validators import validate_name_contains_space
 from django.db.models import Q, Count
 from django.utils.crypto import get_random_string
 import json
+from projects.utils import get_user_projects
 
 class Block(models.Model):
     P_STAGE_TYPES = (
@@ -104,11 +105,15 @@ class Block(models.Model):
             Users can access to some entities depend on their authorize. While the user having admin role can access to all things,
             technicians or researchers can access own projects and other entities related to it.
             '''
-            queryset = Block.objects.all().annotate(num_areas=Count('block_areas'),
-                                                     project_num=Count("block_projects"),
-                                                     patient_num=Count('patient'))
+            queryset = Block.objects.all().annotate(
+                num_areas=Count('block_areas'),
+                project_num=Count("block_projects"),
+                patient_num=Count('patient')
+            )
+
             if not user.is_superuser:
-                return queryset.filter(Q(project__technician=user) | Q(project__researcher=user))
+                return queryset.filter(block_projects__in=get_user_projects(user))
+
             return queryset
 
         def _parse_value(search_value):

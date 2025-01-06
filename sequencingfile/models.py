@@ -2,6 +2,7 @@ from django.db import models
 from datetime import datetime
 from django.db.models import Q, Count, OuterRef, Subquery, Value
 import json
+from projects.utils import get_user_projects
 
 class SequencingFileSet(models.Model):
     set_id = models.AutoField(primary_key=True)
@@ -21,7 +22,18 @@ class SequencingFileSet(models.Model):
     def query_by_args(self, user, **kwargs):
 
         def _get_authorizated_queryset():
-            return SequencingFileSet.objects.all().annotate(num_sequencing_files=Count('sequencing_files'))
+            '''
+            Users can access to some entities depend on their authorize. While the user having admin role can access to all things,
+            technicians or researchers can access own projects and other entities related to it.
+            '''
+            queryset = SequencingFileSet.objects.all().annotate(num_sequencing_files=Count('sequencing_files'))
+
+            if not user.is_superuser:
+                return queryset.filter(
+                    sample_lib__na_sl_links__nucacid__area_na_links__area__block__block_projects__in=get_user_projects(user)
+                )
+
+            return queryset
 
         def _parse_value(search_value):
             '''
