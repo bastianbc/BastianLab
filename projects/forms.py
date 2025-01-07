@@ -48,7 +48,7 @@ class FilterForm(forms.Form):
             ).distinct()
         )
 
-    primary_investigator = forms.ModelChoiceField(queryset=User.objects.filter(
+    pi = forms.ModelChoiceField(queryset=User.objects.filter(
             groups__name="Primary Investigators",
             pi_projects__isnull=False
             ).distinct()
