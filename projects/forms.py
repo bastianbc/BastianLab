@@ -24,7 +24,7 @@ class ProjectForm(BaseForm):
     class Meta:
         model = Project
         fields = [
-            'id', 'name', 'abbreviation', 'blocks', 'description', 'speedtype', 'pi', 'date_start', 'technician', 'researcher', 'primary_investigator',
+            'id', 'name', 'abbreviation', 'blocks', 'description', 'speedtype', 'pi', 'date_start', 'technician', 'researcher',
         ]
         widgets = {'description': forms.Textarea(attrs={'rows': 4, 'cols': 40})}
 
