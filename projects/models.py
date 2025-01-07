@@ -23,6 +23,7 @@ class Project(models.Model):
     speedtype = models.CharField(max_length=50, blank=True, null=True, verbose_name="Speed Type")
     description = models.CharField(max_length=255, blank=True, null=True, verbose_name="Description")
     date_start = models.DateTimeField(blank=True, null=True, default=datetime.now, verbose_name="Start Date")
+    primary_investigator = models.ManyToManyField(User, null=True, blank=True, related_name="pi_projects", verbose_name="PI")
     technician = models.ManyToManyField(User, null=True, blank=True, related_name="technician_projects", verbose_name="Technician")
     researcher = models.ManyToManyField(User, null=True, blank=True, related_name="researcher_projects", verbose_name="Researcher")
     date = models.DateTimeField(default=datetime.now, verbose_name="Date")

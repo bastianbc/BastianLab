@@ -18,11 +18,13 @@ class ProjectForm(BaseForm):
         self.fields['technician'].label_from_instance = lambda obj: "%s" % obj.get_full_name()
         self.fields["researcher"].queryset = User.objects.filter(groups__name=settings.RESEARCHER_GROUP_NAME)
         self.fields['researcher'].label_from_instance = lambda obj: "%s" % obj.get_full_name()
+        self.fields["primary_investigator"].queryset = User.objects.filter(groups__name=settings.PI_GROUP_NAME)
+        self.fields['primary_investigator'].label_from_instance = lambda obj: "%s" % obj.get_full_name()
 
     class Meta:
         model = Project
         fields = [
-            'id', 'name', 'abbreviation', 'blocks', 'description', 'speedtype', 'pi', 'date_start', 'technician', 'researcher',
+            'id', 'name', 'abbreviation', 'blocks', 'description', 'speedtype', 'pi', 'date_start', 'technician', 'researcher', 'primary_investigator',
         ]
         widgets = {'description': forms.Textarea(attrs={'rows': 4, 'cols': 40})}
 
@@ -34,7 +36,7 @@ class ProjectForm(BaseForm):
 
 class FilterForm(forms.Form):
     date_range = forms.DateField(label="Start Date")
-    pi = forms.ChoiceField(choices=[('','---------' )] + Project.PI_CHOICES, label="Private Investigator", required=False)
+    # pi = forms.ChoiceField(choices=[('','---------' )] + Project.PI_CHOICES, label="Private Investigator", required=False)
     technician = forms.ModelChoiceField(queryset=User.objects.filter(
             groups__name='Technicians',
             technician_projects__isnull=False
@@ -43,6 +45,12 @@ class FilterForm(forms.Form):
     researcher = forms.ModelChoiceField(queryset=User.objects.filter(
             groups__name='Researchers',
             researcher_projects__isnull=False
+            ).distinct()
+        )
+
+    pi = forms.ModelChoiceField(queryset=User.objects.filter(
+            groups__name="Primary Investigators",
+            pi_projects__isnull=False
             ).distinct()
         )
 
