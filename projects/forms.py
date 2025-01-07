@@ -24,7 +24,7 @@ class ProjectForm(BaseForm):
     class Meta:
         model = Project
         fields = [
-            'id', 'name', 'abbreviation', 'blocks', 'description', 'speedtype', 'pi', 'date_start', 'technician', 'researcher',
+            'id', 'name', 'abbreviation', 'blocks', 'description', 'speedtype', 'primary_investigator', 'date_start', 'technician', 'researcher',
         ]
         widgets = {'description': forms.Textarea(attrs={'rows': 4, 'cols': 40})}
 
@@ -48,7 +48,7 @@ class FilterForm(forms.Form):
             ).distinct()
         )
 
-    pi = forms.ModelChoiceField(queryset=User.objects.filter(
+    primary_investigator = forms.ModelChoiceField(queryset=User.objects.filter(
             groups__name="Primary Investigators",
             pi_projects__isnull=False
             ).distinct()
