@@ -41,7 +41,7 @@ class Project(models.Model):
         def _get_authorizated_queryset():
             queryset = Project.objects.all().annotate(num_blocks=Count('blocks'))
             if not user.is_superuser:
-                return queryset.filter(Q(technician=user) | Q(researcher=user))
+                return queryset.filter(Q(technician=user) | Q(researcher=user) | Q(primary_investigator=user))
             return queryset
 
         def _is_initial_value(search_value):
