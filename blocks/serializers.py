@@ -20,7 +20,7 @@ class BlocksSerializer(serializers.ModelSerializer):
            return getattr(obj, 'id')
 
     def get_project(self, obj):
-        return ", ".join([p.name for p in obj.block_projects.all()])
+        return ", ".join([p.abbreviation for p in obj.block_projects.all()])
 
     def get_patient(self, obj):
         return obj.patient.pat_id if obj.patient else None
