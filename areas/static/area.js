@@ -59,11 +59,7 @@ var KTDatatablesServerSide = function () {
               { data: 'num_blocks' },
               { data: 'num_projects' },
               { data: 'area_type_label' },
-              { data: 'completion_date',
-                render: function (data) {
-                  return moment(data).format('MM/DD/YYYY');
-                }
-              },
+              { data: 'completion_date'},
               { data: 'investigator' },
               { data: 'num_nucacids' },
               { data: 'num_samplelibs' },
@@ -92,7 +88,7 @@ var KTDatatablesServerSide = function () {
                 },
                 {
                     targets: 3,
-                    orderable: true,
+                    orderable: false,
                     render: function (data, type, row) {
                         if (data > 0) {
                           return `

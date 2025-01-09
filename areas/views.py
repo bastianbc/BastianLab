@@ -6,12 +6,12 @@ from django.contrib import messages
 from blocks.models import *
 from django.contrib.auth.decorators import login_required,permission_required
 from core.decorators import permission_required_for_async
-
+from .serializers import AreasSerializer
 
 @permission_required_for_async("areas.view_area")
 def filter_areas(request):
-    from .serializers import AreasSerializer
-    areas = Area().query_by_args(request.user, **request.GET)
+    
+    areas = Area.query_by_args(request.user, **request.GET)
     serializer = AreasSerializer(areas['items'], many=True)
     result = dict()
     result['data'] = serializer.data
