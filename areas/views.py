@@ -7,6 +7,7 @@ from blocks.models import *
 from django.contrib.auth.decorators import login_required,permission_required
 from core.decorators import permission_required_for_async
 from .serializers import AreasSerializer
+from areatype.models import AreaType
 
 @permission_required_for_async("areas.view_area")
 def filter_areas(request):
@@ -143,3 +144,9 @@ def check_can_deleted_async(request):
 
 def get_collections(request):
     return JsonResponse(Block.get_collections(), safe=False)
+
+
+def get_area_types(request):
+    area_types = AreaType.objects.all().values('id', 'name')
+    data = [{"value": at['id'], "name": at['name']} for at in area_types]
+    return JsonResponse(data, safe=False)

@@ -12,6 +12,7 @@ import pandas as pd
 def filter_patients(request):
     from .serializers import PatientsSerializer
     from django.http import JsonResponse
+    
     patients = Patient().query_by_args(**request.GET)
     serializer = PatientsSerializer(patients['items'], many=True)
     result = dict()

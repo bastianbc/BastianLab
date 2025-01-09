@@ -115,7 +115,7 @@ class Patient(models.Model):
                 )
             if is_initial:
                 if search_value["model"] == "block":
-                    queryset = queryset.filter(Q(patient_blocks__bl_id=search_value["id"]))
+                    queryset = queryset.filter(Q(patient_blocks__id=search_value["id"]))
             elif search_value:
                 queryset = queryset.filter(
                     Q(pat_id__icontains=search_value) |
