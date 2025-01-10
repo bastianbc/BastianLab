@@ -36,6 +36,7 @@ urlpatterns = [
     path('sheet/', include('sheet.urls')),
     path('wiki/', include('wiki.urls')),
     path('analysisrun/', include('analysisrun.urls')),
+    path('cns/', include('cns.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 handler404 = "core.views.error_404"

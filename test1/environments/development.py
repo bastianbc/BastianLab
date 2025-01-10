@@ -89,7 +89,7 @@ INSTALLED_APPS = [
     'sheet',
     'wiki',
     'analysisrun',
-
+    'cns',
 ]
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 CRISPY_FAIL_SILENTLY = not DEBUG
