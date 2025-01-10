@@ -82,10 +82,10 @@ var KTDatatablesServerSide = function () {
                     targets: 6,
                     orderable: false,
                     render: function (data, type, row) {
-                        if (data > 0) {
-                          let id = row["id"];
+                        if (data) {
+                            let id = row["id"];
                           return `
-                              <a href="/samplelib?model=captured_lib&id=${id}&initial=true">${data}</a>`;
+                              <a href="/samplelib?model=captured_lib&id=${id}&initial=true">${data["name"]}</a>`;
                         }
                         return data;
                     }
@@ -94,15 +94,26 @@ var KTDatatablesServerSide = function () {
                     targets: 7,
                     orderable: false,
                     render: function (data, type, row) {
-                        if (data > 0) {
+                        if (data) {
                           let id = row["id"];
-                          return `<a href="/sequencinglib?model=captured_lib&initial=true&id=${id}">${data}</a>`;
+                          return `<a href="/sequencinglib?model=captured_lib&initial=true&id=${id}">${data['name']}</a>`;
                         }
                         return data;
                     }
                 },
                 {
                     targets: 8,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        if (data) {
+                          let id = row["id"];
+                          return `<a href="/sequencinglib?model=captured_lib&initial=true&id=${id}">${data['name']}</a>`;
+                        }
+                        return data;
+                    }
+                },
+                {
+                    targets: 9,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -128,15 +139,6 @@ var KTDatatablesServerSide = function () {
                                     </a>
                                 </div>
                                 <!--end::Menu item-->
-
-                                <!--begin::Menu item-->
-                                <div class="menu-item px-2">
-                                    <a href="javascript:;" class="menu-link px-3 detail-link" data-kt-docs-table-filter="detail_row">
-                                        Used Library(s)
-                                    </a>
-                                </div>
-                                <!--end::Menu item-->
-
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
                                     <a href="/capturedlib/delete/` + row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
