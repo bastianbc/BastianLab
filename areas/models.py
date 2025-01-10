@@ -51,7 +51,7 @@ class Area(models.Model):
 
         super().save(*args, **kwargs)
 
-    def query_by_args(self, user, **kwargs):
+    def query_by_args( user, **kwargs):
         '''
         This is where the sorting and filtering functions of the datatables are executed.
         Parameters:
@@ -80,9 +80,9 @@ class Area(models.Model):
                     distinct=True
                 )
             )
-
+           
             if not user.is_superuser:
-                return queryset.filter(block__project=get_user_projects(user))
+                return queryset.filter(block__block_projects__in=get_user_projects(user))
 
             return queryset
 
@@ -155,7 +155,7 @@ class Area(models.Model):
                 queryset = queryset.filter(
                         Q(name__icontains=search_value) |
                         Q(block__name__icontains=search_value) |
-                        Q(block__project__name__icontains=search_value) |
+                        Q(block__block_projects__name__icontains=search_value) |
                         Q(area_type__value__icontains=search_value) |
                         Q(notes__icontains=search_value)
                     )

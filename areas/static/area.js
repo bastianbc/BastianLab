@@ -58,12 +58,8 @@ var KTDatatablesServerSide = function () {
               { data: 'name' },
               { data: 'num_blocks' },
               { data: 'num_projects' },
-              { data: 'area_type_label' },
-              { data: 'completion_date',
-                render: function (data) {
-                  return moment(data).format('MM/DD/YYYY');
-                }
-              },
+              { data: 'area_type' },
+              { data: 'completion_date'},
               { data: 'investigator' },
               { data: 'num_nucacids' },
               { data: 'num_samplelibs' },
@@ -92,7 +88,7 @@ var KTDatatablesServerSide = function () {
                 },
                 {
                     targets: 3,
-                    orderable: true,
+                    orderable: false,
                     render: function (data, type, row) {
                         if (data > 0) {
                           return `
@@ -807,16 +803,6 @@ var KTDatatablesServerSide = function () {
              label: "Name:",
              name: "name"
             }, {
-              label: "Block",
-              name: "num_blocks",
-              type: "readonly",
-              attr: { disabled:true }
-            }, {
-              label: "Project",
-              name: "num_projects",
-              type: "readonly",
-              attr: { disabled:true }
-            }, {
               label: "Area Type:",
               name: "area_type",
               type: "select",
@@ -867,10 +853,11 @@ var KTDatatablesServerSide = function () {
       function getAreaTypeOptions() {
 
         $.ajax({
-            url: "/areatype/get_area_type_choices",
+            url: "/areas/get_area_types",
             type: "GET",
             async: false,
             success: function (data) {
+                console.log(data);
 
               data.forEach((item, i) => {
 
