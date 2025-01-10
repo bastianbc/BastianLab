@@ -2,19 +2,26 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required,permission_required
 from core.decorators import permission_required_for_async
 from .serializers import CnsSerializer
+from cns.models import Cns
+from cns.forms import FilterForm
+from django.http import JsonResponse
+
 
 @permission_required("cns.view_cns",raise_exception=True)
-def cnses(request):
+def cns(request):
+    filter = FilterForm()
     return render(request, "cns_list.html", locals())
 
+
 @permission_required_for_async("cns.view_cns")
-def filter_cnses(request):
-    cnses = Cns().query_by_args(request.user,**request.GET)
-    serializer = CnsSerializer(cnses['items'], many=True)
+def filter_cns(request):
+    cns = Cns().query_by_args(request.user,**request.GET)
+    serializer = CnsSerializer(cns['items'], many=True)
+    print("*"*100)
+    print(serializer.data)
     result = dict()
     result['data'] = serializer.data
-    result['draw'] = cnses['draw']
-    result['recordsTotal'] = cnses['total']
-    result['recordsFiltered'] = cnses['count']
-
+    result['draw'] = cns['draw']
+    result['recordsTotal'] = cns['total']
+    result['recordsFiltered'] = cns['count']
     return JsonResponse(result)

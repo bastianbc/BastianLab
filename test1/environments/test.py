@@ -89,6 +89,7 @@ INSTALLED_APPS = [
     'wiki',
     'analysisrun',
     'areatype',
+    'cns',
 ]
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 CRISPY_FAIL_SILENTLY = not DEBUG

@@ -5,6 +5,6 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path("", views.cnses, name="cnses"),
-    path("filter_cnses", views.filter_cnses, name="filter-cnses"),
+    path("", views.cns, name="cnses"),
+    path("filter_cns", views.filter_cns, name="filter-cns"),
 ] + staticfiles_urlpatterns()

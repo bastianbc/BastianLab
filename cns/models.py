@@ -1,5 +1,8 @@
 from django.db import models
 from projects.utils import get_user_projects
+from django.db.models import Q, Count, Case, When, IntegerField, Value
+import json
+
 
 class Cns(models.Model):
     sample_lib = models.ForeignKey("samplelib.SampleLib", on_delete=models.CASCADE, related_name="samplelib_cns", blank=True, null=True)
@@ -26,12 +29,21 @@ class Cns(models.Model):
     def query_by_args(self, user, **kwargs):
         def _get_authorizated_queryset():
             queryset = Cns.objects.all()
-            if not user.is_superuser:
-                return queryset.filter(
-                    sample_lib__na_sl_links__nucacid__area_na_links__area__block__block_projects__in=get_user_projects(user)
-                )
+            # if not user.is_superuser:
+            #     return queryset.filter(
+            #         sample_lib__na_sl_links__nucacid__area_na_links__area__block__block_projects__in=get_user_projects(user)
+            #     )
 
             return queryset
+
+        def _parse_value(search_value):
+            if "_initial:" in search_value:
+                return json.loads(search_value.split("_initial:")[1])
+
+            return search_value
+
+        def _is_initial_value(search_value):
+            return "_initial:" in search_value and search_value.split("_initial:")[1] != "null"
 
         try:
             ORDER_COLUMN_CHOICES = {
@@ -50,7 +62,8 @@ class Cns(models.Model):
                 order_column = '-' + order_column
 
             queryset = _get_authorizated_queryset()
-
+            print(queryset)
+            print("search_value: ", search_value)
             total = queryset.count()
 
             if search_value:
@@ -62,6 +75,7 @@ class Cns(models.Model):
 
             count = queryset.count()
             queryset = queryset.order_by(order_column)[start:start + length]
+            print(queryset)
             return {
                 'items': queryset,
                 'count': count,
