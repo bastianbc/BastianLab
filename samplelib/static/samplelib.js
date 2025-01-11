@@ -298,7 +298,6 @@ var KTDatatablesServerSide = function () {
           var i7 = document.getElementById("id_i7").value;
           var areaType = document.getElementById("id_area_type").value;
           var bait = document.getElementById("id_bait").value;
-            console.log("handleFilterDatatable", sequencingRun);
           initDatatable(null,sequencingRun,barcode,i5,i7,areaType,bait);
 
         });

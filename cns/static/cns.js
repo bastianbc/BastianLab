@@ -10,7 +10,7 @@ var KTDatatablesServerSide = function () {
     var selectedRows = [];
 
     // Private functions
-    var initDatatable = function () {
+    var initDatatable = function (initialValue,log2,chr_start,chr_end,sequencing_run,sample_library,chromosome,gene) {
 
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
 
@@ -35,8 +35,14 @@ var KTDatatablesServerSide = function () {
             ajax: {
               url: '/cns/filter_cns',
               type: 'GET',
-              data: function (d) {
-
+              data: {
+                  "log2": log2,
+                  "chr_start": chr_start,
+                  "chr_end": chr_end,
+                  "sequencing_run": sequencing_run,
+                  "sample_library": sample_library,
+                  "chromosome": chromosome,
+                  "gene": gene,
             },
               error: function (xhr, ajaxOptions, thrownError) {
                   if (xhr.status == 403) {
@@ -76,8 +82,16 @@ var KTDatatablesServerSide = function () {
                             </div>`;
                     }
                 },
-
-
+                    {
+                        targets: 4,
+                        orderable: true,
+                        render: function (data, type, row) {
+                            if (data) {
+                                return data.length > 15 ? data.substring(0, 15) + '...' : data;
+                            }
+                            return '';
+                        }
+                    },
                 {
                     targets: 6,
                     orderable: false,
@@ -156,7 +170,7 @@ var KTDatatablesServerSide = function () {
             createdRow: function (row, data, dataIndex) {
                 $(row).find('td:eq(4)').attr('data-filter', data.CreditCardType);
             },
-            oSearch: {sSearch: ""}
+            oSearch: {sSearch: "_initial:" + initialValue}
         });
 
         table = dt.$;
@@ -223,9 +237,42 @@ var KTDatatablesServerSide = function () {
 
     // Filter Datatable
     var handleFilterDatatable = () => {
-      const filterButton = document.querySelector('[data-kt-docs-table-filter="filter"]');
+        const filterButton = document.querySelector('[data-kt-docs-table-filter="filter"]');
+        // Filter datatable on submit
+        filterButton.addEventListener('click', function () {
+
+            var log2 = document.getElementById("id_log2").value;
+            var chr_start = document.getElementById("id_chr_start").value;
+            var chr_end = document.getElementById("id_chr_end").value;
+            var sequencing_run = document.getElementById("id_sequencing_run").value;
+            var sample_library = document.getElementById("id_sample_library").value;
+            var chromosome = document.getElementById("id_chromosome").value;
+            var gene = document.getElementById("id_gene").value;
+            initDatatable(null,log2,chr_start,chr_end,sequencing_run,sample_library,chromosome,gene);
+
+        });
     }
 
+    // Reset Filter
+    var handleResetFilter = () => {
+        // Select reset button
+        const resetButton = document.querySelector('[data-kt-docs-table-filter="reset"]');
+
+        // Reset datatable
+        resetButton.addEventListener('click', function () {
+
+                document.getElementById("id_log2").value='';
+                document.getElementById("id_chr_start").value='';
+                document.getElementById("id_chr_end").value='';
+                document.getElementById("id_sequencing_run").value='';
+                document.getElementById("id_sample_library").value='';
+                document.getElementById("id_chromosome").value='';
+                document.getElementById("id_gene").value='';
+
+          initDatatable(null, null, null, null, null, null, null, null);
+
+        });
+    }
     // Delete customer
     var handleDeleteRows = () => {
         // Select all delete buttons
@@ -351,10 +398,10 @@ var KTDatatablesServerSide = function () {
         const resetButton = document.querySelector('[data-kt-docs-table-filter="reset"]');
 
         resetButton.addEventListener('click', function () {
-         
+
           document.getElementById("normal_area_checkbox").checked = false;
-  
-          
+
+
           initDatatable(null, null);
       });
     }
@@ -564,6 +611,7 @@ var KTDatatablesServerSide = function () {
       const model = params.get('model');
       const id = params.get('id');
       const initial = params.get('initial');
+
       cleanUrl();
 
       if (initial =="true" && model != null && id !=null) {
@@ -576,6 +624,7 @@ var KTDatatablesServerSide = function () {
       }
 
       return null;
+
     }
 
 
@@ -883,7 +932,7 @@ var KTDatatablesServerSide = function () {
     // Public methods
     return {
         init: function () {
-            initDatatable();
+            initDatatable( handleInitialValue(), null, null, null, null, null, null, null );
             handleSearchDatatable();
             initToggleToolbar();
             handleFilterDatatable();
@@ -891,6 +940,7 @@ var KTDatatablesServerSide = function () {
             handleResetForm();
             initEditor();
             handleFilter();
+            handleResetFilter();
         }
     }
 }();

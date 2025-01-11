@@ -17,8 +17,6 @@ def cns(request):
 def filter_cns(request):
     cns = Cns().query_by_args(request.user,**request.GET)
     serializer = CnsSerializer(cns['items'], many=True)
-    print("*"*100)
-    print(serializer.data)
     result = dict()
     result['data'] = serializer.data
     result['draw'] = cns['draw']

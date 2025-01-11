@@ -4,49 +4,38 @@ from areas.models import Area
 from blocks.models import Block
 from sequencingrun.models import SequencingRun
 from lab.models import Patient
-
+from cns.models import Cns
+from gene.models import Gene
 
 class FilterForm(forms.Form):
-    sequencing_run=forms.ModelChoiceField(
-        queryset=SequencingRun.objects.filter(variant_calls__isnull=False).distinct(),
-        label="Sequencing Run"
+    chromosome = forms.ChoiceField(label="Chromosome", required=False)
+    log2 = forms.IntegerField(label="log2", required=False)
+    chr_start = forms.IntegerField(label="chr_start", required=False)
+    chr_end = forms.IntegerField(label="chr_end", required=False)
+    sample_library = forms.ModelChoiceField(
+        queryset=SampleLib.objects.filter(samplelib_cns__isnull=False).distinct().order_by("name"),
+        label="Sample Library", required=False
     )
-    sample_lib=forms.ModelChoiceField(
-        queryset=SampleLib.objects.filter(variant_calls__isnull=False).distinct(),
-        label="Sample Library"
+    sequencing_run = forms.ModelChoiceField(
+        queryset=SequencingRun.objects.filter(sequencingrun_cns__isnull=False).distinct().order_by("name"),
+        label="Sequencing Run", required=False
     )
-    area=forms.ModelChoiceField(
-        queryset=Area.objects.filter(area_na_links__nucacid__na_sl_links__sample_lib__variant_calls__isnull=False).distinct(),
-        label="Areas"
-    )
-    block=forms.ModelChoiceField(
-        queryset=Block.objects.filter(block_areas__area_na_links__nucacid__na_sl_links__sample_lib__variant_calls__isnull=False).distinct(),
-        label="Blocks"
-    )
-    patient=forms.ModelChoiceField(
-        queryset=Patient.objects.filter(
-            patient_blocks__block_areas__area_na_links__nucacid__na_sl_links__sample_lib__variant_calls__isnull=False
-        ).distinct(),
-        label="Patients"
-    )
-    coverage = forms.IntegerField(label="Coverage")
-    log2r = forms.FloatField(label="Log2r")
-    ref_read = forms.IntegerField(label="Ref Read")
-    alt_read = forms.IntegerField(label="Alt Read")
+    gene = forms.CharField(label="Gene", required=False)
+
 
     def __init__(self, *args, **kwargs):
         super(FilterForm, self).__init__(*args, **kwargs)
-        self.fields["patient"].widget.attrs.update({'class': 'form-control-sm'})
-        self.fields["patient"].widget.attrs["data-control"] = "select2"
-        self.fields["block"].widget.attrs.update({'class': 'form-control-sm'})
-        self.fields["block"].widget.attrs["data-control"] = "select2"
         self.fields["sequencing_run"].widget.attrs.update({'class': 'form-control-sm'})
         self.fields["sequencing_run"].widget.attrs["data-control"] = "select2"
-        self.fields["sample_lib"].widget.attrs.update({'class': 'form-control-sm'})
-        self.fields["sample_lib"].widget.attrs["data-control"] = "select2"
-        self.fields["area"].widget.attrs.update({'class': 'form-control-sm'})
-        self.fields["area"].widget.attrs["data-control"] = "select2"
-        self.fields["coverage"].widget.attrs.update({'class':'form-control-sm'})
-        self.fields["log2r"].widget.attrs.update({'class':'form-control-sm'})
-        self.fields["ref_read"].widget.attrs.update({'class':'form-control-sm'})
-        self.fields["alt_read"].widget.attrs.update({'class':'form-control-sm'})
+        self.fields["sample_library"].widget.attrs.update({'class': 'form-control-sm'})
+        self.fields["sample_library"].widget.attrs["data-control"] = "select2"
+        self.fields["chromosome"].widget.attrs.update({'class': 'form-control-sm'})
+        self.fields["chromosome"].widget.attrs["data-control"] = "select2"
+        chromosome_choices = [('', '-------')] + [
+            (f"chr{i}", f"chr{i}") for i in range(1, 24)
+        ] + [
+                                 ("chrX", "chrX"),
+                                 ("chrY", "chrY"),
+                             ]
+
+        self.fields['chromosome'].choices = chromosome_choices

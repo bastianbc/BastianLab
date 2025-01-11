@@ -101,8 +101,13 @@ class SampleLib(models.Model):
             search_value = kwargs.get('search[value]', None)[0]
             order_column = kwargs.get('order[0][column]', None)[0]
             order = kwargs.get('order[0][dir]', None)[0]
+            print(kwargs.get('sequencing_run'), type(kwargs.get('chr_start')), "*" * 100)
+            print(kwargs.get('barcode'), type(kwargs.get('chr_start')), "*" * 100)
+            print(kwargs.get('i5'), type(kwargs.get('chr_start')), "*" * 100)
+            print(kwargs.get('area_type'), type(kwargs.get('chr_start')), "*" * 100)
+            print(kwargs.get('bait'), type(kwargs.get('chr_start')), "*" * 100)
+            print(kwargs.get('i7'), type(kwargs.get('chr_start')), "*" * 100)
             sequencing_run_filter = kwargs.get('sequencing_run', None)[0]
-            # patient_filter = kwargs.get('patient', None)[0]
             barcode_filter = kwargs.get('barcode', None)[0]
             i5_filter = kwargs.get('i5', None)[0]
             i7_filter = kwargs.get('i7', None)[0]
