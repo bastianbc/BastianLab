@@ -1,6 +1,6 @@
 from django.db import models
 from projects.utils import get_user_projects
-from django.db.models import Q, Count, Case, When, IntegerField, Value
+from django.db.models import Q
 import json
 
 
