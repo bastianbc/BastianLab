@@ -1033,7 +1033,6 @@ var KTDatatablesServerSide = function () {
                  label: "Date:",
                  name: "date",
                  type: "datetime",
-                 // def: function () { return new Date(); },
                  displayFormat: "M/D/YYYY",
                  wireFormat: 'YYYY-MM-DD'
              }, {
