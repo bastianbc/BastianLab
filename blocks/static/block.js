@@ -906,7 +906,11 @@ var KTDatatablesServerSide = function () {
                 name: "body_site",
                 type: "select",
                 options: bodyOptions,
+<<<<<<< HEAD
 
+=======
+
+>>>>>>> f5ad8a5df330d075c2c0f5de8add74e458a8ca35
               },
               {
                 label: "Thickness:",
@@ -1193,7 +1197,11 @@ var KTDatatablesServerSide = function () {
                 var tr = this.closest('tr');
                 var row = dt.row(tr);
                 var data = row.data();
+<<<<<<< HEAD
 
+=======
+
+>>>>>>> f5ad8a5df330d075c2c0f5de8add74e458a8ca35
                 // Make AJAX request to get_block_async view
                 fetch(`/blocks/get_block_async?id=${data.id}`)
                     .then(response => response.json())
@@ -1201,14 +1209,22 @@ var KTDatatablesServerSide = function () {
                         // Populate modal with block details
                         var modalBody = document.querySelector('#blockDetailsTable tbody');
                         modalBody.innerHTML = format(blockData);
+<<<<<<< HEAD
 
+=======
+
+>>>>>>> f5ad8a5df330d075c2c0f5de8add74e458a8ca35
                         // Show modal
                         var blockDetailsModal = new bootstrap.Modal(document.getElementById('blockDetailsModal'));
                         blockDetailsModal.show();
                     });
             });
         });
+<<<<<<< HEAD
 
+=======
+
+>>>>>>> f5ad8a5df330d075c2c0f5de8add74e458a8ca35
         // Add event listener for modal close button
         document.querySelectorAll('#blockDetailsModal .btn-close, #blockDetailsModal .btn-secondary').forEach((item) => {
             item.addEventListener('click', function () {
@@ -1219,11 +1235,19 @@ var KTDatatablesServerSide = function () {
                 });
             });
         });
+<<<<<<< HEAD
 
         function format(d) {
             // `d` is the original data object for the row
             let details = '';
 
+=======
+
+        function format(d) {
+            // `d` is the original data object for the row
+            let details = '';
+
+>>>>>>> f5ad8a5df330d075c2c0f5de8add74e458a8ca35
             if (d.name) {
                 details += `
                     <tr>
@@ -1401,7 +1425,11 @@ var KTDatatablesServerSide = function () {
                         <td>${d.ip_dx}</td>
                     </tr>`;
             }
+<<<<<<< HEAD
 
+=======
+
+>>>>>>> f5ad8a5df330d075c2c0f5de8add74e458a8ca35
             return details;
         }
 
