@@ -264,7 +264,8 @@ var KTDatatablesServerSide = function () {
 
                     popupWindow = window.open('', '_blank', 'width=' + windowWidth + ',height=' + windowHeight + ',left=' + left + ',top=' + top);
                 }
-                // show image
+
+                // popupWindow.document.body.innerHTML = '<h1>'+ block +'</h1><img src="' + item.getAttribute("data-url") + '" style="max-width:100%;max-height:100%;" />';
                 popupWindow.location.href = item.getAttribute("data-url");
 
             });
@@ -286,7 +287,6 @@ var KTDatatablesServerSide = function () {
 
             selectedIds.push(id);
         });
-
         return JSON.stringify(selectedIds);
     }
 
@@ -655,7 +655,7 @@ var KTDatatablesServerSide = function () {
             type: "GET",
             url: "/blocks/add_block_to_project_async",
             data: {
-              "selected_ids": getSelectedRows(),
+              "selected_ids": JSON.stringify(selectedRows),
               "project_id": this.getAttribute('data-project_id')
             },
           }).done(function(result) {
@@ -696,7 +696,7 @@ var KTDatatablesServerSide = function () {
                 type: "GET",
                 url: "/blocks/add_block_to_patient_async",
                 data: {
-                    "selected_ids": getSelectedRows(),
+                    "selected_ids": JSON.stringify(selectedRows),
                     "patient_id": this.getAttribute('data-patient_id')
                 },
             }).done(function(result) {
@@ -738,7 +738,7 @@ var KTDatatablesServerSide = function () {
             type: "GET",
             url: "/blocks/remove_block_from_project_async",
             data: {
-              "selected_ids": getSelectedRows(),
+              "selected_ids": JSON.stringify(selectedRows),
               "project_id": this.getAttribute('data-project_id')
             },
           }).done(function(result) {
@@ -780,7 +780,7 @@ var KTDatatablesServerSide = function () {
             type: "GET",
             url: "/blocks/remove_block_from_patient_async",
             data: {
-              "selected_ids": getSelectedRows(),
+              "selected_ids": JSON.stringify(selectedRows),
               "project_id": this.getAttribute('data-patient_id')
             },
           }).done(function(result) {
@@ -904,12 +904,9 @@ var KTDatatablesServerSide = function () {
               {
                 label: "Body Site:",
                 name: "body_site",
-                // type: "select",
-                // options: bodyOptions
-                type: "readonly",
-                attr: {
-                  disabled:true
-                }
+                type: "select",
+                options: bodyOptions,
+
               },
               {
                 label: "Thickness:",
@@ -937,7 +934,7 @@ var KTDatatablesServerSide = function () {
             }
         });
       });
-
+/*
       function getBodyOptions() {
 
         $.ajax({
@@ -962,6 +959,7 @@ var KTDatatablesServerSide = function () {
         });
 
       }
+        */
 
       $('#block_datatable').on( 'click', 'tbody td:not(:first-child)', function (e) {
         editor.inline( dt.cell( this ).index(), {
