@@ -1025,9 +1025,6 @@ var KTDatatablesServerSide = function () {
                  label: "Name:",
                  name: "name"
              }, {
-                 label: "Areas:",
-                 name: "num_areas"
-             }, {
                  label: "Nucleic Acid Type:",
                  name: "na_type",
                  type: "select",
@@ -1036,7 +1033,6 @@ var KTDatatablesServerSide = function () {
                  label: "Date:",
                  name: "date",
                  type: "datetime",
-                 // def: function () { return new Date(); },
                  displayFormat: "M/D/YYYY",
                  wireFormat: 'YYYY-MM-DD'
              }, {
