@@ -3843,7 +3843,8 @@ def call_import_variants(request):
 
 
 def import_genes(request):
-    file = Path(Path(__file__).parent.parent / "uploads" / "gene_result.txt")
-    df = pd.read_csv(file, sep='\t')
-    df = df.reset_index()
+    from cns.models import Cns
+    from variant.models import VariantFile
+    for cns in Cns.objects.filter():
+        print(VariantFile.objects.exclude(name__icontains=cns.sequencing_run.name))
     pass
