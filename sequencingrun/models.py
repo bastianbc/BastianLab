@@ -107,22 +107,19 @@ class SequencingRun(models.Model):
             search_value = kwargs.get('search[value]', None)[0]
             order_column = kwargs.get('order[0][column]', None)[0]
             order = kwargs.get('order[0][dir]', None)[0]
-
             order_column = ORDER_COLUMN_CHOICES[order_column]
             # django orm '-' -> desc
             if order == 'desc':
                 order_column = '-' + order_column
-
             queryset = _get_authorizated_queryset()
-
             total = queryset.count()
-
-
             is_initial = _is_initial_value(search_value)
             search_value = _parse_value(search_value)
             if is_initial:
                 if search_value["model"] == "seqlib":
                     queryset = queryset.filter(Q(sequencing_libs__id=search_value["id"]))
+                if search_value["model"] == "cns":
+                    queryset = queryset.filter(Q(name=search_value["id"]))
             elif search_value:
                 queryset = queryset.filter(
                     Q(name__icontains=search_value) |
