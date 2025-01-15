@@ -3850,7 +3850,13 @@ def import_genes(request):
     for file in VariantFile.objects.filter(q):
         cnss = Cns.objects.filter(variant_file=file)
         for cns in cnss:
-            print(cns.sequencing_run.name in file.name, cns.sample_lib.name, cns.sequencing_run.name, file.name)
+            if cns.sequencing_run.name not in file.name:
+                sq = SequencingRun.objects.get(name=file.name.split(".")[0])
+                _cns = Cns.objects.filter(sequencing_run=sq, sample_lib=cns.sample_lib)
+                for i in _cns:
+                    i.variant_file = file
+                    i.save()
+                    print(cns.sequencing_run.name in file.name, cns.sample_lib.name, cns.sequencing_run.name, file.name)
 
     # for cns in Cns.objects.filter():
     #     for file in VariantFile.objects.exclude(name__icontains=cns.sequencing_run.name, variantfile_cns=cns):
