@@ -3847,16 +3847,12 @@ def import_genes(request):
     from variant.models import VariantFile
     q = Q(variantfile_cns__isnull=False)
     # q =
-    for file in VariantFile.objects.filter(q):
-        cnss = Cns.objects.filter(variant_file=file)
-        for cns in cnss:
-            if cns.sequencing_run.name not in file.name:
-                sq = SequencingRun.objects.get(name=file.name.split(".")[0])
-                _cns = Cns.objects.filter(sequencing_run=sq, sample_lib=cns.sample_lib)
-                for i in _cns:
-                    i.variant_file = file
-                    i.save()
-                    print(cns.sequencing_run.name in file.name, cns.sample_lib.name, cns.sequencing_run.name, file.name)
+    for cns in Cns.objects.filter():
+        if cns.sequencing_run.name not in cns.variant_file.name:
+            print(cns.variant_file.name.name, cns.sample_lib.name, cns.sequencing_run.name)
+
+
+
 
     # for cns in Cns.objects.filter():
     #     for file in VariantFile.objects.exclude(name__icontains=cns.sequencing_run.name, variantfile_cns=cns):
