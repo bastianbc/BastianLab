@@ -3847,9 +3847,7 @@ def import_genes(request):
     from variant.models import VariantFile
     q = Q(variantfile_cns__isnull=False) & Q(Q(name__icontains=".bintest.") | Q(name__icontains=".call."))
     # q = Q(variantfile_cns__isnull=False)
-
-    for file_obj in VariantFile.objects.filter(q):
-        print(file_obj.delete(), "deleted")
+    VariantFile.objects.filter(q).delete()
 
     # for cns in Cns.objects.filter():
     #     for file in VariantFile.objects.exclude(name__icontains=cns.sequencing_run.name, variantfile_cns=cns):
