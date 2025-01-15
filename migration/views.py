@@ -3845,9 +3845,10 @@ def call_import_variants(request):
 def import_genes(request):
     from cns.models import Cns
     from variant.models import VariantFile
-    q = Q(Q(variantfile_cns__isnull=False) & Q(name__icontains=".bintest.") & Q(name__icontains=".call."))
-    for file in VariantFile.objects.filter(q):
-        print(file.name)
+    q = Q(variantfile_cns__isnull=False) & Q(name__icontains=".bintest.") & Q(name__icontains=".call.")
+
+    for file_obj in VariantFile.objects.filter(q):
+        print(file_obj.name)
 
     # for cns in Cns.objects.filter():
     #     for file in VariantFile.objects.exclude(name__icontains=cns.sequencing_run.name, variantfile_cns=cns):
