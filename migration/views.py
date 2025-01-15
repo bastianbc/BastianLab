@@ -3849,7 +3849,7 @@ def import_genes(request):
     # q = Q(variantfile_cns__isnull=False)
 
     for file_obj in VariantFile.objects.filter(q):
-        print(file_obj.name)
+        print(file_obj.delete(), "deleted")
 
     # for cns in Cns.objects.filter():
     #     for file in VariantFile.objects.exclude(name__icontains=cns.sequencing_run.name, variantfile_cns=cns):
