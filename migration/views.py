@@ -3846,5 +3846,5 @@ def import_genes(request):
     from cns.models import Cns
     from variant.models import VariantFile
     for cns in Cns.objects.filter():
-        print(VariantFile.objects.exclude(name__icontains=cns.sequencing_run.name))
+        print(file.name for file in [VariantFile.objects.exclude(name__icontains=cns.sequencing_run.name, variantfile_cns=cns)])
     pass
