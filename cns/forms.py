@@ -39,3 +39,22 @@ class FilterForm(forms.Form):
                              ]
 
         self.fields['chromosome'].choices = chromosome_choices
+
+    def clean(self):
+        """
+        Override clean() to auto-fill chromosome, chr_start, and chr_end
+        from the Gene model if a matching gene name is found.
+        """
+        cleaned_data = super().clean()
+        gene_input = cleaned_data.get("gene", "").strip()
+
+        if gene_input:
+            # Attempt to find a Gene whose name matches (case-insensitive)
+            gene_obj = Gene.objects.filter(name__iexact=gene_input).first()
+            if gene_obj:
+                # Overwrite the fields in cleaned_data
+                cleaned_data["chromosome"] = gene_obj.chr
+                cleaned_data["chr_start"] = gene_obj.start
+                cleaned_data["chr_end"] = gene_obj.end
+
+        return cleaned_data

@@ -48,6 +48,12 @@ class Cns(models.Model):
         try:
             ORDER_COLUMN_CHOICES = {
                 '0': 'id',
+                '1': 'sample_lib',
+                '2': 'sequencing_run',
+                '4': 'chromosome',
+                '5': 'start',
+                '6': 'end',
+                '7': 'log2',
             }
 
             draw = int(kwargs.get('draw', None)[0])
