@@ -62,14 +62,18 @@ var KTDatatablesServerSide = function () {
             },
             columns: [
                 { data: 'id' },
+                { data: 'sample_lib' },
+                { data: 'sequencing_run' },
+                { data: 'analysis_run',
+                  render: function (val, type, row) {
+                    return val["name"];
+                  }
+                },
+
                 { data: 'chromosome' },
                 { data: 'start' },
                 { data: 'end' },
-                { data: 'gene' },
                 { data: 'log2' },
-                { data: 'sample_lib' },
-                { data: 'sequencing_run' },
-                { data: 'analysis_run' },
             ],
             columnDefs: [
                 {
@@ -82,52 +86,32 @@ var KTDatatablesServerSide = function () {
                             </div>`;
                     }
                 },
-                    {
-                        targets: 4,
-                        orderable: true,
-                        render: function (data, type, row) {
-                            if (data) {
-                                return data.length > 15 ? data.substring(0, 15) + '...' : data;
-                            }
-                            return '';
-                        }
-                    },
                 {
-                    targets: 6,
-                    orderable: false,
+                    targets: 1,
+                    orderable: true,
                     render: function (data, type, row) {
                         if (data) {
-                            let id = row["id"];
+                            let name = data["name"];
                           return `
-                              <a href="/samplelib?model=captured_lib&id=${id}&initial=true">${data["name"]}</a>`;
+                              <a href="/samplelib?model=cns&id=${name}&initial=true">${name}</a>`;
                         }
                         return data;
                     }
                 },
                 {
-                    targets: 7,
-                    orderable: false,
+                    targets: 2,
+                    orderable: true,
                     render: function (data, type, row) {
                         if (data) {
-                          let id = row["id"];
-                          return `<a href="/sequencinglib?model=captured_lib&initial=true&id=${id}">${data['name']}</a>`;
+                          let name = data["name"];
+                          return `<a href="/sequencingrun?model=cns&id=${name}&initial=true">${name}</a>`;
                         }
                         return data;
                     }
                 },
+
                 {
                     targets: 8,
-                    orderable: false,
-                    render: function (data, type, row) {
-                        if (data) {
-                          let id = row["id"];
-                          return `<a href="/sequencinglib?model=captured_lib&initial=true&id=${id}">${data['name']}</a>`;
-                        }
-                        return data;
-                    }
-                },
-                {
-                    targets: 9,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -147,18 +131,10 @@ var KTDatatablesServerSide = function () {
                             <!--begin::Menu-->
                             <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4" data-kt-menu="true">
                                 <!--begin::Menu item-->
-                                <div class="menu-item px-3">
-                                    <a href="/capturedlib/edit/`+ row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
-                                        Edit
-                                    </a>
-                                </div>
+                                
                                 <!--end::Menu item-->
                                 <!--begin::Menu item-->
-                                <div class="menu-item px-3">
-                                    <a href="/capturedlib/delete/` + row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
-                                        Delete
-                                    </a>
-                                </div>
+                               
                                 <!--end::Menu item-->
                             </div>
                             <!--end::Menu-->
@@ -600,24 +576,22 @@ var KTDatatablesServerSide = function () {
     }
 
     // Redirects from other pages
-    var handleInitialValue = () => {
+        var handleInitialValue = () => {
 
       // Remove parameters in URL
       function cleanUrl() {
         window.history.replaceState(null, null, window.location.pathname);
       }
-
       const params = new URLSearchParams(window.location.search);
-      const model = params.get('model');
       const id = params.get('id');
       const initial = params.get('initial');
 
+
       cleanUrl();
 
-      if (initial =="true" && model != null && id !=null) {
+      if (initial =="true" && id !=null) {
 
         return JSON.stringify({
-          "model": model,
           "id": id
         });
 

@@ -3843,7 +3843,18 @@ def call_import_variants(request):
 
 
 def import_genes(request):
-    file = Path(Path(__file__).parent.parent / "uploads" / "gene_result.txt")
-    df = pd.read_csv(file, sep='\t')
-    df = df.reset_index()
+    from cns.models import Cns
+    from variant.models import VariantFile
+    q = Q(variantfile_cns__isnull=False)
+    # q =
+    for cns in Cns.objects.filter():
+        if cns.sequencing_run.name not in cns.variant_file.name:
+            print(cns.variant_file.name.name, cns.sample_lib.name, cns.sequencing_run.name)
+
+
+
+
+    # for cns in Cns.objects.filter():
+    #     for file in VariantFile.objects.exclude(name__icontains=cns.sequencing_run.name, variantfile_cns=cns):
+    #         print(file.name, cns.sequencing_run.name, cns.sample_lib.name)
     pass
