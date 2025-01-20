@@ -277,7 +277,7 @@ def get_sample_libs_async(request):
                     area_na_link = nuc_acid.area_na_links.first()
                     if area_na_link:
                         area = area_na_link.area
-                        item["area_type"] = area.area_type
+                        item["area_type"] = area.area_type.value
 
                         patient = area.block.patient
 
