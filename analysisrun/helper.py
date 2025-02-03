@@ -10,16 +10,10 @@ BASE_PATH = settings.VARIANT_FILES_SOURCE_DIRECTORY
 
 def handle_variant_file(ar_name, variant_path):
     folder_path = find_folder(BASE_PATH, ar_name, variant_path)
-    print(ar_name, BASE_PATH, variant_path)
-    folder_path = os.path.join(BASE_PATH, ar_name, variant_path)
-    print("*"*100, folder_path)
-
+    # folder_path = os.path.join(BASE_PATH, ar_name, variant_path)
     if folder_path:
-        print("*"*100,folder_path)
         full_path = os.path.join(folder_path, 'output')
-        print("@"*100,full_path)
         file_path = search_cns_file(full_path)
-        print(file_path)
         return file_path
             
     else:
@@ -30,7 +24,6 @@ def find_folder(base_path, folder_name, sub_path):
         if folder_name in dirs:
             
             full_path = os.path.join(root, folder_name)
-            print("^"*100, full_path)
             for sub_root, sub_dirs, sub_files in os.walk(full_path):
                
                 if sub_path in sub_root:
@@ -41,9 +34,7 @@ def find_folder(base_path, folder_name, sub_path):
     return None
 
 def search_cns_file(folder_path):
-    print("!" * 100, folder_path)
     for root, dirs, files in os.walk(folder_path):
-        print("2" * 100, root, dirs, files)
         for file in files:
             if file.endswith('.cns'):
                 print(root, dirs, files)
