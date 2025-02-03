@@ -64,7 +64,7 @@ def process_variant(request, variant_type, ar_name):
         'SV':'sv'
     }
     if request.method == 'POST':
-        try:
+        # try:
             print(variant_type)
             file_path= handle_variant_file(ar_name, variant_paths[variant_type])
             
@@ -78,6 +78,6 @@ def process_variant(request, variant_type, ar_name):
            
 
             return response
-        except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)})
+        # except Exception as e:
+        #     return JsonResponse({'success': False, 'error': str(e)})
         
