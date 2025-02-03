@@ -26,7 +26,7 @@ def find_folder(base_path, folder_name, sub_path):
         if folder_name in dirs:
             
             full_path = os.path.join(root, folder_name)
-  
+            print("^"*100, full_path)
             for sub_root, sub_dirs, sub_files in os.walk(full_path):
                
                 if sub_path in sub_root:
