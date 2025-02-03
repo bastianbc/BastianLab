@@ -10,7 +10,7 @@ from io import BytesIO
 def generate_graph(ar_name,file_path):
  # CSV verilerini okuma
    print("^"*100, file_path)
-   df = pd.read_csv(file_path, on_bad_lines='skip')
+   df = pd.read_csv(file_path, on_bad_lines='skip', sep='\t')
    print(df)
    # Örneğin, sadece 'chr11' kromozomuna ait verileri filtreleyelim
    df_subset = df[df['chromosome'] == 'chr11']
