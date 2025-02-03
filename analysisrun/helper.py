@@ -11,7 +11,9 @@ BASE_PATH = settings.VARIANT_FILES_SOURCE_DIRECTORY
 def handle_variant_file(ar_name, variant_path):
     folder_path = find_folder(BASE_PATH, ar_name, variant_path)
     print(ar_name, BASE_PATH, variant_path)
+    folder_path = os.path.join(BASE_PATH, ar_name, variant_path)
     print("*"*100, folder_path)
+
     if folder_path:
         full_path = os.path.join(folder_path, 'output')
         file_path = search_cns_file(full_path)
