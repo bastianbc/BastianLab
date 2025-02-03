@@ -11,7 +11,7 @@ var KTDatatablesServerSide = function () {
     // Private functions
     var initDatatable = function () {
 
-        $.fn.dataTable.moment( 'MM/DD/YYYY' );
+        $.fn.dataTable.moment('MM/DD/YYYY');
 
         dt = $(".table").DataTable({
             // searchDelay: 500,
@@ -26,28 +26,28 @@ var KTDatatablesServerSide = function () {
                 className: 'row-selected'
             },
             keys: {
-              columns: ':not(:first-child)',
-              keys: [ 9 ],
-              editOnFocus: true
+                columns: ':not(:first-child)',
+                keys: [9],
+                editOnFocus: true
             },
             ajax: {
-              url: '/analysisrun/filter_analysisruns',
-              type: 'GET',
-              error: function (xhr, ajaxOptions, thrownError) {
-                  if (xhr.status == 403) {
+                url: '/analysisrun/filter_analysisruns',
+                type: 'GET',
+                error: function (xhr, ajaxOptions, thrownError) {
+                    if (xhr.status == 403) {
 
-                    Swal.fire({
-                        text: "You do not have permission to view.",
-                        icon: "error",
-                        buttonsStyling: false,
-                        confirmButtonText: "Ok, got it!",
-                        customClass: {
-                            confirmButton: "btn fw-bold btn-primary",
-                        }
-                    });
+                        Swal.fire({
+                            text: "You do not have permission to view.",
+                            icon: "error",
+                            buttonsStyling: false,
+                            confirmButtonText: "Ok, got it!",
+                            customClass: {
+                                confirmButton: "btn fw-bold btn-primary",
+                            }
+                        });
 
-                  }
-              }
+                    }
+                }
             },
             columns: [
                 { data: 'id' },
@@ -55,10 +55,11 @@ var KTDatatablesServerSide = function () {
                 { data: 'pipeline' },
                 { data: 'genome' },
                 { data: 'sheet' },
-                { data: 'date',
-                  render: function (data) {
-                    return moment(data).format('MM/DD/YYYY');
-                  }
+                {
+                    data: 'date',
+                    render: function (data) {
+                        return moment(data).format('MM/DD/YYYY');
+                    }
                 },
                 { data: 'status' },
                 { data: null },
@@ -103,8 +104,32 @@ var KTDatatablesServerSide = function () {
                                 <!--end::Menu item-->
 
                                 <!--begin::Menu item-->
+                            <div class="menu-item">
+                                <a href="javascript:;" class="menu-link check-file-link text-start" data-variant-type="SNV" data-ar-name="${row.name}">
+                                    Single Nucleotide Variant (SNV)
+                                </a>
+                            </div>
+                            <!--end::Menu item-->
+
+                             <!--begin::Menu item-->
+                            <div class="menu-item">
+                                <a href="javascript:;" class="menu-link check-file-link text-start" data-variant-type="CNV" data-ar-name="${row.name}">
+                                    Copy Number Variant(CNV)
+                                </a>
+                            </div>
+                            <!--end::Menu item-->
+                            
+                             <!--begin::Menu item-->
+                            <div class="menu-item">
+                                <a href="javascript:;" class="menu-link check-file-link text-start" data-variant-type="SV" data-ar-name="${row.name}">
+                                    Structural Variant(SV)
+                                </a>
+                            </div>
+                            <!--end::Menu item-->
+
+                                <!--begin::Menu item-->
                                 <div class="menu-item">
-                                    <a href="#` + row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
+                                    <a href="#` + row["id"] + `" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
                                         Delete
                                     </a>
                                 </div>
@@ -170,7 +195,7 @@ var KTDatatablesServerSide = function () {
     var handleRestoreRowSelection = function () {
         const allCheckboxes = document.querySelectorAll('.table tbody [type="checkbox"]');
         allCheckboxes.forEach(c => {
-            if ( selectedRows.indexOf(c.value) > -1 ) {
+            if (selectedRows.indexOf(c.value) > -1) {
                 c.checked = true;
             }
         });
@@ -233,98 +258,98 @@ var KTDatatablesServerSide = function () {
                     url: "/analysisrun/check_can_deleted_async",
                     type: "GET",
                     data: {
-                      "id": id,
+                        "id": id,
                     },
-                    async:false,
+                    async: false,
                     error: function (xhr, ajaxOptions, thrownError) {
                         if (xhr.status == 403) {
 
-                          Swal.fire({
-                              text: "You do not have permission to delete.",
-                              icon: "error",
-                              buttonsStyling: false,
-                              confirmButtonText: "Ok, got it!",
-                              customClass: {
-                                  confirmButton: "btn fw-bold btn-primary",
-                              }
-                          });
+                            Swal.fire({
+                                text: "You do not have permission to delete.",
+                                icon: "error",
+                                buttonsStyling: false,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn fw-bold btn-primary",
+                                }
+                            });
 
                         }
                     }
                 }).done(function (data) {
 
-                  var message = "Are you sure you want to delete " + name + "?";
+                    var message = "Are you sure you want to delete " + name + "?";
 
-                  if (data.related_objects.length > 0) {
+                    if (data.related_objects.length > 0) {
 
-                    message += " It has downstream records:";
+                        message += " It has downstream records:";
 
-                    for (var item of data.related_objects) {
+                        for (var item of data.related_objects) {
 
-                      message += item.model + "(" + item.count + ")"
+                            message += item.model + "(" + item.count + ")"
+
+                        }
 
                     }
 
-                  }
+                    Swal.fire({
+                        text: message,
+                        icon: "warning",
+                        showCancelButton: true,
+                        buttonsStyling: false,
+                        confirmButtonText: "Yes, delete!",
+                        cancelButtonText: "No, cancel",
+                        customClass: {
+                            confirmButton: "btn fw-bold btn-danger",
+                            cancelButton: "btn fw-bold btn-active-light-primary"
+                        }
+                    }).then(function (result) {
+                        if (result.value) {
+                            // Simulate delete request -- for demo purpose only
+                            Swal.fire({
+                                text: "Deleting " + name,
+                                icon: "info",
+                                buttonsStyling: false,
+                                showConfirmButton: false,
+                                timer: 1000
+                            }).then(function () {
 
-                  Swal.fire({
-                      text: message,
-                      icon: "warning",
-                      showCancelButton: true,
-                      buttonsStyling: false,
-                      confirmButtonText: "Yes, delete!",
-                      cancelButtonText: "No, cancel",
-                      customClass: {
-                          confirmButton: "btn fw-bold btn-danger",
-                          cancelButton: "btn fw-bold btn-active-light-primary"
-                      }
-                  }).then(function (result) {
-                      if (result.value) {
-                          // Simulate delete request -- for demo purpose only
-                          Swal.fire({
-                              text: "Deleting " + name,
-                              icon: "info",
-                              buttonsStyling: false,
-                              showConfirmButton: false,
-                              timer: 1000
-                          }).then(function () {
-
-                            $.ajax({
-                                url: parent.querySelector('[data-kt-docs-table-filter="delete_row"]').href,
-                                type: "DELETE",
-                                headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
-                                error: function (xhr, ajaxOptions, thrownError) {
-                                  Swal.fire({
-                                      text: name + " could not be deleted.",
-                                      icon: "error",
-                                      buttonsStyling: false,
-                                      confirmButtonText: "Ok, got it!",
-                                      customClass: {
-                                          confirmButton: "btn fw-bold btn-primary",
-                                      }
-                                  });
-                                }
-                            }).done(function () {
-
-                              Swal.fire({
-                                    text: "Sequencing Run deleted succesfully.",
-                                    icon: "info",
-                                    buttonsStyling: false,
-                                    confirmButtonText: "Ok, got it!",
-                                    customClass: {
-                                        confirmButton: "btn fw-bold btn-success",
+                                $.ajax({
+                                    url: parent.querySelector('[data-kt-docs-table-filter="delete_row"]').href,
+                                    type: "DELETE",
+                                    headers: { 'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
+                                    error: function (xhr, ajaxOptions, thrownError) {
+                                        Swal.fire({
+                                            text: name + " could not be deleted.",
+                                            icon: "error",
+                                            buttonsStyling: false,
+                                            confirmButtonText: "Ok, got it!",
+                                            customClass: {
+                                                confirmButton: "btn fw-bold btn-primary",
+                                            }
+                                        });
                                     }
-                                }).then(function(){
+                                }).done(function () {
 
-                                  dt.draw();
+                                    Swal.fire({
+                                        text: "Sequencing Run deleted succesfully.",
+                                        icon: "info",
+                                        buttonsStyling: false,
+                                        confirmButtonText: "Ok, got it!",
+                                        customClass: {
+                                            confirmButton: "btn fw-bold btn-success",
+                                        }
+                                    }).then(function () {
+
+                                        dt.draw();
+
+                                    });
 
                                 });
 
                             });
-
-                          });
-                      }
-                  });
+                        }
+                    });
 
                 });
 
@@ -387,106 +412,106 @@ var KTDatatablesServerSide = function () {
 
     var handleSelectedRows = ((e) => {
 
-      const container = document.querySelector('.table');
+        const container = document.querySelector('.table');
 
-      function uncheckedFirstCheckBox() {
+        function uncheckedFirstCheckBox() {
 
-        dt.on( 'draw', function () {
+            dt.on('draw', function () {
 
-          // Remove header checked box
-          const headerCheckbox = container.querySelectorAll('[type="checkbox"]')[0];
-          headerCheckbox.checked = false;
+                // Remove header checked box
+                const headerCheckbox = container.querySelectorAll('[type="checkbox"]')[0];
+                headerCheckbox.checked = false;
 
-        });
-
-      }
-
-      function handleBatchDelete() {
-
-        // Select elements
-        const deleteSelected = document.querySelector('[data-kt-docs-table-select="delete_selected"]');
-
-        // Deleted selected rows
-        deleteSelected.addEventListener('click', function () {
-            Swal.fire({
-                text: "Are you sure you want to delete selected records?",
-                icon: "warning",
-                showCancelButton: true,
-                buttonsStyling: false,
-                showLoaderOnConfirm: true,
-                confirmButtonText: "Yes, delete!",
-                cancelButtonText: "No, cancel",
-                customClass: {
-                    confirmButton: "btn fw-bold btn-danger",
-                    cancelButton: "btn fw-bold btn-active-light-primary"
-                },
-            }).then(function (result) {
-                if (result.value) {
-                    // Simulate delete request -- for demo purpose only
-                    Swal.fire({
-                        text: "Deleting selected records",
-                        icon: "info",
-                        buttonsStyling: false,
-                        showConfirmButton: false,
-                        timer: 2000
-                    }).then(function () {
-
-                        $.ajax({
-                            type: "GET",
-                            url: "/analysisrun/batch_delete",
-                            data: {
-                              "selected_ids": JSON.stringify(selectedRows),
-                            },
-                            error: function (xhr, ajaxOptions, thrownError) {
-                                swal("Error deleting!", "Please try again", "error");
-                            }
-                        }).done(function (result) {
-                            if (result.deleted) {
-                              Swal.fire({
-                                  text: "Sequencing Run(s) deleted succesfully.",
-                                  icon: "info",
-                                  buttonsStyling: false,
-                                  confirmButtonText: "Ok, got it!",
-                                  customClass: {
-                                      confirmButton: "btn fw-bold btn-success",
-                                  }
-                              }).then(function(){
-                                  // clean selected rows
-                                  selectedRows = [];
-                                  // refresh dataTable
-                                  dt.draw();
-                              });
-                            }
-                            else {
-                              Swal.fire({
-                                  text: "Sequencing Run(s) could not be deleted!",
-                                  icon: "error",
-                                  buttonsStyling: false,
-                                  confirmButtonText: "Ok, got it!",
-                                  customClass: {
-                                      confirmButton: "btn fw-bold btn-success",
-                                  }
-                              });
-                            }
-                        });
-
-                        // Remove header checked box
-                        const headerCheckbox = container.querySelectorAll('[type="checkbox"]')[0];
-                        headerCheckbox.checked = false;
-                    });
-                }
             });
-        });
 
-      }
-
-
-
-      return {
-        init: function () {
-          handleBatchDelete(), uncheckedFirstCheckBox();
         }
-      }
+
+        function handleBatchDelete() {
+
+            // Select elements
+            const deleteSelected = document.querySelector('[data-kt-docs-table-select="delete_selected"]');
+
+            // Deleted selected rows
+            deleteSelected.addEventListener('click', function () {
+                Swal.fire({
+                    text: "Are you sure you want to delete selected records?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    buttonsStyling: false,
+                    showLoaderOnConfirm: true,
+                    confirmButtonText: "Yes, delete!",
+                    cancelButtonText: "No, cancel",
+                    customClass: {
+                        confirmButton: "btn fw-bold btn-danger",
+                        cancelButton: "btn fw-bold btn-active-light-primary"
+                    },
+                }).then(function (result) {
+                    if (result.value) {
+                        // Simulate delete request -- for demo purpose only
+                        Swal.fire({
+                            text: "Deleting selected records",
+                            icon: "info",
+                            buttonsStyling: false,
+                            showConfirmButton: false,
+                            timer: 2000
+                        }).then(function () {
+
+                            $.ajax({
+                                type: "GET",
+                                url: "/analysisrun/batch_delete",
+                                data: {
+                                    "selected_ids": JSON.stringify(selectedRows),
+                                },
+                                error: function (xhr, ajaxOptions, thrownError) {
+                                    swal("Error deleting!", "Please try again", "error");
+                                }
+                            }).done(function (result) {
+                                if (result.deleted) {
+                                    Swal.fire({
+                                        text: "Sequencing Run(s) deleted succesfully.",
+                                        icon: "info",
+                                        buttonsStyling: false,
+                                        confirmButtonText: "Ok, got it!",
+                                        customClass: {
+                                            confirmButton: "btn fw-bold btn-success",
+                                        }
+                                    }).then(function () {
+                                        // clean selected rows
+                                        selectedRows = [];
+                                        // refresh dataTable
+                                        dt.draw();
+                                    });
+                                }
+                                else {
+                                    Swal.fire({
+                                        text: "Sequencing Run(s) could not be deleted!",
+                                        icon: "error",
+                                        buttonsStyling: false,
+                                        confirmButtonText: "Ok, got it!",
+                                        customClass: {
+                                            confirmButton: "btn fw-bold btn-success",
+                                        }
+                                    });
+                                }
+                            });
+
+                            // Remove header checked box
+                            const headerCheckbox = container.querySelectorAll('[type="checkbox"]')[0];
+                            headerCheckbox.checked = false;
+                        });
+                    }
+                });
+            });
+
+        }
+
+
+
+        return {
+            init: function () {
+                handleBatchDelete(), uncheckedFirstCheckBox();
+            }
+        }
 
     })();
 
@@ -567,9 +592,8 @@ var KTDatatablesServerSide = function () {
                         });
                     }
 
-                }).fail(function(jqXHR, textStatus, errorThrown) {
+                }).fail(function (jqXHR, textStatus, errorThrown) {
                     Swal.close();
-
                     Swal.fire({
                         text: "An error occurred during import",
                         icon: "error",
@@ -583,7 +607,75 @@ var KTDatatablesServerSide = function () {
             });
         });
 
+        document.querySelectorAll(".check-file-link").forEach(function (element) {
+            element.addEventListener("click", function () {
+                const variantType = this.getAttribute('data-variant-type');
+                const arName = this.getAttribute('data-ar-name');
+                
+                // Show loading message
+                Swal.fire({
+                    title: 'Processing...',
+                    text: 'Checking for folder and file existence',
+                    icon: 'info',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                });
+                
+                // Send AJAX request to server
+                fetch(`process_variant/${variantType}/${arName}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            
+                            Swal.fire({
+                               
+                                text: 'The variant has been processed and the graph is generated.',
+                                imageUrl: `data:image/png;base64, ${data.graphic}`,
+                                imageWidth: 500,
+                                imageHeight: 300,
+                                imageAlt: "Normalization curve",
+                                icon: "info",
+                                buttonsStyling: false,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn fw-bold btn-success",
+                                }
+                            })
+                            
+                        } else {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: data.error,
+                                icon: 'error',
+                                confirmButtonText: 'Ok, got it!',
+                                customClass: {
+                                    confirmButton: 'btn fw-bold btn-primary',
+                                }
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'An error occurred during processing.',
+                            icon: 'error',
+                            confirmButtonText: 'Ok, got it!',
+                            customClass: {
+                                confirmButton: 'btn fw-bold btn-primary',
+                            }
+                        });
+                        console.error('Error:', error);
+                    });
+            })
+        });
+
     }
+
 
     // Public methods
     return {
