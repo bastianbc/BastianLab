@@ -15,9 +15,10 @@ def handle_variant_file(ar_name, variant_path):
     print("*"*100, folder_path)
 
     if folder_path:
+        print("*"*100,folder_path)
         full_path = os.path.join(folder_path, 'output')
         file_path = search_cns_file(full_path)
-    
+        print(file_path)
         return file_path
             
     else:
