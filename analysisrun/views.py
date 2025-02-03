@@ -65,7 +65,6 @@ def process_variant(request, variant_type, ar_name):
     }
     if request.method == 'POST':
         # try:
-            print(variant_type)
             file_path= handle_variant_file(ar_name, variant_paths[variant_type])
             
             parse_cns_file(file_path, ar_name)
