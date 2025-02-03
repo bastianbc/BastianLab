@@ -41,11 +41,12 @@ def find_folder(base_path, folder_name, sub_path):
     return None
 
 def search_cns_file(folder_path):
-
+    print("*" * 100, folder_path)
     for root, dirs, files in os.walk(folder_path):
-    
+        print("*" * 100, root, dirs, files)
         for file in files:
             if file.endswith('.cns'):
+                print(root, dirs, files)
                 return os.path.join(root, file)
     return None
 
