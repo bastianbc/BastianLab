@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-
+from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.contrib.auth.decorators import permission_required
@@ -12,6 +12,8 @@ from django.contrib import messages
 from django.core.files.base import ContentFile
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
+from .helper import handle_variant_file , parse_cns_file
+from cns.helper import generate_graph
 
 
 
@@ -54,4 +56,28 @@ def save_analysis_run(request):
             return JsonResponse({"success": True})
     return JsonResponse({"success": True})
 
+@csrf_exempt
+def process_variant(request, variant_type, ar_name):
+    variant_paths={
+        'CNV':'cnv',
+        'SNV':'snv',
+        'SV':'sv'
+    }
+    if request.method == 'POST':
+        try:
+           
+            file_path= handle_variant_file(ar_name, variant_paths[variant_type])
+            
+            parse_cns_file(file_path, ar_name)
+            print("Parsing complete" , file_path)
 
+            graphic = generate_graph(ar_name, file_path)
+            print("Graph generated" , graphic)
+            
+            response = JsonResponse({'success': True, 'graphic': graphic})
+           
+
+            return response
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+        
