@@ -10,24 +10,25 @@ BASE_PATH = settings.VARIANT_FILES_SOURCE_DIRECTORY
 
 def handle_variant_file(ar_name, variant_path):
     folder_path = find_folder(BASE_PATH, ar_name, variant_path)
-    # folder_path = os.path.join(BASE_PATH, ar_name, variant_path)
     if folder_path:
         full_path = os.path.join(folder_path, 'output')
         file_path = search_cns_file(full_path)
+
         return file_path
-            
+
     else:
         raise Exception("Folder not found")
 
 def find_folder(base_path, folder_name, sub_path):
     for root, dirs, files in os.walk(base_path):
         if folder_name in dirs:
-            
+
             full_path = os.path.join(root, folder_name)
+
             for sub_root, sub_dirs, sub_files in os.walk(full_path):
-               
+
                 if sub_path in sub_root:
-                  
+
                     return sub_root
         else:
             return None
@@ -46,7 +47,7 @@ def parse_cns_file(file_path, ar_name):
     try:
         analysis_run = AnalysisRun.objects.get(name=ar_name)
         variants = VariantCall.objects.filter(analysis_run=analysis_run)
-      
+
         with open(file_path, 'r') as f:
             reader = csv.DictReader(f)
             for row in reader:
@@ -98,9 +99,8 @@ def parse_cns_file(file_path, ar_name):
                         probes=probes,
                         weight=weight,
                     )
-                    
+
     except AnalysisRun.DoesNotExist:
         print(f"AnalysisRun with name {ar_name} does not exist")
     except Exception as e:
         print(f"Error parsing file: {e}")
-        

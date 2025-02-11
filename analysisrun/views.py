@@ -64,19 +64,19 @@ def process_variant(request, variant_type, ar_name):
         'SV':'sv'
     }
     if request.method == 'POST':
-        # try:
+        try:
+
             file_path= handle_variant_file(ar_name, variant_paths[variant_type])
-            
+
             parse_cns_file(file_path, ar_name)
             print("Parsing complete" , file_path)
 
             graphic = generate_graph(ar_name, file_path)
             print("Graph generated" , graphic)
-            
+
             response = JsonResponse({'success': True, 'graphic': graphic})
-           
+
 
             return response
-        # except Exception as e:
-        #     return JsonResponse({'success': False, 'error': str(e)})
-        
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
