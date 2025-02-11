@@ -524,20 +524,37 @@ var KTDatatablesServerSide = function () {
                     Swal.close();
 
                     if (data.success) {
-                        let html = `<p>${data.message}</p>`;
-
-                        // Add statistics if available
-                        if (data.statistics) {
-                            html += `
-                                <div class="mt-3">
-                                    <p><strong>Statistics:</strong></p>
-                                    <ul class="text-start">
-                                        <li>Files Processed: ${data.statistics.files_processed} / ${data.statistics.total_files}</li>
-                                        <li>Variants Processed: ${data.statistics.total_variants_processed}</li>
-                                    </ul>
-                                </div>
-                            `;
-                        }
+                        let html = `
+                            <div class="mt-3">
+                                <p><strong>Process Summary:</strong></p>
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Folder</th>
+                                            <th>Success</th>
+                                            <th>Failed</th>
+                                            <th>Objects Created</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${data.summary.map(stat => `
+                                            <tr>
+                                                <td>${stat.folder_name}</td>
+                                                <td>${stat.success_count}</td>
+                                                <td>${stat.failed_count}</td>
+                                                <td>${stat.objects_created}</td>
+                                            </tr>
+                                        `).join('')}
+                                        <tr class="table-active fw-bold">
+                                            <td>${data.total.folder_name}</td>
+                                            <td>${data.total.success_count}</td>
+                                            <td>${data.total.failed_count}</td>
+                                            <td>${data.total.objects_created}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        `;
 
                         Swal.fire({
                             html: html,
@@ -549,33 +566,20 @@ var KTDatatablesServerSide = function () {
                                 htmlContainer: 'text-start'
                             }
                         });
-                    }
-                    else {
-                        let html = `<p class="text-center">${data.message}</p>`;
-
-                        // Add errors if available
-                        if (data.errors && data.errors.length > 0) {
-                            html += `
-                                <div class="mt-3">
-                                    <p><strong>Errors:</strong></p>
-                                    <ul class="text-start text-danger">
-                                        ${data.errors.map(error => `<li>${error}</li>`).join('')}
-                                    </ul>
-                                </div>
-                            `;
-                        }
+                    } else {
+                        let html = `<p class="text-center">${data.error}</p>`;
 
                         Swal.fire({
                             html: html,
                             icon: "error",
                             buttonsStyling: false,
-                            confirmButtonText: "Ok, got it!",
+                            confirmButtonText: "Ok, anladım!",
                             customClass: {
                                 confirmButton: "btn fw-bold btn-primary",
                                 htmlContainer: 'text-start'
                             }
                         });
-                    }
+                    }                    
 
                 }).fail(function (jqXHR, textStatus, errorThrown) {
                     Swal.close();

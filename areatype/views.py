@@ -66,5 +66,5 @@ def filter_areatype(request):
 
 @permission_required("areatype.view_areatype",raise_exception=True)
 def get_area_type_choices(request):
-    serializer = AreaTypeSerializer(AreaType.objects.all(), many=True)
+    serializer = AreaTypeSerializer(AreaType.objects.all().order_by('name'), many=True)
     return JsonResponse(serializer.data,safe=False)

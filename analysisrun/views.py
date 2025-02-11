@@ -80,37 +80,97 @@ def process_variant(request, variant_type, ar_name):
             return response
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
-        
+
 
 @csrf_exempt
 def import_cns(request, ar_name):
     if request.method == 'POST':
         try:
-            folders = ['cnv\output', 'snv\output', 'sv\output']
-            cns_files = []
-            cns_objects_created = 0
-            files_parsed = 0
+            folders = ['cnv\\output', 'snv\\output', 'sv\\output']
+            folder_stats = []
+            total_stats = {
+                'folder_name': 'total',
+                'success_count': 0,
+                'failed_count': 0,
+                'objects_created': 0
+            }
 
             for folder in folders:
-                    files = handle_variant_file(ar_name,folder)
-                    print(files)
-                    cns_files.extend(files)
-                    files_parsed += len(files)
-                    for file in files:
-                        parse_cns_file(file, ar_name)
-                        cns_objects_created += 1
+                current_stats = {
+                    'folder_name': folder,
+                    'success_count': 0,
+                    'failed_count': 0,
+                    'objects_created': 0
+                }
 
-            cns_object_location = f'/path/to/cns/objects/{ar_name}'
-            files_location = f'/path/to/ar/{ar_name}'
+                try:
+                    cns_files = handle_variant_file(ar_name, folder)
 
-            response = JsonResponse({
+                    for file_path in cns_files:
+                        try:
+                            created_objects_count = parse_cns_file(file_path, ar_name)
+                            current_stats['success_count'] += 1
+                            current_stats['objects_created'] += created_object_count
+                        except Exception as parse_error:
+                            current_stats['failed_count'] += 1
+                            print(f"Error parsing file {file_path}: {str(parse_error)}")
+
+                except Exception as folder_error:
+                    print(f"Error processing folder {folder}: {str(folder_error)}")
+                    continue
+
+                # Update total statistics
+                total_stats['success_count'] += current_stats['success_count']
+                total_stats['failed_count'] += current_stats['failed_count']
+                total_stats['objects_created'] += current_stats['objects_created']
+
+                folder_stats.append(current_stats)
+
+            folder_stats.append(total_stats)
+
+            # SAMPLE DATA
+            # {
+            #     "success": true,
+            #     "summary": [
+            #         {
+            #             "folder_name": "cnv\\output",
+            #             "success_count": 5,
+            #             "failed_count": 1,
+            #             "objects_created": 5
+            #         },
+            #         {
+            #             "folder_name": "snv\\output",
+            #             "success_count": 3,
+            #             "failed_count": 0,
+            #             "objects_created": 3
+            #         },
+            #         {
+            #             "folder_name": "sv\\output",
+            #             "success_count": 4,
+            #             "failed_count": 2,
+            #             "objects_created": 4
+            #         }
+            #     ],
+            #     "total": {
+            #         "folder_name": "total",
+            #         "success_count": 12,
+            #         "failed_count": 3,
+            #         "objects_created": 12
+            #     }
+            # }
+
+            return JsonResponse({
                 'success': True,
-                'cnsObjectsCreated': cns_objects_created,
-                'filesParsed': files_parsed,
-                'cnsObjectLocation': cns_object_location,
-                'filesLocation': files_location
+                'summary': folder_stats
             })
 
-            return response
         except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)})
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            })
+
+    return JsonResponse({
+        'success': False,
+        'error': 'Invalid request method'
+    })
