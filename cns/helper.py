@@ -37,3 +37,8 @@ def generate_graph(ar_name,file_path):
     pilImage.save(buffer, "PNG")
 
     return base64.b64encode(buffer.getvalue()).decode("utf-8")
+<<<<<<< HEAD
+=======
+
+   
+>>>>>>> deb35f376c11f88351710aa49bc37015a7e1f80a

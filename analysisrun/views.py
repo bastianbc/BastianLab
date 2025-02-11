@@ -15,10 +15,6 @@ from django.core.files.storage import FileSystemStorage
 from .helper import handle_variant_file , parse_cns_file
 from cns.helper import generate_graph
 
-
-
-
-
 @permission_required("sequencingrun.view_sequencingrun",raise_exception=True)
 def analysisruns(request):
     return render(request, "analysisrun_list.html", locals())
