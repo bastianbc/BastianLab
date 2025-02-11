@@ -80,3 +80,37 @@ def process_variant(request, variant_type, ar_name):
             return response
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
+        
+
+@csrf_exempt
+def import_cns(request, ar_name):
+    if request.method == 'POST':
+        try:
+            folders = ['cnv\output', 'snv\output', 'sv\output']
+            cns_files = []
+            cns_objects_created = 0
+            files_parsed = 0
+
+            for folder in folders:
+                    files = handle_variant_file(ar_name,folder)
+                    print(files)
+                    cns_files.extend(files)
+                    files_parsed += len(files)
+                    for file in files:
+                        parse_cns_file(file, ar_name)
+                        cns_objects_created += 1
+
+            cns_object_location = f'/path/to/cns/objects/{ar_name}'
+            files_location = f'/path/to/ar/{ar_name}'
+
+            response = JsonResponse({
+                'success': True,
+                'cnsObjectsCreated': cns_objects_created,
+                'filesParsed': files_parsed,
+                'cnsObjectLocation': cns_object_location,
+                'filesLocation': files_location
+            })
+
+            return response
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})

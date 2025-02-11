@@ -8,28 +8,28 @@ from variant.models import VariantCall
 # /Volumes/sequencingdata/ProcessedData/Analysis.tumor-only/Small_Gene_Panel/2-Oct-24/cnv/output/BCB002.NMLP-001/BCB002.NMLP-001.Tumor_dedup_BSQR.cns
 BASE_PATH = settings.VARIANT_FILES_SOURCE_DIRECTORY
 
-def handle_variant_file(ar_name, variant_path):
-    folder_path = find_folder(BASE_PATH, ar_name, variant_path)
+def handle_variant_file(ar_name, folder):
+    folder_path = find_folder(BASE_PATH, ar_name)
+    
     if folder_path:
-        full_path = os.path.join(folder_path, 'output')
-        file_path = search_cns_file(full_path)
+        cns_files = []
+        full_path = os.path.join(folder_path, folder)
+        print("Full Path: ",full_path)
+        print(search_cns_file(full_path))
+        cns_files.append(search_cns_file(full_path))
 
-        return file_path
+        return cns_files
 
     else:
         raise Exception("Folder not found")
 
-def find_folder(base_path, folder_name, sub_path):
+def find_folder(base_path, folder_name):
     for root, dirs, files in os.walk(base_path):
-        if folder_name in dirs:
 
+        if folder_name in dirs:
             full_path = os.path.join(root, folder_name)
 
-            for sub_root, sub_dirs, sub_files in os.walk(full_path):
-
-                if sub_path in sub_root:
-
-                    return sub_root
+            return full_path
         else:
             return None
     return None

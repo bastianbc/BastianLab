@@ -105,27 +105,12 @@ var KTDatatablesServerSide = function () {
 
                                 <!--begin::Menu item-->
                             <div class="menu-item">
-                                <a href="javascript:;" class="menu-link check-file-link text-start" data-variant-type="SNV" data-ar-name="${row.name}">
-                                    Single Nucleotide Variant (SNV)
+                                <a href="javascript:;" class="menu-link check-file-link text-start"  data-ar-name="${row.name}">
+                                    Import CNS
                                 </a>
                             </div>
                             <!--end::Menu item-->
 
-                             <!--begin::Menu item-->
-                            <div class="menu-item">
-                                <a href="javascript:;" class="menu-link check-file-link text-start" data-variant-type="CNV" data-ar-name="${row.name}">
-                                    Copy Number Variant(CNV)
-                                </a>
-                            </div>
-                            <!--end::Menu item-->
-                            
-                             <!--begin::Menu item-->
-                            <div class="menu-item">
-                                <a href="javascript:;" class="menu-link check-file-link text-start" data-variant-type="SV" data-ar-name="${row.name}">
-                                    Structural Variant(SV)
-                                </a>
-                            </div>
-                            <!--end::Menu item-->
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item">
@@ -611,7 +596,7 @@ var KTDatatablesServerSide = function () {
             element.addEventListener("click", function () {
                 const variantType = this.getAttribute('data-variant-type');
                 const arName = this.getAttribute('data-ar-name');
-                
+
                 // Show loading message
                 Swal.fire({
                     title: 'Processing...',
@@ -620,9 +605,9 @@ var KTDatatablesServerSide = function () {
                     allowOutsideClick: false,
                     showConfirmButton: false,
                 });
-                
+
                 // Send AJAX request to server
-                fetch(`process_variant/${variantType}/${arName}`, {
+                fetch(`import_cns/${arName}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -631,22 +616,25 @@ var KTDatatablesServerSide = function () {
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            
+                            const reportHtml = `
+                            <div>
+                                <p><strong>How many CNS objects created:</strong> ${data.cnsObjectsCreated}</p>
+                                <p><strong>How many files parsed:</strong> ${data.filesParsed}</p>
+                                <p><strong>Where is the CNS object can be seen:</strong> ${data.cnsObjectLocation}</p>
+                                <p><strong>Where are the files located:</strong> ${data.filesLocation}</p>
+                            </div>
+                        `;
+
                             Swal.fire({
-                               
-                                text: 'The variant has been processed and the graph is generated.',
-                                imageUrl: `data:image/png;base64, ${data.graphic}`,
-                                imageWidth: 500,
-                                imageHeight: 300,
-                                imageAlt: "Normalization curve",
+                                html: reportHtml,
                                 icon: "info",
                                 buttonsStyling: false,
                                 confirmButtonText: "Ok, got it!",
                                 customClass: {
                                     confirmButton: "btn fw-bold btn-success",
                                 }
-                            })
-                            
+                            });
+
                         } else {
                             Swal.fire({
                                 title: 'Error!',
