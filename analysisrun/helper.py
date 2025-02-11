@@ -98,7 +98,7 @@ def parse_cns_file(file_path, ar_name):
 
                     created_objects_count += 1
 
-        return created_objects_count            
+        return created_objects_count
     except AnalysisRun.DoesNotExist:
         print(f"AnalysisRun with name {ar_name} does not exist")
     except Exception as e:
