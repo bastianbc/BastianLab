@@ -579,7 +579,7 @@ var KTDatatablesServerSide = function () {
                                 htmlContainer: 'text-start'
                             }
                         });
-                    }                    
+                    }
 
                 }).fail(function (jqXHR, textStatus, errorThrown) {
                     Swal.close();
@@ -611,26 +611,63 @@ var KTDatatablesServerSide = function () {
                 });
 
                 // Send AJAX request to server
-                fetch(`import_cns/${arName}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                })
+                fetch(`import_cns/${arName}`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            const reportHtml = `
-                            <div>
-                                <p><strong>How many CNS objects created:</strong> ${data.cnsObjectsCreated}</p>
-                                <p><strong>How many files parsed:</strong> ${data.filesParsed}</p>
-                                <p><strong>Where is the CNS object can be seen:</strong> ${data.cnsObjectLocation}</p>
-                                <p><strong>Where are the files located:</strong> ${data.filesLocation}</p>
-                            </div>
+                            let tableHtml = `
+                            <div class="mt-3">
+                            <p><strong>Variant files imported successfully.</strong></p>
+                            <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th class="text-start" style="border: 1px solid #4a4a4a; white-space: nowrap;">Folder Name</th>
+                                    <th class="text-start" style="border: 1px solid #4a4a4a; white-space: nowrap;">Success Count</th>
+                                    <th class="text-start" style="border: 1px solid #4a4a4a; white-space: nowrap;">Failed Count</th>
+                                    <th class="text-start" style="border: 1px solid #4a4a4a; white-space: nowrap;">Objects Created</th> 
+                                </tr>
+                            </thead>
+                            <tbody>
+                        `;
+
+                            data.summary.forEach(item => {
+                                console.log(item);
+                                if (item.folder_name !== 'Total') {
+                                    tableHtml += `
+                                    <tr>
+                                        <td class="text-start" style="border: 1px solid #4a4a4a;">${item.folder_name}</td>
+                                        <td class="text-center" style="border: 1px solid #4a4a4a;">${item.success_count}</td>
+                                        <td class="text-center" style="border: 1px solid #4a4a4a;">${item.failed_count}</td>
+                                        <td class="text-center" style="border: 1px solid #4a4a4a;">${item.objects_created}</td>
+                                    </tr>
+                                `;
+                                }
+                            });
+
+                            // Total row
+                            const total = data.summary.find(item => item.folder_name === 'Total');
+                            tableHtml += `
+                                    <tr class="table-active">  
+                                        <td class="text-start" style="border: 1px solid #4a4a4a;"><strong>${total.folder_name}</strong></td>
+                                        <td class="text-center" style="border: 1px solid #4a4a4a;"><strong>${total.success_count}</strong></td>
+                                        <td class="text-center" style="border: 1px solid #4a4a4a;"><strong>${total.failed_count}</strong></td>
+                                        <td class="text-center" style="border: 1px solid #4a4a4a;"><strong>${total.objects_created}</strong></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                         `;
 
                             Swal.fire({
-                                html: reportHtml,
+                                html: tableHtml,
+                                text: "Variant files imported successfully.",
                                 icon: "info",
                                 buttonsStyling: false,
                                 confirmButtonText: "Ok, got it!",

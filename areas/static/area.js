@@ -13,8 +13,8 @@ var KTDatatablesServerSide = function () {
    * Initializes the datatable.
    * @param  {String} initialValue  If it comes from another page, it is initialized with this value.
    */
-    var initDatatable = function ( initialValue ) {
-        $.fn.dataTable.moment( 'MM/DD/YYYY' );
+    var initDatatable = function (initialValue) {
+        $.fn.dataTable.moment('MM/DD/YYYY');
 
         dt = $("#area_datatable").DataTable({
             // searchDelay: 500,
@@ -29,40 +29,45 @@ var KTDatatablesServerSide = function () {
                 className: 'row-selected'
             },
             keys: {
-              columns: ':not(:first-child)',
-              keys: [ 9 ],
-              editor: editor,
-              editOnFocus: true
+                columns: ':not(:first-child)',
+                keys: [9],
+                editor: editor,
+                editOnFocus: true
             },
             ajax: {
-              url: '/areas/filter_areas',
-              type: 'GET',
-              error: function (xhr, ajaxOptions, thrownError) {
-                  if (xhr.status == 403) {
+                url: '/areas/filter_areas',
+                type: 'GET',
+                error: function (xhr, ajaxOptions, thrownError) {
+                    if (xhr.status == 403) {
 
-                    Swal.fire({
-                        text: "You do not have permission to view.",
-                        icon: "error",
-                        buttonsStyling: false,
-                        confirmButtonText: "Ok, got it!",
-                        customClass: {
-                            confirmButton: "btn fw-bold btn-primary",
-                        }
-                    });
+                        Swal.fire({
+                            text: "You do not have permission to view.",
+                            icon: "error",
+                            buttonsStyling: false,
+                            confirmButtonText: "Ok, got it!",
+                            customClass: {
+                                confirmButton: "btn fw-bold btn-primary",
+                            }
+                        });
 
-                  }
-              }
+                    }
+                }
             },
             columns: [
-              { data: 'id' },
-              { data: 'name' },
-              { data: 'num_blocks' },
-              { data: 'num_projects' },
-              { data: 'area_type' },
-              { data: 'completion_date'},
-              { data: 'investigator' },
-              { data: 'num_nucacids' },
-              { data: 'num_samplelibs' },
+                { data: 'id' },
+                { data: 'name' },
+                { data: 'num_blocks' },
+                { data: 'num_projects' },
+                {
+                    data: 'area_type',
+                    render: function (val, type, row) {
+                        return row["area_type_label"];
+                    }
+                },
+                { data: 'completion_date' },
+                { data: 'investigator' },
+                { data: 'num_nucacids' },
+                { data: 'num_samplelibs' },
             ],
             columnDefs: [
                 {
@@ -80,7 +85,7 @@ var KTDatatablesServerSide = function () {
                     orderable: false,
                     render: function (data, type, row) {
                         if (data > 0) {
-                          return `
+                            return `
                               <a href="/blocks?model=area&id=${row["id"]}&initial=true">${data}</a>`;
                         }
                         return data;
@@ -91,7 +96,7 @@ var KTDatatablesServerSide = function () {
                     orderable: false,
                     render: function (data, type, row) {
                         if (data > 0) {
-                          return `
+                            return `
                               <a href="/projects?model=area&id=${row["id"]}&initial=true">${data}</a>`;
                         }
                         return data;
@@ -103,7 +108,7 @@ var KTDatatablesServerSide = function () {
                     className: "text-center",
                     render: function (data, type, row) {
                         if (data > 0) {
-                          return `
+                            return `
                               <a href="/libprep?model=area&id=${row["id"]}&initial=true">${data}</a>`;
                         }
                         return data;
@@ -115,7 +120,7 @@ var KTDatatablesServerSide = function () {
                     className: "text-center",
                     render: function (data, type, row) {
                         if (data > 0) {
-                          return `
+                            return `
                               <a href="/samplelib?model=area&id=${row["id"]}&initial=true">${data}</a>`;
                         }
                         return data;
@@ -143,7 +148,7 @@ var KTDatatablesServerSide = function () {
                             <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4" data-kt-menu="true">
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/areas/edit/`+ row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
+                                    <a href="/areas/edit/`+ row["id"] + `" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
                                         Edit
                                     </a>
                                 </div>
@@ -151,7 +156,7 @@ var KTDatatablesServerSide = function () {
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/areas/delete/` + row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
+                                    <a href="/areas/delete/` + row["id"] + `" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
                                         Delete
                                     </a>
                                 </div>
@@ -172,7 +177,7 @@ var KTDatatablesServerSide = function () {
             createdRow: function (row, data, dataIndex) {
                 $(row).find('td:eq(4)').attr('data-filter', data.CreditCardType);
             },
-            oSearch: {sSearch: "_initial:" + initialValue}
+            oSearch: { sSearch: "_initial:" + initialValue }
         });
 
         table = dt.$;
@@ -223,7 +228,7 @@ var KTDatatablesServerSide = function () {
     var handleRestoreRowSelection = function () {
         const allCheckboxes = document.querySelectorAll('#area_datatable tbody [type="checkbox"]');
         allCheckboxes.forEach(c => {
-            if ( selectedRows.indexOf(c.value) > -1 ) {
+            if (selectedRows.indexOf(c.value) > -1) {
                 c.checked = true;
             }
         });
@@ -286,98 +291,98 @@ var KTDatatablesServerSide = function () {
                     url: "/areas/check_can_deleted_async",
                     type: "GET",
                     data: {
-                      "id": id,
+                        "id": id,
                     },
-                    async:false,
+                    async: false,
                     error: function (xhr, ajaxOptions, thrownError) {
                         if (xhr.status == 403) {
 
-                          Swal.fire({
-                              text: "You do not have permission to delete.",
-                              icon: "error",
-                              buttonsStyling: false,
-                              confirmButtonText: "Ok, got it!",
-                              customClass: {
-                                  confirmButton: "btn fw-bold btn-primary",
-                              }
-                          });
+                            Swal.fire({
+                                text: "You do not have permission to delete.",
+                                icon: "error",
+                                buttonsStyling: false,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn fw-bold btn-primary",
+                                }
+                            });
 
                         }
                     }
                 }).done(function (data) {
 
-                  var message = "Are you sure you want to delete " + name + "?";
+                    var message = "Are you sure you want to delete " + name + "?";
 
-                  if (data.related_objects.length > 0) {
+                    if (data.related_objects.length > 0) {
 
-                    message += " It has downstream records:";
+                        message += " It has downstream records:";
 
-                    for (var item of data.related_objects) {
+                        for (var item of data.related_objects) {
 
-                      message += item.model + "(" + item.count + ")"
+                            message += item.model + "(" + item.count + ")"
+
+                        }
 
                     }
 
-                  }
+                    Swal.fire({
+                        text: message,
+                        icon: "warning",
+                        showCancelButton: true,
+                        buttonsStyling: false,
+                        confirmButtonText: "Yes, delete!",
+                        cancelButtonText: "No, cancel",
+                        customClass: {
+                            confirmButton: "btn fw-bold btn-danger",
+                            cancelButton: "btn fw-bold btn-active-light-primary"
+                        }
+                    }).then(function (result) {
+                        if (result.value) {
+                            // Simulate delete request -- for demo purpose only
+                            Swal.fire({
+                                text: "Deleting " + name,
+                                icon: "info",
+                                buttonsStyling: false,
+                                showConfirmButton: false,
+                                timer: 1000
+                            }).then(function () {
 
-                  Swal.fire({
-                      text: message,
-                      icon: "warning",
-                      showCancelButton: true,
-                      buttonsStyling: false,
-                      confirmButtonText: "Yes, delete!",
-                      cancelButtonText: "No, cancel",
-                      customClass: {
-                          confirmButton: "btn fw-bold btn-danger",
-                          cancelButton: "btn fw-bold btn-active-light-primary"
-                      }
-                  }).then(function (result) {
-                      if (result.value) {
-                          // Simulate delete request -- for demo purpose only
-                          Swal.fire({
-                              text: "Deleting " + name,
-                              icon: "info",
-                              buttonsStyling: false,
-                              showConfirmButton: false,
-                              timer: 1000
-                          }).then(function () {
-
-                            $.ajax({
-                                url: parent.querySelector('[data-kt-docs-table-filter="delete_row"]').href,
-                                type: "DELETE",
-                                headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
-                                error: function (xhr, ajaxOptions, thrownError) {
-                                  Swal.fire({
-                                      text: name + " could not be deleted.",
-                                      icon: "error",
-                                      buttonsStyling: false,
-                                      confirmButtonText: "Ok, got it!",
-                                      customClass: {
-                                          confirmButton: "btn fw-bold btn-primary",
-                                      }
-                                  });
-                                }
-                            }).done(function () {
-
-                              Swal.fire({
-                                    text: "Area deleted succesfully.",
-                                    icon: "info",
-                                    buttonsStyling: false,
-                                    confirmButtonText: "Ok, got it!",
-                                    customClass: {
-                                        confirmButton: "btn fw-bold btn-success",
+                                $.ajax({
+                                    url: parent.querySelector('[data-kt-docs-table-filter="delete_row"]').href,
+                                    type: "DELETE",
+                                    headers: { 'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
+                                    error: function (xhr, ajaxOptions, thrownError) {
+                                        Swal.fire({
+                                            text: name + " could not be deleted.",
+                                            icon: "error",
+                                            buttonsStyling: false,
+                                            confirmButtonText: "Ok, got it!",
+                                            customClass: {
+                                                confirmButton: "btn fw-bold btn-primary",
+                                            }
+                                        });
                                     }
-                                }).then(function(){
+                                }).done(function () {
 
-                                  dt.draw();
+                                    Swal.fire({
+                                        text: "Area deleted succesfully.",
+                                        icon: "info",
+                                        buttonsStyling: false,
+                                        confirmButtonText: "Ok, got it!",
+                                        customClass: {
+                                            confirmButton: "btn fw-bold btn-success",
+                                        }
+                                    }).then(function () {
+
+                                        dt.draw();
+
+                                    });
 
                                 });
 
                             });
-
-                          });
-                      }
-                  });
+                        }
+                    });
 
                 });
 
@@ -451,38 +456,38 @@ var KTDatatablesServerSide = function () {
                             type: "GET",
                             url: "/areas/batch_delete",
                             data: {
-                              "selected_ids": JSON.stringify(selectedRows),
+                                "selected_ids": JSON.stringify(selectedRows),
                             },
                             error: function (xhr, ajaxOptions, thrownError) {
                                 swal("Error deleting!", "Please try again", "error");
                             }
                         }).done(function (result) {
                             if (result.deleted) {
-                              Swal.fire({
-                                  text: "Area(s) deleted succesfully.",
-                                  icon: "info",
-                                  buttonsStyling: false,
-                                  confirmButtonText: "Ok, got it!",
-                                  customClass: {
-                                      confirmButton: "btn fw-bold btn-success",
-                                  }
-                              }).then(function(){
-                                  // clean selected rows
-                                  selectedRows = [];
-                                  // refresh dataTable
-                                  dt.draw();
-                              });
+                                Swal.fire({
+                                    text: "Area(s) deleted succesfully.",
+                                    icon: "info",
+                                    buttonsStyling: false,
+                                    confirmButtonText: "Ok, got it!",
+                                    customClass: {
+                                        confirmButton: "btn fw-bold btn-success",
+                                    }
+                                }).then(function () {
+                                    // clean selected rows
+                                    selectedRows = [];
+                                    // refresh dataTable
+                                    dt.draw();
+                                });
                             }
                             else {
-                              Swal.fire({
-                                  text: "Area(s) could not be deleted!",
-                                  icon: "error",
-                                  buttonsStyling: false,
-                                  confirmButtonText: "Ok, got it!",
-                                  customClass: {
-                                      confirmButton: "btn fw-bold btn-success",
-                                  }
-                              });
+                                Swal.fire({
+                                    text: "Area(s) could not be deleted!",
+                                    icon: "error",
+                                    buttonsStyling: false,
+                                    confirmButtonText: "Ok, got it!",
+                                    customClass: {
+                                        confirmButton: "btn fw-bold btn-success",
+                                    }
+                                });
                             }
                         });
 
@@ -518,7 +523,7 @@ var KTDatatablesServerSide = function () {
                 customClass: {
                     confirmButton: "btn fw-bold btn-success",
                 }
-            }).then(function(){
+            }).then(function () {
                 dt.draw();
             });
         }
@@ -544,7 +549,7 @@ var KTDatatablesServerSide = function () {
                     "selected_ids": JSON.stringify(selectedRows),
                     "options": getFormOptions('frm_extraction_options')
                 },
-            }).done(function(result) {
+            }).done(function (result) {
                 if (result.success) {
                     handleSuccess("Nucleic acid(s) created successfully.");
                 } else {
@@ -568,11 +573,11 @@ var KTDatatablesServerSide = function () {
                 const id = parent.querySelector('input[type=checkbox]').value;
                 // Open modal
                 variantInstance.show();
-                getVariantData( id );
+                getVariantData(id);
             });
         });
 
-        function getVariantData( area_id ) {
+        function getVariantData(area_id) {
             fetch(`/variant/get_variants_by_area?area_id=${area_id}`)
                 .then(response => response.json())
                 .then(data => {
@@ -633,7 +638,7 @@ var KTDatatablesServerSide = function () {
             `;
         }
 
-        function populateAreaDetails( data ) {
+        function populateAreaDetails(data) {
             document.querySelector('input[name="area_name"]').value = data.name;
             document.querySelector('input[name="block_name"]').value = data.block_name;
             document.querySelector('input[name="body_site"]').value = data.body_site;
@@ -713,7 +718,7 @@ var KTDatatablesServerSide = function () {
                     {
                         data: null,
                         className: 'text-end',
-                        render: function() {
+                        render: function () {
                             return `
                                 <button type="button"
                                         class="btn btn-icon btn-light-primary btn-sm"
@@ -761,170 +766,171 @@ var KTDatatablesServerSide = function () {
     // Provides the datatable to be fully editable. official docs for more info  --> https://editor.datatables.net
     var initEditor = function () {
 
-      var areaTypeOptions = [];
+        var areaTypeOptions = [];
 
-      Promise.all([
+        Promise.all([
 
-        getAreaTypeOptions()
+            getAreaTypeOptions()
 
-      ]).then(function () {
+        ]).then(function () {
 
-        editor = new $.fn.dataTable.Editor({
-        ajax: {
-          url: "/areas/edit_area_async",
-          type: "POST",
-          headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
-          success: function (data) {
+            editor = new $.fn.dataTable.Editor({
+                ajax: {
+                    url: "/areas/edit_area_async",
+                    type: "POST",
+                    headers: { 'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
+                    success: function (data) {
 
-              if ( !data.success ) {
+                        if (!data.success) {
 
-                Swal.fire({
-                    text: data.message,
-                    icon: "error",
-                    buttonsStyling: false,
-                    confirmButtonText: "Ok, got it!",
-                    customClass: {
-                        confirmButton: "btn fw-bold btn-primary",
+                            Swal.fire({
+                                text: data.message,
+                                icon: "error",
+                                buttonsStyling: false,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn fw-bold btn-primary",
+                                }
+                            });
+
+                        }
+
+                        dt.draw();
+
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        swal("Error updating!", "Please try again!", "error");
                     }
-                });
+                },
+                table: "#area_datatable",
+                fields: [
+                    {
+                        label: "Name:",
+                        name: "name"
+                    }, {
+                        label: "Area Type:",
+                        name: "area_type",
+                        type: "select",
+                        options: areaTypeOptions
+                    }, {
+                        label: "Completion Date:",
+                        name: "completion_date",
+                        type: "datetime",
+                        displayFormat: "M/D/YYYY",
+                        wireFormat: 'YYYY-MM-DD'
+                    }, {
+                        label: "Investigator:",
+                        name: "investigator",
+                        type: "readonly",
+                        attr: { disabled: true }
+                    }, {
+                        label: "Nucleic Acids",
+                        name: "num_nucacids",
+                        type: "readonly",
+                        attr: { disabled: true }
+                    }, {
+                        label: "Sample Libraries",
+                        name: "num_samplelibs",
+                        type: "readonly",
+                        attr: { disabled: true }
+                    },
+                ],
+                formOptions: {
+                    inline: {
+                        onBlur: 'submit'
+                    }
+                }
+            });
 
-              }
-
-              dt.draw();
-
-          },
-          error: function (xhr, ajaxOptions, thrownError) {
-              swal("Error updating!", "Please try again!", "error");
-          }
-        },
-        table: "#area_datatable",
-        fields: [
-            {
-             label: "Name:",
-             name: "name"
-            }, {
-              label: "Area Type:",
-              name: "area_type",
-              type: "select",
-              options: areaTypeOptions
-            }, {
-              label: "Completion Date:",
-              name: "completion_date",
-              type: "datetime",
-              displayFormat: "M/D/YYYY",
-              wireFormat: 'YYYY-MM-DD'
-            }, {
-              label: "Investigator:",
-              name: "investigator",
-              type: "readonly",
-              attr: { disabled:true }
-          }, {
-            label: "Nucleic Acids",
-            name: "num_nucacids",
-            type: "readonly",
-            attr: { disabled:true }
-          }, {
-            label: "Sample Libraries",
-            name: "num_samplelibs",
-            type: "readonly",
-            attr: { disabled:true }
-          },
-       ],
-       formOptions: {
-          inline: {
-            onBlur: 'submit'
-          }
-       }
-     });
-
-      });
-
-      $('#area_datatable').on( 'click', 'tbody td:not(:first-child)', function (e) {
-        editor.inline( dt.cell( this ).index(), {
-            onBlur: 'submit'
-        } );
-      } );
-
-      $('#area_datatable').on( 'key-focus', function ( e, datatable, cell ) {
-        editor.inline( cell.index() );
-      });
-
-      // Gets the area type options and fills the dropdown. It is executed synchronous.
-      function getAreaTypeOptions() {
-
-        $.ajax({
-            url: "/areas/get_area_types",
-            type: "GET",
-            async: false,
-            success: function (data) {
-                console.log(data);
-
-              data.forEach((item, i) => {
-
-               areaTypeOptions.push({
-                 "label":item["name"],
-                 "value":item["value"]
-               })
-
-             });
-            }
-        });
-      }
-
-      // Gets the collection options and fills the dropdown. It is executed synchronous.
-      function getCollectionOptions() {
-
-        $.ajax({
-            url: "/areas/get_collections",
-            type: "GET",
-            async: false,
-            success: function (data) {
-
-             data.forEach((item, i) => {
-
-               collectionOptions.push({
-                 "label":item["label"],
-                 "value":item["value"]
-               })
-
-             });
-            }
         });
 
-      }
+
+        $('#area_datatable').on('click', 'tbody td:not(:first-child)', function (e) {
+            editor.inline(dt.cell(this).index(), {
+                onBlur: 'submit'
+            });
+        });
+
+        $('#area_datatable').on('key-focus', function (e, datatable, cell) {
+            editor.inline(cell.index());
+        });
+
+        // Gets the area type options and fills the dropdown. It is executed synchronous.
+        function getAreaTypeOptions() {
+
+            $.ajax({
+                url: "/areas/get_area_types",
+                type: "GET",
+                async: false,
+                success: function (data) {
+                    console.log(data);
+
+                    data.forEach((item, i) => {
+
+                        areaTypeOptions.push({
+                            "label": item["name"],
+                            "value": item["value"]
+                        })
+
+                    });
+                }
+            });
+        }
+
+        // Gets the collection options and fills the dropdown. It is executed synchronous.
+        function getCollectionOptions() {
+
+            $.ajax({
+                url: "/areas/get_collections",
+                type: "GET",
+                async: false,
+                success: function (data) {
+
+                    data.forEach((item, i) => {
+
+                        collectionOptions.push({
+                            "label": item["label"],
+                            "value": item["value"]
+                        })
+
+                    });
+                }
+            });
+
+        }
 
     }
 
     // Redirects from other pages
     var handleInitialValue = () => {
 
-      // Remove parameters in URL
-      function cleanUrl() {
-        window.history.replaceState(null, null, window.location.pathname);
-      }
+        // Remove parameters in URL
+        function cleanUrl() {
+            window.history.replaceState(null, null, window.location.pathname);
+        }
 
-      const params = new URLSearchParams(window.location.search);
-      const model = params.get('model');
-      const id = params.get('id');
-      const initial = params.get('initial');
-      cleanUrl();
+        const params = new URLSearchParams(window.location.search);
+        const model = params.get('model');
+        const id = params.get('id');
+        const initial = params.get('initial');
+        cleanUrl();
 
-      if (initial =="true" && model != null && id !=null) {
+        if (initial == "true" && model != null && id != null) {
 
-        return JSON.stringify({
-          "model": model,
-          "id": id
-        });
+            return JSON.stringify({
+                "model": model,
+                "id": id
+            });
 
-      }
+        }
 
-      return null;
+        return null;
 
     }
     // Public methods
     return {
         init: function () {
-            initDatatable( handleInitialValue() );
+            initDatatable(handleInitialValue());
             handleSearchDatatable();
             handleBatchDeleteRows();
             handleFilterDatatable();

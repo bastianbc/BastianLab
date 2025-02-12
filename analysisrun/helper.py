@@ -9,82 +9,81 @@ from variant.models import VariantCall
 BASE_PATH = settings.VARIANT_FILES_SOURCE_DIRECTORY
 
 def handle_variant_file(ar_name, folder):
-    folder_path = find_folder(BASE_PATH, ar_name)
+    folder_paths = find_folders(ar_name, folder)
 
-    if folder_path:
-        cns_files = []
-        full_path = os.path.join(folder_path, folder)
-        cns_files.append(search_cns_file(full_path))
+    if folder_paths:
+        cns_files=find_cns_files(folder_paths[0])
 
         return cns_files
     else:
         raise Exception("Folder not found")
 
-def find_folder(base_path, folder_name):
-    for root, dirs, files in os.walk(base_path):
 
-        if folder_name in dirs:
-            full_path = os.path.join(root, folder_name)
+def find_folders(ar_name, folder):
+    found_folders = []
+    for root, dirs, _ in os.walk(BASE_PATH):
+        if ar_name and folder in root:     
+            found_folders.append(root)
+    return found_folders
 
-            return full_path
-        else:
-            return None
-    return None
 
-def search_cns_file(folder_path):
-    for root, dirs, files in os.walk(folder_path):
+
+def find_cns_files(folder):
+    cns_files = []
+    for root, _, files in os.walk(folder):
         for file in files:
-            if file.endswith('.cns'):
-                print(root, dirs, files)
-                return os.path.join(root, file)
-    return None
+            if file.endswith(".cns"):
+                cns_files.append(os.path.join(root, file))
+    return cns_files
+
 
 def parse_cns_file(file_path, ar_name):
     try:
         analysis_run = AnalysisRun.objects.get(name=ar_name)
         variants = VariantCall.objects.filter(analysis_run=analysis_run)
         created_objects_count = 0
-        with open(file_path, 'r') as f:
+        with open(file_path, "r") as f:
             reader = csv.DictReader(f)
             for row in reader:
-               sample_lib = variants.first().sample_lib
-               sequencing_run = variants.first().sequencing_run
+                sample_lib = variants.first().sample_lib
+                sequencing_run = variants.first().sequencing_run
 
                 # Check if the Cns object already exists
-               if not Cns.objects.filter(
+                if not Cns.objects.filter(
                     sample_lib=sample_lib,
                     sequencing_run=sequencing_run,
                     variant_file=file_path,
                     analysis_run=analysis_run,
-                    chromosome=row['chromosome'],
-                    start=int(row['start']),
-                    end=int(row['end'])
+                    chromosome=row["chromosome"],
+                    start=int(row["start"]),
+                    end=int(row["end"]),
                 ).exists():
+
                     def get_float_value(value, default=0.0):
                         try:
                             return float(value)
                         except ValueError:
                             return default
 
-                    depth = get_float_value(row['depth'])
-                    ci_hi = get_float_value(row['ci_hi'])
-                    ci_lo = get_float_value(row['ci_lo'])
-                    cn = get_float_value(row.get('cn', 0.0))
-                    log2 = get_float_value(row['log2'])
-                    p_bintest = get_float_value(row.get('p_bintest', 0.0))
-                    p_ttest = get_float_value(row.get('p_ttest', 0.0))
-                    probes = get_float_value(row['probes'])
-                    weight = get_float_value(row['weight'])
+                    depth = get_float_value(row["depth"])
+                    ci_hi = get_float_value(row["ci_hi"])
+                    ci_lo = get_float_value(row["ci_lo"])
+                    cn = get_float_value(row.get("cn", 0.0))
+                    log2 = get_float_value(row["log2"])
+                    p_bintest = get_float_value(row.get("p_bintest", 0.0))
+                    p_ttest = get_float_value(row.get("p_ttest", 0.0))
+                    probes = get_float_value(row["probes"])
+                    weight = get_float_value(row["weight"])
 
                     Cns.objects.create(
                         sample_lib=sample_lib,
                         sequencing_run=sequencing_run,
                         variant_file=file_path,
                         analysis_run=analysis_run,
-                        chromosome=row['chromosome'],
-                        start=int(row['start']),
-                        end=int(row['end']),
-                        gene=row['gene'],
+                        chromosome=row["chromosome"],
+                        start=int(row["start"]),
+                        end=int(row["end"]),
+                        gene=row["gene"],
                         depth=depth,
                         ci_hi=ci_hi,
                         ci_lo=ci_lo,
