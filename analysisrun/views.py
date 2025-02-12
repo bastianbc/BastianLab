@@ -78,7 +78,6 @@ def process_variant(request, variant_type, ar_name):
 
 @csrf_exempt
 def import_cns(request, ar_name):
-    print("*"*100)
     if request.method == "POST":
         # try:
             folders = ["cnv/output", "snv/output", "alignment/output"]
@@ -89,7 +88,6 @@ def import_cns(request, ar_name):
                 "failed_count": 0,
                 "objects_created": 0,
             }
-            print("1" * 100)
             for folder in folders:
                 current_stats = {
                     "folder_name": folder,
@@ -103,7 +101,6 @@ def import_cns(request, ar_name):
 
                 for file_path in cns_files:
                     # try:
-                        print("2"*100)
                         created_objects_count = parse_cns_file(file_path, ar_name)
                         current_stats["success_count"] += 1
                         current_stats["objects_created"] += created_objects_count
