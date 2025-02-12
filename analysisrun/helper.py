@@ -7,7 +7,6 @@ from variant.models import VariantCall
 from variant.models import VariantFile
 import pandas as pd
 
-# /Volumes/sequencingdata/ProcessedData/Analysis.tumor-only/Small_Gene_Panel/2-Oct-24/cnv/output/BCB002.NMLP-001/BCB002.NMLP-001.Tumor_dedup_BSQR.cns
 BASE_PATH = settings.VARIANT_FILES_SOURCE_DIRECTORY
 
 def handle_variant_file(ar_name, folder):
