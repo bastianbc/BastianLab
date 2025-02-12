@@ -25,6 +25,7 @@ def find_folders(ar_name, folder):
     print("ar_name, folder"*100)
     print(ar_name, folder)
     print(os.path.join(BASE_PATH, ar_name, folder))
+    print(os.path.exists(os.path.join(BASE_PATH, ar_name, folder)))
     # Get only the first-level directories
     for root, dirs, _ in [next(os.walk(BASE_PATH))]:  # Restrict os.walk() to the first level
         for dir_name in dirs:

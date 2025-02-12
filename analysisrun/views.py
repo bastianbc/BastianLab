@@ -81,7 +81,7 @@ def import_cns(request, ar_name):
     print("*"*100)
     if request.method == "POST":
         # try:
-            folders = ["cnv\output", "snv\output", "sv\output"]
+            folders = ["cnv/output", "snv/output", "alignment/output"]
             folder_stats = []
             total_stats = {
                 "folder_name": "Total",
