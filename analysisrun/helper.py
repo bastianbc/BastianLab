@@ -10,12 +10,8 @@ BASE_PATH = settings.VARIANT_FILES_SOURCE_DIRECTORY
 
 def handle_variant_file(ar_name, folder):
     folder_path = find_folders(ar_name, folder)
-    print(folder_path)
     if folder_path:
         cns_files=find_cns_files(folder_path)
-        print(cns_files)
-        for i in cns_files:
-            print(i)
         return cns_files
     else:
         raise Exception("Folder not found")
@@ -48,6 +44,7 @@ def parse_cns_file(file_path, ar_name):
         with open(file_path, "r") as f:
             reader = csv.DictReader(f)
             for row in reader:
+                print(row)
                 sample_lib = variants.first().sample_lib
                 sequencing_run = variants.first().sequencing_run
 
