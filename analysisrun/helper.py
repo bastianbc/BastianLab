@@ -24,6 +24,7 @@ def find_folders(ar_name, folder):
     found_folders = []
 
     for root, dirs, _ in os.walk(BASE_PATH):
+        print(root)
         if ar_name and folder in root:
             print(found_folders)
             found_folders.append(root)
