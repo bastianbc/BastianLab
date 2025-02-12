@@ -9,13 +9,12 @@ from variant.models import VariantCall
 BASE_PATH = settings.VARIANT_FILES_SOURCE_DIRECTORY
 
 def handle_variant_file(ar_name, folder):
-    print("handle_variant_file" * 100)
     print(ar_name, folder)
     folder_paths = find_folders(ar_name, folder)
-
+    print(folder_paths)
     if folder_paths:
         cns_files=find_cns_files(folder_paths[0])
-
+        print(cns_files)
         return cns_files
     else:
         raise Exception("Folder not found")
