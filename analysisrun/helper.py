@@ -23,11 +23,13 @@ def handle_variant_file(ar_name, folder):
 def find_folders(ar_name, folder):
     found_folders = []
 
-    for root, dirs, _ in os.walk(BASE_PATH):
-        print(root)
-        if ar_name and folder in root:
-            print(found_folders)
-            found_folders.append(root)
+    # Get only the first-level directories
+    for root, dirs, _ in [next(os.walk(BASE_PATH))]:  # Restrict os.walk() to the first level
+        for dir_name in dirs:
+            print(dir_name)
+            if ar_name and folder in dir_name:  # Check the folder name, not full path
+                found_folders.append(os.path.join(root, dir_name))
+        print(found_folders, "found_folders")
     return found_folders
 
 
