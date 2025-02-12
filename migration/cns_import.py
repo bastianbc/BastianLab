@@ -65,50 +65,49 @@ def register_files(row):
     )
 
 
-# def import_csn_files():
-#     SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
-#     file = os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "cns_files.csv")
-#     df = pd.read_csv(file, index_col=False)
-#     df = df.reset_index()
-#     df.apply(lambda row: register_files(row), axis=1)
-#
-#     pass
-#
-# def create_csn(row, file):
-#
-#     try:
-#         csn = Cns.objects.create(
-#             sample_lib=get_sample_lib(file.name),
-#             sequencing_run=get_sequencing_run(file.name),
-#             variant_file=file,
-#             chromosome=row['chromosome'],
-#             start=row['start'],
-#             end=row['end'],
-#             gene=row['gene'][:499],
-#             depth=row['depth'],
-#             ci_hi=row.get('ci_hi', 0),
-#             ci_lo=row.get('ci_lo', 0),
-#             cn=row.get('cn', 0),
-#             log2=row['log2'],
-#             p_bintest=row.get('p_bintest', 0),
-#             p_ttest=row.get('p_ttest', 0),
-#             probes=row['probes'],
-#             weight=row['weight']
-#         )
-#         print("csn created")
-#     except Exception as e:
-#         print(e)
+def import_csn_files():
+    SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
+    file = os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "cns_files.csv")
+    df = pd.read_csv(file, index_col=False)
+    df = df.reset_index()
+    df.apply(lambda row: register_files(row), axis=1)
 
-# def import_csn_calls():
-#     col1 = ['chromosome', 'start', 'end', 'gene', 'log2', 'depth', 'weight', 'probes', 'p_bintest']
-#     col2 = ['chromosome', 'start', 'end', 'gene', 'log2', 'depth', 'weight', 'probes', 'cn', 'p_ttest']
-#     col3 = ['chromosome', 'start', 'end', 'gene', 'log2', 'depth', 'weight', 'probes',  'ci_lo', 'ci_hi']
-#     Cns.objects.filter().delete()
-#     for file in VariantFile.objects.filter(type='cns'):
-#         file_path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA,file.directory, file.name)
-#         df = pd.read_csv(file_path, index_col=False, sep='\t')
-#         df.apply(lambda row: create_csn(row, file), axis=1)
-#     print("%^&"*100, "finished")
+    pass
+
+def create_csn(row, file):
+
+    try:
+        csn = Cns.objects.create(
+            sample_lib=get_sample_lib(file.name),
+            sequencing_run=get_sequencing_run(file.name),
+            variant_file=file,
+            chromosome=row['chromosome'],
+            start=row['start'],
+            end=row['end'],
+            gene=row['gene'][:499],
+            depth=row['depth'],
+            ci_hi=row.get('ci_hi', 0),
+            ci_lo=row.get('ci_lo', 0),
+            cn=row.get('cn', 0),
+            log2=row['log2'],
+            p_bintest=row.get('p_bintest', 0),
+            p_ttest=row.get('p_ttest', 0),
+            probes=row['probes'],
+            weight=row['weight']
+        )
+        print("csn created")
+    except Exception as e:
+        print(e)
+
+def import_csn_calls():
+    col1 = ['chromosome', 'start', 'end', 'gene', 'log2', 'depth', 'weight', 'probes', 'p_bintest']
+    col2 = ['chromosome', 'start', 'end', 'gene', 'log2', 'depth', 'weight', 'probes', 'cn', 'p_ttest']
+    col3 = ['chromosome', 'start', 'end', 'gene', 'log2', 'depth', 'weight', 'probes',  'ci_lo', 'ci_hi']
+    for file in VariantFile.objects.filter(type='cns'):
+        file_path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA,file.directory, file.name)
+        df = pd.read_csv(file_path, index_col=False, sep='\t')
+        df.apply(lambda row: create_csn(row, file), axis=1)
+    print("%^&"*100, "finished")
 
 def create_area_types(row):
     if not AreaType.objects.filter(name=row['area_type']):

@@ -4,6 +4,8 @@ from django.conf import settings
 from .models import AnalysisRun
 from cns.models import Cns
 from variant.models import VariantCall
+from variant.models import VariantFile
+import pandas as pd
 
 # /Volumes/sequencingdata/ProcessedData/Analysis.tumor-only/Small_Gene_Panel/2-Oct-24/cnv/output/BCB002.NMLP-001/BCB002.NMLP-001.Tumor_dedup_BSQR.cns
 BASE_PATH = settings.VARIANT_FILES_SOURCE_DIRECTORY
@@ -35,18 +37,29 @@ def find_cns_files(folder):
                 cns_files.append(os.path.join(root, file))
     return cns_files
 
+def register_files(row):
+    VariantFile.objects.create(
+        name=row['File'],
+        directory=row['Dir'],
+        call=False,
+        type="cns",
+    )
+
 
 def parse_cns_file(file_path, ar_name):
     try:
         analysis_run = AnalysisRun.objects.get(name=ar_name)
-        # variants = VariantCall.objects.filter(analysis_run=analysis_run)
+        file_name = file_path.split['/'][-1]
+
+        variant_file = VariantFile.objects.get_or_create(name=file_name, directory=file_path)
         created_objects_count = 0
         print("^"*100, file_path)
-        sample_lib = file_path.split("/")[-1].split(".")[1]
-        sequencing_run = file_path.split("/")[-1].split(".")[0]
-        with open(file_path, "r") as f:
-            reader = csv.DictReader(f)
-            for row in reader:
+        sample_lib = file_name.split(".")[1]
+        sequencing_run = file_name.split(".")[0]
+        # with open(file_path, "r") as f:
+        #     reader = csv.DictReader(f)
+        df = pd.read_csv(file_path, index_col=False, sep='\t')
+        for index, row in df.iterrows():
                 print(row)
 
                 # Check if the Cns object already exists
