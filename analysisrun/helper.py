@@ -9,6 +9,8 @@ from variant.models import VariantCall
 BASE_PATH = settings.VARIANT_FILES_SOURCE_DIRECTORY
 
 def handle_variant_file(ar_name, folder):
+    print("handle_variant_file" * 100)
+    print(ar_name, folder)
     folder_paths = find_folders(ar_name, folder)
 
     if folder_paths:
