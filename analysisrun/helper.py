@@ -35,7 +35,7 @@ def find_cns_files(folder):
     cns_files = []
     for root, _, files in os.walk(folder):
         for file in files:
-            if file.endswith(".cns"):
+            if file.endswith(".cns") and ".bintest" not in file and ".call" not in file:
                 cns_files.append(os.path.join(root, file))
     return cns_files
 
