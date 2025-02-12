@@ -41,6 +41,7 @@ def parse_cns_file(file_path, ar_name):
         analysis_run = AnalysisRun.objects.get(name=ar_name)
         variants = VariantCall.objects.filter(analysis_run=analysis_run)
         created_objects_count = 0
+        print("^"*100, file_path)
         with open(file_path, "r") as f:
             reader = csv.DictReader(f)
             for row in reader:
