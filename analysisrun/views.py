@@ -89,7 +89,7 @@ def import_cns(request, ar_name):
                 "failed_count": 0,
                 "objects_created": 0,
             }
-
+            print("1" * 100)
             for folder in folders:
                 current_stats = {
                     "folder_name": folder,
@@ -103,6 +103,7 @@ def import_cns(request, ar_name):
 
                 for file_path in cns_files:
                     # try:
+                        print("2"*100)
                         created_objects_count = parse_cns_file(file_path, ar_name)
                         current_stats["success_count"] += 1
                         current_stats["objects_created"] += created_objects_count
@@ -120,14 +121,14 @@ def import_cns(request, ar_name):
                 #     folder_stats.append(fail_status)
                 #     print(f"Error processing folder {folder}: {str(folder_error)}")
                 #     continue
-
+                print("3" * 100)
                 # Update total statistics
                 total_stats["success_count"] += current_stats["success_count"]
                 total_stats["failed_count"] += current_stats["failed_count"]
                 total_stats["objects_created"] += current_stats["objects_created"]
 
                 folder_stats.append(current_stats)
-
+            print("4" * 100)
             folder_stats.append(total_stats)
 
             return JsonResponse({"success": True, "summary": folder_stats})
