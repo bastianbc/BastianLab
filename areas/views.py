@@ -88,6 +88,7 @@ def edit_area_async(request):
     parameters = {}
 
     for k,v in request.POST.items():
+        print(k,v)
         if k.startswith('data'):
             r = re.match(r"data\[(\d+)\]\[(\w+)\]", k)
             if r:
