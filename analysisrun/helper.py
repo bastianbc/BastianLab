@@ -14,6 +14,8 @@ def handle_variant_file(ar_name, folder):
     if folder_path:
         cns_files=find_cns_files(folder_path)
         print(cns_files)
+        for i in cns_files:
+            print(i)
         return cns_files
     else:
         raise Exception("Folder not found")
