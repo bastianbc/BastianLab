@@ -47,8 +47,8 @@ def register_files(row):
 
 
 def parse_cns_file(file_path, ar_name):
-    print("$"*100)
-    try:
+        print("$"*100)
+    # try:
         analysis_run = AnalysisRun.objects.get(name=ar_name)
         file_name = file_path.split['/'][-1]
 
@@ -113,7 +113,7 @@ def parse_cns_file(file_path, ar_name):
                     created_objects_count += 1
 
         return created_objects_count
-    except AnalysisRun.DoesNotExist:
-        print(f"AnalysisRun with name {ar_name} does not exist")
-    except Exception as e:
-        print(f"Error parsing file: {e}")
+    # except AnalysisRun.DoesNotExist:
+    #     print(f"AnalysisRun with name {ar_name} does not exist")
+    # except Exception as e:
+    #     print(f"Error parsing file: {e}")
