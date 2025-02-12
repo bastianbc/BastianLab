@@ -39,15 +39,15 @@ def find_cns_files(folder):
 def parse_cns_file(file_path, ar_name):
     try:
         analysis_run = AnalysisRun.objects.get(name=ar_name)
-        variants = VariantCall.objects.filter(analysis_run=analysis_run)
+        # variants = VariantCall.objects.filter(analysis_run=analysis_run)
         created_objects_count = 0
         print("^"*100, file_path)
+        sample_lib = file_path.split("/")[-1].split(".")[1]
+        sequencing_run = file_path.split("/")[-1].split(".")[0]
         with open(file_path, "r") as f:
             reader = csv.DictReader(f)
             for row in reader:
                 print(row)
-                sample_lib = variants.first().sample_lib
-                sequencing_run = variants.first().sequencing_run
 
                 # Check if the Cns object already exists
                 if not Cns.objects.filter(
