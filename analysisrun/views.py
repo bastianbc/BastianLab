@@ -57,15 +57,11 @@ def save_analysis_run(request):
 
 @csrf_exempt
 def process_variant(request, variant_type, ar_name):
-    variant_paths={
-        'CNV':'cnv',
-        'SNV':'snv',
-        'SV':'sv'
-    }
-    if request.method == 'POST':
+    variant_paths = {"CNV": "cnv", "SNV": "snv", "SV": "sv"}
+    if request.method == "POST":
         try:
 
-            file_path= handle_variant_file(ar_name, variant_paths[variant_type])
+            file_path = handle_variant_file(ar_name, variant_paths[variant_type])
 
             parse_cns_file(file_path, ar_name)
             print("Parsing complete", file_path)
@@ -136,12 +132,6 @@ def import_cns(request, ar_name):
             return JsonResponse({"success": True, "summary": folder_stats})
 
         except Exception as e:
-            return JsonResponse({
-                'success': False,
-                'error': str(e)
-            })
+            return JsonResponse({"success": False, "error": str(e)})
 
-    return JsonResponse({
-        'success': False,
-        'error': 'Invalid request method'
-    })
+    return JsonResponse({"success": False, "error": "Invalid request method"})
