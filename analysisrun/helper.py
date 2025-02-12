@@ -9,11 +9,10 @@ from variant.models import VariantCall
 BASE_PATH = settings.VARIANT_FILES_SOURCE_DIRECTORY
 
 def handle_variant_file(ar_name, folder):
-    print(ar_name, folder, BASE_PATH)
-    folder_paths = find_folders(ar_name, folder)
-    print(folder_paths)
-    if folder_paths:
-        cns_files=find_cns_files(folder_paths[0])
+    folder_path = find_folders(ar_name, folder)
+    print(folder_path)
+    if folder_path:
+        cns_files=find_cns_files(folder_path)
         print(cns_files)
         return cns_files
     else:
@@ -21,19 +20,12 @@ def handle_variant_file(ar_name, folder):
 
 
 def find_folders(ar_name, folder):
-    found_folders = []
-    print("ar_name, folder"*100)
-    print(ar_name, folder)
-    print(os.path.join(BASE_PATH, ar_name, folder))
-    print(os.path.exists(os.path.join(BASE_PATH, ar_name, folder)))
-    # Get only the first-level directories
-    for root, dirs, _ in [next(os.walk(BASE_PATH))]:  # Restrict os.walk() to the first level
-        for dir_name in dirs:
-            print(dir_name)
-            if ar_name and "cns" in dir_name:  # Check the folder name, not full path
-                found_folders.append(os.path.join(root, dir_name))
-        print(found_folders, "found_folders")
-    return found_folders
+    first_level_dirs = next(os.walk(BASE_PATH))[1]
+    if not any(ar_name in dir_name for dir_name in first_level_dirs):
+        raise ValueError(f"Error: '{ar_name}' not found in any first-level directories of {BASE_PATH}")
+
+    return os.path.join(BASE_PATH, ar_name, folder)
+
 
 
 
