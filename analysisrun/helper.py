@@ -22,7 +22,7 @@ def handle_variant_file(ar_name, folder):
 
 def find_folders(ar_name, folder):
     found_folders = []
-
+    print(ar_name, folder)
     # Get only the first-level directories
     for root, dirs, _ in [next(os.walk(BASE_PATH))]:  # Restrict os.walk() to the first level
         for dir_name in dirs:
