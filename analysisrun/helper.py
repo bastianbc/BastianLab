@@ -10,6 +10,7 @@ import pandas as pd
 BASE_PATH = settings.VARIANT_FILES_SOURCE_DIRECTORY
 
 def handle_variant_file(ar_name, folder):
+    print("#"*100)
     folder_path = find_folders(ar_name, folder)
     if folder_path:
         cns_files=find_cns_files(folder_path)
