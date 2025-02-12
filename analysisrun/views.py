@@ -102,13 +102,13 @@ def import_cns(request, ar_name):
                 cns_files = handle_variant_file(ar_name, folder)
 
                 for file_path in cns_files:
-                    try:
+                    # try:
                         created_objects_count = parse_cns_file(file_path, ar_name)
                         current_stats["success_count"] += 1
                         current_stats["objects_created"] += created_objects_count
-                    except Exception as parse_error:
-                        current_stats["failed_count"] += 1
-                        print(f"Error parsing file {file_path}: {str(parse_error)}")
+                    # except Exception as parse_error:
+                    #     current_stats["failed_count"] += 1
+                    #     print(f"Error parsing file {file_path}: {str(parse_error)}")
 
                 # except Exception as folder_error:
                 #     fail_status = {
