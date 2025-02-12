@@ -47,6 +47,7 @@ def register_files(row):
 
 
 def parse_cns_file(file_path, ar_name):
+    print("$"*100)
     try:
         analysis_run = AnalysisRun.objects.get(name=ar_name)
         file_name = file_path.split['/'][-1]
