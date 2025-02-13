@@ -15,6 +15,7 @@ class PatientForm(BaseForm, forms.ModelForm):
         #     self.fields['block'].initial = self.instance.patient_blocks.all()
         if self.instance.pk:
             self.fields['block'].initial = self.instance.patient_blocks.values_list('name', flat=True)
+            self.fields['block'].queryset = Block.objects.filter(patient=self.instance)
 
 
     class Meta:
