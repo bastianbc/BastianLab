@@ -5,7 +5,7 @@ from core.forms import BaseForm
 
 class PatientForm(BaseForm):
     block = forms.ModelMultipleChoiceField(
-        queryset=Block.objects.all(),
+        queryset=Block.objects.all().order_by('name'),
         label="Blocks",
         required=False
     )
