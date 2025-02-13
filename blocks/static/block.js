@@ -933,7 +933,7 @@ var KTDatatablesServerSide = function () {
             }
         });
       });
-/*
+
       function getBodyOptions() {
 
         $.ajax({
@@ -958,8 +958,7 @@ var KTDatatablesServerSide = function () {
         });
 
       }
-        */
-
+        
       $('#block_datatable').on( 'click', 'tbody td:not(:first-child)', function (e) {
         editor.inline( dt.cell( this ).index(), {
             onBlur: 'submit'
