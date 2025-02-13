@@ -3,7 +3,7 @@ from .models import Patient
 from blocks.models import Block
 from core.forms import BaseForm
 
-class PatientForm(BaseForm, forms.ModelForm):
+class PatientForm(BaseForm):
     block = forms.ModelMultipleChoiceField(queryset=Block.objects.all(), label="Blocks", required=False)
 
     def __init__(self, *args, **kwargs):
@@ -15,7 +15,7 @@ class PatientForm(BaseForm, forms.ModelForm):
         #     self.fields['block'].initial = self.instance.patient_blocks.all()
         if self.instance.pk:
             self.fields['block'].initial = self.instance.patient_blocks.values_list('name', flat=True)
-            self.fields['block'].queryset = Block.objects.filter(patient=self.instance)
+
 
 
     class Meta:
