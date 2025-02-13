@@ -10,8 +10,9 @@ class PatientForm(forms.ModelForm):
         instance = kwargs.get('instance', None)
         self.fields["block"].widget.attrs.update({'class': 'form-control-sm'})
         self.fields["block"].widget.attrs["data-control"] = "select2"
-        if instance:
-            self.fields['block'].initial = self.instance.patient_blocks.values_list('name', flat=True)
+        if self.instance and self.instance.pk:  # Ensure instance is valid and saved
+            self.fields['block'].queryset = Block.objects.filter(patient=self.instance)
+            self.fields['block'].initial = self.instance.block_set.all()
 
 
     class Meta:
