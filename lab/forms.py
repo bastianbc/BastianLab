@@ -27,11 +27,14 @@ class PatientForm(BaseForm):
 
     def save(self, commit=True):
         instance = super().save(commit=False)
+
         if commit:
             instance.save()
-        for block in self.cleaned_data.get('blocks', []):
-            block.patient = instance
-            block.save()
+
+        # Correct way to update ManyToMany relationship
+        if 'block' in self.cleaned_data:
+            instance.patient_blocks.set(self.cleaned_data['block'])  # Use .set() for ManyToManyField
+
         return instance
 
 class FilterForm(forms.Form):
