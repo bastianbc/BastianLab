@@ -4,27 +4,28 @@ from django.conf import settings
 from .models import AnalysisRun
 from cns.models import Cns
 from variant.models import VariantCall
+from variant.models import VariantFile
+import pandas as pd
 
-# /Volumes/sequencingdata/ProcessedData/Analysis.tumor-only/Small_Gene_Panel/2-Oct-24/cnv/output/BCB002.NMLP-001/BCB002.NMLP-001.Tumor_dedup_BSQR.cns
 BASE_PATH = settings.VARIANT_FILES_SOURCE_DIRECTORY
 
 def handle_variant_file(ar_name, folder):
-    folder_paths = find_folders(ar_name, folder)
-
-    if folder_paths:
-        cns_files=find_cns_files(folder_paths[0])
-
+    print("#"*100)
+    folder_path = find_folders(ar_name, folder)
+    if folder_path:
+        cns_files=find_cns_files(folder_path)
         return cns_files
     else:
         raise Exception("Folder not found")
 
 
 def find_folders(ar_name, folder):
-    found_folders = []
-    for root, dirs, _ in os.walk(BASE_PATH):
-        if ar_name and folder in root:
-            found_folders.append(root)
-    return found_folders
+    first_level_dirs = next(os.walk(BASE_PATH))[1]
+    if not any(ar_name in dir_name for dir_name in first_level_dirs):
+        raise ValueError(f"Error: '{ar_name}' not found in any first-level directories of {BASE_PATH}")
+
+    return os.path.join(BASE_PATH, ar_name, folder)
+
 
 
 
@@ -32,21 +33,35 @@ def find_cns_files(folder):
     cns_files = []
     for root, _, files in os.walk(folder):
         for file in files:
-            if file.endswith(".cns"):
+            if file.endswith(".cns") and ".bintest" not in file and ".call" not in file:
                 cns_files.append(os.path.join(root, file))
     return cns_files
 
+def register_files(row):
+    VariantFile.objects.create(
+        name=row['File'],
+        directory=row['Dir'],
+        call=False,
+        type="cns",
+    )
+
 
 def parse_cns_file(file_path, ar_name):
-    try:
+        print("$"*100)
+    # try:
         analysis_run = AnalysisRun.objects.get(name=ar_name)
-        variants = VariantCall.objects.filter(analysis_run=analysis_run)
+        file_name = file_path.split['/'][-1]
+
+        variant_file = VariantFile.objects.get_or_create(name=file_name, directory=file_path)
         created_objects_count = 0
-        with open(file_path, "r") as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                sample_lib = variants.first().sample_lib
-                sequencing_run = variants.first().sequencing_run
+        print("^"*100, file_path)
+        sample_lib = file_name.split(".")[1]
+        sequencing_run = file_name.split(".")[0]
+        # with open(file_path, "r") as f:
+        #     reader = csv.DictReader(f)
+        df = pd.read_csv(file_path, index_col=False, sep='\t')
+        for index, row in df.iterrows():
+                print(row)
 
                 # Check if the Cns object already exists
                 if not Cns.objects.filter(
@@ -98,7 +113,7 @@ def parse_cns_file(file_path, ar_name):
                     created_objects_count += 1
 
         return created_objects_count
-    except AnalysisRun.DoesNotExist:
-        print(f"AnalysisRun with name {ar_name} does not exist")
-    except Exception as e:
-        print(f"Error parsing file: {e}")
+    # except AnalysisRun.DoesNotExist:
+    #     print(f"AnalysisRun with name {ar_name} does not exist")
+    # except Exception as e:
+    #     print(f"Error parsing file: {e}")
