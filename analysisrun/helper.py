@@ -22,7 +22,7 @@ def handle_variant_file(ar_name, folder):
 def find_folders(ar_name, folder):
     found_folders = []
     for root, dirs, _ in os.walk(BASE_PATH):
-        if ar_name and folder in root:     
+        if ar_name and folder in root:
             found_folders.append(root)
     return found_folders
 
