@@ -53,17 +53,17 @@ def add_block_to_patient_async(request):
     selected_ids = json.loads(request.GET.get("selected_ids"))
     patient_id = request.GET.get("patient_id")
 
-    try:
-        patient = Patient.objects.get(id=patient_id)
-        blocks = Block.objects.filter(id__in=selected_ids)
-        
-        for block in blocks:
-            block.patient = patient
-            block.save()
+    # try:
+    patient = Patient.objects.get(id=patient_id)
+    blocks = Block.objects.filter(id__in=selected_ids)
+
+    for block in blocks:
+        block.patient = patient
+        block.save()
        
             
-    except Exception as e:
-        return JsonResponse({"success":False})
+    # except Exception as e:
+    #     return JsonResponse({"success":False})
 
     return JsonResponse({"success":True})
 
