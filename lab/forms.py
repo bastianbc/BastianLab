@@ -12,7 +12,7 @@ class PatientForm(forms.ModelForm):
         self.fields["block"].widget.attrs["data-control"] = "select2"
         if self.instance and self.instance.pk:  # Ensure instance is valid and saved
             self.fields['block'].queryset = Block.objects.filter(patient=self.instance)
-            self.fields['block'].initial = self.instance.block_set.all()
+            self.fields['block'].initial = self.instance.patient_blocks.all()
 
 
     class Meta:
