@@ -29,13 +29,32 @@ class BlockForm(BaseForm, forms.ModelForm):
         self.fields["patient"].widget.attrs["data-control"] = "select2"
 
 
+    # def clean(self):
+    #     """
+    #     The algorithm created for the body site throws a weird exception. This error is caught and removed.
+    #     """
+    #     if "body_site" in dict(self.errors.items()).keys():
+    #         del self.errors["body_site"]
+    #     return self.cleaned_data
+
     def clean(self):
         """
         The algorithm created for the body site throws a weird exception. This error is caught and removed.
         """
-        if "body_site" in dict(self.errors.items()).keys():
+        if "body_site" in self.errors:
             del self.errors["body_site"]
         return self.cleaned_data
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+
+        # Explicitly clear the body_site if removed
+        if not self.cleaned_data.get("body_site"):
+            instance.body_site = None  # Set it to NULL in the database
+
+        if commit:
+            instance.save()
+        return instance
 
 class AreaCreationForm(forms.Form):
     # area_type = forms.ChoiceField(choices=Area.AREA_TYPE_TYPES)
