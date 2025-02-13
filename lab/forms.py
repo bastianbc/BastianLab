@@ -8,8 +8,8 @@ class PatientForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         instance = kwargs.get('instance', None)
-        self.fields["patient"].widget.attrs.update({'class': 'form-control-sm'})
-        self.fields["patient"].widget.attrs["data-control"] = "select2"
+        self.fields["block"].widget.attrs.update({'class': 'form-control-sm'})
+        self.fields["block"].widget.attrs["data-control"] = "select2"
         if instance:
             self.fields['block'].queryset = Block.objects.filter(patient=instance)
             self.fields['block'].initial = instance.patient_blocks.all()
