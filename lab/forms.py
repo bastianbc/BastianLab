@@ -1,18 +1,20 @@
 from django import forms
 from .models import Patient
 from blocks.models import Block
+from core.forms import BaseForm
 
-class PatientForm(forms.ModelForm):
+class PatientForm(BaseForm, forms.ModelForm):
     block = forms.ModelMultipleChoiceField(queryset=Block.objects.all(), label="Blocks", required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        instance = kwargs.get('instance', None)
-        self.fields["block"].widget.attrs.update({'class': 'form-control-sm'})
-        self.fields["block"].widget.attrs["data-control"] = "select2"
-        if self.instance and self.instance.pk:  # Ensure instance is valid and saved
-            self.fields['block'].queryset = Block.objects.filter(patient=self.instance)
-            self.fields['block'].initial = self.instance.patient_blocks.all()
+        # self.fields["block"].widget.attrs.update({'class': 'form-control-sm'})
+        # self.fields["block"].widget.attrs["data-control"] = "select2"
+        # if self.instance and self.instance.pk:  # Ensure instance is valid and saved
+        #     self.fields['block'].queryset = Block.objects.filter(patient=self.instance)
+        #     self.fields['block'].initial = self.instance.patient_blocks.all()
+        if self.instance.pk:
+            self.fields['block'].initial = self.instance.patient_blocks.values_list('name', flat=True)
 
 
     class Meta:
