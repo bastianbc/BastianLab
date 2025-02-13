@@ -148,6 +148,6 @@ def get_collections(request):
 
 
 def get_area_types(request):
-    area_types = AreaType.objects.all().values('id', 'name')
+    area_types = AreaType.objects.all().values('id', 'name').order_by("name")
     data = [{"value": at['id'], "name": at['name']} for at in area_types]
     return JsonResponse(data, safe=False)
