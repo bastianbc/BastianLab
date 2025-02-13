@@ -3,6 +3,7 @@ from .models import *
 from body.models import Body
 from django.core.exceptions import ValidationError
 from core.forms import BaseForm
+from lab.models import Patient
 
 class BlockForm(BaseForm, forms.ModelForm):
     # mock_body_site = forms.ModelChoiceField(queryset = Body.objects.filter(parent=None), label="Body Site", required=False)
@@ -23,6 +24,10 @@ class BlockForm(BaseForm, forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(BlockForm, self).__init__(*args, **kwargs)
         # self.fields["patient"].required = True
+        self.fields["patient"].queryset = Patient.objects.all().order_by('pat_id')
+        self.fields["patient"].widget.attrs.update({'class': 'form-control-sm'})
+        self.fields["patient"].widget.attrs["data-control"] = "select2"
+
 
     def clean(self):
         """
