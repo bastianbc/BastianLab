@@ -19,7 +19,7 @@ class PatientForm(forms.ModelForm):
         fields = ('pat_id', 'dob', 'sex', 'race', 'source', 'blocks', 'notes', 'consent')
         widgets = {
             'notes': forms.Textarea(attrs={'rows': 4, 'cols': 40}),
-            'dob': forms.DateInput(attrs={'type': 'date'}),
+            'dob': forms.NumberInput(attrs={'min': 1900, 'placeholder': 'Year'}),
         }
 
     def save(self, commit=True):
