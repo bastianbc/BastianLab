@@ -37,20 +37,20 @@ class BlockForm(BaseForm, forms.ModelForm):
     #         del self.errors["body_site"]
     #     return self.cleaned_data
 
-    def clean(self):
-        """
-        The algorithm created for the body site throws a weird exception. This error is caught and removed.
-        """
-        if "body_site" in self.errors:
-            del self.errors["body_site"]
-        return self.cleaned_data
+    def clean_body_site(self):
+        """ Remove body_site if user selects '--Select--' """
+        body_site = self.cleaned_data.get("body_site")
+        print("bodysite:", body_site)
+        if not body_site or body_site == "Select...":  # Ensure it's cleared
+            return None
+        return body_site
 
     def save(self, commit=True):
         instance = super().save(commit=False)
 
-        # Explicitly clear the body_site if removed
-        if not self.cleaned_data.get("body_site"):
-            instance.body_site = None  # Set it to NULL in the database
+        # Explicitly set body_site to None if cleared
+        if self.cleaned_data.get("body_site") is None:
+            instance.body_site = None  # Remove relationship
 
         if commit:
             instance.save()
