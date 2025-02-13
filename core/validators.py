@@ -21,6 +21,6 @@ def validate_birthyear_range(value):
     now = datetime.now()
     if value < 1900 or value > now.year:
         raise ValidationError(
-            'The name field must not contain spaces.',
+            'Pleace give a valid birthyear between 1900 and current year.',
             params={'value': value},
         )
