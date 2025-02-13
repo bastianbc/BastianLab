@@ -11,10 +11,8 @@ class PatientForm(forms.ModelForm):
         self.fields["block"].widget.attrs.update({'class': 'form-control-sm'})
         self.fields["block"].widget.attrs["data-control"] = "select2"
         if instance:
-            self.fields['block'].queryset = Block.objects.filter(patient=instance)
-            self.fields['block'].initial = instance.patient_blocks.all()
-        else:
-            self.fields['block'].queryset = Block.objects.all()
+            self.fields['block'].initial = self.instance.patient_blocks.values_list('name', flat=True)
+
 
     class Meta:
         model = Patient
