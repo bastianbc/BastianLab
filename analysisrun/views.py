@@ -130,7 +130,7 @@ def import_cns(request, ar_name):
 
             return JsonResponse({"success": True, "summary": folder_stats})
 
-        except Exception as e:
-            return JsonResponse({"success": False, "error": str(e)})
+        # except Exception as e:
+        #     return JsonResponse({"success": False, "error": str(e)})
 
     return JsonResponse({"success": False, "error": "Invalid request method"})
