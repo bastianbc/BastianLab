@@ -5,6 +5,8 @@ var bodyContainer = null;
 $(document).ready(function() {
     selectedId = document.getElementById("id_body_site").value;
     bodyContainer = document.querySelector('.body-site-row');
+    console.log(selectedId);
+
 
     getBodySites();
 
@@ -71,23 +73,16 @@ function handleDropdownChange(event) {
             nextDropdown = nextDropdown.nextElementSibling;
         }
     }
+    console.log(selectedId);
 
     if (selectedId) {
         const newDropdown = createDropdown(selectedId);
         if (newDropdown) {
             bodyContainer.appendChild(newDropdown);
         }
-        setBodySite();
-    } else {
-        // If the first dropdown is set to "Select...", clear the field
-        if (currentIndex === 0) {
-            document.getElementById("id_body_site").value = '';
-        } else {
-            // Otherwise, assign the previous valid selection
-            selectedId = dropdowns[currentIndex - 1].value;
-            setBodySite();
-        }
     }
+
+    setBodySite();
 }
 
 function loadSelectedBody(selectedBodyId) {

@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required,permission_required
 from core.decorators import permission_required_for_async
 from blocks.models import Block
 import pandas as pd
+import json
 
 @permission_required_for_async("lab.view_patients")
 def filter_patients(request):
@@ -93,6 +94,16 @@ def delete_patient(request,id):
     except Exception as e:
         messages.error(request, "Patient %s could not be deleted!" % patient.pat_id)
         deleted = False
+
+    return JsonResponse({ "deleted":True })
+
+@permission_required("lab.delete_patients",raise_exception=True)
+def delete_batch_patients(request):
+    try:
+        selected_ids = json.loads(request.GET.get("selected_ids"))
+        Patient.objects.filter(id__in=selected_ids).delete()
+    except Exception as e:
+        return JsonResponse({ "deleted":False, "message":str(e) })
 
     return JsonResponse({ "deleted":True })
 
