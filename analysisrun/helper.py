@@ -10,14 +10,12 @@ import pandas as pd
 BASE_PATH = settings.VARIANT_FILES_SOURCE_DIRECTORY
 
 def handle_variant_file(ar_name, folder):
-    print("#"*100)
     folder_path = find_folders(ar_name, folder)
     if folder_path:
         cns_files=find_cns_files(folder_path)
         return cns_files
     else:
         raise Exception("Folder not found")
-
 
 def find_folders(ar_name, folder):
     first_level_dirs = next(os.walk(BASE_PATH))[1]
