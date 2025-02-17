@@ -208,6 +208,16 @@ class PVariant(models.Model):
     class Meta:
         db_table = "p_variant"
 
+    def update_is_alias(self):
+        """Update is_alias based on whether CVariant nm_id matches Gene nm_canonical."""
+        if self.c_variant and self.c_variant.gene:
+            gene = self.c_variant.gene
+            if gene.nm_canonical and self.c_variant.nm_id == gene.nm_canonical:
+                self.is_alias = True
+            else:
+                self.is_alias = False
+            self.save()
+
 class VariantFile(models.Model):
     FILE_TYPES = [
         ('cns', 'cns'),
