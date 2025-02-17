@@ -319,7 +319,18 @@ def variant_file_parser(file_path, analysis_run_name):
             stats["failed"] += 1
             continue
 
-
+        print(
+            analysis_run,
+sample_lib,
+get_sequencing_run(filename),
+variant_file,
+row['Depth'],
+get_log2r(),
+caller,
+get_normal_sample_lib(sample_lib),
+row['Ref_reads'],
+row['Alt_reads'],
+        )
         logger.debug(f"Creating VariantCall for row {index + 1}")
         variant_call = VariantCall.objects.get(
             analysis_run=analysis_run,
