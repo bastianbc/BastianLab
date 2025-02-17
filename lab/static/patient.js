@@ -346,46 +346,96 @@ var KTDatatablesServerSide = function () {
         });
     }
 
-    var handleSelectedRows = function (e) {
-      // Select element
-      const btnCreateBlock = document.querySelector('[data-kt-docs-table-select="event_selected"]');
+    var handleBatchDeleteRows = function (e) {
+      const container = document.querySelector('.table');
+        const checkboxes = container.querySelectorAll('[type="checkbox"]');
 
-      // Created blocks for selected rows
-      btnCreateBlock.addEventListener('click', function () {
+        // Select elements
+        const deleteSelected = document.querySelector('[data-kt-docs-table-select="delete_selected"]');
 
-        $.ajax({
-          type: "GET",
-          url: "/blocks/add_block_to_patient_async",
-          data: {
-            "selected_ids":JSON.stringify(selectedRows),
-          },
-        }).done(function(result) {
-          if (result.success) {
-            Swal.fire({
-                text: "Block(s) created succesfully.",
-                icon: "info",
-                buttonsStyling: false,
-                confirmButtonText: "Ok, got it!",
-                customClass: {
-                    confirmButton: "btn fw-bold btn-success",
-                }
-            }).then(function(){
-              dt.draw();
+        // Toggle delete selected toolbar
+        checkboxes.forEach(c => {
+            // Checkbox on click event
+            c.addEventListener('click', function () {
+                setTimeout(function () {
+                    toggleToolbars();
+                }, 50);
             });
-          }
-          else {
+        });
+
+        // Deleted selected rows
+        deleteSelected.addEventListener('click', function () {
+            // SweetAlert2 pop up --- official docs reference: https://sweetalert2.github.io/
             Swal.fire({
-                text: "Block(s) could not be created.",
-                icon: "error",
+                text: "Are you sure you want to delete selected records?",
+                icon: "warning",
+                showCancelButton: true,
                 buttonsStyling: false,
-                confirmButtonText: "Ok, got it!",
+                showLoaderOnConfirm: true,
+                confirmButtonText: "Yes, delete!",
+                cancelButtonText: "No, cancel",
                 customClass: {
                     confirmButton: "btn fw-bold btn-danger",
+                    cancelButton: "btn fw-bold btn-active-light-primary"
+                },
+            }).then(function (result) {
+                if (result.value) {
+                    // Simulate delete request -- for demo purpose only
+                    Swal.fire({
+                        text: "Deleting selected records",
+                        icon: "info",
+                        buttonsStyling: false,
+                        showConfirmButton: false,
+                        timer: 2000
+                    }).then(function () {
+
+                        // Calling delete request with ajax
+                        $.ajax({
+                            type: "GET",
+                            url: "/lab/batch_delete",
+                            data: {
+                              "selected_ids": JSON.stringify(selectedRows),
+                            },
+                            error: function (xhr, ajaxOptions, thrownError) {
+                                swal("Error deleting!", "Please try again", "error");
+                            }
+                        }).done(function (result) {
+                            if (result.deleted) {
+                              Swal.fire({
+                                  text: "Patient(s) deleted succesfully.",
+                                  icon: "info",
+                                  buttonsStyling: false,
+                                  confirmButtonText: "Ok, got it!",
+                                  customClass: {
+                                      confirmButton: "btn fw-bold btn-success",
+                                  }
+                              }).then(function(){
+                                  // clean selected rows
+                                  selectedRows = [];
+                                  // refresh dataTable
+                                  dt.draw();
+                              });
+                            }
+                            else {
+                              Swal.fire({
+                                  text: `Patient(s) couldn't deleted!\n${result.message}`,
+                                  icon: "error",
+                                  buttonsStyling: false,
+                                  confirmButtonText: "Ok, got it!",
+                                  customClass: {
+                                      confirmButton: "btn fw-bold btn-success",
+                                  }
+                              });
+                            }
+                        });
+
+                        // Remove header checked box
+                        const headerCheckbox = container.querySelectorAll('[type="checkbox"]')[0];
+                        headerCheckbox.checked = false;
+                    });
                 }
             });
-          }
         });
-      });
     }
 
     // Toggle toolbars
@@ -569,7 +619,7 @@ var KTDatatablesServerSide = function () {
             handleFilterDatatable();
             handleDeleteRows();
             handleResetForm();
-            handleSelectedRows();
+            handleBatchDeleteRows();
             initEditor();
         }
     }
