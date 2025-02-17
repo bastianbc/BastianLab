@@ -175,7 +175,7 @@ def get_variant_file(file_path):
 def get_gene(name, hg):
     logger.debug(f"Getting gene: {name}")
     try:
-        gene = Gene.objects.filter(name=name, hg=hg)
+        gene = Gene.objects.get(name=name, hg=hg)
         logger.info(f"Found gene: {name}")
         return gene
     except ObjectDoesNotExist:
