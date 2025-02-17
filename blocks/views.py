@@ -55,7 +55,7 @@ def add_block_to_patient_async(request):
     print("patient_id: ", patient_id)
     print("selected_ids: ", selected_ids)
     # try:
-    patient = Patient.objects.get(id=patient_id)
+    patient = Patient.objects.get(id_in=selected_ids)
     blocks = Block.objects.filter(id__in=selected_ids)
 
     for block in blocks:

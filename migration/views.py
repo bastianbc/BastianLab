@@ -3836,9 +3836,8 @@ def register_new_fastq_files(request):
     #         generate_file_set(row['file'])
 
 def call_import_variants(request):
-    from .variants_import import import_variants
-    from migration.cns_import import import_csn_files, import_csn_calls, import_area_types
-    import_area_types()
+    from .variants_import_2 import import_variants
+    import_variants()
 
 
 
