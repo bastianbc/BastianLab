@@ -261,7 +261,7 @@ def variant_file_parser(file_path, analysis_run_name):
         logger.error(f"File validation failed: {error_msg}")
         return False, error_msg, {}
 
-    try:
+    # try:
         # Read file
         logger.debug("Reading file with pandas")
         df = pd.read_csv(file_path, sep='\t')
@@ -302,67 +302,67 @@ def variant_file_parser(file_path, analysis_run_name):
         # Process each row
         for index, row in df.iterrows():
             logger.debug(f"Processing row {index + 1}")
-            try:
+            # try:
                 # Check required fields
-                fields_valid, field_error = check_required_fields(row)
-                if not fields_valid:
-                    logger.error(f"Row {index + 1}: {field_error}")
-                    stats["errors"].append(f"Row {index + 1}: {field_error}")
-                    stats["failed"] += 1
-                    continue
-
-                # Caller check
-                caller = get_caller(filename)
-                if not caller:
-                    logger.error(f"Row {index + 1}: Could not determine caller")
-                    stats["errors"].append(f"Row {index + 1}: Could not determine caller")
-                    stats["failed"] += 1
-                    continue
-
-
-                logger.debug(f"Creating VariantCall for row {index + 1}")
-                variant_call = VariantCall.objects.get(
-                    analysis_run=analysis_run,
-                    sample_lib=sample_lib,
-                    sequencing_run=get_sequencing_run(filename),
-                    variant_file=variant_file,
-                    coverage=row['Depth'],
-                    log2r=get_log2r(),
-                    caller=caller,
-                    normal_sl=get_normal_sample_lib(sample_lib),
-                    label="",
-                    ref_read=row['Ref_reads'],
-                    alt_read=row['Alt_reads'],
-                )
-
-                logger.debug(f"Creating GVariant for row {index + 1}")
-                g_variant = GVariant.objects.get(
-                    variant_call=variant_call,
-                    hg=get_hg(filename),
-                    chrom=row['Chr'],
-                    start=row['Start'],
-                    end=row['End'],
-                    ref=row['Ref'][:99],
-                    alt=row['Alt'][:99],
-                    avsnp150=row.get('avsnp150', '')
-                )
-
-                logger.debug(f"Creating C and P variants for row {index + 1}")
-                create_c_and_p_variants(
-                    g_variant=g_variant,
-                    aachange=row['AAChange.refGene'],
-                    func=row['Func.refGene'],
-                    gene_detail=row.get('GeneDetail.refGene', ''),
-                    filename = filename
-                )
-
-                stats["successful"] += 1
-                logger.info(f"Successfully processed row {index + 1}")
-
-            except Exception as e:
-                logger.error(f"Error processing row {index + 1}: {str(e)}", exc_info=True)
-                stats["errors"].append(f"Row {index + 1}: {str(e)}")
+            fields_valid, field_error = check_required_fields(row)
+            if not fields_valid:
+                logger.error(f"Row {index + 1}: {field_error}")
+                stats["errors"].append(f"Row {index + 1}: {field_error}")
                 stats["failed"] += 1
+                continue
+
+            # Caller check
+            caller = get_caller(filename)
+            if not caller:
+                logger.error(f"Row {index + 1}: Could not determine caller")
+                stats["errors"].append(f"Row {index + 1}: Could not determine caller")
+                stats["failed"] += 1
+                continue
+
+
+            logger.debug(f"Creating VariantCall for row {index + 1}")
+            variant_call = VariantCall.objects.get(
+                analysis_run=analysis_run,
+                sample_lib=sample_lib,
+                sequencing_run=get_sequencing_run(filename),
+                variant_file=variant_file,
+                coverage=row['Depth'],
+                log2r=get_log2r(),
+                caller=caller,
+                normal_sl=get_normal_sample_lib(sample_lib),
+                label="",
+                ref_read=row['Ref_reads'],
+                alt_read=row['Alt_reads'],
+            )
+
+            logger.debug(f"Creating GVariant for row {index + 1}")
+            g_variant = GVariant.objects.get(
+                variant_call=variant_call,
+                hg=get_hg(filename),
+                chrom=row['Chr'],
+                start=row['Start'],
+                end=row['End'],
+                ref=row['Ref'][:99],
+                alt=row['Alt'][:99],
+                avsnp150=row.get('avsnp150', '')
+            )
+
+            logger.debug(f"Creating C and P variants for row {index + 1}")
+            create_c_and_p_variants(
+                g_variant=g_variant,
+                aachange=row['AAChange.refGene'],
+                func=row['Func.refGene'],
+                gene_detail=row.get('GeneDetail.refGene', ''),
+                filename = filename
+            )
+
+            stats["successful"] += 1
+            logger.info(f"Successfully processed row {index + 1}")
+
+            # except Exception as e:
+            #     logger.error(f"Error processing row {index + 1}: {str(e)}", exc_info=True)
+            #     stats["errors"].append(f"Row {index + 1}: {str(e)}")
+            #     stats["failed"] += 1
 
 
 
@@ -381,9 +381,9 @@ def variant_file_parser(file_path, analysis_run_name):
             logger.info("All variants processed successfully")
             return True, "All variants processed successfully", stats
 
-    except Exception as e:
-        logger.critical(f"Critical error in variant file parser: {str(e)}", exc_info=True)
-        return False, f"Critical error: {str(e)}", {}
+    # except Exception as e:
+    #     logger.critical(f"Critical error in variant file parser: {str(e)}", exc_info=True)
+    #     return False, f"Critical error: {str(e)}", {}
 
 def create_variant_file(row):
     VariantFile.objects.get_or_create(name=row['File'], directory=row['Dir'])
