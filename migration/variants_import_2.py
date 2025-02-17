@@ -218,6 +218,7 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail, filename):
             print(f"problematic gene: {aachange}, file: {filename}")
     for entry in entries:
         try:
+            print("entry: ", entry)
             logger.debug(f"Processing entry: {entry}")
             gene, nm_id, exon, c_var, p_var = entry.split(':')
             gene = get_gene(gene, nm_id)
