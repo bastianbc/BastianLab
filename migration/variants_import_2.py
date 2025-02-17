@@ -396,6 +396,7 @@ def import_variants():
     for file in files:
         file_path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA,file.directory)
         if "_Filtered" in os.path.join(file_path, file.name):
+            print("*"*100, os.path.join(file_path,file.name))
             variant_file_parser(os.path.join(file_path,file.name), "AR_ALL")
 
 
