@@ -222,6 +222,7 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail, filename):
             logger.debug(f"Processing entry: {entry}")
             gene, nm_id, exon, c_var, p_var = entry.split(':')
             gene = get_gene(gene, nm_id)
+            print("gene: ", gene)
             # Create CVariant instance
             # if gene:
             #     c_variant = CVariant.objects.create(
