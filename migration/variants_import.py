@@ -176,7 +176,7 @@ def get_gene(name, hg, canonical):
     logger.debug(f"Getting gene: {name}")
     try:
         if "NOTCH2NL" in name:
-            gene = Gene.objects.filter(name__icontains=name, hg=hg, nm_canonical=canonical)
+            gene = Gene.objects.get(name__icontains=name, hg=hg, nm_canonical=canonical)
             return gene
         gene = Gene.objects.get(name=name, hg=hg)
         logger.info(f"Found gene: {name}")
