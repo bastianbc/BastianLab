@@ -217,7 +217,7 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail, filename):
         if not any(gene_nm_id(aachange)):
             print(f"problematic gene: {aachange}, file: {filename}")
     for entry in entries:
-        try:
+        # try:
             logger.debug(f"Processing entry: {entry}")
             gene, nm_id, exon, c_var, p_var = entry.split(':')
             gene = get_gene(gene, nm_id)
@@ -246,8 +246,8 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail, filename):
             #                 change_type=change_type,
             #                 name_meta=p_var[:99]
             #             )
-        except Exception as e:
-            logger.error(f"Error processing AAChange entry '{entry}': {str(e)}")
+        # except Exception as e:
+        #     logger.error(f"Error processing AAChange entry '{entry}': {str(e)}")
 
 
 
