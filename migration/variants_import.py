@@ -81,7 +81,7 @@ def parse_p_var(p_var):
         logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
         return start, end, reference_residues, inserted_residues, change_type
     logger.warning(f"Failed to parse p_var: {p_var}")
-    return None, None, None
+    return None, None, None, None, None
 
 def get_log2r():
     """
@@ -236,10 +236,8 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail, filename):
 
                 # Create PVariant instance if p_var is present
                 if p_var:
-                    if parse_p_var(p_var):
-                        continue
-                    else:
-                        start, end, reference_residues, inserted_residues, change_type = parse_p_var(p_var)
+                    start, end, reference_residues, inserted_residues, change_type = parse_p_var(p_var)
+                    if start:
                         inserted_residues = f"{inserted_residues[:98]}*" if p_var.endswith("*") else inserted_residues[:99]
                         p_variant = PVariant.objects.create(
                             c_variant=c_variant,
@@ -250,6 +248,8 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail, filename):
                             change_type=change_type,
                             name_meta=p_var[:99]
                         )
+                    else:
+                        print("?"*50, entry)
         except Exception as e:
             logger.error(f"Error processing AAChange entry '{entry}': {str(e)}")
 
