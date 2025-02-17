@@ -204,6 +204,8 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail, filename):
             gene, nm_id, exon, c_var, p_var = entry.split(':')
             gene = get_gene(gene, nm_id, filename)
             # Create CVariant instance
+            is_alias = True if nm_id.lower() == gene.nm_canonical.lower() else False
+            print("@@@", is_alias, nm_id.lower() == gene.nm_canonical.lower(), nm_id.lower(), gene.nm_canonical.lower())
             if gene:
                 c_variant = CVariant.objects.create(
                     g_variant=g_variant,
@@ -227,7 +229,8 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail, filename):
                         reference_residues=reference_residues,
                         inserted_residues=inserted_residues,
                         change_type=change_type,
-                        name_meta=p_var[:99]
+                        name_meta=p_var[:99],
+                        is_alias=is_alias
                     )
 
         except Exception as e:
