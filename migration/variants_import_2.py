@@ -217,7 +217,7 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail, filename):
         if not any(gene_nm_id(aachange)):
             print(f"problematic gene: {aachange}, file: {filename}")
     for entry in entries:
-        # try:
+        try:
             logger.debug(f"Processing entry: {entry}")
             gene, nm_id, exon, c_var, p_var = entry.split(':')
             gene = get_gene(gene, nm_id)
@@ -246,6 +246,11 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail, filename):
             #                 change_type=change_type,
             #                 name_meta=p_var[:99]
             #             )
+        except ValueError as e:
+            if str(e) == "not enough values to unpack (expected 5, got 1)":
+                print("Caught specific unpacking error:", e)
+            else:
+                raise
         # except Exception as e:
         #     logger.error(f"Error processing AAChange entry '{entry}': {str(e)}")
 
@@ -254,13 +259,11 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail, filename):
 def variant_file_parser(file_path, analysis_run_name):
     logger.info(f"Starting variant file parser for {file_path}")
     logger.info(f"Analysis run name: {analysis_run_name}")
-    print("1")
     # File check
     is_valid, error_msg = check_file(file_path)
     if not is_valid:
         logger.error(f"File validation failed: {error_msg}")
         return False, error_msg, {}
-    print("2")
     # try:
     # Read file
     logger.debug("Reading file with pandas")
@@ -319,20 +322,9 @@ def variant_file_parser(file_path, analysis_run_name):
             stats["failed"] += 1
             continue
 
-        print(
-            analysis_run,
-            sample_lib,
-            get_sequencing_run(filename),
-            variant_file,
-            row['Depth'],
-            get_log2r(),
-            caller,
-            get_normal_sample_lib(sample_lib),
-            row['Ref_reads'],
-            row['Alt_reads'],
-        )
+
         logger.debug(f"Creating VariantCall for row {index + 1}")
-        variant_call = VariantCall.objects.get(
+        variant_call = VariantCall.objects.filter(
             analysis_run=analysis_run,
             sample_lib=sample_lib,
             sequencing_run=get_sequencing_run(filename),
@@ -342,8 +334,8 @@ def variant_file_parser(file_path, analysis_run_name):
             caller=caller,
             ref_read=row['Ref_reads'],
             alt_read=row['Alt_reads'],
-        )
-
+        ).first()
+        print(variant_call)
         logger.debug(f"Creating GVariant for row {index + 1}")
         g_variant = GVariant.objects.get(
             variant_call=variant_call,
@@ -405,7 +397,7 @@ def import_variants():
     for file in files:
         file_path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA,file.directory)
         if "_Filtered" in os.path.join(file_path, file.name):
-            print("*"*100, os.path.join(file_path,file.name))
+            print("*"*10, os.path.join(file_path,file.name))
             variant_file_parser(os.path.join(file_path,file.name), "AR_ALL")
 
 
