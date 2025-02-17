@@ -79,7 +79,7 @@ def process_variant(request, variant_type, ar_name):
 @csrf_exempt
 def import_cns(request, ar_name):
     if request.method == "POST":
-        try:
+        # try:
             folders = ["cnv/output", "snv/output", "alignment/output"]
             folder_stats = []
             total_stats = {
