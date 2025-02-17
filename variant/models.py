@@ -213,7 +213,6 @@ class PVariant(models.Model):
         if self.c_variant and self.c_variant.gene:
             gene = self.c_variant.gene
             self.is_alias = self.c_variant.nm_id == gene.nm_canonical if gene.nm_canonical else False
-            print("&&"*50)
 
     def save(self, *args, **kwargs):
         """Ensure is_alias is updated before saving."""
