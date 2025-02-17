@@ -212,11 +212,12 @@ class PVariant(models.Model):
         """Update is_alias based on whether CVariant nm_id matches Gene nm_canonical."""
         if self.c_variant and self.c_variant.gene:
             gene = self.c_variant.gene
-            if gene.nm_canonical and self.c_variant.nm_id == gene.nm_canonical:
-                self.is_alias = True
-            else:
-                self.is_alias = False
-            self.save()
+            self.is_alias = self.c_variant.nm_id == gene.nm_canonical if gene.nm_canonical else False
+
+    def save(self, *args, **kwargs):
+        """Ensure is_alias is updated before saving."""
+        self.update_is_alias()
+        super().save(*args, **kwargs)
 
 class VariantFile(models.Model):
     FILE_TYPES = [
