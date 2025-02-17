@@ -238,7 +238,6 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail, filename):
                 # Create PVariant instance if p_var is present
                 if p_var:
                     start, end, reference_residues, inserted_residues, change_type = parse_p_var(p_var)
-
                     inserted_residues = f"{inserted_residues[:98]}*" if p_var.endswith("*") else inserted_residues[:99]
                     p_variant = PVariant.objects.create(
                         c_variant=c_variant,
