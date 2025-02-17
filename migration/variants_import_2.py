@@ -321,15 +321,15 @@ def variant_file_parser(file_path, analysis_run_name):
 
         print(
             analysis_run,
-sample_lib,
-get_sequencing_run(filename),
-variant_file,
-row['Depth'],
-get_log2r(),
-caller,
-get_normal_sample_lib(sample_lib),
-row['Ref_reads'],
-row['Alt_reads'],
+            sample_lib,
+            get_sequencing_run(filename),
+            variant_file,
+            row['Depth'],
+            get_log2r(),
+            caller,
+            get_normal_sample_lib(sample_lib),
+            row['Ref_reads'],
+            row['Alt_reads'],
         )
         logger.debug(f"Creating VariantCall for row {index + 1}")
         variant_call = VariantCall.objects.get(
@@ -340,8 +340,6 @@ row['Alt_reads'],
             coverage=row['Depth'],
             log2r=get_log2r(),
             caller=caller,
-            normal_sl=get_normal_sample_lib(sample_lib),
-            label="",
             ref_read=row['Ref_reads'],
             alt_read=row['Alt_reads'],
         )
