@@ -178,7 +178,7 @@ def get_gene(name, canonical):
         logger.info(f"Found gene: {name}")
         return gene
     except ObjectDoesNotExist:
-        logger.error(f"Gene not found: {name}")
+        logger.error(f"Gene not found: {name}, NM_ID: {canonical}")
         return None
 
 def check_required_fields(row):
@@ -347,7 +347,7 @@ def variant_file_parser(file_path, analysis_run_name):
             alt=row['Alt'][:99],
             avsnp150=row.get('avsnp150', '')
         )
-
+        print(g_variant)
         logger.debug(f"Creating C and P variants for row {index + 1}")
         create_c_and_p_variants(
             g_variant=g_variant,
