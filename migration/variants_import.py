@@ -202,8 +202,10 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail, filename):
         try:
             logger.debug(f"Processing entry: {entry}")
             gene, nm_id, exon, c_var, p_var = entry.split(':')
+            print(gene)
             gene = get_gene(gene, nm_id, filename)
             # Create CVariant instance
+            print(gene)
             is_alias = True if nm_id.lower() == gene.nm_canonical.lower() else False
             print("@@@", is_alias, nm_id.lower() == gene.nm_canonical.lower(), nm_id.lower(), gene.nm_canonical.lower())
             if gene:
