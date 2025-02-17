@@ -194,29 +194,10 @@ def check_required_fields(row):
     logger.debug("All required fields present")
     return True, ""
 
-def gene_nm_id(entries):
-    try:
-        find = []
-        for entry in entries.split(","):
-            gene, nm_id, exon, c_var, p_var = entry.split(':')
-            gene = Gene.objects.filter(nm_canonical=nm_id)
-            # print(gene)
-            if gene:
-                find.append(True)
-            else:
-                find.append(False)
-        return find
-    except Exception as e:
-        logger.error(f"{e}")
-        return find
-
 
 def create_c_and_p_variants(g_variant, aachange, func, gene_detail, filename):
     logger.debug(f"Creating C and P variants for aachange: {aachange}")
     entries = aachange.split(',')
-    if aachange.strip() not in [".", "UNKNOWN"]:
-        if not any(gene_nm_id(aachange)):
-            print(f"problematic gene: {aachange}, file: {filename}")
     for entry in entries:
         try:
             logger.debug(f"Processing entry: {entry}")
