@@ -203,6 +203,7 @@ class PVariant(models.Model):
     inserted_residues = models.CharField(max_length=100, blank=True, null=True)
     change_type = models.CharField(max_length=100, blank=True, null=True)
     name_meta = models.CharField(max_length=100)
+    is_alias = models.BooleanField(default=False)
 
     class Meta:
         db_table = "p_variant"
