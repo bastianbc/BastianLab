@@ -254,110 +254,110 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail, filename):
 def variant_file_parser(file_path, analysis_run_name):
     logger.info(f"Starting variant file parser for {file_path}")
     logger.info(f"Analysis run name: {analysis_run_name}")
-
+    print("1")
     # File check
     is_valid, error_msg = check_file(file_path)
     if not is_valid:
         logger.error(f"File validation failed: {error_msg}")
         return False, error_msg, {}
-
+    print("2")
     # try:
-        # Read file
-        logger.debug("Reading file with pandas")
-        df = pd.read_csv(file_path, sep='\t')
-        if df.empty:
-            logger.error(f"File is empty {file_path}")
-            return False, "File is empty", {}
+    # Read file
+    logger.debug("Reading file with pandas")
+    df = pd.read_csv(file_path, sep='\t')
+    if df.empty:
+        logger.error(f"File is empty {file_path}")
+        return False, "File is empty", {}
 
-        filename = os.path.basename(file_path)
-        logger.debug(f"Processing filename: {filename}")
+    filename = os.path.basename(file_path)
+    logger.debug(f"Processing filename: {filename}")
 
-        # Sample library check
-        sample_lib = get_sample_lib(filename)
-        if not sample_lib:
-            logger.error(f"Sample library not found: {filename}")
-            return False, f"Sample library not found: {filename}", {}
+    # Sample library check
+    sample_lib = get_sample_lib(filename)
+    if not sample_lib:
+        logger.error(f"Sample library not found: {filename}")
+        return False, f"Sample library not found: {filename}", {}
 
-        analysis_run = get_analysis_run(analysis_run_name)
-        if not analysis_run:
-            logger.error(f"Analysis run not found: {analysis_run_name}")
-            return False, f"Analysis run not found: {analysis_run_name}", {}
+    analysis_run = get_analysis_run(analysis_run_name)
+    if not analysis_run:
+        logger.error(f"Analysis run not found: {analysis_run_name}")
+        return False, f"Analysis run not found: {analysis_run_name}", {}
 
-        variant_file = get_variant_file(file_path)
-        if variant_file.call:
-            return
+    variant_file = get_variant_file(file_path)
+    if variant_file.call:
+        return
 
-        if not variant_file:
-            logger.error(f"Variant file not found: {file_path}")
-            return False, f"Variant file not found: {file_path}", {}
+    if not variant_file:
+        logger.error(f"Variant file not found: {file_path}")
+        return False, f"Variant file not found: {file_path}", {}
 
-        stats = {
-            "total_rows": len(df),
-            "successful": 0,
-            "failed": 0,
-            "errors": []
-        }
-        logger.info(f"Starting to process {stats['total_rows']} rows")
+    stats = {
+        "total_rows": len(df),
+        "successful": 0,
+        "failed": 0,
+        "errors": []
+    }
+    logger.info(f"Starting to process {stats['total_rows']} rows")
+    print("3")
+    # Process each row
+    for index, row in df.iterrows():
+        logger.debug(f"Processing row {index + 1}")
+        # try:
+            # Check required fields
+        fields_valid, field_error = check_required_fields(row)
+        if not fields_valid:
+            logger.error(f"Row {index + 1}: {field_error}")
+            stats["errors"].append(f"Row {index + 1}: {field_error}")
+            stats["failed"] += 1
+            continue
 
-        # Process each row
-        for index, row in df.iterrows():
-            logger.debug(f"Processing row {index + 1}")
-            # try:
-                # Check required fields
-            fields_valid, field_error = check_required_fields(row)
-            if not fields_valid:
-                logger.error(f"Row {index + 1}: {field_error}")
-                stats["errors"].append(f"Row {index + 1}: {field_error}")
-                stats["failed"] += 1
-                continue
-
-            # Caller check
-            caller = get_caller(filename)
-            if not caller:
-                logger.error(f"Row {index + 1}: Could not determine caller")
-                stats["errors"].append(f"Row {index + 1}: Could not determine caller")
-                stats["failed"] += 1
-                continue
+        # Caller check
+        caller = get_caller(filename)
+        if not caller:
+            logger.error(f"Row {index + 1}: Could not determine caller")
+            stats["errors"].append(f"Row {index + 1}: Could not determine caller")
+            stats["failed"] += 1
+            continue
 
 
-            logger.debug(f"Creating VariantCall for row {index + 1}")
-            variant_call = VariantCall.objects.get(
-                analysis_run=analysis_run,
-                sample_lib=sample_lib,
-                sequencing_run=get_sequencing_run(filename),
-                variant_file=variant_file,
-                coverage=row['Depth'],
-                log2r=get_log2r(),
-                caller=caller,
-                normal_sl=get_normal_sample_lib(sample_lib),
-                label="",
-                ref_read=row['Ref_reads'],
-                alt_read=row['Alt_reads'],
-            )
+        logger.debug(f"Creating VariantCall for row {index + 1}")
+        variant_call = VariantCall.objects.get(
+            analysis_run=analysis_run,
+            sample_lib=sample_lib,
+            sequencing_run=get_sequencing_run(filename),
+            variant_file=variant_file,
+            coverage=row['Depth'],
+            log2r=get_log2r(),
+            caller=caller,
+            normal_sl=get_normal_sample_lib(sample_lib),
+            label="",
+            ref_read=row['Ref_reads'],
+            alt_read=row['Alt_reads'],
+        )
 
-            logger.debug(f"Creating GVariant for row {index + 1}")
-            g_variant = GVariant.objects.get(
-                variant_call=variant_call,
-                hg=get_hg(filename),
-                chrom=row['Chr'],
-                start=row['Start'],
-                end=row['End'],
-                ref=row['Ref'][:99],
-                alt=row['Alt'][:99],
-                avsnp150=row.get('avsnp150', '')
-            )
+        logger.debug(f"Creating GVariant for row {index + 1}")
+        g_variant = GVariant.objects.get(
+            variant_call=variant_call,
+            hg=get_hg(filename),
+            chrom=row['Chr'],
+            start=row['Start'],
+            end=row['End'],
+            ref=row['Ref'][:99],
+            alt=row['Alt'][:99],
+            avsnp150=row.get('avsnp150', '')
+        )
 
-            logger.debug(f"Creating C and P variants for row {index + 1}")
-            create_c_and_p_variants(
-                g_variant=g_variant,
-                aachange=row['AAChange.refGene'],
-                func=row['Func.refGene'],
-                gene_detail=row.get('GeneDetail.refGene', ''),
-                filename = filename
-            )
+        logger.debug(f"Creating C and P variants for row {index + 1}")
+        create_c_and_p_variants(
+            g_variant=g_variant,
+            aachange=row['AAChange.refGene'],
+            func=row['Func.refGene'],
+            gene_detail=row.get('GeneDetail.refGene', ''),
+            filename = filename
+        )
 
-            stats["successful"] += 1
-            logger.info(f"Successfully processed row {index + 1}")
+        stats["successful"] += 1
+        logger.info(f"Successfully processed row {index + 1}")
 
             # except Exception as e:
             #     logger.error(f"Error processing row {index + 1}: {str(e)}", exc_info=True)
