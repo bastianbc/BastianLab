@@ -172,9 +172,12 @@ def get_variant_file(file_path):
         logger.error(f"Variant file not found: {file_path}")
         return None
 
-def get_gene(name, hg):
+def get_gene(name, hg, canonical):
     logger.debug(f"Getting gene: {name}")
     try:
+        if "NOTCH2NL" in name:
+            gene = Gene.objects.filter(name__icontains=name, hg=hg, nm_canonical=canonical)
+            return gene
         gene = Gene.objects.get(name=name, hg=hg)
         logger.info(f"Found gene: {name}")
         return gene
@@ -202,7 +205,7 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail, filename):
         try:
             logger.debug(f"Processing entry: {entry}")
             gene, nm_id, exon, c_var, p_var = entry.split(':')
-            gene = get_gene(gene, "hg19")
+            gene = get_gene(gene, "hg19", nm_id)
             # Create CVariant instance
             is_alias = True if nm_id.lower() == gene.nm_canonical.lower() else False
             if gene:
