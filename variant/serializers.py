@@ -9,15 +9,14 @@ class VariantSerializer(serializers.ModelSerializer):
     blocks = serializers.CharField(read_only=True)
     areas = serializers.CharField(read_only=True)
     genes = serializers.CharField(read_only=True)
-    c_variant = serializers.CharField(read_only=True)
-    p_variant = serializers.CharField(read_only=True)
-    g_variant = serializers.CharField(read_only=True)
+    variant = serializers.CharField(read_only=True)
+    aliases = serializers.CharField(read_only=True)
     sample_lib = serializers.SerializerMethodField()
     sequencing_run = serializers.SerializerMethodField()
 
     class Meta:
         model = VariantCall
-        fields = ("id", "patients", "areas", "blocks", "sample_lib", "sequencing_run", "genes", "g_variant", 'c_variant', "p_variant", "DT_RowId", )
+        fields = ("id", "patients", "areas", "blocks", "sample_lib", "sequencing_run", "genes", 'variant', "aliases", "DT_RowId", )
 
     def get_DT_RowId(self, obj):
        return getattr(obj, 'id')
