@@ -21,7 +21,10 @@ var KTDatatablesServerSide = function () {
         filterCoverage,
         filterLog2r,
         filterRefRead,
-        filterAltRead) {
+        filterAltRead,
+        filterVariant,
+        filterVariantFile
+        ) {
 
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
 
@@ -55,7 +58,9 @@ var KTDatatablesServerSide = function () {
                 "coverage": filterCoverage,
                 "log2r": filterLog2r,
                 "ref_read": filterRefRead,
-                "alt_read": filterAltRead
+                "alt_read": filterAltRead,
+                "variant": filterVariant,
+                "variant_file": filterVariantFile
               },
               error: function (xhr, ajaxOptions, thrownError) {
                   if (xhr.status == 403) {
@@ -81,9 +86,8 @@ var KTDatatablesServerSide = function () {
                 { data: 'sample_lib' },
                 { data: 'sequencing_run' },
                 { data: 'genes' },
-                { data: 'g_variant' },
-                { data: 'p_variant' },
-                { data: 'c_variant' },
+                { data: 'variant' },
+                { data: 'aliases' },
                 { data: null },
             ],
             columnDefs: [
@@ -105,12 +109,9 @@ var KTDatatablesServerSide = function () {
                   targets: 8,
                   orderable: false,
                 },
+
                 {
-                  targets: 9,
-                  orderable: false,
-                },
-                {
-                    targets: 10,
+                    targets: -1,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -238,11 +239,13 @@ var KTDatatablesServerSide = function () {
           var log2r = document.getElementById("id_log2r").value;
           var refRead = document.getElementById("id_ref_read").value;
           var altRead = document.getElementById("id_alt_read").value;
+          var variant = document.getElementById("id_variant").value;
+          var variant_file = document.getElementById("id_variant_file").value;
 
           console.log(sampleLib);
 
           // DataTable'ı başlat
-          initDatatable(null, patient, area, block, sampleLib, sequencingRun ,coverage, log2r, refRead, altRead);
+          initDatatable(null, patient, area, block, sampleLib, sequencingRun ,coverage, log2r, refRead, altRead, variant, variant_file);
 
         });
 
@@ -384,8 +387,9 @@ var KTDatatablesServerSide = function () {
             document.getElementById("id_log2r").value = "";
             document.getElementById("id_ref_read").value = "";
             document.getElementById("id_alt_read").value = "";
+            document.getElementById("id_variant_file").value = "";
 
-            initDatatable(null ,null,null,null,null,null,null,null,null,null);
+            initDatatable(null ,null ,null ,null,null,null,null,null,null,null,null,null);
         });
     }
 
@@ -809,7 +813,7 @@ var KTDatatablesServerSide = function () {
     // Public methods
     return {
         init: function () {
-            initDatatable( handleInitialValue() ,null,null,null,null,null,null,null,null,null);
+            initDatatable( handleInitialValue() ,null,null,null,null,null,null,null,null,null,null,null);
             handleSearchDatatable();
             initToggleToolbar();
             handleFilterDatatable();

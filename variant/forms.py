@@ -33,6 +33,8 @@ class FilterForm(forms.Form):
     log2r = forms.FloatField(label="Log2r")
     ref_read = forms.IntegerField(label="Ref Read")
     alt_read = forms.IntegerField(label="Alt Read")
+    variant = forms.CharField(label="Variant")
+    variant_file = forms.CharField(label="Variant file")
 
     def __init__(self, *args, **kwargs):
         super(FilterForm, self).__init__(*args, **kwargs)
@@ -50,3 +52,5 @@ class FilterForm(forms.Form):
         self.fields["log2r"].widget.attrs.update({'class':'form-control-sm'})
         self.fields["ref_read"].widget.attrs.update({'class':'form-control-sm'})
         self.fields["alt_read"].widget.attrs.update({'class':'form-control-sm'})
+        self.fields["variant"].widget.attrs.update({'class':'form-control-sm'})
+        self.fields["variant_file"].widget.attrs.update({'class':'form-control-sm'})

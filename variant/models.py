@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Q, Count, F, OuterRef, Subquery, Func, Value, CharField
+from django.db.models import Q, Count, F, OuterRef, Subquery, Func, Value, CharField, When, Case
 from datetime import datetime
 from projects.utils import get_user_projects
 
@@ -26,37 +26,33 @@ class VariantCall(models.Model):
             Users can access to some entities depend on their authorize. While the user having admin role can access to all things,
             technicians or researchers can access own projects and other entities related to it.
             '''
-            c_variant_subquery = CVariant.objects.filter(
-                g_variant__variant_call=OuterRef('pk')  # Reference the current VariantCall
-            ).values('c_var')[:1]
 
-            p_variant_subquery = PVariant.objects.filter(
-                c_variant__g_variant__variant_call=OuterRef('pk')  # Reference the current VariantCall
+            variant_subquery = PVariant.objects.filter(
+                c_variant__g_variant__variant_call=OuterRef('pk'),
+                is_alias=True
             ).values('name_meta')[:1]
-            g_variant_subquery = GVariant.objects.filter(
-                variant_call=OuterRef('pk')  # Reference the current VariantCall
-            ).values('chrom', 'start', 'end', 'avsnp150')[:1]
+            aliases_subquery = PVariant.objects.filter(
+                c_variant__g_variant__variant_call=OuterRef('pk'),
+                is_alias=False
+            ).values('name_meta')[:1]
 
-            # Concatenate fields to match the required format
-            g_variant_annotation = Func(
-                Subquery(g_variant_subquery.values('chrom')[:1]),
-                Value('-'),
-                Subquery(g_variant_subquery.values('start')[:1]),
-                Value('-'),
-                Subquery(g_variant_subquery.values('end')[:1]),
-                Value('-'),
-                Subquery(g_variant_subquery.values('avsnp150')[:1]),
-                function='CONCAT',
-                output_field=CharField()
-            )
             queryset = VariantCall.objects.filter().annotate(
                 blocks=F('sample_lib__na_sl_links__nucacid__area_na_links__area__block__name'),
-                areas = F('sample_lib__na_sl_links__nucacid__area_na_links__area__name'),
-                genes = F('g_variants__c_variants__gene__name'),
-                patients = F('sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__pat_id'),
-                c_variant = Subquery(c_variant_subquery),
-                p_variant = Subquery(p_variant_subquery),
-                g_variant=g_variant_annotation
+                areas=F('sample_lib__na_sl_links__nucacid__area_na_links__area__name'),
+                genes=F('g_variants__c_variants__gene__name'),
+                patients=F('sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__pat_id'),
+                nm_id=F('g_variants__c_variants__nm_id'),
+                canonical_id=F('g_variants__c_variants__gene__nm_canonical'),
+                variant=Case(
+                    When(Q(nm_id=F('canonical_id')), then=Subquery(variant_subquery)),
+                    default=Value(""),
+                    output_field=CharField()
+                ),
+                aliases=Case(
+                    When(Q(nm_id=F('canonical_id')), then=Value("")),
+                    default=Subquery(aliases_subquery),
+                    output_field=CharField()
+                )
             )
 
             if not user.is_superuser:
@@ -87,12 +83,15 @@ class VariantCall(models.Model):
             order = kwargs.get('order[0][dir]', None)[0]
             patient = kwargs.get('patient', None)[0]
             sample_lib = kwargs.get('sample_lib', None)[0]
+            sequencing_run = kwargs.get('sequencing_run', None)[0]
             block = kwargs.get('block', None)[0]
             area = kwargs.get('area', None)[0]
             coverage_value = kwargs.get('coverage', None)[0]
             log2r_value = kwargs.get('log2r', None)[0]
             ref_read_value = kwargs.get('ref_read', None)[0]
             alt_read_value = kwargs.get('alt_read', None)[0]
+            variant = kwargs.get('variant', None)[0]
+            variant_file = kwargs.get('variant_file', None)[0]
 
 
             order_column = ORDER_COLUMN_CHOICES[order_column]
@@ -110,6 +109,9 @@ class VariantCall(models.Model):
 
             if sample_lib:
                 queryset = queryset.filter(Q(sample_lib__id=sample_lib))
+
+            if sequencing_run:
+                queryset = queryset.filter(Q(sequencing_run__id=sequencing_run))
 
             if area:
                 queryset = queryset.filter(
@@ -145,6 +147,12 @@ class VariantCall(models.Model):
 
             if alt_read_value:
                 queryset = queryset.filter(alt_read=alt_read_value)
+
+            if variant:
+                queryset = queryset.filter(g_variants__c_variants__p_variants__name_meta__icontains=variant)
+
+            if variant_file:
+                queryset = queryset.filter(variant_file__name__icontains=variant_file)
 
             if is_initial:
                 # filter = [sequencing_run.id for sequencing_run in SequencingRun.objects.filter(id=search_value)]

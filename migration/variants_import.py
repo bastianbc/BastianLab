@@ -41,45 +41,110 @@ def get_caller(filename):
     logger.debug(f"Extracted caller: {caller}")
     return caller
 
+
 def parse_p_var(p_var):
     logger.debug(f"Parsing p_var: {p_var}")
+
     if "M1?" in p_var:
         start, end, reference_residues, inserted_residues, change_type = (1, 1, "M", "", "substitution")
         return start, end, reference_residues, inserted_residues, change_type
-    match = re.match(r'p\.([A-Z])(\d+)([A-Z])', p_var)
+
+    # Handle frames shift mutations
     if "fs" in p_var:
         start, end, reference_residues, inserted_residues, change_type = (0, 0, "", "", "fs")
         return start, end, reference_residues, inserted_residues, change_type
+
+    # Handle special case: p.*92* (termination codon to termination codon)
+    match_term_to_term = re.match(r'p\.\*(\d+)\*', p_var)
+    if match_term_to_term:
+        start, end, reference_residues, inserted_residues, change_type = (
+            match_term_to_term.group(1),
+            match_term_to_term.group(1),
+            "*",
+            "*",
+            "synonymous"  # or you could use "substitution" if preferred
+        )
+        logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
+        return start, end, reference_residues, inserted_residues, change_type
+
+    # Handle mutations at termination codon with delins (e.g., p.*360delinsLIVPPRHPPCPSLVGY*)
+    match_term_delins = re.match(r'p\.\*(\d+)delins([A-Z]+)\*?', p_var)
+    if match_term_delins:
+        start, end, reference_residues, inserted_residues, change_type = (
+            match_term_delins.group(1),
+            match_term_delins.group(1),
+            "*",
+            match_term_delins.group(2) + ("*" if p_var.endswith("*") else ""),
+            "delins"
+        )
+        logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
+        return start, end, reference_residues, inserted_residues, change_type
+
+    # Handle standard substitution
     match = re.match(r'p\.([A-Z])(\d+)([A-Z])', p_var)
     if match:
         start, end, reference_residues, inserted_residues, change_type = (
-        match.group(2), match.group(2), match.group(1), match.group(3), "")
+            match.group(2),
+            match.group(2),
+            match.group(1),
+            match.group(3),
+            "substitution"
+        )
         logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
         return start, end, reference_residues, inserted_residues, change_type
+
+    # Handle single position variants
     match2 = re.match(r'p\.([A-Z])(\d+)(delins|del|ins)', p_var)
     if match2:
         start, end, reference_residues, inserted_residues, change_type = (
-        match2.group(2), match2.group(2), match2.group(1), "", match2.group(3))
+            match2.group(2),
+            match2.group(2),
+            match2.group(1),
+            "",
+            match2.group(3)
+        )
         logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
         return start, end, reference_residues, inserted_residues, change_type
+
+    # Handle range variants
     match5 = re.match(r'p\.([A-Z])(\d+)_([A-Z])(\d+)(delins|del|ins)', p_var)
     if match5:
         start, end, reference_residues, inserted_residues, change_type = (
-        match5.group(2), match5.group(4), match5.group(1)+match5.group(3), "", match5.group(5))
+            match5.group(2),
+            match5.group(4),
+            match5.group(1) + match5.group(3),
+            "",
+            match5.group(5)
+        )
         logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
         return start, end, reference_residues, inserted_residues, change_type
+
+    # Handle nonsense mutations
     match3 = re.match(r'p\.([A-Z])(\d+)\*', p_var)
     if match3:
         start, end, reference_residues, inserted_residues, change_type = (
-        match3.group(2), match3.group(2), match3.group(1), "", "")
+            match3.group(2),
+            match3.group(2),
+            match3.group(1),
+            "*",
+            "nonsense"
+        )
         logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
         return start, end, reference_residues, inserted_residues, change_type
+
+    # Handle more complex variants
     match4 = re.match(r'p\.([A-Z]+)(\d+)_([A-Z]+)(\d+)(delins|del|ins)([A-Z]+)', p_var)
     if match4:
         start, end, reference_residues, inserted_residues, change_type = (
-        match4.group(2), match4.group(4), match4.group(1) + match4.group(3), match4.group(6), match4.group(5))
+            match4.group(2),
+            match4.group(4),
+            match4.group(1) + match4.group(3),
+            match4.group(6),
+            match4.group(5)
+        )
         logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
         return start, end, reference_residues, inserted_residues, change_type
+
     logger.warning(f"Failed to parse p_var: {p_var}")
     print(f"Failed to parse p_var: {p_var}")
     return None, None, None, None, None
@@ -175,7 +240,7 @@ def get_variant_file(file_path):
 def get_gene(name, hg, canonical):
     logger.debug(f"Getting gene: {name}")
     try:
-        if "NOTCH2NL" in name:
+        if "NOTCH2NL" in name or "MUC1" in name or "MUC2" in name:
             gene = Gene.objects.get(name__icontains=name, hg=hg, nm_canonical=canonical)
             return gene
         gene = Gene.objects.get(name=name, hg=hg)
