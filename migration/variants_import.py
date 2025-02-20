@@ -263,6 +263,7 @@ def check_required_fields(row):
     return True, ""
 
 def create_gene_detail(gene_detail, row_gene, g_variant, func):
+    print("$$$", gene_detail, row_gene)
     entries = gene_detail.split(';')
     for entry in entries:
         try:
