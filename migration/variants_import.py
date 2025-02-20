@@ -290,7 +290,6 @@ def create_gene_detail(gene_detail, row_gene, g_variant, func):
 
 def create_c_and_p_variants(g_variant, aachange, func, gene_detail, filename, row_gene):
     logger.debug(f"Creating C and P variants for aachange: {aachange}")
-    print("aachange: ", aachange, " gene_detail: ", gene_detail)
     entries = aachange.split(',')
     if any(aachange.strip() in invalid for invalid in ["UNKNOWN", "."]):
         if gene_detail.strip() == ".":
