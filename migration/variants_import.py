@@ -262,15 +262,13 @@ def check_required_fields(row):
     logger.debug("All required fields present")
     return True, ""
 
-
-def create_c_and_p_variants(g_variant, aachange, func, gene_detail, filename):
-    logger.debug(f"Creating C and P variants for aachange: {aachange}")
-    entries = aachange.split(',')
+def create_gene_detail(gene_detail, row_gene, g_variant, func):
+    entries = gene_detail.split(';')
     for entry in entries:
         try:
-            logger.debug(f"Processing entry: {entry}")
-            gene, nm_id, exon, c_var, p_var = entry.split(':')
-            gene = get_gene(gene, "hg19", nm_id)
+            logger.debug(f"Processing gene_detail: {entry}")
+            nm_id, exon, c_var = entry.split(':')
+            gene = get_gene(row_gene, "hg19", nm_id)
             # Create CVariant instance
             is_alias = True if nm_id.lower() == gene.nm_canonical.lower() else False
             if gene:
@@ -281,27 +279,56 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail, filename):
                     exon=exon,
                     c_var=c_var,
                     func=func,
-                    gene_detail=gene_detail
+                    gene_detail=gene_detail,
+                    is_alias=is_alias,
                 )
                 logger.info(f"Created CVariant: {c_variant}")
-
-                # Create PVariant instance if p_var is present
-                if p_var:
-                    start, end, reference_residues, inserted_residues, change_type = parse_p_var(p_var)
-                    inserted_residues = f"{inserted_residues[:98]}*" if p_var.endswith("*") else inserted_residues[:99]
-                    p_variant = PVariant.objects.create(
-                        c_variant=c_variant,
-                        start=start,
-                        end=end,
-                        reference_residues=reference_residues,
-                        inserted_residues=inserted_residues,
-                        change_type=change_type,
-                        name_meta=p_var[:99],
-                        is_alias=is_alias
-                    )
-
         except Exception as e:
-            logger.error(f"Error processing AAChange entry '{entry}': {str(e)}")
+            logger.error(f"Error processing gene_detail entry '{entry}': {str(e)}")
+
+
+def create_c_and_p_variants(g_variant, aachange, func, gene_detail, filename, row_gene):
+    logger.debug(f"Creating C and P variants for aachange: {aachange}")
+    entries = aachange.split(',')
+    if any(aachange in invalid for invalid in ["UNKNOWN", "."]):
+        create_gene_detail(gene_detail, row_gene, g_variant, func)
+    else:
+        for entry in entries:
+            try:
+                logger.debug(f"Processing entry: {entry}")
+                gene, nm_id, exon, c_var, p_var = entry.split(':')
+                gene = get_gene(gene, "hg19", nm_id)
+                # Create CVariant instance
+                is_alias = True if nm_id.lower() == gene.nm_canonical.lower() else False
+                if gene:
+                    c_variant = CVariant.objects.create(
+                        g_variant=g_variant,
+                        gene=gene,
+                        nm_id=nm_id,
+                        exon=exon,
+                        c_var=c_var,
+                        func=func,
+                        gene_detail=gene_detail
+                    )
+                    logger.info(f"Created CVariant: {c_variant}")
+
+                    # Create PVariant instance if p_var is present
+                    if p_var:
+                        start, end, reference_residues, inserted_residues, change_type = parse_p_var(p_var)
+                        inserted_residues = f"{inserted_residues[:98]}*" if p_var.endswith("*") else inserted_residues[:99]
+                        p_variant = PVariant.objects.create(
+                            c_variant=c_variant,
+                            start=start,
+                            end=end,
+                            reference_residues=reference_residues,
+                            inserted_residues=inserted_residues,
+                            change_type=change_type,
+                            name_meta=p_var[:99],
+                            is_alias=is_alias
+                        )
+
+            except Exception as e:
+                logger.error(f"Error processing AAChange entry '{entry}': {str(e)}")
 
 
 
@@ -407,7 +434,8 @@ def variant_file_parser(file_path, analysis_run_name):
                     aachange=row['AAChange.refGene'],
                     func=row['Func.refGene'],
                     gene_detail=row.get('GeneDetail.refGene', ''),
-                    filename = filename
+                    filename = filename,
+                    gene=row['Gene.refGene']
                 )
 
                 stats["successful"] += 1

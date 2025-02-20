@@ -1,5 +1,8 @@
 from django.db import models
 from django.db.models import Q, Count, F, OuterRef, Subquery, Func, Value, CharField, When, Case
+from django.contrib.postgres.aggregates import StringAgg
+from django.db.models.functions import Concat
+
 from datetime import datetime
 from projects.utils import get_user_projects
 
@@ -26,7 +29,34 @@ class VariantCall(models.Model):
             Users can access to some entities depend on their authorize. While the user having admin role can access to all things,
             technicians or researchers can access own projects and other entities related to it.
             '''
-
+            # variant_subquery = PVariant.objects.filter(
+            #     c_variant__g_variant__variant_call=OuterRef('pk'),
+            #     is_alias=True
+            # ).values('name_meta')[:1]
+            # aliases_subquery = PVariant.objects.filter(
+            #     c_variant__g_variant__variant_call=OuterRef('pk'),
+            #     is_alias=False
+            # ).values('name_meta')[:1]
+            #
+            # queryset = VariantCall.objects.filter(variant_file__name__icontains='BCB037.OMLP-053.HS_Final.annovar.hg19_multianno_Filtered'
+            #     ).annotate(
+            #     blocks=F('sample_lib__na_sl_links__nucacid__area_na_links__area__block__name'),
+            #     areas=F('sample_lib__na_sl_links__nucacid__area_na_links__area__name'),
+            #     genes=F('g_variants__c_variants__gene__name'),
+            #     patients=F('sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__pat_id'),
+            #     nm_id=F('g_variants__c_variants__nm_id'),
+            #     canonical_id=F('g_variants__c_variants__gene__nm_canonical'),
+            #     variant=Case(
+            #         When(Q(nm_id=F('canonical_id')), then=Subquery(variant_subquery)),
+            #         default=Value(""),
+            #         output_field=CharField()
+            #     ),
+            #     aliases=Case(
+            #         When(Q(nm_id=F('canonical_id')), then=Value("")),
+            #         default=Subquery(aliases_subquery),
+            #         output_field=CharField()
+            #     )
+            # )
             variant_subquery = PVariant.objects.filter(
                 c_variant__g_variant__variant_call=OuterRef('pk'),
                 is_alias=True
@@ -36,24 +66,32 @@ class VariantCall(models.Model):
                 is_alias=False
             ).values('name_meta')[:1]
 
-            queryset = VariantCall.objects.filter().annotate(
-                blocks=F('sample_lib__na_sl_links__nucacid__area_na_links__area__block__name'),
-                areas=F('sample_lib__na_sl_links__nucacid__area_na_links__area__name'),
-                genes=F('g_variants__c_variants__gene__name'),
-                patients=F('sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__pat_id'),
-                nm_id=F('g_variants__c_variants__nm_id'),
-                canonical_id=F('g_variants__c_variants__gene__nm_canonical'),
-                variant=Case(
-                    When(Q(nm_id=F('canonical_id')), then=Subquery(variant_subquery)),
-                    default=Value(""),
-                    output_field=CharField()
+            queryset = VariantCall.objects.filter(variant_file__name__icontains='BCB037.OMLP-053.HS_Final.annovar.hg19_multianno_Filtered'
+                ).annotate(
+                    blocks=F('sample_lib__na_sl_links__nucacid__area_na_links__area__block__name'),
+                    variant=StringAgg(
+                        Case(
+                            When(g_variants__c_variants__p_variants__is_alias=True,  # Include only if is_alias=True
+                                 then=Concat(F('g_variants__c_variants__nm_id'), Value(": "), F('g_variants__c_variants__p_variants__name_meta')),
+                                 ),
+                            output_field=CharField()
+                        ),
+                        delimiter=', ',
+                        distinct=True
                 ),
-                aliases=Case(
-                    When(Q(nm_id=F('canonical_id')), then=Value("")),
-                    default=Subquery(aliases_subquery),
-                    output_field=CharField()
-                )
+                    aliases=StringAgg(
+                        Case(
+                            When(g_variants__c_variants__p_variants__is_alias=False,  # Include only if is_alias=True
+                                 then=Concat(F('g_variants__c_variants__nm_id'), Value(": "), F('g_variants__c_variants__p_variants__name_meta')),
+                                 ),
+                            output_field=CharField()
+                        ),
+                        delimiter=', ',
+                        distinct=True
+                ),
             )
+            for gv in queryset:
+                print(f"GVariant ID: {gv}, Variants: {gv.variant}, Aliases: {gv.aliases}")
 
             if not user.is_superuser:
                 return queryset.filter(
@@ -199,6 +237,8 @@ class CVariant(models.Model):
     exon = models.CharField(max_length=100, blank=True, null=True)
     func = models.CharField(max_length=100, blank=True, null=True)
     gene_detail = models.CharField(max_length=100)
+    is_alias = models.BooleanField(default=False)
+
 
     class Meta:
         db_table = "c_variant"
