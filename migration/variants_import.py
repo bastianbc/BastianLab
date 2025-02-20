@@ -294,7 +294,9 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail, filename, ro
     entries = aachange.split(',')
     if any(aachange in invalid for invalid in ["UNKNOWN", "."]):
         print("%%%")
-        create_gene_detail(gene_detail, row_gene, g_variant, func)
+        if not any(gene_detail in invalid for invalid in ["UNKNOWN", "."]):
+            create_gene_detail(gene_detail, row_gene, g_variant, func)
+        logger.error(f"Error processing gene_detail entry '{gene_detail}' UNKNOWN")
     else:
         for entry in entries:
             try:
