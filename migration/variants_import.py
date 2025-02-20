@@ -280,7 +280,7 @@ def create_gene_detail(gene_detail, row_gene, g_variant, func):
                     exon=exon,
                     c_var=c_var,
                     func=func,
-                    gene_detail=gene_detail,
+                    gene_detail=entry,
                     is_alias=is_alias,
                 )
                 logger.info(f"Created CVariant: {c_variant}")
@@ -310,7 +310,7 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail, filename, ro
                         exon=exon,
                         c_var=c_var,
                         func=func,
-                        gene_detail=gene_detail
+                        gene_detail=entry
                     )
                     logger.info(f"Created CVariant: {c_variant}")
 
