@@ -280,8 +280,9 @@ def create_gene_detail(gene_detail, row_gene, g_variant, func):
                     exon=exon,
                     c_var=c_var,
                     func=func,
-                    gene_detail=entry,
+                    gene_detail=entry[:99],
                     is_alias=is_alias,
+                    is_gene_detail=True,
                 )
                 logger.info(f"Created CVariant: {c_variant}")
         except Exception as e:
@@ -311,7 +312,7 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail, filename, ro
                         exon=exon,
                         c_var=c_var,
                         func=func,
-                        gene_detail=entry
+                        gene_detail=entry[:99]
                     )
                     logger.info(f"Created CVariant: {c_variant}")
 
