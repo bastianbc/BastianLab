@@ -436,7 +436,7 @@ def variant_file_parser(file_path, analysis_run_name):
                     func=row['Func.refGene'],
                     gene_detail=row.get('GeneDetail.refGene', ''),
                     filename = filename,
-                    gene=row['Gene.refGene']
+                    row_gene=row['Gene.refGene']
                 )
 
                 stats["successful"] += 1
