@@ -66,29 +66,49 @@ class VariantCall(models.Model):
                 is_alias=False
             ).values('name_meta')[:1]
 
-            queryset = VariantCall.objects.filter(variant_file__name__icontains='BCB037.OMLP-053.HS_Final.annovar.hg19_multianno_Filtered'
+            queryset = VariantCall.objects.filter(
+                variant_file__name__icontains='BCB002.NMLP-038.FB_Final.annovar.hg19_multianno_Filtered'
                 ).annotate(
                     blocks=F('sample_lib__na_sl_links__nucacid__area_na_links__area__block__name'),
+                    areas=F('sample_lib__na_sl_links__nucacid__area_na_links__area__name'),
+                    genes=F('g_variants__c_variants__gene__name'),
+                    patients=F('sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__pat_id'),
                     variant=StringAgg(
                         Case(
-                            When(g_variants__c_variants__p_variants__is_alias=True,  # Include only if is_alias=True
-                                 then=Concat(F('g_variants__c_variants__nm_id'), Value(": "), F('g_variants__c_variants__p_variants__name_meta')),
-                                 ),
+                            When(
+                                Q(g_variants__c_variants__is_gene_detail=True) & Q(
+                                    g_variants__c_variants__p_variants__is_alias=True),
+                                then=F('g_variants__c_variants__gene_detail')
+                            ),
+                            When(
+                                Q(g_variants__c_variants__is_gene_detail=False) & Q(
+                                    g_variants__c_variants__p_variants__is_alias=True),
+                                then=Concat(F('g_variants__c_variants__nm_id'), Value(": "),
+                                            F('g_variants__c_variants__p_variants__name_meta'))
+                            ),
                             output_field=CharField()
                         ),
                         delimiter=', ',
                         distinct=True
-                ),
+                    ),
                     aliases=StringAgg(
                         Case(
-                            When(g_variants__c_variants__p_variants__is_alias=False,  # Include only if is_alias=True
-                                 then=Concat(F('g_variants__c_variants__nm_id'), Value(": "), F('g_variants__c_variants__p_variants__name_meta')),
-                                 ),
+                            When(
+                                Q(g_variants__c_variants__gene_detail=True) & Q(
+                                    g_variants__c_variants__p_variants__is_alias=False),
+                                then=F('g_variants__c_variants__gene_detail')
+                            ),
+                            When(
+                                Q(g_variants__c_variants__gene_detail=False) & Q(
+                                    g_variants__c_variants__p_variants__is_alias=False),
+                                then=Concat(F('g_variants__c_variants__nm_id'), Value(": "),
+                                            F('g_variants__c_variants__p_variants__name_meta'))
+                            ),
                             output_field=CharField()
                         ),
                         delimiter=', ',
                         distinct=True
-                ),
+                    ),
             )
             for gv in queryset:
                 print(f"GVariant ID: {gv}, Variants: {gv.variant}, Aliases: {gv.aliases}")
@@ -187,7 +207,10 @@ class VariantCall(models.Model):
                 queryset = queryset.filter(alt_read=alt_read_value)
 
             if variant:
-                queryset = queryset.filter(g_variants__c_variants__p_variants__name_meta__icontains=variant)
+                queryset = queryset.filter(
+                    Q(g_variants__c_variants__p_variants__name_meta__icontains=variant) |
+                    Q(g_variants__c_variants__c_var__icontains=variant)  # Ensure `c_name` exists in `CVariant`
+                )
 
             if variant_file:
                 queryset = queryset.filter(variant_file__name__icontains=variant_file)
@@ -238,6 +261,7 @@ class CVariant(models.Model):
     func = models.CharField(max_length=100, blank=True, null=True)
     gene_detail = models.CharField(max_length=100)
     is_alias = models.BooleanField(default=False)
+    is_gene_detail = models.BooleanField(default=False)
 
 
     class Meta:
