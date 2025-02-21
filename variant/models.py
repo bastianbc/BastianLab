@@ -29,16 +29,13 @@ class VariantCall(models.Model):
             Users can access to some entities depend on their authorize. While the user having admin role can access to all things,
             technicians or researchers can access own projects and other entities related to it.
             '''
-            queryset = VariantCall.objects.filter(
-                variant_file__name__icontains='BCB037.OMLP-053.HS_Final.annovar.hg19_multianno_Filtered'
-                ).annotate(
-                    blocks=F('sample_lib__na_sl_links__nucacid__area_na_links__area__block__name'),
-                    areas=F('sample_lib__na_sl_links__nucacid__area_na_links__area__name'),
-                    genes=F('g_variants__c_variants__gene__name'),
-                    patients=F('sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__pat_id'),
+            queryset = VariantCall.objects.filter().annotate(
+                blocks=F('sample_lib__na_sl_links__nucacid__area_na_links__area__block__name'),
+                areas=F('sample_lib__na_sl_links__nucacid__area_na_links__area__name'),
+                genes=F('g_variants__c_variants__gene__name'),
+                patients=F('sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__pat_id'),
                 variant=StringAgg(
                     Case(
-                        # First try to get variants where is_alias=True
                         When(
                             Q(
                                 Exists(
@@ -67,10 +64,8 @@ class VariantCall(models.Model):
                                 ).values('c_variant__g_variant__variant_call')
                                 .annotate(
                                     agg_value=StringAgg('combined_value', delimiter=', ')
-                                )
-                                .values('agg_value')[:1]
+                                ).values('agg_value')[:1]
                             ),
-
                         When(
                             ~Q(
                                 Exists(
@@ -90,13 +85,12 @@ class VariantCall(models.Model):
                             then=CVariant.objects.filter(
                                 g_variant__variant_call=OuterRef('pk'),
                                 is_alias=True
-                            ).annotate(
-                                combined_value=F('gene_detail'),
-                            ).values('g_variant__variant_call')
+                                ).annotate(
+                                    combined_value=F('gene_detail'),
+                                ).values('g_variant__variant_call')
                                 .annotate(
                                     agg_value=StringAgg('combined_value', delimiter=', ')
-                                )
-                                .values('agg_value')[:1]
+                                ).values('agg_value')[:1]
                         ),
                         default=Value(''),  # Handle case where neither condition matches
                         output_field=CharField()
@@ -104,78 +98,74 @@ class VariantCall(models.Model):
                     delimiter=', ',
                     distinct=True
                 ),
-                    aliases=StringAgg(
-                        Case(
-                            # First try to get variants where is_alias=True
-                            When(
-                                Q(
-                                    Exists(
-                                        PVariant.objects.filter(
-                                            c_variant__g_variant__variant_call=OuterRef('pk'), # 1 (True)
-                                            is_alias=False
-                                        )
+                aliases=StringAgg(
+                    Case(
+                        # First try to get variants where is_alias=True
+                        When(
+                            Q(
+                                Exists(
+                                    PVariant.objects.filter(
+                                        c_variant__g_variant__variant_call=OuterRef('pk'), # 1 (True)
+                                        is_alias=False
                                     )
                                 )
-                                & ~Q(
-                                    Exists(
-                                        CVariant.objects.filter(
-                                            g_variant__variant_call=OuterRef('pk'), # 1 (True)
-                                            is_gene_detail=True
-                                        )
+                            )
+                            & ~Q(
+                                Exists(
+                                    CVariant.objects.filter(
+                                        g_variant__variant_call=OuterRef('pk'), # 1 (True)
+                                        is_gene_detail=True
                                     )
-                                ),
-                                then=PVariant.objects.filter(
-                                    c_variant__g_variant__variant_call=OuterRef('pk'),
-                                    is_alias=False
-                                ).annotate(
-                                    combined_value=Concat(
-                                        'c_variant__nm_id',
-                                        Value(': '),
-                                        'name_meta'
-                                    )
-                                ).values('c_variant__g_variant__variant_call')
-                                .annotate(
-                                    agg_value=StringAgg('combined_value', delimiter=', ')
                                 )
-                                .values('agg_value')[:1]
                             ),
-
-                            When(
-                                ~Q(
-                                    Exists(
-                                        PVariant.objects.filter(
-                                            c_variant__g_variant__variant_call=OuterRef('pk'),
-                                        )
-                                    )
-                                ) & Q(
-                                    Exists(
-                                        CVariant.objects.filter(
-                                            g_variant__variant_call=OuterRef('pk'),
-                                            is_alias=False
-                                        )
-                                    )
-                                ),
-                                then=CVariant.objects.filter(
-                                    g_variant__variant_call=OuterRef('pk'),
-                                    is_alias=False
-                                ).annotate(
-                                    combined_value=F('gene_detail'),
-
-                                ).values('g_variant__variant_call')
-                                .annotate(
-                                    agg_value=StringAgg('combined_value', delimiter=', ')
+                            then=PVariant.objects.filter(
+                                c_variant__g_variant__variant_call=OuterRef('pk'),
+                                is_alias=False
+                            ).annotate(
+                                combined_value=Concat(
+                                    'c_variant__nm_id',
+                                    Value(': '),
+                                    'name_meta'
                                 )
-                                .values('agg_value')[:1]
-                            ),
-                            default=Value(''),  # Handle case where neither condition matches
-                            output_field=CharField()
+                            ).values('c_variant__g_variant__variant_call')
+                            .annotate(
+                                agg_value=StringAgg('combined_value', delimiter=', ')
+                            )
+                            .values('agg_value')[:1]
                         ),
-                        delimiter=', ',
-                        distinct=True
+                        When(
+                            ~Q(
+                                Exists(
+                                    PVariant.objects.filter(
+                                        c_variant__g_variant__variant_call=OuterRef('pk'),
+                                    )
+                                )
+                            ) & Q(
+                                Exists(
+                                    CVariant.objects.filter(
+                                        g_variant__variant_call=OuterRef('pk'),
+                                        is_alias=False
+                                    )
+                                )
+                            ),
+                            then=CVariant.objects.filter(
+                                g_variant__variant_call=OuterRef('pk'),
+                                is_alias=False
+                            ).annotate(
+                                combined_value=F('gene_detail'),
+
+                            ).values('g_variant__variant_call')
+                            .annotate(
+                                agg_value=StringAgg('combined_value', delimiter=', ')
+                            ).values('agg_value')[:1]
+                        ),
+                        default=Value(''),  # Handle case where neither condition matches
+                        output_field=CharField()
                     ),
+                    delimiter=', ',
+                    distinct=True
+                ),
             )
-            for gv in queryset:
-                print(f"GVariant ID: {gv}, Variants: {gv.variant}, Aliases: {gv.aliases}")
 
             if not user.is_superuser:
                 return queryset.filter(
