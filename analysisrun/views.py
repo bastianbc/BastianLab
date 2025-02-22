@@ -79,7 +79,7 @@ def process_variant(request, variant_type, ar_name):
 @csrf_exempt
 def import_cns(request, ar_name):
     if request.method == "POST":
-        try:
+        # try:
             folders = ["cnv/output", "snv/output", "alignment/output"]
             folder_stats = []
             total_stats = {
@@ -130,7 +130,7 @@ def import_cns(request, ar_name):
 
             return JsonResponse({"success": True, "summary": folder_stats})
 
-        except Exception as e:
-            return JsonResponse({"success": False, "error": str(e)})
+        # except Exception as e:
+        #     return JsonResponse({"success": False, "error": str(e)})
 
     return JsonResponse({"success": False, "error": "Invalid request method"})
