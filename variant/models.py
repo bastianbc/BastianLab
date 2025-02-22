@@ -152,7 +152,12 @@ class VariantCall(models.Model):
                                 g_variant__variant_call=OuterRef('pk'),
                                 is_alias=False
                             ).annotate(
-                                combined_value=F('gene_detail'),
+                                combined_value=Concat(
+                                    'exon',
+                                    Value(': '),
+                                    'c_var',
+                                    Value("("), "nm_id", Value(")"),
+                                ),
 
                             ).values('g_variant__variant_call')
                             .annotate(
