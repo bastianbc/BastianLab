@@ -12,6 +12,7 @@ import os
 from django.db.models import Prefetch
 from areas.models import Area
 from blocks.models import Block
+from samplelib.models import SampleLib
 
 def variants(request):
     filter = FilterForm()
@@ -250,18 +251,17 @@ def get_variants_by_block(request):
 
     # Base query
     block = Block.objects.get(pk=block_id)
-    area = Area.objects.get(block_id=block_id)
-    na_links = area.area_na_links.all()
+    area = Area.objects.filter(block=block).first()
+    # na_links = area.area_na_links.all()
+    #
 
-    sample_libs = []
-    for na_link in na_links:
-        sample_libs.extend(na_link.nucacid.na_sl_links.all().values_list('sample_lib', flat=True))
-
-    # Initial queryset
-    variant_calls = VariantCall.objects.filter(
-        sample_lib__id__in=sample_libs
-    )
-
+    sample_libs = SampleLib.objects.filter(na_sl_links__nucacid__area_na_links__area__block=block)
+    #
+    # # Initial queryset
+    # variant_calls = VariantCall.objects.filter(
+    #     sample_lib__id__in=sample_libs
+    # )
+    variant_calls = VariantCall.objects.filter(sample_lib__na_sl_links__nucacid__area_na_links__area__block=block)
     # Filter by analysis if provided
     if analysis_id:
         variant_calls = variant_calls.filter(analysis_run_id=analysis_id)
@@ -314,7 +314,7 @@ def get_variants_by_block(request):
     if not 'draw' in request.GET:
         # Prepare analyses
         analyses = VariantCall.objects.filter(
-            sample_lib__id__in=sample_libs
+            sample_lib__in=sample_libs
         ).select_related('analysis_run').distinct('analysis_run').values(
             'analysis_run_id', 'analysis_run__name'
         )
@@ -325,7 +325,7 @@ def get_variants_by_block(request):
                 'name': block.name,
                 'body_site': block.body_site.name if block.body_site else '',
                 'diagnosis': block.diagnosis.name if block.diagnosis else '',
-                'he_image': area.image.url if area.image else None
+                'he_image': area.image.url if area and area.image else None
             },
             'analyses': [
                 {
@@ -335,8 +335,9 @@ def get_variants_by_block(request):
                 for analysis in analyses
             ]
         }
+        print("@@@",response_data)
         return JsonResponse(response_data)
-
+    print("!!!",variants_data)
     # DataTables response
     return JsonResponse({
         'draw': draw,
