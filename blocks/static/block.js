@@ -1033,7 +1033,7 @@ var KTDatatablesServerSide = function () {
             // Clear modal first
             tabContainer.innerHTML = "";
             tabContent.innerHTML = "";
-
+            console.log("@@@",data);
             // Fill the data
             populateBlockDetails(data.block);
 
@@ -1042,13 +1042,14 @@ var KTDatatablesServerSide = function () {
                 showNoDataMessage(tabContent, "No analysis runs found for this area.");
                 return;
             }
-
+            console.log("!!!",data.analyses);
             // Check if any analysis has variants
-            const hasVariants = data.analyses.some(analysis => analysis.variants && analysis.variants.length > 0);
-            if (!hasVariants) {
-                showNoDataMessage(tabContent, "No variants found in any analysis runs.");
-                return;
-            }
+            // const hasVariants = data.analyses.some(analysis => analysis.variants && analysis.variants.length > 0);
+            // console.log("!!!",hasVariants);
+            // if (!hasVariants) {
+            //     showNoDataMessage(tabContent, "No variants found in any analysis runs.");
+            //     return;
+            // }
 
             data.analyses.forEach((analysis, index) => {
                 // Create tab
