@@ -958,7 +958,7 @@ var KTDatatablesServerSide = function () {
         });
 
       }
-        
+
       $('#block_datatable').on( 'click', 'tbody td:not(:first-child)', function (e) {
         editor.inline( dt.cell( this ).index(), {
             onBlur: 'submit'
@@ -1016,8 +1016,8 @@ var KTDatatablesServerSide = function () {
             });
         });
 
-        function getVariantData( block_id ) {
-            fetch(`/variant/get_variants_by_block?block_id=${block_id}`)
+        function getVariantData( blockId ) {
+            fetch(`/variant/get_variants_by_block?block_id=${blockId}`)
                 .then(response => response.json())
                 .then(data => {
                     initializeModal(data);
@@ -1056,7 +1056,7 @@ var KTDatatablesServerSide = function () {
                 const tabId = `analysis_${index}`;
 
                 createTab(tabContainer, tabId, analysis.analysis_name, isActive);
-                createTabPane(tabContent, tabId, analysis.variants, isActive);
+                createTabPane(tabContent, tabId, analysis, isActive, data.block.id);
 
             });
         }
@@ -1099,7 +1099,7 @@ var KTDatatablesServerSide = function () {
             container.appendChild(li);
         }
 
-        function createTabPane(container, id, data, isActive) {
+        function createTabPane(container, id, analysis, isActive, blockId) {
             const div = document.createElement('div');
             div.className = `tab-pane fade ${isActive ? 'show active' : ''}`;
             div.id = id;
@@ -1126,13 +1126,22 @@ var KTDatatablesServerSide = function () {
                 </div>`;
             container.appendChild(div);
 
-            // Initialize DataTable
-            initializeDataTable(`variant_datatable_${id}`, data);
+            // Initialize DataTable with server-side processing
+            initializeDataTable(`variant_datatable_${id}`, blockId, analysis.analysis_id);
         }
 
-        function initializeDataTable(tableId, variants) {
+        function initializeDataTable(tableId, blockId, analysisId) {
             $(`#${tableId}`).DataTable({
-                data: variants,
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: `/variant/get_variants_by_block`,
+                    type: 'GET',
+                    data: {
+                        block_id: blockId,
+                        analysis_id: analysisId
+                    }
+                },
                 columns: [
                     {
                         data: 'areaName',
@@ -1396,7 +1405,7 @@ var KTDatatablesServerSide = function () {
                         <td>${d.ip_dx}</td>
                     </tr>`;
             }
-            
+
             return details;
         }
 

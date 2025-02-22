@@ -617,7 +617,7 @@ var KTDatatablesServerSide = function () {
                 const tabId = `analysis_${index}`;
 
                 createTab(tabContainer, tabId, analysis.analysis_name, isActive);
-                createTabPane(tabContent, tabId, analysis.variants, isActive);
+                createTabPane(tabContent, tabId, analysis, isActive, data.area.id);
 
             });
         }
@@ -661,7 +661,7 @@ var KTDatatablesServerSide = function () {
             container.appendChild(li);
         }
 
-        function createTabPane(container, id, data, isActive) {
+        function createTabPane(container, id, data, isActive, areaId) {
             const div = document.createElement('div');
             div.className = `tab-pane fade ${isActive ? 'show active' : ''}`;
             div.id = id;
@@ -688,12 +688,21 @@ var KTDatatablesServerSide = function () {
             container.appendChild(div);
 
             // Initialize DataTable
-            initializeDataTable(`variant_datatable_${id}`, data);
+            initializeDataTable(`variant_datatable_${id}`, areaId, analysis.analysis_id);
         }
 
-        function initializeDataTable(tableId, variants) {
+        function initializeDataTable(tableId, areaId, analysisId) {
             $(`#${tableId}`).DataTable({
-                data: variants,
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: `/variant/get_variants_by_area`,
+                    type: 'GET',
+                    data: {
+                        area_id: areaId,
+                        analysis_id: analysisId
+                    }
+                },
                 columns: [
                     {
                         data: 'sampleLibrary',
@@ -863,7 +872,6 @@ var KTDatatablesServerSide = function () {
                 type: "GET",
                 async: false,
                 success: function (data) {
-                    console.log(data);
 
                     data.forEach((item, i) => {
 
