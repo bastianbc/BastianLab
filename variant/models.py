@@ -1,5 +1,6 @@
 from django.db import models
-from django.db.models import Q, Count, F, OuterRef, Subquery, Func, Value, CharField, When, Case, Exists
+from django.db.models import Q, F, OuterRef, Value, CharField, When, \
+    Case, Exists, ExpressionWrapper, FloatField
 from django.contrib.postgres.aggregates import StringAgg
 from django.db.models.functions import Concat
 
@@ -57,15 +58,15 @@ class VariantCall(models.Model):
                                 is_alias=True
                             ).annotate(
                                 combined_value=Concat(
-                                        'c_variant__nm_id',
-                                        Value(': '),
-                                        'name_meta'
-                                    )
-                                ).values('c_variant__g_variant__variant_call')
-                                .annotate(
-                                    agg_value=StringAgg('combined_value', delimiter=', ')
-                                ).values('agg_value')[:1]
-                            ),
+                                    'c_variant__nm_id',
+                                    Value(': '),
+                                    'name_meta'
+                                )
+                            ).values('c_variant__g_variant__variant_call')
+                            .annotate(
+                                agg_value=StringAgg('combined_value', delimiter=', ')
+                            ).values('agg_value')[:1]
+                        ),
                         When(
                             ~Q(
                                 Exists(
@@ -85,12 +86,12 @@ class VariantCall(models.Model):
                             then=CVariant.objects.filter(
                                 g_variant__variant_call=OuterRef('pk'),
                                 is_alias=True
-                                ).annotate(
-                                    combined_value=F('gene_detail'),
-                                ).values('g_variant__variant_call')
-                                .annotate(
-                                    agg_value=StringAgg('combined_value', delimiter=', ')
-                                ).values('agg_value')[:1]
+                            ).annotate(
+                                combined_value=F('gene_detail'),
+                            ).values('g_variant__variant_call')
+                            .annotate(
+                                agg_value=StringAgg('combined_value', delimiter=', ')
+                            ).values('agg_value')[:1]
                         ),
                         default=Value(''),  # Handle case where neither condition matches
                         output_field=CharField()
@@ -179,6 +180,21 @@ class VariantCall(models.Model):
 
             return queryset
 
+        def _get_block_variants_queryset(block_id):
+            return VariantCall.objects.filter(sample_lib__na_sl_links__nucacid__area_na_links__area__block__id=block_id).annotate(
+                areas=F('sample_lib__na_sl_links__nucacid__area_na_links__area__name'),
+                genes=F('g_variants__c_variants__gene__name'),
+                p_variant=F('g_variants__c_variants__p_variants__name_meta'),
+                vaf=ExpressionWrapper(
+                    Case(
+                        When(ref_read__gt=0, then=(F('alt_read') * 100.0) / (F('ref_read') + F('alt_read'))),
+                        default=Value(0.0),
+                        output_field=FloatField(),
+                    ),
+                    output_field=FloatField()
+                )
+            )
+
         def _parse_value(search_value):
             if "_initial:" in search_value:
                 v = search_value.split("_initial:")[1]
@@ -188,42 +204,71 @@ class VariantCall(models.Model):
         def _is_initial_value(search_value):
             return "_initial:" in search_value and search_value.split("_initial:")[1] != "null"
 
+        def get_kwarg_value(kwargs, key, default=None):
+            value = kwargs.get(key, default)
+            if isinstance(value, (list, tuple)):
+                try:
+                    return value[0]
+                except IndexError:
+                    return default
+            return value
+
         try:
             ORDER_COLUMN_CHOICES = {
-                "0": "id",
+                 "0": "id",
+                "1": "patient",
+                "2": "areas",
+                "3": "block",
+                "4": "sample_lib",
+                "5": "sequencing_run",
+                "6": "gene",
+                "7": "variant",
+                "8": "aliases",
             }
+            ORDER_COLUMN_CHOICES_BLOCK = {
+                "0": "areas",
+                "1": "sample_lib",
+                "2": "gene",
+                "3": "p_variant",
+                "4": "coverage",
+                "5": "vaf",
+            }
+            print(kwargs.get('order[0][column]', None)[0])
             draw = int(kwargs.get('draw', None)[0])
             length = int(kwargs.get('length', None)[0])
             start = int(kwargs.get('start', None)[0])
+            print(start, " - ", length)
             search_value = kwargs.get('search[value]', None)[0]
             order_column = kwargs.get('order[0][column]', None)[0]
             order = kwargs.get('order[0][dir]', None)[0]
-            patient = kwargs.get('patient', None)[0]
-            sample_lib = kwargs.get('sample_lib', None)[0]
-            sequencing_run = kwargs.get('sequencing_run', None)[0]
-            block = kwargs.get('block', None)[0]
-            area = kwargs.get('area', None)[0]
-            coverage_value = kwargs.get('coverage', None)[0]
-            log2r_value = kwargs.get('log2r', None)[0]
-            ref_read_value = kwargs.get('ref_read', None)[0]
-            alt_read_value = kwargs.get('alt_read', None)[0]
-            variant = kwargs.get('variant', None)[0]
-            variant_file = kwargs.get('variant_file', None)[0]
+            patient = get_kwarg_value(kwargs, 'patient')
+            sample_lib = get_kwarg_value(kwargs, 'sample_lib')
+            sequencing_run = get_kwarg_value(kwargs, 'sequencing_run')
+            block = get_kwarg_value(kwargs, 'block')
+            area = get_kwarg_value(kwargs, 'area')
+            coverage_value = get_kwarg_value(kwargs, 'coverage_value')
+            log2r_value = get_kwarg_value(kwargs, 'log2r_value')
+            ref_read_value = get_kwarg_value(kwargs, 'ref_read_value')
+            alt_read_value = get_kwarg_value(kwargs, 'alt_read_value')
+            variant = get_kwarg_value(kwargs, 'variant')
+            variant_file = get_kwarg_value(kwargs, 'variant_file')
+            model_block = get_kwarg_value(kwargs, 'model_block')
+            block_id = get_kwarg_value(kwargs, 'block_id')
+            is_initial = _is_initial_value(search_value)
+            search_value = _parse_value(search_value)
 
-
-            order_column = ORDER_COLUMN_CHOICES[order_column]
+            # django orm '-' -> desc
+            order_column = ORDER_COLUMN_CHOICES_BLOCK[order_column] if model_block else ORDER_COLUMN_CHOICES[order_column]
             # django orm '-' -> desc
             if order == 'desc':
                 order_column = '-' + order_column
 
-            queryset = _get_authorizated_queryset()
+            if model_block:
+                queryset = _get_block_variants_queryset(block_id)
+            else:
+                queryset = _get_authorizated_queryset()
 
             total = queryset.count()
-
-            is_initial = _is_initial_value(search_value)
-            search_value = _parse_value(search_value)
-
-
             if sample_lib:
                 queryset = queryset.filter(Q(sample_lib__id=sample_lib))
 
@@ -286,8 +331,8 @@ class VariantCall(models.Model):
                 )
 
             count = queryset.count()
+            print("count: ", count)
             queryset = queryset.order_by(order_column)[start:start + length]
-            # queryset = queryset[start:start + length]
             return {
                 'items': queryset,
                 'count': count,

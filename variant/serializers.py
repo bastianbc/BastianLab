@@ -26,3 +26,23 @@ class VariantSerializer(serializers.ModelSerializer):
 
     def get_sequencing_run(self,obj):
         return obj.sequencing_run.name
+
+
+class VariantSerializerBlock(serializers.ModelSerializer):
+    DT_RowId = serializers.SerializerMethodField()
+    blocks = serializers.CharField(read_only=True)
+    areas = serializers.CharField(read_only=True)
+    genes = serializers.CharField(read_only=True)
+    sample_lib = serializers.SerializerMethodField()
+    vaf = serializers.FloatField()
+    p_variant = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = VariantCall
+        fields = ("id", "areas", "sample_lib", "genes", "DT_RowId", "coverage", "vaf", "analysis_run", "blocks",  "p_variant")
+
+    def get_DT_RowId(self, obj):
+       return getattr(obj, 'id')
+
+    def get_sample_lib(self,obj):
+        return obj.sample_lib.name

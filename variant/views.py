@@ -1,6 +1,5 @@
 from django.shortcuts import render
 from .forms import FilterForm
-from django.contrib.auth.decorators import login_required,permission_required
 from core.decorators import permission_required_for_async
 from .models import *
 from .serializers import *
@@ -12,23 +11,31 @@ import os
 from django.db.models import Prefetch
 from areas.models import Area
 from blocks.models import Block
-from samplelib.models import SampleLib
-
-def variants(request):
-    filter = FilterForm()
-    return render(request,"variants.html",locals())
+from blocks.variants_query import variant_queryset, VariantCustomSerializer
+from .helper import get_kwarg_value
 
 @permission_required_for_async("variant.view_variant")
 def filter_variants(request):
     variants = VariantCall.query_by_args(request.user,**request.GET)
-    serializer = VariantSerializer(variants['items'], many=True)
+    kwargs = request.GET
+    model_block = get_kwarg_value(kwargs, 'model_block')
+    if model_block:
+        serializer = VariantSerializerBlock(variants['items'], many=True)
+    else:
+        serializer = VariantSerializer(variants['items'], many=True)
+    print(serializer.data)
     result = dict()
     result['data'] = serializer.data
     result['draw'] = variants['draw']
     result['recordsTotal'] = variants['total']
     result['recordsFiltered'] = variants['count']
-
     return JsonResponse(result)
+
+
+def variants(request):
+    filter = FilterForm()
+    return render(request,"variants.html",locals())
+
 
 def import_variants(request, name):
     """
@@ -231,10 +238,10 @@ def get_variants_by_area(request):
         'data': variants_data
     })
 
+
 def get_variants_by_block(request):
     block_id = request.GET.get('block_id')
     analysis_id = request.GET.get('analysis_id')
-
     # DataTables parametreleri
     draw = int(request.GET.get('draw', 1))
     start = int(request.GET.get('start', 0))
@@ -246,35 +253,13 @@ def get_variants_by_block(request):
     order_direction = request.GET.get('order[0][dir]', 'asc')
 
     # Column names mapping
-    columns = ['areaName', 'sampleLibrary', 'gene', 'pVariant', 'coverage', 'vaf']
+    columns = ["id", "areas", "sample_lib", "genes", "DT_RowId", "coverage", "vaf"]
     order_column = columns[int(order_column_index)]
-
     # Base query
     block = Block.objects.get(pk=block_id)
-    area = Area.objects.filter(block=block).first()
-    # na_links = area.area_na_links.all()
-    #
 
-    sample_libs = SampleLib.objects.filter(na_sl_links__nucacid__area_na_links__area__block=block)
-    #
-    # # Initial queryset
-    # variant_calls = VariantCall.objects.filter(
-    #     sample_lib__id__in=sample_libs
-    # )
-    variant_calls = VariantCall.objects.filter(sample_lib__na_sl_links__nucacid__area_na_links__area__block=block)
-    # Filter by analysis if provided
-    if analysis_id:
-        variant_calls = variant_calls.filter(analysis_run_id=analysis_id)
+    variant_calls = variant_queryset(block)
 
-    # Add prefetch related
-    variant_calls = variant_calls.prefetch_related(
-        'sample_lib',
-        Prefetch('g_variants', queryset=GVariant.objects.all()),
-        Prefetch('g_variants__c_variants', queryset=CVariant.objects.all()),
-        Prefetch('g_variants__c_variants__p_variants', queryset=PVariant.objects.all())
-    ).select_related('analysis_run')
-
-    # Get total records before filtering
     total_records = variant_calls.count()
 
     # Apply search if provided
@@ -289,59 +274,13 @@ def get_variants_by_block(request):
     total_filtered_records = variant_calls.count()
 
     # Apply pagination
-    variant_calls = variant_calls[start:start + length]
+    variant_calls = variant_calls.order_by(order_column)[start:start + length]
 
-    # Prepare variants data
-    variants_data = []
-    for vc in variant_calls:
-        for g_variant in vc.g_variants.all():
-            for c_variant in g_variant.c_variants.all():
-                variant_data = {
-                    'areaName': area.name,
-                    'sampleLibrary': vc.sample_lib.name,
-                    'gene': c_variant.gene.name,
-                    'pVariant': (
-                        (c_variant.p_variants.first().reference_residues or '') +
-                        str(c_variant.p_variants.first().start or '') +
-                        (c_variant.p_variants.first().inserted_residues or '')
-                    ) if c_variant.p_variants.first() else '',
-                    'coverage': vc.coverage,
-                    'vaf': round((vc.alt_read / (vc.ref_read + vc.alt_read)) * 100, 2) if (vc.ref_read + vc.alt_read) > 0 else 0,
-                }
-                variants_data.append(variant_data)
+    serializer = VariantCustomSerializer(variant_calls, many=True)
+    result = dict()
+    result['data'] = serializer.data
+    result['draw'] = draw
+    result['recordsTotal'] = total_records
+    result['recordsFiltered'] = total_filtered_records
 
-    # Check first request
-    if not 'draw' in request.GET:
-        # Prepare analyses
-        analyses = VariantCall.objects.filter(
-            sample_lib__in=sample_libs
-        ).select_related('analysis_run').distinct('analysis_run').values(
-            'analysis_run_id', 'analysis_run__name'
-        )
-
-        response_data = {
-            'block': {
-                'id': block.id,
-                'name': block.name,
-                'body_site': block.body_site.name if block.body_site else '',
-                'diagnosis': block.diagnosis.name if block.diagnosis else '',
-                'he_image': area.image.url if area and area.image else None
-            },
-            'analyses': [
-                {
-                    'analysis_id': analysis['analysis_run_id'],
-                    'analysis_name': analysis['analysis_run__name']
-                }
-                for analysis in analyses
-            ]
-        }
-        print("@@@",response_data)
-        return JsonResponse(response_data)
-    print("!!!",variants_data)
-    # DataTables response
-    return JsonResponse({
-        'draw': draw,
-        'recordsTotal': total_records,
-        'recordsFiltered': total_filtered_records,
-        'data': variants_data
-    })
+    return JsonResponse(result)
