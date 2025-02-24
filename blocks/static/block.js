@@ -1012,12 +1012,13 @@ var KTDatatablesServerSide = function () {
                 const id = parent.querySelector('input[type=checkbox]').value;
                 // Open modal
                 variantInstance.show();
+                console.log("block_id: ", id)
                 getVariantData( id );
             });
         });
 
         function getVariantData( blockId ) {
-            fetch(`/variant/get_variants_by_block?block_id=${blockId}`)
+            fetch(`/blocks/get_block_vaiants?id=${blockId}`)
                 .then(response => response.json())
                 .then(data => {
                     initializeModal(data);
@@ -1055,7 +1056,7 @@ var KTDatatablesServerSide = function () {
                 // Create tab
                 const isActive = index === 0;
                 const tabId = `analysis_${index}`;
-
+                console.log(data.block)
                 createTab(tabContainer, tabId, analysis.analysis_name, isActive);
                 createTabPane(tabContent, tabId, analysis, isActive, data.block.id);
 
@@ -1128,6 +1129,7 @@ var KTDatatablesServerSide = function () {
             container.appendChild(div);
 
             // Initialize DataTable with server-side processing
+            console.log("Block_id: ", id, blockId)
             initializeDataTable(`variant_datatable_${id}`, blockId, analysis.analysis_id);
         }
 
@@ -1136,28 +1138,29 @@ var KTDatatablesServerSide = function () {
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: `/variant/get_variants_by_block`,
+                    url: `/variant/filter_variants`,
                     type: 'GET',
                     data: {
                         block_id: blockId,
-                        analysis_id: analysisId
+                        analysis_id: analysisId,
+                        model_block:'block'
                     }
                 },
                 columns: [
                     {
-                        data: 'areaName',
+                        data: 'areas',
                         className: 'text-gray-800 text-hover-primary'
                     },
                     {
-                        data: 'sampleLibrary',
+                        data: 'sample_lib',
                         className: 'text-gray-800 text-hover-primary'
                     },
                     {
-                        data: 'gene',
+                        data: 'genes',
                         className: 'text-gray-800'
                     },
                     {
-                        data: 'pVariant',
+                        data: 'p_variant',
                         className: 'text-gray-800'
                     },
                     {
@@ -1188,7 +1191,7 @@ var KTDatatablesServerSide = function () {
                         }
                     }
                 ],
-                order: [[1, 'asc']],  // Sort by gene by default
+                order: [[0, 'asc']],  // Sort by areas by default
                 pageLength: 10,
                 lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
                 responsive: true

@@ -8,6 +8,7 @@ from projects.models import Project
 from .serializers import BlocksSerializer, SingleBlockSerializer
 from django.contrib.auth.decorators import login_required,permission_required
 from core.decorators import permission_required_for_async
+from variant.models import VariantCall
 
 @permission_required_for_async("blocks.view_block")
 def filter_blocks(request):
@@ -228,3 +229,36 @@ def edit_block_url(request):
     else:
         form = BlockUrlForm(instance=instance)
     return render(request,"block_url.html",locals())
+
+def get_block_vaiants(request):
+    # Prepare area and analysis information
+    print("^"*100)
+    block = Block.objects.get(id=request.GET.get('id'))
+    area = block.block_areas.first()
+    analyses = VariantCall.objects.filter(
+        sample_lib__na_sl_links__nucacid__area_na_links__area__block=block
+    ).select_related('analysis_run').distinct('analysis_run').values(
+        'analysis_run_id', 'analysis_run__name'
+    )
+    response_data = {
+        'area': {
+            'id': area.id,
+            'name': area.name,
+            'he_image': area.image.url if area.image else None,
+        },
+        'block': {
+            'id': block.id if block else '',
+            'name': block.name if block else '',
+            'body_site': block.body_site.name if block and block.body_site else '',
+            'diagnosis': block.diagnosis.name if block and block.diagnosis else '',
+            'he_image': area.image.url if area.image else None,
+        },
+        'analyses': [
+            {
+                'analysis_id': analysis['analysis_run_id'],
+                'analysis_name': analysis['analysis_run__name']
+            }
+            for analysis in analyses
+        ]
+    }
+    return JsonResponse(response_data)

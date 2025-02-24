@@ -276,3 +276,14 @@ def variant_file_parser(file_path, analysis_run_name):
     except Exception as e:
         logger.critical(f"Critical error in variant file parser: {str(e)}", exc_info=True)
         return False, f"Critical error: {str(e)}", {}
+
+
+def get_kwarg_value(kwargs, key, default=None):
+    value = kwargs.get(key, default)
+    if isinstance(value, (list, tuple)):
+        try:
+            return value[0]
+        except IndexError:
+            return default
+    return value
+
