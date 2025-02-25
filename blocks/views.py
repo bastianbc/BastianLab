@@ -74,7 +74,7 @@ def remove_block_from_patient_async(request):
 
     try:
         for id in selected_ids:
-            block = Block.objects.get(bl_id=id)
+            block = Block.objects.get(id=id)
             block.patient = None
             block.save()
     except Exception as e:
@@ -156,7 +156,7 @@ def edit_block_async(request):
 @permission_required_for_async("blocks.delete_blocks")
 def delete_block(request,id):
     try:
-        block = Block.objects.get(bl_id=id)
+        block = Block.objects.get(id=id)
         block.delete()
         messages.success(request,"Block %s deleted successfully." % block.name)
         deleted = True
@@ -170,7 +170,7 @@ def delete_block(request,id):
 def delete_batch_blocks(request):
     try:
         selected_ids = json.loads(request.GET.get("selected_ids"))
-        Block.objects.filter(bl_id__in=selected_ids).delete()
+        Block.objects.filter(id__in=selected_ids).delete()
     except Exception as e:
         print(str(e))
         return JsonResponse({ "deleted":False })
@@ -180,7 +180,7 @@ def delete_batch_blocks(request):
 @permission_required_for_async("blocks.delete_blocks")
 def check_can_deleted_async(request):
     id = request.GET.get("id")
-    instance = Block.objects.get(bl_id=id)
+    instance = Block.objects.get(id=id)
     related_objects = []
     for field in instance._meta.related_objects:
         relations = getattr(instance,field.related_name)
@@ -231,8 +231,6 @@ def edit_block_url(request):
     return render(request,"block_url.html",locals())
 
 def get_block_vaiants(request):
-    # Prepare area and analysis information
-    print("^"*100)
     block = Block.objects.get(id=request.GET.get('id'))
     area = block.block_areas.first()
     analyses = VariantCall.objects.filter(

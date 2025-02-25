@@ -56,7 +56,7 @@ class CapturedLib(models.Model):
             technicians or researchers can access own projects and other entities related to it.
             '''
             queryset = CapturedLib.objects.all().annotate(
-                num_samplelibs=Count('sl_cl_links'),
+                num_samplelibs=Count('sl_cl_links', distinct=True),
                 num_sequencinglibs=Count('cl_seql_links',distinct=True)
             )
 

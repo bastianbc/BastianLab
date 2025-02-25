@@ -136,12 +136,9 @@ def query_by_args(user, seq_runs, **kwargs):
             order_column = ORDER_COLUMN_CHOICES[order_column]
             if order == 'desc':
                 order_column = '-' + order_column
-            print("_get_authorizated_queryset_111111")
             queryset = _get_authorizated_queryset(seq_runs)
-            print("_get_authorizated_queryset_2")
 
             # total = len(queryset)
-            print("_get_authorizated_queryset_3")
             search_value = _parse_value(search_value)
             if sequencing_run_filter[0] != "":
                 queryset = queryset.filter(Q(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=sequencing_run_filter))
@@ -166,12 +163,9 @@ def query_by_args(user, seq_runs, **kwargs):
                 queryset = queryset.filter(
                     Q(name__icontains=search_value)
                 )
-            print("_get_authorizated_queryset_4")
 
-            print(order_column, start, length)
             queryset = queryset.order_by(order_column)[start:start + length]
             # count = len(queryset)
-            print("_get_authorizated_queryset_5")
             return {
                 'items': queryset,
                 # 'count': count,

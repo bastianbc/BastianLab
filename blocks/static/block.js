@@ -11,7 +11,7 @@ var KTDatatablesServerSide = function () {
     var selectedRows = [];
 
     // Private functions
-    var initDatatable = function ( initialValue, p_stage, prim, collection , body_site ) {
+    var initDatatable = function ( initialValue, p_stage, prim, body_site ) {
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
 
         dt = $("#block_datatable").DataTable({
@@ -38,7 +38,6 @@ var KTDatatablesServerSide = function () {
               data:{
                 "p_stage": p_stage,
                 "prim": prim,
-                "collection": collection,
                 "body_site": body_site,
               },
               error: function (xhr, ajaxOptions, thrownError) {
@@ -72,6 +71,7 @@ var KTDatatablesServerSide = function () {
               { data: 'body_site' },
               { data: 'scan_number'},
               { data: 'num_areas' },
+              { data: 'num_variants' },
             ],
             columnDefs: [
                 {
@@ -120,7 +120,7 @@ var KTDatatablesServerSide = function () {
                 },
                 {
                     targets: 8,
-                    orderable: false,
+                    orderable: true,
                     render: function (data, type, row) {
                         if (data > 0) {
                           let id = row["id"];
@@ -132,6 +132,18 @@ var KTDatatablesServerSide = function () {
                 },
                 {
                     targets: 9,
+                    orderable: true,
+                    render: function (data, type, row) {
+                        if (data > 0) {
+                          let id = row["id"];
+                          return `
+                              <a href="/variant?model=block&id=${id}&initial=true">${data}</a>`;
+                        }
+                        return data;
+                    }
+                },
+                {
+                    targets: 10,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -308,10 +320,9 @@ var KTDatatablesServerSide = function () {
 
           var p_stage = document.getElementById("id_p_stage").value;
           var prim = document.getElementById("id_prim").value;
-          var collection = document.getElementById("id_collection").value;
           var body_site = document.getElementById("id_body_site").value;
 
-          initDatatable(null, p_stage, prim, collection, body_site);
+          initDatatable(null, p_stage, prim, body_site);
 
         });
     };
@@ -443,10 +454,9 @@ var KTDatatablesServerSide = function () {
 
           document.getElementById("id_p_stage").value = "";
           document.getElementById("id_prim").value = "";
-          document.getElementById("id_collection").value = "";
           document.getElementById("id_body_site").value = "";
 
-          initDatatable(null, null, null, null, null);
+          initDatatable(null, null, null, null);
 
         });
     }
@@ -1418,7 +1428,7 @@ var KTDatatablesServerSide = function () {
     // Public methods
     return {
         init: function () {
-            initDatatable( handleInitialValue(), null, null, null, null );
+            initDatatable( handleInitialValue(), null, null, null );
             handleSearchDatatable();
             handleBatchDeleteRows();
             handleFilterDatatable();

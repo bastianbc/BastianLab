@@ -1,3 +1,4 @@
+import json
 from django.db import models
 from django.db.models import Q, F, OuterRef, Value, CharField, When, \
     Case, Exists, ExpressionWrapper, FloatField
@@ -196,12 +197,27 @@ class VariantCall(models.Model):
             )
 
         def _parse_value(search_value):
+            '''
+            When the datatables are to be filled with a certain data, the search function of datatables is used.
+            The incoming parameter is parsed ve returned. If there is a initial value, the "search_value" has "_initial" prefix.
+            Parameters:
+                search_value (str): A string
+            Returns:
+                search_value (str): Parsed value
+            '''
             if "_initial:" in search_value:
-                v = search_value.split("_initial:")[1]
-                return None if v == "null" or not v.isnumeric() else v
+                return json.loads(search_value.split("_initial:")[1])
             return search_value
 
         def _is_initial_value(search_value):
+            '''
+            When the datatables are to be filled with a certain data, the search function of datatables is used.
+            The incoming parameter is parsed ve returned. If there is a initial value, the "search_value" has "_initial" prefix.
+            Parameters:
+                search_value (str): A string
+            Returns:
+                is_initial (boolean): If there is a initial value, it is True
+            '''
             return "_initial:" in search_value and search_value.split("_initial:")[1] != "null"
 
         def get_kwarg_value(kwargs, key, default=None):
@@ -233,11 +249,9 @@ class VariantCall(models.Model):
                 "4": "coverage",
                 "5": "vaf",
             }
-            print(kwargs.get('order[0][column]', None)[0])
             draw = int(kwargs.get('draw', None)[0])
             length = int(kwargs.get('length', None)[0])
             start = int(kwargs.get('start', None)[0])
-            print(start, " - ", length)
             search_value = kwargs.get('search[value]', None)[0]
             order_column = kwargs.get('order[0][column]', None)[0]
             order = kwargs.get('order[0][dir]', None)[0]
@@ -281,7 +295,7 @@ class VariantCall(models.Model):
 
             if block:
                 queryset = queryset.filter(
-                    Q(sample_lib__na_sl_links__nucacid__area_na_links__area__block_area_links__block__bl_id=block))
+                    Q(sample_lib__na_sl_links__nucacid__area_na_links__area__block__id=block))
 
             if patient:
                 queryset = queryset.filter(
@@ -320,9 +334,9 @@ class VariantCall(models.Model):
                 queryset = queryset.filter(variant_file__name__icontains=variant_file)
 
             if is_initial:
-                # filter = [sequencing_run.id for sequencing_run in SequencingRun.objects.filter(id=search_value)]
-                # queryset = queryset.filter(Q(id__in=filter))
-                pass
+                if search_value["model"] == "block":
+                    queryset = queryset.filter(sample_lib__na_sl_links__nucacid__area_na_links__area__block__id=int(search_value["id"]))
+
             elif search_value:
                 queryset = queryset.filter(
                     Q(caller__icontains=search_value) |
@@ -331,7 +345,6 @@ class VariantCall(models.Model):
                 )
 
             count = queryset.count()
-            print("count: ", count)
             queryset = queryset.order_by(order_column)[start:start + length]
             return {
                 'items': queryset,

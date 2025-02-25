@@ -35,8 +35,8 @@ class SequencingLib(models.Model):
             technicians or researchers can access own projects and other entities related to it.
             '''
             queryset = SequencingLib.objects.all().annotate(
-                num_capturedlibs=Count("cl_seql_links"),
-                num_sequencingruns=Count("sequencing_runs",distinct=True)
+                num_capturedlibs=Count("cl_seql_links" , distinct=True),
+                num_sequencingruns=Count("sequencing_runs", distinct=True)
             )
 
             if not user.is_superuser:

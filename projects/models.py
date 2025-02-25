@@ -126,7 +126,7 @@ class Project(models.Model):
                 if search_value["model"] == "area":
                     queryset = queryset.filter(Q(blocks__block_areas__id=search_value["id"]))
                 if search_value["model"] == "block":
-                    queryset = queryset.filter(Q(blocks__bl_id=search_value["id"]))
+                    queryset = queryset.filter(Q(blocks__id=search_value["id"]))
                 if search_value["model"] == "project":
                     queryset = queryset.filter(Q(blocks__id=search_value["id"]))
             elif search_value:

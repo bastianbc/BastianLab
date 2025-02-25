@@ -44,7 +44,6 @@ class Block(models.Model):
         ("ethanol", "ethanol"),
     )
 
-    # bl_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50, blank=True, null=False, unique=True, validators=[validate_name_contains_space])
     patient = models.ForeignKey('lab.Patient', on_delete=models.CASCADE, db_column='patient', blank=True, null=True, related_name="patient_blocks")
     # project = models.ForeignKey('projects.Projects', on_delete=models.DO_NOTHING, blank=True, null=True, related_name="project_blocks")
@@ -106,9 +105,10 @@ class Block(models.Model):
             technicians or researchers can access own projects and other entities related to it.
             '''
             queryset = Block.objects.all().annotate(
-                num_areas=Count('block_areas'),
-                project_num=Count("block_projects"),
-                patient_num=Count('patient')
+                num_areas=Count('block_areas', distinct=True),
+                project_num=Count("block_projects", distinct=True),
+                patient_num=Count('patient', distinct=True),
+                num_variants=Count('block_areas__area_na_links__nucacid__na_sl_links__sample_lib__variant_calls', distinct=True)
             )
 
             if not user.is_superuser:
@@ -161,6 +161,8 @@ class Block(models.Model):
                 "5":"diagnosis",
                 "6":"body_site",
                 "7":"scan_number",
+                "8":"num_areas",
+                "9":"num_variants",
             }
             draw = int(kwargs.get('draw', None)[0])
             length = int(kwargs.get('length', None)[0])
