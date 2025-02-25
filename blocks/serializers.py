@@ -4,6 +4,7 @@ from lab.models import Patient
 
 class BlocksSerializer(serializers.ModelSerializer):
     num_areas = serializers.IntegerField()
+    num_variants = serializers.IntegerField()
     patient_id = serializers.SerializerMethodField()
     DT_RowId = serializers.SerializerMethodField()
     # project_id = serializers.SerializerMethodField()
@@ -14,7 +15,9 @@ class BlocksSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Block
-        fields = ("id","name","patient_id","project","patient","diagnosis","body_site","thickness","date_added","num_areas","DT_RowId","block_url","scan_number",)
+        fields = ("id","name","patient_id","project","patient","diagnosis","body_site","thickness",
+                  "date_added","num_areas","DT_RowId","block_url","scan_number","num_variants"
+                  )
 
     def get_DT_RowId(self, obj):
            return getattr(obj, 'id')

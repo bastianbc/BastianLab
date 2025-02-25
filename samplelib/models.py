@@ -58,8 +58,8 @@ class SampleLib(models.Model):
             technicians or researchers can access own projects and other entities related to it.
             '''
             queryset = SampleLib.objects.all().annotate(
-                num_nucacids=Count('na_sl_links',distinct=True),
-                num_files=Count('sequencing_file_sets__sequencing_files',distinct=True),
+                num_nucacids=Count('na_sl_links', distinct=True),
+                num_files=Count('sequencing_file_sets__sequencing_files', distinct=True),
                 num_blocks=Count('na_sl_links', distinct=True),
                 num_capturedlibs=Count('sl_cl_links', distinct=True),
                 area_num=Count("na_sl_links__nucacid__area_na_links__area", distinct=True),

@@ -29,18 +29,10 @@ class BlockForm(BaseForm, forms.ModelForm):
         self.fields["patient"].widget.attrs["data-control"] = "select2"
 
 
-    # def clean(self):
-    #     """
-    #     The algorithm created for the body site throws a weird exception. This error is caught and removed.
-    #     """
-    #     if "body_site" in dict(self.errors.items()).keys():
-    #         del self.errors["body_site"]
-    #     return self.cleaned_data
 
     def clean_body_site(self):
         """ Remove body_site if user selects '--Select--' """
         body_site = self.cleaned_data.get("body_site")
-        print("bodysite:", body_site)
         if not body_site or body_site == "Select...":  # Ensure it's cleared
             return None
         return body_site
@@ -76,7 +68,6 @@ class BlockUrlForm(forms.ModelForm):
 class FilterForm(forms.Form):
     p_stage = forms.ChoiceField(choices=[('','---------' )] + list(Block.P_STAGE_TYPES), label="P_STAGE", required=False)
     prim = forms.ChoiceField(choices=[('','---------' )] + list(Block.PRIM_TYPES), label="PRIM", required=False)
-    # collection = forms.ChoiceField(choices=[('','---------' )] + list(Block.COLLECTION_CHOICES), label="COLLECTION", required=False)
     body_site = forms.ModelChoiceField(queryset=Body.objects.all())
 
 
@@ -84,6 +75,5 @@ class FilterForm(forms.Form):
         super(FilterForm, self).__init__(*args, **kwargs)
         self.fields["p_stage"].widget.attrs.update({'class':'form-control-sm'})
         self.fields["prim"].widget.attrs.update({'class':'form-control-sm'})
-        # self.fields["collection"].widget.attrs.update({'class':'form-control-sm'})
         self.fields["body_site"].widget.attrs.update({'class':'form-control-sm'})
         self.fields["body_site"].widget.attrs["data-control"] = "select2"

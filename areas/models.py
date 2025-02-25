@@ -180,15 +180,4 @@ class Area(models.Model):
         '''
         return [{"label":"---------","value":""}] + [{ "label":c[1], "value":c[0] } for c in Area.COLLECTION_CHOICES]
 
-class BLOCK_AREA_LINK(models.Model):
-    block = models.ForeignKey("blocks.Block",on_delete=models.CASCADE, related_name="block_area_links", verbose_name="Block")
-    area = models.ForeignKey("areas.Area", on_delete=models.CASCADE, related_name="block_area_links", verbose_name="Area")
-    input_vol = models.FloatField(blank=True, null=True, verbose_name="Volume")
-    input_amount = models.FloatField(blank=True, null=True, verbose_name="Amount")
-    date = models.DateTimeField(default=datetime.now, verbose_name="Date")
 
-    class Meta:
-        db_table = "block_area_link"
-
-    def __str__(self):
-        return f"{self.area.name} - {self.nucacid.name}"

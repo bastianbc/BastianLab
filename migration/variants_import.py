@@ -230,7 +230,6 @@ def get_variant_file(file_path):
     logger.debug(f"Getting variant file: {file_path}")
     try:
         variant_file = VariantFile.objects.get(name=file_path.split("/")[-1])
-        print("variant_file: ", variant_file.name)
         logger.info(f"Found variant file: {variant_file}")
         return variant_file
     except ObjectDoesNotExist:
@@ -263,7 +262,6 @@ def check_required_fields(row):
     return True, ""
 
 def create_gene_detail(gene_detail, row_gene, g_variant, func):
-    print("$$$", gene_detail, row_gene)
     entries = gene_detail.split(';')
     for entry in entries:
         try:
@@ -496,7 +494,6 @@ def create_genes(row):
         hg = row['hg'],
         nm_canonical = row['NM_canonical']
     )
-    print("Gene: ", gene.name)
 
 def import_genes():
     # gene_instance = Gene.objects.get(id=1)  # Get the Gene instance

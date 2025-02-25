@@ -97,7 +97,7 @@ class Patient(models.Model):
             if order == 'desc':
                 order_column = '-' + order_column
 
-            queryset = Patient.objects.all().annotate(num_blocks=Count('patient_blocks'))
+            queryset = Patient.objects.all().annotate(num_blocks=Count('patient_blocks', distinct=True))
             total = queryset.count()
             is_initial = _is_initial_value(search_value)
             search_value = _parse_value(search_value)

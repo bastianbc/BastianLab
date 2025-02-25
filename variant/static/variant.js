@@ -605,11 +605,22 @@ var KTDatatablesServerSide = function () {
       }
 
       const params = new URLSearchParams(window.location.search);
-      const x = params.get('initial');
+      const model = params.get('model');
+      const id = params.get('id');
+      const initial = params.get('initial');
 
       cleanUrl();
 
-      return x;
+      if (initial =="true" && model != null && id !=null) {
+
+        return JSON.stringify({
+          "model": model,
+          "id": id
+        });
+
+      }
+
+      return null;
 
     }
 

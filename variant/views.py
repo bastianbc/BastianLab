@@ -23,7 +23,6 @@ def filter_variants(request):
         serializer = VariantSerializerBlock(variants['items'], many=True)
     else:
         serializer = VariantSerializer(variants['items'], many=True)
-    print(serializer.data)
     result = dict()
     result['data'] = serializer.data
     result['draw'] = variants['draw']
