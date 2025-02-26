@@ -248,7 +248,7 @@ def get_block_vaiants(request):
             'id': block.id if block else '',
             'name': block.name if block else '',
             'body_site': block.body_site.name if block and block.body_site else '',
-            'diagnosis': block.diagnosis.name if block and block.diagnosis else '',
+            'diagnosis': block.diagnosis if block and block.diagnosis else '',
             'he_image': area.image.url if area.image else None,
         },
         'analyses': [
