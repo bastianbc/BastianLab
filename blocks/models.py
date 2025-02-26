@@ -44,7 +44,7 @@ class Block(models.Model):
         ("ethanol", "ethanol"),
     )
 
-    name = models.CharField(max_length=50, blank=True, null=False, unique=True, validators=[validate_name_contains_space])
+    name = models.CharField(max_length=50, blank=True, null=False, unique=True)
     patient = models.ForeignKey('lab.Patient', on_delete=models.CASCADE, db_column='patient', blank=True, null=True, related_name="patient_blocks")
     # project = models.ForeignKey('projects.Projects', on_delete=models.DO_NOTHING, blank=True, null=True, related_name="project_blocks")
     age = models.FloatField(blank=True, null=True, validators=[

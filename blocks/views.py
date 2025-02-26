@@ -250,6 +250,8 @@ def get_block_vaiants(request):
             'body_site': block.body_site.name if block and block.body_site else '',
             'diagnosis': block.diagnosis if block and block.diagnosis else '',
             'he_image': area.image.url if area.image else None,
+            'scan_number': block.scan_number if block else None,
+            'block_url': block.get_block_url()
         },
         'analyses': [
             {
