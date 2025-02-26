@@ -1094,8 +1094,9 @@ var KTDatatablesServerSide = function () {
             document.querySelector('input[name="body_site"]').value = data.body_site;
             document.querySelector('textarea[name="diagnosis"]').textContent = data.diagnosis;
 
-            if (data.he_image) {
-                document.querySelector('a[name="he_image"]').href = data.he_image;
+            if (data.block_url) {
+                console.log(data.block_url.url);
+                document.querySelector('a[name="he_image"]').href = data.block_url.url+""+data.scan_number
             }
         }
 

@@ -656,9 +656,9 @@ var KTDatatablesServerSide = function () {
 
         function populateAreaDetails(data) {
             document.querySelector('input[name="area_name"]').value = data.name;
-            document.querySelector('input[name="block_name"]').value = data.block_name;
-            document.querySelector('input[name="body_site"]').value = data.body_site;
-            document.querySelector('textarea[name="diagnosis"]').textContent = data.diagnosis;
+            document.querySelector('input[name="block_name"]').value = data.block.name;
+            document.querySelector('input[name="body_site"]').value = data.block.body_site;
+            document.querySelector('textarea[name="diagnosis"]').textContent = data.block.diagnosis;
 
             if (data.he_image) {
                 document.querySelector('a[name="he_image"]').href = data.he_image;
