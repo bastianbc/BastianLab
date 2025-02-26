@@ -78,6 +78,10 @@ class Area(models.Model):
                 num_projects=Count(
                     'block__block_projects',
                     distinct=True
+                ),
+                num_variants=Count(
+                    'area_na_links__nucacid__na_sl_links__sample_lib__variant_calls',
+                    distinct=True
                 )
             )
            
@@ -121,6 +125,7 @@ class Area(models.Model):
                 "6":"investigator",
                 "7":"num_nucacids",
                 "8":"num_samplelibs",
+                "9":"num_variants",
             }
             draw = int(kwargs.get('draw', None)[0])
             length = int(kwargs.get('length', None)[0])

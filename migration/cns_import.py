@@ -15,7 +15,7 @@ import logging
 from pathlib import Path
 from gene.models import Gene
 from migration.variants_import import get_sample_lib, get_sequencing_run
-from areas.models import Areas
+from areas.models import Area
 from areatype.models import AreaType
 
 logger = logging.getLogger("file")
@@ -117,7 +117,7 @@ def create_area_types(row):
         )
     else:
         area_type = AreaType.objects.get(name=row['area_type'])
-    area = Areas.objects.get(ar_id=row['ar_id'])
+    area = Area.objects.get(id=row['ar_id'])
     area.area_type = area_type
     area.save()
 

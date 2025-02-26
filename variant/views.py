@@ -19,10 +19,12 @@ def filter_variants(request):
     variants = VariantCall.query_by_args(request.user,**request.GET)
     kwargs = request.GET
     model_block = get_kwarg_value(kwargs, 'model_block')
-    if model_block:
-        serializer = VariantSerializerBlock(variants['items'], many=True)
+    model_area = get_kwarg_value(kwargs, 'model_area')
+    if model_block or model_area:
+        serializer = VariantSerializerBlockArea(variants['items'], many=True)
     else:
         serializer = VariantSerializer(variants['items'], many=True)
+    print(serializer.data)
     result = dict()
     result['data'] = serializer.data
     result['draw'] = variants['draw']
