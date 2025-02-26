@@ -169,7 +169,7 @@ def get_area_vaiants(request):
             'block': {
                 'name': area.block.name if area.block else '',
                 'body_site': area.block.body_site.name if area.block and area.block.body_site else '',
-                'diagnosis': area.block.diagnosis.name if area.block and area.block.diagnosis else ''
+                'diagnosis': area.block.diagnosis if area.block and area.block.diagnosis else ''
             }
         },
         'analyses': [
