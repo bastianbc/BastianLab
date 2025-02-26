@@ -68,6 +68,7 @@ var KTDatatablesServerSide = function () {
                 { data: 'investigator' },
                 { data: 'num_nucacids' },
                 { data: 'num_samplelibs' },
+                { data: 'num_variants' },
             ],
             columnDefs: [
                 {
@@ -128,6 +129,19 @@ var KTDatatablesServerSide = function () {
                 },
                 {
                     targets: 9,
+                    orderable: true,
+                    className: "text-center",
+                    render: function (data, type, row) {
+                        let id = row["id"];
+                        if (data > 0) {
+                            return `
+                              <a href="/variant?model=area&id=${id}&initial=true">${data}</a>`;
+                        }
+                        return data;
+                    }
+                },
+                {
+                    targets: 10,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -578,7 +592,7 @@ var KTDatatablesServerSide = function () {
         });
 
         function getVariantData(area_id) {
-            fetch(`/variant/get_variants_by_area?area_id=${area_id}`)
+            fetch(`/areas/get_area_vaiants?id=${area_id}`)
                 .then(response => response.json())
                 .then(data => {
                     initializeModal(data);
@@ -599,23 +613,25 @@ var KTDatatablesServerSide = function () {
             populateAreaDetails(data.area);
 
             // Check if there are any analyses
-            if (!data.analyses || data.analyses.length === 0) {
-                showNoDataMessage(tabContent, "No analysis runs found for this area.");
-                return;
-            }
+            // if (!data.analyses || data.analyses.length === 0) {
+            //     showNoDataMessage(tabContent, "No analysis runs found for this area.");
+            //     return;
+            // }
 
             // Check if any analysis has variants
-            const hasVariants = data.analyses.some(analysis => analysis.variants && analysis.variants.length > 0);
-            if (!hasVariants) {
-                showNoDataMessage(tabContent, "No variants found in any analysis runs.");
-                return;
-            }
-
+            // const hasVariants = data.analyses.some(analysis => analysis.variants && analysis.variants.length > 0);
+            // if (!hasVariants) {
+            //     showNoDataMessage(tabContent, "No variants found in any analysis runs.");
+            //     return;
+            // }
+            console.log(data.analyses);
             data.analyses.forEach((analysis, index) => {
                 // Create tab
                 const isActive = index === 0;
                 const tabId = `analysis_${index}`;
 
+                console.log(analysis);
+                console.log(analysis.analysis_name);
                 createTab(tabContainer, tabId, analysis.analysis_name, isActive);
                 createTabPane(tabContent, tabId, analysis, isActive, data.area.id);
 
@@ -661,7 +677,7 @@ var KTDatatablesServerSide = function () {
             container.appendChild(li);
         }
 
-        function createTabPane(container, id, data, isActive, areaId) {
+        function createTabPane(container, id, analysis, isActive, areaId) {
             const div = document.createElement('div');
             div.className = `tab-pane fade ${isActive ? 'show active' : ''}`;
             div.id = id;
@@ -696,24 +712,25 @@ var KTDatatablesServerSide = function () {
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: `/variant/get_variants_by_area`,
+                    url: `/variant/filter_variants`,
                     type: 'GET',
                     data: {
                         area_id: areaId,
-                        analysis_id: analysisId
+                        analysis_id: analysisId,
+                        model_area:"area"
                     }
                 },
                 columns: [
                     {
-                        data: 'sampleLibrary',
+                        data: 'sample_lib',
                         className: 'text-gray-800 text-hover-primary'
                     },
                     {
-                        data: 'gene',
+                        data: 'genes',
                         className: 'text-gray-800'
                     },
                     {
-                        data: 'pVariant',
+                        data: 'p_variant',
                         className: 'text-gray-800'
                     },
                     {

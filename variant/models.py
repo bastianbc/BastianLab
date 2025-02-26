@@ -194,7 +194,22 @@ class VariantCall(models.Model):
                     ),
                     output_field=FloatField()
                 )
-            )
+            ).distinct()
+
+        def _get_area_variants_queryset(area_id):
+            print("&&&&", VariantCall.objects.filter(sample_lib__na_sl_links__nucacid__area_na_links__area__id=area_id).count())
+            return VariantCall.objects.filter(sample_lib__na_sl_links__nucacid__area_na_links__area__id=area_id).annotate(
+                genes=F('g_variants__c_variants__gene__name'),
+                p_variant=F('g_variants__c_variants__p_variants__name_meta'),
+                vaf=ExpressionWrapper(
+                    Case(
+                        When(ref_read__gt=0, then=(F('alt_read') * 100.0) / (F('ref_read') + F('alt_read'))),
+                        default=Value(0.0),
+                        output_field=FloatField(),
+                    ),
+                    output_field=FloatField()
+                )
+            ).distinct()
 
         def _parse_value(search_value):
             '''
@@ -244,10 +259,17 @@ class VariantCall(models.Model):
             ORDER_COLUMN_CHOICES_BLOCK = {
                 "0": "areas",
                 "1": "sample_lib",
-                "2": "gene",
+                "2": "genes",
                 "3": "p_variant",
                 "4": "coverage",
                 "5": "vaf",
+            }
+            ORDER_COLUMN_CHOICES_AREA = {
+                "0": "sample_lib",
+                "1": "genes",
+                "2": "p_variant",
+                "3": "coverage",
+                "4": "vaf",
             }
             draw = int(kwargs.get('draw', None)[0])
             length = int(kwargs.get('length', None)[0])
@@ -267,18 +289,24 @@ class VariantCall(models.Model):
             variant = get_kwarg_value(kwargs, 'variant')
             variant_file = get_kwarg_value(kwargs, 'variant_file')
             model_block = get_kwarg_value(kwargs, 'model_block')
+            model_area = get_kwarg_value(kwargs, 'model_area')
             block_id = get_kwarg_value(kwargs, 'block_id')
+            area_id = get_kwarg_value(kwargs, 'area_id')
             is_initial = _is_initial_value(search_value)
             search_value = _parse_value(search_value)
 
             # django orm '-' -> desc
-            order_column = ORDER_COLUMN_CHOICES_BLOCK[order_column] if model_block else ORDER_COLUMN_CHOICES[order_column]
+            order_column = ORDER_COLUMN_CHOICES_BLOCK[order_column] if model_block else ORDER_COLUMN_CHOICES_AREA[order_column] if model_area else ORDER_COLUMN_CHOICES[order_column]
             # django orm '-' -> desc
             if order == 'desc':
                 order_column = '-' + order_column
 
             if model_block:
                 queryset = _get_block_variants_queryset(block_id)
+            elif model_area:
+                print("model area", area_id)
+                queryset = _get_area_variants_queryset(area_id)
+                print(queryset.count())
             else:
                 queryset = _get_authorizated_queryset()
 
@@ -336,6 +364,11 @@ class VariantCall(models.Model):
             if is_initial:
                 if search_value["model"] == "block":
                     queryset = queryset.filter(sample_lib__na_sl_links__nucacid__area_na_links__area__block__id=int(search_value["id"]))
+
+                if search_value["model"] == "area":
+                    print(queryset)
+                    queryset = queryset.filter(sample_lib__na_sl_links__nucacid__area_na_links__area__id=int(search_value["id"]))
+                    print(queryset)
 
             elif search_value:
                 queryset = queryset.filter(

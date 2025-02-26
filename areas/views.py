@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required,permission_required
 from core.decorators import permission_required_for_async
 from .serializers import AreasSerializer
 from areatype.models import AreaType
+from variant.models import VariantCall
 
 @permission_required_for_async("areas.view_area")
 def filter_areas(request):
@@ -151,3 +152,32 @@ def get_area_types(request):
     area_types = AreaType.objects.all().values('id', 'name').order_by("name")
     data = [{"value": at['id'], "name": at['name']} for at in area_types]
     return JsonResponse(data, safe=False)
+
+def get_area_vaiants(request):
+    area = Area.objects.get(id=request.GET.get('id'))
+    analyses = VariantCall.objects.filter(
+        sample_lib__na_sl_links__nucacid__area_na_links__area=area
+    ).select_related('analysis_run').distinct('analysis_run').values(
+        'analysis_run_id', 'analysis_run__name'
+    )
+
+    response_data = {
+        'area': {
+            'id': area.id,
+            'name': area.name,
+            'he_image': area.image.url if area.image else None,
+            'block': {
+                'name': area.block.name if area.block else '',
+                'body_site': area.block.body_site.name if area.block and area.block.body_site else '',
+                'diagnosis': area.block.diagnosis.name if area.block and area.block.diagnosis else ''
+            }
+        },
+        'analyses': [
+            {
+                'analysis_id': analysis['analysis_run_id'],
+                'analysis_name': analysis['analysis_run__name']
+            }
+            for analysis in analyses
+        ]
+    }
+    return JsonResponse(response_data)

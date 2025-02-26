@@ -28,7 +28,7 @@ class VariantSerializer(serializers.ModelSerializer):
         return obj.sequencing_run.name
 
 
-class VariantSerializerBlock(serializers.ModelSerializer):
+class VariantSerializerBlockArea(serializers.ModelSerializer):
     DT_RowId = serializers.SerializerMethodField()
     blocks = serializers.CharField(read_only=True)
     areas = serializers.CharField(read_only=True)
