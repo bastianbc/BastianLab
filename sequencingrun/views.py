@@ -191,6 +191,7 @@ def add_async(request):
         return JsonResponse({"success":False, "message": str(e)})
 
 def get_sequencing_files(request, id):
+    print("*"*100, request.GET)
     sequencing_run = SequencingRun.objects.get(id=id)
     sample_libs = SampleLib.objects.filter(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct()
     file_sets = helper.get_file_sets()
