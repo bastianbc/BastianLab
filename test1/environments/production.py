@@ -220,6 +220,7 @@ PI_GROUP_NAME = "Primary Investigators"
 smb_directory_labshare = "/mnt/labshare"
 SEQUENCING_FILES_SOURCE_DIRECTORY = Path(Path(smb_directory_labshare) / "BastianRaid-02")
 TEMP_DIRECTORY = Path(Path(smb_directory_labshare) / "BastianRaid-02" / "TEMP")
+HISEQDATA_DIRECTORY = Path(Path(smb_directory_labshare) / "BastianRaid-02" / "HiSeqData")
 
 SMB_DIRECTORY_SEQUENCINGDATA = "/mnt/sequencingdata"
 SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")

@@ -1,16 +1,67 @@
 import os
+import re
 from django.conf import settings
 import shutil
+from sequencingfile.models import SequencingFile, SequencingFileSet
+from django.core.exceptions import ObjectDoesNotExist
+from collections import defaultdict
+from collections import defaultdict
 
-def get_file_sets():
-    from collections import defaultdict
-    files = os.listdir(settings.SEQUENCING_FILES_SOURCE_DIRECTORY)
+
+def generate_prefix(x):
+    prefix = "*"*30
+    match = re.match(r'(\w+)[-_]([ACTG]{6,8}(?:-[ACTG]{6,8})?)', x)
+    if match:
+        dna = match.group(2)
+        prefix = x.split(dna)[0] + dna
+    elif ".fastq" in x:
+        prefix = x.split("_L0")[0]
+        if "." in prefix:
+            prefix = x.split("_R")[0]
+    elif ".sorted" in x:
+        prefix = x.split(".sorted")[0]
+    elif "deduplicated.realign.bam" in x:
+        prefix = x.split(".deduplicated.realign.bam")[0]
+    elif ".bam" in x and "deduplicated" not in x:
+        prefix = x.split(".bam")[0]
+        if "." in prefix:
+            prefix = x.split(".sortq")[0]
+    elif ".bai" in x and not ".bam" in x:
+        prefix = x.split(".bai")[0]
+
+    if "." not in prefix:
+        return prefix
+    return
+
+
+
+def get_file_tree(file_list, path, sequencing_run, sample_libs):
+    try:
+        sample_dict = defaultdict(list)
+        for file in file_list:
+            for sample in sample_libs:
+                if sample.name in file:  # Check if sample name is in file name
+                    sample_dict[sample.name].append(file)
+        return sample_dict
+    except ObjectDoesNotExist as e:
+        print(e)
+        return
+
+
+def get_file_sets(sequencing_run, sample_libs):
+    files = os.path.join(settings.HISEQDATA_DIRECTORY, sequencing_run.name)
+
+    # print(files)
+    file_list = []
     file_sets = defaultdict(list)
-    for file_name in files:
-        parts = file_name.split('_')[:2]
-        key = '_'.join(parts)
-        file_sets[key].append(file_name)
-    return [{'file_set': key, 'files': value} for key, value in file_sets.items()]
+    for root, dirs, files in os.walk(files):
+        # print(root,dirs,files)
+        for file in files:
+            # print(file)
+            if file.strip().endswith(".fastq.gz") | file.strip().endswith(".bam") | file.strip().endswith(".bai"):
+                file_list.append(file)
+    print(get_file_tree(file_list, root, sequencing_run, sample_libs))
+    return [{'file_set': key, 'files': value} for key, value in get_file_tree(file_list, root, sequencing_run, sample_libs).items()]
 
 def add_flag_to_filename(file_name):
     base_name, extension = os.path.splitext(file_name)

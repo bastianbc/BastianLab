@@ -18,6 +18,9 @@ from capturedlib.models import CapturedLib
 from sequencinglib.models import SequencingLib
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.expressions import RawSQL
+import subprocess
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 
 @permission_required("sequencingfile.view_sequencingfile",raise_exception=True)
@@ -522,6 +525,20 @@ def filter_temp_directory(request):
 
     return JsonResponse(result)
 
+def execute_mount_script():
+    try:
+        # Define your bash commands
+        commands = [
+            "sudo ufw disable",
+            "sudo mount -v -t cifs //bastianlab.ucsf.edu/labshare /mnt/labshare -o username=cbagci,file_mode=0777,dir_mode=0777"
+        ]
+
+        # Execute the commands using subprocess
+        for cmd in commands:
+            process = subprocess.run(cmd, shell=True, check=True, text=True, capture_output=True)
+        return True
+    except subprocess.CalledProcessError as e:
+        return False
 
 
 
