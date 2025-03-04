@@ -17,6 +17,7 @@ from django.core.files.base import ContentFile
 from capturedlib.models import SL_CL_LINK
 import json
 from analysisrun.forms import AnalysisRunForm
+from sequencingfile.views import execute_mount_script
 
 @permission_required("sequencingrun.view_sequencingrun",raise_exception=True)
 def sequencingruns(request):
@@ -191,10 +192,11 @@ def add_async(request):
         return JsonResponse({"success":False, "message": str(e)})
 
 def get_sequencing_files(request, id):
+    execute_mount_script()
     print("*"*100, request.GET)
     sequencing_run = SequencingRun.objects.get(id=id)
-    sample_libs = SampleLib.objects.filter(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct()
-    file_sets = helper.get_file_sets()
+    sample_libs = SampleLib.objects.filter(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct().order_by('name')
+    file_sets = helper.get_file_sets(sequencing_run, sample_libs)
     return JsonResponse({
         'success': True,
         "file_sets": file_sets,
@@ -205,10 +207,13 @@ def get_sequencing_files(request, id):
 def save_sequencing_files(request, id):
     success = False
     sequencing_run = SequencingRun.objects.get(id=id)
+    sample_libs = SampleLib.objects.filter(
+        sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct().order_by(
+        'name')
     data = json.loads(request.POST.get('data'))
     # get posted data
     # files from source directory
-    file_sets = helper.get_file_sets()
+    file_sets = helper.get_file_sets(sequencing_run, sample_libs)
 
     transfers = [] # file pairs to transfer as (source,destination) construct
     #create data of the transfer files

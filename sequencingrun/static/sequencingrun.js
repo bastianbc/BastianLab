@@ -1061,10 +1061,23 @@ var KTDatatablesServerSide = function () {
 
             sequencingRunId = parent.querySelector('input[type=checkbox]').value;
 
+            Swal.fire({
+                title: 'Loading...',
+                text: 'Fetching sequencing files, please wait...',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+
             $.ajax({
                 url: "/sequencingrun/" + sequencingRunId + "/get_sequencing_files",
                 type: "GET",
                 success: function (data) {
+                    Swal.close();
                     initialMachingTable(data);
                     fillElements(data);
                     checkMatching();
