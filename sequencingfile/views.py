@@ -530,7 +530,7 @@ def execute_mount_script():
         # Define your bash commands
         commands = [
             "sudo ufw disable",
-            "sudo mount -v -t cifs //bastianlab.ucsf.edu/labshare /mnt/labshare -o username=cbagci,file_mode=0777,dir_mode=0777"
+            "sudo mount -v -t cifs //bastianlab.ucsf.edu/labshare /mnt/labshare -o credentials=/etc/smbcredentials,file_mode=0777,dir_mode=0777"
         ]
 
         # Execute the commands using subprocess
