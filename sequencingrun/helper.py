@@ -6,7 +6,7 @@ from sequencingfile.models import SequencingFile, SequencingFileSet
 from django.core.exceptions import ObjectDoesNotExist
 from collections import defaultdict
 from collections import defaultdict
-
+from samplelib.models import SampleLib
 
 def generate_prefix(x):
     prefix = "*"*30
@@ -50,8 +50,6 @@ def get_file_tree(file_list, path, sequencing_run, sample_libs):
 
 def get_file_sets(sequencing_run, sample_libs):
     files = os.path.join(settings.HISEQDATA_DIRECTORY, sequencing_run.name)
-
-    # print(files)
     file_list = []
     file_sets = defaultdict(list)
     for root, dirs, files in os.walk(files):
@@ -62,6 +60,62 @@ def get_file_sets(sequencing_run, sample_libs):
                 file_list.append(file)
     print(get_file_tree(file_list, root, sequencing_run, sample_libs))
     return [{'file_set': key, 'files': value} for key, value in get_file_tree(file_list, root, sequencing_run, sample_libs).items()]
+
+
+def get_or_create_file_set(sample, sequencing_run, file):
+    try:
+        fs = SequencingFileSet.objects.filter(
+            sequencing_run=sequencing_run,
+            sample_lib=sample
+        ).first()
+        if not fs:
+            generate_prefix(file)
+            fs, _ = SequencingFileSet.objects.create(
+                prefix=generate_prefix(file),
+                sequencing_run=sequencing_run,
+                sample_lib=sample
+            )
+        return fs
+    except Exception as e:
+        print(e)
+
+
+def get_type(file):
+    if file.endswith(".fastq"):
+        return "fastq"
+    if file.endswith('.bam') and ".bai" not in file:
+        return 'bam'
+    if file.endswith('.bai') and ".bam" not in file:
+        return 'bai'
+
+
+
+def get_or_create_file(file, fs):
+    try:
+        _file = SequencingFile.objects.filter(
+            name=file,
+        ).first()
+        if not _file:
+            _file, _ = SequencingFile.objects.create(
+                sequencing_file_set=fs,
+                name=file,
+                type=get_type(file)
+            )
+        return _file
+    except Exception as e:
+        print(e)
+
+
+
+def create_files_and_sets(file_sets, sequencing_run):
+    for sample, files in file_sets[0].items():
+        sample_lib = SampleLib.objects.get(name=sample)
+        if files:
+            for file in files:
+                fs = get_or_create_file_set(sample_lib, sequencing_run, file)
+                _file = get_or_create_file(file,fs)
+
+
 
 def add_flag_to_filename(file_name):
     base_name, extension = os.path.splitext(file_name)
