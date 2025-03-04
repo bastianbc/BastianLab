@@ -193,7 +193,6 @@ def add_async(request):
 
 def get_sequencing_files(request, id):
     execute_mount_script()
-    print("*"*100, request.GET)
     sequencing_run = SequencingRun.objects.get(id=id)
     sample_libs = SampleLib.objects.filter(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct().order_by('name')
     file_sets = helper.get_file_sets(sequencing_run, sample_libs)
@@ -205,6 +204,7 @@ def get_sequencing_files(request, id):
     })
 
 def save_sequencing_files(request, id):
+    print("*"*100, request.GET)
     success = False
     sequencing_run = SequencingRun.objects.get(id=id)
     sample_libs = SampleLib.objects.filter(
@@ -214,25 +214,27 @@ def save_sequencing_files(request, id):
     # get posted data
     # files from source directory
     file_sets = helper.get_file_sets(sequencing_run, sample_libs)
-
-    transfers = [] # file pairs to transfer as (source,destination) construct
-    #create data of the transfer files
-    for d in data:
-        if d["initial"] != d["swap"]:
-            # files to swap
-            files = [x["files"] for x in file_sets if x["file_set"] == d["initial"] or x["file_set"] == d["swap"]]
-            for file_name in files[0]:
-                # change file name as inserting the "FLAG" statement
-                new_file_name = helper.add_flag_to_filename(file_name)
-                transfers.append((file_name,new_file_name))
-        else:
-            files = [x["files"] for x in file_sets if x["file_set"] == d["initial"]]
-            for file_name in files[0]:
-                transfers.append((file_name,file_name))
-
-    success, directory_path = helper.file_transfer(sequencing_run,transfers)
-
+    print(file_sets)
+    helper.create_files_and_sets(file_sets, sequencing_run)
     return JsonResponse({"success": success})
+    # transfers = [] # file pairs to transfer as (source,destination) construct
+    # #create data of the transfer files
+    # for d in data:
+    #     if d["initial"] != d["swap"]:
+    #         # files to swap
+    #         files = [x["files"] for x in file_sets if x["file_set"] == d["initial"] or x["file_set"] == d["swap"]]
+    #         for file_name in files[0]:
+    #             # change file name as inserting the "FLAG" statement
+    #             new_file_name = helper.add_flag_to_filename(file_name)
+    #             transfers.append((file_name,new_file_name))
+    #     else:
+    #         files = [x["files"] for x in file_sets if x["file_set"] == d["initial"]]
+    #         for file_name in files[0]:
+    #             transfers.append((file_name,file_name))
+    #
+    # success, directory_path = helper.file_transfer(sequencing_run,transfers)
+    #
+    # return JsonResponse({"success": success})
 
 def get_sample_libs_async(request):
     """

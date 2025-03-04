@@ -1248,6 +1248,16 @@ var KTDatatablesServerSide = function () {
         }
 
         function saveChanges() {
+            Swal.fire({
+                title: 'Saving...',
+                text: 'Saving files and file sets...',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
             $.ajax({
                 url: "/sequencingrun/" + sequencingRunId + "/save_sequencing_files",
                 type: "POST",
@@ -1257,6 +1267,7 @@ var KTDatatablesServerSide = function () {
                 },
                 success: function (data) {
                     if (data.success) {
+                        Swal.close();
                         Swal.fire({
                             text: "The sequencing files created successfully and the file locations replaced.",
                             icon: "success",
