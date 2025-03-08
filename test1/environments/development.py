@@ -90,6 +90,7 @@ INSTALLED_APPS = [
     'wiki',
     'analysisrun',
     'cns',
+    'qc',
 ]
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 CRISPY_FAIL_SILENTLY = not DEBUG
