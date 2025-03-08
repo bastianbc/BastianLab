@@ -46,23 +46,23 @@
         <div class="mb-10">
           <!--begin::Options-->
           <div class="row mb-2">
-            <div class="col-sm-12">{{ filter.chromosome|as_crispy_field }}</div>
+            <div class="col-sm-12">{{ filter.sample_lib|as_crispy_field }}</div>
           </div>
           <div class="row mb-2">
-            <div class="col-sm-12">{{ filter.log2|as_crispy_field }}</div>
+            <div class="col-sm-12">{{ filter.analysis_run|as_crispy_field }}</div>
           </div>
           <div class="row mb-2">
-            <div class="col-sm-6">{{ filter.chr_start|as_crispy_field }}</div>
-            <div class="col-sm-6">{{ filter.chr_end|as_crispy_field }}</div>
+            <div class="col-sm-6">{{ filter.sequencing_run|as_crispy_field }}</div>
+            <div class="col-sm-6">{{ filter.secondary_or_supplementary_rds|as_crispy_field }}</div>
           </div>
           <div class="row mb-2">
-            <div class="col-sm-12">{{ filter.gene|as_crispy_field }}</div>
+            <div class="col-sm-12">{{ filter.read_pair_duplicates|as_crispy_field }}</div>
           </div>
           <div class="row mb-2">
-            <div class="col-sm-12">{{ filter.sample_library|as_crispy_field }}</div>
+            <div class="col-sm-12">{{ filter.read_pair_optical_duplicates|as_crispy_field }}</div>
           </div>
           <div class="row mb-2">
-            <div class="col-sm-12">{{ filter.sequencing_run|as_crispy_field }}</div>
+            <div class="col-sm-12">{{ filter.percent_duplication|as_crispy_field }}</div>
           </div>
           <!--end::Options-->
         </div>
@@ -88,7 +88,7 @@
         </svg>
       </span>
       <!--end::Svg Icon-->
-      Add Cns
+      Add QC
   </button>
     <!--end::Add record-->
   </div>
@@ -183,5 +183,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="static/cns.js"></script>
+<script src="static/qc.js"></script>
 {% endblock %}

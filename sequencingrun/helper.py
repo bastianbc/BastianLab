@@ -50,6 +50,8 @@ def get_file_tree(file_list, path, sequencing_run, sample_libs):
 
 def get_file_sets(sequencing_run, sample_libs):
     files = os.path.join(settings.HISEQDATA_DIRECTORY, sequencing_run.name)
+    if not os.path.exists(files):
+        raise FileNotFoundError(f"Directory not found {os.path.join(settings.HISEQDATA_DIRECTORY, sequencing_run.name)}")
     file_list = []
     file_sets = defaultdict(list)
     for root, dirs, files in os.walk(files):
@@ -70,11 +72,12 @@ def get_or_create_file_set(sample, sequencing_run, file):
         ).first()
         if not fs:
             generate_prefix(file)
-            fs, _ = SequencingFileSet.objects.create(
+            fs = SequencingFileSet.objects.create(
                 prefix=generate_prefix(file),
                 sequencing_run=sequencing_run,
                 sample_lib=sample
             )
+            print("set created")
         return fs
     except Exception as e:
         print(e)
@@ -92,15 +95,17 @@ def get_type(file):
 
 def get_or_create_file(file, fs):
     try:
-        _file = SequencingFile.objects.filter(
-            name=file,
-        ).first()
+        _file = SequencingFile.objects.get(name=file)
+        _file.sequencing_file_set = fs
+        _file.type = get_type(file)
+        _file.save()
         if not _file:
-            _file, _ = SequencingFile.objects.create(
+            _file = SequencingFile.objects.create(
                 sequencing_file_set=fs,
                 name=file,
                 type=get_type(file)
             )
+            print("file created")
         return _file
     except Exception as e:
         print(e)
@@ -108,12 +113,17 @@ def get_or_create_file(file, fs):
 
 
 def create_files_and_sets(file_sets, sequencing_run):
-    for sample, files in file_sets[0].items():
-        sample_lib = SampleLib.objects.get(name=sample)
-        if files:
-            for file in files:
+    files = []
+    for item in file_sets:
+        sample_lib = SampleLib.objects.get(name=item['file_set'])
+        print(sample_lib)
+        if item['files']:
+            print("1"*100)
+            for file in item['files']:
                 fs = get_or_create_file_set(sample_lib, sequencing_run, file)
                 _file = get_or_create_file(file,fs)
+                files.append(_file.name)
+    return files
 
 
 

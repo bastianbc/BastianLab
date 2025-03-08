@@ -1071,21 +1071,30 @@ var KTDatatablesServerSide = function () {
                     Swal.showLoading();
                 }
             });
-
-
             $.ajax({
                 url: "/sequencingrun/" + sequencingRunId + "/get_sequencing_files",
                 type: "GET",
                 success: function (data) {
-                    Swal.close();
-                    initialMachingTable(data);
-                    fillElements(data);
-                    checkMatching();
-                    modalSequencingFiles.show();
-                },
-                error: function (xhr, ajaxOptions, thrownError) {
-
-                }
+                  if (data.success) {
+                        Swal.close();
+                        initialMachingTable(data);
+                        fillElements(data);
+                        checkMatching();
+                        modalSequencingFiles.show();
+                  }
+                  else {
+                      Swal.fire({
+                          text: `${data.message} please check your folder name`,
+                          icon: "error",
+                          buttonsStyling: false,
+                          confirmButtonText: "Ok, got it!",
+                          customClass: {
+                              confirmButton: "btn fw-bold btn-primary",
+                          }
+                      });
+                  }
+              },
+              error: function (data) {}
             });
 
           });
@@ -1266,6 +1275,7 @@ var KTDatatablesServerSide = function () {
                     data: JSON.stringify(matchingTable),
                 },
                 success: function (data) {
+
                     if (data.success) {
                         Swal.close();
                         Swal.fire({
@@ -1279,8 +1289,10 @@ var KTDatatablesServerSide = function () {
                         });
                     }
                     else {
+                        console.log("123");
+                        Swal.close();
                         Swal.fire({
-                            text: "An error occurred.The operation could not be performed.",
+                            text: `${data.message}`,
                             icon: "error",
                             buttonsStyling: false,
                             confirmButtonText: "Ok, got it!",
@@ -1293,7 +1305,16 @@ var KTDatatablesServerSide = function () {
                     modalSequencingFiles.hide();
                 },
                 error: function (xhr, ajaxOptions, thrownError) {
-
+                    Swal.close();
+                        Swal.fire({
+                            text: `${data.message}`,
+                            icon: "error",
+                            buttonsStyling: false,
+                            confirmButtonText: "Ok, got it!",
+                            customClass: {
+                                confirmButton: "btn fw-bold btn-primary",
+                            }
+                        });
                 }
             });
         }
