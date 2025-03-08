@@ -7,7 +7,6 @@ from django.http import JsonResponse
 
 @permission_required("qc.view_sampleqc",raise_exception=True)
 def sample_qcs(request):
-    filter = FilterForm()
     return render(request, "cns_list.html", locals())
 
 @permission_required_for_async("qc.view_sampleqc")
