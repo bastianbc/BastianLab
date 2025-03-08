@@ -105,7 +105,7 @@ var KTDatatablesServerSide = function () {
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item">
-                                    <a href="javascript:;" class="menu-link check-file-link text-start"  data-ar-name="${row.name}">
+                                    <a href="javascript:;" class="menu-link cns-link text-start"  data-ar-name="${row.name}">
                                         Import CNS
                                     </a>
                                 </div>
@@ -603,7 +603,7 @@ var KTDatatablesServerSide = function () {
             });
         });
 
-        document.querySelectorAll(".check-file-link").forEach(function (element) {
+        document.querySelectorAll(".cns-link").forEach(function (element) {
             element.addEventListener("click", function () {
                 const variantType = this.getAttribute('data-variant-type');
                 const arName = this.getAttribute('data-ar-name');
@@ -618,7 +618,7 @@ var KTDatatablesServerSide = function () {
                 });
 
                 // Send AJAX request to server
-                fetch(`import_cns/${arName}`,
+                fetch(`/cns/import_cns/${arName}`,
                     {
                         method: 'POST',
                         headers: {
@@ -717,64 +717,111 @@ var KTDatatablesServerSide = function () {
                 // Show loading message
                 Swal.fire({
                     title: 'Processing...',
-                    text: 'Checking for folder and file existence',
+                    text: 'Processing QC metrics for analysis run',
                     icon: 'info',
                     allowOutsideClick: false,
                     showConfirmButton: false,
                 });
 
-                // Send AJAX request to server
-                fetch(`qc/import_qc/${arName}`,
-                    {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            let tableHtml = `
-                                <div class="mt-3">
-                                <p><strong>Quality control files imported successfully.</strong></p>
+                // Send AJAX request to server with the updated endpoint
+                fetch(`/qc/process/${arName}/`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Check the status from our new API response format
+                    if (data.status === 'success') {
+                        // Create a table to display summary report
+                        let tableHtml = `
+                            <div class="mt-3">
+                                <p><strong>QC metrics processed successfully for ${data.analysis_run_name}</strong></p>
+                                <p>${data.message}</p>
+                                <table class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Sample Library</th>
+                                            <th>Dup Metrics</th>
+                                            <th>HS Metrics</th>
+                                            <th>Insert Metrics</th>
+                                            <th>Histogram PDF</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                        `;
+
+                        // Add rows for each sample library
+                        for (const [sampleLib, status] of Object.entries(data.summary_report)) {
+                            tableHtml += `
+                                <tr>
+                                    <td>${sampleLib}</td>
+                                    <td>${status.dup_metrics_processed ? '✅' : '❌'}</td>
+                                    <td>${status.hs_metrics_processed ? '✅' : '❌'}</td>
+                                    <td>${status.insert_metrics_processed ? '✅' : '❌'}</td>
+                                    <td>${status.histogram_pdf_processed ? '✅' : '❌'}</td>
+                                </tr>
                             `;
-                            
-                            Swal.fire({
-                                html: tableHtml,
-                                text: "Variant files imported successfully.",
-                                icon: "info",
-                                buttonsStyling: false,
-                                confirmButtonText: "Ok, got it!",
-                                customClass: {
-                                    confirmButton: "btn fw-bold btn-success",
-                                }
-                            });
-                            } else {
-                                Swal.fire({
-                                    title: 'Error!',
-                                    text: data.error,
-                                    icon: 'error',
-                                    confirmButtonText: 'Ok, got it!',
-                                    customClass: {
-                                        confirmButton: 'btn fw-bold btn-primary',
-                                    }
-                                });
+
+                            // If there's an error, add it as a row
+                            if (status.error) {
+                                tableHtml += `
+                                    <tr class="table-danger">
+                                        <td colspan="5"><strong>Error:</strong> ${status.error}</td>
+                                    </tr>
+                                `;
                             }
-                    })
-                    .catch(error => {
+                        }
+
+                        tableHtml += `
+                                    </tbody>
+                                </table>
+                            </div>
+                        `;
+
                         Swal.fire({
-                            title: 'Error!',
-                            text: 'An error occurred during processing.',
+                            title: 'QC Processing Complete',
+                            html: tableHtml,
+                            icon: "success",
+                            buttonsStyling: false,
+                            confirmButtonText: "Ok, got it!",
+                            customClass: {
+                                confirmButton: "btn fw-bold btn-success",
+                            }
+                        });
+                    } else {
+                        // Handle error response from our API
+                        Swal.fire({
+                            title: 'Processing Error',
+                            text: data.message || data.error || 'Failed to process QC metrics',
                             icon: 'error',
                             confirmButtonText: 'Ok, got it!',
                             customClass: {
                                 confirmButton: 'btn fw-bold btn-primary',
                             }
                         });
-                        console.error('Error:', error);
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'An error occurred during processing: ' + error.message,
+                        icon: 'error',
+                        confirmButtonText: 'Ok, got it!',
+                        customClass: {
+                            confirmButton: 'btn fw-bold btn-primary',
+                        }
                     });
-            })
-        });
+                    console.error('Error:', error);
+                });
+            });
+      });
 
     }
 

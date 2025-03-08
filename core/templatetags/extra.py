@@ -20,7 +20,9 @@ def is_admin_area(path):
         "sequencingfile",
         "gene",
         "wiki",
-        'analysisrun',
+        "analysisrun",
+        "cns",
+        "qc",
     ]
 
     app_name = path.split("/")[1]

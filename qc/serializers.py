@@ -1,10 +1,10 @@
 from rest_framework import serializers
 from .models import *
 
-class CnsSerializer(serializers.ModelSerializer):
+class SampleQCSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Cns
-        fields = ("id","sample_lib","sequencing_run","analysis_run","chromosome","start","end","gene","log2","DT_RowId")
+        model = SampleQC
+        fields = ("id","sample_lib","sequencing_run","analysis_run","insert_size_histogram","DT_RowId")
 
     def get_sequencing_run_name(self,obj):
         return obj.sequencing_run.name
