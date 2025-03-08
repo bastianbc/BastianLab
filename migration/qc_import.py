@@ -104,7 +104,8 @@ def import_variants():
     for file in files:
         file_path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA,file.directory)
         if "_Filtered" in os.path.join(file_path, file.name):
-            variant_file_parser(os.path.join(file_path,file.name), "AR_ALL")
+            pass
+            # variant_file_parser(os.path.join(file_path,file.name), "AR_ALL")
 
 
 def create_genes(row):
@@ -119,16 +120,15 @@ def create_genes(row):
         nm_canonical = row['NM_canonical']
     )
 
-def import_genes():
-    # gene_instance = Gene.objects.get(id=1)  # Get the Gene instance
-    # CVariant.objects.filter().update(gene=gene_instance)
-    # Gene.objects.filter(id__gt=1).delete()
+def collect_qc():
+    for root, dirs, files in os.walk("/Volumes/sequencingdata/ProcessedData/Analysis.tumor-normal"):
+        print(root, dirs, files)
+
+def import_qc():
+
     SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
-    # file = os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "cns_files.csv")
-    file = Path(Path(__file__).parent.parent / "uploads" / "MANE_hg19_final_filtered.csv")
-    df = pd.read_csv(file, index_col=False)
-    df = df.reset_index()
-    # df.apply(create_genes, axis=1)
+    collect_qc()
+
     pass
 
 
