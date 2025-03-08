@@ -48,7 +48,7 @@ var KTDatatablesServerSide = function () {
 
                     }
                 }
-            },,
+            },
             columns: [
                 { data: 'id' },
                 { data: 'sample_lib' },
@@ -133,7 +133,7 @@ var KTDatatablesServerSide = function () {
             handleSelectedRows.init();
             KTMenu.createInstances();
         });
-    }
+    };
 
     var initRowSelection = function () {
         // Select all checkboxes
@@ -181,7 +181,7 @@ var KTDatatablesServerSide = function () {
         filterSearch.addEventListener('keyup', function (e) {
             dt.search(e.target.value).draw();
         });
-    }
+    };
 
     // Filter Datatable
     var handleFilterDatatable = () => {
@@ -199,7 +199,7 @@ var KTDatatablesServerSide = function () {
             initDatatable(null,log2,chr_start,chr_end,sequencing_run,sample_library,chromosome,gene);
 
         });
-    }
+    };
 
     // Reset Filter
     var handleResetFilter = () => {
@@ -220,7 +220,7 @@ var KTDatatablesServerSide = function () {
           initDatatable(null, null, null, null, null, null, null, null);
 
         });
-    }
+    };
     // Delete customer
     var handleDeleteRows = () => {
         // Select all delete buttons

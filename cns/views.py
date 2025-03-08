@@ -10,6 +10,7 @@ from django.http import JsonResponse
 @permission_required("cns.view_cns",raise_exception=True)
 def cns(request):
     filter = FilterForm()
+    print(filter)
     return render(request, "cns_list.html", locals())
 
 @permission_required_for_async("cns.view_cns")

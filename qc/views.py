@@ -1,23 +1,30 @@
+import json
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required,permission_required
 from core.decorators import permission_required_for_async
 from .models import SampleQC
 from .forms import SampleQCForm
 from django.http import JsonResponse
+from qc.serializers import SampleQCSerializer
+import logging
+
+logger = logging.getLogger("file")
+
 
 @permission_required("qc.view_sampleqc",raise_exception=True)
 def sample_qcs(request):
-    return render(request, "cns_list.html", locals())
+    filter = SampleQCForm()
+    return render(request, "qc_list.html", locals())
 
 @permission_required_for_async("qc.view_sampleqc")
 def filter_sampleqcs(request):
-    cns = SampleQC().query_by_args(request.user,**request.GET)
-    serializer = SampleQCSerializer(cns['items'], many=True)
+    qc = SampleQC().query_by_args(request.user,**request.GET)
+    serializer = SampleQCSerializer(qc['items'], many=True)
     result = dict()
     result['data'] = serializer.data
-    result['draw'] = cns['draw']
-    result['recordsTotal'] = cns['total']
-    result['recordsFiltered'] = cns['count']
+    result['draw'] = qc['draw']
+    result['recordsTotal'] = qc['total']
+    result['recordsFiltered'] = qc['count']
     return JsonResponse(result)
 
 @permission_required_for_async("qc.add_sampleqc")

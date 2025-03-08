@@ -193,47 +193,40 @@ def add_async(request):
 
 def get_sequencing_files(request, id):
     execute_mount_script()
-    sequencing_run = SequencingRun.objects.get(id=id)
-    sample_libs = SampleLib.objects.filter(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct().order_by('name')
-    file_sets = helper.get_file_sets(sequencing_run, sample_libs)
-    return JsonResponse({
-        'success': True,
-        "file_sets": file_sets,
-        "sample_libs": SingleSampleLibSerializer(sample_libs, many=True).data,
-        "sequencing_run": SingleSequencingRunSerializer(sequencing_run).data
-    })
+    try:
+        sequencing_run = SequencingRun.objects.get(id=id)
+        sample_libs = SampleLib.objects.filter(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct().order_by('name')
+        file_sets = helper.get_file_sets(sequencing_run, sample_libs)
+        return JsonResponse({
+            'success': True,
+            "file_sets": file_sets,
+            "sample_libs": SingleSampleLibSerializer(sample_libs, many=True).data,
+            "sequencing_run": SingleSequencingRunSerializer(sequencing_run).data
+        })
+    except Exception as e:
+        print("$"*100)
+        return JsonResponse({"success": False, "message": str(e)})
 
 def save_sequencing_files(request, id):
-    print("*"*100, request.GET)
-    success = False
-    sequencing_run = SequencingRun.objects.get(id=id)
-    sample_libs = SampleLib.objects.filter(
-        sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct().order_by(
-        'name')
-    data = json.loads(request.POST.get('data'))
-    # get posted data
-    # files from source directory
-    file_sets = helper.get_file_sets(sequencing_run, sample_libs)
-    print(file_sets)
-    helper.create_files_and_sets(file_sets, sequencing_run)
-    return JsonResponse({"success": success})
-    # transfers = [] # file pairs to transfer as (source,destination) construct
-    # #create data of the transfer files
-    # for d in data:
-    #     if d["initial"] != d["swap"]:
-    #         # files to swap
-    #         files = [x["files"] for x in file_sets if x["file_set"] == d["initial"] or x["file_set"] == d["swap"]]
-    #         for file_name in files[0]:
-    #             # change file name as inserting the "FLAG" statement
-    #             new_file_name = helper.add_flag_to_filename(file_name)
-    #             transfers.append((file_name,new_file_name))
-    #     else:
-    #         files = [x["files"] for x in file_sets if x["file_set"] == d["initial"]]
-    #         for file_name in files[0]:
-    #             transfers.append((file_name,file_name))
-    #
-    # success, directory_path = helper.file_transfer(sequencing_run,transfers)
-    #
+    try:
+        sequencing_run = SequencingRun.objects.get(id=id)
+        sample_libs = SampleLib.objects.filter(
+            sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct().order_by(
+            'name')
+        data = json.loads(request.POST.get('data'))
+        print("*"*100, data)
+        # get posted data
+        # files from source directory
+        file_sets = helper.get_file_sets(sequencing_run, sample_libs)
+        print(file_sets)
+        files_created = helper.create_files_and_sets(file_sets, sequencing_run)
+        print(files_created)
+        if files_created:
+            return JsonResponse({"success": True, "data": files_created})
+        else:
+            return JsonResponse({"success": False})
+    except Exception as e:
+        return JsonResponse({"success": False, "message": str(e)})
     # return JsonResponse({"success": success})
 
 def get_sample_libs_async(request):

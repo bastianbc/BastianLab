@@ -3,6 +3,7 @@ import pandas as pd
 import logging
 from datetime import datetime
 from collections import defaultdict
+from qc.models import SampleQC
 
 logger = logging.getLogger(__name__)
 
