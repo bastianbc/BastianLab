@@ -444,7 +444,7 @@ class PVariant(models.Model):
 class VariantFile(models.Model):
     FILE_TYPES = [
         ('cns', 'cns'),
-        ('variant', "variant")
+        ('variant', "variant"),
         ('qc', "qc")
     ]
     name = models.CharField(max_length=150, blank=True, null=True)
