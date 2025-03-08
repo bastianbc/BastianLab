@@ -1,0 +1,104 @@
+{% extends "master.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">Sample QC Details</h3>
+  </div>
+  <div class="card-body">
+    {% csrf_token %}
+    <div class="row">
+      <!-- Sample & Run Information -->
+      <div class="col-12 mb-4">
+        <h4>Sample & Run Information</h4>
+        <hr>
+      </div>
+      <div class="col-md-4">{{ form.sample_lib|as_crispy_field }}</div>
+      <div class="col-md-4">{{ form.analysis_run|as_crispy_field }}</div>
+      <div class="col-md-4">{{ form.sequencing_run|as_crispy_field }}</div>
+
+      <!-- Duplicate Metrics -->
+      <div class="col-12 mt-4 mb-3">
+        <h4>Duplicate Metrics</h4>
+        <hr>
+      </div>
+      <div class="col-md-4">{{ form.unpaired_reads_examined|as_crispy_field }}</div>
+      <div class="col-md-4">{{ form.read_pairs_examined|as_crispy_field }}</div>
+      <div class="col-md-4">{{ form.secondary_or_supplementary_rds|as_crispy_field }}</div>
+      <div class="col-md-4">{{ form.unmapped_reads|as_crispy_field }}</div>
+      <div class="col-md-4">{{ form.unpaired_read_duplicates|as_crispy_field }}</div>
+      <div class="col-md-4">{{ form.read_pair_duplicates|as_crispy_field }}</div>
+      <div class="col-md-4">{{ form.read_pair_optical_duplicates|as_crispy_field }}</div>
+      <div class="col-md-4">{{ form.percent_duplication|as_crispy_field }}</div>
+      <div class="col-md-4">{{ form.estimated_library_size|as_crispy_field }}</div>
+
+      <!-- Hs Metrics -->
+      <div class="col-12 mt-4 mb-3">
+        <h4>Coverage Metrics</h4>
+        <hr>
+      </div>
+      <div class="col-md-4">{{ form.pct_off_bait|as_crispy_field }}</div>
+      <div class="col-md-4">{{ form.mean_bait_coverage|as_crispy_field }}</div>
+      <div class="col-md-4">{{ form.mean_target_coverage|as_crispy_field }}</div>
+      <div class="col-md-4">{{ form.median_target_coverage|as_crispy_field }}</div>
+
+      <!-- Coverage Distribution -->
+      <div class="col-12 mt-4 mb-3">
+        <h4>Coverage Distribution</h4>
+        <hr>
+      </div>
+      <div class="col-md-3">{{ form.pct_target_bases_1x|as_crispy_field }}</div>
+      <div class="col-md-3">{{ form.pct_target_bases_2x|as_crispy_field }}</div>
+      <div class="col-md-3">{{ form.pct_target_bases_10x|as_crispy_field }}</div>
+      <div class="col-md-3">{{ form.pct_target_bases_20x|as_crispy_field }}</div>
+      <div class="col-md-3">{{ form.pct_target_bases_30x|as_crispy_field }}</div>
+      <div class="col-md-3">{{ form.pct_target_bases_40x|as_crispy_field }}</div>
+      <div class="col-md-3">{{ form.pct_target_bases_50x|as_crispy_field }}</div>
+      <div class="col-md-3">{{ form.pct_target_bases_100x|as_crispy_field }}</div>
+      <div class="col-md-3">{{ form.at_dropout|as_crispy_field }}</div>
+      <div class="col-md-3">{{ form.gc_dropout|as_crispy_field }}</div>
+
+      <!-- Insert Size Metrics -->
+      <div class="col-12 mt-4 mb-3">
+        <h4>Insert Size Metrics</h4>
+        <hr>
+      </div>
+      <div class="col-md-4">{{ form.median_insert_size|as_crispy_field }}</div>
+      <div class="col-md-4">{{ form.mode_insert_size|as_crispy_field }}</div>
+      <div class="col-md-4">{{ form.mean_insert_size|as_crispy_field }}</div>
+
+      <!-- Histogram -->
+      <div class="col-12 mt-4 mb-3">
+        <h4>Histogram</h4>
+        <hr>
+      </div>
+      <div class="col-12">{{ form.insert_size_histogram|as_crispy_field }}</div>
+
+      {% if sample_qc.insert_size_histogram %}
+      <div class="col-12 mt-3">
+        <div class="text-center">
+          <img src="{{ sample_qc.insert_size_histogram }}" class="img-fluid" alt="Insert Size Histogram">
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  <div class="card-footer">
+    <div class="d-flex justify-content-between">
+      <a href="{% url 'sample_qc_list' %}" class="btn btn-secondary">Back to List</a>
+      {% if perms.sample.change_sampleqc %}
+      <a href="{% url 'sample_qc_edit' sample_qc.id %}" class="btn btn-primary">Edit</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  $(document).ready(function() {
+    // Make all form fields readonly for detail view
+    $('form input, form select, form textarea').prop('disabled', true);
+  });
+</script>
+{% endblock %}

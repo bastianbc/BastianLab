@@ -15,12 +15,12 @@ QC_FILE_EXTENSIONS = {
     "histogram_pdf": ".Tumor_insert_size_histogram.pdf"
 }
 
-def find_sample_libraries_for_analysis_run(arun_id):
+def find_sample_libraries_for_analysis_run(ar_name):
     """
     Find all sample libraries associated with a specific analysis run
     by traversing through the directory structure.
     """
-    logger.info(f"Searching for sample libraries and QC files for sequencing run: {arun_id}")
+    logger.info(f"Searching for sample libraries and QC files for sequencing run: {ar_name}")
 
     # List to store sample QC file information
     sample_qc_files = []
@@ -218,53 +218,243 @@ def group_qc_files_by_sample(qc_files):
 
     return sample_libraries
 
-def process_analysis_run(arun_id):
+def save_qc_metrics(ar_name):
     """
-    Process all samples associated with an analysis run.
-    This is the main business flow that starts with an analysis run ID.
+    Process all samples associated with an analysis run and save the data to the database.
+    Creates and returns a summary report of the processing.
     """
-    logger.info(f"Starting to process sequencing run: {arun_id}")
+    logger.info(f"Starting to process and save QC metrics for analysis run name: {ar_name}")
 
-    # Find all sample libraries and their QC files in a single pass
-    qc_files = find_sample_libraries_for_analysis_run(arun_id)
+    # Get the AnalysisRun object
+    try:
+        from analysisrun.models import AnalysisRun
+        analysis_run = AnalysisRun.objects.get(name=ar_name)
+        logger.info(f"Found analysis run: {ar_name}")
+    except AnalysisRun.DoesNotExist:
+        logger.error(f"Analysis run with name {ar_name} not found")
+        return {
+            'analysis_run_name': ar_name,
+            'status': 'error',
+            'message': f"Analysis run with name {ar_name} not found",
+            'summary_report': {}
+        }
 
+    # Find all sample libraries and their QC files
+    qc_files = find_sample_libraries_for_analysis_run(ar_name)
+
+    if not qc_files:
+        logger.warning(f"No QC files found for analysis run {ar_name}")
+        return {
+            'analysis_run': ar_name,
+            'status': 'warning',
+            'message': f"No QC files found for analysis run {ar_name}",
+            'summary_report': {}
+        }
+
+    # Group QC files by sample library
     sample_libraries = group_qc_files_by_sample(qc_files)
 
     # Process each sample library
-    logger.info(f"Processing {len(sample_libraries)} sample libraries for analysis run {arun_id}")
-    results = []
+    logger.info(f"Processing {len(sample_libraries)} sample libraries for analysis run {ar_name}")
+
+    # Dictionary to store processing status for each sample
+    summary_report = {}
 
     for sample_lib_name, details in sample_libraries.items():
         try:
             # Get QC files for this sample
             sample_files = details['files']
-            sequencing_run_name = details['files']
+            sequencing_run_name = details['sequencing_run_name']
 
-            # Parse each metrics file
-            dup_metrics = parse_dup_metrics(sample_files['dup_metrics'])
-            hs_metrics = parse_hs_metrics(sample_files['hs_metrics'])
-            insert_metrics = parse_insert_size_metrics(sample_files['insert_metrics'])
-
-            # Combine all metrics into a tabular row
-            combined_metrics = {
-                'sequencing_run_name': sequencing_run_name,
-                'sample_lib_name': sample_lib_name,
-                'histogram_pdf_path': sample_files.get('histogram_pdf'),
-                **dup_metrics,
-                **hs_metrics,
-                **insert_metrics
+            # Default status is False for all metrics
+            processing_status = {
+                'dup_metrics_processed': False,
+                'hs_metrics_processed': False,
+                'insert_metrics_processed': False,
+                'histogram_pdf_processed': False
             }
 
-            # Add to results
-            results.append(combined_metrics)
-            logger.info(f"Successfully processed {sample_lib_name} for analysis run {arun_id}")
+            # Get the SampleLib object
+            try:
+                from samplelib.models import SampleLib
+                sample_lib = SampleLib.objects.get(name=sample_lib_name)
+            except SampleLib.DoesNotExist:
+                logger.error(f"SampleLib {sample_lib_name} not found")
+                summary_report[sample_lib_name] = {
+                    'dup_metrics_processed': False,
+                    'hs_metrics_processed': False,
+                    'insert_metrics_processed': False,
+                    'histogram_pdf_processed': False,
+                    'error': f"SampleLib {sample_lib_name} not found"
+                }
+                continue
+            except Exception as e:
+                logger.error(f"Error retrieving SampleLib {sample_lib_name}: {str(e)}")
+                summary_report[sample_lib_name] = {
+                    'dup_metrics_processed': False,
+                    'hs_metrics_processed': False,
+                    'insert_metrics_processed': False,
+                    'histogram_pdf_processed': False,
+                    'error': str(e)
+                }
+                continue
+
+            # Get the SequencingRun object
+            try:
+                from sequencingrun.models import SequencingRun
+                sequencing_run = SequencingRun.objects.get(name=sequencing_run_name)
+            except SequencingRun.DoesNotExist:
+                logger.error(f"SequencingRun {sequencing_run_name} not found")
+                summary_report[sample_lib_name] = {
+                    'dup_metrics_processed': False,
+                    'hs_metrics_processed': False,
+                    'insert_metrics_processed': False,
+                    'histogram_pdf_processed': False,
+                    'error': f"SequencingRun {sequencing_run_name} not found"
+                }
+                continue
+            except Exception as e:
+                logger.error(f"Error retrieving SequencingRun {sequencing_run_name}: {str(e)}")
+                summary_report[sample_lib_name] = {
+                    'dup_metrics_processed': False,
+                    'hs_metrics_processed': False,
+                    'insert_metrics_processed': False,
+                    'histogram_pdf_processed': False,
+                    'error': str(e)
+                }
+                continue
+
+            # Get or create SampleQC object
+            try:
+                sample_qc = SampleQC.objects.get(sample_lib=sample_lib,analysis_run=analysis_run)
+                # Update the sequencing run if it was previously null
+                if sample_qc.sequencing_run is None and sequencing_run is not None:
+                    sample_qc.sequencing_run = sequencing_run
+            except SampleQC.DoesNotExist:
+                # Create a new SampleQC object
+                sample_qc = SampleQC(
+                    sample_lib=sample_lib,
+                    analysis_run=analysis_run,
+                    sequencing_run=sequencing_run
+                )
+
+            # Parse duplicate metrics if available
+            dup_metrics_path = sample_files.get('dup_metrics')
+            if dup_metrics_path and os.path.exists(dup_metrics_path):
+                dup_metrics = parse_dup_metrics(dup_metrics_path)
+                if dup_metrics:
+                    for field, value in dup_metrics.items():
+                        setattr(sample_qc, field, value)
+                    processing_status['dup_metrics_processed'] = True
+
+            # Parse Hs metrics if available
+            hs_metrics_path = sample_files.get('hs_metrics')
+            if hs_metrics_path and os.path.exists(hs_metrics_path):
+                hs_metrics = parse_hs_metrics(hs_metrics_path)
+                if hs_metrics:
+                    for field, value in hs_metrics.items():
+                        setattr(sample_qc, field, value)
+                    processing_status['hs_metrics_processed'] = True
+
+            # Parse insert size metrics if available
+            insert_metrics_path = sample_files.get('insert_metrics')
+            if insert_metrics_path and os.path.exists(insert_metrics_path):
+                insert_metrics = parse_insert_size_metrics(insert_metrics_path)
+                if insert_metrics:
+                    for field, value in insert_metrics.items():
+                        setattr(sample_qc, field, value)
+                    processing_status['insert_metrics_processed'] = True
+
+            # Save histogram PDF path if available
+            histogram_pdf_path = sample_files.get('histogram_pdf')
+            if histogram_pdf_path and os.path.exists(histogram_pdf_path):
+                sample_qc.insert_size_histogram = histogram_pdf_path
+                processing_status['histogram_pdf_processed'] = True
+
+            # Save the sample QC data
+            sample_qc.save()
+            logger.info(f"Successfully saved QC metrics for {sample_lib_name} in analysis run {ar_name}")
+
+            # Add processing status to summary report
+            summary_report[sample_lib_name] = processing_status
 
         except Exception as e:
-            logger.error(f"Error processing {sample_lib_name} for analysis run {arun_id}: {str(e)}")
+            logger.error(f"Error processing {sample_lib_name} for analysis run {ar_name}: {str(e)}")
+            # Add failed processing status to summary report
+            summary_report[sample_lib_name] = {
+                'dup_metrics_processed': False,
+                'hs_metrics_processed': False,
+                'insert_metrics_processed': False,
+                'histogram_pdf_processed': False,
+                'error': str(e)
+            }
+
+    if not summary_report:
+        summary_status = 'error'
+        message = 'No sample libraries were processed'
+    else:
+        all_failed = all(not any(status.values()) for lib, status in summary_report.items() if isinstance(status, dict) and 'error' not in status)
+        if all_failed:
+            summary_status = 'error'
+            message = 'Failed to process any QC metrics'
+        else:
+            summary_status = 'success'
+            message = f'Processed QC metrics for {len(summary_report)} sample libraries'
 
     return {
-        'analysis_run': arun_id,
+        'analysis_run': ar_name,
         'status': summary_status,
-        'data': results,
-        'summary_report': {}
+        'message': message,
+        'summary_report': summary_report
     }
+
+# def process_analysis_run(ar_name):
+#     """
+#     Process all samples associated with an analysis run.
+#     This is the main business flow that starts with an analysis run ID.
+#     """
+#     logger.info(f"Starting to process analysis run: {ar_name}")
+#
+#     # Find all sample libraries and their QC files in a single pass
+#     qc_files = find_sample_libraries_for_analysis_run(ar_name)
+#
+#     sample_libraries = group_qc_files_by_sample(qc_files)
+#
+#     # Process each sample library
+#     logger.info(f"Processing {len(sample_libraries)} sample libraries for analysis run {ar_name}")
+#     results = []
+#
+#     for sample_lib_name, details in sample_libraries.items():
+#         try:
+#             # Get QC files for this sample
+#             sample_files = details['files']
+#             sequencing_run_name = details['files']
+#
+#             # Parse each metrics file
+#             dup_metrics = parse_dup_metrics(sample_files['dup_metrics'])
+#             hs_metrics = parse_hs_metrics(sample_files['hs_metrics'])
+#             insert_metrics = parse_insert_size_metrics(sample_files['insert_metrics'])
+#
+#             # Combine all metrics into a tabular row
+#             combined_metrics = {
+#                 'sequencing_run_name': sequencing_run_name,
+#                 'sample_lib_name': sample_lib_name,
+#                 'histogram_pdf_path': sample_files.get('histogram_pdf'),
+#                 **dup_metrics,
+#                 **hs_metrics,
+#                 **insert_metrics
+#             }
+#
+#             # Add to results
+#             results.append(combined_metrics)
+#             logger.info(f"Successfully processed {sample_lib_name} for analysis run {ar_name}")
+#
+#         except Exception as e:
+#             logger.error(f"Error processing {sample_lib_name} for analysis run {ar_name}: {str(e)}")
+#
+#     return {
+#         'analysis_run': ar_name,
+#         'status': summary_status,
+#         'data': results,
+#         'summary_report': {}
+#     }
