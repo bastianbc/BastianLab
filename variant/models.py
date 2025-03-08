@@ -445,6 +445,7 @@ class VariantFile(models.Model):
     FILE_TYPES = [
         ('cns', 'cns'),
         ('variant', "variant")
+        ('qc', "qc")
     ]
     name = models.CharField(max_length=150, blank=True, null=True)
     directory = models.CharField(max_length=200, blank=True, null=True)
