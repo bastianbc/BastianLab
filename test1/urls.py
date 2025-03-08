@@ -1,12 +1,10 @@
 from django.conf import settings
-
 from django.conf.urls.static import static
 from django.urls import include, path, re_path
 from django.contrib import admin
 from django.views.static import serve
 from django.views.generic.base import TemplateView
 from django.views.generic import RedirectView
-
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -37,6 +35,7 @@ urlpatterns = [
     path('wiki/', include('wiki.urls')),
     path('analysisrun/', include('analysisrun.urls')),
     path('cns/', include('cns.urls')),
+    path('qc/', include('qc.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 handler404 = "core.views.error_404"

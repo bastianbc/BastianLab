@@ -104,13 +104,20 @@ var KTDatatablesServerSide = function () {
                                 <!--end::Menu item-->
 
                                 <!--begin::Menu item-->
-                            <div class="menu-item">
-                                <a href="javascript:;" class="menu-link check-file-link text-start"  data-ar-name="${row.name}">
-                                    Import CNS
-                                </a>
-                            </div>
-                            <!--end::Menu item-->
+                                <div class="menu-item">
+                                    <a href="javascript:;" class="menu-link check-file-link text-start"  data-ar-name="${row.name}">
+                                        Import CNS
+                                    </a>
+                                </div>
+                                <!--end::Menu item-->
 
+                                <!--begin::Menu item-->
+                                <div class="menu-item">
+                                    <a href="javascript:;" class="menu-link qc-link text-start"  data-ar-name="${row.name}">
+                                        Import QC
+                                    </a>
+                                </div>
+                                <!--end::Menu item-->
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item">
@@ -630,7 +637,7 @@ var KTDatatablesServerSide = function () {
                                     <th class="text-start" style="border: 1px solid #4a4a4a; white-space: nowrap;">Folder Name</th>
                                     <th class="text-start" style="border: 1px solid #4a4a4a; white-space: nowrap;">Success Count</th>
                                     <th class="text-start" style="border: 1px solid #4a4a4a; white-space: nowrap;">Failed Count</th>
-                                    <th class="text-start" style="border: 1px solid #4a4a4a; white-space: nowrap;">Objects Created</th> 
+                                    <th class="text-start" style="border: 1px solid #4a4a4a; white-space: nowrap;">Objects Created</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -653,7 +660,7 @@ var KTDatatablesServerSide = function () {
                             // Total row
                             const total = data.summary.find(item => item.folder_name === 'Total');
                             tableHtml += `
-                                    <tr class="table-active">  
+                                    <tr class="table-active">
                                         <td class="text-start" style="border: 1px solid #4a4a4a;"><strong>${total.folder_name}</strong></td>
                                         <td class="text-center" style="border: 1px solid #4a4a4a;"><strong>${total.success_count}</strong></td>
                                         <td class="text-center" style="border: 1px solid #4a4a4a;"><strong>${total.failed_count}</strong></td>
@@ -687,6 +694,72 @@ var KTDatatablesServerSide = function () {
                                 }
                             });
                         }
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'An error occurred during processing.',
+                            icon: 'error',
+                            confirmButtonText: 'Ok, got it!',
+                            customClass: {
+                                confirmButton: 'btn fw-bold btn-primary',
+                            }
+                        });
+                        console.error('Error:', error);
+                    });
+            })
+        });
+
+        document.querySelectorAll(".qc-link").forEach(function (element) {
+            element.addEventListener("click", function () {
+                const arName = this.getAttribute('data-ar-name');
+
+                // Show loading message
+                Swal.fire({
+                    title: 'Processing...',
+                    text: 'Checking for folder and file existence',
+                    icon: 'info',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                });
+
+                // Send AJAX request to server
+                fetch(`qc/import_qc/${arName}`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            let tableHtml = `
+                                <div class="mt-3">
+                                <p><strong>Quality control files imported successfully.</strong></p>
+                            `;
+                            
+                            Swal.fire({
+                                html: tableHtml,
+                                text: "Variant files imported successfully.",
+                                icon: "info",
+                                buttonsStyling: false,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn fw-bold btn-success",
+                                }
+                            });
+                            } else {
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: data.error,
+                                    icon: 'error',
+                                    confirmButtonText: 'Ok, got it!',
+                                    customClass: {
+                                        confirmButton: 'btn fw-bold btn-primary',
+                                    }
+                                });
+                            }
                     })
                     .catch(error => {
                         Swal.fire({
