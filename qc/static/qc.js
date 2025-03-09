@@ -10,7 +10,7 @@ var KTDatatablesServerSide = function () {
     var selectedRows = [];
 
     // Private functions
-    var initDatatable = function (initialValue) {
+    var initDatatable = function (initialValue,sample_lib,analysis_run,sequencing_run,variant_file,type) {
 
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
 
@@ -35,6 +35,13 @@ var KTDatatablesServerSide = function () {
             ajax: {
                 url: '/qc/filter_sampleqcs',
                 type: 'GET',
+                data: {
+                  "sample_lib": sample_lib,
+                  "analysis_run": analysis_run,
+                  "sequencing_run": sequencing_run,
+                  "variant_file": variant_file,
+                  "type": type,
+                },
                 error: function (xhr, ajaxOptions, thrownError) {
                     if (xhr.status == 403) {
 
@@ -77,7 +84,7 @@ var KTDatatablesServerSide = function () {
                         if (!data) {
                             return '<span class="text-muted">No PDF</span>';
                         }
-                        return `<a href="${data}" target="_blank" class="btn btn-sm btn-light-primary">
+                        return `<a href="pdf/${row['id']}" target="_blank" class="btn btn-sm btn-light-primary">
                                     <i class="bi bi-file-pdf me-1"></i>View PDF
                                 </a>`;
                     }
@@ -191,14 +198,12 @@ var KTDatatablesServerSide = function () {
         // Filter datatable on submit
         filterButton.addEventListener('click', function () {
 
-            var log2 = document.getElementById("id_log2").value;
-            var chr_start = document.getElementById("id_chr_start").value;
-            var chr_end = document.getElementById("id_chr_end").value;
+            var sample_lib = document.getElementById("id_sample_lib").value;
+            var analysis_run = document.getElementById("id_analysis_run").value;
             var sequencing_run = document.getElementById("id_sequencing_run").value;
-            var sample_library = document.getElementById("id_sample_library").value;
-            var chromosome = document.getElementById("id_chromosome").value;
-            var gene = document.getElementById("id_gene").value;
-            initDatatable(null,log2,chr_start,chr_end,sequencing_run,sample_library,chromosome,gene);
+            var variant_file = document.getElementById("id_variant_file").value;
+            var type = document.getElementById("id_type").value;
+            initDatatable(null,sample_lib,analysis_run,sequencing_run,variant_file,type);
 
         });
     };
@@ -211,13 +216,11 @@ var KTDatatablesServerSide = function () {
         // Reset datatable
         resetButton.addEventListener('click', function () {
 
-                document.getElementById("id_log2").value='';
-                document.getElementById("id_chr_start").value='';
-                document.getElementById("id_chr_end").value='';
-                document.getElementById("id_sequencing_run").value='';
-                document.getElementById("id_sample_library").value='';
-                document.getElementById("id_chromosome").value='';
-                document.getElementById("id_gene").value='';
+                document.getElementById("sample_lib").value='';
+                document.getElementById("analysis_run").value='';
+                document.getElementById("sequencing_run").value='';
+                document.getElementById("variant_file").value='';
+                document.getElementById("type").value='';
 
           initDatatable(null, null, null, null, null, null, null, null);
 
@@ -354,7 +357,33 @@ var KTDatatablesServerSide = function () {
 
           initDatatable(null, null);
       });
-    }
+    };
+
+    // Redirects from other pages
+    var handleInitialValue = () => {
+
+      // Remove parameters in URL
+      function cleanUrl() {
+        window.history.replaceState(null, null, window.location.pathname);
+      }
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      const initial = params.get('initial');
+
+
+      cleanUrl();
+
+      if (initial =="true" && id !=null) {
+
+        return JSON.stringify({
+          "id": id
+        });
+
+      }
+
+      return null;
+
+    };
 
     // Init toggle toolbar
     var initToggleToolbar = function () {
@@ -814,7 +843,7 @@ var KTDatatablesServerSide = function () {
     // Public methods
     return {
         init: function () {
-            initDatatable();
+            initDatatable(handleInitialValue(),null,null,null,null,null);
             handleSearchDatatable();
             initToggleToolbar();
             handleFilterDatatable();

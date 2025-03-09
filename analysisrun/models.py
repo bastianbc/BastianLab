@@ -28,6 +28,9 @@ class AnalysisRun(models.Model):
     class Meta:
         db_table = "analysis_run"
 
+    def __str__(self):
+        return self.name
+
     def generate_name(self):
         last_run = AnalysisRun.objects.all().order_by('id').last()
         if last_run:

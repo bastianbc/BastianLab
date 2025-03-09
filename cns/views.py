@@ -6,11 +6,12 @@ from .serializers import CnsSerializer
 from cns.models import Cns
 from cns.forms import FilterForm
 from django.http import JsonResponse
+from cns.helper import handle_variant_file, parse_cns_file, generate_graph
+
 
 @permission_required("cns.view_cns",raise_exception=True)
 def cns(request):
     filter = FilterForm()
-    print(filter)
     return render(request, "cns_list.html", locals())
 
 @permission_required_for_async("cns.view_cns")

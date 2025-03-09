@@ -55,7 +55,15 @@ class Cns(models.Model):
                 '6': 'end',
                 '7': 'log2',
             }
-
+            print(
+                kwargs.get('log2', None),
+                kwargs.get('chr_start', None),
+                kwargs.get('chr_end', None),
+                kwargs.get('sequencing_run', None),
+                kwargs.get('sample_library', None),
+                kwargs.get('chromosome', None),
+                kwargs.get('gene', None),
+            )
             draw = int(kwargs.get('draw', None)[0])
             length = int(kwargs.get('length', None)[0])
             start = int(kwargs.get('start', None)[0])
