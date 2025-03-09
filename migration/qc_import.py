@@ -159,9 +159,12 @@ def collect_insert_size_histogram():
                 create_variant_file(file, root.replace("/Volumes/sequencingdata/",""), "qc")
 
 def get_insert_size_histogram(variant_file):
-    return next((os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, variant_file.directory, file) for file in
-                 os.listdir(os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, variant_file.directory)) if
-                 "insert_size_histogram.pdf" in file), None)
+    return next(
+        (
+            file for file in os.listdir(os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, variant_file.directory))
+            if "insert_size_histogram.pdf" in file), None
+    )
+
 
 
 def create_qc_sample(metrics, file, type, variant_file):
