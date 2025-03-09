@@ -183,8 +183,10 @@ def create_qc_sample(metrics, file):
         pct_target_bases_100x=metrics.get('pct_target_bases_100x', None),
         at_dropout=metrics.get('at_dropout', None),
         gc_dropout=metrics.get('gc_dropout', None),
-        median_insert_size=metrics.get('median_insert_size', None),
-        mode_insert_size=metrics.get('mode_insert_size', None),
+        median_insert_size=int(metrics.get('median_insert_size', 0)) if metrics.get(
+            'median_insert_size') is not None else None,
+        mode_insert_size=int(metrics.get('mode_insert_size', 0)) if metrics.get(
+            'median_insert_size') is not None else None,
         mean_insert_size=metrics.get('mean_insert_size', None),
     )
 
