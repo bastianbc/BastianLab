@@ -172,7 +172,7 @@ def parse_insert_size_metrics(file_path):
             return {}
 
         # Read the file with pandas
-        df = pd.read_csv(file_path, sep='\t', skiprows=6)
+        df = pd.read_csv(file_path, sep='\t', skiprows=6, encoding='utf-8', engine='python')
 
         # Check if data is present
         if df.empty or len(df) < 2:
@@ -180,7 +180,7 @@ def parse_insert_size_metrics(file_path):
             return {}
 
         # Extract row from index 1 (after skipping 6 rows, this is row 7-8)
-        row = df.iloc[1]
+        row = df.iloc[0]
 
         # Extract metrics
         metrics = {

@@ -14,7 +14,7 @@ import re
 import logging
 from pathlib import Path
 from gene.models import Gene
-from qc.helper import parse_dup_metrics, parse_hs_metrics
+from qc.helper import parse_dup_metrics, parse_hs_metrics, parse_insert_size_metrics
 from qc.models import SampleQC
 from analysisrun.models import AnalysisRun
 
@@ -183,6 +183,9 @@ def create_qc_sample(metrics, file):
         pct_target_bases_100x=metrics.get('pct_target_bases_100x', None),
         at_dropout=metrics.get('at_dropout', None),
         gc_dropout=metrics.get('gc_dropout', None),
+        median_insert_size=metrics.get('median_insert_size', None),
+        mode_insert_size=metrics.get('mode_insert_size', None),
+        mean_insert_size=metrics.get('mean_insert_size', None),
     )
 
 def parse_parse_dup_metrics():
@@ -192,14 +195,22 @@ def parse_parse_dup_metrics():
     #     metrics = parse_dup_metrics(path)
     #     create_qc_sample(metrics, file.directory.split('/')[-1])
 
-    dup_metrics = VariantFile.objects.filter(type='qc', name__icontains='hs_metrics')
-    for file in dup_metrics:
-        path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA,file.directory,file.name)
-        metrics = parse_hs_metrics(path)
-        create_qc_sample(metrics, file.directory.split('/')[-1])
+    # dup_metrics = VariantFile.objects.filter(type='qc', name__icontains='hs_metrics')
+    # for file in dup_metrics:
+    #     path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA,file.directory,file.name)
+    #     metrics = parse_hs_metrics(path)
+    #     create_qc_sample(metrics, file.directory.split('/')[-1])
         # create_qc_sample(metrics, file.directory.split('/')[-1])
 
         # print(path, metrics)
+
+    dup_metrics = VariantFile.objects.filter(type='qc', name__icontains='insert_size_metrics')
+    for file in dup_metrics:
+        path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA,file.directory,file.name)
+        metrics = parse_insert_size_metrics(path)
+        # print(path, metrics)
+        create_qc_sample(metrics, file.directory.split('/')[-1])
+
 
 def import_qc():
 
