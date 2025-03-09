@@ -14,7 +14,9 @@ import re
 import logging
 from pathlib import Path
 from gene.models import Gene
-
+from qc.helper import parse_dup_metrics
+from qc.models import SampleQC
+from analysisrun.models import AnalysisRun
 
 logger = logging.getLogger("file")
 
@@ -51,6 +53,7 @@ def get_sequencing_run(filename):
         logger.debug(f"Extracted sequencing name: {name}")
         try:
             seq_run = SequencingRun.objects.get(name=name)
+            print(seq_run)
             logger.info(f"Found sample lib: {seq_run}")
             return seq_run
         except Exception as e:
@@ -92,6 +95,20 @@ def check_required_fields(row):
     logger.debug("All required fields present")
     return True, ""
 
+def get_sample_lib(filename):
+    logger.debug(f"Getting sample lib from filename: {filename}")
+    name = filename.split(".")[1]
+    logger.debug(f"Extracted sample lib name: {name}")
+    try:
+        sample_lib = SampleLib.objects.get(name=name)
+        print(sample_lib)
+        logger.info(f"Found sample lib: {sample_lib}")
+        return sample_lib
+    except Exception as e:
+        logger.error(f"Error finding sample lib with name {name}: {str(e)}")
+        return None
+    logger.warning(f"Could not extract sample lib name from filename: {filename}")
+    return None
 
 def create_variant_file(row):
     VariantFile.objects.get_or_create(name=row['File'], directory=row['Dir'])
@@ -120,19 +137,58 @@ def create_genes(row):
         nm_canonical = row['NM_canonical']
     )
 
+def create_variant_file(file,dir,type):
+    VariantFile.objects.get_or_create(
+        name=file,
+        directory=dir,
+        type=type,
+    )
+
 def collect_qc():
-    for root, dirs, files in os.walk("/Volumes/sequencingdata/ProcessedData/Analysis.tumor-normal"):
-        print(root, dirs, files)
+    for root, dirs, files in os.walk("/Volumes/sequencingdata/ProcessedData/Analysis.tumor-only"):
+        for file in files:
+            if "metrics" in file.lower():
+                print(file, "---path: ",root.replace("/Volumes/sequencingdata/",""))
+                create_variant_file(file, root.replace("/Volumes/sequencingdata/",""), "qc")
+
+def create_qc_sample(metrics, file):
+    '''
+    {'unpaired_reads_examined': '1422', 'read_pairs_examined': '6078719', 'secondary_or_supplementary_rds': '191953', 'unmapped_reads': '1752', 'unpaired_read_duplicates': 1211.0, 'read_pair_duplicates': 3884092.0, 'read_pair_optical_duplicates': 17231.0, 'percent_duplication': 0.63899, 'estimated_library_size': 2381452.0}
+
+    '''
+    SampleQC.objects.create(
+        sample_lib=get_sample_lib(file),
+        analysis_run=AnalysisRun.objects.get(name="AR_ALL"),
+        sequencing_run=get_sequencing_run(file),
+        unpaired_reads_examined=metrics['unpaired_reads_examined'],
+        read_pairs_examined=metrics['read_pairs_examined'],
+        secondary_or_supplementary_rds=metrics['secondary_or_supplementary_rds'],
+        unmapped_reads=metrics['unmapped_reads'],
+        unpaired_read_duplicates=metrics['unpaired_read_duplicates'],
+        read_pair_duplicates=metrics['read_pair_duplicates'],
+        read_pair_optical_duplicates=metrics['read_pair_optical_duplicates'],
+        percent_duplication=metrics['percent_duplication'],
+        estimated_library_size=metrics['estimated_library_size'],
+    )
+
+def parse_parse_dup_metrics():
+    dup_metrics = VariantFile.objects.filter(type='qc', name__icontains='dup_metrics')
+    for file in dup_metrics:
+        path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA,file.directory,file.name)
+        metrics = parse_dup_metrics(path)
+        create_qc_sample(metrics, file.directory.split('/')[-1])
+
+        # print(path, metrics)
 
 def import_qc():
 
     SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
-    collect_qc()
+    parse_parse_dup_metrics()
 
     pass
 
 
 if __name__ == "__main__":
     print("start")
-    import_variants()
+    import_qc()
     print("end")

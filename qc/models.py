@@ -41,7 +41,7 @@ class SampleQC(models.Model):
     insert_size_histogram = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:
-        unique_together = ('sample_lib', 'analysis_run')
+        # unique_together = ('sample_lib', 'analysis_run')
         db_table = 'sample_qc'
 
     def __str__(self):
