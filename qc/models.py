@@ -46,7 +46,7 @@ class SampleQC(models.Model):
     mode_insert_size = models.IntegerField(null=True, blank=True)
     mean_insert_size = models.FloatField(null=True, blank=True)
     # Path to histogram PDF
-    insert_size_histogram = models.CharField(max_length=500, null=True, blank=True)
+    insert_size_histogram = models.CharField(max_length=200, null=True, blank=True)
 
     class Meta:
         # unique_together = ('sample_lib', 'analysis_run')
