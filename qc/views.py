@@ -7,6 +7,9 @@ from .forms import SampleQCForm
 from django.http import JsonResponse
 from qc.serializers import SampleQCSerializer
 import logging
+import os
+from django.http import FileResponse, HttpResponse
+from django.conf import settings
 
 logger = logging.getLogger("file")
 
@@ -20,7 +23,6 @@ def sample_qcs(request):
 def filter_sampleqcs(request):
     qc = SampleQC().query_by_args(request.user,**request.GET)
     serializer = SampleQCSerializer(qc['items'], many=True)
-    print()
     result = dict()
     result['data'] = serializer.data
     result['draw'] = qc['draw']
@@ -74,3 +76,15 @@ def get_sampleqc_detail(request, pk):
         'sample_qc': sample_qc,
         'form': form,
     })
+
+
+def serve_pdf(request, pk):
+    # Convert the relative path to an absolute path in your filesystem
+    qc = SampleQC.objects.get(pk=pk)
+    file_path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, qc.variant_file.directory, qc.insert_size_histogram)
+
+    try:
+        # Serve the file
+        return FileResponse(open(file_path, 'rb'), content_type='application/pdf')
+    except FileNotFoundError:
+        return HttpResponse("PDF not found", status=404)

@@ -456,3 +456,6 @@ class VariantFile(models.Model):
 
     class Meta:
         db_table = "variant_file"
+
+    def __str__(self):
+        return self.name

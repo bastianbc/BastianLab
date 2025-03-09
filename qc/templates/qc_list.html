@@ -52,18 +52,15 @@
             <div class="col-sm-12">{{ filter.analysis_run|as_crispy_field }}</div>
           </div>
           <div class="row mb-2">
-            <div class="col-sm-6">{{ filter.sequencing_run|as_crispy_field }}</div>
-            <div class="col-sm-6">{{ filter.secondary_or_supplementary_rds|as_crispy_field }}</div>
+            <div class="col-sm-12">{{ filter.sequencing_run|as_crispy_field }}</div>
           </div>
           <div class="row mb-2">
-            <div class="col-sm-12">{{ filter.read_pair_duplicates|as_crispy_field }}</div>
+            <div class="col-sm-12">{{ filter.variant_file|as_crispy_field }}</div>
           </div>
           <div class="row mb-2">
-            <div class="col-sm-12">{{ filter.read_pair_optical_duplicates|as_crispy_field }}</div>
+            <div class="col-sm-12">{{ filter.type|as_crispy_field }}</div>
           </div>
-          <div class="row mb-2">
-            <div class="col-sm-12">{{ filter.percent_duplication|as_crispy_field }}</div>
-          </div>
+
           <!--end::Options-->
         </div>
         <!--end::Input group-->
@@ -168,10 +165,7 @@
         <th>sample_lib</th>
         <th>sequencing_run</th>
         <th>analysis_run</th>
-        <th>chromosome</th>
-        <th>start</th>
-        <th>end</th>
-        <th>log2</th>
+        <th>insert size histogram</th>
         <th class="text-end min-w-100px">Actions</th>
     </tr>
     {% csrf_token %}
