@@ -5,10 +5,12 @@ var KTDatatablesServerSide = function () {
     // Shared variables
     var table;
     var dt;
+    var filterPayment;
+    var editor;
     var selectedRows = [];
 
     // Private functions
-    var initDatatable = function () {
+    var initDatatable = function (initialValue) {
 
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
 

@@ -151,7 +151,22 @@ def collect_qc():
                 print(file, "---path: ",root.replace("/Volumes/sequencingdata/",""))
                 create_variant_file(file, root.replace("/Volumes/sequencingdata/",""), "qc")
 
-def create_qc_sample(metrics, file):
+def collect_insert_size_histogram():
+    for root, dirs, files in os.walk("/Volumes/sequencingdata/ProcessedData/Analysis.tumor-only"):
+        for file in files:
+            if "insert_size_histogram.pdf" in file.lower():
+                print(file, "---path: ",root.replace("/Volumes/sequencingdata/",""))
+                create_variant_file(file, root.replace("/Volumes/sequencingdata/",""), "qc")
+
+def get_insert_size_histogram(variant_file):
+    print(os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, variant_file.directory) if any(
+            "insert_size_histogram.pdf" in file for file in
+            os.listdir(os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, variant_file.directory))) else None)
+    return os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, variant_file.directory) if any(
+            "insert_size_histogram.pdf" in file for file in
+            os.listdir(os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, variant_file.directory))) else None
+
+def create_qc_sample(metrics, file, type, variant_file):
     '''
     {'unpaired_reads_examined': '1422', 'read_pairs_examined': '6078719', 'secondary_or_supplementary_rds': '191953', 'unmapped_reads': '1752', 'unpaired_read_duplicates': 1211.0, 'read_pair_duplicates': 3884092.0, 'read_pair_optical_duplicates': 17231.0, 'percent_duplication': 0.63899, 'estimated_library_size': 2381452.0}
 
@@ -160,6 +175,9 @@ def create_qc_sample(metrics, file):
         sample_lib=get_sample_lib(file),
         analysis_run=AnalysisRun.objects.get(name="AR_ALL"),
         sequencing_run=get_sequencing_run(file),
+        variant_file=variant_file,
+        type=type,
+        insert_size_histogram=get_insert_size_histogram(variant_file),
         unpaired_reads_examined=metrics.get('unpaired_reads_examined', None),
         read_pairs_examined=metrics.get('read_pairs_examined', None),
         secondary_or_supplementary_rds=metrics.get('secondary_or_supplementary_rds', None),
@@ -191,27 +209,23 @@ def create_qc_sample(metrics, file):
     )
 
 def parse_parse_dup_metrics():
-    # dup_metrics = VariantFile.objects.filter(type='qc', name__icontains='dup_metrics')
-    # for file in dup_metrics:
-    #     path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA,file.directory,file.name)
-    #     metrics = parse_dup_metrics(path)
-    #     create_qc_sample(metrics, file.directory.split('/')[-1])
+    variant_files = VariantFile.objects.filter(type='qc', name__icontains='dup_metrics')
+    for file in variant_files:
+        path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA,file.directory,file.name)
+        metrics = parse_dup_metrics(path)
+        create_qc_sample(metrics, file.directory.split('/')[-1], 'dup', file)
 
-    # dup_metrics = VariantFile.objects.filter(type='qc', name__icontains='hs_metrics')
-    # for file in dup_metrics:
-    #     path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA,file.directory,file.name)
-    #     metrics = parse_hs_metrics(path)
-    #     create_qc_sample(metrics, file.directory.split('/')[-1])
-        # create_qc_sample(metrics, file.directory.split('/')[-1])
+    variant_files = VariantFile.objects.filter(type='qc', name__icontains='hs_metrics')
+    for file in variant_files:
+        path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA,file.directory,file.name)
+        metrics = parse_hs_metrics(path)
+        create_qc_sample(metrics, file.directory.split('/')[-1], 'hs', file)
 
-        # print(path, metrics)
-
-    dup_metrics = VariantFile.objects.filter(type='qc', name__icontains='insert_size_metrics')
-    for file in dup_metrics:
+    variant_files = VariantFile.objects.filter(type='qc', name__icontains='insert_size_metrics')
+    for file in variant_files:
         path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA,file.directory,file.name)
         metrics = parse_insert_size_metrics(path)
-        # print(path, metrics)
-        create_qc_sample(metrics, file.directory.split('/')[-1])
+        create_qc_sample(metrics, file.directory.split('/')[-1], "insert_size", file)
 
 
 def import_qc():
