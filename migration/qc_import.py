@@ -159,12 +159,10 @@ def collect_insert_size_histogram():
                 create_variant_file(file, root.replace("/Volumes/sequencingdata/",""), "qc")
 
 def get_insert_size_histogram(variant_file):
-    print(os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, variant_file.directory) if any(
-            "insert_size_histogram.pdf" in file for file in
-            os.listdir(os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, variant_file.directory))) else None)
-    return os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, variant_file.directory) if any(
-            "insert_size_histogram.pdf" in file for file in
-            os.listdir(os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, variant_file.directory))) else None
+    return next((os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, variant_file.directory, file) for file in
+                 os.listdir(os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, variant_file.directory)) if
+                 "insert_size_histogram.pdf" in file), None)
+
 
 def create_qc_sample(metrics, file, type, variant_file):
     '''
@@ -177,7 +175,7 @@ def create_qc_sample(metrics, file, type, variant_file):
         sequencing_run=get_sequencing_run(file),
         variant_file=variant_file,
         type=type,
-        insert_size_histogram=get_insert_size_histogram(variant_file),
+        insert_size_histogram=get_insert_size_histogram(variant_file).replace("/Volumes/sequencingdata/",""),
         unpaired_reads_examined=metrics.get('unpaired_reads_examined', None),
         read_pairs_examined=metrics.get('read_pairs_examined', None),
         secondary_or_supplementary_rds=metrics.get('secondary_or_supplementary_rds', None),
