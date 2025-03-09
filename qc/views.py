@@ -20,6 +20,7 @@ def sample_qcs(request):
 def filter_sampleqcs(request):
     qc = SampleQC().query_by_args(request.user,**request.GET)
     serializer = SampleQCSerializer(qc['items'], many=True)
+    print()
     result = dict()
     result['data'] = serializer.data
     result['draw'] = qc['draw']

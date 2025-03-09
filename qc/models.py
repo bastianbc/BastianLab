@@ -2,12 +2,20 @@ from django.db import models
 from projects.utils import get_user_projects
 from django.db.models import Q
 import json
-
+from datetime import datetime
 
 class SampleQC(models.Model):
+    FILE_TYPES = [
+        ('dup_metrics', 'dup'),
+        ('hs_metrics', "hs"),
+        ('insert_size_metrics', "insert_size")
+    ]
     sample_lib = models.ForeignKey("samplelib.SampleLib", on_delete=models.CASCADE, related_name='qc_metrics')
     analysis_run = models.ForeignKey("analysisrun.AnalysisRun", on_delete=models.CASCADE, related_name='qc_metrics')
     sequencing_run = models.ForeignKey("sequencingrun.SequencingRun", on_delete=models.CASCADE, related_name="qc_metrics", blank=True, null=True)
+    variant_file = models.ForeignKey("variant.VariantFile", on_delete=models.CASCADE, related_name="variant_calls", blank=True, null=True)
+    type = models.CharField(max_length=20, choices=FILE_TYPES, blank=True, null=True)
+    date = models.DateTimeField(default=datetime.now, verbose_name="Date")
     # Duplicate metrics
     unpaired_reads_examined = models.BigIntegerField(null=True, blank=True)
     read_pairs_examined = models.BigIntegerField(null=True, blank=True)
@@ -38,7 +46,7 @@ class SampleQC(models.Model):
     mode_insert_size = models.IntegerField(null=True, blank=True)
     mean_insert_size = models.FloatField(null=True, blank=True)
     # Path to histogram PDF
-    insert_size_histogram = models.CharField(max_length=255, null=True, blank=True)
+    insert_size_histogram = models.CharField(max_length=500, null=True, blank=True)
 
     class Meta:
         # unique_together = ('sample_lib', 'analysis_run')
