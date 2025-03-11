@@ -13,10 +13,13 @@ logger = logging.getLogger(__name__)
 def log_in(request):
     if request.method == "POST":
         try:
+            form = LoginForm(request.POST)
+
             username = request.POST.get("username")
             password = request.POST.get("password")
             next = request.GET.get('next')
             user = authenticate(username=username, password=password)
+
             if user:
                 login(request, user)
                 if next:
@@ -36,7 +39,7 @@ def log_in(request):
             print(e)
     else:
         form = LoginForm()
-        
+
     return render(request, "sign-in.html", locals())
 
 def log_out(request):
