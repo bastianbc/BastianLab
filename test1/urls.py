@@ -36,6 +36,7 @@ urlpatterns = [
     path('analysisrun/', include('analysisrun.urls')),
     path('cns/', include('cns.urls')),
     path('qc/', include('qc.urls')),
+    path('notofocation/', include('notofocation.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 handler404 = "core.views.error_404"
