@@ -93,6 +93,7 @@ INSTALLED_APPS = [
     'qc',
     'channels',
     'jobs',
+    'notification',
 ]
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 CRISPY_FAIL_SILENTLY = not DEBUG
@@ -128,7 +129,16 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'test1.wsgi.application'
+ASGI_APPLICATION = "test1.asgi.application"
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
