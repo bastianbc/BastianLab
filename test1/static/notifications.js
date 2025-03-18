@@ -14,11 +14,7 @@ var NotificationManager = function () {
             var data = JSON.parse(event.data);
 
             if (data.notification) {
-                if (data.notification.includes("🛠️ A new block")) {
-                    showNotification("📦 New Block Created!", data.notification);
-                } else {
-                    showNotification("🔔 Notification", data.notification);
-                }
+                handleNotification(data.notification);
             }
         };
 
@@ -29,6 +25,14 @@ var NotificationManager = function () {
         socket.onclose = function (event) {
             console.log("🔴 WebSocket Closed:", event);
         };
+    };
+
+    var handleNotification = function (message) {
+        if (message.includes("🛠️ A new block")) {
+            showNotification("📦 New Block Created!", message);
+        } else {
+            showNotification("🔔 Notification", message);
+        }
     };
 
     var showNotification = function (title, message) {
