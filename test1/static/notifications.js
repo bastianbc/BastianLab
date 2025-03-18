@@ -12,8 +12,13 @@ var NotificationManager = function () {
 
         socket.onmessage = function (event) {
             var data = JSON.parse(event.data);
+
             if (data.notification) {
-                showNotification(data.notification);
+                if (data.notification.includes("🛠️ A new block")) {
+                    showNotification("📦 New Block Created!", data.notification);
+                } else {
+                    showNotification("🔔 Notification", data.notification);
+                }
             }
         };
 
@@ -26,9 +31,9 @@ var NotificationManager = function () {
         };
     };
 
-    var showNotification = function (message) {
+    var showNotification = function (title, message) {
         Swal.fire({
-            title: "🔔 Notification",
+            title: title,
             text: message,
             icon: "info",
             toast: true,

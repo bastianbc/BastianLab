@@ -9,6 +9,9 @@ from .serializers import BlocksSerializer, SingleBlockSerializer
 from django.contrib.auth.decorators import login_required,permission_required
 from core.decorators import permission_required_for_async
 from variant.models import VariantCall
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
 
 @permission_required_for_async("blocks.view_block")
 def filter_blocks(request):
@@ -41,6 +44,14 @@ def new_block(request):
         if form.is_valid():
             block = form.save()
             messages.success(request,"Block %s created successfully." % block.id)
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                f"user_{request.user.id}",
+                {
+                    "type": "send_notification",
+                    "message": f"🛠️ A new block (ID: {block.id}) has been created.",
+                },
+            )
             return redirect("blocks")
         else:
             messages.error(request,"Block not created.")
