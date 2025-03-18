@@ -122,7 +122,7 @@ class Project(models.Model):
                 )
 
             if is_initial:
-             
+
                 if search_value["model"] == "area":
                     queryset = queryset.filter(Q(blocks__block_areas__id=search_value["id"]))
                 if search_value["model"] == "block":
