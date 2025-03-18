@@ -100,18 +100,49 @@ def add_block_to_project_async(request):
 
 @permission_required_for_async("blocks.change_blocks")
 def remove_block_from_project_async(request):
-    selected_ids = ",".join(json.loads(request.GET.get("selected_ids")))
-    project_id = request.GET.get("project_id")
+    """
+    Asynchronously remove blocks from a project.
 
+    Args:
+        request: HTTP request containing project_id and selected_ids parameters
+
+    Returns:
+        JsonResponse with success status and optional error message
+    """
     try:
-        project = Project.objects.get(id=project_id)
-        blocks = Block.objects.filter(id__in=selected_ids)
-        project.blocks.remove(*blocks)
-    except Exception as e:
-        print(str(e))
-        return JsonResponse({"success":False})
+        # Validate input parameters
+        if not request.GET.get("selected_ids") or not request.GET.get("project_id"):
+            return JsonResponse({"success": False, "error": "Missing required parameters"}, status=400)
 
-    return JsonResponse({"success":True})
+        # Parse selected IDs safely
+        try:
+            selected_ids = json.loads(request.GET.get("selected_ids"))
+            if not isinstance(selected_ids, list):
+                return JsonResponse({"success": False, "error": "selected_ids must be a list"}, status=400)
+        except json.JSONDecodeError:
+            return JsonResponse({"success": False, "error": "Invalid JSON format for selected_ids"}, status=400)
+
+        project_id = request.GET.get("project_id")
+
+        # Get project or return 404 response
+        project = Project.objects.get(id=project_id)
+
+        # The original code used a comma-joined string for the ids, but we should use the list directly
+        blocks = Block.objects.filter(id__in=selected_ids)
+
+        project.blocks.remove(*blocks)
+
+        return JsonResponse({"success": True})
+
+    except ValidationError as e:
+        return JsonResponse({"success": False, "error": str(e)}, status=400)
+    except Exception as e:
+        # Log the error for server-side debugging
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error removing blocks from project: {str(e)}")
+
+        return JsonResponse({"success": False, "error": "Server error occurred"}, status=500)
 
 @permission_required("blocks.change_blocks",raise_exception=True)
 def edit_block(request,id):
