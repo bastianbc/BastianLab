@@ -89,6 +89,8 @@ INSTALLED_APPS = [
     'analysisrun',
     'cns',
     'qc',
+    'channels',
+    'jobs',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
