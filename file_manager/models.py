@@ -5,7 +5,7 @@ from django.db import models
 from django.db.models import Q
 import json
 from concurrent.futures import ThreadPoolExecutor
-
+from cns.models import Cns
 
 class FileModel(models.Model):
     """Base model (concrete) to allow proxy models"""
@@ -22,14 +22,23 @@ class FileProxyManager(models.Manager):
         super().__init__(*args, **kwargs)  # Ensure proper manager initialization
         self.smb_directory_labshare = settings.SMB_DIRECTORY_LABSHARE# Corrected attribute name
         self.smb_directory_sequencingdata = settings.SMB_DIRECTORY_SEQUENCINGDATA  # Corrected capitalization
+        self.variant_file_locations = ['alignments', 'snv', 'cnv']
+
+    def get_variant_file(self, path):
+        pass
 
     def list_files(self, sub_dir="", exact_dir=None, **kwargs):
         """List all files in the SMB directory."""
         directory = self._resolve_directory(sub_dir, exact_dir)
-        return [
-            {"id":1, "name": entry.name, "dir": entry.path, "type": "file", "size": None}
-            for entry in os.scandir(directory) if entry.is_file()
-        ]
+        print(any(variant in directory for variant in self.variant_file_locations))
+        print("directory: ", directory)
+        if not any(variant in directory for variant in self.variant_file_locations):
+            return [
+                {"id":1, "name": entry.name, "dir": entry.path, "type": "file", "size": None}
+                for entry in os.scandir(directory) if entry.is_file()
+            ]
+
+
 
     def list_directories(self, sub_dir="", exact_dir=None, **kwargs):
         """List all directories in the SMB directory."""

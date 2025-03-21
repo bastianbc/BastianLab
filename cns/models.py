@@ -7,7 +7,7 @@ import json
 class Cns(models.Model):
     sample_lib = models.ForeignKey("samplelib.SampleLib", on_delete=models.CASCADE, related_name="samplelib_cns", blank=True, null=True)
     sequencing_run = models.ForeignKey("sequencingrun.SequencingRun", on_delete=models.CASCADE, related_name="sequencingrun_cns", blank=True, null=True)
-    variant_file = models.CharField(max_length=255, blank=True, null=True)
+    variant_file = models.ForeignKey("variant.VariantFile", on_delete=models.CASCADE, related_name="variant_file_cns", blank=True, null=True)
     analysis_run = models.ForeignKey("analysisrun.AnalysisRun", on_delete=models.CASCADE, related_name="analysis_run_cns")
     chromosome = models.CharField(max_length=20, blank=True, null=True)
     start = models.IntegerField(default=0, blank=True, null=True)
