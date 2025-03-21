@@ -58,7 +58,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'django_tables2',
-    'debug_toolbar',
+    # 'debug_toolbar',
     'widget_tweaks',
     'rest_framework',
     'crispy_forms',
@@ -94,6 +94,7 @@ INSTALLED_APPS = [
     'channels',
     'jobs',
     'notification',
+    'file_manager',
 ]
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 CRISPY_FAIL_SILENTLY = not DEBUG
@@ -242,10 +243,10 @@ PI_GROUP_NAME = "Primary Investigators"
 
 
 
-smb_directory_labshare = "/Volumes/labshare"
-SEQUENCING_FILES_SOURCE_DIRECTORY = Path(Path(smb_directory_labshare) / "BastianRaid-02")
-TEMP_DIRECTORY = Path(Path(smb_directory_labshare) / "BastianRaid-02" / "TEMP")
-HISEQDATA_DIRECTORY = Path(Path(smb_directory_labshare) / "BastianRaid-02" / "HiSeqData")
+SMB_DIRECTORY_LABSHARE = "/Volumes/labshare"
+SEQUENCING_FILES_SOURCE_DIRECTORY = Path(Path(SMB_DIRECTORY_LABSHARE) / "BastianRaid-02")
+TEMP_DIRECTORY = Path(Path(SMB_DIRECTORY_LABSHARE) / "BastianRaid-02" / "TEMP")
+HISEQDATA_DIRECTORY = Path(Path(SMB_DIRECTORY_LABSHARE) / "BastianRaid-02" / "HiSeqData")
 
 SMB_DIRECTORY_SEQUENCINGDATA = "/Volumes/sequencingdata"
 SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")

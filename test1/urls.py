@@ -37,6 +37,7 @@ urlpatterns = [
     path('cns/', include('cns.urls')),
     path('qc/', include('qc.urls')),
     path('notification/', include('notification.urls')),
+    path('file_manager/', include('file_manager.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 handler404 = "core.views.error_404"
