@@ -5,12 +5,12 @@ var KTDatatablesServerSide = function () {
     // Shared variables
     var table;
     var dt;
+    var filterPayment;
     var editor;
     var selectedRows = [];
 
     // Private functions
-    var initDatatable = function (initialValue,log2,chr_start,chr_end,sequencing_run,sample_library,chromosome,gene) {
-
+    var initDatatable = function (initialValue,sub_dir) {
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
 
         dt = $(".table").DataTable({
@@ -22,6 +22,9 @@ var KTDatatablesServerSide = function () {
             destroy: true,
             paging: true,
             pagingType: 'full_numbers',
+            pageLength: 10,
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+            responsive: true,
             select: {
                 style: 'multi',
                 selector: 'td:first-child input[type="checkbox"]',
@@ -34,17 +37,12 @@ var KTDatatablesServerSide = function () {
               editOnFocus: true
             },
             ajax: {
-              url: '/cns/filter_cns',
+              url: '/file_manager/filter_files',
               type: 'GET',
-              data: {
-                  "log2": log2,
-                  "chr_start": chr_start,
-                  "chr_end": chr_end,
-                  "sequencing_run": sequencing_run,
-                  "sample_library": sample_library,
-                  "chromosome": chromosome,
-                  "gene": gene,
-            },
+                data:{
+                  sub_dir:sub_dir,
+                },
+                dataSrc: 'data',
               error: function (xhr, ajaxOptions, thrownError) {
                   if (xhr.status == 403) {
 
@@ -63,18 +61,9 @@ var KTDatatablesServerSide = function () {
             },
             columns: [
                 { data: 'id' },
-                { data: 'sample_lib' },
-                { data: 'sequencing_run' },
-                { data: 'analysis_run',
-                  render: function (val, type, row) {
-                    return val["name"];
-                  }
-                },
-
-                { data: 'chromosome' },
-                { data: 'start' },
-                { data: 'end' },
-                { data: 'log2' },
+                { data: 'name' },
+                { data: 'type' },
+                { data: 'size'},
             ],
             columnDefs: [
                 {
@@ -89,6 +78,37 @@ var KTDatatablesServerSide = function () {
                 },
                 {
                     targets: 1,
+                    orderable: false,
+                    render: function (data, type, row) {
+                        if (row['type'] === 'directory') {
+                            return `
+                                <div class="d-flex align-items-center">
+                                    <i class="ki-duotone ki-folder fs-2x text-primary me-4">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                    <a href="javascript:void(0);" class="reload-subdir-link text-gray-800 text-hover-primary" data-subdir="${encodeURIComponent(row['dir'])}">
+                                        ${row['name']}
+                                    </a>
+                                </div>`;
+                        } else if (row['type'] === 'file') {
+                            return `
+                                <div class="d-flex align-items-center">
+                                    <span class="icon-wrapper">
+                                        <i class="ki-duotone ki-files fs-2x text-primary me-4"></i>
+                                    </span>
+                                    <a href="" class="text-gray-800 text-hover-primary">
+                                        ${row['name']}
+                                    </a>
+                                </div>`;
+                        } else {
+                            // Fallback if type is unknown
+                            return `<span>${row['name']}</span>`;
+                        }
+                    }
+                },
+                {
+                    targets: 1,
                     orderable: true,
                     render: function (data, type, row) {
                         if (data) {
@@ -99,20 +119,10 @@ var KTDatatablesServerSide = function () {
                         return data;
                     }
                 },
-                {
-                    targets: 2,
-                    orderable: true,
-                    render: function (data, type, row) {
-                        if (data) {
-                          let name = data["name"];
-                          return `<a href="/sequencingrun?model=cns&id=${name}&initial=true">${name}</a>`;
-                        }
-                        return data;
-                    }
-                },
+
 
                 {
-                    targets: 8,
+                    targets: -1,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -156,13 +166,138 @@ var KTDatatablesServerSide = function () {
         dt.on('draw', function () {
             initRowSelection();
             handleRestoreRowSelection();
-            initToggleToolbar();
-            toggleToolbars();
-            handleDeleteRows();
-            handleSelectedRows.init();
             KTMenu.createInstances();
+            addReloadSubDirListeners();
+            addBackButtonListener();
+
         });
     }
+    var isBackButtonInitialized = false;
+
+    var addBackButtonListener = function () {
+        const backButton = document.getElementById('back');
+        const container = document.getElementById('breadcrumb-container');
+
+        if (!backButton || !container || isBackButtonInitialized) return;
+
+        backButton.addEventListener('click', function () {
+            const breadcrumbLinks = container.querySelectorAll('.breadcrumb-link');
+            if (breadcrumbLinks.length > 1) {
+                const previousLink = breadcrumbLinks[breadcrumbLinks.length - 2];
+                const previousDir = previousLink.getAttribute('data-subdir');
+                if (previousDir) {
+                    KTDatatablesServerSide.reloadDatatableWithSubDir(previousDir);
+                    updateBreadcrumb(previousDir);
+                }
+            } else {
+                const root = "labshare";
+                KTDatatablesServerSide.reloadDatatableWithSubDir(root);
+                updateBreadcrumb(root);
+            }
+        });
+
+        isBackButtonInitialized = true;
+    };
+
+    window.history.replaceState(null, null, window.location.pathname);
+
+    // Add tab event listeners
+    document.getElementById("labshareBtn")?.addEventListener("click", function (e) {
+        e.preventDefault();
+        const subdir = "labshare";
+        initDatatable(null, subdir);     // re-init with new subdir
+        updateBreadcrumb(subdir);
+
+        // Highlight tab
+        this.classList.add("active");
+        document.getElementById("sequencingDataBtn")?.classList.remove("active");
+    });
+
+    document.getElementById("sequencingDataBtn")?.addEventListener("click", function (e) {
+        e.preventDefault();
+
+        const subdir = "sequencingdata";
+
+        initDatatable(handleInitialValue(), subdir);
+
+        updateBreadcrumb(subdir);
+
+        this.classList.add("active");
+        document.getElementById("labshareBtn")?.classList.remove("active");
+    });
+
+
+
+    var reloadDatatableWithSubDir = function(exact_dir) {
+        if (exact_dir) {
+            console.log("^^^^^",exact_dir);
+            dt.ajax.url(`/file_manager/filter_files?exact_dir=${exact_dir}`).load(function(json) {
+                console.log("Loaded new data:", json);
+                dt.columns.adjust().draw(); // Ensures redrawing
+                updateBreadcrumb(exact_dir);
+            });
+        }
+    };
+
+    function updateBreadcrumb(path) {
+        const container = document.getElementById('breadcrumb-container');
+        const backButton = document.getElementById('back');
+
+        if (!container) return;
+
+        const segments = decodeURIComponent(path).split('/').filter(Boolean);
+
+        const startIndex = segments.findIndex(seg => seg === 'labshare' || seg === 'sequencingdata');
+        const visibleSegments = segments.slice(startIndex);  // only show from this point on
+
+        let fullPath = '';
+        let html = `
+            <div class="d-flex align-items-center flex-wrap">
+                <i class="ki-duotone ki-abstract-32 fs-2 text-primary me-3">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                </i>`;
+
+        visibleSegments.forEach((segment, index) => {
+            fullPath += (index === 0 ? '' : '/') + segment;
+            html += `<a href="#" class="breadcrumb-link" data-subdir="${segments.slice(0, startIndex + index + 1).join('/')}">${segment}</a>`;
+
+            if (index < visibleSegments.length - 1) {
+                html += `
+                    <i class="ki-duotone ki-right fs-2 text-primary mx-1"></i>`;
+            }
+        });
+
+        html += `</div>`;
+        container.innerHTML = html;
+
+        if (visibleSegments.length <= 1) {
+            backButton.style.display = 'none';
+        } else {
+            backButton.style.display = 'inline-flex';
+        }
+
+        container.querySelectorAll('.breadcrumb-link').forEach(link => {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+                const subDir = this.getAttribute('data-subdir');
+                KTDatatablesServerSide.reloadDatatableWithSubDir(subDir);
+                updateBreadcrumb(subDir);
+            });
+        });
+    }
+
+
+
+
+    var addReloadSubDirListeners = function() {
+    document.querySelectorAll('.reload-subdir-link').forEach(link => {
+        link.addEventListener('click', function() {
+            var subDir = this.getAttribute('data-subdir');
+            KTDatatablesServerSide.reloadDatatableWithSubDir(subDir);
+        });
+    });
+};
 
     var initRowSelection = function () {
         // Select all checkboxes
@@ -204,232 +339,12 @@ var KTDatatablesServerSide = function () {
 
     }
 
-    // Search Datatable --- official docs reference: https://datatables.net/reference/api/search()
-    var handleSearchDatatable = function () {
-        const filterSearch = document.querySelector('[data-kt-docs-table-filter="search"]');
-        filterSearch.addEventListener('keyup', function (e) {
-            dt.search(e.target.value).draw();
-        });
-    }
-
-    // Filter Datatable
-    var handleFilterDatatable = () => {
-        const filterButton = document.querySelector('[data-kt-docs-table-filter="filter"]');
-        // Filter datatable on submit
-        filterButton.addEventListener('click', function () {
-
-            var log2 = document.getElementById("id_log2").value;
-            var chr_start = document.getElementById("id_chr_start").value;
-            var chr_end = document.getElementById("id_chr_end").value;
-            var sequencing_run = document.getElementById("id_sequencing_run").value;
-            var sample_library = document.getElementById("id_sample_library").value;
-            var chromosome = document.getElementById("id_chromosome").value;
-            var gene = document.getElementById("id_gene").value;
-            initDatatable(null,log2,chr_start,chr_end,sequencing_run,sample_library,chromosome,gene);
-
-        });
-    }
-
-    // Reset Filter
-    var handleResetFilter = () => {
-        // Select reset button
-        const resetButton = document.querySelector('[data-kt-docs-table-filter="reset"]');
-
-        // Reset datatable
-        resetButton.addEventListener('click', function () {
-
-                document.getElementById("id_log2").value='';
-                document.getElementById("id_chr_start").value='';
-                document.getElementById("id_chr_end").value='';
-                document.getElementById("id_sequencing_run").value='';
-                document.getElementById("id_sample_library").value='';
-                document.getElementById("id_chromosome").value='';
-                document.getElementById("id_gene").value='';
-
-          initDatatable(null, null, null, null, null, null, null, null);
-
-        });
-    }
-    // Delete customer
-    var handleDeleteRows = () => {
-        // Select all delete buttons
-        const deleteButtons = document.querySelectorAll('[data-kt-docs-table-filter="delete_row"]');
-
-        deleteButtons.forEach(d => {
-            // Delete button on click
-            d.addEventListener('click', function (e) {
-                e.preventDefault();
-
-                // Select parent row
-                const parent = e.target.closest('tr');
-
-                const name = parent.querySelectorAll('td')[1].innerText;
-                const id = parent.querySelectorAll('td')[0].querySelector(".form-check-input").value;
-
-                $.ajax({
-                    url: "/capturedlib/check_can_deleted_async",
-                    type: "GET",
-                    data: {
-                      "id": id,
-                    },
-                    async:false,
-                    error: function (xhr, ajaxOptions, thrownError) {
-                        if (xhr.status == 403) {
-
-                          Swal.fire({
-                              text: "You do not have permission to delete.",
-                              icon: "error",
-                              buttonsStyling: false,
-                              confirmButtonText: "Ok, got it!",
-                              customClass: {
-                                  confirmButton: "btn fw-bold btn-primary",
-                              }
-                          });
-
-                        }
-                    }
-                }).done(function (data) {
-
-                  var message = "Are you sure you want to delete " + name + "?";
-
-                  if (data.related_objects.length > 0) {
-
-                    message += " It has downstream records:";
-
-                    for (var item of data.related_objects) {
-
-                      message += item.model + "(" + item.count + ")"
-
-                    }
-
-                  }
-
-                  Swal.fire({
-                      text: message,
-                      icon: "warning",
-                      showCancelButton: true,
-                      buttonsStyling: false,
-                      confirmButtonText: "Yes, delete!",
-                      cancelButtonText: "No, cancel",
-                      customClass: {
-                          confirmButton: "btn fw-bold btn-danger",
-                          cancelButton: "btn fw-bold btn-active-light-primary"
-                      }
-                  }).then(function (result) {
-                      if (result.value) {
-                          // Simulate delete request -- for demo purpose only
-                          Swal.fire({
-                              text: "Deleting " + name,
-                              icon: "info",
-                              buttonsStyling: false,
-                              showConfirmButton: false,
-                              timer: 1000
-                          }).then(function () {
-
-                            $.ajax({
-                                url: parent.querySelector('[data-kt-docs-table-filter="delete_row"]').href,
-                                type: "DELETE",
-                                headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
-                                error: function (xhr, ajaxOptions, thrownError) {
-                                  Swal.fire({
-                                      text: name + " could not be deleted.",
-                                      icon: "error",
-                                      buttonsStyling: false,
-                                      confirmButtonText: "Ok, got it!",
-                                      customClass: {
-                                          confirmButton: "btn fw-bold btn-primary",
-                                      }
-                                  });
-                                }
-                            }).done(function () {
-
-                              Swal.fire({
-                                    text: "Captured Library deleted succesfully.",
-                                    icon: "info",
-                                    buttonsStyling: false,
-                                    confirmButtonText: "Ok, got it!",
-                                    customClass: {
-                                        confirmButton: "btn fw-bold btn-success",
-                                    }
-                                }).then(function(){
-
-                                  dt.draw();
-
-                                });
-
-                            });
-
-                          });
-                      }
-                  });
-
-                });
-
-            })
-        });
-    }
-
-    // Reset Filter
-    var handleResetForm = () => {
-        // Select reset button
-        const resetButton = document.querySelector('[data-kt-docs-table-filter="reset"]');
-
-        resetButton.addEventListener('click', function () {
-
-          document.getElementById("normal_area_checkbox").checked = false;
-
-
-          initDatatable(null, null);
-      });
-    }
-
-    // Init toggle toolbar
-    var initToggleToolbar = function () {
-        // Toggle selected action toolbar
-        // Select all checkboxes
-        const container = document.querySelector('.table');
-        const checkboxes = container.querySelectorAll('[type="checkbox"]');
-
-        // Toggle delete selected toolbar
-        checkboxes.forEach(c => {
-            // Checkbox on click event
-            c.addEventListener('click', function () {
-                setTimeout(function () {
-                    toggleToolbars();
-                }, 50);
-            });
-        });
-
-    }
-
-    // Toggle toolbars
-    var toggleToolbars = function () {
-        // Define variables
-        const container = document.querySelector('.table');
-        const toolbarBase = document.querySelector('[data-kt-docs-table-toolbar="base"]');
-        const toolbarSelected = document.querySelector('[data-kt-docs-table-toolbar="selected"]');
-        const selectedCount = document.querySelector('[data-kt-docs-table-select="selected_count"]');
-
-        // Toggle toolbars
-        if (selectedRows.length > 0) {
-            selectedCount.innerHTML = selectedRows.length;
-            toolbarBase.classList.add('d-none');
-            toolbarSelected.classList.remove('d-none');
-        } else {
-            toolbarBase.classList.remove('d-none');
-            toolbarSelected.classList.add('d-none');
-        }
-    }
-
     var initEditor = function () {
 
       var baitOptions = [];
       var bufferOptions = [];
 
       Promise.all([
-
-          getBaitOptions(),
-          getBufferOptions()
 
       ]).then(() => {
 
@@ -504,69 +419,16 @@ var KTDatatablesServerSide = function () {
             }
          }
        });
-
-      }).catch((err) => {
-          console.log(err);
-      });
-
-      function  getBaitOptions() {
-
-        $.ajax({
-            url: "/bait/get_bait_choices",
-            type: "GET",
-            async: false,
-            success: function (data) {
-
-             // var options = [];
-             data.forEach((item, i) => {
-
-               baitOptions.push({
-                 "label":item["name"],
-                 "value":item["id"]
-               })
-
-             });
-
-             // editor.field( 'bait' ).update( options );
-
-            }
-        });
-
-      }
-
-      function  getBufferOptions() {
-
-        $.ajax({
-            url: "/buffer/get_buffer_choices",
-            type: "GET",
-            async: false,
-            success: function (data) {
-
-             // var options = [];
-             data.forEach((item, i) => {
-
-               bufferOptions.push({
-                 "label":item["name"],
-                 "value":item["id"]
-               })
-
-             });
-
-             // editor.field( 'buffer' ).update( options );
-
-            }
-        });
-
-      }
-
-      $('.table').on( 'click', 'tbody td:not(:first-child)', function (e) {
+         $('.table').on( 'click', 'tbody td:not(:first-child)', function (e) {
            editor.inline( this );
       });
 
       $('.table').on( 'key-focus', function ( e, datatable, cell ) {
            editor.inline( cell.index() );
       });
-
+      }).catch((err) => {
+          console.log(err);
+      });
     }
     function wait(ms){
        var start = new Date().getTime();
@@ -880,43 +742,16 @@ var KTDatatablesServerSide = function () {
 
     })();
 
-    var handleFilter = () => {
-
-      $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
-        var min = parseInt($('#min').val(), 10);
-        var max = parseInt($('#max').val(), 10);
-        var age = parseFloat(data[3]) || 0; // use data for the age column
-
-        if (
-            (isNaN(min) && isNaN(max)) ||
-            (isNaN(min) && age <= max) ||
-            (min <= age && isNaN(max)) ||
-            (min <= age && age <= max)
-        ) {
-            return true;
-        }
-        return false;
-      });
-
-      $('#min, #max').keyup(function () {
-          table.draw();
-      });
-
-    }
-
     // Public methods
     return {
         init: function () {
-            initDatatable( handleInitialValue(), null, null, null, null, null, null, null );
-            handleSearchDatatable();
-            initToggleToolbar();
-            handleFilterDatatable();
-            handleDeleteRows();
-            handleResetForm();
+            const initialSubdir = "labshare";
+            initDatatable(handleInitialValue(), initialSubdir);
             initEditor();
-            handleFilter();
-            handleResetFilter();
-        }
+            updateBreadcrumb(initialSubdir); // 🌟 Initial breadcrumb set
+        },
+        reloadDatatableWithSubDir: reloadDatatableWithSubDir  // <== Add this line
+
     }
 }();
 
