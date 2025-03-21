@@ -76,6 +76,7 @@ var KTDatatablesServerSide = function () {
                             </div>`;
                     }
                 },
+
                 {
                     targets: 1,
                     orderable: false,
@@ -107,22 +108,18 @@ var KTDatatablesServerSide = function () {
                         }
                     }
                 },
+
                 {
-                    targets: 1,
-                    orderable: true,
+                    targets: 2,
+                    orderable: false,
                     render: function (data, type, row) {
-                        if (data) {
-                            let name = data["name"];
-                          return `
-                              <a href="/samplelib?model=cns&id=${name}&initial=true">${name}</a>`;
-                        }
-                        return data;
+                        if (row['status']) {return `<div class="badge badge-light-success">Completed</div>`;}
+                        else {return `<div class="badge badge-light-secondary">Doesn't apply</div>`;}
                     }
                 },
 
-
                 {
-                    targets: -1,
+                    targets: 4,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -650,7 +647,6 @@ var KTDatatablesServerSide = function () {
         init: function () {
             const initialSubdir = "labshare";
             initDatatable(handleInitialValue(), initialSubdir);
-            initEditor();
             updateBreadcrumb(initialSubdir); // 🌟 Initial breadcrumb set
         },
         reloadDatatableWithSubDir: reloadDatatableWithSubDir  // <== Add this line
