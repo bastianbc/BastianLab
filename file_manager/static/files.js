@@ -22,7 +22,7 @@ var KTDatatablesServerSide = function () {
             destroy: true,
             paging: true,
             pagingType: 'full_numbers',
-            pageLength: 10,
+            pageLength: "All",
             lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
             responsive: true,
             select: {
@@ -62,8 +62,8 @@ var KTDatatablesServerSide = function () {
             columns: [
                 { data: 'id' },
                 { data: 'name' },
-                { data: 'type' },
-                { data: 'size'},
+                { data: 'status' },
+                { data: 'variant_file'},
             ],
             columnDefs: [
                 {
@@ -113,10 +113,22 @@ var KTDatatablesServerSide = function () {
                     targets: 2,
                     orderable: false,
                     render: function (data, type, row) {
-                        if (row['status']) {return `<div class="badge badge-light-success">Completed</div>`;}
-                        else {return `<div class="badge badge-light-secondary">Doesn't apply</div>`;}
+                        const status = row['status'];
+                        let badgeClass = 'badge-light-warning'; // default class
+                        let label = status || 'Unknown';
+
+                        if (status === 'Completed') {
+                            badgeClass = 'badge-light-success';
+                        } else if (status === 'Does not Apply') {
+                            badgeClass = 'badge-light-secondary';
+                        } else if (status === 'Not Processed') {
+                            badgeClass = 'badge-light-danger';
+                        }
+
+                        return `<div class="badge ${badgeClass}">${label}</div>`;
                     }
                 },
+
 
                 {
                     targets: 4,
@@ -227,9 +239,7 @@ var KTDatatablesServerSide = function () {
 
     var reloadDatatableWithSubDir = function(exact_dir) {
         if (exact_dir) {
-            console.log("^^^^^",exact_dir);
             dt.ajax.url(`/file_manager/filter_files?exact_dir=${exact_dir}`).load(function(json) {
-                console.log("Loaded new data:", json);
                 dt.columns.adjust().draw(); // Ensures redrawing
                 updateBreadcrumb(exact_dir);
             });

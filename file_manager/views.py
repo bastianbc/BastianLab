@@ -12,8 +12,8 @@ def list_files(request):
 @permission_required_for_async("cns.view_cns")
 def filter_files(request):
     directories = FileManager.objects.query_by_args(**request.GET)
-
     serializer = FileDirectorySerializer(directories['items'], many=True)
+    print(serializer.data)
     result = dict()
     result['data'] = serializer.data
     result['draw'] = directories['draw']

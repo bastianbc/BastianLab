@@ -2,10 +2,13 @@ import os.path
 from pathlib import Path
 from django.conf import settings
 from django.db import models
-from django.db.models import Q
-import json
 from concurrent.futures import ThreadPoolExecutor
+from variant.models import VariantFile
+from qc.models import SampleQC
+from variant.models import VariantCall
 from cns.models import Cns
+from django.db.models import Max, Count
+from analysisrun.models import AnalysisRun
 
 class FileModel(models.Model):
     """Base model (concrete) to allow proxy models"""
@@ -22,31 +25,102 @@ class FileProxyManager(models.Manager):
         super().__init__(*args, **kwargs)  # Ensure proper manager initialization
         self.smb_directory_labshare = settings.SMB_DIRECTORY_LABSHARE# Corrected attribute name
         self.smb_directory_sequencingdata = settings.SMB_DIRECTORY_SEQUENCINGDATA  # Corrected capitalization
-        self.variant_file_locations = ['alignments', 'snv', 'cnv']
+        self.variant_file_locations = ['alignment', 'snv', 'cnv']
 
-    def get_variant_file(self, path):
-        pass
+    def get_variant_file(self, entry):
+        try:
+            print(VariantFile.objects.get(name=entry.name.strip()))
+            return VariantFile.objects.get(name=entry.name.strip()).name
+        except:
+            # print("Object not found")
+            return ""
+
+    def get_status(self, type, source, model, label="QC sample"):
+        try:
+            parts = source.split(".")
+            if len(parts) < 2:
+                return f"Invalid format for {label}"
+            sequencing_run, sample_lib = parts[0], parts[1]
+            if label == "SNV Variant" and type == "file":
+                if model.objects.filter(sample_lib__name=sample_lib, sequencing_run__name=sequencing_run).exists() and "_filtered.txt" in source.lower():
+                    return "Completed"
+                if model.objects.filter(sample_lib__name=sample_lib, sequencing_run__name=sequencing_run).exists() and "_filtered.txt" not in source.lower():
+                    return "Does not Apply"
+                else:
+                    return "Not Processed"
+            if label == "CNS Variant" and type == "file":
+                if model.objects.filter(sample_lib__name=sample_lib, sequencing_run__name=sequencing_run).exists() and "bsqr.cns" in source.lower():
+                    return "Completed"
+                if model.objects.filter(sample_lib__name=sample_lib, sequencing_run__name=sequencing_run).exists() and "bsqr.cns" not in source.lower():
+                    return "Does not Apply"
+                else:
+                    return "Not Processed"
+            if type == "directory":
+                if model.objects.filter(sample_lib__name=sample_lib, sequencing_run__name=sequencing_run).exists():
+                    return "Completed"
+                else:
+                    return "Not Processed"
+        except Exception as e:
+            return f"{str(e)}"
+
 
     def list_files(self, sub_dir="", exact_dir=None, **kwargs):
         """List all files in the SMB directory."""
         directory = self._resolve_directory(sub_dir, exact_dir)
-        print(any(variant in directory for variant in self.variant_file_locations))
-        print("directory: ", directory)
         if not any(variant in directory for variant in self.variant_file_locations):
             return [
-                {"id":1, "name": entry.name, "dir": entry.path, "type": "file", "size": None}
+                {"id":1, "name": entry.name, "variant_file": "", "dir": entry.path, "type": "file", "status": "Does not Apply"}
                 for entry in os.scandir(directory) if entry.is_file()
             ]
+        else:
+            if "metrics" in directory:
+                return [
+                    {"id": 1, "name": entry.name, "variant_file": self.get_variant_file(entry=entry),
+                     "dir": entry.path, "type": "file", "status": self.get_status("file", entry.name,SampleQC)}
+                    for entry in os.scandir(directory) if entry.is_file()
+                ]
+            elif "snv" in directory:
+                return [
+                    {"id": 1, "name": entry.name, "variant_file": self.get_variant_file(entry=entry),
+                     "dir": entry.path, "type": "file", "status": self.get_status("file", entry.name,VariantCall,"SNV Variant")}
+                    for entry in os.scandir(directory) if entry.is_file()
+                ]
+            elif "cnv" in directory:
+                return [
+                    {"id": 1, "name": entry.name, "variant_file": self.get_variant_file(entry=entry),
+                     "dir": entry.path, "type": "file", "status": self.get_status("file", entry.name, Cns, "CNS Variant")}
+                    for entry in os.scandir(directory) if entry.is_file()
+                ]
 
 
 
     def list_directories(self, sub_dir="", exact_dir=None, **kwargs):
         """List all directories in the SMB directory."""
         directory = self._resolve_directory(sub_dir, exact_dir)
-        return [
-            {"id":1, "name": entry.name, "dir": entry.path, "type": "directory", "size": None}
-            for entry in os.scandir(directory) if entry.is_dir()
-        ]
+        if not any(variant in directory for variant in self.variant_file_locations):
+            return [
+                {"id":1, "name": entry.name, "dir": entry.path, "variant_file": "", "type": "directory", "status": "Does not Apply"}
+                for entry in os.scandir(directory) if entry.is_dir()
+            ]
+        else:
+            if "metrics" in directory:
+                return [
+                    {"id": 1, "name": entry.name, "variant_file": "",
+                     "dir": entry.path, "type": "directory", "status": self.get_status("directory", entry.name,SampleQC)}
+                    for entry in os.scandir(directory) if entry.is_dir()
+                ]
+            elif "snv" in directory:
+                return [
+                    {"id": 1, "name": entry.name, "variant_file": "",
+                     "dir": entry.path, "type": "directory", "status": self.get_status("directory", entry.name,VariantCall,"SNV Variant")}
+                    for entry in os.scandir(directory) if entry.is_dir()
+                ]
+            elif "cnv" in directory:
+                return [
+                    {"id": 1, "name": entry.name, "variant_file": "",
+                     "dir": entry.path, "type": "directory", "status": self.get_status("directory", entry.name, Cns, "CNS Variant")}
+                    for entry in os.scandir(directory) if entry.is_dir()
+                ]
 
     def _resolve_directory(self, sub_dir, exact_dir):
         """Resolve the path for the given sub_dir or exact_dir"""
@@ -68,27 +142,15 @@ class FileProxyManager(models.Manager):
                 future_files = executor.submit(self.list_files, **kwargs)
                 return future_dirs.result() + future_files.result()
         try:
-            draw = kwargs.get('draw', None)[0]
-            print("draw: "*10,
-                kwargs.get('sub_dir', None),
-                kwargs.get('exact_dir', None),
-                kwargs.get('draw', None),
-                kwargs.get('start', None),
-                kwargs.get('length', None),
-            )
+            length_raw = kwargs.get('length', [10])[0]
+            length = -1 if length_raw == 'All' else int(length_raw)
+
             draw = int(kwargs.get('draw', [0])[0])
             start = int(kwargs.get('start', [0])[0])
-            length = int(kwargs.get('length', [10])[0])
-            print("1"*10)
             queryset = _get_authorizated_queryset(**kwargs)
             total = len(queryset)
-            print("total"*10, total)
             paginated_items = queryset[start:start + length]
-            print("3"*10)
-
-            print("4"*10)
             count = len(paginated_items)
-            print("count"*10, count)
             return {
                 'items': paginated_items,
                 'count': count,
