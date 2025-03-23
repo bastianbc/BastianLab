@@ -2,21 +2,17 @@ import os
 import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "test1.settings")
 django.setup()
-from sequencingrun.models import SequencingRun
 from django.conf import settings
 import pandas as pd
-from django.db import transaction
-from django.core.exceptions import ObjectDoesNotExist
-from variant.models import VariantCall, GVariant, CVariant, PVariant, VariantFile
-from analysisrun.models import AnalysisRun
-from samplelib.models import SampleLib
-import re
+from variant.models import VariantFile
 import logging
-from pathlib import Path
 from gene.models import Gene
 from migration.variants_import import get_sample_lib, get_sequencing_run
 from areas.models import Area
 from areatype.models import AreaType
+from cns.models import Cns
+from analysisrun.models import AnalysisRun
+
 
 logger = logging.getLogger("file")
 
@@ -81,6 +77,7 @@ def create_csn(row, file):
             sample_lib=get_sample_lib(file.name),
             sequencing_run=get_sequencing_run(file.name),
             variant_file=file,
+            analysis_run=AnalysisRun.objects.get(name="AR_ALL"),
             chromosome=row['chromosome'],
             start=row['start'],
             end=row['end'],
@@ -100,9 +97,6 @@ def create_csn(row, file):
         print(e)
 
 def import_csn_calls():
-    col1 = ['chromosome', 'start', 'end', 'gene', 'log2', 'depth', 'weight', 'probes', 'p_bintest']
-    col2 = ['chromosome', 'start', 'end', 'gene', 'log2', 'depth', 'weight', 'probes', 'cn', 'p_ttest']
-    col3 = ['chromosome', 'start', 'end', 'gene', 'log2', 'depth', 'weight', 'probes',  'ci_lo', 'ci_hi']
     for file in VariantFile.objects.filter(type='cns'):
         file_path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA,file.directory, file.name)
         df = pd.read_csv(file_path, index_col=False, sep='\t')
@@ -133,5 +127,5 @@ def import_area_types():
 
 if __name__ == "__main__":
     print("start")
-    import_area_types()
+    import_csn_calls()
     print("end")
