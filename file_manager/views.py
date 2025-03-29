@@ -28,19 +28,14 @@ def filter_files(request):
     cache_key_raw = json.dumps(filtered_params, sort_keys=True)
     cache_key = "filter_files:" + hashlib.md5(cache_key_raw.encode()).hexdigest()
 
-    print("\n"*5)
-    print("cache_key_raw: ", cache_key_raw)
-    print("cache_key: ", cache_key)
 
     # Try to get cached data
     cached_data = cache.get(cache_key)
 
     if cached_data is not None:
-        print("Cache hit.")
-        print(cached_data)
+        cached_data['draw'] = request.GET['draw']
         return JsonResponse(cached_data)
     else:
-        print("Cache miss. Querying database.")
         directories = FileManager.objects.query_by_args(**request.GET)
         serializer = FileDirectorySerializer(directories['items'], many=True)
         result = {
