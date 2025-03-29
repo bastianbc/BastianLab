@@ -306,13 +306,14 @@ var KTDatatablesServerSide = function () {
 
 
     var addReloadSubDirListeners = function() {
-    // Use event delegation to attach the event listener to the parent container (.table)
-        $(".table").off('click', '.reload-subdir-link')  // Remove any existing listeners
-        .on('click', '.reload-subdir-link', function() {
+    // Make sure to remove ALL existing listeners from the document
+        $(document).off('click', '.table .reload-subdir-link');
 
-            var self = this; // Store reference to 'this'
+        // Then add a new listener at the document level
+        $(document).on('click', '.table .reload-subdir-link', function() {
+            console.log("addReloadSubDirListeners");
+            var self = this;
             setTimeout(function() {
-                console.log("addReloadSubDirListeners");
                 var subDir = self.getAttribute('data-subdir');
                 KTDatatablesServerSide.reloadDatatableWithSubDir(subDir);
             }, 5000);
