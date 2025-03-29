@@ -181,7 +181,7 @@ var KTDatatablesServerSide = function () {
 
         addReloadSubDirListeners();
 
-    }
+    };
     var isBackButtonInitialized = false;
 
     var addBackButtonListener = function () {
@@ -275,7 +275,8 @@ var KTDatatablesServerSide = function () {
 
         visibleSegments.forEach((segment, index) => {
             fullPath += (index === 0 ? '' : '/') + segment;
-            html += `<a href="#" class="breadcrumb-link" data-subdir="${segments.slice(0, startIndex + index + 1).join('/')}">${segment}</a>`;
+            // Ensure data-subdir starts with '/'
+            html += `<a href="#" class="breadcrumb-link" data-subdir="/${segments.slice(0, startIndex + index + 1).join('/')}">${segment}</a>`;
 
             if (index < visibleSegments.length - 1) {
                 html += `
