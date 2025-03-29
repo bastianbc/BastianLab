@@ -194,8 +194,9 @@ var KTDatatablesServerSide = function () {
             const breadcrumbLinks = container.querySelectorAll('.breadcrumb-link');
             if (breadcrumbLinks.length > 1) {
                 const previousLink = breadcrumbLinks[breadcrumbLinks.length - 2];
-                const previousDir = previousLink.getAttribute('data-subdir');
+                let previousDir = previousLink.getAttribute('data-subdir');
                 if (previousDir) {
+                    // Ensure previousDir starts with a '/'
                     if (!previousDir.startsWith('/')) {
                         previousDir = '/' + previousDir;
                     }
