@@ -33,9 +33,12 @@ def filter_files(request):
     print("cache_key: ", cache_key)
 
     # Try to get cached data
-    result = cache.get(cache_key)
+    cached_data = cache.get(cache_key)
 
-    if result is None:
+    if cached_data is not None:
+        print("Cache hit.")
+        return JsonResponse(cached_data)
+    else:
         print("Cache miss. Querying database.")
         directories = FileManager.objects.query_by_args(**request.GET)
         serializer = FileDirectorySerializer(directories['items'], many=True)
@@ -47,8 +50,6 @@ def filter_files(request):
         }
         # Cache the result for 5 minutes
         cache.set(cache_key, result, timeout=300)
-    else:
-        print("Cache hit.")
 
     return JsonResponse(result)
 
