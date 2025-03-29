@@ -110,6 +110,7 @@ class FileProxyManager(models.Manager):
 
     def list_directories(self, sub_dir="", exact_dir=None, **kwargs):
         directory = self._resolve_directory(sub_dir, exact_dir)
+        print("@"*100, directory)
         return [
             self._generate_entry(entry, directory, is_file=False)
             for entry in os.scandir(directory) if entry.is_dir()
