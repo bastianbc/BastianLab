@@ -176,10 +176,10 @@ var KTDatatablesServerSide = function () {
             initRowSelection();
             handleRestoreRowSelection();
             KTMenu.createInstances();
-            addReloadSubDirListeners();
             addBackButtonListener();
-
         });
+
+        addReloadSubDirListeners();
     }
     var isBackButtonInitialized = false;
 
@@ -301,13 +301,13 @@ var KTDatatablesServerSide = function () {
 
 
     var addReloadSubDirListeners = function() {
-    document.querySelectorAll('.reload-subdir-link').forEach(link => {
-        link.addEventListener('click', function() {
+        // Use event delegation to attach the event listener to the table or any parent container
+        $(".table").on('click', '.reload-subdir-link', function() {
             var subDir = this.getAttribute('data-subdir');
             KTDatatablesServerSide.reloadDatatableWithSubDir(subDir);
         });
-    });
-};
+    };
+
 
     var initRowSelection = function () {
         // Select all checkboxes
