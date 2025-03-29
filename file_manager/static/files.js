@@ -306,6 +306,7 @@ var KTDatatablesServerSide = function () {
             link.addEventListener('click', function (e) {
                 e.preventDefault();
                 const subDir = this.getAttribute('data-subdir');
+                console.log(subDir,"%%%%%%");
                 KTDatatablesServerSide.reloadDatatableWithSubDir(subDir);
                 updateBreadcrumb(subDir);
             });
