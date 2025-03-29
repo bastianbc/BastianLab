@@ -141,6 +141,12 @@ CHANNEL_LAYERS = {
     },
 }
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'file_browser_cache',
+    }
+}
 # Database
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
 
