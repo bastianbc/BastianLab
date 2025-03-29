@@ -4,22 +4,54 @@ from .models import FileManager
 from .serializer import *
 from core.decorators import permission_required_for_async
 from django.http import JsonResponse
+from django.core.cache import cache
+import hashlib
+
 
 def list_files(request):
     return render(request, "files_list.html", locals())
 
 
-@permission_required_for_async("cns.view_cns")
+@permission_required_for_async("file_mamanger.view_file_manager")
 def filter_files(request):
-    directories = FileManager.objects.query_by_args(**request.GET)
-    serializer = FileDirectorySerializer(directories['items'], many=True)
-    print(serializer.data)
-    result = dict()
-    result['data'] = serializer.data
-    result['draw'] = directories['draw']
-    result['recordsTotal'] = directories['count']
-    result['recordsFiltered'] = directories['total']
+    # Extract the 'sub_dir' and 'exact_dir' from request.GET
+    sub_dir = request.GET.get('sub_dir', '')
+    exact_dir = request.GET.get('exact_dir', '')
+
+    # Create a dictionary with only 'sub_dir' and 'exact_dir' for caching purposes
+    filtered_params = {
+        'sub_dir': sub_dir,
+        'exact_dir': exact_dir,
+    }
+
+    # Generate a stable cache key using only these parameters
+    cache_key_raw = json.dumps(filtered_params, sort_keys=True)
+    cache_key = "filter_files:" + hashlib.md5(cache_key_raw.encode()).hexdigest()
+
+    print("\n"*5)
+    print("cache_key_raw: ", cache_key_raw)
+    print("cache_key: ", cache_key)
+
+    # Try to get cached data
+    result = cache.get(cache_key)
+
+    if result is None:
+        print("Cache miss. Querying database.")
+        directories = FileManager.objects.query_by_args(**request.GET)
+        serializer = FileDirectorySerializer(directories['items'], many=True)
+        result = {
+            'data': serializer.data,
+            'draw': directories['draw'],
+            'recordsTotal': directories['count'],
+            'recordsFiltered': directories['total'],
+        }
+        # Cache the result for 5 minutes
+        cache.set(cache_key, result, timeout=300)
+    else:
+        print("Cache hit.")
+
     return JsonResponse(result)
+
 
 class ListDirectoriesView(View):
     """API to list all directories in SMB"""
