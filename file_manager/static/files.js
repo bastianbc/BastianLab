@@ -253,8 +253,10 @@ var KTDatatablesServerSide = function () {
                 console.log("reloadDatatableWithSubDir");
                 dt.ajax.url(`/file_manager/filter_files?exact_dir=${exact_dir}`).load(function(json) {
                     console.log("1"*20);
-                    dt.columns.adjust().draw(); // Ensures redrawing of the table
-                    console.log("2"*20);
+                    setTimeout(function() {
+                        dt.columns.adjust().draw(); // Ensures redrawing of the table
+                        console.log("2" * 20);
+                    },5000);
                     updateBreadcrumb(exact_dir);
                     console.log("3"*20);
                 });
