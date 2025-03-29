@@ -196,6 +196,9 @@ var KTDatatablesServerSide = function () {
                 const previousLink = breadcrumbLinks[breadcrumbLinks.length - 2];
                 const previousDir = previousLink.getAttribute('data-subdir');
                 if (previousDir) {
+                    if (!previousDir.startsWith('/')) {
+                        previousDir = '/' + previousDir;
+                    }
                     KTDatatablesServerSide.reloadDatatableWithSubDir(previousDir);
                     updateBreadcrumb(previousDir);
                 }
