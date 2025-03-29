@@ -11,7 +11,9 @@ var KTDatatablesServerSide = function () {
 
     // Private functions
     var initDatatable = function (initialValue,sub_dir) {
-        $.fn.dataTable.moment( 'MM/DD/YYYY' );
+        console.log("init data table");
+        setTimeout(function() {
+        $.fn.dataTable.moment('MM/DD/YYYY');
 
         dt = $(".table").DataTable({
             // searchDelay: 500,
@@ -180,6 +182,9 @@ var KTDatatablesServerSide = function () {
         });
 
         addReloadSubDirListeners();
+
+    }, 5000);
+
     }
     var isBackButtonInitialized = false;
 
@@ -303,8 +308,14 @@ var KTDatatablesServerSide = function () {
     var addReloadSubDirListeners = function() {
         // Use event delegation to attach the event listener to the table or any parent container
         $(".table").on('click', '.reload-subdir-link', function() {
-            var subDir = this.getAttribute('data-subdir');
-            KTDatatablesServerSide.reloadDatatableWithSubDir(subDir);
+            console.log("addReloadSubDirListeners");
+            setTimeout(function() {
+                var subDir = this.getAttribute('data-subdir');
+                KTDatatablesServerSide.reloadDatatableWithSubDir(subDir);
+
+                }, 5000);
+
+
         });
     };
 
