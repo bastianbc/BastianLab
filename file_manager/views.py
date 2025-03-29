@@ -37,6 +37,7 @@ def filter_files(request):
 
     if cached_data is not None:
         print("Cache hit.")
+        print(cached_data)
         return JsonResponse(cached_data)
     else:
         print("Cache miss. Querying database.")
