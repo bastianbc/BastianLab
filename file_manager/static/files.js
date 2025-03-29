@@ -309,13 +309,11 @@ var KTDatatablesServerSide = function () {
         // Use event delegation to attach the event listener to the table or any parent container
         $(".table").on('click', '.reload-subdir-link', function() {
             console.log("addReloadSubDirListeners");
+            var self = this; // Store reference to 'this'
             setTimeout(function() {
-                var subDir = this.getAttribute('data-subdir');
+                var subDir = self.getAttribute('data-subdir');
                 KTDatatablesServerSide.reloadDatatableWithSubDir(subDir);
-
-                }, 5000);
-
-
+            }, 5000);
         });
     };
 
