@@ -11,8 +11,6 @@ var KTDatatablesServerSide = function () {
 
     // Private functions
     var initDatatable = function (initialValue,sub_dir) {
-        console.log("init data table");
-        setTimeout(function() {
         $.fn.dataTable.moment('MM/DD/YYYY');
 
         dt = $(".table").DataTable({
@@ -183,8 +181,6 @@ var KTDatatablesServerSide = function () {
 
         addReloadSubDirListeners();
 
-    }, 5000);
-
     }
     var isBackButtonInitialized = false;
 
@@ -247,20 +243,10 @@ var KTDatatablesServerSide = function () {
     var reloadDatatableWithSubDir = function(exact_dir) {
         if (exact_dir && exact_dir !== currentSubDir) {
             currentSubDir = exact_dir; // Update the current subdirectory
+            dt.ajax.url(`/file_manager/filter_files?exact_dir=${exact_dir}`).load(function(json) {
+                updateBreadcrumb(exact_dir);
+            });
 
-            // Add 5-second delay before loading data
-            setTimeout(function() {
-                console.log("reloadDatatableWithSubDir");
-                dt.ajax.url(`/file_manager/filter_files?exact_dir=${exact_dir}`).load(function(json) {
-                    // console.log("1"*20);
-                    // setTimeout(function() {
-                    //     dt.columns.adjust().draw(); // Ensures redrawing of the table
-                    //     console.log("2" * 20);
-                    // },5000);
-                    updateBreadcrumb(exact_dir);
-                    console.log("3"*20);
-                });
-            }, 5000); // 5000 milliseconds = 5 seconds
         }
     };
 
@@ -322,13 +308,10 @@ var KTDatatablesServerSide = function () {
 
         // Then add a new listener at the document level
         $(document).on('click', '.table .reload-subdir-link', function() {
-
             var self = this;
-            setTimeout(function() {
-                var subDir = self.getAttribute('data-subdir');
-                console.log("addReloadSubDirListeners");
-                KTDatatablesServerSide.reloadDatatableWithSubDir(subDir);
-            }, 5000);
+            var subDir = self.getAttribute('data-subdir');
+            console.log("addReloadSubDirListeners");
+            KTDatatablesServerSide.reloadDatatableWithSubDir(subDir);
         });
     };
 
