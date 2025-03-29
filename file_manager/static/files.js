@@ -237,10 +237,13 @@ var KTDatatablesServerSide = function () {
 
 
 
+    var currentSubDir = ""; // Keep track of the currently loaded subdirectory
+
     var reloadDatatableWithSubDir = function(exact_dir) {
-        if (exact_dir) {
+        if (exact_dir && exact_dir !== currentSubDir) {
+            currentSubDir = exact_dir; // Update the current subdirectory
             dt.ajax.url(`/file_manager/filter_files?exact_dir=${exact_dir}`).load(function(json) {
-                dt.columns.adjust().draw(); // Ensures redrawing
+                dt.columns.adjust().draw(); // Ensures redrawing of the table
                 updateBreadcrumb(exact_dir);
             });
         }
