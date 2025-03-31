@@ -35,7 +35,11 @@ import pandas as pd
 import uuid
 import numpy as np
 from django.utils import timezone
-
+import os
+import django
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "test1.settings")
+django.setup()
+from django.conf import settings
 
 def migrate(request):
 
@@ -3836,8 +3840,13 @@ def register_new_fastq_files(request):
     #         generate_file_set(row['file'])
 
 def call_import_variants(request):
-    from .cns_import import import_csn_calls
-    import_csn_calls()
+    from .cns_import import get_directory_size,human_readable_size
+    SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
+    SMB_DIRECTORY_LABSHARE = Path(settings.SMB_DIRECTORY_LABSHARE)
+    size_in_bytes = get_directory_size(SEQUENCING_FILES_SOURCE_DIRECTORY)
+    print(f"Total size of '{SEQUENCING_FILES_SOURCE_DIRECTORY}' is: {human_readable_size(size_in_bytes)}")
+    size_in_bytes = get_directory_size(SMB_DIRECTORY_LABSHARE)
+    print(f"Total size of '{SMB_DIRECTORY_LABSHARE}' is: {human_readable_size(size_in_bytes)}")
 
 
 
