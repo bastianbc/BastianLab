@@ -125,7 +125,36 @@ def import_area_types():
     print("%^&"*100, "finished")
 
 
+import os
+
+
+def get_directory_size(directory_path):
+    total_size = 0
+
+    # Walk through the directory and its subdirectories
+    for dirpath, dirnames, filenames in os.walk(directory_path):
+        for filename in filenames:
+            file_path = os.path.join(dirpath, filename)
+            try:
+                # Add the size of the file to the total size
+                total_size += os.path.getsize(file_path)
+            except FileNotFoundError:
+                # In case the file is deleted before we get its size
+                pass
+
+    return total_size
+
+
+def human_readable_size(size_in_bytes):
+    # Convert bytes to a human-readable format (KB, MB, GB, etc.)
+    for unit in ['B', 'KB', 'MB', 'GB', 'TB']:
+        if size_in_bytes < 1024:
+            return f"{size_in_bytes:.2f} {unit}"
+        size_in_bytes /= 1024
+
+
 if __name__ == "__main__":
-    print("start")
-    import_csn_calls()
-    print("end")
+    folder_path = input("Enter the path of the folder: ")
+    size_in_bytes = get_directory_size(folder_path)
+    print(f"Total size of '{folder_path}' is: {human_readable_size(size_in_bytes)}")
+
