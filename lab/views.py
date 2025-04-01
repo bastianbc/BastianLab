@@ -9,7 +9,7 @@ from blocks.models import Block
 import pandas as pd
 import json
 
-@permission_required_for_async("lab.view_patients")
+@permission_required_for_async("lab.view_patient")
 def filter_patients(request):
     from .serializers import PatientsSerializer
     from django.http import JsonResponse
@@ -24,7 +24,7 @@ def filter_patients(request):
 
     return JsonResponse(result)
 
-@permission_required("lab.view_patients",raise_exception=True)
+@permission_required("lab.view_patient",raise_exception=True)
 def patients(request):
     filter = FilterForm()
     return render(request,"patient_list.html", locals())
