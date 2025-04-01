@@ -3839,14 +3839,52 @@ def register_new_fastq_files(request):
     #         print(e, row['file'])
     #         generate_file_set(row['file'])
 
+from django.db import connections
+from account.models import User
+from django.core.exceptions import ValidationError
+
 def call_import_variants(request):
-    from .cns_import import get_directory_size,human_readable_size
-    SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
-    SMB_DIRECTORY_LABSHARE = Path(settings.SMB_DIRECTORY_LABSHARE)
-    size_in_bytes = get_directory_size(SEQUENCING_FILES_SOURCE_DIRECTORY)
-    print(f"Total size of '{SEQUENCING_FILES_SOURCE_DIRECTORY}' is: {human_readable_size(size_in_bytes)}")
-    size_in_bytes = get_directory_size(SMB_DIRECTORY_LABSHARE)
-    print(f"Total size of '{SMB_DIRECTORY_LABSHARE}' is: {human_readable_size(size_in_bytes)}")
+    # Get users from labdb (ucsf database)
+    with connections['ucsf'].cursor() as cursor:
+        cursor.execute('SELECT * FROM auth_user')  # Replace with your actual user table
+        labdb_users = cursor.fetchall()
+
+    # Get existing users from labproductiondb (default database)
+    existing_users = User.objects.using('default').values_list('username', flat=True)
+
+    # Migrate users (skip duplicates)
+    for user in labdb_users:
+        username = user[1]  # Assuming username is at index 1
+        email = user[2]  # Assuming email is at index 2
+        password = user[3]  # Assuming password is at index 3
+
+        # Handle case where email is null or empty
+        if not email:
+            email = f'{username}@example.com'  # Assign a default email or generate one
+
+        try:
+            # Check if user already exists
+            existing_user = User.objects.using('default').filter(username=username).first()
+
+            if existing_user:
+                # If user exists, update the user
+                existing_user.email = email
+                existing_user.password = password
+                existing_user.save()
+                print(f"User {username} updated.")
+            else:
+                # If user doesn't exist, create a new one
+                User.objects.using('default').create(
+                    username=username,
+                    email=email,
+                    password=password,
+                )
+                print(f"User {username} created.")
+
+        except ValidationError as e:
+            print(f"Skipping user {username} due to validation error: {e}")
+
+    print('Successfully migrated or updated users to labproductiondb')
 
 
 

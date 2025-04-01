@@ -10,6 +10,7 @@ from variant.models import VariantCall
 from cns.models import Cns
 from django.db.models import Max, Count
 from analysisrun.models import AnalysisRun
+from sequencingfile.models import SequencingFileSet
 
 class FileModel(models.Model):
     """Base model (concrete) to allow proxy models"""
@@ -28,7 +29,7 @@ class FileProxyManager(models.Manager):
         self.smb_directory_sequencingdata = settings.SMB_DIRECTORY_SEQUENCINGDATA  # Corrected capitalization
         self.variant_file_locations = ['alignment', 'snv', 'cnv']
         self.VALID_FILENAME_REGEX = re.compile(
-            r'^[A-Z]+\d*\.[A-Z]+-\d+\.(?:[A-Z0-9]+_Final\.annovar\.hg19_multianno_Filtered\.txt|Tumor_dedup_BSQR\.cns)$'
+            r'^[A-Za-z0-9\-]+(?:_[A-Za-z0-9]+)*\.(?:[A-Z0-9]+_Final\.annovar\.hg19_multianno_Filtered\.txt|Tumor_dedup_BSQR\.cns|fastq\.gz)$'
         )
     def get_variant_file(self, entry):
         try:
@@ -42,20 +43,26 @@ class FileProxyManager(models.Manager):
             if type_ == "file" and not self.VALID_FILENAME_REGEX.match(source):
                 return "Does not Apply"
 
-            parts = source.split(".")
-            if len(parts) < 2:
-                return f"Invalid format for {label}"
 
-            sequencing_run, sample_lib = parts[0], parts[1]
-            qs = model.objects.filter(sample_lib__name=sample_lib, sequencing_run__name=sequencing_run)
+            if label == "Sequencing File Set":
+                qs = model.objects.filter(sequencing_files__name=source)
+            else:
+                parts = source.split(".")
+                if len(parts) < 2:
+                    return f"Invalid format for {label}"
+                sequencing_run, sample_lib = parts[0], parts[1]
+                qs = model.objects.filter(sample_lib__name=sample_lib, sequencing_run__name=sequencing_run)
 
             if type_ == "directory":
+                if label == "Sequencing File Set":
+                    qs = model.objects.filter(sequencing_run__name=source.split("/")[-1])
                 return "Completed" if qs.exists() else "Not Processed"
 
             status_checks = {
                 "SNV Variant": "_filtered.txt",
                 "CNS Variant": "bsqr.cns",
-                "QC sample": "metrics"
+                "QC sample": "metrics",
+                "Sequencing File Set": "fastq.gz"
             }
 
             keyword = status_checks.get(label, "")
@@ -76,7 +83,8 @@ class FileProxyManager(models.Manager):
         label_model_map = {
             "metrics": (SampleQC, "QC sample"),
             "snv": (VariantCall, "SNV Variant"),
-            "cnv": (Cns, "CNS Variant")
+            "cnv": (Cns, "CNS Variant"),
+            "HiSeqData": (SequencingFileSet, "Sequencing File Set")
         }
 
         for key in label_model_map:
@@ -110,7 +118,6 @@ class FileProxyManager(models.Manager):
 
     def list_directories(self, sub_dir="", exact_dir=None, **kwargs):
         directory = self._resolve_directory(sub_dir, exact_dir)
-        print("@"*100, directory)
         return [
             self._generate_entry(entry, directory, is_file=False)
             for entry in os.scandir(directory) if entry.is_dir()
