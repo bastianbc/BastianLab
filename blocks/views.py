@@ -44,14 +44,6 @@ def new_block(request):
         if form.is_valid():
             block = form.save()
             messages.success(request,"Block %s created successfully." % block.id)
-            channel_layer = get_channel_layer()
-            async_to_sync(channel_layer.group_send)(
-                f"user_{request.user.id}",
-                {
-                    "type": "send_notification",
-                    "message": f"🛠️ A new block (ID: {block.id}) has been created.",
-                },
-            )
             return redirect("blocks")
         else:
             messages.error(request,"Block not created.")
