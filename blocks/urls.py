@@ -19,4 +19,5 @@ urlpatterns = [
     path("export_csv_all_data", views.export_csv_all_data, name="export-csv-all-data"),
     path("edit_block_url", views.edit_block_url, name="edit_block_url"),
     path("get_block_vaiants", views.get_block_vaiants, name="get_block_vaiants"),
+    path("get_block_areas/<int:id>", views.get_block_areas, name="get-block-areas"),
 ] + staticfiles_urlpatterns()

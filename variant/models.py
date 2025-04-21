@@ -459,3 +459,46 @@ class VariantFile(models.Model):
 
     def __str__(self):
         return self.name
+
+class VariantsView(models.Model):
+    area_id = models.IntegerField()
+    area_name = models.CharField(max_length=50)
+    area_type_id = models.IntegerField(null=True)
+    collection = models.CharField(max_length=2)
+    block_id = models.IntegerField()
+    block_name = models.CharField(max_length=50)
+    samplelib_id = models.IntegerField()
+    samplelib_name = models.CharField(max_length=50)
+    gene_id = models.IntegerField()
+    gene_name = models.CharField(max_length=30)
+    chromosome = models.CharField(max_length=30, null=True)
+    variantcall_id = models.IntegerField()
+    analysis_run_id = models.IntegerField()
+    analysis_run_name = models.IntegerField()
+    coverage = models.IntegerField()
+    log2r = models.FloatField()
+    caller = models.CharField(max_length=100, null=True)
+    ref_read = models.IntegerField()
+    alt_read = models.IntegerField()
+    vaf = models.FloatField()
+    alias = models.CharField(max_length=50, null=True)
+    gvariant_id = models.IntegerField()
+    g_chromosome = models.CharField(max_length=100, null=True)
+    g_start = models.IntegerField()
+    g_end = models.IntegerField()
+    g_ref = models.CharField(max_length=100, null=True)
+    g_alt = models.CharField(max_length=100, null=True)
+    avsnp150 = models.CharField(max_length=100, null=True)
+    cvariant_id = models.IntegerField()
+    nm_id = models.CharField(max_length=100, null=True)
+    c_var = models.CharField(max_length=100, null=True)
+    exon = models.CharField(max_length=100, null=True)
+    func = models.CharField(max_length=100, null=True)
+    pvariant_id = models.IntegerField(null=True)
+    reference_residues = models.CharField(max_length=100, null=True)
+    inserted_residues = models.CharField(max_length=100, null=True)
+    change_type = models.CharField(max_length=100, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'variants_view'
