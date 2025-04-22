@@ -296,3 +296,27 @@ def get_block_vaiants(request):
         ]
     }
     return JsonResponse(response_data)
+
+def get_block_areas(request, id):
+    """
+    It brings the structural information of the block and the areas belonging to this block.
+    """
+    try:
+        block = Block.objects.get(id=id)
+
+        areas = Area.objects.filter(block_id=block_id)
+
+        result = {
+            'block_id': block.id,
+            'block_name': block.name,
+            'diagnosis': block.diagnosis,
+            'body_site': block.body_site,
+            'patient_id': block.pat_id,
+            'areas': list(areas.values('area_id', 'area_name', 'area_type_id'))
+        }
+
+        return JsonResponse(result)
+    except Block.DoesNotExist:
+        return JsonResponse({'error': 'Blok bulunamadı'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
