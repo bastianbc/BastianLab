@@ -180,7 +180,7 @@ var KTDatatablesServerSide = function () {
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="#" class="menu-link px-3 variant-link">View Variants</a>
+                                    <a href="#" class="menu-link px-3 variant-link-by-area">View Variants</a>
                                 </div>
                                 <!--end::Menu item-->
 
@@ -1010,420 +1010,634 @@ var KTDatatablesServerSide = function () {
     }
 
     var handleRowActions = function () {
-        const variantModal = document.getElementById("variant_layout");
-        const variantInstance = new bootstrap.Modal(variantModal);
+        // AnalysisRun Base Variant Modal
+        const VariantModal = {
+            modal: document.getElementById("variant_layout"),
+            instance: null,
 
-        document.querySelectorAll('.variant-link').forEach((item, i) => {
+            init: function() {
+                this.instance = new bootstrap.Modal(this.modal);
+                this.setupEventListeners();
+            },
 
-            item.addEventListener('click', function () {
-                // Select parent row
-                const parent = this.closest('tr');
-                // Get customer name
-                const id = parent.querySelector('input[type=checkbox]').value;
-                // Open modal
-                variantInstance.show();
-                console.log("block_id: ", id)
-                getVariantData( id );
-            });
-        });
-
-        function getVariantData( blockId ) {
-            fetch(`/blocks/get_block_vaiants?id=${blockId}`)
-                .then(response => response.json())
-                .then(data => {
-                    initializeModal(data);
-                    $('#variant_layout').modal('show');
+            setupEventListeners: function() {
+                document.querySelectorAll('.variant-link').forEach((item, i) => {
+                    item.addEventListener('click', (e) => {
+                        // Select parent row
+                        const parent = e.target.closest('tr');
+                        // Get customer name
+                        const id = parent.querySelector('input[type=checkbox]').value;
+                        // Open modal
+                        this.instance.show();
+                        console.log("block_id: ", id);
+                        this.getVariantData(id);
+                    });
                 });
-        }
 
-        function initializeModal( data ) {
-            // Initialize tabs
-            const tabContainer = document.getElementById('variantTabList');
-            const tabContent = document.getElementById('variantTabContent');
+                // Add event listener for dt-control click
+                document.querySelectorAll('#block_datatable tbody td.dt-control').forEach((item) => {
+                    item.addEventListener('click', function () {
+                        var tr = this.closest('tr');
+                        var row = dt.row(tr);
+                        var data = row.data();
+                        // Make AJAX request to get_block_async view
+                        fetch(`/blocks/get_block_async?id=${data.id}`)
+                            .then(response => response.json())
+                            .then(blockData => {
+                                // Populate modal with block details
+                                var modalBody = document.querySelector('#blockDetailsTable tbody');
+                                modalBody.innerHTML = format(blockData);
+                                // Show modal
+                                var blockDetailsModal = new bootstrap.Modal(document.getElementById('blockDetailsModal'));
+                                blockDetailsModal.show();
+                            });
+                    });
+                });
+                // Add event listener for modal close button
+                document.querySelectorAll('#blockDetailsModal .btn-close, #blockDetailsModal .btn-secondary').forEach((item) => {
+                    item.addEventListener('click', function () {
+                        var blockDetailsModal = bootstrap.Modal.getInstance(document.getElementById('blockDetailsModal'));
+                        blockDetailsModal.hide();
+                        document.querySelectorAll('.modal-backdrop').forEach((backdrop) => {
+                            backdrop.remove();
+                        });
+                    });
+                });
+            },
 
-            // Clear modal first
-            tabContainer.innerHTML = "";
-            tabContent.innerHTML = "";
-            console.log("@@@",data);
-            // Fill the data
-            populateBlockDetails(data.block);
+            initializeModal: function(data) {
+                // Initialize tabs
+                const tabContainer = document.getElementById('variantTabList');
+                const tabContent = document.getElementById('variantTabContent');
 
-            // Check if there are any analyses
-            if (!data.analyses || data.analyses.length === 0) {
-                showNoDataMessage(tabContent, "No analysis runs found for this area.");
-                return;
-            }
-            console.log("!!!",data.analyses);
-            // Check if any analysis has variants
-            // const hasVariants = data.analyses.some(analysis => analysis.variants && analysis.variants.length > 0);
-            // console.log("!!!",hasVariants);
-            // if (!hasVariants) {
-            //     showNoDataMessage(tabContent, "No variants found in any analysis runs.");
-            //     return;
-            // }
+                // Clear modal first
+                tabContainer.innerHTML = "";
+                tabContent.innerHTML = "";
+                console.log("@@@",data);
+                // Fill the data
+                populateBlockDetails(data.block);
 
-            data.analyses.forEach((analysis, index) => {
-                // Create tab
-                const isActive = index === 0;
-                const tabId = `analysis_${index}`;
-                console.log(data.block)
-                createTab(tabContainer, tabId, analysis.analysis_name, isActive);
-                createTabPane(tabContent, tabId, analysis, isActive, data.block.id);
+                // Check if there are any analyses
+                if (!data.analyses || data.analyses.length === 0) {
+                    showNoDataMessage(tabContent, "No analysis runs found for this area.");
+                    return;
+                }
+                console.log("!!!",data.analyses);
+                // Check if any analysis has variants
+                // const hasVariants = data.analyses.some(analysis => analysis.variants && analysis.variants.length > 0);
+                // console.log("!!!",hasVariants);
+                // if (!hasVariants) {
+                //     showNoDataMessage(tabContent, "No variants found in any analysis runs.");
+                //     return;
+                // }
 
-            });
-        }
+                data.analyses.forEach((analysis, index) => {
+                    // Create tab
+                    const isActive = index === 0;
+                    const tabId = `analysis_${index}`;
+                    console.log(data.block)
+                    createTab(tabContainer, tabId, analysis.analysis_name, isActive);
+                    createTabPane(tabContent, tabId, analysis, isActive, data.block.id);
 
-        function showNoDataMessage(container, message) {
-            container.innerHTML = `
-                <div class="card">
-                    <div class="card-body p-10 text-center">
-                        <i class="ki-duotone ki-information-5 fs-5x text-primary mb-5">
-                            <span class="path1"></span>
-                            <span class="path2"></span>
-                            <span class="path3"></span>
-                        </i>
-                        <p class="fs-3 fw-semibold text-gray-800 mb-2">${message}</p>
-                        <p class="fs-6 text-gray-600">Please select a different area or check if analysis has been completed.</p>
-                    </div>
-                </div>
-            `;
-        }
+                });
+            },
 
-        function populateBlockDetails( data ) {
-            document.querySelector('input[name="block_name"]').value = data.name;
-            document.querySelector('input[name="body_site"]').value = data.body_site;
-            document.querySelector('textarea[name="diagnosis"]').textContent = data.diagnosis;
+            populateBlockDetails: function(data) {
+                document.querySelector('input[name="block_name"]').value = data.name;
+                document.querySelector('input[name="body_site"]').value = data.body_site;
+                document.querySelector('textarea[name="diagnosis"]').textContent = data.diagnosis;
 
-            if (data.block_url) {
-                console.log(data.block_url.url);
-                document.querySelector('a[name="he_image"]').href = data.block_url.url+""+data.scan_number
-            }
-        }
+                if (data.block_url) {
+                    console.log(data.block_url.url);
+                    document.querySelector('a[name="he_image"]').href = data.block_url.url+""+data.scan_number
+                }
+            },
 
-        function createTab(container, id, text, isActive) {
-            const li = document.createElement('li');
-            li.className = 'nav-item';
-            li.innerHTML = `
-                <a class="nav-link text-active-primary pb-4 ${isActive ? 'active' : ''}"
-                   data-bs-toggle="tab"
-                   href="#${id}">
-                   ${text}
-                </a>`;
-            container.appendChild(li);
-        }
+            getVariantData: function(blockId) {
+                fetch(`/blocks/get_variants_by_block?id=${blockId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        initializeModal(data);
+                        $('#variant_layout').modal('show');
+                    });
+            },
 
-        function createTabPane(container, id, analysis, isActive, blockId) {
-            const div = document.createElement('div');
-            div.className = `tab-pane fade ${isActive ? 'show active' : ''}`;
-            div.id = id;
-            div.innerHTML = `
-                <div class="card card-flush mt-2 flex-row-fluid overflow-hidden">
-                    <div class="card-body pt-0">
-                        <div class="table-responsive">
-                            <table id="variant_datatable_${id}" class="table align-middle table-row-dashed fs-6 gy-5">
-                                <thead>
-                                    <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
-                                        <th>Area</th>
-                                        <th>Sample Library</th>
-                                        <th>Gene</th>
-                                        <th>P Variant</th>
-                                        <th>Coverage</th>
-                                        <th>VAF</th>
-                                        <th class="text-end min-w-100px">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="text-gray-600 fw-semibold"></tbody>
-                            </table>
+            showNoDataMessage: function(container, message) {
+                container.innerHTML = `
+                    <div class="card">
+                        <div class="card-body p-10 text-center">
+                            <i class="ki-duotone ki-information-5 fs-5x text-primary mb-5">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                                <span class="path3"></span>
+                            </i>
+                            <p class="fs-3 fw-semibold text-gray-800 mb-2">${message}</p>
+                            <p class="fs-6 text-gray-600">Please select a different area or check if analysis has been completed.</p>
                         </div>
                     </div>
-                </div>`;
-            container.appendChild(div);
+                `;
+            },
 
-            // Initialize DataTable with server-side processing
-            console.log("Block_id: ", id, blockId)
-            initializeDataTable(`variant_datatable_${id}`, blockId, analysis.analysis_id);
-        }
+            createTab: function(container, id, text, isActive) {
+                const li = document.createElement('li');
+                li.className = 'nav-item';
+                li.innerHTML = `
+                    <a class="nav-link text-active-primary pb-4 ${isActive ? 'active' : ''}"
+                       data-bs-toggle="tab"
+                       href="#${id}">
+                       ${text}
+                    </a>`;
+                container.appendChild(li);
+            },
 
-        function initializeDataTable(tableId, blockId, analysisId) {
-            $(`#${tableId}`).DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: {
-                    url: `/variant/filter_variants`,
-                    type: 'GET',
-                    data: {
-                        block_id: blockId,
-                        analysis_id: analysisId,
-                        model_block:'block'
-                    }
-                },
-                columns: [
-                    {
-                        data: 'areas',
-                        className: 'text-gray-800 text-hover-primary'
-                    },
-                    {
-                        data: 'sample_lib',
-                        className: 'text-gray-800 text-hover-primary'
-                    },
-                    {
-                        data: 'genes',
-                        className: 'text-gray-800'
-                    },
-                    {
-                        data: 'p_variant',
-                        className: 'text-gray-800'
-                    },
-                    {
-                        data: 'coverage',
-                        className: 'text-gray-800'
-                    },
-                    {
-                        data: 'vaf',
-                        className: 'text-gray-800',
-                    },
-                    {
-                        data: null,
-                        className: 'text-end',
-                        render: function() {
-                            return `
-                                <button type="button"
-                                        class="btn btn-icon btn-light-primary btn-sm"
-                                        data-bs-toggle="tooltip"
-                                        data-bs-placement="top"
-                                        title="View Details">
-                                    <i class="ki-duotone ki-eye fs-2">
-                                        <span class="path1"></span>
-                                        <span class="path2"></span>
-                                        <span class="path3"></span>
-                                    </i>
-                                </button>
-                            `;
+            createTabPane: function(container, id, analysis, isActive, blockId) {
+                const div = document.createElement('div');
+                div.className = `tab-pane fade ${isActive ? 'show active' : ''}`;
+                div.id = id;
+                div.innerHTML = `
+                    <div class="card card-flush mt-2 flex-row-fluid overflow-hidden">
+                        <div class="card-body pt-0">
+                            <div class="table-responsive">
+                                <table id="variant_datatable_${id}" class="table align-middle table-row-dashed fs-6 gy-5">
+                                    <thead>
+                                        <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
+                                            <th>Area</th>
+                                            <th>Sample Library</th>
+                                            <th>Gene</th>
+                                            <th>P Variant</th>
+                                            <th>Coverage</th>
+                                            <th>VAF</th>
+                                            <th class="text-end min-w-100px">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="text-gray-600 fw-semibold"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>`;
+                container.appendChild(div);
+
+                // Initialize DataTable with server-side processing
+                console.log("Block_id: ", id, blockId)
+                initializeDataTable(`variant_datatable_${id}`, blockId, analysis.analysis_id);
+            },
+
+            initializeDataTable: function(tableId, blockId, analysisId) {
+                $(`#${tableId}`).DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: {
+                        url: `/variant/filter_variants`,
+                        type: 'GET',
+                        data: {
+                            block_id: blockId,
+                            analysis_id: analysisId,
+                            model_block:'block'
                         }
-                    }
-                ],
-                order: [[0, 'asc']],  // Sort by areas by default
-                pageLength: 10,
-                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-                responsive: true
-            });
-        }
-
-        // Add event listener for dt-control click
-        document.querySelectorAll('#block_datatable tbody td.dt-control').forEach((item) => {
-            item.addEventListener('click', function () {
-                var tr = this.closest('tr');
-                var row = dt.row(tr);
-                var data = row.data();
-                // Make AJAX request to get_block_async view
-                fetch(`/blocks/get_block_async?id=${data.id}`)
-                    .then(response => response.json())
-                    .then(blockData => {
-                        // Populate modal with block details
-                        var modalBody = document.querySelector('#blockDetailsTable tbody');
-                        modalBody.innerHTML = format(blockData);
-                        // Show modal
-                        var blockDetailsModal = new bootstrap.Modal(document.getElementById('blockDetailsModal'));
-                        blockDetailsModal.show();
-                    });
-            });
-        });
-        // Add event listener for modal close button
-        document.querySelectorAll('#blockDetailsModal .btn-close, #blockDetailsModal .btn-secondary').forEach((item) => {
-            item.addEventListener('click', function () {
-                var blockDetailsModal = bootstrap.Modal.getInstance(document.getElementById('blockDetailsModal'));
-                blockDetailsModal.hide();
-                document.querySelectorAll('.modal-backdrop').forEach((backdrop) => {
-                    backdrop.remove();
+                    },
+                    columns: [
+                        {
+                            data: 'areas',
+                            className: 'text-gray-800 text-hover-primary'
+                        },
+                        {
+                            data: 'sample_lib',
+                            className: 'text-gray-800 text-hover-primary'
+                        },
+                        {
+                            data: 'genes',
+                            className: 'text-gray-800'
+                        },
+                        {
+                            data: 'p_variant',
+                            className: 'text-gray-800'
+                        },
+                        {
+                            data: 'coverage',
+                            className: 'text-gray-800'
+                        },
+                        {
+                            data: 'vaf',
+                            className: 'text-gray-800',
+                        },
+                        {
+                            data: null,
+                            className: 'text-end',
+                            render: function() {
+                                return `
+                                    <button type="button"
+                                            class="btn btn-icon btn-light-primary btn-sm"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="top"
+                                            title="View Details">
+                                        <i class="ki-duotone ki-eye fs-2">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                            <span class="path3"></span>
+                                        </i>
+                                    </button>
+                                `;
+                            }
+                        }
+                    ],
+                    order: [[0, 'asc']],  // Sort by areas by default
+                    pageLength: 10,
+                    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                    responsive: true
                 });
-            });
-        });
+            },
 
-        function format(d) {
-            // `d` is the original data object for the row
-            let details = '';
+            format: function(d) {
+                // `d` is the original data object for the row
+                let details = '';
 
-            if (d.name) {
-                details += `
-                    <tr>
-                        <td>Full name:</td>
-                        <td>${d.name}</td>
-                    </tr>`;
-            }
-            if (d.patient) {
-                details += `
-                    <tr>
-                        <td>Patient:</td>
-                        <td>${d.patient}</td>
-                    </tr>`;
-            }
-            if (d.age) {
-                details += `
-                    <tr>
-                        <td>Age:</td>
-                        <td>${d.age}</td>
-                    </tr>`;
-            }
-            if (d.body_site) {
-                details += `
-                    <tr>
-                        <td>Body site:</td>
-                        <td>${d.body_site}</td>
-                    </tr>`;
-            }
-            if (d.ulceration !== null) {
-                details += `
-                    <tr>
-                        <td>Ulceration:</td>
-                        <td>${d.ulceration}</td>
-                    </tr>`;
-            }
-            if (d.thickness) {
-                details += `
-                    <tr>
-                        <td>Thickness:</td>
-                        <td>${d.thickness}</td>
-                    </tr>`;
-            }
-            if (d.mitoses) {
-                details += `
-                    <tr>
-                        <td>Mitoses:</td>
-                        <td>${d.mitoses}</td>
-                    </tr>`;
-            }
-            if (d.p_stage) {
-                details += `
-                    <tr>
-                        <td>P Stage:</td>
-                        <td>${d.p_stage}</td>
-                    </tr>`;
-            }
-            if (d.prim) {
-                details += `
-                    <tr>
-                        <td>Prim:</td>
-                        <td>${d.prim}</td>
-                    </tr>`;
-            }
-            if (d.subtype) {
-                details += `
-                    <tr>
-                        <td>Subtype:</td>
-                        <td>${d.subtype}</td>
-                    </tr>`;
-            }
-            if (d.slides) {
-                details += `
-                    <tr>
-                        <td>Slides:</td>
-                        <td>${d.slides}</td>
-                    </tr>`;
-            }
-            if (d.slides_left) {
-                details += `
-                    <tr>
-                        <td>Slides Left:</td>
-                        <td>${d.slides_left}</td>
-                    </tr>`;
-            }
-            if (d.fixation) {
-                details += `
-                    <tr>
-                        <td>Fixation:</td>
-                        <td>${d.fixation}</td>
-                    </tr>`;
-            }
-            if (d.storage) {
-                details += `
-                    <tr>
-                        <td>Storage:</td>
-                        <td>${d.storage}</td>
-                    </tr>`;
-            }
-            if (d.scan_number) {
-                details += `
-                    <tr>
-                        <td>Scan Number:</td>
-                        <td>${d.scan_number}</td>
-                    </tr>`;
-            }
-            if (d.icd10) {
-                details += `
-                    <tr>
-                        <td>ICD10:</td>
-                        <td>${d.icd10}</td>
-                    </tr>`;
-            }
-            if (d.diagnosis) {
-                details += `
-                    <tr>
-                        <td>Diagnosis:</td>
-                        <td>${d.diagnosis}</td>
-                    </tr>`;
-            }
-            if (d.notes) {
-                details += `
-                    <tr>
-                        <td>Notes:</td>
-                        <td>${d.notes}</td>
-                    </tr>`;
-            }
-            if (d.micro) {
-                details += `
-                    <tr>
-                        <td>Micro:</td>
-                        <td>${d.micro}</td>
-                    </tr>`;
-            }
-            if (d.gross) {
-                details += `
-                    <tr>
-                        <td>Gross:</td>
-                        <td>${d.gross}</td>
-                    </tr>`;
-            }
-            if (d.clinical) {
-                details += `
-                    <tr>
-                        <td>Clinical:</td>
-                        <td>${d.clinical}</td>
-                    </tr>`;
-            }
-            if (d.date_added) {
-                const date = new Date(d.date_added);
-                const formattedDate = `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}/${date.getFullYear()} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-                details += `
-                    <tr>
-                        <td>Date Added:</td>
-                        <td>${formattedDate}</td>
-                    </tr>`;
-            }
-            if (d.old_body_site) {
-                details += `
-                    <tr>
-                        <td>Old Body Site:</td>
-                        <td>${d.old_body_site}</td>
-                    </tr>`;
-            }
-            if (d.path_note) {
-                details += `
-                    <tr>
-                        <td>Path Note:</td>
-                        <td>${d.path_note}</td>
-                    </tr>`;
-            }
-            if (d.ip_dx) {
-                details += `
-                    <tr>
-                        <td>IP DX:</td>
-                        <td>${d.ip_dx}</td>
-                    </tr>`;
+                if (d.name) {
+                    details += `
+                        <tr>
+                            <td>Full name:</td>
+                            <td>${d.name}</td>
+                        </tr>`;
+                }
+                if (d.patient) {
+                    details += `
+                        <tr>
+                            <td>Patient:</td>
+                            <td>${d.patient}</td>
+                        </tr>`;
+                }
+                if (d.age) {
+                    details += `
+                        <tr>
+                            <td>Age:</td>
+                            <td>${d.age}</td>
+                        </tr>`;
+                }
+                if (d.body_site) {
+                    details += `
+                        <tr>
+                            <td>Body site:</td>
+                            <td>${d.body_site}</td>
+                        </tr>`;
+                }
+                if (d.ulceration !== null) {
+                    details += `
+                        <tr>
+                            <td>Ulceration:</td>
+                            <td>${d.ulceration}</td>
+                        </tr>`;
+                }
+                if (d.thickness) {
+                    details += `
+                        <tr>
+                            <td>Thickness:</td>
+                            <td>${d.thickness}</td>
+                        </tr>`;
+                }
+                if (d.mitoses) {
+                    details += `
+                        <tr>
+                            <td>Mitoses:</td>
+                            <td>${d.mitoses}</td>
+                        </tr>`;
+                }
+                if (d.p_stage) {
+                    details += `
+                        <tr>
+                            <td>P Stage:</td>
+                            <td>${d.p_stage}</td>
+                        </tr>`;
+                }
+                if (d.prim) {
+                    details += `
+                        <tr>
+                            <td>Prim:</td>
+                            <td>${d.prim}</td>
+                        </tr>`;
+                }
+                if (d.subtype) {
+                    details += `
+                        <tr>
+                            <td>Subtype:</td>
+                            <td>${d.subtype}</td>
+                        </tr>`;
+                }
+                if (d.slides) {
+                    details += `
+                        <tr>
+                            <td>Slides:</td>
+                            <td>${d.slides}</td>
+                        </tr>`;
+                }
+                if (d.slides_left) {
+                    details += `
+                        <tr>
+                            <td>Slides Left:</td>
+                            <td>${d.slides_left}</td>
+                        </tr>`;
+                }
+                if (d.fixation) {
+                    details += `
+                        <tr>
+                            <td>Fixation:</td>
+                            <td>${d.fixation}</td>
+                        </tr>`;
+                }
+                if (d.storage) {
+                    details += `
+                        <tr>
+                            <td>Storage:</td>
+                            <td>${d.storage}</td>
+                        </tr>`;
+                }
+                if (d.scan_number) {
+                    details += `
+                        <tr>
+                            <td>Scan Number:</td>
+                            <td>${d.scan_number}</td>
+                        </tr>`;
+                }
+                if (d.icd10) {
+                    details += `
+                        <tr>
+                            <td>ICD10:</td>
+                            <td>${d.icd10}</td>
+                        </tr>`;
+                }
+                if (d.diagnosis) {
+                    details += `
+                        <tr>
+                            <td>Diagnosis:</td>
+                            <td>${d.diagnosis}</td>
+                        </tr>`;
+                }
+                if (d.notes) {
+                    details += `
+                        <tr>
+                            <td>Notes:</td>
+                            <td>${d.notes}</td>
+                        </tr>`;
+                }
+                if (d.micro) {
+                    details += `
+                        <tr>
+                            <td>Micro:</td>
+                            <td>${d.micro}</td>
+                        </tr>`;
+                }
+                if (d.gross) {
+                    details += `
+                        <tr>
+                            <td>Gross:</td>
+                            <td>${d.gross}</td>
+                        </tr>`;
+                }
+                if (d.clinical) {
+                    details += `
+                        <tr>
+                            <td>Clinical:</td>
+                            <td>${d.clinical}</td>
+                        </tr>`;
+                }
+                if (d.date_added) {
+                    const date = new Date(d.date_added);
+                    const formattedDate = `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}/${date.getFullYear()} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+                    details += `
+                        <tr>
+                            <td>Date Added:</td>
+                            <td>${formattedDate}</td>
+                        </tr>`;
+                }
+                if (d.old_body_site) {
+                    details += `
+                        <tr>
+                            <td>Old Body Site:</td>
+                            <td>${d.old_body_site}</td>
+                        </tr>`;
+                }
+                if (d.path_note) {
+                    details += `
+                        <tr>
+                            <td>Path Note:</td>
+                            <td>${d.path_note}</td>
+                        </tr>`;
+                }
+                if (d.ip_dx) {
+                    details += `
+                        <tr>
+                            <td>IP DX:</td>
+                            <td>${d.ip_dx}</td>
+                        </tr>`;
+                }
+
+                return details;
             }
 
-            return details;
-        }
+        };
 
+        // Area Base Variant Modal
+        const VariantModalByArea = {
+            modal: document.getElementById("variant_layout_by_area"),
+            instance: null,
+            tabContainer: null,
+            tabContent: null,
+
+            init: function() {
+                this.instance = new bootstrap.Modal(this.modal);
+                this.tabContainer = this.modal.querySelector('.variant-tab-container');
+                this.tabContent = this.modal.querySelector('.tab-content');
+                this.setupEventListeners();
+            },
+
+            setupEventListeners: function() {
+                document.querySelectorAll('.variant-link-by-area').forEach((item, i) => {
+                    item.addEventListener('click', (e) => {
+                        // Select parent row
+                        const parent = e.target.closest('tr');
+                        // Get customer name
+                        const id = parent.querySelector('input[type=checkbox]').value;
+                        // Open modal
+                        this.instance.show();
+                        this.initializeModal(id);
+                    });
+                });
+
+            },
+
+            initializeModal: function(blockId) {
+                // Clear modal first
+                tabContainer.innerHTML = "";
+                tabContent.innerHTML = "";
+
+                fetch(`/block/get_block_areas/${blockId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // fill the details
+                        this.populateBlockDetails(data);
+
+                        // create areas
+                        data.areas.forEach((area, index) => {
+                            // Create tab
+                            const isActive = index === 0;
+                            const tabId = `analysis_${index}`;
+
+                            createTab(tabContainer, tabId, area.name, isActive);
+                            createTabPane(tabContent, tabId, analysis, isActive, data.block.id);
+
+                        });
+
+                        // load variants for first area(first tab)
+                        if (data.areas.length > 0) {
+                            getVariantData(blockId, data.areas[0].area_id);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Blok verileri getirilemedi:', error);
+                    });
+
+            },
+
+            populateBlockDetails: function(data) {
+                modalElement.querySelector('a[name="patient_id"]').textContent = data.patient_id;
+                modalElement.querySelector('a[name="block_name"]').textContent = data.block_name;
+                modalElement.querySelector('a[name="diagnosis"]').textContent = data.diagnosis;
+                modalElement.querySelector('a[name="body_site"]').textContent = data.body_site;
+            },
+
+            getVariantData: function(blockId) {
+                fetch(`/blocks/get_block_vaiants?id=${blockId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        this.initializeDataTable()
+                    });
+            },
+
+            showNoDataMessage: function(message) {
+                tabContainer.innerHTML = `
+                    <div class="card">
+                        <div class="card-body p-10 text-center">
+                            <i class="ki-duotone ki-information-5 fs-5x text-primary mb-5">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                                <span class="path3"></span>
+                            </i>
+                            <p class="fs-3 fw-semibold text-gray-800 mb-2">${message}</p>
+                            <p class="fs-6 text-gray-600">Please select a different area or check if analysis has been completed.</p>
+                        </div>
+                    </div>
+                `;
+            },
+
+            createTab: function(id, text, isActive) {
+                const li = document.createElement('li');
+                li.className = 'nav-item';
+                li.innerHTML = `
+                    <a class="nav-link text-active-primary pb-4 ${isActive ? 'active' : ''}"
+                       data-bs-toggle="tab"
+                       href="#${id}">
+                       ${text}
+                    </a>`;
+                tabContainer.appendChild(li);
+            },
+
+            createTabPane: function(id, analysis, isActive, blockId) {
+                const div = document.createElement('div');
+                div.className = `tab-pane fade ${isActive ? 'show active' : ''}`;
+                div.id = id;
+                div.innerHTML = `
+                    <div class="card card-flush mt-2 flex-row-fluid overflow-hidden">
+                        <div class="card-body pt-0">
+                            <div class="table-responsive">
+                                <table id="variant_datatable_${id}" class="table align-middle table-row-dashed fs-6 gy-5">
+                                    <thead>
+                                        <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
+                                            <th>Area</th>
+                                            <th>Sample Library</th>
+                                            <th>Gene</th>
+                                            <th>P Variant</th>
+                                            <th>Coverage</th>
+                                            <th>VAF</th>
+                                            <th class="text-end min-w-100px">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="text-gray-600 fw-semibold"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>`;
+                tabContainer.appendChild(div);
+
+                // Initialize DataTable with server-side processing
+                initializeDataTable(`variant_datatable_${id}`, blockId, analysis.analysis_id);
+            },
+
+            initializeDataTable: function(tableId, areaId) {
+                $(`#${tableId}`).DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: {
+                        url: `/variant/get_variants_by_area`,
+                        type: 'GET',
+                        data: {
+                            area_id: areaId,
+                        }
+                    },
+                    columns: [
+                        {
+                            data: 'areas',
+                            className: 'text-gray-800 text-hover-primary'
+                        },
+                        {
+                            data: 'sample_lib',
+                            className: 'text-gray-800 text-hover-primary'
+                        },
+                        {
+                            data: 'genes',
+                            className: 'text-gray-800'
+                        },
+                        {
+                            data: 'p_variant',
+                            className: 'text-gray-800'
+                        },
+                        {
+                            data: 'coverage',
+                            className: 'text-gray-800'
+                        },
+                        {
+                            data: 'vaf',
+                            className: 'text-gray-800',
+                        },
+                        {
+                            data: null,
+                            className: 'text-end',
+                            render: function() {
+                                return `
+                                    <button type="button"
+                                            class="btn btn-icon btn-light-primary btn-sm"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="top"
+                                            title="View Details">
+                                        <i class="ki-duotone ki-eye fs-2">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                            <span class="path3"></span>
+                                        </i>
+                                    </button>
+                                `;
+                            }
+                        }
+                    ],
+                    order: [[0, 'asc']],  // Sort by areas by default
+                    pageLength: 10,
+                    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                    responsive: true
+                });
+            },
+
+        };
+
+        // start the modals
+        VariantModal.init();
+        VariantModalByArea.init();
     }
 
     // Public methods
