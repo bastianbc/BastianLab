@@ -11,6 +11,7 @@ from cns.models import Cns
 from django.db.models import Max, Count
 from analysisrun.models import AnalysisRun
 from sequencingfile.models import SequencingFileSet
+from sequencingrun.models import SequencingRun
 
 class FileModel(models.Model):
     """Base model (concrete) to allow proxy models"""
@@ -31,10 +32,17 @@ class FileProxyManager(models.Manager):
         self.VALID_FILENAME_REGEX = re.compile(
             r'^[A-Za-z0-9\-]+(?:_[A-Za-z0-9]+)*\.(?:[A-Z0-9]+_Final\.annovar\.hg19_multianno_Filtered\.txt|Tumor_dedup_BSQR\.cns|fastq\.gz)$'
         )
-    def get_variant_file(self, entry):
+    def get_variant_file(self, entry, type_, entry_name):
         try:
-            variant = VariantFile.objects.get(name=entry.name.strip())
-            return variant.name
+            if type_ == "directory":
+                sr = SequencingRun.objects.filter(name=entry_name)
+                print(sr)
+                if sr:
+                    return sr.first().name
+                return "Sequencing Run Not Located"
+            else:
+                variant = VariantFile.objects.get(name=entry.name.strip())
+                return variant.name
         except VariantFile.DoesNotExist:
             return ""
 
@@ -93,7 +101,7 @@ class FileProxyManager(models.Manager):
                 return {
                     "id": 1,
                     "name": entry_name,
-                    "variant_file": self.get_variant_file(entry) if is_file else "",
+                    "variant_file": self.get_variant_file(entry, type_, entry_name),
                     "dir": entry_path,
                     "type": type_,
                     "status": self.get_status(type_, entry_name, model, label)
