@@ -202,7 +202,7 @@ def get_file_set(sr, sl):
         print(f"SequencingFileSet not found {sr, sl}")
 
 def register_new_fastq_files():
-    file = Path(Path(__file__).parent.parent / "uploads" / "df_fq.csv")
+    file = Path(Path(__file__).parent / "df_fq.csv")
     df = pd.read_csv(file)
     df = df.reset_index()
     for index, row in df.iterrows():
@@ -388,7 +388,7 @@ def create_file(file, prefix):
 
 def create_file_from_df_fq():
     execute_rules()
-    file = Path(Path(__file__).parent.parent / "uploads" / "df_fq.csv")
+    file = Path(Path(__file__).parent / "df_fq.csv")
     df = pd.read_csv(file)
     print(df.count())
     '''sample_lib
