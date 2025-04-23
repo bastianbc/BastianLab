@@ -99,7 +99,7 @@ def match_sl_fastq_file_2(request):
 
 
 
-def generate_file_set(file, sample_lib, seq_run):
+def generate_file_set(file, path, sample_lib, seq_run):
     try:
         match = re.match(r'.*[-_]([ACTG]{6,8})[-_]', file)
         file_type = ""
@@ -135,11 +135,13 @@ def generate_file_set(file, sample_lib, seq_run):
         file_set, _ = SequencingFileSet.objects.get_or_create(prefix=prefix)
         file_set.sample_lib = sample_lib
         file_set.sequencing_run = seq_run
+        file_set.path = path
         file_set.save()
         print("file_set generated", prefix, "------", file)
         return file_set
     except Exception as e:
         print(f"Fileset not created {file} {e}")
+        return None
 
 
 def find_sample(file_name):
@@ -176,11 +178,13 @@ def register_new_fastq_files():
                 sl = find_sample(row['file'])
             if not file.sequencing_file_set.sequencing_run:
                 sr = find_seqrun(row['path'])
-            generate_file_set(row['file'], sl, sr)
+            file_set = generate_file_set(row['file'], sl, sr)
         else:
             sl = find_sample(row['file'])
             sr = find_seqrun(row['path'])
-            generate_file_set(row['file'], sl, sr)
+            file_set = generate_file_set(row['file'], sl, sr)
+        file.sequencing_file_set = file_set
+        file.save()
 
 
 
