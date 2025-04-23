@@ -156,9 +156,10 @@ def find_sample(file_name):
 def find_seqrun(path):
     try:
         sr_name = path.split("/")[1]
-        SequencingRun.objects.get(name=sr_name)
+        return SequencingRun.objects.get(name=sr_name)
     except:
         print(f"Seq Run not found {path}")
+        return None
 
 def get_file_set(sr, sl):
     try:
