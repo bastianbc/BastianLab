@@ -158,7 +158,7 @@ def find_seqrun(path):
         sr_name = path.split("/")[1]
         SequencingRun.objects.get(name=sr_name)
     except:
-        print(f"Seq Run not found {sr_name}")
+        print(f"Seq Run not found {path}")
 
 def get_file_set(sr, sl):
     try:
@@ -174,14 +174,15 @@ def register_new_fastq_files():
         file, created = SequencingFile.objects.get_or_create(name=row['file'])
         if file.sequencing_file_set:
             if not file.sequencing_file_set.sequencing_run or not file.sequencing_file_set.sample_lib:
-                print(file.name)
+                print("SL % SR missing", file.name)
+                sl = find_sample(row['file'])
+                sr = find_seqrun(row['path'])
+                fs = file.sequencing_file_set
+                fs.sample_lib = sl
+                fs.sequencing_run = sr
+                fs.save()
             continue
-            # sl, sr = file.sequencing_file_set.sample_lib, file.sequencing_file_set.sequencing_run
-            # if not file.sequencing_file_set.sample_lib:
-            #     sl = find_sample(row['file'])
-            # if not file.sequencing_file_set.sequencing_run:
-            #     sr = find_seqrun(row['path'])
-            # file_set = generate_file_set(row['file'], sl, sr)
+
         else:
             sl = find_sample(row['file'])
             sr = find_seqrun(row['path'])
