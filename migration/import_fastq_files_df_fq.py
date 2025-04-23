@@ -99,94 +99,57 @@ def match_sl_fastq_file_2(request):
 
 
 
-def generate_file_set(file, seq_run, sample_lib):
-    match = re.match(r'.*[-_]([ACTG]{6,8})[-_]', file)
-    file_type = ""
-    if "fastq" in file:
-        file_type = "fastq"
-        prefix = file.split("_L0")[0] if "_L0" in file else file.split("_001")[0] if "_001" in file else None
-    elif ".sorted" in file:
-        file_type = "bam"
-        prefix = file.split(".sorted")[0]
-    elif ".sort" in file:
-        file_type = "bam"
-        prefix = file.split(".sort")[0]
-    elif ".removedupes" in file:
-        file_type = "bam"
-        prefix = file.split(".removedupes")[0]
-    elif ".recal" in file:
-        file_type = "bam"
-        prefix = file.split(".recal")[0]
-    elif "deduplicated.realign.bam" in file:
-        file_type = "bam"
-        prefix = file.split(".deduplicated.realign.bam")[0]
-    elif file.endswith(".bai"):
-        file_type = "bai"
-        prefix = file.split(".bai")[0]
-    elif file.endswith(".bam"):
-        file_type = "bam"
-        prefix = file.split(".bam")[0]
-    if match:
-        dna = match.group(1)
-        prefix = file.split(dna)[0] + dna
-    if prefix is None:
-        prefix = file.split(".")[0]
-    file_set, _ = SequencingFileSet.objects.get_or_create(prefix=prefix,
-                                                          sequencing_run=seq_run,
-                                                          sample_lib=sample_lib)
-    print("file_set generated", prefix, "------", file)
-    return file_set
-
-
-def find_path_seq_run_for_file_sets():
-    q = Q(Q(sequencing_run__isnull=True) | Q(path__isnull=True))
-    fs = SequencingFileSet.objects.filter(q).order_by('prefix')
-    file = Path(Path(__file__).parent.parent / "uploads" / "df_fq_bcb0079.csv")
-    df = pd.read_csv(file)
-    df = df.reset_index()  # make sure indexes pair with number of rows
-    for file_set in fs:
-        try:
-            # Print the prefix
-            print("prefix = ", file_set.prefix)
-
-            path = df[df['HiSeqData/'].str.contains(file_set.prefix)]["path"].values[0]
-            file_set.path = path
-            file_set.save()
-
-            sr = path.split("/")[1]
-            print("seq_run = ", sr)
-
-            patterns = [
-                (r'.*BCB(\d+).*', "BCB", "_saved__BCB_"),
-                (r'.*BB(\d+).*', "", "_saved__BB_"),
-                (r'.*SGPC-(\d+).*', "", "_saved__SGPC_"),
-                (r'.*AGEX-(\d+).*', "", "_saved__AGEX_"),
-                (r'.*IYEH(\d+).*', "", "_saved__IYEH_"),
-                (r'.*Hunter_RNAseq.*', "", "saved__Hunter_RNAseq_"),
-                (r'.*VisiumCytAssit_MW.*', "", "saved__VisiumCytAssit_MW_"),
-                (r'.*Public ChIp-seq data.*', "", "saved__Public ChIp-seq data_"),
-                (r'.*VisiumCytAssit_MW.*', "", "saved__VisiumCytAssit_MW_"),
-                (r'.*RNA-seq.*', "", "saved__RNA-seq_"),
-            ]
-
-            for pattern, prefix, message in patterns:
-                match = re.match(pattern, sr)
-                if match:
-                    sequencing_run_name = prefix + match.group(1) if prefix else sr
-                    file_set.sequencing_run, _ = SequencingRun.objects.get_or_create(name=sequencing_run_name)
-                    file_set.save()
-                    print(message * 4)
-        except Exception as e:
-            print(e)
+def generate_file_set(file, sample_lib, seq_run):
+    try:
+        match = re.match(r'.*[-_]([ACTG]{6,8})[-_]', file)
+        file_type = ""
+        if "fastq" in file:
+            file_type = "fastq"
+            prefix = file.split("_L0")[0] if "_L0" in file else file.split("_001")[0] if "_001" in file else None
+        elif ".sorted" in file:
+            file_type = "bam"
+            prefix = file.split(".sorted")[0]
+        elif ".sort" in file:
+            file_type = "bam"
+            prefix = file.split(".sort")[0]
+        elif ".removedupes" in file:
+            file_type = "bam"
+            prefix = file.split(".removedupes")[0]
+        elif ".recal" in file:
+            file_type = "bam"
+            prefix = file.split(".recal")[0]
+        elif "deduplicated.realign.bam" in file:
+            file_type = "bam"
+            prefix = file.split(".deduplicated.realign.bam")[0]
+        elif file.endswith(".bai"):
+            file_type = "bai"
+            prefix = file.split(".bai")[0]
+        elif file.endswith(".bam"):
+            file_type = "bam"
+            prefix = file.split(".bam")[0]
+        if match:
+            dna = match.group(1)
+            prefix = file.split(dna)[0] + dna
+        if prefix is None:
+            prefix = file.split(".")[0]
+        file_set, _ = SequencingFileSet.objects.get_or_create(prefix=prefix)
+        file_set.sample_lib = sample_lib
+        file_set.sequencing_run = seq_run
+        file_set.save()
+        print("file_set generated", prefix, "------", file)
+        return file_set
+    except Exception as e:
+        print(f"Fileset not created {file} {e}")
 
 
 def find_sample(file_name):
     try:
         match = re.match(r"^(.*?)(?:_S|\.)", file_name)
         if match and re.search(r"\b(bam|bai)\b", file_name):
-            SampleLib.objects.get(name=match.group(1))
+            return SampleLib.objects.get(name=match.group(1))
     except:
         print(f"Sample not found {file_name}")
+        return None
 
 def find_seqrun(path):
     try:
@@ -207,15 +170,17 @@ def register_new_fastq_files():
     df = df.reset_index()
     for index, row in df.iterrows():
         file, created = SequencingFile.objects.get_or_create(name=row['file'])
-        print(row['file'].split('.')[0])
-        if any(file_type[0] == "bam" for file_type in SequencingFile.FILE_TYPES):
-            file.type = 'bam'
-        if any(file_type[0] == "bai" for file_type in SequencingFile.FILE_TYPES):
-            file.type = 'bai'
-        file.save()
-        # print("sample_name: ", row['file'].split('_R')[0])
-        find_sample(row['file'])
-        find_seqrun(row['path'])
+        if file.sequencing_file_set:
+            sl, sr = file.sequencing_file_set.sample_lib, file.sequencing_file_set.sequencing_run
+            if not file.sequencing_file_set.sample_lib:
+                sl = find_sample(row['file'])
+            if not file.sequencing_file_set.sequencing_run:
+                sr = find_seqrun(row['path'])
+            generate_file_set(row['file'], sl, sr)
+        else:
+            sl = find_sample(row['file'])
+            sr = find_seqrun(row['path'])
+            generate_file_set(row['file'], sl, sr)
 
 
 
