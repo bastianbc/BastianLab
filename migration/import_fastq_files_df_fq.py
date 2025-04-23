@@ -184,6 +184,14 @@ def register_new_fastq_files():
             sr = find_seqrun(row['path'])
             file_set = generate_file_set(row['file'], sl, sr)
         file.sequencing_file_set = file_set
+        if "fastq" in row['file'].lower():
+            _type = "fastq"
+        elif "bai" in row['file'].lower():
+            _type = "bai"
+        else:
+            _type = "bam"
+
+        file.type = _type
         file.save()
 
 
