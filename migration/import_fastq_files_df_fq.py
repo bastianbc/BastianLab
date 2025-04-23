@@ -181,7 +181,15 @@ def register_new_fastq_files():
                 fs.sample_lib = sl
                 fs.sequencing_run = sr
                 fs.save()
+                if "fastq" in row['file'].lower():
+                    _type = "fastq"
+                elif "bai" in row['file'].lower():
+                    _type = "bai"
+                else:
+                    _type = "bam"
 
+                file.type = _type
+                file.save()
             continue
 
         else:
