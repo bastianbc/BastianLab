@@ -173,26 +173,29 @@ def register_new_fastq_files():
     for index, row in df.iterrows():
         file, created = SequencingFile.objects.get_or_create(name=row['file'])
         if file.sequencing_file_set:
-            sl, sr = file.sequencing_file_set.sample_lib, file.sequencing_file_set.sequencing_run
-            if not file.sequencing_file_set.sample_lib:
-                sl = find_sample(row['file'])
-            if not file.sequencing_file_set.sequencing_run:
-                sr = find_seqrun(row['path'])
-            file_set = generate_file_set(row['file'], sl, sr)
+            if not file.sequencing_file_set.sequencing_run or not file.sequencing_file_set.sample_lib:
+                print(file.name)
+            continue
+            # sl, sr = file.sequencing_file_set.sample_lib, file.sequencing_file_set.sequencing_run
+            # if not file.sequencing_file_set.sample_lib:
+            #     sl = find_sample(row['file'])
+            # if not file.sequencing_file_set.sequencing_run:
+            #     sr = find_seqrun(row['path'])
+            # file_set = generate_file_set(row['file'], sl, sr)
         else:
             sl = find_sample(row['file'])
             sr = find_seqrun(row['path'])
             file_set = generate_file_set(row['file'], sl, sr)
-        file.sequencing_file_set = file_set
-        if "fastq" in row['file'].lower():
-            _type = "fastq"
-        elif "bai" in row['file'].lower():
-            _type = "bai"
-        else:
-            _type = "bam"
+            file.sequencing_file_set = file_set
+            if "fastq" in row['file'].lower():
+                _type = "fastq"
+            elif "bai" in row['file'].lower():
+                _type = "bai"
+            else:
+                _type = "bam"
 
-        file.type = _type
-        file.save()
+            file.type = _type
+            file.save()
 
 
 
