@@ -177,10 +177,11 @@ def register_new_fastq_files():
                 print("SL % SR missing", file.name)
                 sl = find_sample(row['file'])
                 sr = find_seqrun(row['path'])
-                fs = file.sequencing_file_set
+                fs = SequencingFileSet.objects.get(prefix=file.sequencing_file_set.prefix)
                 fs.sample_lib = sl
                 fs.sequencing_run = sr
                 fs.save()
+
             continue
 
         else:
