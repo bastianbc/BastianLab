@@ -30,6 +30,7 @@ def filter_analysisruns(request):
     return JsonResponse(result)
 
 def save_analysis_run(request):
+    print("save_analysis_run_"*10)
     if request.method == "POST":
         form = AnalysisRunForm(request.POST)
         try:
@@ -45,6 +46,7 @@ def save_analysis_run(request):
                 analysis_run.save()
                 analysis_run.sheet.save(file_name, csv_file, save=False)
                 analysis_run.save()
+                print("Analysis Run Saved")
         except:
             return JsonResponse({"success": True})
     return JsonResponse({"success": True})

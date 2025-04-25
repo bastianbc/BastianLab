@@ -908,30 +908,56 @@ var KTDatatablesServerSide = function () {
               console.log(data);
               listBody.innerHTML = ''; // Clear existing content
 
+              const table = document.createElement("table");
+              table.classList.add("table", "table-sm"); // Added some basic table classes
+              const thead = document.createElement("thead");
+              const headerRow = document.createElement("tr");
+
+              // Create table headers
+              headerRow.appendChild(createTableHeader("")); // For the checkbox
+              headerRow.appendChild(createTableHeader("Patient"));
+              headerRow.appendChild(createTableHeader("Sample Lib"));
+              headerRow.appendChild(createTableHeader("Barcode"));
+              headerRow.appendChild(createTableHeader("NA Type"));
+              headerRow.appendChild(createTableHeader("Area Type"));
+              headerRow.appendChild(createTableHeader("Sequencing Run"));
+              headerRow.appendChild(createTableHeader("Footprint"));
+              headerRow.appendChild(createTableHeader("File"));
+              headerRow.appendChild(createTableHeader("Path"));
+              headerRow.appendChild(createTableHeader("Matching Normal SL"));
+              headerRow.appendChild(createTableHeader("Err"));
+              thead.appendChild(headerRow);
+              table.appendChild(thead);
+
+              const tbody = document.createElement("tbody");
               data.forEach(item => {
-                  const row = document.createElement("div");
-                  row.classList.add("row", "mt-1");
-
-                  row.appendChild(createCheckboxColumn());
-                  row.appendChild(createColumn(item.patient));
-                  row.appendChild(createColumn(item.sample_lib));
-                  row.appendChild(createColumn(item.barcode));
-                  row.appendChild(createColumn(item.na_type));
-                  row.appendChild(createColumn(item.area_type));
-                  row.appendChild(createColumn(item.sequencing_run));
-                  row.appendChild(createColumn(item.footprint));
-                  row.appendChild(createColumn(item.file));
-                  row.appendChild(createColumn(item.path));
-                  row.appendChild(createColumn(item.matching_normal_sl));
-                  row.appendChild(createColumn(item.err));
-
-                  listBody.appendChild(row);
+                const row = document.createElement("tr");
+                row.appendChild(createCheckboxCell()); // Use createCheckboxCell for table cells
+                row.appendChild(createTableCell(item.patient)); // Use createTableCell for table cells
+                row.appendChild(createTableCell(item.sample_lib));
+                row.appendChild(createTableCell(item.barcode));
+                row.appendChild(createTableCell(item.na_type));
+                row.appendChild(createTableCell(item.area_type));
+                row.appendChild(createTableCell(item.sequencing_run));
+                row.appendChild(createTableCell(item.footprint));
+                row.appendChild(createTableCell(item.file));
+                row.appendChild(createTableCell(item.path));
+                row.appendChild(createTableCell(item.matching_normal_sl));
+                row.appendChild(createTableCell(item.err));
+                tbody.appendChild(row);
               });
-          }
+              table.appendChild(tbody);
+              listBody.appendChild(table); // Append the entire table to the listBody
+            }
 
-          function createCheckboxColumn() {
-              const col = document.createElement("div");
-              col.classList.add("col-1");
+            function createTableHeader(textContent) {
+              const th = document.createElement("th");
+              th.textContent = textContent;
+              return th;
+            }
+
+            function createCheckboxCell() {
+              const td = document.createElement("td");
               const checkDiv = document.createElement("div");
               checkDiv.classList.add("form-check", "form-check-sm");
               const input = document.createElement("input");
@@ -939,38 +965,72 @@ var KTDatatablesServerSide = function () {
               input.classList.add("form-check-input");
               input.checked = true;
               checkDiv.append(input);
-              col.appendChild(checkDiv);
-              return col;
-          }
+              td.appendChild(checkDiv);
+              return td;
+            }
 
-          function createColumn(content, className = "col-1") {
-              const col = document.createElement("div");
-              col.classList.add(className);
+            function createTableCell(content) {
+              const td = document.createElement("td");
               const span = document.createElement("span");
               span.textContent = content;
-              col.appendChild(span);
-              return col;
-          }
+              td.appendChild(span);
+              return td;
+            }
 
-          function generateCSV() {
-              const headerCells = document.querySelectorAll('#analysis-sheet-list .list-header .row div');
-              const headers = Array.from(headerCells).map(header => header.textContent.trim());
-              let csvContent = headers.join(',') + '\n';
+            function generateCSV() {
+                console.log("generateCSV");
 
-              const rows = document.querySelectorAll('#analysis-sheet-list .list-body .row');
+                const table = document.querySelector('#analysis-sheet-list table');
+                if (!table) {
+                    console.error("Table not found!");
+                    return;
+                }
 
-              rows.forEach(row => {
-                  const checkbox = row.querySelector('input[type="checkbox"]');
-                  if (checkbox.checked) {
-                      const columns = row.querySelectorAll('div:not(.col-1) span');
-                      const rowData = Array.from(columns).map(col => col.textContent.trim()).join(',');
-                      csvContent += `${rowData}\n`;
-                  }
-              });
+                const headers = Array.from(table.querySelectorAll('thead th'))
+                    .map(th => th.textContent.trim());
+                let csvContent = headers.join(',') + '\n';
 
-              const sheetContent = document.querySelector('input[name="sheet_content"]');
-              sheetContent.value = csvContent;
-          }
+                const rows = table.querySelectorAll('tbody tr');
+                rows.forEach(row => {
+                    const checkbox = row.querySelector('input[type="checkbox"]');
+                    if (checkbox && checkbox.checked) {
+                        const cells = row.querySelectorAll('td:not(:first-child)');
+                        const rowData = Array.from(cells)
+                            .map(td => {
+                                // Escape quotes and handle commas in data
+                                let text = td.textContent.trim();
+                                if (text.includes('"') || text.includes(',')) {
+                                    text = '"' + text.replace(/"/g, '""') + '"';
+                                }
+                                return text;
+                            })
+                            .join(',');
+                        csvContent += rowData + '\n';
+                    }
+                });
+
+                // Create and trigger download directly
+                downloadCSV(csvContent);
+            }
+
+            function downloadCSV(csvContent) {
+                // Create a blob with the CSV content
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+
+                // Create download link
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+
+                // Set up download properties
+                link.setAttribute('href', url);
+                link.setAttribute('download', 'table-data.csv');
+                link.style.visibility = 'hidden';
+
+                // Add to document, trigger download, and clean up
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
 
           function submitForm() {
               generateCSV();
