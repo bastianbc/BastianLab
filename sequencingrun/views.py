@@ -239,7 +239,7 @@ def get_sample_libs_async(request):
     A list data formatted according to purpose.
     """
     selected_ids = json.loads(request.GET.get("selected_ids"))
-
+    print("Selected Ids: ", selected_ids)
     selected_sequencing_runs = SequencingRun.objects.filter(id__in=selected_ids).prefetch_related('sequencing_libs')
     # Function to get the related sequencing files for each sequencing run
     def get_sequencing_files(sequencing_file_set):
@@ -263,12 +263,13 @@ def get_sample_libs_async(request):
             'err':'',
         }
         for sequencing_file_set in seq_run.sequencing_file_sets.all():
+            print(sequencing_file_set)
             item["sequencing_run"] = seq_run.name
 
             sample_lib = sequencing_file_set.sample_lib
             if sample_lib:
                 item["sample_lib"] = sample_lib.name
-                item["barcode"] = sample_lib.barcode.name
+                item["barcode"] = sample_lib.barcode.name if sample_lib.barcode else ""
 
                 na_sl_link = sample_lib.na_sl_links.first()
                 if na_sl_link:
@@ -317,6 +318,6 @@ def get_sample_libs_async(request):
 
             data.append(item)
 
-    # print(json.dumps(data))
 
+    print("$"*100, data)
     return JsonResponse(data, safe=False)

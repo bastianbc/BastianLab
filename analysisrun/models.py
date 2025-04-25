@@ -10,6 +10,7 @@ class AnalysisRun(models.Model):
 
     GENOME_CHOICES = (
         ("hg19", "Hg19"),
+        ("hg38", "Hg38"),
     )
 
     STATUS_CHOICES = (
