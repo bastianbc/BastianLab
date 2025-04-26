@@ -15,9 +15,7 @@ def _get_authorizated_queryset(seq_runs):
     ).values('sequencing_run__id')
     path_subquery = Subquery(
         SequencingFileSet.objects
-        .filter(
-            sample_lib=OuterRef('pk'),
-        )
+        .filter(sample_lib=OuterRef('pk'))
         .order_by('pk')
         .values('path')[:1]
     )

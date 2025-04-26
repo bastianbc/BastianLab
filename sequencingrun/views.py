@@ -18,6 +18,8 @@ from capturedlib.models import SL_CL_LINK
 import json
 from analysisrun.forms import AnalysisRunForm
 from sequencingfile.views import execute_mount_script
+from sheet.api import _get_authorizated_queryset
+from sheet.service import CustomSampleLibSerializer
 
 @permission_required("sequencingrun.view_sequencingrun",raise_exception=True)
 def sequencingruns(request):
@@ -240,83 +242,103 @@ def get_sample_libs_async(request):
     """
     selected_ids = json.loads(request.GET.get("selected_ids"))
     print("Selected Ids: ", selected_ids)
-    selected_sequencing_runs = SequencingRun.objects.filter(id__in=selected_ids).prefetch_related('sequencing_libs')
-    # Function to get the related sequencing files for each sequencing run
-    def get_sequencing_files(sequencing_file_set):
-        files = SequencingFile.objects.filter(sequencing_file_set=sequencing_file_set).values('name', 'checksum')
-        return {file['name']: file['checksum'] for file in files}
-
-    data = []
-
-    for seq_run in selected_sequencing_runs:
-        item = {
-            'patient': '',
-            'sample_lib': '',
-            'barcode': '',
-            'na_type': '',
-            'area_type': '',
-            'sequencing_run': '',
-            'footprint': '',
-            'file': '',
-            'path': '',
-            'matching_normal_sl': '',
-            'err':'',
-        }
-        for sequencing_file_set in seq_run.sequencing_file_sets.all():
-            print(sequencing_file_set)
-            item["sequencing_run"] = seq_run.name
-
-            sample_lib = sequencing_file_set.sample_lib
-            if sample_lib:
-                item["sample_lib"] = sample_lib.name
-                item["barcode"] = sample_lib.barcode.name if sample_lib.barcode else ""
-
-                na_sl_link = sample_lib.na_sl_links.first()
-                if na_sl_link:
-                    nuc_acid = na_sl_link.nucacid
-                    item["na_type"] = nuc_acid.na_type
-
-                    area_na_link = nuc_acid.area_na_links.first()
-                    if area_na_link:
-                        area = area_na_link.area
-                        item["area_type"] = area.area_type.value
-
-                        patient = area.block.patient
-
-                        # The patients who has sample libraries that area type is "Normal"
-                        matching_normal_sl = []
-                        if patient:
-                            normal_sample_libs = SampleLib.objects.filter(na_sl_links__nucacid__area_na_links__area__block__patient=patient,
-                                                                          na_sl_links__nucacid__area_na_links__area__area_type__value='normal')
-                            matching_normal_sl = list(normal_sample_libs.values_list('name', flat=True))
-
-                            item["patient"] = patient.pat_id
-                            item["matching_normal_sl"] = matching_normal_sl
-                        else:
-                            item["err"] = "not found patient"
-                    else:
-                        item["err"] = "not found area_na_link"
-                else:
-                    item["err"] = "not found na_sl_link"
-
-                if sample_lib.sl_cl_links is not None:
-                    sl_cl_link = sample_lib.sl_cl_links.first()
-
-                    if sl_cl_link:
-                        captured_lib = sl_cl_link.captured_lib
-                        item["footprint"] = captured_lib.bait.name
-                    else:
-                        item["err"] = "not found sl_cl_link"
-                else:
-                    item["err"] = "not found sl_cl_links of a sample_lib"
-            else:
-                item["err"] = "not found samplelib"
-
-
-            item["files"] = get_sequencing_files(sequencing_file_set)
-            item["path"] = sequencing_file_set.path if sequencing_file_set.path else f"HiSeqData/{seq_run.name}"
-
-            data.append(item)
+    sequencing_runs = SequencingRun.objects.filter(id__in=selected_ids)
+    qs=_get_authorizated_queryset(sequencing_runs)
+    print(qs)
+    serializer = CustomSampleLibSerializer(qs, many=True)
+    result = dict()
+    result['data'] = serializer.data
+    print(serializer.data)
+    return JsonResponse(serializer.data, safe=False)
+    # selected_sequencing_runs = SequencingRun.objects.filter(id__in=selected_ids).prefetch_related('sequencing_libs')
+    # # Function to get the related sequencing files for each sequencing run
+    # def get_sequencing_files(sequencing_file_set):
+    #     files = SequencingFile.objects.filter(sequencing_file_set=sequencing_file_set).values('name', 'checksum')
+    #     return {file['name']: file['checksum'] for file in files}
+    #
+    # data = []
+    #     @patient = serializers.CharField(read_only=True)
+    #     @seq_run = serializers.SerializerMethodField()
+    #     @na_type = serializers.CharField(read_only=True)
+    #     @bait = serializers.CharField(read_only=True)
+    #     @area_type = serializers.CharField(read_only=True)
+    #     @matching_normal_sl = serializers.CharField(read_only=True)
+    #     @barcode_name = serializers.CharField(read_only=True)
+    #     fastq = serializers.CharField(read_only=True)
+    #     bam = serializers.CharField(read_only=True)
+    #     bai = serializers.CharField(read_only=True)
+    #     path_fastq = serializers.CharField(read_only=True)
+    #     path_bam = serializers.CharField(read_only=True)
+    #     path_bai = serializers.CharField(read_only=True)
+    # for seq_run in selected_sequencing_runs:
+    #     item = {
+    #         'patient': '',
+    #         'sample_lib': '',
+    #         'barcode': '',
+    #         'na_type': '',
+    #         'area_type': '',
+    #         'sequencing_run': '',
+    #         'footprint': '',
+    #         'file': '',
+    #         'path': '',
+    #         'matching_normal_sl': '',
+    #         'err':'',
+    #     }
+    #     for sequencing_file_set in seq_run.sequencing_file_sets.all():
+    #         print(sequencing_file_set)
+    #         item["sequencing_run"] = seq_run.name
+    #
+    #         sample_lib = sequencing_file_set.sample_lib
+    #         if sample_lib:
+    #             item["sample_lib"] = sample_lib.name
+    #             item["barcode"] = sample_lib.barcode.name if sample_lib.barcode else ""
+    #
+    #             na_sl_link = sample_lib.na_sl_links.first()
+    #             if na_sl_link:
+    #                 nuc_acid = na_sl_link.nucacid
+    #                 item["na_type"] = nuc_acid.na_type
+    #
+    #                 area_na_link = nuc_acid.area_na_links.first()
+    #                 if area_na_link:
+    #                     area = area_na_link.area
+    #                     item["area_type"] = area.area_type.value
+    #
+    #                     patient = area.block.patient
+    #
+    #                     # The patients who has sample libraries that area type is "Normal"
+    #                     matching_normal_sl = []
+    #                     if patient:
+    #                         normal_sample_libs = SampleLib.objects.filter(na_sl_links__nucacid__area_na_links__area__block__patient=patient,
+    #                                                                       na_sl_links__nucacid__area_na_links__area__area_type__value='normal')
+    #                         matching_normal_sl = list(normal_sample_libs.values_list('name', flat=True))
+    #
+    #                         item["patient"] = patient.pat_id
+    #                         item["matching_normal_sl"] = matching_normal_sl
+    #                     else:
+    #                         item["err"] = "not found patient"
+    #                 else:
+    #                     item["err"] = "not found area_na_link"
+    #             else:
+    #                 item["err"] = "not found na_sl_link"
+    #
+    #             if sample_lib.sl_cl_links is not None:
+    #                 sl_cl_link = sample_lib.sl_cl_links.first()
+    #
+    #                 if sl_cl_link:
+    #                     captured_lib = sl_cl_link.captured_lib
+    #                     item["footprint"] = captured_lib.bait.name
+    #                 else:
+    #                     item["err"] = "not found sl_cl_link"
+    #             else:
+    #                 item["err"] = "not found sl_cl_links of a sample_lib"
+    #         else:
+    #             item["err"] = "not found samplelib"
+    #
+    #
+    #         item["files"] = get_sequencing_files(sequencing_file_set)
+    #         item["path"] = sequencing_file_set.path if sequencing_file_set.path else f"HiSeqData/{seq_run.name}"
+    #
+    #         data.append(item)
 
 
     print("$"*100, data)
