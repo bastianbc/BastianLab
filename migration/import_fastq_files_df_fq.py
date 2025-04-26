@@ -189,6 +189,9 @@ def register_new_fastq_files():
                 else:
                     _type = "bam"
 
+                if not fs.path:
+                    fs.path = row['path']
+                    fs.save()
                 file.type = _type
                 file.save()
             continue
