@@ -888,6 +888,18 @@ var KTDatatablesServerSide = function () {
           }
 
           function fetchData() {
+              console.log("loadingel");
+                const loadingEl = document.createElement("div");
+                document.body.prepend(loadingEl);
+                loadingEl.classList.add("page-loader");
+                loadingEl.classList.add("flex-column");
+                loadingEl.classList.add("bg-dark");
+                loadingEl.classList.add("bg-opacity-25");
+                loadingEl.innerHTML = `
+                    <span class="spinner-border text-primary" role="status"></span>
+                    <span class="text-gray-800 fs-6 fw-semibold mt-5">"Sequencing Files are loading..."</span>
+                `;
+                KTApp.showPageLoading();
               $.ajax({
                   type: "GET",
                   url: "/sequencingrun/get_sample_libs_async",
@@ -895,87 +907,90 @@ var KTDatatablesServerSide = function () {
                       "selected_ids": JSON.stringify(selectedRows),
                   },
                   error: function (xhr, ajaxOptions, thrownError) {
+                      console.log("loadingel2");
+                      loadingEl.remove();
                       swal("Error getting records!", "Please try again", "error");
                   }
               }).done(function (result) {
+                  console.log("loadingel3");
+                  loadingEl.remove();
                   populateTable(result);
                   modal.show();
               });
           }
 
           function populateTable(data) {
-              console.log("populate:");
-              console.log(data);
-              listBody.innerHTML = ''; // Clear existing content
+            console.log("populate:");
+            console.log(data);
 
-              const table = document.createElement("table");
-              table.classList.add("table", "table-sm"); // Added some basic table classes
-              const thead = document.createElement("thead");
-              const headerRow = document.createElement("tr");
+            const listBody = document.querySelector("#analysis-sheet-list tbody"); // Find the existing tbody
+            listBody.innerHTML = ''; // Clear previous rows
 
-              // Create table headers
-              headerRow.appendChild(createTableHeader("")); // For the checkbox
-              headerRow.appendChild(createTableHeader("Patient"));
-              headerRow.appendChild(createTableHeader("Sample Lib"));
-              headerRow.appendChild(createTableHeader("Barcode"));
-              headerRow.appendChild(createTableHeader("NA Type"));
-              headerRow.appendChild(createTableHeader("Area Type"));
-              headerRow.appendChild(createTableHeader("Sequencing Run"));
-              headerRow.appendChild(createTableHeader("Footprint"));
-              headerRow.appendChild(createTableHeader("File"));
-              headerRow.appendChild(createTableHeader("Path"));
-              headerRow.appendChild(createTableHeader("Matching Normal SL"));
-              headerRow.appendChild(createTableHeader("Err"));
-              thead.appendChild(headerRow);
-              table.appendChild(thead);
+            data.forEach(item => {
+                var path = "";
+                if (item.path_fastq) {
+                    path = `${item.path_fastq}`;
+                } else if (item.path_bam) {
+                    path = `${item.path_bam}`;
+                } else if (item.path_bai) {
+                    path = `${item.path_bai}`;
+                }
+                console.log(path);
+                let file = "";
+                if (item.fastq) {
+                    file = item.fastq;
+                } else if (item.bam) {
+                    file = item.bam;
+                } else if (item.bai) {
+                    file = item.bai;
+                }
 
-              const tbody = document.createElement("tbody");
-              data.forEach(item => {
                 const row = document.createElement("tr");
-                row.appendChild(createCheckboxCell()); // Use createCheckboxCell for table cells
-                row.appendChild(createTableCell(item.patient)); // Use createTableCell for table cells
-                row.appendChild(createTableCell(item.sample_lib));
-                row.appendChild(createTableCell(item.barcode));
-                row.appendChild(createTableCell(item.na_type));
-                row.appendChild(createTableCell(item.area_type));
-                row.appendChild(createTableCell(item.sequencing_run));
-                row.appendChild(createTableCell(item.footprint));
-                row.appendChild(createTableCell(item.file));
-                row.appendChild(createTableCell(item.path));
-                row.appendChild(createTableCell(item.matching_normal_sl));
-                row.appendChild(createTableCell(item.err));
-                tbody.appendChild(row);
-              });
-              table.appendChild(tbody);
-              listBody.appendChild(table); // Append the entire table to the listBody
-            }
 
-            function createTableHeader(textContent) {
-              const th = document.createElement("th");
-              th.textContent = textContent;
-              return th;
-            }
+                row.appendChild(createCheckboxCell());
+                row.appendChild(createTableCell("#")); // Or you can use row index if needed
+                row.appendChild(createTableCell(item.patient || ""));
+                row.appendChild(createTableCell(item.barcode_name || ""));
+                row.appendChild(createTableCell(item.na_type || ""));
+                row.appendChild(createTableCell(item.area_type || ""));
+                row.appendChild(createTableCell(item.seq_run || ""));
+                row.appendChild(createTableCell(item.name || ""));
+                row.appendChild(createTableCell(item.bait || ""));
+                row.appendChild(createTableCell(file));
+                row.appendChild(createTableCell(path));
+                row.appendChild(createTableCell(item.matching_normal_sl || ""));
 
-            function createCheckboxCell() {
-              const td = document.createElement("td");
-              const checkDiv = document.createElement("div");
-              checkDiv.classList.add("form-check", "form-check-sm");
-              const input = document.createElement("input");
-              input.type = "checkbox";
-              input.classList.add("form-check-input");
-              input.checked = true;
-              checkDiv.append(input);
-              td.appendChild(checkDiv);
-              return td;
-            }
+                listBody.appendChild(row);
+            });
+        }
 
-            function createTableCell(content) {
-              const td = document.createElement("td");
-              const span = document.createElement("span");
-              span.textContent = content;
-              td.appendChild(span);
-              return td;
-            }
+        function createTableHeader(textContent) {
+            const th = document.createElement("th");
+            th.textContent = textContent;
+            return th;
+        }
+
+        function createCheckboxCell() {
+            const td = document.createElement("td");
+            const checkDiv = document.createElement("div");
+            checkDiv.classList.add("form-check", "form-check-sm", "form-check-custom", "form-check-solid", "me-3");
+            const input = document.createElement("input");
+            input.type = "checkbox";
+            input.classList.add("form-check-input");
+            input.checked = true;
+            checkDiv.appendChild(input);
+            td.appendChild(checkDiv);
+            return td;
+        }
+
+        function createTableCell(content) {
+            const td = document.createElement("td");
+            const span = document.createElement("span");
+            span.textContent = content;
+            td.appendChild(span);
+            return td;
+        }
+
 
             function generateCSV() {
                 console.log("generateCSV");

@@ -123,10 +123,10 @@ def generate_file_set(file, path, sample_lib, seq_run):
             prefix = file.split(".deduplicated.realign.bam")[0]
         elif file.endswith(".bai"):
             file_type = "bai"
-            prefix = file.split(".bai")[0]
+            prefix = file.split(".")[0]
         elif file.endswith(".bam"):
             file_type = "bam"
-            prefix = file.split(".bam")[0]
+            prefix = file.split(".")[0]
         if match:
             dna = match.group(1)
             prefix = file.split(dna)[0] + dna
@@ -168,7 +168,7 @@ def get_file_set(sr, sl):
         print(f"SequencingFileSet not found {sr, sl}")
 
 def register_new_fastq_files():
-    file = Path(Path(__file__).parent / "df_fq.csv")
+    file = Path(Path(__file__).parent / "df_fq0421.csv")
     df = pd.read_csv(file)
     df = df.reset_index()
     for index, row in df.iterrows():

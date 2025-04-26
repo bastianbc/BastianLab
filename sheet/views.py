@@ -29,9 +29,11 @@ def get_sheet(request):
 
 
 def create_csv_sheet(request):
+    print(request)
     try:
         seq_runs = SequencingRun.objects.filter()
         query_set = query_by_args(request.user, seq_runs, **request.GET)
+        print(query_set)
         return generate_file(data=query_set, file_name="Analysis Report")
     except Exception as e:
         print(e)
