@@ -168,7 +168,7 @@ def get_file_set(sr, sl):
         print(f"SequencingFileSet not found {sr, sl}")
 
 def register_new_fastq_files():
-    file = Path(Path(__file__).parent / "df_fq_0421.csv")
+    file = Path(Path(__file__).parent / "df_fq.csv")
     df = pd.read_csv(file)
     df = df.reset_index()
     for index, row in df.iterrows():
