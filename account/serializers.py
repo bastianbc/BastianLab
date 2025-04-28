@@ -9,4 +9,6 @@ class AccountSerializer(serializers.ModelSerializer):
         fields = ("id","username","first_name","last_name","group","last_login",)
 
     def get_group(self,obj):
-        return obj.groups.first().name
+        if obj.groups:
+            return obj.groups.first().name
+        return ""
