@@ -3889,6 +3889,6 @@ def call_import_variants(request):
 
 
 def import_genes(request):
-    from .import_fastq_files_df_fq import register_new_fastq_files
-    register_new_fastq_files()
+    from .import_fastq_files_df_fq import find_seqrun_for_prefix
+    find_seqrun_for_prefix()
 

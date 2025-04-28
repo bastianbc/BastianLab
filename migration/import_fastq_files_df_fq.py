@@ -15,6 +15,106 @@ import re
 from pathlib import Path
 import pandas as pd
 
+l = ["AMLP-617_S104_L008_I1_001.fastq.gz",
+"AMLP-617_S104_L008_I2_001.fastq.gz",
+"AMLP-617_S104_L008_R1_001.fastq.gz",
+"AMLP-617_S104_L008_R2_001.fastq.gz",
+"AMLP-618_S105_L008_I1_001.fastq.gz",
+"AMLP-618_S105_L008_I2_001.fastq.gz",
+"AMLP-618_S105_L008_R1_001.fastq.gz",
+"AMLP-618_S105_L008_R2_001.fastq.gz",
+"CMELP-019_S673_L006_I1_001.fastq.gz",
+"CMELP-019_S673_L006_I2_001.fastq.gz",
+"CMELP-019_S673_L006_R1_001.fastq.gz",
+"CMELP-019_S673_L006_R2_001.fastq.gz",
+"CMELP-020_S674_L006_I1_001.fastq.gz",
+"CMELP-020_S674_L006_I2_001.fastq.gz",
+"CMELP-020_S674_L006_R1_001.fastq.gz",
+"CMELP-020_S674_L006_R2_001.fastq.gz",
+"CMELP-024_S675_L006_I1_001.fastq.gz",
+"CMELP-024_S675_L006_I2_001.fastq.gz",
+"CMELP-024_S675_L006_R1_001.fastq.gz",
+"CMELP-024_S675_L006_R2_001.fastq.gz",
+"CMELP-025_S676_L006_I1_001.fastq.gz",
+"CMELP-025_S676_L006_I2_001.fastq.gz",
+"CMELP-025_S676_L006_R1_001.fastq.gz",
+"CMELP-025_S676_L006_R2_001.fastq.gz",
+"CMELP-026_S677_L006_I1_001.fastq.gz",
+"CMELP-026_S677_L006_I2_001.fastq.gz",
+"CMELP-026_S677_L006_R1_001.fastq.gz",
+"CMELP-026_S677_L006_R2_001.fastq.gz",
+"CMELP-027_S678_L006_I1_001.fastq.gz",
+"CMELP-027_S678_L006_I2_001.fastq.gz",
+"CMELP-027_S678_L006_R1_001.fastq.gz",
+"CMELP-027_S678_L006_R2_001.fastq.gz",
+"CMELP-028_S679_L006_I1_001.fastq.gz",
+"CMELP-028_S679_L006_I2_001.fastq.gz",
+"CMELP-028_S679_L006_R1_001.fastq.gz",
+"CMELP-028_S679_L006_R2_001.fastq.gz",
+"CMELP-029_S680_L006_I1_001.fastq.gz",
+"CMELP-029_S680_L006_I2_001.fastq.gz",
+"CMELP-029_S680_L006_R1_001.fastq.gz",
+"CMELP-029_S680_L006_R2_001.fastq.gz",
+"CMELP-030_S681_L006_I1_001.fastq.gz",
+"CMELP-030_S681_L006_I2_001.fastq.gz",
+"CMELP-030_S681_L006_R1_001.fastq.gz",
+"CMELP-030_S681_L006_R2_001.fastq.gz",
+"CMELP-031_S682_L006_I1_001.fastq.gz",
+"CMELP-031_S682_L006_I2_001.fastq.gz",
+"CMELP-031_S682_L006_R1_001.fastq.gz",
+"CMELP-031_S682_L006_R2_001.fastq.gz",
+"CMELP-032_S683_L006_I1_001.fastq.gz",
+"CMELP-032_S683_L006_I2_001.fastq.gz",
+"CMELP-032_S683_L006_R1_001.fastq.gz",
+"CMELP-032_S683_L006_R2_001.fastq.gz",
+"CMELP-033_S684_L006_I1_001.fastq.gz",
+"CMELP-033_S684_L006_I2_001.fastq.gz",
+"CMELP-033_S684_L006_R1_001.fastq.gz",
+"CMELP-033_S684_L006_R2_001.fastq.gz",
+"CMELP-034_S685_L006_I1_001.fastq.gz",
+"CMELP-034_S685_L006_I2_001.fastq.gz",
+"CMELP-034_S685_L006_R1_001.fastq.gz",
+"CMELP-034_S685_L006_R2_001.fastq.gz",
+"CMELP-039_S686_L006_I1_001.fastq.gz",
+"CMELP-039_S686_L006_I2_001.fastq.gz",
+"CMELP-039_S686_L006_R1_001.fastq.gz",
+"CMELP-039_S686_L006_R2_001.fastq.gz",
+"CMELP-040_S687_L006_I1_001.fastq.gz",
+"CMELP-040_S687_L006_I2_001.fastq.gz",
+"CMELP-040_S687_L006_R1_001.fastq.gz",
+"CMELP-040_S687_L006_R2_001.fastq.gz",
+"CMELP-041_S688_L006_I1_001.fastq.gz",
+"CMELP-041_S688_L006_I2_001.fastq.gz",
+"CMELP-041_S688_L006_R1_001.fastq.gz",
+"CMELP-041_S688_L006_R2_001.fastq.gz",
+"CMELP-042_S689_L006_I1_001.fastq.gz",
+"CMELP-042_S689_L006_I2_001.fastq.gz",
+"CMELP-042_S689_L006_R1_001.fastq.gz",
+"CMELP-042_S689_L006_R2_001.fastq.gz",
+"CMELP-043_S690_L006_I1_001.fastq.gz",
+"CMELP-043_S690_L006_I2_001.fastq.gz",
+"CMELP-043_S690_L006_R1_001.fastq.gz",
+"CMELP-043_S690_L006_R2_001.fastq.gz",
+"CMELP-044_S691_L006_I1_001.fastq.gz",
+"CMELP-044_S691_L006_I2_001.fastq.gz",
+"CMELP-044_S691_L006_R1_001.fastq.gz",
+"CMELP-044_S691_L006_R2_001.fastq.gz",
+"CMELP-045_S692_L006_I1_001.fastq.gz",
+"CMELP-045_S692_L006_I2_001.fastq.gz",
+"CMELP-045_S692_L006_R1_001.fastq.gz",
+"CMELP-045_S692_L006_R2_001.fastq.gz",
+"DLP-141_S103_L008_I1_001.fastq.gz",
+"DLP-141_S103_L008_I2_001.fastq.gz",
+"DLP-141_S103_L008_R1_001.fastq.gz",
+"DLP-141_S103_L008_R2_001.fastq.gz",
+"RLP-275_S101_L008_I1_001.fastq.gz",
+"RLP-275_S101_L008_I2_001.fastq.gz",
+"RLP-275_S101_L008_R1_001.fastq.gz",
+"RLP-275_S101_L008_R2_001.fastq.gz",
+"RLP-276_S102_L008_I1_001.fastq.gz",
+"RLP-276_S102_L008_I2_001.fastq.gz",
+"RLP-276_S102_L008_R1_001.fastq.gz",
+"RLP-276_S102_L008_R2_001.fastq.gz"]
 
 def match_respectively_via_names(sl,files):
     l = ["16","19","20","21","22","23","24","25","28","89","AGLP","AM-",
@@ -167,9 +267,72 @@ def get_file_set(sr, sl):
     except:
         print(f"SequencingFileSet not found {sr, sl}")
 
+# def find_paths(df, l):
+#     for i in l:
+#         s = df[df["/"].str.contains(i)]
+#         print(s['file'].values[0])
+#         print(s['path'].values[0])
+#         file = SequencingFile.objects.get(name=s['file'].values[0])
+#         sf = file.sequencing_file_set
+#         sf.path = s['path'].values[0]
+#         sf.save()
+
+def execute_rules():
+    SequencingFileSet.objects.filter(prefix__regex=r'_R\d$').delete()
+    SequencingFileSet.objects.filter(prefix__regex=r'[ACTG]{6,8}.*S\d$').delete()
+    for fs in SequencingFileSet.objects.filter(sample_lib__isnull=True):
+        try:
+            match = re.match(r'([ACTG]{6,8})', fs.prefix)
+            if match:
+                name = fs.prefix.replace(match.group(1),"")
+                sl = SampleLib.objects.get(name=name)
+                fs.sample_lib = sl
+                fs.save()
+                print(sl)
+            elif re.search(r'S\d$', fs.prefix):
+                name = fs.prefix.split("_S")[0]
+                sl = SampleLib.objects.get(name=name)
+                fs.sample_lib = sl
+                fs.save()
+                print(sl)
+        except Exception as e:
+            print(e)
+
+def find_sl_for_prefix():
+    file_sets = SequencingFileSet.objects.filter(sample_lib__isnull=True)
+    for fs in file_sets:
+        match = re.match(r'^([^-\s]+)-[ACGT]{6,8}$', fs.prefix)
+        if match:
+            sl_name = match.group(1)
+        match = re.match(r'^(.*)_R\d+$', fs.prefix)
+        if match:
+            sl_name = match.group(1)
+        match = re.match(r'^(.*)_S\d+$', fs.prefix)
+        if match:
+            sl_name = match.group(1)
+        try:
+            sl = SampleLib.objects.get(name=sl_name)
+            fs.sample_lib = sl
+            fs.save()
+        except:
+            print("not found")
+
+def find_seqrun_for_prefix():
+    file_sets = SequencingFileSet.objects.filter(sequencing_run__isnull=True)
+    for fs in file_sets:
+        seq_run_name = fs.path.split('/')[1]
+
+        try:
+            sr = SequencingRun.objects.get(name=seq_run_name)
+            fs.sequencing_run = sr
+            fs.save()
+        except:
+            print("not found")
+
+
 def register_new_fastq_files():
-    file = Path(Path(__file__).parent / "df_fq.csv")
-    df = pd.read_csv(file)
+    path_file = Path(Path(__file__).parent / "df_fq.csv")
+    df = pd.read_csv(path_file)
     df = df.reset_index()
     for index, row in df.iterrows():
         file, created = SequencingFile.objects.get_or_create(name=row['file'])
@@ -210,6 +373,7 @@ def register_new_fastq_files():
 
             file.type = _type
             file.save()
+
 
 
 
