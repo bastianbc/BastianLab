@@ -197,7 +197,6 @@ class VariantCall(models.Model):
             ).distinct()
 
         def _get_area_variants_queryset(area_id):
-            print("&&&&", VariantCall.objects.filter(sample_lib__na_sl_links__nucacid__area_na_links__area__id=area_id).count())
             return VariantCall.objects.filter(sample_lib__na_sl_links__nucacid__area_na_links__area__id=area_id).annotate(
                 genes=F('g_variants__c_variants__gene__name'),
                 p_variant=F('g_variants__c_variants__p_variants__name_meta'),
@@ -304,9 +303,7 @@ class VariantCall(models.Model):
             if model_block:
                 queryset = _get_block_variants_queryset(block_id)
             elif model_area:
-                print("model area", area_id)
                 queryset = _get_area_variants_queryset(area_id)
-                print(queryset.count())
             else:
                 queryset = _get_authorizated_queryset()
 
@@ -366,9 +363,7 @@ class VariantCall(models.Model):
                     queryset = queryset.filter(sample_lib__na_sl_links__nucacid__area_na_links__area__block__id=int(search_value["id"]))
 
                 if search_value["model"] == "area":
-                    print(queryset)
                     queryset = queryset.filter(sample_lib__na_sl_links__nucacid__area_na_links__area__id=int(search_value["id"]))
-                    print(queryset)
 
             elif search_value:
                 queryset = queryset.filter(

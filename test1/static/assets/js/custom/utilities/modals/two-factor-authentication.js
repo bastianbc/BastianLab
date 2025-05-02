@@ -76,7 +76,6 @@ var KTModalTwoFactorAuthentication = function () {
 			// Validate form before submit
 			if (smsValidator) {
 				smsValidator.validate().then(function (status) {
-					console.log('validated!');
 
 					if (status == 'Valid') {
 						// Show loading indication
@@ -169,7 +168,6 @@ var KTModalTwoFactorAuthentication = function () {
 			// Validate form before submit
 			if (appsValidator) {
 				appsValidator.validate().then(function (status) {
-					console.log('validated!');
 
 					if (status == 'Valid') {
 						appsSubmitButton.setAttribute('data-kt-indicator', 'on');

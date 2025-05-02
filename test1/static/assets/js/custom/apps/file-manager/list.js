@@ -336,8 +336,7 @@ var KTFileManagerList = function () {
                 // Validate form before submit
                 if (validator) {
                     validator.validate().then(function (status) {
-                        console.log('validated!');
-
+    
                         if (status == 'Valid') {
                             // Simulate process for demo only
                             setTimeout(function () {
@@ -532,7 +531,6 @@ var KTFileManagerList = function () {
             // Detect if valid
             if (renameValidator) {
                 renameValidator.validate().then(function (status) {
-                    console.log('validated!');
 
                     if (status == 'Valid') {
                         // Pop up confirmation
@@ -835,7 +833,6 @@ var KTFileManagerList = function () {
 
             if (validator) {
                 validator.validate().then(function (status) {
-                    console.log('validated!');
 
                     if (status == 'Valid') {
                         // Simulate process for demo only

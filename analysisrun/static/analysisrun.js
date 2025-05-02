@@ -644,7 +644,6 @@ var KTDatatablesServerSide = function () {
                         `;
 
                             data.summary.forEach(item => {
-                                console.log(item);
                                 if (item.folder_name !== 'Total') {
                                     tableHtml += `
                                     <tr>

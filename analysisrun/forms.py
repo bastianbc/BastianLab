@@ -4,11 +4,12 @@ from datetime import date, datetime
 from core.forms import BaseForm
 
 class AnalysisRunForm(BaseForm):
-    sheet_content = forms.CharField(widget=forms.HiddenInput())
-
     class Meta:
         model = AnalysisRun
-        fields = ("user", "pipeline", "genome")
-        widgets = {
-            "user": forms.HiddenInput(),
-        }
+        fields = ("pipeline", "genome")
+
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['pipeline'].required = True
+        self.fields['genome'].required = True

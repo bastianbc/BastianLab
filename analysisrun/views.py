@@ -12,6 +12,8 @@ from django.core.files.base import ContentFile
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from cns.helper import generate_graph
+from sheet.views import get_sheet_by_id
+
 
 @permission_required("sequencingrun.view_sequencingrun", raise_exception=True)
 def analysisruns(request):
@@ -30,23 +32,32 @@ def filter_analysisruns(request):
     return JsonResponse(result)
 
 def save_analysis_run(request):
-    print("save_analysis_run_"*10)
     if request.method == "POST":
-        form = AnalysisRunForm(request.POST)
-        try:
-            if form.is_valid():
-                analysis_run = form.save(commit=False)
+        # try:
+            print(request.POST)
+            pipeline = request.POST.get('pipeline')  # returns 'v1'
+            genome = request.POST.get('genome')  # returns 'hg19'
+            selected_ids = request.POST.getlist('selected_ids[]')  # returns ['268', '261', '264', '266', '269']
 
-                sheet_content = form.cleaned_data["sheet_content"]
-
-                # convert to csv
-                csv_file = ContentFile(sheet_content.encode("utf-8"))
-                file_name = f"{analysis_run.user.username}_analysis_sheet.csv"
-                analysis_run.sheet_name = file_name
-                analysis_run.save()
-                analysis_run.sheet.save(file_name, csv_file, save=False)
-                analysis_run.save()
-                print("Analysis Run Saved")
-        except:
-            return JsonResponse({"success": True})
+            # pipeline = json.dumps(request.POST["pipeline"][0])
+            # genome = json.dumps(request.POST["genome"][0])
+            # selected_ids = json.dumps(request.POST["selected_ids[]"][0])
+            print(pipeline, genome, selected_ids)
+            print(type(pipeline), type(genome), type(selected_ids))
+            return get_sheet_by_id(selected_ids)
+            print(sheet)
+            print(type(sheet))
+            AnalysisRun.objects.create(
+                user=request.user,
+                name=f"AR_{date.today().strftime('%Y_%m_%d')}",
+                pipeline=pipeline,
+                genome=genome,
+                sheet=sheet,
+                sheet_name=f"AR_{date.today().strftime('%Y_%m_%d')}",
+                status="pending"
+            )
+            print("Analysis Run Saved")
+        # except Exception as e:
+        #     print(f"{str(e)}"*10)
+        #     return JsonResponse({"success": False})
     return JsonResponse({"success": True})

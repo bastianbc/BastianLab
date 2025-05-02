@@ -264,7 +264,6 @@ var KTDatatablesServerSide = function () {
 
     var init_csv_button = function (){
         document.getElementById('export_to_csv').onclick = function(){
-            console.log("");
             const loadingEl = document.createElement("div");
             document.body.prepend(loadingEl);
             loadingEl.classList.add("page-loader");

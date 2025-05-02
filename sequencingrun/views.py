@@ -241,14 +241,11 @@ def get_sample_libs_async(request):
     A list data formatted according to purpose.
     """
     selected_ids = json.loads(request.GET.get("selected_ids"))
-    print("Selected Ids: ", selected_ids)
     sequencing_runs = SequencingRun.objects.filter(id__in=selected_ids)
     qs=_get_authorizated_queryset(sequencing_runs)
-    print(qs)
     serializer = CustomSampleLibSerializer(qs, many=True)
     result = dict()
     result['data'] = serializer.data
-    print(serializer.data)
     return JsonResponse(serializer.data, safe=False)
     # selected_sequencing_runs = SequencingRun.objects.filter(id__in=selected_ids).prefetch_related('sequencing_libs')
     # # Function to get the related sequencing files for each sequencing run
