@@ -657,10 +657,8 @@ var KTApp = function () {
 	}
 
     var showPageLoading = function() {
-        console.log("showPageLoading2");
         document.body.classList.add('page-loading');
         document.body.setAttribute('data-kt-app-page-loading', "on");
-        console.log("showPageLoading2 again");
     }
 
     var hidePageLoading = function() {
@@ -713,7 +711,6 @@ var KTApp = function () {
         },
 
         showPageLoading: function () {
-            console.log("showPageLoading");
             showPageLoading();
         },
 

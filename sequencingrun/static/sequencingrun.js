@@ -816,7 +816,6 @@ var KTDatatablesServerSide = function () {
       stepper = new KTStepper(document.getElementById("modal_stepper"));
 
       function handleGenerateAnalysisSheet() {
-          console.log("handleGenerateAnalysisSheet");
 
           // Initialize modal and related elements only once
           if (!isModalInitialized) {
@@ -830,7 +829,7 @@ var KTDatatablesServerSide = function () {
               menuItem = document.querySelector('[data-kt-docs-table-select="generate_analysis_sheet"]');
               const stepperElement = document.getElementById("modal_stepper");
               form = document.getElementById("form-analysis-run");
-              listBody = document.querySelector('#analysis-sheet-list .list-body');
+              listBody = document.querySelector("#analysis-sheet-list tbody");
 
               // Initialize modal events only once
               initModalEvents();
@@ -849,12 +848,10 @@ var KTDatatablesServerSide = function () {
               const modalElement = document.getElementById("modal_analysis_sheet");
 
               modalElement.addEventListener('hide.bs.modal', function(){
-                  console.log("modal hide");
                   resetModal();
               });
 
               modalElement.addEventListener('shown.bs.modal', function(){
-                  console.log("modal show");
                   initStepper();
               });
 
@@ -862,33 +859,55 @@ var KTDatatablesServerSide = function () {
           }
 
           function resetModal() {
-              listBody.innerHTML = "";
-              if (stepper) {
-                  stepper.goFirst();
-                  stepper = null;
-              }
-              form.reset();
-              selectedRows = [];
-              dt.draw();
-          }
+              console.log("reset modeal");
+                listBody.innerHTML = "";
 
-          function initStepper() {
-              if (stepper) {
+                if (stepper) {
+                    stepper.destroy();  // <--- important! destroy stepper cleanly
+                    stepper = null;
+                }
 
-                stepper.on("kt.stepper.next", function (stepper) {
-                    stepper.goNext(); // go next step
-                });
+                form.reset();
+                selectedRows = [];
+                dt.draw();
+            }
 
-                stepper.on("kt.stepper.previous", function (stepper) {
-                    stepper.goPrevious(); // go previous step
-                });
+            function initStepper() {
+                const stepperElement = document.getElementById("modal_stepper");
 
-              }
+                if (stepperElement) {
+                    if (stepper) {
+                        stepper.destroy();
+                    }
 
-          }
+                    stepper = new KTStepper(stepperElement);
+
+                    const stepperContents = stepperElement.querySelectorAll('[data-kt-stepper-element="content"]');
+                    if (stepperContents.length > 0) {
+                        stepperContents.forEach((content, index) => {
+                            if (index === 0) {
+                                content.classList.add('current');  // first step active
+                            } else {
+                                content.classList.remove('current'); // others hidden by default
+                            }
+                        });
+                    }
+
+                    // Stepper event listeners
+                    stepper.on("kt.stepper.next", function (stepperObj) {
+                        stepperObj.goNext();
+                    });
+
+                    stepper.on("kt.stepper.previous", function (stepperObj) {
+                        stepperObj.goPrevious();
+                    });
+                }
+            }
+
+
+
 
           function fetchData() {
-              console.log("loadingel");
                 const loadingEl = document.createElement("div");
                 document.body.prepend(loadingEl);
                 loadingEl.classList.add("page-loader");
@@ -907,12 +926,10 @@ var KTDatatablesServerSide = function () {
                       "selected_ids": JSON.stringify(selectedRows),
                   },
                   error: function (xhr, ajaxOptions, thrownError) {
-                      console.log("loadingel2");
                       loadingEl.remove();
                       swal("Error getting records!", "Please try again", "error");
                   }
               }).done(function (result) {
-                  console.log("loadingel3");
                   loadingEl.remove();
                   populateTable(result);
                   modal.show();
@@ -920,11 +937,11 @@ var KTDatatablesServerSide = function () {
           }
 
           function populateTable(data) {
-            console.log("populate:");
-            console.log(data);
-
             const listBody = document.querySelector("#analysis-sheet-list tbody"); // Find the existing tbody
+              console.log("data coming");
+              console.log(data);
             listBody.innerHTML = ''; // Clear previous rows
+
 
             data.forEach(item => {
                 var path = "";
@@ -935,7 +952,6 @@ var KTDatatablesServerSide = function () {
                 } else if (item.path_bai) {
                     path = `${item.path_bai}`;
                 }
-                console.log(path);
                 let file = "";
                 if (item.fastq) {
                     file = item.fastq;
@@ -964,11 +980,6 @@ var KTDatatablesServerSide = function () {
             });
         }
 
-        function createTableHeader(textContent) {
-            const th = document.createElement("th");
-            th.textContent = textContent;
-            return th;
-        }
 
         function createCheckboxCell() {
             const td = document.createElement("td");
@@ -992,41 +1003,7 @@ var KTDatatablesServerSide = function () {
         }
 
 
-            function generateCSV() {
-                console.log("generateCSV");
 
-                const table = document.querySelector('#analysis-sheet-list table');
-                if (!table) {
-                    console.error("Table not found!");
-                    return;
-                }
-
-                const headers = Array.from(table.querySelectorAll('thead th'))
-                    .map(th => th.textContent.trim());
-                let csvContent = headers.join(',') + '\n';
-
-                const rows = table.querySelectorAll('tbody tr');
-                rows.forEach(row => {
-                    const checkbox = row.querySelector('input[type="checkbox"]');
-                    if (checkbox && checkbox.checked) {
-                        const cells = row.querySelectorAll('td:not(:first-child)');
-                        const rowData = Array.from(cells)
-                            .map(td => {
-                                // Escape quotes and handle commas in data
-                                let text = td.textContent.trim();
-                                if (text.includes('"') || text.includes(',')) {
-                                    text = '"' + text.replace(/"/g, '""') + '"';
-                                }
-                                return text;
-                            })
-                            .join(',');
-                        csvContent += rowData + '\n';
-                    }
-                });
-
-                // Create and trigger download directly
-                downloadCSV(csvContent);
-            }
 
             function downloadCSV(csvContent) {
                 // Create a blob with the CSV content
@@ -1048,44 +1025,59 @@ var KTDatatablesServerSide = function () {
             }
 
           function submitForm() {
-              generateCSV();
+              if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+                const formData = new FormData(form);
+                const pipelineDropdown = form.querySelector('select[name="pipeline"]');
+                const genomeDropdown = form.querySelector('select[name="genome"]');
 
-              const formData = new FormData(form);
-
+                const pipeline = pipelineDropdown.value;
+                const genome = genomeDropdown.value;
+                console.log(pipeline, genome);
               $.ajax({
                   url: "/analysisrun/save_analysis_run",
                   type: "POST",
                   headers: {
                       'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value
                   },
-                  data: formData,
-                  processData: false,
-                  contentType: false,
-                  success: function (data) {
-                      if (data.success) {
-                          Swal.fire({
-                              text: "Run analysis created and a CSV file saved.",
-                              icon: "success",
-                              buttonsStyling: false,
-                              confirmButtonText: "Ok, got it!",
-                              customClass: {
-                                  confirmButton: "btn fw-bold btn-primary",
-                              }
-                          });
-                          modal.hide();
-                      }
-                      else {
-                          Swal.fire({
-                              text: "An error occurred. The operation could not be performed.",
-                              icon: "error",
-                              buttonsStyling: false,
-                              confirmButtonText: "Ok, got it!",
-                              customClass: {
-                                  confirmButton: "btn fw-bold btn-primary",
-                              }
-                          });
-                      }
-                  },
+                  data: {
+                         "selected_ids":selectedRows,
+                         "pipeline":pipeline,
+                         "genome":genome
+                      },
+                  success: function (data, status, xhr) {
+                    const blob = new Blob([data], { type: 'text/csv' });
+                    const url = window.URL.createObjectURL(blob);
+                    const link = document.createElement("a");
+
+                    // Try to get filename from response headers
+                    const disposition = xhr.getResponseHeader("Content-Disposition");
+                    let filename = "download.csv";
+                    if (disposition && disposition.indexOf("filename=") !== -1) {
+                        filename = disposition.split("filename=")[1].replace(/['"]/g, '');
+                    }
+
+                    link.href = url;
+                    link.download = filename;
+
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    window.URL.revokeObjectURL(url);
+
+                    Swal.fire({
+                        text: "CSV file has been downloaded successfully.",
+                        icon: "success",
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn fw-bold btn-primary",
+                        }
+                    });
+
+                    modal.hide();
+                },
                   error: function (xhr, ajaxOptions, thrownError) {
                       Swal.fire({
                           text: "An error occurred. The operation could not be performed.",
@@ -1364,7 +1356,6 @@ var KTDatatablesServerSide = function () {
                         });
                     }
                     else {
-                        console.log("123");
                         Swal.close();
                         Swal.fire({
                             text: `${data.message}`,

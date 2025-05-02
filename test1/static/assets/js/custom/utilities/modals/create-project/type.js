@@ -47,7 +47,6 @@ var KTModalCreateProjectType = function () {
 			// Validate form before submit
 			if (validator) {
 				validator.validate().then(function (status) {
-					console.log('validated!');
 					e.preventDefault();
 
 					if (status == 'Valid') {

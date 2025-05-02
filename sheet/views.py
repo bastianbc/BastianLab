@@ -6,7 +6,7 @@ import json
 from .forms import FilterForm, ReportForm
 from .api import query_by_args, _get_authorizated_queryset
 from .service import CustomSampleLibSerializer
-
+from datetime import date
 
 def filter_sheet(request):
     seq_runs = SequencingRun.objects.filter()
@@ -35,6 +35,15 @@ def create_csv_sheet(request):
         query_set = query_by_args(request.user, seq_runs, **request.GET)
         print(query_set)
         return generate_file(data=query_set, file_name="Analysis Report")
+    except Exception as e:
+        print(e)
+        return JsonResponse({'error': str(e)}, status=500)
+
+def get_sheet_by_id(selected_ids):
+    try:
+        sequencing_runs = SequencingRun.objects.filter(id__in=selected_ids)
+        qs = _get_authorizated_queryset(sequencing_runs)
+        return generate_file(data=qs, file_name=f"AR_{date.today().strftime('%Y_%m_%d')}")
     except Exception as e:
         print(e)
         return JsonResponse({'error': str(e)}, status=500)

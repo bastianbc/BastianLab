@@ -5,7 +5,6 @@ var bodyContainer = null;
 $(document).ready(function() {
     selectedId = document.getElementById("id_body_site").value;
     bodyContainer = document.querySelector('.body-site-row');
-    console.log(selectedId);
 
 
     getBodySites();
@@ -73,7 +72,6 @@ function handleDropdownChange(event) {
             nextDropdown = nextDropdown.nextElementSibling;
         }
     }
-    console.log(selectedId);
 
     if (selectedId) {
         const newDropdown = createDropdown(selectedId);

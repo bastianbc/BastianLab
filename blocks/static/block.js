@@ -90,7 +90,6 @@ var KTDatatablesServerSide = function () {
                     render: function (data, type, row) {
                         if (data !== null) {
                           let id = row["id"];
-                          console.log(data);
                           return `<a href="/projects?model=project&id=${id}&initial=true">${data}</a>`;
                         }
 
@@ -1029,7 +1028,6 @@ var KTDatatablesServerSide = function () {
                         const id = parent.querySelector('input[type=checkbox]').value;
                         // Open modal
                         this.instance.show();
-                        console.log("block_id: ", id);
                         this.getVariantData(id);
                     });
                 });
@@ -1073,7 +1071,6 @@ var KTDatatablesServerSide = function () {
                 // Clear modal first
                 tabContainer.innerHTML = "";
                 tabContent.innerHTML = "";
-                console.log("@@@",data);
                 // Fill the data
                 populateBlockDetails(data.block);
 
@@ -1082,7 +1079,6 @@ var KTDatatablesServerSide = function () {
                     showNoDataMessage(tabContent, "No analysis runs found for this area.");
                     return;
                 }
-                console.log("!!!",data.analyses);
                 // Check if any analysis has variants
                 // const hasVariants = data.analyses.some(analysis => analysis.variants && analysis.variants.length > 0);
                 // console.log("!!!",hasVariants);
@@ -1095,7 +1091,6 @@ var KTDatatablesServerSide = function () {
                     // Create tab
                     const isActive = index === 0;
                     const tabId = `analysis_${index}`;
-                    console.log(data.block)
                     createTab(tabContainer, tabId, analysis.analysis_name, isActive);
                     createTabPane(tabContent, tabId, analysis, isActive, data.block.id);
 
@@ -1108,7 +1103,6 @@ var KTDatatablesServerSide = function () {
                 document.querySelector('textarea[name="diagnosis"]').textContent = data.diagnosis;
 
                 if (data.block_url) {
-                    console.log(data.block_url.url);
                     document.querySelector('a[name="he_image"]').href = data.block_url.url+""+data.scan_number
                 }
             },
@@ -1178,7 +1172,6 @@ var KTDatatablesServerSide = function () {
                 container.appendChild(div);
 
                 // Initialize DataTable with server-side processing
-                console.log("Block_id: ", id, blockId)
                 initializeDataTable(`variant_datatable_${id}`, blockId, analysis.analysis_id);
             },
 

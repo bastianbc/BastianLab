@@ -261,7 +261,6 @@ var KTDatatablesServerSide = function () {
 
           var dateRange = document.getElementById("id_date_range").value;
           var naType = document.getElementById("id_na_type").value;
-          console.log(naType);
           initDatatable(null,dateRange,naType)
 
         });

@@ -17,9 +17,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 function toggleEyeIconVisibility( item ) {
-    console.log(item);
-    console.log(item.nextElementSibling);
-    console.log(item.nextElementSibling.firstElementChild);
     var eyeIcon = item.nextElementSibling.firstElementChild;
 
     if ( item.value ) {

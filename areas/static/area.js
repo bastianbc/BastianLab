@@ -624,14 +624,10 @@ var KTDatatablesServerSide = function () {
             //     showNoDataMessage(tabContent, "No variants found in any analysis runs.");
             //     return;
             // }
-            console.log(data.analyses);
             data.analyses.forEach((analysis, index) => {
                 // Create tab
                 const isActive = index === 0;
                 const tabId = `analysis_${index}`;
-
-                console.log(analysis);
-                console.log(analysis.analysis_name);
                 createTab(tabContainer, tabId, analysis.analysis_name, isActive);
                 createTabPane(tabContent, tabId, analysis, isActive, data.area.id);
 

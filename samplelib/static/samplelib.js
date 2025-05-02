@@ -902,7 +902,6 @@ var KTDatatablesServerSide = function () {
                 .then(response => {
                     if (response.ok) {
                         // Handle success
-                        console.log('Files uploaded successfully');
                         return response.json();
                     } else {
                         // Handle error

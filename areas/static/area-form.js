@@ -25,7 +25,6 @@ function getBlockInfo( value ) {
             swal("Error deleting!", "Please try again", "error");
         }
     }).done(function (result) {
-        console.log(result);
         visibleBlockInfo();
 
         document.querySelector('input[name="patient"]').value = result.patient;

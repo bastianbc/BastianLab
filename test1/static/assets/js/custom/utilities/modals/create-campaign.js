@@ -45,7 +45,6 @@ var KTCreateCampaign = function () {
 
 			if (validator) {
 				validator.validate().then(function (status) {
-					console.log('validated!');
 
 					if (status == 'Valid') {
 						stepper.goNext();
