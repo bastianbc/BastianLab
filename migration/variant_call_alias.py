@@ -22,7 +22,7 @@ logger = logging.getLogger("file")
 
 
 def generate_variant():
-    for vc in VariantCall.objects.filter(variant_file__name="BCB013.SGLP-0418.MT2_Final.annovar.hg19_multianno_Filtered.txt"):
+    for vc in VariantCall.objects.filter():
         cv_all = CVariant.objects.filter(g_variant__variant_call=vc)
         for cv in cv_all:
 
