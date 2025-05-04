@@ -20,6 +20,8 @@ class VariantCall(models.Model):
     label = models.CharField(max_length=100, blank=True, null=True)
     ref_read = models.IntegerField(default=0)
     alt_read = models.IntegerField(default=0)
+    variant__meta = models.TextField(blank=True, null=True, help_text="Stores variant information that was previously annotated in queries")
+    alias__meta = models.TextField(blank=True, null=True, help_text="Stores alias information that was previously annotated in queries")
 
     class Meta:
         db_table = "variant_call"
@@ -405,7 +407,7 @@ class CVariant(models.Model):
     exon = models.CharField(max_length=100, blank=True, null=True)
     func = models.CharField(max_length=100, blank=True, null=True)
     gene_detail = models.CharField(max_length=100)
-    is_alias = models.BooleanField(default=False)
+    is_alias = models.BooleanField(default=False) # if c_variant.nm_id == to gene.nm_id set True
     is_gene_detail = models.BooleanField(default=False)
 
 
