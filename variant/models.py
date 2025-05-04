@@ -20,8 +20,8 @@ class VariantCall(models.Model):
     label = models.CharField(max_length=100, blank=True, null=True)
     ref_read = models.IntegerField(default=0)
     alt_read = models.IntegerField(default=0)
-    variant__meta = models.TextField(blank=True, null=True, help_text="Stores variant information that was previously annotated in queries")
-    alias__meta = models.TextField(blank=True, null=True, help_text="Stores alias information that was previously annotated in queries")
+    variant_meta = models.TextField(blank=True, null=True, help_text="Stores variant information that was previously annotated in queries")
+    alias_meta = models.TextField(blank=True, null=True, help_text="Stores alias information that was previously annotated in queries")
 
     class Meta:
         db_table = "variant_call"
