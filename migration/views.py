@@ -3889,6 +3889,7 @@ def call_import_variants(request):
 
 
 def import_genes(request):
-    from .import_fastq_files_df_fq import find_seqrun_for_prefix
-    find_seqrun_for_prefix()
+    from .variant_call_alias import generate_variant
+    generate_variant()
+    print("finished")
 
