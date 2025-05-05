@@ -479,6 +479,7 @@ class VariantsView(models.Model):
     alt_read = models.IntegerField()
     vaf = models.FloatField()
     alias = models.CharField(max_length=50, null=True)
+    variant = models.CharField(max_length=50, null=True)
     gvariant_id = models.IntegerField()
     g_chromosome = models.CharField(max_length=100, null=True)
     g_start = models.IntegerField()
