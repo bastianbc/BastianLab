@@ -34,28 +34,27 @@ def filter_analysisruns(request):
 def save_analysis_run(request):
     if request.method == "POST":
         # try:
-            print(request.POST)
             pipeline = request.POST.get('pipeline')  # returns 'v1'
             genome = request.POST.get('genome')  # returns 'hg19'
             selected_ids = request.POST.getlist('selected_ids[]')  # returns ['268', '261', '264', '266', '269']
-
-            # pipeline = json.dumps(request.POST["pipeline"][0])
-            # genome = json.dumps(request.POST["genome"][0])
-            # selected_ids = json.dumps(request.POST["selected_ids[]"][0])
-            print(pipeline, genome, selected_ids)
-            print(type(pipeline), type(genome), type(selected_ids))
-            return get_sheet_by_id(selected_ids)
-            print(sheet)
-            print(type(sheet))
+            print("&"*100)
+            print(request.user, f"AR_{date.today().strftime('%Y_%m_%d')}_{genome}",
+                  pipeline, genome, f"AR_{date.today().strftime('%Y_%m_%d')}", "pending")
             AnalysisRun.objects.create(
                 user=request.user,
-                name=f"AR_{date.today().strftime('%Y_%m_%d')}",
+                name=f"AR_{date.today().strftime('%Y_%m_%d')}_{genome}",
                 pipeline=pipeline,
                 genome=genome,
-                sheet=sheet,
                 sheet_name=f"AR_{date.today().strftime('%Y_%m_%d')}",
                 status="pending"
             )
+            print(pipeline, genome, selected_ids)
+            print(type(pipeline), type(genome), type(selected_ids))
+            print(get_sheet_by_id(selected_ids).__dict__)
+            return get_sheet_by_id(selected_ids)
+            print(sheet)
+            print(type(sheet))
+
             print("Analysis Run Saved")
         # except Exception as e:
         #     print(f"{str(e)}"*10)

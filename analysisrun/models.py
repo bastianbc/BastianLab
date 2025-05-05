@@ -18,7 +18,7 @@ class AnalysisRun(models.Model):
         ("imported", "Imported"),
     )
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="analysis_runs")
-    name = models.CharField(max_length=12, unique=True, verbose_name="Name")
+    name = models.CharField(max_length=100, unique=True, verbose_name="Name")
     pipeline = models.CharField(max_length=10, choices=PIPELINE_CHOICES, verbose_name = "Pipeline Version")
     genome = models.CharField(max_length=10, choices=GENOME_CHOICES, verbose_name = "Reference Genome")
     date = models.DateTimeField(auto_now_add=True)
