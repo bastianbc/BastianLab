@@ -1074,9 +1074,15 @@ var KTDatatablesServerSide = function () {
                         customClass: {
                             confirmButton: "btn fw-bold btn-primary",
                         }
-                    });
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                          // this will reload the page
+                          window.location.reload();
+                        }
+                      });
 
                     modal.hide();
+
                 },
                   error: function (xhr, ajaxOptions, thrownError) {
                       Swal.fire({

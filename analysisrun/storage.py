@@ -23,3 +23,9 @@ class CustomFileSystemStorage(FileSystemStorage):
             counter += 1
             new_name = f"{base}_{counter}{ext}"
         return new_name
+
+
+# Custom storage to write files under SEQUENCING_FILES_SOURCE_DIRECTORY
+def analysis_run_upload_to(instance, filename):
+    # Saves to: <SEQUENCING_FILES_SOURCE_DIRECTORY>/<run_name>/<filename>
+    return f"{instance.name}/{filename}"
