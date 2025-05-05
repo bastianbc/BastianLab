@@ -13,6 +13,9 @@ from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from cns.helper import generate_graph
 from sheet.views import get_sheet_by_id
+from django.conf import settings
+import os
+
 
 
 @permission_required("sequencingrun.view_sequencingrun", raise_exception=True)
@@ -31,32 +34,69 @@ def filter_analysisruns(request):
 
     return JsonResponse(result)
 
+def save_csv_response_to_disk(response, save_path):
+    """
+    Given a Django HttpResponse (or StreamingHttpResponse) containing CSV,
+    write it out to `save_path` (creating directories as needed).
+    """
+    # 1) Ensure parent directory exists
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+    # 2) Grab the raw bytes from the response
+    if hasattr(response, "streaming_content"):
+        # StreamingHttpResponse
+        raw = b"".join(response.streaming_content)
+    else:
+        # Normal HttpResponse
+        raw = response.content
+
+    # 3) Write to disk in binary mode
+    with open(save_path, "wb") as f:
+        f.write(raw)
+
+from datetime import date
+from django.core.files.base import ContentFile
+
 def save_analysis_run(request):
     if request.method == "POST":
-        # try:
-            pipeline = request.POST.get('pipeline')  # returns 'v1'
-            genome = request.POST.get('genome')  # returns 'hg19'
-            selected_ids = request.POST.getlist('selected_ids[]')  # returns ['268', '261', '264', '266', '269']
-            print("&"*100)
-            print(request.user, f"AR_{date.today().strftime('%Y_%m_%d')}_{genome}",
-                  pipeline, genome, f"AR_{date.today().strftime('%Y_%m_%d')}", "pending")
-            AnalysisRun.objects.create(
-                user=request.user,
-                name=f"AR_{date.today().strftime('%Y_%m_%d')}_{genome}",
-                pipeline=pipeline,
-                genome=genome,
-                sheet_name=f"AR_{date.today().strftime('%Y_%m_%d')}",
-                status="pending"
-            )
-            print(pipeline, genome, selected_ids)
-            print(type(pipeline), type(genome), type(selected_ids))
-            print(get_sheet_by_id(selected_ids).__dict__)
-            return get_sheet_by_id(selected_ids)
-            print(sheet)
-            print(type(sheet))
+        pipeline     = request.POST.get('pipeline')
+        genome       = request.POST.get('genome')
+        selected_ids = request.POST.getlist('selected_ids[]')
+        run_name     = f"AR_{date.today():%Y_%m_%d}_{genome}"
+        csv_filename = f"{run_name}.csv"
 
-            print("Analysis Run Saved")
-        # except Exception as e:
-        #     print(f"{str(e)}"*10)
-        #     return JsonResponse({"success": False})
-    return JsonResponse({"success": True})
+        # 1) get or create
+        analysis_run, created = AnalysisRun.objects.get_or_create(
+            name=run_name,
+            defaults={
+                'user':       request.user,
+                'pipeline':   pipeline,
+                'genome':     genome,
+                'sheet_name': run_name,
+                'status':     'pending',
+            }
+        )
+        if not created:
+            analysis_run.pipeline   = pipeline
+            analysis_run.genome     = genome
+            analysis_run.sheet_name = run_name
+            analysis_run.status     = 'pending'
+            analysis_run.save(update_fields=['pipeline','genome','sheet_name','status'])
+
+        # 2) get your CSV response
+        response = get_sheet_by_id(selected_ids, run_name)
+
+        # 3) wrap bytes in a ContentFile
+        raw_bytes = (
+            b"".join(response.streaming_content)
+            if hasattr(response, "streaming_content")
+            else response.content
+        )
+        content_file = ContentFile(raw_bytes)
+
+        # 4) save into the FileField (this will create the folder via upload_to)
+        analysis_run.sheet.save(csv_filename, content_file, save=True)
+
+        # 5) return the CSV for download
+        return response
+
