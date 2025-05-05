@@ -21,7 +21,7 @@ logger = logging.getLogger("file")
 
 
 
-def generate_variant():
+def check_alias():
     for vc in VariantCall.objects.filter():
         cv_all = CVariant.objects.filter(g_variant__variant_call=vc)
         for cv in cv_all:
@@ -50,6 +50,26 @@ def generate_variant():
 
 
     pass
+
+
+def generate_variant():
+    for vc in VariantCall.objects.filter():
+        cv_all = CVariant.objects.filter(g_variant__variant_call=vc)
+        for cv in cv_all:
+            pv = cv.p_variants.first()
+            if pv:
+                if cv.is_alias == True and cv.is_gene_detail == False:
+                    variant = f"{pv.name_meta}({cv.nm_id})"
+                if cv.is_alias == False and cv.is_gene_detail == True:
+                    variant = f"{cv.gene_detail}"
+        vc.variant_meta = variant
+        vc.save()
+        print(f"variant saved: {variant}")
+
+
+
+
+
 
 
 if __name__ == "__main__":
