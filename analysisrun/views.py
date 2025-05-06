@@ -62,7 +62,8 @@ def save_analysis_run(request):
         pipeline     = request.POST.get('pipeline')
         genome       = request.POST.get('genome')
         selected_ids = request.POST.getlist('selected_ids[]')
-        run_name     = f"AR_{date.today():%Y_%m_%d}_{genome}"
+
+        run_name     = f"AR_{date.today():%m_%d_%Y}_{genome}_{(int(AnalysisRun.objects.last().id)+1)}"
         csv_filename = f"{run_name}.csv"
 
         # 1) get or create
@@ -83,10 +84,8 @@ def save_analysis_run(request):
             analysis_run.status     = 'pending'
             analysis_run.save(update_fields=['pipeline','genome','sheet_name','status'])
 
-        # 2) get your CSV response
         response = get_sheet_by_id(selected_ids, run_name)
 
-        # 3) wrap bytes in a ContentFile
         raw_bytes = (
             b"".join(response.streaming_content)
             if hasattr(response, "streaming_content")
@@ -94,9 +93,7 @@ def save_analysis_run(request):
         )
         content_file = ContentFile(raw_bytes)
 
-        # 4) save into the FileField (this will create the folder via upload_to)
         analysis_run.sheet.save(csv_filename, content_file, save=True)
 
-        # 5) return the CSV for download
         return response
 
