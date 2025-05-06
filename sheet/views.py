@@ -39,11 +39,11 @@ def create_csv_sheet(request):
         print(e)
         return JsonResponse({'error': str(e)}, status=500)
 
-def get_sheet_by_id(selected_ids):
+def get_sheet_by_id(selected_ids, file_name=None):
     try:
         sequencing_runs = SequencingRun.objects.filter(id__in=selected_ids)
         qs = _get_authorizated_queryset(sequencing_runs)
-        return generate_file(data=qs, file_name=f"AR_{date.today().strftime('%Y_%m_%d')}")
+        return generate_file(data=qs, file_name=file_name)
     except Exception as e:
         print(e)
         return JsonResponse({'error': str(e)}, status=500)
