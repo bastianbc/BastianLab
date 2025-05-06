@@ -1458,12 +1458,13 @@ var KTDatatablesServerSide = function () {
 
             initializeModal: function(blockId) {
                 // Clear modal first
-                tabContainer.innerHTML = "";
-                tabContent.innerHTML = "";
+                this.tabContainer.innerHTML = "";
+                this.tabContent.innerHTML = "";
 
-                fetch(`/block/get_block_areas/${blockId}`)
+                fetch(`/blocks/get_block_areas/${blockId}/`)
                     .then(response => response.json())
                     .then(data => {
+                        console.log(data);
                         // fill the details
                         this.populateBlockDetails(data);
 
@@ -1471,37 +1472,24 @@ var KTDatatablesServerSide = function () {
                         data.areas.forEach((area, index) => {
                             // Create tab
                             const isActive = index === 0;
-                            const tabId = `analysis_${index}`;
+                            const tabId = `area_${index}`;
 
-                            createTab(tabContainer, tabId, area.name, isActive);
-                            createTabPane(tabContent, tabId, analysis, isActive, data.block.id);
-
+                            this.createTab(tabId, area.name, isActive);
+                            this.createTabPane(tabId, area.id, isActive, data.block.id);
+                            this.initializeDataTable(area.id);
                         });
-
-                        // load variants for first area(first tab)
-                        if (data.areas.length > 0) {
-                            getVariantData(blockId, data.areas[0].area_id);
-                        }
                     })
                     .catch(error => {
-                        console.error('Blok verileri getirilemedi:', error);
+                        console.error('Could not get block data:', error);
                     });
 
             },
 
             populateBlockDetails: function(data) {
-                modalElement.querySelector('a[name="patient_id"]').textContent = data.patient_id;
-                modalElement.querySelector('a[name="block_name"]').textContent = data.block_name;
-                modalElement.querySelector('a[name="diagnosis"]').textContent = data.diagnosis;
-                modalElement.querySelector('a[name="body_site"]').textContent = data.body_site;
-            },
-
-            getVariantData: function(blockId) {
-                fetch(`/blocks/get_block_vaiants?id=${blockId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        this.initializeDataTable()
-                    });
+                this.modal.querySelector('a[name="patient_id"]').textContent = data.patient_id;
+                this.modal.querySelector('a[name="block_name"]').textContent = data.block.name;
+                this.modal.querySelector('a[name="diagnosis"]').textContent = data.block.diagnosis;
+                this.modal.querySelector('a[name="body_site"]').textContent = data.block.body_site;
             },
 
             showNoDataMessage: function(message) {
@@ -1529,42 +1517,35 @@ var KTDatatablesServerSide = function () {
                        href="#${id}">
                        ${text}
                     </a>`;
-                tabContainer.appendChild(li);
+                this.tabContainer.appendChild(li);
             },
 
-            createTabPane: function(id, analysis, isActive, blockId) {
+            createTabPane: function(id, areaId, isActive, blockId) {
                 const div = document.createElement('div');
                 div.className = `tab-pane fade ${isActive ? 'show active' : ''}`;
                 div.id = id;
                 div.innerHTML = `
-                    <div class="card card-flush mt-2 flex-row-fluid overflow-hidden">
-                        <div class="card-body pt-0">
-                            <div class="table-responsive">
-                                <table id="variant_datatable_${id}" class="table align-middle table-row-dashed fs-6 gy-5">
-                                    <thead>
-                                        <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
-                                            <th>Area</th>
-                                            <th>Sample Library</th>
-                                            <th>Gene</th>
-                                            <th>P Variant</th>
-                                            <th>Coverage</th>
-                                            <th>VAF</th>
-                                            <th class="text-end min-w-100px">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="text-gray-600 fw-semibold"></tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>`;
-                tabContainer.appendChild(div);
-
-                // Initialize DataTable with server-side processing
-                initializeDataTable(`variant_datatable_${id}`, blockId, analysis.analysis_id);
+                  <div class="table-responsive">
+                      <table id="variant_datatable_${areaId}" class="table align-middle table-row-dashed fs-6 gy-5">
+                          <thead>
+                              <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
+                                  <th>Analysis Run</th>
+                                  <th>Gene</th>
+                                  <th>P Variant</th>
+                                  <th>Alias</th>
+                                  <th>Coverage</th>
+                                  <th>VAF</th>
+                                  <th class="text-end min-w-100px">Actions</th>
+                              </tr>
+                          </thead>
+                          <tbody class="text-gray-600 fw-semibold"></tbody>
+                      </table>
+                  </div>`;
+                this.tabContent.appendChild(div);
             },
 
-            initializeDataTable: function(tableId, areaId) {
-                $(`#${tableId}`).DataTable({
+            initializeDataTable: function(areaId) {
+                $(`#variant_datatable_${areaId}`).DataTable({
                     processing: true,
                     serverSide: true,
                     ajax: {
@@ -1576,15 +1557,14 @@ var KTDatatablesServerSide = function () {
                     },
                     columns: [
                         {
-                            data: 'areas',
+                            data: 'variantcall_id',
+                        },
+                        {
+                            data: 'analysis_run_name',
                             className: 'text-gray-800 text-hover-primary'
                         },
                         {
-                            data: 'sample_lib',
-                            className: 'text-gray-800 text-hover-primary'
-                        },
-                        {
-                            data: 'genes',
+                            data: 'gene_name',
                             className: 'text-gray-800'
                         },
                         {
@@ -1618,6 +1598,12 @@ var KTDatatablesServerSide = function () {
                                 `;
                             }
                         }
+                    ],
+                    columnDefs: [
+                        {
+                            targets: 1,
+                            visible: false,
+                        },
                     ],
                     order: [[0, 'asc']],  // Sort by areas by default
                     pageLength: 10,

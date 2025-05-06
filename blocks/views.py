@@ -11,7 +11,9 @@ from core.decorators import permission_required_for_async
 from variant.models import VariantCall
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
+import logging
 
+logger = logging.getLogger(__name__)
 
 @permission_required_for_async("blocks.view_block")
 def filter_blocks(request):
@@ -304,19 +306,23 @@ def get_block_areas(request, id):
     try:
         block = Block.objects.get(id=id)
 
-        areas = Area.objects.filter(block_id=block_id)
+        areas = block.block_areas.all()
 
         result = {
-            'block_id': block.id,
-            'block_name': block.name,
-            'diagnosis': block.diagnosis,
-            'body_site': block.body_site,
-            'patient_id': block.pat_id,
-            'areas': list(areas.values('area_id', 'area_name', 'area_type_id'))
+            'patient_id': block.patient.pat_id,
+            'block': {
+                'id': block.id,
+                'name': block.name,
+                'diagnosis': block.diagnosis,
+                'body_site': block.body_site.name if block.body_site else '',
+            },
+            'areas': list(areas.values('id', 'name', 'area_type'))
         }
 
         return JsonResponse(result)
     except Block.DoesNotExist:
-        return JsonResponse({'error': 'Blok bulunamadı'}, status=404)
+        logger.error(f"Couldn't find block id: {str(e)}")
+        return JsonResponse({'error': 'Could not find a block'}, status=404)
     except Exception as e:
+        logger.error(f"Unexpected error during request the get_block_areas: {str(e)}")
         return JsonResponse({'error': str(e)}, status=500)

@@ -46,3 +46,10 @@ class VariantSerializerBlockArea(serializers.ModelSerializer):
 
     def get_sample_lib(self,obj):
         return obj.sample_lib.name
+
+class VariantsViewSerializer(serializers.ModelSerializer):
+    DT_RowId = serializers.SerializerMethodField()
+
+    class Meta:
+        model = VariantsView
+        fields = ("analysis_run_name","gene_name","pvariant_id","alias","coverage","vaf","DT_RowId",)

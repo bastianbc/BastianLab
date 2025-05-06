@@ -17,13 +17,7 @@ from .helper import get_kwarg_value
 @permission_required_for_async("variant.view_variant")
 def filter_variants(request):
     variants = VariantCall.query_by_args(request.user,**request.GET)
-    kwargs = request.GET
-    model_block = get_kwarg_value(kwargs, 'model_block')
-    model_area = get_kwarg_value(kwargs, 'model_area')
-    if model_block or model_area:
-        serializer = VariantSerializerBlockArea(variants['items'], many=True)
-    else:
-        serializer = VariantSerializer(variants['items'], many=True)
+    serializer = VariantSerializer(variants['items'], many=True)
     result = dict()
     result['data'] = serializer.data
     result['draw'] = variants['draw']

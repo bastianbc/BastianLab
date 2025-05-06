@@ -460,7 +460,7 @@ class VariantFile(models.Model):
 class VariantsView(models.Model):
     area_id = models.IntegerField()
     area_name = models.CharField(max_length=50)
-    area_type_id = models.IntegerField(null=True)
+    area_type = models.IntegerField(null=True)
     collection = models.CharField(max_length=2)
     block_id = models.IntegerField()
     block_name = models.CharField(max_length=50)
@@ -500,3 +500,94 @@ class VariantsView(models.Model):
     class Meta:
         managed = False
         db_table = 'variants_view'
+
+    def query_by_args(self, **kwargs):
+        try:
+            ORDER_COLUMN_CHOICES = {
+                "0": "id",
+                "1": "patient",
+                "2": "areas",
+                "3": "block",
+                "4": "sample_lib",
+                "5": "sequencing_run",
+                "6": "gene",
+                "7": "variant",
+            }
+
+            draw = int(kwargs.get('draw', None)[0])
+            length = int(kwargs.get('length', None)[0])
+            start = int(kwargs.get('start', None)[0])
+            search_value = kwargs.get('search[value]', None)[0]
+            order_column = kwargs.get('order[0][column]', None)[0]
+            order = kwargs.get('order[0][dir]', None)[0]
+
+            order_column = ORDER_COLUMN_CHOICES[order_column]
+            # django orm '-' -> desc
+            if order == 'desc':
+                order_column = '-' + order_column
+
+            queryset = VariantsView.objects.filter(is_superuser=False)
+
+            total = queryset.count()
+
+            total = queryset.count()
+            if sample_lib:
+                queryset = queryset.filter(Q(sample_lib__id=sample_lib))
+
+            if sequencing_run:
+                queryset = queryset.filter(Q(sequencing_run__id=sequencing_run))
+
+            if area:
+                queryset = queryset.filter(
+                    Q(sample_lib__na_sl_links__nucacid__area_na_links__area__id=block))
+
+            if block:
+                queryset = queryset.filter(
+                    Q(sample_lib__na_sl_links__nucacid__area_na_links__area__block__id=block))
+
+            if patient:
+                queryset = queryset.filter(
+                    Q(sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__id=patient))
+            if coverage_value:
+                queryset = queryset.filter(coverage=coverage_value)
+
+            if log2r_value:
+                queryset = queryset.filter(log2r=log2r_value)
+
+            if ref_read_value:
+                queryset = queryset.filter(ref_read=ref_read_value)
+
+            if alt_read_value:
+                queryset = queryset.filter(alt_read=alt_read_value)
+
+            if coverage_value:
+                queryset = queryset.filter(coverage=coverage_value)
+
+            if log2r_value:
+                queryset = queryset.filter(log2r=log2r_value)
+
+            if ref_read_value:
+                queryset = queryset.filter(ref_read=ref_read_value)
+
+            if alt_read_value:
+                queryset = queryset.filter(alt_read=alt_read_value)
+
+            if search_value:
+                queryset = queryset.filter(
+                    Q(patient__icontains=search_value) |
+                    Q(area__icontains=search_value) |
+                    Q(last_name__icontains=search_value)
+                )
+
+            count = queryset.count()
+            queryset = queryset.order_by(order_column)[start:start + length]
+            # queryset = queryset[start:start + length]
+            return {
+                'items': queryset,
+                'count': count,
+                'total': total,
+                'draw': draw
+            }
+        except Exception as e:
+            print(str(e))
+            raise

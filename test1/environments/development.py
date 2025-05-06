@@ -230,12 +230,21 @@ LOGGING = {
             'filename': 'variant-debug.log',
             'formatter': 'verbose',
         },
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        },
     },
     'loggers': {
         'variant_parser': {
             'handlers': ['file'],
             'level': 'DEBUG',
             'propagate': True,
+        },
+        'root': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
         },
     },
 }
