@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 import json
-from .storage import CustomFileSystemStorage
+from .storage import CustomFileSystemStorage, analysis_run_upload_to
 
 class AnalysisRun(models.Model):
     PIPELINE_CHOICES = (
@@ -18,13 +18,16 @@ class AnalysisRun(models.Model):
         ("imported", "Imported"),
     )
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="analysis_runs")
-    name = models.CharField(max_length=12, unique=True, verbose_name="Name")
+    name = models.CharField(max_length=100, unique=True, verbose_name="Name")
     pipeline = models.CharField(max_length=10, choices=PIPELINE_CHOICES, verbose_name = "Pipeline Version")
     genome = models.CharField(max_length=10, choices=GENOME_CHOICES, verbose_name = "Reference Genome")
     date = models.DateTimeField(auto_now_add=True)
-    sheet = models.FileField(storage=CustomFileSystemStorage(), upload_to='')
+    sheet = models.FileField(storage=CustomFileSystemStorage(), upload_to=analysis_run_upload_to, verbose_name="Sheet File")
     sheet_name = models.CharField(max_length=200, blank=True, null=True, verbose_name="Sheet Name")
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=STATUS_CHOICES[0][0], verbose_name = "Status")
+    # used_seq_runs = models.FileField(storage=CustomFileSystemStorage(), upload_to=analysis_run_upload_to, verbose_name="SeqRun txt")
+    # used_seq_runs_name = models.CharField(max_length=200, blank=True, null=True, verbose_name="SeqRun Name")
+
 
     class Meta:
         db_table = "analysis_run"
@@ -44,6 +47,11 @@ class AnalysisRun(models.Model):
         if not self.name:
             self.name = self.generate_name()
         super(AnalysisRun, self).save(*args, **kwargs)
+
+    def analysis_run_upload_to(self, instance, filename):
+        # instance.name is your unique run name (e.g. "AR_2025_05_05_hg38")
+        # this will save into: <SEQUENCING_FILES_SOURCE_DIRECTORY>/AR_2025_05_05_hg38/filename
+        return f"{instance.name}/{filename}"
 
     def query_by_args(self, user, **kwargs):
         def _get_authorizated_queryset():
