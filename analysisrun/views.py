@@ -72,14 +72,14 @@ def save_analysis_run(request):
                 'user':       request.user,
                 'pipeline':   pipeline,
                 'genome':     genome,
-                'sheet_name': run_name,
+                'sheet_name': f"{run_name}-{selected_ids}",
                 'status':     'pending',
             }
         )
         if not created:
             analysis_run.pipeline   = pipeline
             analysis_run.genome     = genome
-            analysis_run.sheet_name = run_name
+            analysis_run.sheet_name = f"{run_name}-{selected_ids}",
             analysis_run.status     = 'pending'
             analysis_run.save(update_fields=['pipeline','genome','sheet_name','status'])
 
