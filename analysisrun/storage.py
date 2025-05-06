@@ -6,6 +6,9 @@ class CustomFileSystemStorage(FileSystemStorage):
     def __init__(self, *args, **kwargs):
         # Default directory to store files
         kwargs['location'] = settings.SEQUENCING_FILES_SOURCE_DIRECTORY
+        # prevent any chmod() calls
+        kwargs['file_permissions_mode'] = None
+        kwargs['directory_permissions_mode'] = None
         super(CustomFileSystemStorage, self).__init__(*args, **kwargs)
 
     def get_available_name(self, name, max_length=None):
