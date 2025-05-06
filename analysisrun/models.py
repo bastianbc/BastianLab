@@ -25,8 +25,8 @@ class AnalysisRun(models.Model):
     sheet = models.FileField(storage=CustomFileSystemStorage(), upload_to=analysis_run_upload_to, verbose_name="Sheet File")
     sheet_name = models.CharField(max_length=200, blank=True, null=True, verbose_name="Sheet Name")
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=STATUS_CHOICES[0][0], verbose_name = "Status")
-    used_seq_runs = models.FileField(storage=CustomFileSystemStorage(), upload_to=analysis_run_upload_to, verbose_name="SeqRun txt")
-    used_seq_runs_name = models.CharField(max_length=200, blank=True, null=True, verbose_name="SeqRun Name")
+    # used_seq_runs = models.FileField(storage=CustomFileSystemStorage(), upload_to=analysis_run_upload_to, verbose_name="SeqRun txt")
+    # used_seq_runs_name = models.CharField(max_length=200, blank=True, null=True, verbose_name="SeqRun Name")
 
 
     class Meta:
