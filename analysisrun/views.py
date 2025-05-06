@@ -63,7 +63,7 @@ def save_analysis_run(request):
         genome       = request.POST.get('genome')
         selected_ids = request.POST.getlist('selected_ids[]')
 
-        run_name     = f"AR_{date.today():%m_%d_%Y}_{genome}_{(int(AnalysisRun.objects.last().id)+1)}"
+        run_name     = f"AR_{request.user}_{date.today():%m_%d_%Y}_{genome}_{(int(AnalysisRun.objects.last().id)+1)}"
         csv_filename = f"{run_name}.csv"
 
         # 1) get or create
