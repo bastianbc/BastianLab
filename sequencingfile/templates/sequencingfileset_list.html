@@ -183,6 +183,24 @@
 </table>
 <!--end::Datatable-->
 
+<h1>Live Logs</h1>
+  <pre id="log-container"></pre>
+
+  <script>
+    const logContainer = document.getElementById('log-container');
+    const es = new EventSource('/sequencingfile/sequencingfileset/');
+
+    es.onmessage = e => {
+      logContainer.textContent += e.data + "\n";
+      // auto‐scroll
+      logContainer.scrollTop = logContainer.scrollHeight;
+    };
+
+    es.onerror = err => {
+      console.error("EventSource failed:", err);
+      es.close();
+    };
+  </script>
 {% endblock %}
 
 {% block scripts %}

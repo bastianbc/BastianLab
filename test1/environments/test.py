@@ -249,6 +249,42 @@ PI_GROUP_NAME = "Primary Investigators"
 
 
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'sequencing_sync.log',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'sync_sequencing_files': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}
+
+
 SMB_DIRECTORY_LABSHARE = "/Volumes/labshare"
 SEQUENCING_FILES_SOURCE_DIRECTORY = Path(Path(SMB_DIRECTORY_LABSHARE) / "BastianRaid-02")
 TEMP_DIRECTORY = Path(Path(SMB_DIRECTORY_LABSHARE) / "BastianRaid-02" / "TEMP")

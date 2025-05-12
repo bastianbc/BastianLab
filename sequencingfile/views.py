@@ -21,6 +21,9 @@ from django.db.models.expressions import RawSQL
 import subprocess
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+# views.py
+from django.http import StreamingHttpResponse
+import time, subprocess
 
 
 @permission_required("sequencingfile.view_sequencingfile",raise_exception=True)
@@ -542,4 +545,141 @@ def execute_mount_script():
 
 
 
+from pathlib import Path
+
+from django.conf import settings
+from sequencingfile.models import SequencingFile, SequencingFileSet
+
+import os
+import logging
+from django.http import StreamingHttpResponse
+
+ROOT_DIRS = [
+    settings.SEQUENCING_FILES_SOURCE_DIRECTORY,
+]
+
+class StreamHandler(logging.Handler):
+    def __init__(self):
+        super().__init__()
+        self.logs = []
+
+    def emit(self, record):
+        message = self.format(record)
+        self.logs.append(message)
+
+
+# Function to stream logs to browser
+def stream_sync_sequencing_files(request):
+    """
+    Stream the contents of a directory to the client.
+    Optimized for directories with large numbers of files.
+
+    Args:
+        request: HTTP request object
+        directory_path: Optional path to the directory to stream.
+                       If None, uses BASE_DIR from settings.
+    """
+    directory_path = settings.SEQUENCING_FILES_SOURCE_DIRECTORY
+
+    # Get optional query parameters for optimization
+    batch_size = int(request.GET.get('batch_size', 100))
+    max_depth = request.GET.get('max_depth')
+    max_depth = int(max_depth) if max_depth else None
+
+    def directory_generator():
+        """Generator function that yields directory contents as JSON."""
+        # Yield initial message
+        yield f"data: {json.dumps({'type': 'info', 'message': f'Starting to scan: {directory_path}'})}\n\n"
+
+        file_count = 0
+        total_files = 0
+        current_depth = 0
+        file_batch = []
+
+        try:
+            # Walk the directory with topdown=True to track depth
+            for root, dirs, files in os.walk(directory_path, topdown=True):
+                # Calculate current depth
+                rel_path = os.path.relpath(root, directory_path)
+                current_depth = 0 if rel_path == '.' else rel_path.count(os.sep) + 1
+
+                # Stop at max_depth if specified
+                if max_depth is not None and current_depth > max_depth:
+                    dirs[:] = []  # Clear dirs list to prevent deeper traversal
+                    continue
+
+                # Yield the current directory
+                if rel_path == '.':
+                    rel_path = ''
+
+                yield f"data: {json.dumps({'type': 'directory', 'path': rel_path, 'file_count': len(files)})}\n\n"
+
+                # Process files in batches
+                for file in files:
+                    file_path = os.path.join(rel_path, file)
+                    full_path = os.path.join(root, file)
+
+                    try:
+                        # Use stat to get file info (faster than multiple separate calls)
+                        file_stat = os.stat(full_path)
+                        file_info = {
+                            'type': 'file',
+                            'path': file_path,
+                            'size': file_stat.st_size
+                        }
+                        file_batch.append(file_info)
+                        file_count += 1
+                        total_files += 1
+
+                        # Send batch when it reaches the batch size
+                        if len(file_batch) >= batch_size:
+                            yield f"data: {json.dumps({'type': 'file_batch', 'files': file_batch, 'progress': {'processed': total_files}})}\n\n"
+                            file_batch = []  # Reset batch
+                    except OSError:
+                        yield f"data: {json.dumps({'type': 'error', 'message': f'Cannot access file: {file_path}'})}\n\n"
+
+            # Send any remaining files in the batch
+            if file_batch:
+                yield f"data: {json.dumps({'type': 'file_batch', 'files': file_batch, 'progress': {'processed': total_files}})}\n\n"
+
+            # Yield completion message
+            yield f"data: {json.dumps({'type': 'info', 'message': f'Directory scan complete. Total files: {total_files}'})}\n\n"
+
+        except PermissionError:
+            yield f"data: {json.dumps({'type': 'error', 'message': 'Permission denied accessing some directories'})}\n\n"
+        except Exception as e:
+            yield f"data: {json.dumps({'type': 'error', 'message': f'Error: {str(e)}'})}\n\n"
+
+    # Return a streaming response with SSE (Server-Sent Events) format
+    response = StreamingHttpResponse(
+        directory_generator(),
+        content_type='text/event-stream'
+    )
+    response['Cache-Control'] = 'no-cache'
+    response['X-Accel-Buffering'] = 'no'  # Disable buffering for Nginx
+    return response
+
+
+# views.py
+import asyncio
+from django.http import StreamingHttpResponse
+
+async def generate_logs():
+    """An example async generator that yields log lines."""
+    for i in range(1, 11):
+        # In real life you’d pull from your log source instead
+        await asyncio.sleep(1)
+        yield f"data: Log entry #{i} at {asyncio.get_event_loop().time()}\n\n"
+
+async def stream_logs(request):
+    """
+    Async view that returns a streaming SSE response.
+    Clients will see each line as it comes.
+    """
+    response = StreamingHttpResponse(
+        generate_logs(),
+        content_type='text/event-stream'
+    )
+    response['Cache-Control'] = 'no-cache'
+    return response
 
