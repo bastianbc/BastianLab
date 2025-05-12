@@ -267,7 +267,8 @@ def create_gene_detail(gene_detail, row_gene, g_variant, func):
         try:
             logger.debug(f"Processing gene_detail: {entry}")
             nm_id, exon, c_var = entry.split(':')
-            gene = get_gene(row_gene, "hg19", nm_id)
+            # AnalysisRun.objects.get() TODO
+            gene = get_gene(row_gene, "hg38", nm_id)
             # Create CVariant instance
             is_alias = True if nm_id.lower() == gene.nm_canonical.lower() else False
             if gene:
@@ -298,8 +299,8 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail, filename, ro
         for entry in entries:
             try:
                 logger.debug(f"Processing entry: {entry}")
-                gene, nm_id, exon, c_var, p_var = entry.split(':')
-                gene = get_gene(gene, "hg19", nm_id)
+                gene, nm_id, exon, c_var, p_var = entry.split(':') # NTRK1:NM_001012331:exon16:c.C2253A:p.Y751X,NTRK1
+                gene = get_gene(gene, "hg19", nm_id) # TODO look at it
                 # Create CVariant instance
                 is_alias = True if nm_id.lower() == gene.nm_canonical.lower() else False
                 if gene:

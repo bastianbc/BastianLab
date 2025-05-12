@@ -56,11 +56,11 @@ from django.core.files.base import ContentFile
 
 def save_analysis_run(request):
     if request.method == "POST":
-        pipeline     = request.POST.get('pipeline')
-        genome       = request.POST.get('genome')
+        pipeline = request.POST.get('pipeline')
+        genome = request.POST.get('genome')
         selected_ids = request.POST.getlist('selected_ids[]')
 
-        run_name     = f"AR_{request.user}_{date.today():%m_%d_%Y}_{genome}_{(int(AnalysisRun.objects.last().id)+1)}"
+        run_name = f"AR_{request.user}_{date.today():%m_%d_%Y}_{genome}_{(int(AnalysisRun.objects.last().id)+1)}"
         csv_filename = f"{run_name}.csv"
 
         # 1) get or create
@@ -75,10 +75,10 @@ def save_analysis_run(request):
             }
         )
         if not created:
-            analysis_run.pipeline   = pipeline
-            analysis_run.genome     = genome
+            analysis_run.pipeline = pipeline
+            analysis_run.genome = genome
             analysis_run.sheet_name = f"{run_name}",
-            analysis_run.status     = 'pending'
+            analysis_run.status = 'pending'
             analysis_run.save(update_fields=['pipeline','genome','sheet_name','status'])
 
         response = get_sheet_by_id(selected_ids, run_name)
