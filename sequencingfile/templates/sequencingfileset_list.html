@@ -188,7 +188,7 @@
 
   <script>
     const logContainer = document.getElementById('log-container');
-    const es = new EventSource('/sequencingfile/sequencingfileset/');
+    const es = new EventSource('/sequencingfile/sequencingfileset/stream_logs');
 
     es.onmessage = e => {
       logContainer.textContent += e.data + "\n";
