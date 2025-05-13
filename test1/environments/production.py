@@ -108,7 +108,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'core.log_streaming.AsyncLogStreamMiddleware'
+    # 'core.log_streaming.AsyncLogStreamMiddleware'
 ]
 
 ROOT_URLCONF = 'test1.urls'
