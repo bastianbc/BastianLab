@@ -724,3 +724,70 @@ async def get_new_logs(request):
         "logs":   new,
         "last_idx": last_idx
     })
+
+
+
+# asgi.py
+import os, time, asyncio
+from django.core.asgi import get_asgi_application
+import redis.asyncio as aioredis
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'your_project.settings')
+application = get_asgi_application()
+
+# --- below, schedule the async log‐generator ---
+REDIS_URL = "redis://localhost:6379/0"
+LOG_KEY   = "log_buffer"
+
+async def log_producer():
+    client = aioredis.from_url(REDIS_URL)
+    # generate 10 entries, one per second
+    for i in range(1, 11):
+        await asyncio.sleep(1)
+        msg = f"Log entry #{i} at {time.time():.2f}"
+        # push to Redis list
+        await client.rpush(LOG_KEY, msg)
+
+# fire-and-forget
+asyncio.get_event_loop().create_task(log_producer())
+
+
+async def async_view(request):
+    await asyncio.sleep(2)
+    data = {"message": "This is an asynchronous response."}
+    return JsonResponse(data)
+
+
+# yourapp/views.py
+
+import asyncio
+from channels.generic.websocket import AsyncWebsocketConsumer
+
+class LogStreamerConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        await self.accept()
+        # launch background task to push logs
+        self.log_task = asyncio.create_task(self.stream_logs())
+
+    async def disconnect(self, close_code):
+        # clean up when client disconnects
+        self.log_task.cancel()
+
+    async def stream_logs(self):
+        """
+        Replace this loop with reading your real log source.
+        For example, tailing a file or subscribing to an external logger.
+        """
+        counter = 1
+        try:
+            while True:
+                message = f"[{counter}] Example log entry"
+                await self.send(text_data=message)
+                counter += 1
+                await asyncio.sleep(1)   # simulate delay
+        except asyncio.CancelledError:
+            pass  # task was cancelled on disconnect
+
+    async def receive(self, text_data):
+        # (Optional) handle messages from the client here
+        pass
