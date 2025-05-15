@@ -719,7 +719,7 @@ async def get_new_logs(request):
     # Filter out anything with idx > since
     new = [entry for entry in LOG_BUFFER if entry["idx"] > since]
     last_idx = new[-1]["idx"] if new else since
-
+    print(new, last_idx)
     return JsonResponse({
         "logs":   new,
         "last_idx": last_idx
