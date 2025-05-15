@@ -57,7 +57,7 @@ var NotificationManager = (function () {
 
     // ──────── Log‐Streaming WS ────────
     function initLogSocket() {
-        logSocket = new WebSocket("ws://10.65.11.68:8000/ws/logs");
+        logSocket = new WebSocket("ws://10.65.11.68:8000/ws/logs/");
 
         logSocket.onopen = function () {
             console.log("✅ Log WS Connected");
