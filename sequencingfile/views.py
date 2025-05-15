@@ -684,3 +684,43 @@ async def stream_logs(request):
     return response
 
 
+# views.py
+import asyncio
+from django.http import JsonResponse
+from django.views.decorators.http import require_GET
+from django.utils.decorators import sync_and_async_middleware
+
+# simple in-memory log store for demo purposes
+LOG_BUFFER = []
+
+async def generate_logs_background():
+    """Populate LOG_BUFFER in the background."""
+    for i in range(1, 11):
+        await asyncio.sleep(1)
+        LOG_BUFFER.append({
+            "idx": i,
+            "msg": f"Log entry #{i} at {asyncio.get_event_loop().time():.2f}"
+        })
+
+# Kick off your background task somewhere on startup:
+# asyncio.create_task(generate_logs_background())
+
+@require_GET
+async def get_new_logs(request):
+    """
+    Query params: ?since_idx=<int>
+    Returns: { logs: [ {idx, msg}, … ], last_idx: <int> }
+    """
+    try:
+        since = int(request.GET.get("since_idx", 0))
+    except ValueError:
+        since = 0
+
+    # Filter out anything with idx > since
+    new = [entry for entry in LOG_BUFFER if entry["idx"] > since]
+    last_idx = new[-1]["idx"] if new else since
+
+    return JsonResponse({
+        "logs":   new,
+        "last_idx": last_idx
+    })
