@@ -22,6 +22,6 @@ application = ProtocolTypeRouter({
     # WebSocket connections go through the Auth middleware
     # into your URLRouter (notification.routing.websocket_urlpatterns)
     "websocket": AuthMiddlewareStack(
-        URLRouter(notification_patterns + sequencingfile_patterns)
+        URLRouter(notification_patterns)
     ),
 })
