@@ -11,7 +11,6 @@ from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
 from notification.routing import websocket_urlpatterns as notification_patterns
-from sequencingfile.routing import websocket_urlpatterns as sequencingfile_patterns
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'test1.settings')
 
