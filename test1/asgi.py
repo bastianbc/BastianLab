@@ -10,7 +10,8 @@ import os
 from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
-from notification.routing import websocket_urlpatterns
+from notification.routing import websocket_urlpatterns as notification_patterns
+from sequencingfile.routing import websocket_urlpatterns as sequencingfile_patterns
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'test1.settings')
 
@@ -21,6 +22,6 @@ application = ProtocolTypeRouter({
     # WebSocket connections go through the Auth middleware
     # into your URLRouter (notification.routing.websocket_urlpatterns)
     "websocket": AuthMiddlewareStack(
-        URLRouter(websocket_urlpatterns)
+        URLRouter(notification_patterns + sequencingfile_patterns)
     ),
 })
