@@ -21,6 +21,7 @@ urlpatterns = [
     path('sequencingfileset/delete/<str:id>', views.delete_sequencingfileset, name='delete-sequencingfileset'),
     path('sequencingfileset/batch_delete', views.delete_batch_sequencingfilesets, name='delete-batch-sequencingfilesets'),
     path('sequencingfileset/stream_sync_sequencing_files', views.stream_sync_sequencing_files, name='stream_sync_sequencing_files'),
+    path('sequencingfileset/get_new_logs', views.get_new_logs, name='get_new_logs'),
     path('sequencingfileset/stream_logs', views.stream_logs, name='stream_logs'),
     path('check_can_deleted_async_set', views.check_can_deleted_async_set, name='checkcan-deleted-async-set'),
 

@@ -30,7 +30,7 @@
 
       function poll() {
         $.ajax({
-          url: '/sequencingfile/sequencingfileset/get-new-logs/',
+          url: '/sequencingfile/sequencingfileset/get_new_logs',
           data: { since_idx: lastIdx },
           dataType: 'json',
           success(data) {
