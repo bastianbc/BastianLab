@@ -28,10 +28,8 @@ const $logMessages = $('#log-messages');
             // Append the message to the log display area
             $logMessages.append('<p>' + escapeHtml(message) + '</p>');
             // Scroll to the bottom of the log display
-            $logMessages.scrollTop($logMessages[0].scrollHeight);
         } catch (error) {
             console.error("Error parsing message from server or updating DOM:", error);
-            $logMessages.append('<p><em>Error processing message.</em></p>');
         }
     };
 
