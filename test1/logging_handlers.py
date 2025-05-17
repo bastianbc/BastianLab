@@ -1,21 +1,20 @@
-# somewhere in your project, e.g. test1/logging_handlers.py
+# myapp/log_handlers.py
 import logging
 from asgiref.sync import async_to_sync
-from channels.layers import get_channel_layer
 
-class WebsocketLogHandler(logging.Handler):
+class WebSocketLogHandler(logging.Handler):
+    """
+    A logging.Handler that routes every log record
+    straight into a WebSocket.send(text_data=...).
+    """
+    def __init__(self, send_method):
+        super().__init__()
+        self.send_method = send_method
+
     def emit(self, record):
         try:
-            message = self.format(record)
-            channel_layer = get_channel_layer()
-            # send to the “logging” group
-            async_to_sync(channel_layer.group_send)(
-                "logging",
-                {
-                    "type": "log_message",   # maps to the method name in consumer
-                    "message": message,
-                }
-            )
+            msg = self.format(record)
+            # send raw text over the open WebSocket
+            async_to_sync(self.send_method)(text_data=msg)
         except Exception:
-            # don’t let logging failures crash your app
             self.handleError(record)
