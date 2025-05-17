@@ -17,7 +17,7 @@ class FileTreeConsumer(AsyncWebsocketConsumer):
         asyncio.get_event_loop().run_in_executor(None, self._run_scan)
 
     def _run_scan(self):
-        for root_dir in settings.HISEQDATA_DIRECTORY:
+        for root_dir in [settings.HISEQDATA_DIRECTORY]:
             for root, dirs, files in os.walk(root_dir):
                 rel = root.replace(root_dir, "")
                 for fn in files:
