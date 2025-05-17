@@ -11,7 +11,6 @@ from sequencingrun.models import *
 from capturedlib.models import CapturedLib
 from sequencinglib.models import SequencingLib
 import subprocess
-from .walk_labshare import create_file_tree
 
 
 @permission_required("sequencingfile.view_sequencingfile",raise_exception=True)
@@ -261,10 +260,6 @@ def check_can_deleted_async_set(request):
 
     return JsonResponse({"related_objects":related_objects})
 
-def create_file_tree(request):
-    create_file_tree()
-
-    return JsonResponse({"related_objects":related_objects})
 
 def make_dict(d):
     try:
