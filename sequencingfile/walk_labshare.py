@@ -19,9 +19,8 @@ class FileTreeConsumer(AsyncWebsocketConsumer):
     def _run_scan(self):
         for root_dir in [settings.HISEQDATA_DIRECTORY]:
             for root, dirs, files in os.walk(root_dir):
-                rel = root.replace(root_dir, "")
-                for fn in files:
-                    payload = {"message": f"{rel} ➔ {fn}"}
+                for file in files:
+                    payload = {"message": f"{root} ➔ {file}"}
                     async_to_sync(self.send)(text_data=json.dumps(payload))
         # final “done” message
         async_to_sync(self.send)(text_data=json.dumps({"complete": True}))
