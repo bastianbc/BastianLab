@@ -1,6 +1,11 @@
 # myapp/consumers.py
 import re
 import os, asyncio, logging
+import django
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "test1.settings")
+django.setup()
+
 from django.conf import settings
 from channels.generic.websocket import AsyncWebsocketConsumer
 from test1.logging_handlers import WebSocketLogHandler
