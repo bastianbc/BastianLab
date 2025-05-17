@@ -1,29 +1,17 @@
-import os
-import json
 import pandas as pd
-from pathlib import Path
 import re
-
 from django.shortcuts import render,redirect
-from django.contrib.auth.decorators import login_required,permission_required
-from django.http import JsonResponse
+from django.contrib.auth.decorators import permission_required
 from django.contrib import messages
 from core.decorators import permission_required_for_async
-from .models import SequencingFile, SequencingFileSet
 from .serializers import SequencingFileSerializer, SequencingFileSetSerializer
 from .forms import SequencingFileForm, SequencingFileSetForm
 from samplelib.models import *
 from sequencingrun.models import *
 from capturedlib.models import CapturedLib
 from sequencinglib.models import SequencingLib
-from django.core.exceptions import ObjectDoesNotExist
-from django.db.models.expressions import RawSQL
 import subprocess
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-# views.py
-from django.http import StreamingHttpResponse
-import time, subprocess
+from .walk_labshare import create_file_tree
 
 
 @permission_required("sequencingfile.view_sequencingfile",raise_exception=True)
@@ -270,6 +258,11 @@ def check_can_deleted_async_set(request):
                 "model": field.related_model.__name__,
                 "count": relations.count()
             })
+
+    return JsonResponse({"related_objects":related_objects})
+
+def create_file_tree(request):
+    create_file_tree()
 
     return JsonResponse({"related_objects":related_objects})
 

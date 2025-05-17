@@ -230,7 +230,6 @@ def parse_parse_dup_metrics():
 
 
 def import_qc():
-
     SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
     parse_parse_dup_metrics()
 
