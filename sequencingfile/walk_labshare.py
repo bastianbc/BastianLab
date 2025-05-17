@@ -1,29 +1,34 @@
 # myapp/consumers.py
-import os, asyncio, json, logging
+import os, asyncio, logging
 from django.conf import settings
-from asgiref.sync import async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer
+from test1.logging_handlers import WebSocketLogHandler
 
 logger = logging.getLogger("file-tree")
 
 class FileTreeConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        # Log on server
-        logger.debug("WebSocket CONNECTED from %s", self.scope["client"])
         await self.accept()
-        # Send an initial handshake message
-        await self.send(json.dumps({"message": "🟢 Connection accepted, starting scan…"}))
-        # Offload your blocking scan
+
+        # 1. Attach our WebSocketLogHandler
+        self.ws_handler = WebSocketLogHandler(self.send)
+        # (optional) choose your log format
+        self.ws_handler.setFormatter(logging.Formatter("%(message)s"))
+        logger.addHandler(self.ws_handler)
+
+        # 2. Kick off the scan in a thread
         asyncio.get_event_loop().run_in_executor(None, self._run_scan)
 
     def _run_scan(self):
-        for root_dir in [settings.HISEQDATA_DIRECTORY]:
-            for root, dirs, files in os.walk(root_dir):
-                for file in files:
-                    payload = {"message": f"{root} ➔ {file}"}
-                    async_to_sync(self.send)(text_data=json.dumps(payload))
-        # final “done” message
-        async_to_sync(self.send)(text_data=json.dumps({"complete": True}))
+        root_dir = settings.HISEQDATA_DIRECTORY
+        for root, dirs, files in os.walk(root_dir):
+            for filename in files:
+                # now just log — the handler sends it to the browser
+                logger.info(f"{root} ➔ {filename}")
+
+        # final notice
+        logger.info("--- Scan complete ---")
 
     async def disconnect(self, close_code):
-        logger.debug("WebSocket DISCONNECTED (code=%s)", close_code)
+        # Clean up: remove our handler so we don't leak connections
+        logger.removeHandler(self.ws_handler)
