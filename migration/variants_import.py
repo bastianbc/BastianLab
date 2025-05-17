@@ -492,7 +492,7 @@ def create_genes(row):
         chr = str(row['chr']),
         start = int(row['start']) if not pd.isnull(row['start']) else 0,
         end = int(row['end']) if not pd.isnull(row['end']) else 0,
-        hg = row['hg'],
+        hg = row['Hg'],
         nm_canonical = row['NM_canonical']
     )
 
@@ -501,15 +501,16 @@ def import_genes():
     # CVariant.objects.filter().update(gene=gene_instance)
     # Gene.objects.filter(id__gt=1).delete()
     SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
+    p = Path("/Users/cbagci/Downloads/MANE.GRCh38.csv")
     # file = os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "cns_files.csv")
     file = Path(Path(__file__).parent.parent / "uploads" / "MANE_hg19_final_filtered.csv")
-    df = pd.read_csv(file, index_col=False)
+    df = pd.read_csv(p, index_col=False)
     df = df.reset_index()
-    # df.apply(create_genes, axis=1)
+    df.apply(create_genes, axis=1)
     pass
 
 
 if __name__ == "__main__":
     print("start")
-    import_variants()
+    import_genes()
     print("end")
