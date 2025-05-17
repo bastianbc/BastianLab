@@ -1,8 +1,11 @@
-from django.db import models
-from datetime import datetime
-from django.db.models import Q, Count, OuterRef, Subquery, Value
+import re
+import os
 import json
+from django.db import models
+from django.db.models import Q, Count
 from projects.utils import get_user_projects
+from sequencingrun.models import SequencingRun
+from samplelib.models import SampleLib
 
 class SequencingFileSet(models.Model):
     set_id = models.AutoField(primary_key=True)
@@ -18,6 +21,103 @@ class SequencingFileSet(models.Model):
 
     def __str__(self):
         return self.prefix
+
+    @classmethod
+    def generate_file_set(cls, file_name, path, sample_lib, seq_run):
+        try:
+            match = re.match(r'.*[-_]([ACTG]{6,8})[-_]', file_name)
+            prefix = None
+            file_type = None
+
+            lower_name = file_name.lower()
+            # FASTQ files
+            if "fastq" in lower_name:
+                file_type = "fastq"
+                if "_l0" in lower_name:
+                    prefix = file_name.split("_L0")[0]
+                elif "_001" in file_name:
+                    prefix = file_name.split("_001")[0]
+            # BAM variations
+            elif ".sorted" in lower_name:
+                file_type = "bam"
+                prefix = file_name.split(".sorted")[0]
+            elif ".sort" in lower_name:
+                file_type = "bam"
+                prefix = file_name.split(".sort")[0]
+            elif ".removedupes" in lower_name:
+                file_type = "bam"
+                prefix = file_name.split(".removedupes")[0]
+            elif ".recal" in lower_name:
+                file_type = "bam"
+                prefix = file_name.split(".recal")[0]
+            elif "deduplicated.realign.bam" in lower_name:
+                file_type = "bam"
+                prefix = file_name.split(".deduplicated.realign.bam")[0]
+            # BAI index
+            elif file_name.endswith(".bai"):
+                file_type = "bai"
+                prefix = file_name.rsplit(".", 1)[0]
+            # generic BAM
+            elif file_name.endswith(".bam"):
+                file_type = "bam"
+                prefix = file_name.rsplit(".", 1)[0]
+
+            # Override prefix if barcode found
+            if match:
+                dna = match.group(1)
+                prefix = file_name.split(dna)[0] + dna
+
+            # Fallback: filename without extension
+            if prefix is None:
+                prefix = os.path.splitext(file_name)[0]
+
+            # Create or fetch the file set
+            # file_set, created = cls.objects.get_or_create(prefix=prefix)
+            # file_set.sample_lib = sample_lib
+            # file_set.sequencing_run = seq_run
+            # file_set.path = path
+            # file_set.save()
+
+            return prefix, file_type
+        except Exception as e:
+            print(f"Error generating file set for {file_name}: {e}")
+            return None, None
+
+    @staticmethod
+    def find_sample(file_name):
+        """
+        Extract sample name from FASTQ/BAM/BAI filename and return matching SampleLib.
+        """
+        try:
+            match = re.match(r"^(.*?)(?:_S|\.)", file_name)
+            if match and re.search(r"\b(bam|bai)\b", file_name.lower()):
+                return SampleLib.objects.get(name=match.group(1))
+        except SampleLib.DoesNotExist:
+            print(f"Sample not found {file_name}")
+        return None
+
+    @staticmethod
+    def find_seqrun(path):
+        """
+        Parse sequencing run name from path and return matching SequencingRun.
+        """
+        try:
+            sr_name = path.split("/")[1]
+            return SequencingRun.objects.get(name=sr_name)
+        except Exception:
+            print(f"Seq Run not found {path}")
+        return None
+
+    @classmethod
+    def get_file_set(cls, seq_run, sample_lib):
+        """
+        Retrieve a SequencingFileSet matching the given run and sample.
+        """
+        try:
+            return cls.objects.get(sequencing_run=seq_run, sample_lib=sample_lib)
+        except cls.DoesNotExist:
+            print(f"SequencingFileSet not found {seq_run}, {sample_lib}")
+            return None
 
     def query_by_args(self, user, **kwargs):
 

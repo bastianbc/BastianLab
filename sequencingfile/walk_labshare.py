@@ -1,8 +1,12 @@
 # myapp/consumers.py
+import re
 import os, asyncio, logging
 from django.conf import settings
 from channels.generic.websocket import AsyncWebsocketConsumer
 from test1.logging_handlers import WebSocketLogHandler
+from sequencingfile.models import SequencingFile, SequencingFileSet
+from sequencingrun.models import SequencingRun
+from sequencinglib.models import SequencingLib
 
 logger = logging.getLogger("file-tree")
 
@@ -21,10 +25,13 @@ class FileTreeConsumer(AsyncWebsocketConsumer):
 
     def _run_scan(self):
         root_dir = settings.HISEQDATA_DIRECTORY
+        pattern = re.compile(r"\.(?:bam|bai|fastq\.gz)$", re.IGNORECASE)
+
         for root, dirs, files in os.walk(root_dir):
             for filename in files:
-                # now just log — the handler sends it to the browser
-                logger.info(f"{root} ➔ {filename}")
+                if pattern.search(filename):
+                    # Log path and filename
+                    logger.info(f"{root} ➔ {filename}")
 
         # final notice
         logger.info("--- Scan complete ---")
