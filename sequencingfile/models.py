@@ -1,5 +1,9 @@
 import re
 import os, logging
+import django
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "test1.settings")
+django.setup()
+from django.conf import settings
 import json
 from django.db import models
 from django.db.models import Q, Count
@@ -7,11 +11,7 @@ from projects.utils import get_user_projects
 from sequencingrun.models import SequencingRun
 from samplelib.models import SampleLib
 from django.core.exceptions import ObjectDoesNotExist
-# import django
-#
-# os.environ.setdefault("DJANGO_SETTINGS_MODULE", "test1.settings")
-# django.setup()
-# from django.conf import settings
+
 
 
 logger = logging.getLogger("file-tree")
@@ -247,13 +247,13 @@ class SequencingFile(models.Model):
             seq_file = cls.objects.get(name=file_name)
             fs = seq_file.sequencing_file_set
             if fs and fs.path != path:
-                fs.path = path
+                fs.path = path.replace(str(settings.SEQUENCING_FILES_SOURCE_DIRECTORY),"")
                 # fs.save()
                 logger.info("*")
 
             return seq_file, fs
         except ObjectDoesNotExist:
-            logger.info(f"ObjectDoesNotExist: {file_name}, path {path}")
+            logger.info(f"ObjectDoesNotExist: {file_name}, path {path.replace(str(settings.SEQUENCING_FILES_SOURCE_DIRECTORY),'')}")
             sample_lib = SequencingFileSet.find_sample(file_name)
             seq_run = SequencingFileSet.find_seqrun(path)
             prefix, file_type = SequencingFileSet.generate_prefix(file_name=file_name)
