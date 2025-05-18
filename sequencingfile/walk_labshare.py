@@ -36,7 +36,7 @@ class FileTreeConsumer(AsyncWebsocketConsumer):
             for file_name in files:
                 if pattern.search(file_name):
                     # Log path and filename
-                    file = Path(Path(__file__).parent / "df_fq_05_17.csv")
+                    file = Path(Path(__file__).parent.parent / "migration" / "df_fq_05_17.csv")
                     df = pd.read_csv(file)
                     df.apply(
                         lambda row: SequencingFile.get_with_file_set(
