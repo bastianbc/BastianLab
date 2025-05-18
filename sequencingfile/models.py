@@ -245,8 +245,8 @@ class SequencingFile(models.Model):
             fs = seq_file.sequencing_file_set
             if fs and fs.path != path:
                 fs.path = path.replace(str(settings.SEQUENCING_FILES_SOURCE_DIRECTORY),"")
-                # fs.save()
-                logger.info("*")
+                fs.save()
+                # logger.info("*")
 
             return seq_file, fs
         except ObjectDoesNotExist:
@@ -260,7 +260,7 @@ class SequencingFile(models.Model):
             #     type=file_type
             # )
             seq_file, fs = "", ""
-            logger.info(f"Created new file: {file_name}, set={prefix}, "
+            logger.info(f"file: {file_name}, set={prefix}, "
                         f"type={file_type},  sample_lib={sample_lib},  seq_run={seq_run}")
             return seq_file, fs
 
