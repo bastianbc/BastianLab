@@ -256,18 +256,14 @@ class SequencingFile(models.Model):
             logger.info(f"ObjectDoesNotExist: {file_name}, path {path.replace(str(settings.SEQUENCING_FILES_SOURCE_DIRECTORY),'')}")
             sample_lib = SequencingFileSet.find_sample(file_name)
             seq_run = SequencingFileSet.find_seqrun(path)
-            fs, file_type = SequencingFileSet.generate_file_set(
-                file_name=file_name,
-                path=path,
-                sample_lib=sample_lib,
-                seq_run=seq_run
-            )
+            prefix, file_type = SequencingFileSet.generate_prefix(file_name=file_name)
             # seq_file = cls.objects.create(
             #     sequencing_file_set=fs,
             #     name=file_name,
             #     type=file_type
             # )
-            # logger.info(f"Created new file: {file_name}, set={fs.prefix}, type={file_type}")
+            logger.info(f"Created new file: {file_name}, set={prefix}, "
+                        f"type={file_type},  sample_lib={sample_lib},  seq_run={seq_run}")
             return seq_file, fs
 
     def query_by_args(self, user, **kwargs):
