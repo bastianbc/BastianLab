@@ -259,6 +259,7 @@ class SequencingFile(models.Model):
             #     name=file_name,
             #     type=file_type
             # )
+            seq_file = ""
             logger.info(f"Created new file: {file_name}, set={prefix}, "
                         f"type={file_type},  sample_lib={sample_lib},  seq_run={seq_run}")
             return seq_file, fs
