@@ -2,10 +2,10 @@
 import re
 import os, asyncio, logging
 import django
-
+from pathlib import Path
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "test1.settings")
 django.setup()
-
+import pandas as pd
 from django.conf import settings
 from channels.generic.websocket import AsyncWebsocketConsumer
 from test1.logging_handlers import WebSocketLogHandler
@@ -36,7 +36,15 @@ class FileTreeConsumer(AsyncWebsocketConsumer):
             for file_name in files:
                 if pattern.search(file_name):
                     # Log path and filename
-                    seq_file, fs = SequencingFile.get_with_file_set(file_name=file_name, path=root)
+                    file = Path(Path(__file__).parent / "df_fq_05_17.csv")
+                    df = pd.read_csv(file)
+                    df.apply(
+                        lambda row: SequencingFile.get_with_file_set(
+                            file_name=row["file"],
+                            path=row["prefix"]
+                        ),
+                        axis=1
+                    )
 
         # final notice
         logger.info("--- Scan complete ---")
