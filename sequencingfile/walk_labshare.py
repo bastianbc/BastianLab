@@ -41,7 +41,7 @@ class FileTreeConsumer(AsyncWebsocketConsumer):
                     df.apply(
                         lambda row: SequencingFile.get_with_file_set(
                             file_name=row["file"],
-                            path=row["prefix"]
+                            path=row["path"]
                         ),
                         axis=1
                     )
