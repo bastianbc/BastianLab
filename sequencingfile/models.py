@@ -1,8 +1,5 @@
 import re
 import os, logging
-import django
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "test1.settings")
-django.setup()
 from django.conf import settings
 import json
 from django.db import models
