@@ -11,8 +11,8 @@ import django
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "test1.settings")
 django.setup()
-
 from django.conf import settings
+
 
 logger = logging.getLogger("file-tree")
 
