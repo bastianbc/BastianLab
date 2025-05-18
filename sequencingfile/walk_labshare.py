@@ -2,13 +2,17 @@
 import re
 import os, asyncio, logging
 import django
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "test1.settings")
+django.setup()
+
 from django.conf import settings
 from channels.generic.websocket import AsyncWebsocketConsumer
 from test1.logging_handlers import WebSocketLogHandler
+from sequencingfile.models import SequencingFile, SequencingFileSet
+from sequencingrun.models import SequencingRun
+from sequencinglib.models import SequencingLib
 
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "test1.settings")
-from sequencingfile.models import SequencingFile
 logger = logging.getLogger("file-tree")
 
 class FileTreeConsumer(AsyncWebsocketConsumer):
@@ -33,7 +37,7 @@ class FileTreeConsumer(AsyncWebsocketConsumer):
                 if pattern.search(file_name):
                     # Log path and filename
                     seq_file, fs = SequencingFile.get_with_file_set(file_name=file_name, path=root)
-                    # logger.info(f"{seq_file.name} ➔ {file_name}")
+                    logger.info(f"{seq_file.name} ➔ {file_name}")
 
         # final notice
         logger.info("--- Scan complete ---")
