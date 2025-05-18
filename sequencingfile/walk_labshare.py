@@ -33,11 +33,11 @@ class FileTreeConsumer(AsyncWebsocketConsumer):
         pattern = re.compile(r"\.(?:bam|bai|fastq\.gz)$", re.IGNORECASE)
 
         for root, dirs, files in os.walk(root_dir):
-            for filename in files:
-                if pattern.search(filename):
+            for file_name in files:
+                if pattern.search(file_name):
                     # Log path and filename
-                    seq_file = SequencingFile.objects.get(name=filename)
-                    logger.info(f"{seq_file.name} ➔ {filename}")
+                    seq_file, fs = SequencingFile.objects.get_with_file_set(file_namename=file_name, path=root)
+                    logger.info(f"{seq_file.name} ➔ {file_name}")
 
         # final notice
         logger.info("--- Scan complete ---")
