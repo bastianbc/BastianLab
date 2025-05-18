@@ -7,7 +7,12 @@ from projects.utils import get_user_projects
 from sequencingrun.models import SequencingRun
 from samplelib.models import SampleLib
 from django.core.exceptions import ObjectDoesNotExist
+import django
 
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "test1.settings")
+django.setup()
+
+from django.conf import settings
 
 logger = logging.getLogger("file-tree")
 
@@ -242,11 +247,13 @@ class SequencingFile(models.Model):
             seq_file = cls.objects.get(name=file_name)
             fs = seq_file.sequencing_file_set
             if fs and fs.path != path:
-                fs.path = path
+                fs.path = path.replace(str(settings.SEQUENCING_FILES_SOURCE_DIRECTORY),"")
                 # fs.save()
-            logger.info(f"Updated existing file: {file_name}, path set to {path}")
+                logger.info("*")
+
             return seq_file, fs
         except ObjectDoesNotExist:
+            logger.info(f"ObjectDoesNotExist: {file_name}, path {path.replace(str(settings.SEQUENCING_FILES_SOURCE_DIRECTORY),'')}")
             sample_lib = SequencingFileSet.find_sample(file_name)
             seq_run = SequencingFileSet.find_seqrun(path)
             fs, file_type = SequencingFileSet.generate_file_set(
@@ -260,7 +267,7 @@ class SequencingFile(models.Model):
             #     name=file_name,
             #     type=file_type
             # )
-            logger.info(f"Created new file: {file_name}, set={fs.prefix}, type={file_type}")
+            # logger.info(f"Created new file: {file_name}, set={fs.prefix}, type={file_type}")
             return seq_file, fs
 
     def query_by_args(self, user, **kwargs):
