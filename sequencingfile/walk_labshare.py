@@ -8,7 +8,6 @@ from test1.logging_handlers import WebSocketLogHandler
 
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "test1.settings")
-django.setup()
 from sequencingfile.models import SequencingFile
 logger = logging.getLogger("file-tree")
 
