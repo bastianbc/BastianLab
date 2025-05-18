@@ -37,7 +37,6 @@ class FileTreeConsumer(AsyncWebsocketConsumer):
                 if pattern.search(file_name):
                     # Log path and filename
                     seq_file, fs = SequencingFile.get_with_file_set(file_name=file_name, path=root)
-                    logger.info(f"{seq_file.name} ➔ {file_name}")
 
         # final notice
         logger.info("--- Scan complete ---")
