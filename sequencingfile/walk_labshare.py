@@ -5,11 +5,11 @@ import django
 from django.conf import settings
 from channels.generic.websocket import AsyncWebsocketConsumer
 from test1.logging_handlers import WebSocketLogHandler
-from sequencingfile.models import SequencingFile
 
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "test1.settings")
 django.setup()
+from sequencingfile.models import SequencingFile
 logger = logging.getLogger("file-tree")
 
 class FileTreeConsumer(AsyncWebsocketConsumer):
