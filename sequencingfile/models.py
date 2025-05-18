@@ -1,11 +1,16 @@
 import re
-import os
+import os, logging
 import json
 from django.db import models
 from django.db.models import Q, Count
 from projects.utils import get_user_projects
 from sequencingrun.models import SequencingRun
 from samplelib.models import SampleLib
+from django.core.exceptions import ObjectDoesNotExist
+
+
+logger = logging.getLogger("file-tree")
+
 
 class SequencingFileSet(models.Model):
     set_id = models.AutoField(primary_key=True)
@@ -23,7 +28,7 @@ class SequencingFileSet(models.Model):
         return self.prefix
 
     @classmethod
-    def generate_file_set(cls, file_name, path, sample_lib, seq_run):
+    def generate_prefix(cls, file_name):
         try:
             match = re.match(r'.*[-_]([ACTG]{6,8})[-_]', file_name)
             prefix = None
@@ -231,6 +236,42 @@ class SequencingFile(models.Model):
             "checksum": self.checksum,
         }
 
+    # sequencingfile/models.py
+    import logging
+    from django.db import models
+    from django.core.exceptions import ObjectDoesNotExist
+
+    logger = logging.getLogger("file-tree")
+
+    class SequencingFile(models.Model):
+        # … fields …
+
+        @classmethod
+        def get_with_file_set(cls, file_name: str, path: str):
+            try:
+                seq_file = cls.objects.get(name=file_name)
+                fs = seq_file.sequencing_file_set
+                if fs and fs.path != path:
+                    fs.path = path
+                    # fs.save()
+                logger.info(f"Updated existing file: {file_name}, path set to {path}")
+                return seq_file, fs
+            except ObjectDoesNotExist:
+                sample_lib = SequencingFileSet.find_sample(file_name)
+                seq_run = SequencingFileSet.find_seqrun(path)
+                fs, file_type = SequencingFileSet.generate_file_set(
+                    file_name=file_name,
+                    path=path,
+                    sample_lib=sample_lib,
+                    seq_run=seq_run
+                )
+                # seq_file = cls.objects.create(
+                #     sequencing_file_set=fs,
+                #     name=file_name,
+                #     type=file_type
+                # )
+                logger.info(f"Created new file: {file_name}, set={fs.prefix}, type={file_type}")
+                return seq_file, fs
 
     def query_by_args(self, user, **kwargs):
 
