@@ -98,6 +98,7 @@ class SequencingFileSet(models.Model):
         try:
             match = re.match(r"^(.*?)(?:_S|\.)", file_name)
             if match and re.search(r"\b(bam|bai)\b", file_name.lower()):
+                print(match.group(1))
                 return SampleLib.objects.get(name=match.group(1))
         except SampleLib.DoesNotExist:
             print(f"Sample not found {file_name}")
