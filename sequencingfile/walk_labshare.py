@@ -31,14 +31,14 @@ class FileTreeConsumer(AsyncWebsocketConsumer):
     def _run_scan(self):
         root_dir = settings.HISEQDATA_DIRECTORY
         pattern = re.compile(r"\.(?:bam|bai|fastq\.gz)$", re.IGNORECASE)
-        file = Path(Path(__file__).parent.parent / "migration" / "df_fq_05_17.csv")
-        df = pd.read_csv(file)
-        df.apply(lambda row: SequencingFile.get_with_file_set(file_name=row["file"], path=row["path"]),axis=1)
-        # for root, dirs, files in os.walk(root_dir):
-        #     for file_name in files:
-        #         if pattern.search(file_name):
-        #             # Log path and filename
-        #             pass
+        # file = Path(Path(__file__).parent.parent / "migration" / "df_fq_05_17.csv")
+        # df = pd.read_csv(file)
+        # df.apply(lambda row: SequencingFile.get_with_file_set(file_name=row["file"], path=row["path"]),axis=1)
+        for root, dirs, files in os.walk(root_dir):
+            for file_name in files:
+                if pattern.search(file_name):
+                    # Log path and filename
+                    SequencingFile.get_with_file_set(file_name=file_name, path=root)
 
         # final notice
         logger.info("--- Scan complete ---")
