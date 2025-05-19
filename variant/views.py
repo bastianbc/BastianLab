@@ -367,10 +367,11 @@ def get_walk_processed_data(request):
     as a downloadable text file.
     """
     # 1. Prepare inputs
-    roots = [settings.SEQUENCING_FILES_SOURCE_DIRECTORY]
+    # roots = [settings.SEQUENCING_FILES_SOURCE_DIRECTORY]
+    roots = [os.path.join(settings.SEQUENCING_FILES_SOURCE_DIRECTORY, "Broad-data.16Apr24")]
     # you can choose any writable path; here we use BASE_DIR/tmp/
     out_fname = f"file_tree_{request.timestamp:%Y%m%d_%H%M%S}.txt" \
-                if hasattr(request, "timestamp") else "file_tree.txt"
+                if hasattr(request, "timestamp") else "file_tree_Broad-data_16Apr24.txt"
     output_path = os.path.join(settings.BASE_DIR, out_fname)
 
     # 2. Generate the file
