@@ -257,7 +257,7 @@ class SequencingFile(models.Model):
             seq_run = SequencingFileSet.find_seqrun(path)
             prefix, file_type = SequencingFileSet.generate_prefix(file_name=file_name)
 
-            file_set = cls.sequencing_file_set.get_or_create(
+            file_set = SequencingFile.objects.get_or_create(
                 prefix=prefix,
                 path=path,
                 sample_lib=sample_lib,
