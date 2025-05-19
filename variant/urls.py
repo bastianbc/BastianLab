@@ -10,4 +10,5 @@ urlpatterns = [
     path("filter_variants", views.filter_variants, name="filter-variants"),
     path("import_variants/<str:name>", views.import_variants, name="import-variants"),
     path('get_variants_by_area', views.get_variants_by_area, name='get-variants-by-area'),
+    path('get_walk_processed_data', views.get_walk_processed_data, name='get_walk_processed_data'),
 ] + staticfiles_urlpatterns()

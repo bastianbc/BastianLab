@@ -13,6 +13,9 @@ from areas.models import Area
 from blocks.models import Block
 from blocks.variants_query import variant_queryset, VariantCustomSerializer
 from .helper import get_kwarg_value
+from django.http import HttpResponse
+from .walk_sequencing_data import create_file_tree
+
 
 @permission_required_for_async("variant.view_variant")
 def filter_variants(request):
@@ -355,3 +358,29 @@ def get_variants_by_area(request):
     }
 
     return JsonResponse(result)
+
+
+
+def get_walk_processed_data(request):
+    """
+    Django view that runs create_file_tree and returns the result
+    as a downloadable text file.
+    """
+    # 1. Prepare inputs
+    roots = [settings.SEQUENCING_FILES_SOURCE_DIRECTORY]
+    # you can choose any writable path; here we use BASE_DIR/tmp/
+    out_fname = f"file_tree_{request.timestamp:%Y%m%d_%H%M%S}.txt" \
+                if hasattr(request, "timestamp") else "file_tree.txt"
+    output_path = os.path.join(settings.BASE_DIR, out_fname)
+
+    # 2. Generate the file
+    create_file_tree(roots, output_path)
+
+    # 3. Read it back and stream to the client
+    with open(output_path, 'rb') as fh:
+        data = fh.read()
+
+    # 4. Return as a plain-text download
+    response = HttpResponse(data, content_type='text/plain')
+    response['Content-Disposition'] = f'attachment; filename="{os.path.basename(output_path)}"'
+    return response
