@@ -25,6 +25,7 @@ def create_file_tree(root_dir_list, file_tree_file):
             for root, dirs, files in os.walk(root_dir):
                 dirs[:] = [d for d in dirs if d not in ('log', 'scripts', 'strelka')]
                 for fname in files:
+                    print(f"{fname}")
                     flags = [suffix for suffix in SUFFIX_KEYS if fname.endswith(suffix)]
                     if not flags:
                         continue  # skip non-matching files
