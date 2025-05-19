@@ -29,5 +29,5 @@ def create_file_tree(root_dir_list, file_tree_file):
                         continue  # skip non-matching files
                     rel_dir = root.replace(settings.SMB_DIRECTORY_SEQUENCINGDATA, "")
                     var_file, _ = VariantFile.objects.get_or_create(name=fname, directory=rel_dir)
-                    print(f"{rel_dir[:-3]}-->{fname[:3]}\n --> {var_file}")
+                    print(f"{rel_dir[:3]}-->{fname[:3]}\n --> {var_file}")
                     f.write(f"{rel_dir}-->{fname}\n")
