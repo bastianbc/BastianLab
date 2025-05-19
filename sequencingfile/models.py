@@ -261,7 +261,7 @@ class SequencingFile(models.Model):
                 prefix=prefix,
                 path=path,
                 sample_lib=sample_lib,
-                seq_run=seq_run
+                sequencing_run=seq_run
             )
             logger.info(f"Fileset Created: {file_set.prefix}")
             seq_file = cls.objects.create(
