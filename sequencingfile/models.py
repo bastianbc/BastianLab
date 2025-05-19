@@ -251,17 +251,28 @@ class SequencingFile(models.Model):
 
             return seq_file, fs
         except ObjectDoesNotExist:
-            logger.info(f"ObjectDoesNotExist: {file_name}, path {path.replace(str(settings.SEQUENCING_FILES_SOURCE_DIRECTORY),'')}")
+            path = path.replace(str(settings.SEQUENCING_FILES_SOURCE_DIRECTORY),'')
+            logger.info(f"ObjectDoesNotExist: {file_name}, path {path}")
             sample_lib = SequencingFileSet.find_sample(file_name)
             seq_run = SequencingFileSet.find_seqrun(path)
             prefix, file_type = SequencingFileSet.generate_prefix(file_name=file_name)
-            # seq_file = cls.objects.create(
-            #     sequencing_file_set=fs,
-            #     name=file_name,
-            #     type=file_type
-            # )
+
+            file_set = cls.sequencing_file_set.get_or_create(
+                prefix=prefix,
+                path=path,
+                sample_lib=sample_lib,
+                seq_run=seq_run
+            )
+            logger.info(f"Fileset Created: {file_set.prefix}")
+            seq_file = cls.objects.create(
+                sequencing_file_set=file_set,
+                name=file_name,
+                type=file_type
+            )
+            logger.info(f"File Created: {seq_file}")
+
             seq_file, fs = "", ""
-            logger.info(f"file: {file_name}, set={prefix}, "
+            logger.info(f"file: {file_name}, set={file_set}, "
                         f"type={file_type},  sample_lib={sample_lib},  seq_run={seq_run}")
             return seq_file, fs
 
