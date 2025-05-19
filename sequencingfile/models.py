@@ -247,7 +247,6 @@ class SequencingFile(models.Model):
             if fs and fs.path != path:
                 fs.path = path.replace(str(settings.SEQUENCING_FILES_SOURCE_DIRECTORY),"")
                 fs.save()
-                # logger.info("*")
 
             return seq_file, fs
         except ObjectDoesNotExist:
