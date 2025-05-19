@@ -3,6 +3,7 @@ import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "test1.settings")
 django.setup()
 from django.conf import settings
+from variant.models import VariantFile
 
 logger = logging.getLogger("file-tree")
 
@@ -27,5 +28,6 @@ def create_file_tree(root_dir_list, file_tree_file):
                     if not flags:
                         continue  # skip non-matching files
                     rel_dir = root.replace(settings.SMB_DIRECTORY_SEQUENCINGDATA, "")
-                    print(f"{rel_dir}-->{fname}\n")
+                    var_file = VariantFile.objects.get_or_create(name=fname, directory=rel_dir)
+                    print(f"{rel_dir[:-3]}-->{fname[:3]}\n --> {var_file}")
                     f.write(f"{rel_dir}-->{fname}\n")
