@@ -26,5 +26,6 @@ def create_file_tree(root_dir_list, file_tree_file):
                     flags = [suffix for suffix in SUFFIX_KEYS if fname.endswith(suffix)]
                     if not flags:
                         continue  # skip non-matching files
-                    rel_dir = root.replace(settings.SEQUENCING_FILES_SOURCE_DIRECTORY, "")
+                    rel_dir = root.replace(settings.SMB_DIRECTORY_SEQUENCINGDATA, "")
+                    print(f"{rel_dir}-->{fname}\n")
                     f.write(f"{rel_dir}-->{fname}\n")
