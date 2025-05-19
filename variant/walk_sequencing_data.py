@@ -23,11 +23,12 @@ def create_file_tree(root_dir_list, file_tree_file):
     with open(file_tree_file, 'w') as f:
         for root_dir in root_dir_list:
             for root, dirs, files in os.walk(root_dir):
+                dirs[:] = [d for d in dirs if d not in ('log', 'scripts', 'strelka')]
                 for fname in files:
                     flags = [suffix for suffix in SUFFIX_KEYS if fname.endswith(suffix)]
                     if not flags:
                         continue  # skip non-matching files
                     rel_dir = root.replace(settings.SMB_DIRECTORY_SEQUENCINGDATA, "").lstrip(os.sep)
                     var_file, _ = VariantFile.objects.get_or_create(name=fname, directory=rel_dir)
-                    print(f"{rel_dir[:3]}-->{fname[:3]}\n --> {var_file}")
+                    print(f"{rel_dir} --> {var_file}")
                     f.write(f"{rel_dir}-->{fname}\n")
