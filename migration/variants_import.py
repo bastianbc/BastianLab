@@ -15,7 +15,7 @@ import logging
 from pathlib import Path
 from gene.models import Gene
 import csv
-
+import sys
 
 logger = logging.getLogger("file")
 
@@ -334,6 +334,37 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail, filename, ro
             except Exception as e:
                 logger.error(f"Error processing AAChange entry '{entry}': {str(e)}")
 
+def read_csv_file_custom(file_path):
+    with open(file_path, 'r') as f:
+        content = f.read()
+
+    # Process content to get headers
+    lines = content.strip().split('\n')
+    headers = lines[0].split('\t')
+    header_count = len(headers)
+    csv.field_size_limit(min(sys.maxsize, 2147483647))
+
+    # Read line by line ensuring we get the right number of columns
+    data = []
+    with open(file_path, 'r') as f:
+        reader = csv.reader(f, delimiter='\t')
+        for i, row in enumerate(reader):
+            if i == 0:  # This is the header row
+                headers = row
+                data.append(row)
+            else:
+                # Ensure each row has exactly the number of columns we expect
+                if len(row) < header_count:
+                    # Pad with empty strings if needed
+                    row = row + [''] * (header_count - len(row))
+                elif len(row) > header_count:
+                    # Truncate if too many
+                    row = row[:header_count]
+                data.append(row)
+
+    # Create DataFrame
+    df = pd.DataFrame(data[1:], columns=data[0])
+    return df
 
 
 def variant_file_parser(file_path, analysis_run_name):
@@ -350,10 +381,7 @@ def variant_file_parser(file_path, analysis_run_name):
         # Read file
         logger.debug("Reading file with pandas")
         print(f"file_path:*****{file_path}")
-        df = pd.read_csv(file_path,
-                     sep='\t',engine='python',
-                    quoting=csv.QUOTE_NONE,      # don’t treat quotes specially
-                    on_bad_lines='warn')
+        df = read_csv_file_custom(file_path)
         df = df.reset_index(drop=True)
 
         if df.empty:
