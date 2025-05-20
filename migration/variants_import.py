@@ -14,6 +14,7 @@ import re
 import logging
 from pathlib import Path
 from gene.models import Gene
+import csv
 
 
 logger = logging.getLogger("file")
@@ -350,7 +351,10 @@ def variant_file_parser(file_path, analysis_run_name):
         logger.debug("Reading file with pandas")
         print("file_path:*****")
         print(file_path)
-        df = pd.read_csv(file_path, sep='\t')
+        df = pd.read_csv(file_path,
+                     sep='\t',engine='python',
+                    quoting=csv.QUOTE_NONE,      # don’t treat quotes specially
+                    on_bad_lines='warn')      # warn, skip, or raise)
         if df.empty:
             logger.error(f"File is empty {file_path}")
             return False, "File is empty", {}
