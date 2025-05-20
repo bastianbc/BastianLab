@@ -368,6 +368,8 @@ def variant_file_parser(file_path, analysis_run_name):
     try:
         # Read file
         logger.debug("Reading file with pandas")
+        print("file_path:*****")
+        print(file_path)
         df = pd.read_csv(file_path, sep='\t')
         if df.empty:
             logger.error(f"File is empty {file_path}")
