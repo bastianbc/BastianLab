@@ -349,8 +349,7 @@ def variant_file_parser(file_path, analysis_run_name):
     try:
         # Read file
         logger.debug("Reading file with pandas")
-        print("file_path:*****")
-        print(file_path)
+        print(f"file_path:*****{file_path}")
         df = pd.read_csv(file_path,
                      sep='\t',engine='python',
                     quoting=csv.QUOTE_NONE,      # don’t treat quotes specially
