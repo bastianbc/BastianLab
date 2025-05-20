@@ -417,7 +417,7 @@ def variant_file_parser(file_path, analysis_run_name):
                     sample_lib=sample_lib,
                     sequencing_run=get_sequencing_run(filename),
                     variant_file=variant_file,
-                    coverage=row['Depth'],
+                    coverage=int(row['Depth']) if not "." else 0,
                     log2r=get_log2r(),
                     caller=caller,
                     normal_sl=get_normal_sample_lib(sample_lib),
