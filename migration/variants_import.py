@@ -353,7 +353,9 @@ def variant_file_parser(file_path, analysis_run_name):
         df = pd.read_csv(file_path,
                      sep='\t',engine='python',
                     quoting=csv.QUOTE_NONE,      # don’t treat quotes specially
-                    on_bad_lines='warn')      # warn, skip, or raise)
+                    on_bad_lines='warn')
+        df = df.reset_index(drop=True)
+
         if df.empty:
             logger.error(f"File is empty {file_path}")
             return False, "File is empty", {}
@@ -389,27 +391,27 @@ def variant_file_parser(file_path, analysis_run_name):
         logger.info(f"Starting to process {stats['total_rows']} rows")
 
         # Process each row
-        for index, row in df.iterrows():
-            logger.debug(f"Processing row {index + 1}")
+        for i, (_, row) in enumerate(df.iterrows(), start=1):
+            logger.debug(f"Processing row {i + 1}")
             try:
                 # Check required fields
                 fields_valid, field_error = check_required_fields(row)
                 if not fields_valid:
-                    logger.error(f"Row {index + 1}: {field_error}")
-                    stats["errors"].append(f"Row {index + 1}: {field_error}")
+                    logger.error(f"Row {i + 1}: {field_error}")
+                    stats["errors"].append(f"Row {i + 1}: {field_error}")
                     stats["failed"] += 1
                     continue
 
                 # Caller check
                 caller = get_caller(filename)
                 if not caller:
-                    logger.error(f"Row {index + 1}: Could not determine caller")
-                    stats["errors"].append(f"Row {index + 1}: Could not determine caller")
+                    logger.error(f"Row {i + 1}: Could not determine caller")
+                    stats["errors"].append(f"Row {i + 1}: Could not determine caller")
                     stats["failed"] += 1
                     continue
 
 
-                logger.debug(f"Creating VariantCall for row {index + 1}")
+                logger.debug(f"Creating VariantCall for row {i + 1}")
                 variant_call = VariantCall.objects.create(
                     analysis_run=analysis_run,
                     sample_lib=sample_lib,
@@ -424,7 +426,7 @@ def variant_file_parser(file_path, analysis_run_name):
                     alt_read=row['Alt_reads'],
                 )
 
-                logger.debug(f"Creating GVariant for row {index + 1}")
+                logger.debug(f"Creating GVariant for row {i + 1}")
                 g_variant = GVariant.objects.create(
                     variant_call=variant_call,
                     hg=get_hg(filename),
@@ -436,7 +438,7 @@ def variant_file_parser(file_path, analysis_run_name):
                     avsnp150=row.get('avsnp150', '')
                 )
 
-                logger.debug(f"Creating C and P variants for row {index + 1}")
+                logger.debug(f"Creating C and P variants for row {i + 1}")
                 create_c_and_p_variants(
                     g_variant=g_variant,
                     aachange=row['AAChange.refGene'],
@@ -447,11 +449,11 @@ def variant_file_parser(file_path, analysis_run_name):
                 )
 
                 stats["successful"] += 1
-                logger.info(f"Successfully processed row {index + 1}")
+                logger.info(f"Successfully processed row {i + 1}")
 
             except Exception as e:
-                logger.error(f"Error processing row {index + 1}: {str(e)}", exc_info=True)
-                stats["errors"].append(f"Row {index + 1}: {str(e)}")
+                logger.error(f"Error processing row {i + 1}: {str(e)}", exc_info=True)
+                stats["errors"].append(f"Row {i + 1}: {str(e)}")
                 stats["failed"] += 1
 
 
