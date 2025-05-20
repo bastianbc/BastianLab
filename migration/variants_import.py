@@ -267,7 +267,7 @@ def create_gene_detail(gene_detail, row_gene, g_variant, func):
         try:
             logger.debug(f"Processing gene_detail: {entry}")
             nm_id, exon, c_var = entry.split(':')
-            # AnalysisRun.objects.get() TODO
+            # AnalysisRun.objects.get() TODO hg is getting from Analysis Run
             gene = get_gene(row_gene, "hg38", nm_id)
             # Create CVariant instance
             is_alias = True if nm_id.lower() == gene.nm_canonical.lower() else False
@@ -300,7 +300,7 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail, filename, ro
             try:
                 logger.debug(f"Processing entry: {entry}")
                 gene, nm_id, exon, c_var, p_var = entry.split(':') # NTRK1:NM_001012331:exon16:c.C2253A:p.Y751X,NTRK1
-                gene = get_gene(gene, "hg19", nm_id) # TODO look at it
+                gene = get_gene(gene, "hg38", nm_id) # TODO look at it
                 # Create CVariant instance
                 is_alias = True if nm_id.lower() == gene.nm_canonical.lower() else False
                 if gene:
@@ -476,7 +476,7 @@ def create_variant_file(row):
 # Parse and save data into the database
 def import_variants():
     VariantFile.objects.filter().update(call=False)
-    files = VariantFile.objects.filter()
+    files = VariantFile.objects.filter(name__icontains="hg38", type="variant")
     VariantCall.objects.filter().delete()
     for file in files:
         file_path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA,file.directory)

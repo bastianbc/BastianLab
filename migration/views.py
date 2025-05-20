@@ -3889,7 +3889,7 @@ def call_import_variants(request):
 
 
 def import_genes(request):
-    from .variant_call_alias import generate_variant
-    generate_variant()
+    from .variants_import import import_variants
+    import_variants()
     print("finished")
 
