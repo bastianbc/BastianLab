@@ -300,36 +300,54 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail, filename, ro
         for entry in entries:
             try:
                 logger.debug(f"Processing entry: {entry}")
-                gene, nm_id, exon, c_var, p_var = entry.split(':') # NTRK1:NM_001012331:exon16:c.C2253A:p.Y751X,NTRK1
-                gene = get_gene(gene, "hg38", nm_id) # TODO look at it
-                # Create CVariant instance
-                is_alias = True if nm_id.lower() == gene.nm_canonical.lower() else False
-                if gene:
-                    c_variant = CVariant.objects.create(
-                        g_variant=g_variant,
-                        gene=gene,
-                        nm_id=nm_id,
-                        exon=exon,
-                        c_var=c_var,
-                        func=func,
-                        gene_detail=entry[:99]
-                    )
-                    logger.info(f"Created CVariant: {c_variant}")
-
-                    # Create PVariant instance if p_var is present
-                    if p_var:
-                        start, end, reference_residues, inserted_residues, change_type = parse_p_var(p_var)
-                        inserted_residues = f"{inserted_residues[:98]}*" if p_var.endswith("*") else inserted_residues[:99]
-                        p_variant = PVariant.objects.create(
-                            c_variant=c_variant,
-                            start=start,
-                            end=end,
-                            reference_residues=reference_residues,
-                            inserted_residues=inserted_residues,
-                            change_type=change_type,
-                            name_meta=p_var[:99],
-                            is_alias=is_alias
+                if len(entry.split(':'))==4:
+                    gene, nm_id, exon, c_var = entry.split(':') # NTRK1:NM_001012331:exon16:c.C2253A:p.Y751X,NTRK1
+                    gene = get_gene(gene, "hg38", nm_id) # TODO look at it
+                    # Create CVariant instance
+                    is_alias = True if nm_id.lower() == gene.nm_canonical.lower() else False
+                    if gene:
+                        c_variant = CVariant.objects.create(
+                            g_variant=g_variant,
+                            gene=gene,
+                            nm_id=nm_id,
+                            exon=exon,
+                            c_var=c_var,
+                            func=func,
+                            gene_detail=entry[:99]
                         )
+                        logger.info(f"Created CVariant: {c_variant}")
+
+                if len(entry.split(':'))==5:
+                    gene, nm_id, exon, c_var, p_var = entry.split(':') # NTRK1:NM_001012331:exon16:c.C2253A:p.Y751X,NTRK1
+                    gene = get_gene(gene, "hg38", nm_id) # TODO look at it
+                    # Create CVariant instance
+                    is_alias = True if nm_id.lower() == gene.nm_canonical.lower() else False
+                    if gene:
+                        c_variant = CVariant.objects.create(
+                            g_variant=g_variant,
+                            gene=gene,
+                            nm_id=nm_id,
+                            exon=exon,
+                            c_var=c_var,
+                            func=func,
+                            gene_detail=entry[:99]
+                        )
+                        logger.info(f"Created CVariant: {c_variant}")
+
+                        # Create PVariant instance if p_var is present
+                        if p_var:
+                            start, end, reference_residues, inserted_residues, change_type = parse_p_var(p_var)
+                            inserted_residues = f"{inserted_residues[:98]}*" if p_var.endswith("*") else inserted_residues[:99]
+                            p_variant = PVariant.objects.create(
+                                c_variant=c_variant,
+                                start=start,
+                                end=end,
+                                reference_residues=reference_residues,
+                                inserted_residues=inserted_residues,
+                                change_type=change_type,
+                                name_meta=p_var[:99],
+                                is_alias=is_alias
+                            )
 
             except Exception as e:
                 logger.error(f"Error processing AAChange entry '{entry}': {str(e)}")
