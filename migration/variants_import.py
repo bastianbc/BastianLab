@@ -121,9 +121,9 @@ def parse_p_var(p_var):
 
     # Handle more complex variants
     match_range = re.match(
-        r"^p\.([A-Z])(\d+)_([A-Z]?)(\d+)"
-        r"(delins|del|ins)"
-        r"([A-Z]+)\*?$",
+        r"^p\.([A-Z])(\d+)_([A-Z]?)(\d+)"  # ref‐AA1, pos1, optional ref‐AA2, pos2
+        r"(delins|del|ins)"  # change type
+        r"([A-Z]*)\*?$",  # *optional* inserted‐residues + optional '*'
         p_var
     )
     if match_range:
