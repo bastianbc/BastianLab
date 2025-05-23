@@ -317,7 +317,7 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail, filename, ro
                             gene=gene,
                             nm_id=nm_id,
                             exon=exon,
-                            c_var=c_var,
+                            c_var=c_var[:99],
                             func=func,
                             gene_detail=entry[:99]
                         )
@@ -334,7 +334,7 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail, filename, ro
                             gene=gene,
                             nm_id=nm_id,
                             exon=exon,
-                            c_var=c_var,
+                            c_var=c_var[:99],
                             func=func,
                             gene_detail=entry[:99]
                         )
