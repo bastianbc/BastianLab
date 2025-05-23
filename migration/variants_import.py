@@ -107,18 +107,7 @@ def parse_p_var(p_var):
         logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
         return start, end, reference_residues, inserted_residues, change_type
 
-    # Handle range variants
-    match5 = re.match(r'p\.([A-Z])(\d+)_([A-Z])(\d+)(delins|del|ins)', p_var)
-    if match5:
-        start, end, reference_residues, inserted_residues, change_type = (
-            match5.group(2),
-            match5.group(4),
-            match5.group(1) + match5.group(3),
-            "",
-            match5.group(5)
-        )
-        logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
-        return start, end, reference_residues, inserted_residues, change_type
+
 
     # Handle nonsense mutations
     match3 = re.match(r'p\.([A-Z])(\d+)\*', p_var)
@@ -134,17 +123,28 @@ def parse_p_var(p_var):
         return start, end, reference_residues, inserted_residues, change_type
 
     # Handle more complex variants
-    match4 = re.match(r'p\.([A-Z]+)(\d+)_([A-Z]+)(\d+)(delins|del|ins)([A-Z]+)', p_var)
-    if match4:
-        start, end, reference_residues, inserted_residues, change_type = (
-            match4.group(2),
-            match4.group(4),
-            match4.group(1) + match4.group(3),
-            match4.group(6),
-            match4.group(5)
-        )
-        logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
+    match_range = re.match(
+        r"^p\.([A-Z]+)(\d+)_([A-Z]+)(\d+)"
+        r"(delins|del|ins)"
+        r"([A-Z]*)\*?$",
+        p_var
+    )
+    if match_range:
+        start = match_range.group(2)
+        end = match_range.group(4)
+        # e.g. “Y” + “V” → “YV”
+        reference_residues = match_range.group(1) + match_range.group(3)
+        change_type = match_range.group(5)
+        inserted_residues = match_range.group(6) or ""
+        # if the string ends with a *, but the captured inserted_residues didn’t include it:
+        if p_var.endswith("*") and not inserted_residues.endswith("*"):
+            inserted_residues += "*"
+        print(f"match_range Parsed p_var successfully: "
+              f"{start}, {end}, {reference_residues}, "
+              f"{inserted_residues}, {change_type}")
         return start, end, reference_residues, inserted_residues, change_type
+
+    print(f",{p_var}")
 
     logger.warning(f"Failed to parse p_var: {p_var}")
     print(f"Failed to parse p_var: {p_var}")
