@@ -139,15 +139,13 @@ def parse_p_var(p_var):
         # if the string ends with a *, but the captured inserted_residues didn’t include it:
         if p_var.endswith("*") and not inserted_residues.endswith("*"):
             inserted_residues += "*"
-        print(f"match_range Parsed p_var successfully: "
+        logger.debug(f"match_range Parsed p_var successfully: "
               f"{start}, {end}, {reference_residues}, "
               f"{inserted_residues}, {change_type}")
         return start, end, reference_residues, inserted_residues, change_type
 
-    print(f",{p_var}")
 
     logger.warning(f"Failed to parse p_var: {p_var}")
-    print(f"Failed to parse p_var: {p_var}")
     return None, None, None, None, None
 
 def get_log2r():
