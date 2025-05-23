@@ -140,7 +140,7 @@ def parse_p_var(p_var):
         if p_var.endswith("*") and not inserted_residues.endswith("*"):
             inserted_residues += "*"
 
-        print("match_range Parsed p_var successfully:",
+        logger.debug("match_range Parsed p_var successfully:",
               start, end, reference_residues,
               inserted_residues, change_type)
         return start, end, reference_residues, inserted_residues, change_type
