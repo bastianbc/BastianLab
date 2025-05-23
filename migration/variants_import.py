@@ -119,6 +119,14 @@ def parse_p_var(p_var):
         logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
         return start, end, reference_residues, inserted_residues, change_type
 
+    m_num = re.match(r"^p\.(\d+)_(\d+)(delins|del|ins)\*?$", p_var)
+    if m_num:
+        start = m_num.group(1)
+        end = m_num.group(2)
+        change_type = m_num.group(3)
+        # no reference residues or inserted residues
+        return start, end, "", "", change_type
+
     # Handle more complex variants
     match_range = re.match(
         r"^p\.([A-Z])(\d+)_([A-Z]?)(\d+)"  # ref‐AA1, pos1, optional ref‐AA2, pos2
