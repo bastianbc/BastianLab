@@ -120,16 +120,29 @@ def parse_p_var(p_var):
         return start, end, reference_residues, inserted_residues, change_type
 
     # Handle more complex variants
-    match_range = re.match(r"^p\.([A-Z]+)(\d+)_([A-Z]+)(\d+)(delins|del|ins)([A-Z]*)\*?$",p_var)
+    match_range = re.match(
+        r"^p\.([A-Z])(\d+)_([A-Z]?)(\d+)"
+        r"(delins|del|ins)"
+        r"([A-Z]+)\*?$",
+        p_var
+    )
     if match_range:
         start = match_range.group(2)
         end = match_range.group(4)
-        reference_residues = match_range.group(1) + match_range.group(3)
+        # if the second-letter was missing, just use the first
+        ref1 = match_range.group(1)
+        ref2 = match_range.group(3) or ref1
+        reference_residues = ref1 + ref2
+
         change_type = match_range.group(5)
-        inserted_residues = match_range.group(6) or ""
+        inserted_residues = match_range.group(6)
+        # re-attach trailing * if needed
         if p_var.endswith("*") and not inserted_residues.endswith("*"):
             inserted_residues += "*"
-        logger.debug(f"match_range Parsed p_var successfully:{start}, {end}, {reference_residues},{inserted_residues}, {change_type}")
+
+        print("match_range Parsed p_var successfully:",
+              start, end, reference_residues,
+              inserted_residues, change_type)
         return start, end, reference_residues, inserted_residues, change_type
 
     logger.warning(f"Failed to parse p_var: {p_var}")
