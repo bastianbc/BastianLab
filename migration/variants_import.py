@@ -45,7 +45,6 @@ def get_caller(filename):
 
 def parse_p_var(p_var):
     logger.debug(f"Parsing p_var: {p_var}")
-
     if "M1?" in p_var:
         start, end, reference_residues, inserted_residues, change_type = (1, 1, "M", "", "substitution")
         return start, end, reference_residues, inserted_residues, change_type
@@ -107,8 +106,6 @@ def parse_p_var(p_var):
         logger.debug(f"Parsed p_var successfully: {start, end, reference_residues, inserted_residues, change_type}")
         return start, end, reference_residues, inserted_residues, change_type
 
-
-
     # Handle nonsense mutations
     match3 = re.match(r'p\.([A-Z])(\d+)\*', p_var)
     if match3:
@@ -123,27 +120,17 @@ def parse_p_var(p_var):
         return start, end, reference_residues, inserted_residues, change_type
 
     # Handle more complex variants
-    match_range = re.match(
-        r"^p\.([A-Z]+)(\d+)_([A-Z]+)(\d+)"
-        r"(delins|del|ins)"
-        r"([A-Z]*)\*?$",
-        p_var
-    )
+    match_range = re.match(r"^p\.([A-Z]+)(\d+)_([A-Z]+)(\d+)(delins|del|ins)([A-Z]*)\*?$",p_var)
     if match_range:
         start = match_range.group(2)
         end = match_range.group(4)
-        # e.g. “Y” + “V” → “YV”
         reference_residues = match_range.group(1) + match_range.group(3)
         change_type = match_range.group(5)
         inserted_residues = match_range.group(6) or ""
-        # if the string ends with a *, but the captured inserted_residues didn’t include it:
         if p_var.endswith("*") and not inserted_residues.endswith("*"):
             inserted_residues += "*"
-        logger.debug(f"match_range Parsed p_var successfully: "
-              f"{start}, {end}, {reference_residues}, "
-              f"{inserted_residues}, {change_type}")
+        logger.debug(f"match_range Parsed p_var successfully:{start}, {end}, {reference_residues},{inserted_residues}, {change_type}")
         return start, end, reference_residues, inserted_residues, change_type
-
 
     logger.warning(f"Failed to parse p_var: {p_var}")
     return None, None, None, None, None
@@ -238,14 +225,14 @@ def get_variant_file(file_path):
 def get_gene(name, hg, canonical):
     logger.debug(f"Getting gene: {name}")
     try:
-        if "NOTCH2NL" in name or "MUC1" in name or "MUC2" in name:
+        if "MUC1" in name or "MUC2" in name:
             gene = Gene.objects.get(name__icontains=name, hg=hg, nm_canonical=canonical)
             return gene
         gene = Gene.objects.get(name=name, hg=hg)
         logger.info(f"Found gene: {name}")
         return gene
     except ObjectDoesNotExist:
-        logger.error(f"Gene not found: {name}")
+        logger.error(f"Gene not found: {name}, with nm_canonical: {canonical}")
         return None
 
 def check_required_fields(row):
