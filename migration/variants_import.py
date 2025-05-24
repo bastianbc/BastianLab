@@ -404,7 +404,7 @@ def variant_file_parser(file_path, analysis_run_name):
     try:
         # Read file
         logger.debug("Reading file with pandas")
-        print(f"file_path:*****{file_path}")
+        print(f"{file_path}")
         df = read_csv_file_custom(file_path)
         df = df.reset_index(drop=True)
 
@@ -537,7 +537,7 @@ def import_variants():
     print("1"*30)
     VariantFile.objects.filter().update(call=False)
     print("2"*30)
-    files = VariantFile.objects.filter(name__icontains="hg38", type="variant")
+    files = VariantFile.objects.filter(name__icontains="hg38", type="variant", variant_calls__isnull=True)
     print("3"*30)
     VariantCall.objects.filter().delete()
     print("4"*30)
