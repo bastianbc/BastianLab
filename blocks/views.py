@@ -39,7 +39,7 @@ def blocks(request):
 
     return render(request,"block_list.html",locals())
 
-@permission_required("blocks.add_blocks",raise_exception=True)
+@permission_required("blocks.add_block",raise_exception=True)
 def new_block(request):
     if request.method=="POST":
         form = BlockForm(request.POST)
@@ -54,7 +54,7 @@ def new_block(request):
 
     return render(request,"block.html",locals())
 
-@permission_required_for_async("blocks.add_blocks")
+@permission_required_for_async("blocks.add_block")
 def add_block_to_patient_async(request):
     selected_ids = json.loads(request.GET.get("selected_ids"))
     patient_id = request.GET.get("patient_id")
@@ -73,7 +73,7 @@ def add_block_to_patient_async(request):
 
     return JsonResponse({"success":True})
 
-@permission_required_for_async("blocks.change_blocks")
+@permission_required_for_async("blocks.change_block")
 def remove_block_from_patient_async(request):
     selected_ids = json.loads(request.GET.get("selected_ids"))
 
@@ -88,7 +88,7 @@ def remove_block_from_patient_async(request):
 
     return JsonResponse({"success":True})
 
-@permission_required_for_async("blocks.add_blocks")
+@permission_required_for_async("blocks.add_block")
 def add_block_to_project_async(request):
     selected_ids = json.loads(request.GET.get("selected_ids"))
     project_id = request.GET.get("project_id")
@@ -103,7 +103,7 @@ def add_block_to_project_async(request):
 
     return JsonResponse({"success":True})
 
-@permission_required_for_async("blocks.change_blocks")
+@permission_required_for_async("blocks.change_block")
 def remove_block_from_project_async(request):
     """
     Asynchronously remove blocks from a project.
@@ -149,7 +149,7 @@ def remove_block_from_project_async(request):
 
         return JsonResponse({"success": False, "error": "Server error occurred"}, status=500)
 
-@permission_required("blocks.change_blocks",raise_exception=True)
+@permission_required("blocks.change_block",raise_exception=True)
 def edit_block(request,id):
     block = Block.objects.get(id=id)
 
@@ -166,7 +166,7 @@ def edit_block(request,id):
 
     return render(request,"block.html",locals())
 
-@permission_required_for_async("blocks.change_blocks")
+@permission_required_for_async("blocks.change_block")
 def edit_block_async(request):
     import re
     from core.utils import custom_update
@@ -189,7 +189,7 @@ def edit_block_async(request):
 
     return JsonResponse({"success":True})
 
-@permission_required_for_async("blocks.delete_blocks")
+@permission_required_for_async("blocks.delete_block")
 def delete_block(request,id):
     try:
         block = Block.objects.get(id=id)
@@ -202,7 +202,7 @@ def delete_block(request,id):
 
     return JsonResponse({ "deleted":deleted })
 
-@permission_required("blocks.delete_blocks",raise_exception=True)
+@permission_required("blocks.delete_block",raise_exception=True)
 def delete_batch_blocks(request):
     try:
         selected_ids = json.loads(request.GET.get("selected_ids"))
@@ -213,7 +213,7 @@ def delete_batch_blocks(request):
 
     return JsonResponse({ "deleted":True })
 
-@permission_required_for_async("blocks.delete_blocks")
+@permission_required_for_async("blocks.delete_block")
 def check_can_deleted_async(request):
     id = request.GET.get("id")
     instance = Block.objects.get(id=id)
