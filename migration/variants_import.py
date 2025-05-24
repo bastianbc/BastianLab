@@ -539,7 +539,7 @@ def import_variants():
     print("2"*30)
     files = VariantFile.objects.filter(name__icontains="hg38", type="variant", variant_calls__isnull=True)
     print("3"*30)
-    VariantCall.objects.filter().delete()
+    # VariantCall.objects.filter().delete()
     print("4"*30)
     for file in files:
         file_path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA,file.directory)
