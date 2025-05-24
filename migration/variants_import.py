@@ -193,7 +193,7 @@ def get_hg(filename):
 
 def get_sample_lib(filename):
     logger.debug(f"Getting sample lib from filename: {filename}")
-    match = re.match(r'^[^.]+\.(\w+-\d+)', filename)
+    match = re.match(r'^[^.]+\.([A-Za-z0-9-]+)\.', filename)
     if match:
         name = match.group(1)
         logger.debug(f"Extracted sample lib name: {name}")
