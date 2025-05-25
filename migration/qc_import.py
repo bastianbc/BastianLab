@@ -170,7 +170,7 @@ def create_qc_sample(metrics, file, type, variant_file):
     {'unpaired_reads_examined': '1422', 'read_pairs_examined': '6078719', 'secondary_or_supplementary_rds': '191953', 'unmapped_reads': '1752', 'unpaired_read_duplicates': 1211.0, 'read_pair_duplicates': 3884092.0, 'read_pair_optical_duplicates': 17231.0, 'percent_duplication': 0.63899, 'estimated_library_size': 2381452.0}
 
     '''
-    SampleQC.objects.get_or_create(
+    SampleQC.objects.create(
         sample_lib=get_sample_lib(file),
         analysis_run=AnalysisRun.objects.get(name="AR_ALL"),
         sequencing_run=get_sequencing_run(file),
@@ -208,7 +208,13 @@ def create_qc_sample(metrics, file, type, variant_file):
     )
 
 def parse_parse_dup_metrics():
-    variant_files = VariantFile.objects.filter(type='qc', name__icontains='dup_metrics', qc_metrics__isnull=True)
+    SampleQC.objects.filter(variant_file__name__icontains='FKP').delete()
+    variant_files = VariantFile.objects.filter(
+        Q(type='qc') &
+        Q(name__icontains='dup_metrics') &
+        Q(name__icontains='FKP')
+    )
+    # variant_files = VariantFile.objects.filter(type='qc', name__icontains='dup_metrics')
     print("="*30, "dup_metrics", "="*30)
     for file in variant_files:
         print(os.path.join(file.directory,file.name))
@@ -216,7 +222,12 @@ def parse_parse_dup_metrics():
         metrics = parse_dup_metrics(path)
         create_qc_sample(metrics, file.directory.split('/')[-1], 'dup', file)
 
-    variant_files = VariantFile.objects.filter(type='qc', name__icontains='hs_metrics', qc_metrics__isnull=True)
+    # variant_files = VariantFile.objects.filter(type='qc', name__icontains='hs_metrics')
+    variant_files = VariantFile.objects.filter(
+        Q(type='qc') &
+        Q(name__icontains='hs_metrics') &
+        Q(name__icontains='FKP')
+    )
     print("="*30, "hs_metrics", "="*30)
     for file in variant_files:
         print(os.path.join(file.directory,file.name))
@@ -224,7 +235,12 @@ def parse_parse_dup_metrics():
         metrics = parse_hs_metrics(path)
         create_qc_sample(metrics, file.directory.split('/')[-1], 'hs', file)
 
-    variant_files = VariantFile.objects.filter(type='qc', name__icontains='insert_size_metrics', qc_metrics__isnull=True)
+    # variant_files = VariantFile.objects.filter(type='qc', name__icontains='insert_size_metrics')
+    variant_files = VariantFile.objects.filter(
+        Q(type='qc') &
+        Q(name__icontains='insert_size_metrics') &
+        Q(name__icontains='FKP')
+    )
     print("="*30, "insert_size_metrics", "="*30)
     for file in variant_files:
         print(os.path.join(file.directory,file.name))
