@@ -208,7 +208,7 @@ def create_qc_sample(metrics, file, type, variant_file):
     )
 
 def parse_parse_dup_metrics():
-    variant_files = VariantFile.objects.filter(type='qc', name__icontains='dup_metrics')
+    variant_files = VariantFile.objects.filter(type='qc', name__icontains='dup_metrics', qc_metrics__isnull=True)
     print("="*30, "dup_metrics", "="*30)
     for file in variant_files:
         print(os.path.join(file.directory,file.name))
