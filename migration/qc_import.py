@@ -53,7 +53,6 @@ def get_sequencing_run(filename):
         logger.debug(f"Extracted sequencing name: {name}")
         try:
             seq_run = SequencingRun.objects.get(name=name)
-            print(seq_run)
             logger.info(f"Found sample lib: {seq_run}")
             return seq_run
         except Exception as e:
@@ -101,7 +100,6 @@ def get_sample_lib(filename):
     logger.debug(f"Extracted sample lib name: {name}")
     try:
         sample_lib = SampleLib.objects.get(name=name)
-        print(sample_lib)
         logger.info(f"Found sample lib: {sample_lib}")
         return sample_lib
     except Exception as e:
@@ -212,18 +210,24 @@ def create_qc_sample(metrics, file, type, variant_file):
 def parse_parse_dup_metrics():
     variant_files = VariantFile.objects.filter(type='qc', name__icontains='dup_metrics')
     for file in variant_files:
+        print("="*30, "dup_metrics", "="*30)
+        print(os.path.join(file.directory,file.name))
         path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA,file.directory,file.name)
         metrics = parse_dup_metrics(path)
         create_qc_sample(metrics, file.directory.split('/')[-1], 'dup', file)
 
     variant_files = VariantFile.objects.filter(type='qc', name__icontains='hs_metrics')
     for file in variant_files:
+        print("="*30, "hs_metrics", "="*30)
+        print(os.path.join(file.directory,file.name))
         path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA,file.directory,file.name)
         metrics = parse_hs_metrics(path)
         create_qc_sample(metrics, file.directory.split('/')[-1], 'hs', file)
 
     variant_files = VariantFile.objects.filter(type='qc', name__icontains='insert_size_metrics')
     for file in variant_files:
+        print("="*30, "insert_size_metrics", "="*30)
+        print(os.path.join(file.directory,file.name))
         path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA,file.directory,file.name)
         metrics = parse_insert_size_metrics(path)
         create_qc_sample(metrics, file.directory.split('/')[-1], "insert_size", file)
