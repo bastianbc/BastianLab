@@ -3890,6 +3890,7 @@ def call_import_variants(request):
 
 def import_genes(request):
     from .variants_import import import_variants
-    import_variants()
+    from .qc_import import import_qc
+    import_qc()
     print("finished")
 
