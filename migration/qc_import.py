@@ -208,13 +208,8 @@ def create_qc_sample(metrics, file, type, variant_file):
     )
 
 def parse_parse_dup_metrics():
-    SampleQC.objects.filter(variant_file__name__icontains='FKP').delete()
-    variant_files = VariantFile.objects.filter(
-        Q(type='qc') &
-        Q(name__icontains='dup_metrics') &
-        Q(name__icontains='FKP')
-    )
-    # variant_files = VariantFile.objects.filter(type='qc', name__icontains='dup_metrics')
+    SampleQC.objects.filter().delete()
+    variant_files = VariantFile.objects.filter(type='qc', name__icontains='dup_metrics', directory__icontains="hg38_ProcessedData")
     print("="*30, "dup_metrics", "="*30)
     for file in variant_files:
         print(os.path.join(file.directory,file.name))
@@ -222,12 +217,7 @@ def parse_parse_dup_metrics():
         metrics = parse_dup_metrics(path)
         create_qc_sample(metrics, file.directory.split('/')[-1], 'dup', file)
 
-    # variant_files = VariantFile.objects.filter(type='qc', name__icontains='hs_metrics')
-    variant_files = VariantFile.objects.filter(
-        Q(type='qc') &
-        Q(name__icontains='hs_metrics') &
-        Q(name__icontains='FKP')
-    )
+    variant_files = VariantFile.objects.filter(type='qc', name__icontains='hs_metrics', directory__icontains="hg38_ProcessedData")
     print("="*30, "hs_metrics", "="*30)
     for file in variant_files:
         print(os.path.join(file.directory,file.name))
@@ -235,12 +225,7 @@ def parse_parse_dup_metrics():
         metrics = parse_hs_metrics(path)
         create_qc_sample(metrics, file.directory.split('/')[-1], 'hs', file)
 
-    # variant_files = VariantFile.objects.filter(type='qc', name__icontains='insert_size_metrics')
-    variant_files = VariantFile.objects.filter(
-        Q(type='qc') &
-        Q(name__icontains='insert_size_metrics') &
-        Q(name__icontains='FKP')
-    )
+    variant_files = VariantFile.objects.filter(type='qc', name__icontains='insert_size_metrics', directory__icontains="hg38_ProcessedData")
     print("="*30, "insert_size_metrics", "="*30)
     for file in variant_files:
         print(os.path.join(file.directory,file.name))
@@ -250,10 +235,7 @@ def parse_parse_dup_metrics():
 
 
 def import_qc():
-    SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
     parse_parse_dup_metrics()
-
-    pass
 
 
 from django.db import transaction
