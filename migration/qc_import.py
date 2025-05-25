@@ -209,24 +209,24 @@ def create_qc_sample(metrics, file, type, variant_file):
 
 def parse_parse_dup_metrics():
     variant_files = VariantFile.objects.filter(type='qc', name__icontains='dup_metrics')
+    print("="*30, "dup_metrics", "="*30)
     for file in variant_files:
-        print("="*30, "dup_metrics", "="*30)
         print(os.path.join(file.directory,file.name))
         path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA,file.directory,file.name)
         metrics = parse_dup_metrics(path)
         create_qc_sample(metrics, file.directory.split('/')[-1], 'dup', file)
 
     variant_files = VariantFile.objects.filter(type='qc', name__icontains='hs_metrics')
+    print("="*30, "hs_metrics", "="*30)
     for file in variant_files:
-        print("="*30, "hs_metrics", "="*30)
         print(os.path.join(file.directory,file.name))
         path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA,file.directory,file.name)
         metrics = parse_hs_metrics(path)
         create_qc_sample(metrics, file.directory.split('/')[-1], 'hs', file)
 
     variant_files = VariantFile.objects.filter(type='qc', name__icontains='insert_size_metrics')
+    print("="*30, "insert_size_metrics", "="*30)
     for file in variant_files:
-        print("="*30, "insert_size_metrics", "="*30)
         print(os.path.join(file.directory,file.name))
         path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA,file.directory,file.name)
         metrics = parse_insert_size_metrics(path)
