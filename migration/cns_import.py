@@ -71,7 +71,7 @@ def import_csn_files():
     pass
 
 def create_csn(row, file):
-
+    print(file)
     try:
         csn = Cns.objects.create(
             sample_lib=get_sample_lib(file.name),
