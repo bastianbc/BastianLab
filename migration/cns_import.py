@@ -97,7 +97,7 @@ def create_csn(row, file):
         print(e)
 
 def import_csn_calls():
-    for file in VariantFile.objects.filter(type='cns'):
+    for file in VariantFile.objects.filter(type='cns', directory__icontains='hg38_ProcessedData'):
         file_path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA,file.directory, file.name)
         df = pd.read_csv(file_path, index_col=False, sep='\t')
         df.apply(lambda row: create_csn(row, file), axis=1)

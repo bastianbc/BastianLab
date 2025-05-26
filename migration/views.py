@@ -3891,6 +3891,7 @@ def call_import_variants(request):
 def import_genes(request):
     from .variants_import import import_variants
     from .qc_import import import_qc
-    import_qc()
+    from .cns_import import import_csn_calls
+    import_csn_calls()
     print("finished")
 
