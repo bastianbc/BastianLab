@@ -238,10 +238,9 @@ def import_qc():
     parse_parse_dup_metrics()
 
 
-from django.db import transaction
-from django.db.models import F, Q
+
 from qc.models import SampleQC
-from variant.models import  VariantFile  # Replace with your actual app name
+from variant.models import  VariantFile
 
 
 def merge_sample_qc_metrics():
@@ -249,110 +248,142 @@ def merge_sample_qc_metrics():
     Merge multiple SampleQC records (dup, hs, insert_size) for the same sample
     into a single consolidated record, eliminating NULL values.
     """
-    # Get all unique sample_lib and analysis_run combinations
-    sample_combinations = SampleQC.objects.values('sample_lib_id', 'analysis_run_id').distinct()
-
-    # Track stats
-    merged_count = 0
-    skipped_count = 0
-
-    with transaction.atomic():
-        for combo in sample_combinations:
-            sample_lib_id = combo['sample_lib_id']
-            analysis_run_id = combo['analysis_run_id']
-
-            # Get all QC records for this sample/analysis combination
-            qc_records = SampleQC.objects.filter(
-                sample_lib_id=sample_lib_id,
-                analysis_run_id=analysis_run_id
-            ).select_related('variant_file')
-
-            # Group by "Normal" or "Tumor" from the variant file name
-            sample_groups = {}
-
-            for record in qc_records:
-                # Skip records without variant file
-                if not record.variant_file:
-                    continue
-
-                # Determine if Normal or Tumor from variant_file name
-                variant_name = record.variant_file.name
-                if "Normal" in variant_name:
-                    key = "Normal"
-                elif "Tumor" in variant_name:
-                    key = "Tumor"
-                else:
-                    # Skip if can't determine Normal/Tumor
-                    continue
-
-                if key not in sample_groups:
-                    sample_groups[key] = []
-
-                sample_groups[key].append(record)
-
-            # Process each group (Normal/Tumor)
-            for group_name, records in sample_groups.items():
-                if len(records) <= 1:
-                    # Nothing to merge
-                    skipped_count += 1
-                    continue
-
-                # Find the primary record to keep (prefer 'dup' type)
-                primary_record = None
-                for record in records:
-                    if record.variant_file.type == 'dup':
-                        primary_record = record
-                        break
-
-                # If no 'dup' record, take the first one
-                if not primary_record and records:
-                    primary_record = records[0]
-
-                if not primary_record:
-                    continue
-
-                # Merge data from other records into the primary record
-                for record in records:
-                    if record.id == primary_record.id:
-                        continue
-
-                    # Merge all non-null fields
-                    for field in [
-                        'unpaired_reads_examined', 'read_pairs_examined',
-                        'secondary_or_supplementary_rds', 'unmapped_reads',
-                        'unpaired_read_duplicates', 'read_pair_duplicates',
-                        'read_pair_optical_duplicates', 'percent_duplication',
-                        'estimated_library_size', 'pct_off_bait',
-                        'mean_bait_coverage', 'mean_target_coverage',
-                        'median_target_coverage', 'pct_target_bases_1x',
-                        'pct_target_bases_2x', 'pct_target_bases_10x',
-                        'pct_target_bases_20x', 'pct_target_bases_30x',
-                        'pct_target_bases_40x', 'pct_target_bases_50x',
-                        'pct_target_bases_100x', 'at_dropout', 'gc_dropout',
-                        'median_insert_size', 'mode_insert_size', 'mean_insert_size'
-                    ]:
-                        # Only update if the target field is null and source field is not null
-                        if getattr(primary_record, field) is None and getattr(record, field) is not None:
-                            setattr(primary_record, field, getattr(record, field))
-
-                    # Handle insert_size_histogram - keep what we have if possible
-                    if primary_record.insert_size_histogram is None and record.insert_size_histogram is not None:
-                        primary_record.insert_size_histogram = record.insert_size_histogram
-
-                # Save the updated primary record
-                primary_record.save()
-
-                # Delete the other records
-                for record in records:
-                    if record.id != primary_record.id:
-                        record.delete()
-
-                merged_count += 1
-
-    return {
-        'merged_count': merged_count,
-        'skipped_count': skipped_count
-    }
+    merge_query = '''
+        SELECT * FROM sample_qc qc where 
+            qc.insert_size_histogram       IS NULL
+          OR qc.unpaired_reads_examined   IS NULL
+          OR qc.read_pairs_examined       IS NULL
+          OR qc.secondary_or_supplementary_rds IS NULL
+          OR qc.unmapped_reads            IS NULL
+          OR qc.unpaired_read_duplicates  IS NULL
+          OR qc.read_pair_duplicates      IS NULL
+          OR qc.read_pair_optical_duplicates IS NULL
+          OR qc.percent_duplication       IS NULL
+          OR qc.estimated_library_size    IS NULL
+          OR qc.pct_off_bait              IS NULL
+          OR qc.mean_bait_coverage        IS NULL
+          OR qc.mean_target_coverage      IS NULL
+          OR qc.median_target_coverage    IS NULL
+          OR qc.pct_target_bases_1x       IS NULL
+          OR qc.pct_target_bases_2x       IS NULL
+          OR qc.pct_target_bases_10x      IS NULL
+          OR qc.pct_target_bases_20x      IS NULL
+          OR qc.pct_target_bases_30x      IS NULL
+          OR qc.pct_target_bases_40x      IS NULL
+          OR qc.pct_target_bases_50x      IS NULL
+          OR qc.pct_target_bases_100x     IS NULL
+          OR qc.at_dropout                IS NULL
+          OR qc.gc_dropout                IS NULL
+          OR qc.median_insert_size        IS NULL
+          OR qc.mode_insert_size          IS NULL
+          OR qc.mean_insert_size          IS NULL
+          
+        
+        WITH merged AS (
+          SELECT
+            qc.sample_lib_id,
+            qc.sequencing_run_id,
+            f.directory,
+            MAX(qc.insert_size_histogram)           AS insert_size_histogram,
+            MAX(qc.unpaired_reads_examined)         AS unpaired_reads_examined,
+            MAX(qc.read_pairs_examined)             AS read_pairs_examined,
+            MAX(qc.secondary_or_supplementary_rds)  AS secondary_or_supplementary_rds,
+            MAX(qc.unmapped_reads)                  AS unmapped_reads,
+            MAX(qc.unpaired_read_duplicates)        AS unpaired_read_duplicates,
+            MAX(qc.read_pair_duplicates)            AS read_pair_duplicates,
+            MAX(qc.read_pair_optical_duplicates)    AS read_pair_optical_duplicates,
+            MAX(qc.percent_duplication)             AS percent_duplication,
+            MAX(qc.estimated_library_size)          AS estimated_library_size,
+            MAX(qc.pct_off_bait)                    AS pct_off_bait,
+            MAX(qc.mean_bait_coverage)              AS mean_bait_coverage,
+            MAX(qc.mean_target_coverage)            AS mean_target_coverage,
+            MAX(qc.median_target_coverage)          AS median_target_coverage,
+            MAX(qc.pct_target_bases_1x)             AS pct_target_bases_1x,
+            MAX(qc.pct_target_bases_2x)             AS pct_target_bases_2x,
+            MAX(qc.pct_target_bases_10x)            AS pct_target_bases_10x,
+            MAX(qc.pct_target_bases_20x)            AS pct_target_bases_20x,
+            MAX(qc.pct_target_bases_30x)            AS pct_target_bases_30x,
+            MAX(qc.pct_target_bases_40x)            AS pct_target_bases_40x,
+            MAX(qc.pct_target_bases_50x)            AS pct_target_bases_50x,
+            MAX(qc.pct_target_bases_100x)           AS pct_target_bases_100x,
+            MAX(qc.at_dropout)                      AS at_dropout,
+            MAX(qc.gc_dropout)                      AS gc_dropout,
+            MAX(qc.median_insert_size)              AS median_insert_size,
+            MAX(qc.mode_insert_size)                AS mode_insert_size,
+            MAX(qc.mean_insert_size)                AS mean_insert_size
+          FROM sample_qc qc
+          JOIN variant_file f
+            ON f.id = qc.variant_file_id
+          GROUP BY
+            qc.sample_lib_id,
+            qc.sequencing_run_id,
+            f.directory
+        )
+        UPDATE sample_qc qc
+        SET
+          insert_size_histogram            = COALESCE(qc.insert_size_histogram, m.insert_size_histogram),
+          unpaired_reads_examined          = COALESCE(qc.unpaired_reads_examined, m.unpaired_reads_examined),
+          read_pairs_examined              = COALESCE(qc.read_pairs_examined, m.read_pairs_examined),
+          secondary_or_supplementary_rds   = COALESCE(qc.secondary_or_supplementary_rds, m.secondary_or_supplementary_rds),
+          unmapped_reads                   = COALESCE(qc.unmapped_reads, m.unmapped_reads),
+          unpaired_read_duplicates         = COALESCE(qc.unpaired_read_duplicates, m.unpaired_read_duplicates),
+          read_pair_duplicates             = COALESCE(qc.read_pair_duplicates, m.read_pair_duplicates),
+          read_pair_optical_duplicates     = COALESCE(qc.read_pair_optical_duplicates, m.read_pair_optical_duplicates),
+          percent_duplication              = COALESCE(qc.percent_duplication, m.percent_duplication),
+          estimated_library_size           = COALESCE(qc.estimated_library_size, m.estimated_library_size),
+          pct_off_bait                     = COALESCE(qc.pct_off_bait, m.pct_off_bait),
+          mean_bait_coverage               = COALESCE(qc.mean_bait_coverage, m.mean_bait_coverage),
+          mean_target_coverage             = COALESCE(qc.mean_target_coverage, m.mean_target_coverage),
+          median_target_coverage           = COALESCE(qc.median_target_coverage, m.median_target_coverage),
+          pct_target_bases_1x              = COALESCE(qc.pct_target_bases_1x, m.pct_target_bases_1x),
+          pct_target_bases_2x              = COALESCE(qc.pct_target_bases_2x, m.pct_target_bases_2x),
+          pct_target_bases_10x             = COALESCE(qc.pct_target_bases_10x, m.pct_target_bases_10x),
+          pct_target_bases_20x             = COALESCE(qc.pct_target_bases_20x, m.pct_target_bases_20x),
+          pct_target_bases_30x             = COALESCE(qc.pct_target_bases_30x, m.pct_target_bases_30x),
+          pct_target_bases_40x             = COALESCE(qc.pct_target_bases_40x, m.pct_target_bases_40x),
+          pct_target_bases_50x             = COALESCE(qc.pct_target_bases_50x, m.pct_target_bases_50x),
+          pct_target_bases_100x            = COALESCE(qc.pct_target_bases_100x, m.pct_target_bases_100x),
+          at_dropout                       = COALESCE(qc.at_dropout, m.at_dropout),
+          gc_dropout                       = COALESCE(qc.gc_dropout, m.gc_dropout),
+          median_insert_size               = COALESCE(qc.median_insert_size, m.median_insert_size),
+          mode_insert_size                 = COALESCE(qc.mode_insert_size, m.mode_insert_size),
+          mean_insert_size                 = COALESCE(qc.mean_insert_size, m.mean_insert_size)
+        FROM merged m, variant_file f
+        WHERE
+          qc.variant_file_id = f.id
+          AND f.directory = m.directory
+          AND qc.sample_lib_id = m.sample_lib_id
+          AND qc.sequencing_run_id = m.sequencing_run_id
+          AND (
+            qc.insert_size_histogram       IS NULL
+          OR qc.unpaired_reads_examined   IS NULL
+          OR qc.read_pairs_examined       IS NULL
+          OR qc.secondary_or_supplementary_rds IS NULL
+          OR qc.unmapped_reads            IS NULL
+          OR qc.unpaired_read_duplicates  IS NULL
+          OR qc.read_pair_duplicates      IS NULL
+          OR qc.read_pair_optical_duplicates IS NULL
+          OR qc.percent_duplication       IS NULL
+          OR qc.estimated_library_size    IS NULL
+          OR qc.pct_off_bait              IS NULL
+          OR qc.mean_bait_coverage        IS NULL
+          OR qc.mean_target_coverage      IS NULL
+          OR qc.median_target_coverage    IS NULL
+          OR qc.pct_target_bases_1x       IS NULL
+          OR qc.pct_target_bases_2x       IS NULL
+          OR qc.pct_target_bases_10x      IS NULL
+          OR qc.pct_target_bases_20x      IS NULL
+          OR qc.pct_target_bases_30x      IS NULL
+          OR qc.pct_target_bases_40x      IS NULL
+          OR qc.pct_target_bases_50x      IS NULL
+          OR qc.pct_target_bases_100x     IS NULL
+          OR qc.at_dropout                IS NULL
+          OR qc.gc_dropout                IS NULL
+          OR qc.median_insert_size        IS NULL
+          OR qc.mode_insert_size          IS NULL
+          OR qc.mean_insert_size          IS NULL
+          );
+  '''
 
 
 if __name__ == "__main__":
