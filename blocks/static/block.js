@@ -1557,9 +1557,9 @@ var KTDatatablesServerSide = function () {
                         }
                     },
                     columns: [
-                        {
-                            data: 'variantcall_id',
-                        },
+                        // {
+                        //     data: 'variantcall_id',
+                        // },
                         {
                             data: 'analysis_run_name',
                             className: 'text-gray-800'
