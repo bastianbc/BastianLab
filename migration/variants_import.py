@@ -336,7 +336,8 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail, filename, ro
                             exon=exon,
                             c_var=c_var[:99],
                             func=func,
-                            gene_detail=entry[:99]
+                            gene_detail=entry[:99],
+                            is_alias=is_alias
                         )
                         logger.info(f"Created CVariant: {c_variant}")
 
