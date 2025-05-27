@@ -339,7 +339,7 @@ def get_variants_by_area(request):
     data = []
     for variant in variants:
         data.append({
-            'DT_RowId': f"variant_{variant.variantcall_id}",
+            # 'DT_RowId': f"variant_{variant.variantcall_id}",
             'variantcall_id': variant.variantcall_id,
             'analysis_run_name': variant.analysis_run_name,
             'gene_name': variant.gene_name,
@@ -349,7 +349,7 @@ def get_variants_by_area(request):
             'coverage': variant.coverage,
             'vaf': round(variant.vaf, 2) if variant.vaf else 0,
         })
-
+        print(variant.analysis_run_name)
     result = {
         'draw': draw,
         'recordsTotal': total_records,
