@@ -1562,7 +1562,7 @@ var KTDatatablesServerSide = function () {
                         },
                         {
                             data: 'analysis_run_name',
-                            className: 'text-gray-800 text-hover-primary'
+                            className: 'text-gray-800'
                         },
                         {
                             data: 'gene_name',
