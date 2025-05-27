@@ -68,7 +68,7 @@ def generate_variant():
         print(f"variant saved: {variant}")
 
 def generate_variant_2():
-    calls = VariantCall.objects.filter(variant_file__name='BCB002.NMLP-001.FB_Final.annovar.hg38_multianno_Filtered.txt')
+    calls = VariantCall.objects.filter()
 
     for vc in calls:
         print(vc.sample_lib.name)
