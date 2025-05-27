@@ -1529,6 +1529,7 @@ var KTDatatablesServerSide = function () {
                       <table id="variant_datatable_${areaId}" class="table align-middle table-row-dashed fs-6 gy-5">
                           <thead>
                               <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
+                                  <th>VC</th>
                                   <th>Analysis Run</th>
                                   <th>Gene</th>
                                   <th>P Variant</th>
@@ -1556,9 +1557,9 @@ var KTDatatablesServerSide = function () {
                         }
                     },
                     columns: [
-                        // {
-                        //     data: 'variantcall_id',
-                        // },
+                        {
+                            data: 'variantcall_id',
+                        },
                         {
                             data: 'analysis_run_name',
                             className: 'text-gray-800'
@@ -1605,8 +1606,20 @@ var KTDatatablesServerSide = function () {
                     ],
                     columnDefs: [
                         {
-                            targets: 1,
+                            targets: 0,
                             visible: false,
+                        },
+                        {
+                            targets: 1,
+                                orderable: true,
+                                render: function (data, type, row) {
+                                    if (data > 0) {
+                                      let id = row["id"];
+                                      return `
+                                          <a href="/areas?model=block&id=${id}&initial=true">${data}</a>`;
+                                    }
+                                    return data;
+                                }
                         },
                     ],
                     order: [[0, 'asc']],  // Sort by areas by default
