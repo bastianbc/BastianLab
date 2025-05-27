@@ -1573,6 +1573,10 @@ var KTDatatablesServerSide = function () {
                             className: 'text-gray-800'
                         },
                         {
+                            data: 'alias',
+                            className: 'text-gray-800'
+                        },
+                        {
                             data: 'coverage',
                             className: 'text-gray-800'
                         },
