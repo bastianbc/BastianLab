@@ -86,8 +86,8 @@ var KTDatatablesServerSide = function () {
                 { data: 'sample_lib' },
                 { data: 'sequencing_run' },
                 { data: 'genes' },
-                { data: 'variant' },
-                { data: 'aliases' },
+                { data: 'variant_meta' },
+                { data: 'alias_meta' },
                 { data: null },
             ],
             columnDefs: [

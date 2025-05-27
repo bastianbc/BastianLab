@@ -737,7 +737,7 @@ async def log_producer():
         await client.rpush(LOG_KEY, msg)
 
 # fire-and-forget
-asyncio.get_event_loop().create_task(log_producer())
+    asyncio.get_event_loop().create_task(log_producer())
 
 
 async def async_view(request):
