@@ -1529,6 +1529,7 @@ var KTDatatablesServerSide = function () {
                       <table id="variant_datatable_${areaId}" class="table align-middle table-row-dashed fs-6 gy-5">
                           <thead>
                               <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
+                                  <th></th>
                                   <th>Analysis Run</th>
                                   <th>Gene</th>
                                   <th>P Variant</th>
