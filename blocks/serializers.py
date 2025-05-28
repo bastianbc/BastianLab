@@ -4,7 +4,7 @@ from lab.models import Patient
 
 class BlocksSerializer(serializers.ModelSerializer):
     num_areas = serializers.IntegerField()
-    num_variants = serializers.IntegerField()
+    num_variants = serializers.CharField()
     patient_id = serializers.SerializerMethodField()
     DT_RowId = serializers.SerializerMethodField()
     # project_id = serializers.SerializerMethodField()
