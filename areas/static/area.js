@@ -684,9 +684,11 @@ var KTDatatablesServerSide = function () {
                             <table id="variant_datatable_${id}" class="table align-middle table-row-dashed fs-6 gy-5">
                                 <thead>
                                     <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
-                                        <th>Sample Library</th>
+                                        <th>VC</th>
+                                        <th>Analysis Run</th>
                                         <th>Gene</th>
                                         <th>P Variant</th>
+                                        <th>Alias</th>
                                         <th>Coverage</th>
                                         <th>VAF</th>
                                         <th class="text-end min-w-100px">Actions</th>
@@ -717,45 +719,70 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 columns: [
-                    {
-                        data: 'sample_lib',
-                        className: 'text-gray-800 text-hover-primary'
-                    },
-                    {
-                        data: 'genes',
-                        className: 'text-gray-800'
-                    },
-                    {
-                        data: 'p_variant',
-                        className: 'text-gray-800'
-                    },
-                    {
-                        data: 'coverage',
-                        className: 'text-gray-800'
-                    },
-                    {
-                        data: 'vaf',
-                        className: 'text-gray-800',
-                    },
-                    {
-                        data: null,
-                        className: 'text-end',
-                        render: function () {
-                            return `
-                                <button type="button"
-                                        class="btn btn-icon btn-light-primary btn-sm"
-                                        data-bs-toggle="tooltip"
-                                        data-bs-placement="top"
-                                        title="View Details">
-                                    <i class="ki-duotone ki-eye fs-2">
-                                        <span class="path1"></span>
-                                        <span class="path2"></span>
-                                        <span class="path3"></span>
-                                    </i>
-                                </button>
-                            `;
+                     {
+                            data: 'variantcall_id',
+                        },
+                        {
+                            data: 'analysis_run_name',
+                            className: 'text-gray-800'
+                        },
+                        {
+                            data: 'gene_name',
+                            className: 'text-gray-800'
+                        },
+                        {
+                            data: 'p_variant',
+                            className: 'text-gray-800'
+                        },
+                        {
+                            data: 'alias',
+                            className: 'text-gray-800'
+                        },
+                        {
+                            data: 'coverage',
+                            className: 'text-gray-800'
+                        },
+                        {
+                            data: 'vaf',
+                            className: 'text-gray-800',
+                        },
+                        {
+                            data: null,
+                            className: 'text-end',
+                            render: function() {
+                                return `
+                                    <button type="button"
+                                            class="btn btn-icon btn-light-primary btn-sm"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="top"
+                                            title="View Details">
+                                        <i class="ki-duotone ki-eye fs-2">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                            <span class="path3"></span>
+                                        </i>
+                                    </button>
+                                `;
+                            }
                         }
-                    }
+                    ],
+                    columnDefs: [
+                        {
+                            targets: 0,
+                            visible: false,
+                        },
+                        {
+                            targets: 1,
+                                orderable: true,
+                                render: function (data, type, row) {
+                                    if (data > 0) {
+                                      let id = row["id"];
+                                      return `
+                                          <a href="/areas?model=block&id=${id}&initial=true">${data}</a>`;
+                                    }
+                                    return data;
+                                }
+                        },
                 ],
                 order: [[1, 'asc']],  // Sort by gene by default
                 pageLength: 10,
