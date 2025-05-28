@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from core.validators import validate_name_contains_space
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Case, When, Value, CharField
 from django.utils.crypto import get_random_string
 import json
 from projects.utils import get_user_projects
@@ -108,7 +108,14 @@ class Block(models.Model):
                 num_areas=Count('block_areas', distinct=True),
                 project_num=Count("block_projects", distinct=True),
                 patient_num=Count('patient', distinct=True),
-                num_variants=Count('block_areas__area_na_links__nucacid__na_sl_links__sample_lib__variant_calls', distinct=True)
+                num_variants=Case(
+                    When(
+                        block_areas__area_na_links__nucacid__na_sl_links__sample_lib__variant_calls__isnull=False,
+                        then=Value('YES')
+                    ),
+                    default=Value('NO'),
+                    output_field=CharField(),
+                )
             )
 
             if not user.is_superuser:
