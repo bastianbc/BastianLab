@@ -710,12 +710,11 @@ var KTDatatablesServerSide = function () {
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: `/variant/filter_variants`,
+                    url: `/variant/get_variants_by_area`,
                     type: 'GET',
                     data: {
                         area_id: areaId,
-                        analysis_id: analysisId,
-                        model_area:"area"
+
                     }
                 },
                 columns: [

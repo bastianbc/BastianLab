@@ -343,13 +343,21 @@ def get_variants_by_area(request):
             'variantcall_id': variant.variantcall_id,
             'analysis_run_name': variant.analysis_run_name,
             'gene_name': variant.gene_name,
-            'samplelib_name': variant.samplelib_name,
             'p_variant': variant.variant if variant.variant else '',
             'alias': variant.alias if variant.alias else '',
             'coverage': variant.coverage,
             'vaf': round(variant.vaf, 2) if variant.vaf else 0,
         })
-        print(variant.analysis_run_name)
+        print({
+            # 'DT_RowId': f"variant_{variant.variantcall_id}",
+            'variantcall_id': variant.variantcall_id,
+            'analysis_run_name': variant.analysis_run_name,
+            'gene_name': variant.gene_name,
+            'p_variant': variant.variant if variant.variant else '',
+            'alias': variant.alias if variant.alias else '',
+            'coverage': variant.coverage,
+            'vaf': round(variant.vaf, 2) if variant.vaf else 0,
+        })
     result = {
         'draw': draw,
         'recordsTotal': total_records,
