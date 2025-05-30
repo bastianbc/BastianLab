@@ -108,14 +108,7 @@ class Block(models.Model):
                 num_areas=Count('block_areas', distinct=True),
                 project_num=Count("block_projects", distinct=True),
                 patient_num=Count('patient', distinct=True),
-                num_variants=Case(
-                    When(
-                        block_areas__area_na_links__nucacid__na_sl_links__sample_lib__variant_calls__isnull=False,
-                        then=Value('YES')
-                    ),
-                    default=Value('NO'),
-                    output_field=CharField(),
-                )
+                num_variants=Count("block_areas__area_na_links__nucacid__na_sl_links__sample_lib__variant_calls", distinct=True)
             )
 
             if not user.is_superuser:
