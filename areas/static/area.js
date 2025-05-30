@@ -575,150 +575,88 @@ var KTDatatablesServerSide = function () {
     }
 
     var handleRowActions = function () {
-        const variantModal = document.getElementById("variant_layout");
-        const variantInstance = new bootstrap.Modal(variantModal);
+        const VariantModal = {
+            modal: document.getElementById("variant_layout"),
+            instance: null,
+            modalContent: null,
 
-        document.querySelectorAll('.variant-link').forEach((item, i) => {
+            init: function() {
+                this.instance = new bootstrap.Modal(this.modal);
+                this.modalContent = this.modal.querySelector('.modal-body');
+                this.setupEventListeners();
+            },
 
-            item.addEventListener('click', function () {
-                // Select parent row
-                const parent = this.closest('tr');
-                // Get customer name
-                const id = parent.querySelector('input[type=checkbox]').value;
-                // Open modal
-                variantInstance.show();
-                getVariantData(id);
-            });
-        });
-
-        function getVariantData(area_id) {
-            fetch(`/areas/get_area_vaiants?id=${area_id}`)
-                .then(response => response.json())
-                .then(data => {
-                    initializeModal(data);
-                    $('#variant_layout').modal('show');
+            setupEventListeners: function() {
+                document.querySelectorAll('.variant-link').forEach((item, i) => {
+                    item.addEventListener('click', (e) => {
+                        // Select parent row
+                        const parent = e.target.closest('tr');
+                        // Get customer name
+                        const id = parent.querySelector('input[type=checkbox]').value;
+                        // Open modal
+                        this.instance.show();
+                        this.initializeModal(id);
+                    });
                 });
-        }
 
-        function initializeModal(data) {
-            // Initialize tabs
-            const tabContainer = document.getElementById('variantTabList');
-            const tabContent = document.getElementById('variantTabContent');
+            },
 
-            // Clear modal first
-            tabContainer.innerHTML = "";
-            tabContent.innerHTML = "";
+            initializeModal: function(areaId) {
+                // Clear modal first
+                this.modal.querySelector('.modal-body').innerHTML = "";
 
-            // Fill the data
-            populateAreaDetails(data.area);
+                const div = document.createElement('div');
+                div.innerHTML = `
+                  <div class="table-responsive">
+                      <table id="variant_datatable" class="table align-middle table-row-dashed fs-6 gy-5">
+                          <thead>
+                              <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
+                                  <th>VC</th>
+                                  <th>Analysis Run</th>
+                                  <th>Gene</th>
+                                  <th>P Variant</th>
+                                  <th>Alias</th>
+                                  <th>Coverage</th>
+                                  <th>VAF</th>
+                                  <th class="text-end min-w-100px">Actions</th>
+                              </tr>
+                          </thead>
+                          <tbody class="text-gray-600 fw-semibold"></tbody>
+                      </table>
+                  </div>`;
 
-            // Check if there are any analyses
-            // if (!data.analyses || data.analyses.length === 0) {
-            //     showNoDataMessage(tabContent, "No analysis runs found for this area.");
-            //     return;
-            // }
+                  this.modalContent.appendChild(div);
+            },
 
-            // Check if any analysis has variants
-            // const hasVariants = data.analyses.some(analysis => analysis.variants && analysis.variants.length > 0);
-            // if (!hasVariants) {
-            //     showNoDataMessage(tabContent, "No variants found in any analysis runs.");
-            //     return;
-            // }
-            data.analyses.forEach((analysis, index) => {
-                // Create tab
-                const isActive = index === 0;
-                const tabId = `analysis_${index}`;
-                createTab(tabContainer, tabId, analysis.analysis_name, isActive);
-                createTabPane(tabContent, tabId, analysis, isActive, data.area.id);
-
-            });
-        }
-
-        function showNoDataMessage(container, message) {
-            container.innerHTML = `
-                <div class="card">
-                    <div class="card-body p-10 text-center">
-                        <i class="ki-duotone ki-information-5 fs-5x text-primary mb-5">
-                            <span class="path1"></span>
-                            <span class="path2"></span>
-                            <span class="path3"></span>
-                        </i>
-                        <p class="fs-3 fw-semibold text-gray-800 mb-2">${message}</p>
-                        <p class="fs-6 text-gray-600">Please select a different area or check if analysis has been completed.</p>
-                    </div>
-                </div>
-            `;
-        }
-
-        function populateAreaDetails(data) {
-            document.querySelector('input[name="area_name"]').value = data.name;
-            document.querySelector('input[name="block_name"]').value = data.block.name;
-            document.querySelector('input[name="body_site"]').value = data.block.body_site;
-            document.querySelector('textarea[name="diagnosis"]').textContent = data.block.diagnosis;
-
-            if (data.he_image) {
-                document.querySelector('a[name="he_image"]').href = data.he_image;
-            }
-        }
-
-        function createTab(container, id, text, isActive) {
-            const li = document.createElement('li');
-            li.className = 'nav-item';
-            li.innerHTML = `
-                <a class="nav-link text-active-primary pb-4 ${isActive ? 'active' : ''}"
-                   data-bs-toggle="tab"
-                   href="#${id}">
-                   ${text}
-                </a>`;
-            container.appendChild(li);
-        }
-
-        function createTabPane(container, id, analysis, isActive, areaId) {
-            const div = document.createElement('div');
-            div.className = `tab-pane fade ${isActive ? 'show active' : ''}`;
-            div.id = id;
-            div.innerHTML = `
-                <div class="card card-flush mt-2 flex-row-fluid overflow-hidden">
-                    <div class="card-body pt-0">
-                        <div class="table-responsive">
-                            <table id="variant_datatable_${id}" class="table align-middle table-row-dashed fs-6 gy-5">
-                                <thead>
-                                    <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
-                                        <th>VC</th>
-                                        <th>Analysis Run</th>
-                                        <th>Gene</th>
-                                        <th>P Variant</th>
-                                        <th>Alias</th>
-                                        <th>Coverage</th>
-                                        <th>VAF</th>
-                                        <th class="text-end min-w-100px">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="text-gray-600 fw-semibold"></tbody>
-                            </table>
+            showNoDataMessage: function(message) {
+                tabContainer.innerHTML = `
+                    <div class="card">
+                        <div class="card-body p-10 text-center">
+                            <i class="ki-duotone ki-information-5 fs-5x text-primary mb-5">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                                <span class="path3"></span>
+                            </i>
+                            <p class="fs-3 fw-semibold text-gray-800 mb-2">${message}</p>
+                            <p class="fs-6 text-gray-600">Please select a different area or check if analysis has been completed.</p>
                         </div>
                     </div>
-                </div>`;
-            container.appendChild(div);
+                `;
+            },
 
-            // Initialize DataTable
-            initializeDataTable(`variant_datatable_${id}`, areaId, analysis.analysis_id);
-        }
-
-        function initializeDataTable(tableId, areaId, analysisId) {
-            $(`#${tableId}`).DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: {
-                    url: `/variant/get_variants_by_area`,
-                    type: 'GET',
-                    data: {
-                        area_id: areaId,
-
-                    }
-                },
-                columns: [
-                     {
+            initializeDataTable: function(areaId) {
+                $(`#variant_datatable`).DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: {
+                        url: `/variant/get_variants_by_area`,
+                        type: 'GET',
+                        data: {
+                            area_id: areaId,
+                        }
+                    },
+                    columns: [
+                        {
                             data: 'variantcall_id',
                         },
                         {
@@ -782,14 +720,18 @@ var KTDatatablesServerSide = function () {
                                     return data;
                                 }
                         },
-                ],
-                order: [[1, 'asc']],  // Sort by gene by default
-                pageLength: 10,
-                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-                responsive: true
-            });
-        }
+                    ],
+                    order: [[0, 'asc']],  // Sort by areas by default
+                    pageLength: 10,
+                    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                    responsive: true
+                });
+            },
 
+        };
+
+        // start the modals
+        VariantModal.init();
     }
 
     // Toggle toolbars
