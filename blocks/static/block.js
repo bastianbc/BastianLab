@@ -136,7 +136,7 @@ var KTDatatablesServerSide = function () {
                         if (data > 0) {
                           let id = row["id"];
                           return `
-                              <a href="/variant?model=block&id=${id}&initial=true">${data}</a>`;
+                              <a href="#" class="variant-link-by-area">${data}</a>`;
                         }
                         return data;
                     }
@@ -174,12 +174,6 @@ var KTDatatablesServerSide = function () {
                                   <a href="javascript:;" class="menu-link px-3" data-block_id=` + row["id"] + ` data-block_name=` + row["name"] + ` data-bs-toggle="modal" data-bs-target="#modal_area_options">
                                       Create Area(s)
                                   </a>
-                                </div>
-                                <!--end::Menu item-->
-
-                                <!--begin::Menu item-->
-                                <div class="menu-item px-3">
-                                    <a href="#" class="menu-link px-3 variant-link-by-area">View Variants</a>
                                 </div>
                                 <!--end::Menu item-->
 
