@@ -44,6 +44,20 @@ class Block(models.Model):
         ("ethanol", "ethanol"),
     )
 
+    CSD_CHOICES = (
+        ("0", "0"),
+        ("1", "1"),
+        ("1-", "1-"),
+        ("1+", "1+"),
+        ("2", "2"),
+        ("2-", "2-"),
+        ("2+", "2+"),
+        ("3", "3"),
+        ("3-", "3-"),
+        ("3+", "3+"),
+
+    )
+
     name = models.CharField(max_length=50, blank=True, null=False, unique=True)
     patient = models.ForeignKey('lab.Patient', on_delete=models.CASCADE, db_column='patient', blank=True, null=True, related_name="patient_blocks")
     # project = models.ForeignKey('projects.Projects', on_delete=models.DO_NOTHING, blank=True, null=True, related_name="project_blocks")
@@ -56,6 +70,7 @@ class Block(models.Model):
     thickness = models.FloatField(blank=True, null=True, help_text="float field ex. 0.1", verbose_name="Tumor thickness [mm]")
     mitoses = models.IntegerField(blank=True, null=True, verbose_name="Mitoses [per mm2]")
     p_stage = models.CharField(max_length=10, choices=P_STAGE_TYPES, blank=True, null=True)
+    csd_score = models.CharField(max_length=3, choices=CSD_CHOICES, blank=True, null=True)
     prim = models.CharField(max_length=10, choices=PRIM_TYPES, blank=True, null=True)
     subtype = models.CharField(max_length=120, blank=True, null=True, choices=SUBTYPE_CHOICES)
     slides = models.IntegerField(blank=True, null=True)
