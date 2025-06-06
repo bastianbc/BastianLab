@@ -8,6 +8,8 @@ try:
         from .environments.development import *
     elif ENVIRONMENT == "TEST":
         from .environments.test import *
+    elif ENVIRONMENT == "AWS":
+        from .environments.aws import *
 
     print("{} settings loaded..".format(ENVIRONMENT))
 except ImportError as e:
