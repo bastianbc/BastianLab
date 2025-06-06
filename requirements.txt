@@ -3,7 +3,6 @@ anyio==4.5.2
 asgiref==3.8.1
 async-timeout==5.0.1
 attrs==25.3.0
-autobahn==23.1.2
 Automat==24.8.1
 backports.zoneinfo==0.2.1
 certifi==2024.12.14
