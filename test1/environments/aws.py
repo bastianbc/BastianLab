@@ -156,7 +156,7 @@ CACHES = {
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
 
 DATABASES = {
-    'default': {
+    'labdb': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'labdb',
         'USER': 'testuser',
@@ -165,6 +165,15 @@ DATABASES = {
         'PORT': '5432',
         'DISABLE_SERVER_SIDE_CURSORS': True
     },
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'USER': 'testuser',
+        'PASSWORD': '1235',
+        'NAME': 'labdbproduction',
+        'HOST': '10.65.11.68',
+        'PORT': '5432',
+        'DISABLE_SERVER_SIDE_CURSORS': True
+   },
 }
 
 AUTH_PASSWORD_VALIDATORS = [
