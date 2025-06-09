@@ -1,0 +1,7 @@
+{
+  "username": "testuser",
+  "password": "Zt!aNb.jej4eJVq2LYKhb$jO1za:",
+  "host":     "labdbproduction.cf8eouyk40ff.us-west-2.rds.amazonaws.com",
+  "port":     5432,
+  "dbname":   "labdbproduction"
+}

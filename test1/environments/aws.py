@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/dev/ref/settings/
 
 from pathlib import Path
 import os
+import json
 from django.contrib.messages import constants as message_constants
 
 from django.contrib.messages import constants as messages
@@ -155,25 +156,21 @@ CACHES = {
 # Database
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
 
+secret_path = Path(__file__).resolve().parent.parent / "db_connection.json"
+RDS_SECRET = json.loads(secret_path.read_text())
+
 DATABASES = {
-    'labdb': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'labdb',
-        'USER': 'testuser',
-        'PASSWORD': '1235',
-        'HOST': 'localhost',
-        'PORT': '5432',
-        'DISABLE_SERVER_SIDE_CURSORS': True
-    },
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'USER': 'testuser',
-        'PASSWORD': '1235',
-        'NAME': 'labdbproduction',
-        'HOST': '10.65.11.68',
-        'PORT': '5432',
-        'DISABLE_SERVER_SIDE_CURSORS': True
-   },
+    "default": {
+        "ENGINE":   "django.db.backends.postgresql",
+        "NAME":     RDS_SECRET["dbname"],
+        "USER":     RDS_SECRET["username"],
+        "PASSWORD": RDS_SECRET["password"],
+        "HOST":     RDS_SECRET["host"],
+        "PORT":     RDS_SECRET["port"],
+        "OPTIONS": {
+            "sslmode": "require",
+        },
+    }
 }
 
 AUTH_PASSWORD_VALIDATORS = [
