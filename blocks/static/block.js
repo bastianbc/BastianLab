@@ -1011,7 +1011,10 @@ var KTDatatablesServerSide = function () {
             tabContent: null,
 
             init: function() {
+                console.log("this:",this);
+                console.log("this:",document.getElementById("variant_layout_by_area"));
                 this.instance = new bootstrap.Modal(this.modal);
+                console.log("this.instance:",this.instance);
                 this.tabContainer = this.modal.querySelector('.variant-tab-container');
                 this.tabContent = this.modal.querySelector('.tab-content');
                 this.setupEventListeners();
