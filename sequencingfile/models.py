@@ -8,6 +8,7 @@ from projects.utils import get_user_projects
 from sequencingrun.models import SequencingRun
 from samplelib.models import SampleLib
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils import timezone
 
 
 
@@ -349,3 +350,19 @@ class SequencingFile(models.Model):
         except Exception as e:
             print(str(e))
             raise
+
+
+class SMBDirectory(models.Model):
+    directory = models.CharField(max_length=1000, unique=True, verbose_name="File Name")
+    is_registered = models.BooleanField(default=False)
+    date_registered = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        db_table = "smb_directory"
+
+    def save(self, *args, **kwargs):
+        # If is_registered is being set to True and date is not yet set
+        if self.is_registered and not self.date_registered:
+            self.date_registered = timezone.now()
+
+        super().save(*args, **kwargs)
