@@ -15,4 +15,5 @@ urlpatterns = [
     path("qpcr_at_seqrun", views.qpcr_at_seqrun, name="qpcr_at_seqrun"),
     path("import_body_sites", views.import_body_sites, name="import_body_sites"),
     path('import_genes', views.import_genes, name='import_genes'),
+    path('import_file_tree', views.import_file_tree, name='import_file_tree'),
 ]
