@@ -165,8 +165,8 @@ DATABASES = {
         "NAME":     RDS_SECRET["dbname"],
         "USER":     RDS_SECRET["username"],
         "PASSWORD": RDS_SECRET["password"],
-        "HOST":     RDS_SECRET["host"],
-        "PORT":     RDS_SECRET["port"],
+        "HOST":     "127.0.0.1",
+        "PORT":     "56789",
         "OPTIONS": {
             "sslmode": "require",
         },
@@ -232,6 +232,7 @@ RESEARCHER_GROUP_NAME = "Researchers"
 PI_GROUP_NAME = "Primary Investigators"
 
 SMB_DIRECTORY_LABSHARE = "/mnt/labshare"
+SMB_DIRECTORY_LABSHARE_LOCAL = "/Volumes/labshare"
 BASTIANRAID_DIRECTORY = Path(Path(SMB_DIRECTORY_LABSHARE) / "BastianRaid-02")
 TEMP_DIRECTORY = Path(Path(SMB_DIRECTORY_LABSHARE) / "BastianRaid-02" / "TEMP")
 HISEQDATA_DIRECTORY = Path(Path(SMB_DIRECTORY_LABSHARE) / "BastianRaid-02" / "HiSeqData")
