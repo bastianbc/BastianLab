@@ -1,15 +1,12 @@
 import os
 from django.conf import settings
+from sequencingfile.models import SMBDirectory
 
 def create_file_tree():
     print("start")
-    root_dir = '/mnt/sequencingdata/ProcessedData'
-    file_tree_output_file = 'file_tree_06_20_sequencingdata.txt'
-    file_tree_output_file = os.path.join(settings.MEDIA_ROOT, 'file_tree_06_20_sequencingdata.txt')
-
-    with open(file_tree_output_file, 'w') as f:
-        for root, dirs, files in os.walk(root_dir):
-            for file in files:
-                full_path = os.path.join(root, file)
-                f.write(full_path + "\n")
+    root_dir = '/mnt/labshare'
+    for root, dirs, files in os.walk(root_dir):
+        for file in files:
+            full_path = os.path.join(root, file)
+            obj, created = SMBDirectory.objects.get_or_create(directory=full_path.strip())
     print("finish")
