@@ -4,9 +4,16 @@ from sequencingfile.models import SMBDirectory
 
 def create_file_tree():
     print("start")
-    root_dir = '/mnt/labshare'
-    for root, dirs, files in os.walk(root_dir):
-        for file in files:
-            full_path = os.path.join(root, file)
-            obj, created = SMBDirectory.objects.get_or_create(directory=full_path.strip())
+    root_dirs = ['/mnt/labshare/BastianRaid-01/UCSF/Data/Meng',
+                '/mnt/labshare/BastianRaid-01/UCSF/Data/Mouse Model Images',
+                '/mnt/labshare/BastianRaid-01/UCSF/Data/Qi',
+                '/mnt/labshare/BastianRaid-01/UCSF/Data/Xu',
+                '/mnt/labshare/BastianRaid-01/UCSF/Data/Yuying']
+    for dir in root_dirs:
+        for root, dirs, files in os.walk(dir):
+            for file in files:
+                full_path = os.path.join(root, file)
+                obj, created = SMBDirectory.objects.get_or_create(directory=full_path.strip())
     print("finish")
+
+
