@@ -4,11 +4,12 @@ from sequencingfile.models import SMBDirectory
 
 def create_file_tree():
     print("start")
-    root_dirs = ['/mnt/labshare/BastianRaid-01/UCSF/Data/Meng',
-                '/mnt/labshare/BastianRaid-01/UCSF/Data/Mouse Model Images',
-                '/mnt/labshare/BastianRaid-01/UCSF/Data/Qi',
-                '/mnt/labshare/BastianRaid-01/UCSF/Data/Xu',
-                '/mnt/labshare/BastianRaid-01/UCSF/Data/Yuying']
+    root_dirs = ['/mnt/labshare/BastianRaid-01/UCSF/Lab Maintenance',
+                '/mnt/labshare/BastianRaid-01/UCSF/Lab Protocols',
+                '/mnt/labshare/BastianRaid-01/UCSF/NexusProjects',
+                '/mnt/labshare/BastianRaid-01/UCSF/Plasmids',
+                '/mnt/labshare/BastianRaid-01/UCSF/Primers',
+                 '/mnt/labshare/BastianRaid-01/UCSF/Reference Sequences']
     for dir in root_dirs:
         for root, dirs, files in os.walk(dir):
             for file in files:

@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .forms import *
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from lab.models import Patient
 from blocks.models import Block
 from projects.models import Project
@@ -808,3 +808,4 @@ def import_genes(request):
 def import_file_tree(request):
     from .file_tree import create_file_tree
     create_file_tree()
+    return JsonResponse({"response":"finished"})
