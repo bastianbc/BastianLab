@@ -165,8 +165,8 @@ DATABASES = {
         "NAME":     RDS_SECRET["dbname"],
         "USER":     RDS_SECRET["username"],
         "PASSWORD": RDS_SECRET["password"],
-        "HOST":     "127.0.0.1",
-        "PORT":     "56789",
+        "HOST":     RDS_SECRET["host"],
+        "PORT":     RDS_SECRET["port"],
         "OPTIONS": {
             "sslmode": "require",
         },
