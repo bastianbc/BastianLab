@@ -4,9 +4,9 @@ from sequencingfile.models import SMBDirectory
 
 def create_file_tree():
     print("start")
-    root_dirs = ['/mnt/sequencingdata/Broad-data.16Apr24',
-                 '/mnt/sequencingdata/hg38_ProcessedData',
-                 '/mnt/sequencingdata/tumor-normal-dev']
+    root_dirs = ['/mnt/sequencingdata/Broad-data.16Apr24/',
+                 '/mnt/sequencingdata/hg38_ProcessedData/',
+                 '/mnt/sequencingdata/tumor-normal-dev/']
     for dir in root_dirs:
         for root, dirs, files in os.walk(dir):
             for file in files:
