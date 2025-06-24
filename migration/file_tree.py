@@ -8,6 +8,7 @@ def create_file_tree():
                  '/mnt/sequencingdata/hg38_ProcessedData/',
                  '/mnt/sequencingdata/tumor-normal-dev/']
     for dir in root_dirs:
+        print(dir)
         for root, dirs, files in os.walk(dir):
             for file in files:
                 full_path = os.path.join(root, file)
