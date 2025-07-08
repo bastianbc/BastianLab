@@ -16,6 +16,7 @@ import json
 from django.contrib.messages import constants as message_constants
 
 from django.contrib.messages import constants as messages
+from test1.db_connection_error import DatabaseCredentialMiddleware
 
 MESSAGE_TAGS = {
     messages.DEBUG: 'alert-info',
@@ -109,6 +110,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'test1.db_connection_error.DatabaseCredentialMiddleware',
     # 'core.log_streaming.AsyncLogStreamMiddleware'
 ]
 
