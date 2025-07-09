@@ -110,7 +110,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'test1.db_connection_error.DatabaseCredentialMiddleware',
     # 'core.log_streaming.AsyncLogStreamMiddleware'
 ]
 
