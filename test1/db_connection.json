@@ -1,6 +1,6 @@
 {
   "username": "testuser",
-  "password": "$?mH|ZiNZYWHF462XcW26u$j8y*",
+  "password": "$?mH|ZiNZYWHF462XcW26u$j8y*U",
   "host":     "labdbproduction.cf8eouyk40ff.us-west-2.rds.amazonaws.com",
   "port":     5432,
   "dbname":   "labdbproduction"
