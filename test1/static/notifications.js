@@ -4,7 +4,7 @@ var NotificationManager = function () {
     var socket;
 
     var initWebSocket = function () {
-        socket = new WebSocket("ws://10.65.11.68/ws/notifications/");
+        socket = new WebSocket("ws://10.91.62.76/ws/notifications/");
 
         socket.onopen = function () {
             console.log("✅ WebSocket Connected");
