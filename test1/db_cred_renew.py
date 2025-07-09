@@ -43,6 +43,6 @@ def get_db_credentials():
     return json.loads(credentials)
 
 
-if __name__ == "__main__":
-    secret = get_secret()
-    store_secret_in_redis(secret)
+# if __name__ == "__main__":
+#     secret = get_secret()
+#     store_secret_in_redis(secret)
