@@ -16,7 +16,7 @@ import json
 from django.contrib.messages import constants as message_constants
 
 from django.contrib.messages import constants as messages
-from test1.db_cred_renew import get_db_credentials
+# from test1.db_cred_renew import get_db_credentials
 
 MESSAGE_TAGS = {
     messages.DEBUG: 'alert-info',
