@@ -16,7 +16,7 @@ import json
 from django.contrib.messages import constants as message_constants
 
 from django.contrib.messages import constants as messages
-from test1.db_connection_error import DatabaseCredentialMiddleware
+from test1.db_cred_renew import get_db_credentials
 
 MESSAGE_TAGS = {
     messages.DEBUG: 'alert-info',
@@ -159,13 +159,14 @@ CACHES = {
 
 secret_path = Path(__file__).resolve().parent.parent / "db_connection.json"
 RDS_SECRET = json.loads(secret_path.read_text())
+cred = get_db_credentials()
 
 DATABASES = {
     "default": {
         "ENGINE":   "django.db.backends.postgresql",
         "NAME":     RDS_SECRET["dbname"],
         "USER":     RDS_SECRET["username"],
-        "PASSWORD": RDS_SECRET["password"],
+        "PASSWORD": cred.get('password'),
         "HOST":     RDS_SECRET["host"],
         "PORT":     RDS_SECRET["port"],
         "OPTIONS": {
