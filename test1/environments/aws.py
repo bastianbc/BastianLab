@@ -166,7 +166,7 @@ DATABASES = {
         "ENGINE":   "django.db.backends.postgresql",
         "NAME":     RDS_SECRET["dbname"],
         "USER":     RDS_SECRET["username"],
-        "PASSWORD": cred.get('password'),
+        "PASSWORD": RDS_SECRET['password'],
         "HOST":     RDS_SECRET["host"],
         "PORT":     RDS_SECRET["port"],
         "OPTIONS": {
