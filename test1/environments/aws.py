@@ -94,6 +94,7 @@ INSTALLED_APPS = [
     'jobs',
     'notification',
     'file_manager',
+    'gpt',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
