@@ -38,6 +38,7 @@ urlpatterns = [
     path('qc/', include('qc.urls')),
     path('notification/', include('notification.urls')),
     path('file_manager/', include('file_manager.urls')),
+    path('gpt/', include('gpt.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 handler404 = "core.views.error_404"
