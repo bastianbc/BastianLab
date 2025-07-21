@@ -1,14 +1,26 @@
 import json
 from django.db import models
-from django.db.models import Q, F, OuterRef, Value, CharField, When, \
-    Case, Exists, ExpressionWrapper, FloatField
+from django.db.models import Q, F, OuterRef, Value, CharField, When, Case, Exists, ExpressionWrapper, FloatField
 from django.contrib.postgres.aggregates import StringAgg
 from django.db.models.functions import Concat
-
 from datetime import datetime
 from projects.utils import get_user_projects
 
+class GVariant(models.Model):
+    hg = models.IntegerField(default=0)
+    chrom = models.CharField(max_length=100, blank=True, null=True)
+    start = models.IntegerField(default=0)
+    end = models.IntegerField(default=0)
+    ref = models.CharField(max_length=100, blank=True, null=True)
+    alt = models.CharField(max_length=100, blank=True, null=True)
+    avsnp150 = models.CharField(max_length=100, blank=True, null=True)
+
+    class Meta:
+        db_table = "g_variant"
+        # unique_together = ['chrom', 'start', 'end', 'ref', 'alt']
+
 class VariantCall(models.Model):
+    g_variant = models.ForeignKey(GVariant, on_delete=models.CASCADE, related_name="variant_calls")
     sample_lib = models.ForeignKey("samplelib.SampleLib", on_delete=models.CASCADE, related_name="variant_calls", blank=True, null=True)
     sequencing_run = models.ForeignKey("sequencingrun.SequencingRun", on_delete=models.CASCADE, related_name="variant_calls", blank=True, null=True)
     variant_file = models.ForeignKey("variant.VariantFile", on_delete=models.CASCADE, related_name="variant_calls", blank=True, null=True)
@@ -36,7 +48,7 @@ class VariantCall(models.Model):
             queryset = VariantCall.objects.filter().annotate(
                 blocks=F('sample_lib__na_sl_links__nucacid__area_na_links__area__block__name'),
                 areas=F('sample_lib__na_sl_links__nucacid__area_na_links__area__name'),
-                genes=F('g_variants__c_variants__gene__name'),
+                genes=F('g_variant__c_variants__gene__name'),
                 patients=F('sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__pat_id')
             )
 
@@ -50,8 +62,8 @@ class VariantCall(models.Model):
         def _get_block_variants_queryset(block_id):
             return VariantCall.objects.filter(sample_lib__na_sl_links__nucacid__area_na_links__area__block__id=block_id).annotate(
                 areas=F('sample_lib__na_sl_links__nucacid__area_na_links__area__name'),
-                genes=F('g_variants__c_variants__gene__name'),
-                p_variant=F('g_variants__c_variants__p_variants__name_meta'),
+                genes=F('g_variant__c_variants__gene__name'),
+                p_variant=F('g_variant__c_variants__p_variants__name_meta'),
                 vaf=ExpressionWrapper(
                     Case(
                         When(ref_read__gt=0, then=(F('alt_read') * 100.0) / (F('ref_read') + F('alt_read'))),
@@ -64,8 +76,8 @@ class VariantCall(models.Model):
 
         def _get_area_variants_queryset(area_id):
             return VariantCall.objects.filter(sample_lib__na_sl_links__nucacid__area_na_links__area__id=area_id).annotate(
-                genes=F('g_variants__c_variants__gene__name'),
-                p_variant=F('g_variants__c_variants__p_variants__name_meta'),
+                genes=F('g_variant__c_variants__gene__name'),
+                p_variant=F('g_variant__c_variants__p_variants__name_meta'),
                 vaf=ExpressionWrapper(
                     Case(
                         When(ref_read__gt=0, then=(F('alt_read') * 100.0) / (F('ref_read') + F('alt_read'))),
@@ -217,8 +229,8 @@ class VariantCall(models.Model):
 
             if variant:
                 queryset = queryset.filter(
-                    Q(g_variants__c_variants__p_variants__name_meta__icontains=variant) |
-                    Q(g_variants__c_variants__c_var__icontains=variant)  # Ensure `c_name` exists in `CVariant`
+                    Q(g_variant__c_variants__p_variants__name_meta__icontains=variant) |
+                    Q(g_variant__c_variants__c_var__icontains=variant)  # Ensure `c_name` exists in `CVariant`
                 )
 
             if variant_file:
@@ -249,19 +261,6 @@ class VariantCall(models.Model):
         except Exception as e:
             print(str(e))
             raise
-
-class GVariant(models.Model):
-    variant_call = models.ForeignKey(VariantCall, on_delete=models.CASCADE, related_name="g_variants")
-    hg = models.IntegerField(default=0)
-    chrom = models.CharField(max_length=100, blank=True, null=True)
-    start = models.IntegerField(default=0)
-    end = models.IntegerField(default=0)
-    ref = models.CharField(max_length=100, blank=True, null=True)
-    alt = models.CharField(max_length=100, blank=True, null=True)
-    avsnp150 = models.CharField(max_length=100, blank=True, null=True)
-
-    class Meta:
-        db_table = "g_variant"
 
 class CVariant(models.Model):
     g_variant = models.ForeignKey(GVariant, on_delete=models.CASCADE, related_name="c_variants", blank=True, null=True)
@@ -455,3 +454,97 @@ class VariantsView(models.Model):
         except Exception as e:
             print(str(e))
             raise
+
+
+
+# MATERIALIZED VIEW: variants_view
+#
+# Description: It was created to access all variants more effectively according to the assets it is associated with.
+
+"""
+CREATE MATERIALIZED VIEW variants_view AS
+SELECT DISTINCT ON (vc.id)
+    ROW_NUMBER() OVER() AS id,
+    vc.id AS variantcall_id,
+    a.id AS area_id,
+    a.name AS area_name,
+    a.area_type,
+    a.collection,
+    b.id AS block_id,
+    b.name AS block_name,
+    sl.id AS samplelib_id,
+    sl.name AS samplelib_name,
+    g.id AS gene_id,
+    g.name AS gene_name,
+    g.chr AS chromosome,
+    vc.coverage,
+    vc.log2r,
+    vc.caller,
+    vc.ref_read,
+    vc.alt_read,
+    CASE
+        WHEN vc.ref_read > 0 THEN (vc.alt_read * 100.0) / (vc.ref_read + vc.alt_read)
+        ELSE 0.0
+    END AS vaf,
+    vc.alias_meta as "alias",
+    vc.variant_meta as "variant",
+    gv.id AS gvariant_id,
+    gv.chrom AS g_chromosome,
+    gv.start AS g_start,
+    gv.end AS g_end,
+    gv.ref AS g_ref,
+    gv.alt AS g_alt,
+    gv.avsnp150,
+    cv.id AS cvariant_id,
+    cv.nm_id,
+    cv.c_var,
+    cv.exon,
+    cv.func,
+    pv.id AS pvariant_id,
+    pv.reference_residues,
+    pv.inserted_residues,
+    pv.change_type,
+    ar.id AS analysis_run_id,
+    ar.name AS analysis_run_name
+FROM
+    areas a
+JOIN
+    block b ON a.block = b.id
+JOIN
+    area_na_link anl ON anl.area_id = a.id
+JOIN
+    nuc_acids na ON anl.nucacid_id = na.id
+JOIN
+    na_sl_link nsl ON nsl.nucacid_id = na.id
+JOIN
+    sample_lib sl ON nsl.sample_lib_id = sl.id
+JOIN
+    variant_call vc ON vc.sample_lib_id = sl.id
+JOIN
+    g_variant gv ON vc.g_variant_id = gv.id
+JOIN
+    c_variant cv ON cv.g_variant_id = gv.id
+JOIN
+    gene g ON cv.gene_id = g.id
+JOIN
+    analysis_run ar ON vc.analysis_run_id = ar.id
+LEFT JOIN
+    p_variant pv ON pv.c_variant_id = cv.id
+WHERE
+    a.area_type IS NOT NULL;
+"""
+
+
+# Here are some database indexes after need to create after to created the materialized view above
+"""
+CREATE UNIQUE INDEX ON variants_view (id);
+CREATE INDEX idx_area_variants_area_id ON variants_view (area_id);
+CREATE INDEX idx_area_variants_block_id ON variants_view (block_id);
+"""
+
+# Here are some helpfull commands
+"""
+drop materialized view variants_view;
+
+select * from pg_catalog.pg_matviews;
+"""

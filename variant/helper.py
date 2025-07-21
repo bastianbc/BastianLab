@@ -2,6 +2,7 @@ import pandas as pd
 from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist
 from .models import VariantCall, GVariant, CVariant, PVariant
+from gene.models import Gene
 from analysisrun.models import AnalysisRun
 from samplelib.models import SampleLib
 import re
@@ -122,14 +123,47 @@ def check_required_fields(row):
     logger.debug("All required fields present")
     return True, ""
 
+def get_or_create_g_variant(hg, chrom, start, end, ref, alt, avsnp150):
+    """
+    Get or create GVariant based on unique genomic coordinates.
+    Reuses existing GVariant if one with same chrom, start, end, ref, alt exists.
+    """
+    logger.debug(f"Getting or creating GVariant for {chrom}:{start}-{end} {ref}>{alt}")
+
+    try:
+        # Try to get existing GVariant with same coordinates
+        g_variant = GVariant.objects.get(
+            chrom=chrom,
+            start=start,
+            end=end,
+            ref=ref,
+            alt=alt
+        )
+        logger.info(f"Found existing GVariant: {g_variant.id}")
+        return g_variant
+    except GVariant.DoesNotExist:
+        # Create new GVariant if none exists
+        g_variant = GVariant.objects.create(
+            hg=hg,
+            chrom=chrom,
+            start=start,
+            end=end,
+            ref=ref,
+            alt=alt,
+            avsnp150=avsnp150
+        )
+        logger.info(f"Created new GVariant: {g_variant.id}")
+        return g_variant
+
 def create_c_and_p_variants(g_variant, aachange, func, gene_detail):
     logger.debug(f"Creating C and P variants for aachange: {aachange}")
     entries = aachange.split(',')
     for entry in entries:
         try:
             logger.debug(f"Processing entry: {entry}")
-            gene, nm_id, exon, c_var, p_var = entry.split(':')
-
+            gene_name, nm_id, exon, c_var, p_var = entry.split(':')
+            hg_value = f"hg{g_variant.hg}"
+            gene = Gene.objects.get(name=gene_name,hg=hg_value)
             # Create CVariant instance
             c_variant = CVariant.objects.create(
                 g_variant=g_variant,
@@ -154,9 +188,12 @@ def create_c_and_p_variants(g_variant, aachange, func, gene_detail):
                     )
                     logger.info(f"Created PVariant: {p_variant}")
                 else:
-                    logger.warning(f"Skipped PVariant creation due to invalid p_var: {p_var}")
+                    logger.error(f"Skipped PVariant creation due to invalid p_var: {p_var}")
+                    return False
+            return True
         except Exception as e:
             logger.error(f"Error processing AAChange entry '{entry}': {str(e)}")
+            return False
 
 @transaction.atomic
 def variant_file_parser(file_path, analysis_run_name):
@@ -220,23 +257,8 @@ def variant_file_parser(file_path, analysis_run_name):
                     continue
 
                 with transaction.atomic():
-                    logger.debug(f"Creating VariantCall for row {index + 1}")
-                    variant_call = VariantCall.objects.create(
-                        analysis_run=analysis_run,
-                        sample_lib=sample_lib,
-                        sequencing_run=get_sequencing_run(filename),
-                        coverage=row['Depth'],
-                        log2r=get_log2r(),
-                        caller=caller,
-                        normal_sl=get_normal_sample_lib(sample_lib),
-                        label="",
-                        ref_read=row['Ref_reads'],
-                        alt_read=row['Alt_reads'],
-                    )
-
-                    logger.debug(f"Creating GVariant for row {index + 1}")
-                    g_variant = GVariant.objects.create(
-                        variant_call=variant_call,
+                    logger.debug(f"Getting or creating GVariant for row {index + 1}")
+                    g_variant = get_or_create_g_variant(
                         hg=get_hg(filename),
                         chrom=row['Chr'],
                         start=row['Start'],
@@ -246,17 +268,68 @@ def variant_file_parser(file_path, analysis_run_name):
                         avsnp150=row.get('avsnp150', '')
                     )
 
-                    logger.debug(f"Creating C and P variants for row {index + 1}")
-                    create_c_and_p_variants(
+                    logger.debug(f"Creating VariantCall for row {index + 1}")
+                    variant_call = VariantCall.objects.create(
+                        analysis_run=analysis_run,
+                        sample_lib=sample_lib,
+                        sequencing_run=get_sequencing_run(filename),
                         g_variant=g_variant,
-                        aachange=row['AAChange.refGene'],
-                        func=row['Func.refGene'],
-                        gene_detail=row.get('GeneDetail.refGene', '')
+                        coverage=row['Depth'],
+                        log2r=get_log2r(),
+                        caller=caller,
+                        normal_sl=get_normal_sample_lib(sample_lib),
+                        label="",
+                        ref_read=row['Ref_reads'],
+                        alt_read=row['Alt_reads'],
                     )
 
-                    stats["successful"] += 1
-                    logger.info(f"Successfully processed row {index + 1}")
+                    logger.debug(f"Creating C and P variants for row {index + 1}")
 
+                    entries = row['AAChange.refGene'].split(',')
+                    for entry in entries:
+                        try:
+                            logger.debug(f"Processing entry: {entry}")
+                            gene_name, nm_id, exon, c_var, p_var = entry.split(':')
+                            hg_value = f"hg{get_hg(filename)}"
+                            print(hg_value)
+                            gene = Gene.objects.get(name=gene_name,hg=hg_value)
+                            # Create CVariant instance
+                            c_variant = CVariant.objects.create(
+                                g_variant=g_variant,
+                                gene=gene,
+                                nm_id=nm_id,
+                                exon=exon,
+                                c_var=c_var,
+                                func=row['Func.refGene'],
+                                gene_detail=row.get('GeneDetail.refGene', '')
+                            )
+                            logger.info(f"Created CVariant: {c_variant}")
+
+                            # Create PVariant instance if p_var is present
+                            if p_var:
+                                p_ref, p_pos, p_alt = parse_p_var(p_var)
+                                if all([p_ref, p_pos, p_alt]):
+                                    p_variant = PVariant.objects.create(
+                                        c_variant=c_variant,
+                                        ref=p_ref,
+                                        pos=p_pos,
+                                        alt=p_alt
+                                    )
+                                    logger.info(f"Created PVariant: {p_variant}")
+                                else:
+                                    message = f"Skipped PVariant creation due to invalid p_var: {p_var}"
+                                    logger.error(message)
+                                    stats["errors"].append(f"Row {index + 1}: {message}")
+                                    stats["failed"] += 1
+
+                            stats["successful"] += 1
+                            logger.info(f"Successfully processed row {index + 1}")
+
+                        except Exception as e:
+                            message = f"Error processing AAChange entry '{entry}': {str(e)}"
+                            logger.error(message)
+                            stats["errors"].append(f"Row {index + 1}: {message}")
+                            stats["failed"] += 1
             except Exception as e:
                 logger.error(f"Error processing row {index + 1}: {str(e)}", exc_info=True)
                 stats["errors"].append(f"Row {index + 1}: {str(e)}")
@@ -276,14 +349,3 @@ def variant_file_parser(file_path, analysis_run_name):
     except Exception as e:
         logger.critical(f"Critical error in variant file parser: {str(e)}", exc_info=True)
         return False, f"Critical error: {str(e)}", {}
-
-
-def get_kwarg_value(kwargs, key, default=None):
-    value = kwargs.get(key, default)
-    if isinstance(value, (list, tuple)):
-        try:
-            return value[0]
-        except IndexError:
-            return default
-    return value
-

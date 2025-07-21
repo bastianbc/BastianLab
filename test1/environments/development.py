@@ -250,13 +250,13 @@ LOGGING = {
 }
 
 SMB_DIRECTORY_SEQUENCINGDATA = "/home/bazo/Documents/PROJELER/UCSF/variants"
-SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(BASE_DIR,"uploads", "files", "ProcessedData")
+SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(BASE_DIR,"uploads", "variants")
 SEQUENCING_FILES_DESTINATION_DIRECTORY = os.path.join(BASE_DIR,"uploads", "dest")
 
 #For cns file serching
 VARIANT_FILES_SOURCE_DIRECTORY = os.path.join(BASE_DIR,"uploads", "files", "ProcessedData")
 
 SMB_DIRECTORY_LABSHARE = "/Volumes/labshare"
-SEQUENCING_FILES_SOURCE_DIRECTORY = Path(Path(SMB_DIRECTORY_LABSHARE) / "BastianRaid-02")
+# SEQUENCING_FILES_SOURCE_DIRECTORY = Path(Path(SMB_DIRECTORY_LABSHARE) / "BastianRaid-02")
 TEMP_DIRECTORY = Path(Path(SMB_DIRECTORY_LABSHARE) / "BastianRaid-02" / "TEMP")
 HISEQDATA_DIRECTORY = Path(Path(SMB_DIRECTORY_LABSHARE) / "BastianRaid-02" / "HiSeqData")

@@ -12,7 +12,6 @@ from django.db.models import Prefetch
 from areas.models import Area
 from blocks.models import Block
 from blocks.variants_query import variant_queryset, VariantCustomSerializer
-from .helper import get_kwarg_value
 from django.http import HttpResponse
 from .walk_sequencing_data import create_file_tree
 
@@ -20,13 +19,7 @@ from .walk_sequencing_data import create_file_tree
 @permission_required_for_async("variant.view_variant")
 def filter_variants(request):
     variants = VariantCall.query_by_args(request.user,**request.GET)
-    kwargs = request.GET
-    model_block = get_kwarg_value(kwargs, 'model_block')
-    model_area = get_kwarg_value(kwargs, 'model_area')
-    if model_block or model_area:
-        serializer = VariantSerializerBlockArea(variants['items'], many=True)
-    else:
-        serializer = VariantSerializer(variants['items'], many=True)
+    serializer = VariantSerializer(variants['items'], many=True)
     result = dict()
     result['data'] = serializer.data
     result['draw'] = variants['draw']
@@ -103,7 +96,15 @@ def import_variants(request, name):
 
             # If any files had errors, raise exception to trigger rollback
             if processing_stats["errors"]:
-                raise Exception("Some files had processing errors")
+                return JsonResponse({
+                    "success": False,
+                    "message": "Some files had processing errors",
+                    "statistics": {
+                        "files_processed": processing_stats["processed_files"],
+                        "total_variants_processed": processing_stats["successful_variants"],
+                        "total_files": processing_stats["total_files"]
+                    }
+                })
 
             return JsonResponse({
                 "success": True,
