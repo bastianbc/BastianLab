@@ -28,6 +28,8 @@ from pathlib import Path
 import pandas as pd
 import os
 import django
+from django.db.models import Count, Min
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "test1.settings")
 django.setup()
 
@@ -806,6 +808,37 @@ def import_genes(request):
     print("finished")
 
 def import_file_tree(request):
-    from .file_tree import create_file_tree
-    create_file_tree()
-    return JsonResponse({"response":"finished"})
+    # qs = GVariant.objects.values(
+    #     'start', 'chrom', 'ref', 'alt'
+    # ).annotate(min_id=Min('id'), count_id=Count('id')).filter(count_id__gt=1).order_by("id")[:10]
+    # print(qs)
+    duplicate_foobars = (
+        GVariant.objects
+        .values('start', 'chrom', 'ref', 'alt')
+        .annotate(count=Count('id'))
+        .filter(count__gt=1)
+    )
+
+    # Step 2: For each duplicate group, delete all except the one with the lowest ID
+    for dup in duplicate_foobars:
+        start = dup['start']
+        chrom = dup['chrom']
+        ref = dup['ref']
+        alt = dup['alt']
+
+        # Get the minimum ID to keep
+        min_id = (
+            GVariant.objects
+            .filter(start=start, chrom=chrom, ref=ref, alt=alt)
+            .aggregate(min_id=Min('id'))['min_id']
+        )
+
+        # Delete all others in the same group
+        deleted, _ = (
+            GVariant.objects
+            .filter(start=start, chrom=chrom, ref=ref, alt=alt)
+            .exclude(id=min_id)
+            .delete()
+        )
+
+        print(f"✅ Kept GVariant ID {min_id} for ({chrom}, {start}, {ref}, {alt}); Deleted {deleted} duplicates.")
