@@ -808,10 +808,6 @@ def import_genes(request):
     print("finished")
 
 def import_file_tree(request):
-    # qs = GVariant.objects.values(
-    #     'start', 'chrom', 'ref', 'alt'
-    # ).annotate(min_id=Min('id'), count_id=Count('id')).filter(count_id__gt=1).order_by("id")[:10]
-    # print(qs)
     duplicate_foobars = (
         GVariant.objects
         .values('start', 'chrom', 'ref', 'alt')
@@ -819,26 +815,28 @@ def import_file_tree(request):
         .filter(count__gt=1)
     )
 
-    # Step 2: For each duplicate group, delete all except the one with the lowest ID
     for dup in duplicate_foobars:
         start = dup['start']
         chrom = dup['chrom']
         ref = dup['ref']
         alt = dup['alt']
 
-        # Get the minimum ID to keep
-        min_id = (
-            GVariant.objects
-            .filter(start=start, chrom=chrom, ref=ref, alt=alt)
-            .aggregate(min_id=Min('id'))['min_id']
-        )
+        # Find all duplicate GVariant IDs for this group
+        duplicates = GVariant.objects.filter(
+            start=start, chrom=chrom, ref=ref, alt=alt
+        ).values_list('id', flat=True)
 
-        # Delete all others in the same group
-        deleted, _ = (
-            GVariant.objects
-            .filter(start=start, chrom=chrom, ref=ref, alt=alt)
-            .exclude(id=min_id)
-            .delete()
-        )
+        min_id = min(duplicates)
 
-        print(f"✅ Kept GVariant ID {min_id} for ({chrom}, {start}, {ref}, {alt}); Deleted {deleted} duplicates.")
+        # Update all VariantCalls that reference the duplicate GVariants
+        VariantCall.objects.filter(g_variant_id__in=duplicates).update(g_variant_id=min_id)
+
+        # Delete all GVariants except the one with min ID
+        deleted, _ = GVariant.objects.filter(id__in=duplicates).exclude(id=min_id).delete()
+
+        print(
+            f"✅ Assigned VariantCalls to GVariant ID {min_id}; Deleted {deleted} duplicates for ({chrom}, {start}, {ref}, {alt})")
+
+    print(f"✅ Kept GVariant ID {min_id} for ({chrom}, {start}, {ref}, {alt}); Deleted {deleted} duplicates.")
+
+
