@@ -837,6 +837,6 @@ def import_file_tree(request):
         print(
             f"✅ Assigned VariantCalls to GVariant ID {min_id}; Deleted {deleted} duplicates for ({chrom}, {start}, {ref}, {alt})")
 
-    print(f"✅ Kept GVariant ID {min_id} for ({chrom}, {start}, {ref}, {alt}); Deleted {deleted} duplicates.")
+    return HttpResponse("Deduplication complete.")
 
 
