@@ -19,6 +19,263 @@ class GVariant(models.Model):
         db_table = "g_variant"
         # unique_together = ['chrom', 'start', 'end', 'ref', 'alt']
 
+    @staticmethod
+    def query_by_args(user, **kwargs):
+        """
+        Query GVariant objects with filtering, pagination, and authorization.
+        This method handles DataTables requests and filters variants based on user permissions.
+        """
+
+        def _get_authorizated_queryset():
+            """
+            Users can access entities based on their authorization. Admin users can access everything,
+            while technicians or researchers can only access their own projects and related entities.
+            """
+            queryset = GVariant.objects.filter().annotate(
+                blocks=F('variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__block__name'),
+                areas=F('variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__name'),
+                genes=F('c_variants__gene__name'),
+                patients=F('variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__pat_id'),
+            )
+
+            if not user.is_superuser:
+                return queryset.filter(
+                    variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__block__block_projects__in=get_user_projects(user)
+                )
+
+            return queryset
+
+        def _get_block_variants_queryset(block_id):
+            """
+            Get GVariant queryset filtered by specific block ID with additional annotations.
+            """
+            return GVariant.objects.filter(
+                variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__block__id=block_id
+            ).annotate(
+                areas=F('variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__name'),
+                genes=F('c_variants__gene__name'),
+                p_variant=F('c_variants__p_variants__name_meta'),
+                coverage=F('variant_calls__coverage'),
+                vaf=ExpressionWrapper(
+                    Case(
+                        When(variant_calls__ref_read__gt=0,
+                             then=(F('variant_calls__alt_read') * 100.0) / (F('variant_calls__ref_read') + F('variant_calls__alt_read'))),
+                        default=Value(0.0),
+                        output_field=FloatField(),
+                    ),
+                    output_field=FloatField()
+                ),
+                sample_lib=F('variant_calls__sample_lib'),
+                sequencing_run=F('variant_calls__sequencing_run'),
+                variant_file=F('variant_calls__variant_file'),
+                log2r=F('variant_calls__log2r'),
+                caller=F('variant_calls__caller'),
+                ref_read=F('variant_calls__ref_read'),
+                alt_read=F('variant_calls__alt_read'),
+                analysis_run=F('variant_calls__analysis_run')
+            ).distinct()
+
+        def _get_area_variants_queryset(area_id):
+            """
+            Get GVariant queryset filtered by specific area ID with additional annotations.
+            """
+            return GVariant.objects.filter(
+                variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__id=area_id
+            ).annotate(
+                genes=F('c_variants__gene__name'),
+                p_variant=F('c_variants__p_variants__name_meta'),
+                coverage=F('variant_calls__coverage'),
+                vaf=ExpressionWrapper(
+                    Case(
+                        When(variant_calls__ref_read__gt=0,
+                             then=(F('variant_calls__alt_read') * 100.0) / (F('variant_calls__ref_read') + F('variant_calls__alt_read'))),
+                        default=Value(0.0),
+                        output_field=FloatField(),
+                    ),
+                    output_field=FloatField()
+                ),
+                sample_lib=F('variant_calls__sample_lib'),
+                sequencing_run=F('variant_calls__sequencing_run'),
+                variant_file=F('variant_calls__variant_file'),
+                log2r=F('variant_calls__log2r'),
+                caller=F('variant_calls__caller'),
+                ref_read=F('variant_calls__ref_read'),
+                alt_read=F('variant_calls__alt_read'),
+                analysis_run=F('variant_calls__analysis_run')
+            ).distinct()
+
+        def _parse_value(search_value):
+            """
+            Parse search value from DataTables request.
+            If the value contains '_initial' prefix, it's parsed as JSON.
+
+            Args:
+                search_value (str): Search string from DataTables
+
+            Returns:
+                str: Parsed search value
+            """
+            if "_initial:" in search_value:
+                return json.loads(search_value.split("_initial:")[1])
+            return search_value
+
+        def _is_initial_value(search_value):
+            """
+            Check if the search value contains initial filtering data.
+
+            Args:
+                search_value (str): Search string from DataTables
+
+            Returns:
+                bool: True if contains initial value, False otherwise
+            """
+            return "_initial:" in search_value and search_value.split("_initial:")[1] != "null"
+
+        def get_kwarg_value(kwargs, key, default=None):
+            """
+            Extract value from kwargs, handling both single values and lists.
+            """
+            value = kwargs.get(key, default)
+            if isinstance(value, (list, tuple)):
+                try:
+                    return value[0]
+                except IndexError:
+                    return default
+            return value
+
+        try:
+            # Column mapping for ordering in different contexts
+            ORDER_COLUMN_CHOICES = {
+                "0": "id",
+                "1": "patients",  # Changed to use annotated field
+                "2": "areas",
+                "3": "blocks",    # Changed to use annotated field
+                "4": "sample_lib",
+                "5": "sequencing_run",
+                "6": "genes",     # Changed to use annotated field
+                "7": "p_variant", # Changed to use p_variant annotation
+                "8": "c_variants__nm_id",  # For aliases
+            }
+
+            # Extract DataTables parameters
+            draw = int(kwargs.get('draw', None)[0])
+            length = int(kwargs.get('length', None)[0])
+            start = int(kwargs.get('start', None)[0])
+            search_value = kwargs.get('search[value]', None)[0]
+            order = kwargs.get('order[0][dir]', None)[0]
+            order_column = kwargs.get('order[0][column]', None)[0]
+            order_column = ORDER_COLUMN_CHOICES[order_column]
+
+            # Extract filter parameters
+            patient = get_kwarg_value(kwargs, 'patient')
+            sample_lib = get_kwarg_value(kwargs, 'sample_lib')
+            sequencing_run = get_kwarg_value(kwargs, 'sequencing_run')
+            block = get_kwarg_value(kwargs, 'block')
+            area = get_kwarg_value(kwargs, 'area')
+            coverage_value = get_kwarg_value(kwargs, 'coverage_value')
+            log2r_value = get_kwarg_value(kwargs, 'log2r_value')
+            ref_read_value = get_kwarg_value(kwargs, 'ref_read_value')
+            alt_read_value = get_kwarg_value(kwargs, 'alt_read_value')
+            variant = get_kwarg_value(kwargs, 'variant')
+            variant_file = get_kwarg_value(kwargs, 'variant_file')
+            model_block = get_kwarg_value(kwargs, 'model_block')
+            model_area = get_kwarg_value(kwargs, 'model_area')
+            block_id = get_kwarg_value(kwargs, 'block_id')
+            area_id = get_kwarg_value(kwargs, 'area_id')
+
+            is_initial = _is_initial_value(search_value)
+            search_value = _parse_value(search_value)
+
+            # Apply descending order if needed
+            if order == 'desc':
+                order_column = '-' + order_column
+
+            # Get appropriate queryset based on context
+            if model_block:
+                queryset = _get_block_variants_queryset(block_id)
+            elif model_area:
+                queryset = _get_area_variants_queryset(area_id)
+            else:
+                queryset = _get_authorizated_queryset()
+
+            total = queryset.count()
+
+            # Apply filters based on parameters
+            if sample_lib:
+                queryset = queryset.filter(Q(variant_calls__sample_lib__id=sample_lib))
+
+            if sequencing_run:
+                queryset = queryset.filter(Q(variant_calls__sequencing_run__id=sequencing_run))
+
+            if area:
+                queryset = queryset.filter(
+                    Q(variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__id=area))
+
+            if block:
+                queryset = queryset.filter(
+                    Q(variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__block__id=block))
+
+            if patient:
+                queryset = queryset.filter(
+                    Q(variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__id=patient))
+
+            if coverage_value:
+                queryset = queryset.filter(variant_calls__coverage=coverage_value)
+
+            if log2r_value:
+                queryset = queryset.filter(variant_calls__log2r=log2r_value)
+
+            if ref_read_value:
+                queryset = queryset.filter(variant_calls__ref_read=ref_read_value)
+
+            if alt_read_value:
+                queryset = queryset.filter(variant_calls__alt_read=alt_read_value)
+
+            if variant:
+                queryset = queryset.filter(
+                    Q(c_variants__p_variants__name_meta__icontains=variant) |
+                    Q(c_variants__c_var__icontains=variant)
+                )
+
+            if variant_file:
+                queryset = queryset.filter(variant_calls__variant_file__name__icontains=variant_file)
+
+            # Handle initial filtering from DataTables
+            if is_initial:
+                if search_value["model"] == "block":
+                    queryset = queryset.filter(
+                        variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__block__id=int(search_value["id"]))
+
+                if search_value["model"] == "area":
+                    queryset = queryset.filter(
+                        variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__id=int(search_value["id"]))
+
+            elif search_value:
+                # General search across multiple fields
+                queryset = queryset.filter(
+                    Q(variant_calls__caller__icontains=search_value) |
+                    Q(variant_calls__label__icontains=search_value) |
+                    Q(variant_calls__coverage__icontains=search_value) |
+                    Q(chrom__icontains=search_value) |
+                    Q(ref__icontains=search_value) |
+                    Q(alt__icontains=search_value) |
+                    Q(avsnp150__icontains=search_value)
+                )
+
+            count = queryset.count()
+            queryset = queryset.order_by(order_column)[start:start + length]
+
+            return {
+                'items': queryset,
+                'count': count,
+                'total': total,
+                'draw': draw
+            }
+
+        except Exception as e:
+            print(str(e))
+            raise
+
 class VariantCall(models.Model):
     g_variant = models.ForeignKey(GVariant, on_delete=models.CASCADE, related_name="variant_calls")
     sample_lib = models.ForeignKey("samplelib.SampleLib", on_delete=models.CASCADE, related_name="variant_calls", blank=True, null=True)
@@ -38,230 +295,6 @@ class VariantCall(models.Model):
     class Meta:
         db_table = "variant_call"
 
-    def query_by_args(user, **kwargs):
-
-        def _get_authorizated_queryset():
-            '''
-            Users can access to some entities depend on their authorize. While the user having admin role can access to all things,
-            technicians or researchers can access own projects and other entities related to it.
-            '''
-            queryset = VariantCall.objects.filter().annotate(
-                blocks=F('sample_lib__na_sl_links__nucacid__area_na_links__area__block__name'),
-                areas=F('sample_lib__na_sl_links__nucacid__area_na_links__area__name'),
-                genes=F('g_variant__c_variants__gene__name'),
-                patients=F('sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__pat_id')
-            )
-
-            if not user.is_superuser:
-                return queryset.filter(
-                    sample_lib__na_sl_links__nucacid__area_na_links__area__block__block_projects__in=get_user_projects(user)
-                )
-
-            return queryset
-
-        def _get_block_variants_queryset(block_id):
-            return VariantCall.objects.filter(sample_lib__na_sl_links__nucacid__area_na_links__area__block__id=block_id).annotate(
-                areas=F('sample_lib__na_sl_links__nucacid__area_na_links__area__name'),
-                genes=F('g_variant__c_variants__gene__name'),
-                p_variant=F('g_variant__c_variants__p_variants__name_meta'),
-                vaf=ExpressionWrapper(
-                    Case(
-                        When(ref_read__gt=0, then=(F('alt_read') * 100.0) / (F('ref_read') + F('alt_read'))),
-                        default=Value(0.0),
-                        output_field=FloatField(),
-                    ),
-                    output_field=FloatField()
-                )
-            ).distinct()
-
-        def _get_area_variants_queryset(area_id):
-            return VariantCall.objects.filter(sample_lib__na_sl_links__nucacid__area_na_links__area__id=area_id).annotate(
-                genes=F('g_variant__c_variants__gene__name'),
-                p_variant=F('g_variant__c_variants__p_variants__name_meta'),
-                vaf=ExpressionWrapper(
-                    Case(
-                        When(ref_read__gt=0, then=(F('alt_read') * 100.0) / (F('ref_read') + F('alt_read'))),
-                        default=Value(0.0),
-                        output_field=FloatField(),
-                    ),
-                    output_field=FloatField()
-                )
-            ).distinct()
-
-        def _parse_value(search_value):
-            '''
-            When the datatables are to be filled with a certain data, the search function of datatables is used.
-            The incoming parameter is parsed ve returned. If there is a initial value, the "search_value" has "_initial" prefix.
-            Parameters:
-                search_value (str): A string
-            Returns:
-                search_value (str): Parsed value
-            '''
-            if "_initial:" in search_value:
-                return json.loads(search_value.split("_initial:")[1])
-            return search_value
-
-        def _is_initial_value(search_value):
-            '''
-            When the datatables are to be filled with a certain data, the search function of datatables is used.
-            The incoming parameter is parsed ve returned. If there is a initial value, the "search_value" has "_initial" prefix.
-            Parameters:
-                search_value (str): A string
-            Returns:
-                is_initial (boolean): If there is a initial value, it is True
-            '''
-            return "_initial:" in search_value and search_value.split("_initial:")[1] != "null"
-
-        def get_kwarg_value(kwargs, key, default=None):
-            value = kwargs.get(key, default)
-            if isinstance(value, (list, tuple)):
-                try:
-                    return value[0]
-                except IndexError:
-                    return default
-            return value
-
-        try:
-            ORDER_COLUMN_CHOICES = {
-                 "0": "id",
-                "1": "patient",
-                "2": "areas",
-                "3": "block",
-                "4": "sample_lib",
-                "5": "sequencing_run",
-                "6": "gene",
-                "7": "variant",
-                "8": "aliases",
-            }
-            ORDER_COLUMN_CHOICES_BLOCK = {
-                "0": "areas",
-                "1": "sample_lib",
-                "2": "genes",
-                "3": "p_variant",
-                "4": "coverage",
-                "5": "vaf",
-            }
-            ORDER_COLUMN_CHOICES_AREA = {
-                "0": "sample_lib",
-                "1": "genes",
-                "2": "p_variant",
-                "3": "coverage",
-                "4": "vaf",
-            }
-            draw = int(kwargs.get('draw', None)[0])
-            length = int(kwargs.get('length', None)[0])
-            start = int(kwargs.get('start', None)[0])
-            search_value = kwargs.get('search[value]', None)[0]
-            order_column = kwargs.get('order[0][column]', None)[0]
-            order = kwargs.get('order[0][dir]', None)[0]
-            patient = get_kwarg_value(kwargs, 'patient')
-            sample_lib = get_kwarg_value(kwargs, 'sample_lib')
-            sequencing_run = get_kwarg_value(kwargs, 'sequencing_run')
-            block = get_kwarg_value(kwargs, 'block')
-            area = get_kwarg_value(kwargs, 'area')
-            coverage_value = get_kwarg_value(kwargs, 'coverage_value')
-            log2r_value = get_kwarg_value(kwargs, 'log2r_value')
-            ref_read_value = get_kwarg_value(kwargs, 'ref_read_value')
-            alt_read_value = get_kwarg_value(kwargs, 'alt_read_value')
-            variant = get_kwarg_value(kwargs, 'variant')
-            variant_file = get_kwarg_value(kwargs, 'variant_file')
-            model_block = get_kwarg_value(kwargs, 'model_block')
-            model_area = get_kwarg_value(kwargs, 'model_area')
-            block_id = get_kwarg_value(kwargs, 'block_id')
-            area_id = get_kwarg_value(kwargs, 'area_id')
-            is_initial = _is_initial_value(search_value)
-            search_value = _parse_value(search_value)
-
-            # django orm '-' -> desc
-            order_column = ORDER_COLUMN_CHOICES_BLOCK[order_column] if model_block else ORDER_COLUMN_CHOICES_AREA[order_column] if model_area else ORDER_COLUMN_CHOICES[order_column]
-            # django orm '-' -> desc
-            if order == 'desc':
-                order_column = '-' + order_column
-
-            if model_block:
-                queryset = _get_block_variants_queryset(block_id)
-            elif model_area:
-                queryset = _get_area_variants_queryset(area_id)
-            else:
-                queryset = _get_authorizated_queryset()
-
-            total = queryset.count()
-            if sample_lib:
-                queryset = queryset.filter(Q(sample_lib__id=sample_lib))
-
-            if sequencing_run:
-                queryset = queryset.filter(Q(sequencing_run__id=sequencing_run))
-
-            if area:
-                queryset = queryset.filter(
-                    Q(sample_lib__na_sl_links__nucacid__area_na_links__area__id=block))
-
-            if block:
-                queryset = queryset.filter(
-                    Q(sample_lib__na_sl_links__nucacid__area_na_links__area__block__id=block))
-
-            if patient:
-                queryset = queryset.filter(
-                    Q(sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__id=patient))
-            if coverage_value:
-                queryset = queryset.filter(coverage=coverage_value)
-
-            if log2r_value:
-                queryset = queryset.filter(log2r=log2r_value)
-
-            if ref_read_value:
-                queryset = queryset.filter(ref_read=ref_read_value)
-
-            if alt_read_value:
-                queryset = queryset.filter(alt_read=alt_read_value)
-
-            if coverage_value:
-                queryset = queryset.filter(coverage=coverage_value)
-
-            if log2r_value:
-                queryset = queryset.filter(log2r=log2r_value)
-
-            if ref_read_value:
-                queryset = queryset.filter(ref_read=ref_read_value)
-
-            if alt_read_value:
-                queryset = queryset.filter(alt_read=alt_read_value)
-
-            if variant:
-                queryset = queryset.filter(
-                    Q(g_variant__c_variants__p_variants__name_meta__icontains=variant) |
-                    Q(g_variant__c_variants__c_var__icontains=variant)  # Ensure `c_name` exists in `CVariant`
-                )
-
-            if variant_file:
-                queryset = queryset.filter(variant_file__name__icontains=variant_file)
-
-            if is_initial:
-                if search_value["model"] == "block":
-                    queryset = queryset.filter(sample_lib__na_sl_links__nucacid__area_na_links__area__block__id=int(search_value["id"]))
-
-                if search_value["model"] == "area":
-                    queryset = queryset.filter(sample_lib__na_sl_links__nucacid__area_na_links__area__id=int(search_value["id"]))
-
-            elif search_value:
-                queryset = queryset.filter(
-                    Q(caller__icontains=search_value) |
-                    Q(label__icontains=search_value) |
-                    Q(coverage__icontains=search_value)
-                )
-
-            count = queryset.count()
-            queryset = queryset.order_by(order_column)[start:start + length]
-            return {
-                'items': queryset,
-                'count': count,
-                'total': total,
-                'draw': draw
-            }
-        except Exception as e:
-            print(str(e))
-            raise
-
 class CVariant(models.Model):
     g_variant = models.ForeignKey(GVariant, on_delete=models.CASCADE, related_name="c_variants", blank=True, null=True)
     gene = models.ForeignKey("gene.Gene", on_delete=models.CASCADE, related_name="c_variants", blank=True, null=True)
@@ -272,7 +305,6 @@ class CVariant(models.Model):
     gene_detail = models.CharField(max_length=100)
     is_alias = models.BooleanField(default=False) # if c_variant.nm_id == to gene.nm_id set True
     is_gene_detail = models.BooleanField(default=False)
-
 
     class Meta:
         db_table = "c_variant"
@@ -312,7 +344,6 @@ class VariantFile(models.Model):
     date = models.DateTimeField(default=datetime.now, verbose_name="Date")
     call = models.BooleanField(default=False)
     type = models.CharField(max_length=10, choices=FILE_TYPES, blank=True, null=True)
-
 
     class Meta:
         db_table = "variant_file"
@@ -455,8 +486,6 @@ class VariantsView(models.Model):
             print(str(e))
             raise
 
-
-
 # MATERIALIZED VIEW: variants_view
 #
 # Description: It was created to access all variants more effectively according to the assets it is associated with.
@@ -548,3 +577,17 @@ drop materialized view variants_view;
 
 select * from pg_catalog.pg_matviews;
 """
+
+class CosmicGVariantView(models.Model):
+    g_variant_id = models.IntegerField()
+    chr = models.CharField(max_length=2)
+    pos = models.IntegerField()
+    ref = models.CharField(max_length=1)
+    alt = models.CharField(max_length=1)
+    gene_symbol = models.CharField(max_length=10)
+    cosmic_aa = models.CharField(max_length=10)
+    primary_site_counts = models.JSONField()
+
+    class Meta:
+        managed = False
+        db_table = 'cosmic_g_variants_view'
