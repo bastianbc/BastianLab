@@ -80,14 +80,20 @@ var KTDatatablesServerSide = function () {
             },
             columns: [
                 { data: 'id' },
+                { data: 'chrom' },
+                { data: 'start' },
+                { data: 'ref' },
+                { data: 'alt' },
                 { data: 'patients' },
                 { data: 'areas' },
                 { data: 'blocks' },
                 { data: 'sample_lib' },
                 { data: 'sequencing_run' },
                 { data: 'genes' },
-                { data: 'variant_meta' },
-                { data: 'alias_meta' },
+                { data: 'gene_symbol' },
+                { data: 'cosmic_aa' },
+                { data: 'primary_site_counts' },
+                { data: 'total_calls' },
                 { data: null },
             ],
             columnDefs: [
@@ -102,14 +108,87 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                  targets: 7,
-                  orderable: false,
+                    // Patients column (index 5) - expects array of [id, name] tuples
+                    targets: 5,
+                    render: function (data, type, row) {
+                        if (!data || !Array.isArray(data)) return '';
+                        return data.map(function(patient) {
+                            var patientId = patient[0]; // id
+                            var patientName = patient[1]; // name
+                            return `<a href="/patients/edit/${patientId}" class="text-primary">${patientName}</a>`;
+                        }).join(', ');
+                    }
                 },
                 {
-                  targets: 8,
-                  orderable: false,
+                    // Areas column (index 6) - expects array of [id, name] tuples
+                    targets: 6,
+                    render: function (data, type, row) {
+                        if (!data || !Array.isArray(data)) return '';
+                        return data.map(function(area) {
+                            var areaId = area[0]; // id
+                            var areaName = area[1]; // name
+                            return `<a href="/areas/edit/${areaId}" class="text-primary">${areaName}</a>`;
+                        }).join(', ');
+                    }
                 },
-
+                {
+                    // Blocks column (index 7) - expects array of [id, name] tuples
+                    targets: 7,
+                    render: function (data, type, row) {
+                        if (!data || !Array.isArray(data)) return '';
+                        return data.map(function(block) {
+                            var blockId = block[0]; // id
+                            var blockName = block[1]; // name
+                            return `<a href="/blocks/edit/${blockId}" class="text-primary">${blockName}</a>`;
+                        }).join(', ');
+                    }
+                },
+                {
+                    // Sample libraries column (index 8) - expects array of [id, name] tuples
+                    targets: 8,
+                    render: function (data, type, row) {
+                        if (!data || !Array.isArray(data)) return '';
+                        return data.map(function(sampleLib) {
+                            var sampleLibId = sampleLib[0]; // id
+                            var sampleLibName = sampleLib[1]; // name
+                            return `<a href="/sample_libraries/edit/${sampleLibId}" class="text-primary">${sampleLibName}</a>`;
+                        }).join(', ');
+                    }
+                },
+                {
+                    // Sequencing runs column (index 9) - expects array of [id, name] tuples
+                    targets: 9,
+                    render: function (data, type, row) {
+                        if (!data || !Array.isArray(data)) return '';
+                        return data.map(function(seqRun) {
+                            var seqRunId = seqRun[0]; // id
+                            var seqRunName = seqRun[1]; // name
+                            return `<a href="/sequencing_runs/edit/${seqRunId}" class="text-primary">${seqRunName}</a>`;
+                        }).join(', ');
+                    }
+                },
+                {
+                    // Genes column (index 10) - expects array of [id, name] tuples
+                    targets: 10,
+                    render: function (data, type, row) {
+                        if (!data || !Array.isArray(data)) return '';
+                        return data.map(function(gene) {
+                            var geneId = gene[0]; // id
+                            var geneName = gene[1]; // name
+                            return `<a href="/genes/edit/${geneId}" class="text-primary">${geneName}</a>`;
+                        }).join(', ');
+                    }
+                },
+                {
+                    // Primary sites columns
+                    targets: 13,
+                    className: 'text-center'
+                },
+                {
+                    // Total calls columns
+                    targets: 14,
+                    className: 'text-center'
+                },
                 {
                     targets: -1,
                     data: null,
