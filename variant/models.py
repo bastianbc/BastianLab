@@ -605,5 +605,5 @@ class CosmicGVariantView(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'cosmic_g_variant_view_with_id'
+        db_table = 'cosmic_g_variant_view_with_id_stats'
 
