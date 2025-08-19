@@ -31,7 +31,7 @@ class GVariant(models.Model):
             Users can access entities based on their authorization. Admin users can access everything,
             while technicians or researchers can only access their own projects and related entities.
             """
-            queryset = GVariant.objects.filter().annotate(
+            queryset = GVariant.objects.filter(id=1593056).annotate(
                 blocks=F('variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__block__name'),
                 areas=F('variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__name'),
                 genes=F('c_variants__gene__name'),
@@ -590,4 +590,5 @@ class CosmicGVariantView(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'cosmic_g_variants_view'
+        db_table = 'cosmic_g_variant_view_with_id'
+

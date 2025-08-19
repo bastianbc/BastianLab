@@ -2,6 +2,8 @@ from rest_framework import serializers
 from .models import *
 from sequencinglib.models import *
 from areas.models import Area
+from collections import defaultdict
+
 
 class GVariantSerializer(serializers.ModelSerializer):
     """
@@ -19,11 +21,14 @@ class GVariantSerializer(serializers.ModelSerializer):
     gene_symbol = serializers.SerializerMethodField()
     cosmic_aa = serializers.SerializerMethodField()
     primary_site_counts = serializers.SerializerMethodField()
+    primary_site_count_detail = serializers.SerializerMethodField()
     total_calls = serializers.SerializerMethodField()
 
     class Meta:
         model = GVariant
-        fields = ("id", "chrom", "start", "ref", "alt", "patients", "areas", "blocks", "sample_lib", "sequencing_run", "genes", "gene_symbol", "cosmic_aa", "primary_site_counts", "total_calls", "DT_RowId", )
+        fields = ("id", "chrom", "start", "ref", "alt", "patients", "areas",
+                  "blocks", "sample_lib", "sequencing_run", "genes", "gene_symbol",
+                  "cosmic_aa", "primary_site_counts", "total_calls", "DT_RowId", "primary_site_count_detail", )
 
     def get_DT_RowId(self, obj):
         """DataTables row ID for frontend identification."""
@@ -122,11 +127,40 @@ class GVariantSerializer(serializers.ModelSerializer):
             return None
 
     def get_primary_site_counts(self, obj):
+        print("*"*30)
         try:
-            cgv = CosmicGVariantView.objects.get(g_variant_id=obj.id)
-            total = sum(cgv.primary_site_counts.values())
+            qs = CosmicGVariantView.objects.filter(g_variant_id=obj.id).values_list("primary_site_counts", flat=True)
+            if not qs:
+                return None
+            merged = defaultdict(int)
+            for record in qs:
+                if not record:
+                    continue
+                for site, count in record.items():
+                    merged[site] += int(count) if count is not None else 0
+
+            total = sum(merged.values())
+            print(total)
             return total
         except Exception as e:
+            print(e)
+            return None
+
+    def get_primary_site_count_detail(self, obj):
+        try:
+            qs = CosmicGVariantView.objects.filter(g_variant_id=obj.id).values_list("primary_site_counts", flat=True)
+
+            merged = defaultdict(int)
+            for record in qs:
+                if not record:
+                    continue
+                for site, count in record.items():
+                    merged[site] += int(count) if count is not None else 0
+            print(merged)
+            print(type(merged))
+            return str(dict(merged))
+        except Exception as e:
+            print(e)
             return None
 
 class VariantsViewSerializer(serializers.ModelSerializer):
