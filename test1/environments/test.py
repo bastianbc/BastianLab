@@ -163,8 +163,23 @@ CACHES = {
 #         'DISABLE_SERVER_SIDE_CURSORS': True
 #    }
 # }
+import json
+secret_path = Path(__file__).resolve().parent.parent / "db_connection_local.json"
+RDS_SECRET = json.loads(secret_path.read_text())
 
 DATABASES = {
+    "default": {
+        "ENGINE":   "django.db.backends.postgresql",
+        "NAME":     RDS_SECRET["dbname"],
+        "USER":     RDS_SECRET["username"],
+        "PASSWORD": RDS_SECRET['password'],
+        "HOST":     RDS_SECRET["host"],
+        "PORT":     RDS_SECRET["port"],
+        "OPTIONS": {
+            "sslmode": "require",
+            "options": "-c search_path=cosmic_hg38,public"
+        },
+    },
     'ucsf': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'USER': 'testuser',
@@ -173,18 +188,8 @@ DATABASES = {
         'HOST': '127.0.0.1',
         'PORT': '5432',
         'DISABLE_SERVER_SIDE_CURSORS': True
-   },
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'USER': 'testuser',
-        'PASSWORD': '1235',
-        'NAME': 'labdbproduction',
-        'HOST': '10.65.11.68',
-        'PORT': '5432',
-        'DISABLE_SERVER_SIDE_CURSORS': True
-   },
+   }
 }
-
 
 
 # Password validation
