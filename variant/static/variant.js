@@ -197,7 +197,7 @@ var KTDatatablesServerSide = function () {
                     render: function (data, type, row) {
                         return `
                             <a href="#" class="btn btn-light btn-active-light-primary btn-sm" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" data-kt-menu-flip="top-end">
-                                Actions
+                                Site Details
                                 <span class="svg-icon svg-icon-5 m-0">
                                     <!-- svg content here -->
                                 </span>
@@ -207,11 +207,6 @@ var KTDatatablesServerSide = function () {
                                 <div class="menu-item px-3">
                                     <a href="#" class="menu-link px-3" data-kt-docs-table-filter="edit_row">
                                         ${row.primary_site_count_detail ?? ''}
-                                    </a>
-                                </div>
-                                <div class="menu-item px-3">
-                                    <a href="#" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
-                                        Delete
                                     </a>
                                 </div>
                             </div>
