@@ -399,7 +399,8 @@ class VariantsView(models.Model):
     reference_residues = models.CharField(max_length=100, null=True)
     inserted_residues = models.CharField(max_length=100, null=True)
     change_type = models.CharField(max_length=100, null=True)
-    primary_site_counts = models.JSONField()
+    primary_site_counts = models.CharField(max_length=1000, null=True)
+    primary_site_total = models.IntegerField()
 
     class Meta:
         managed = False
