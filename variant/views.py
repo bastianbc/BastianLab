@@ -17,7 +17,7 @@ def filter_variants(request):
     variants = GVariant.query_by_args(request.user,**request.GET)
     print(variants)
     for i in variants['items']:
-        print(i.id, i.has_cosmic)
+        print(i.id)
     serializer = GVariantSerializer(variants['items'], many=True)
     result = dict()
     result['data'] = serializer.data
