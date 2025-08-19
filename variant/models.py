@@ -31,19 +31,33 @@ class GVariant(models.Model):
             Users can access entities based on their authorization. Admin users can access everything,
             while technicians or researchers can only access their own projects and related entities.
             """
-            queryset = GVariant.objects.filter(id=1593056).annotate(
-                blocks=F('variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__block__name'),
-                areas=F('variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__name'),
-                genes=F('c_variants__gene__name'),
-                patients=F('variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__pat_id'),
+            qs = (
+                GVariant.objects
+                # mark whether this variant appears in the COSMIC view
+                .annotate(has_cosmic=Exists(
+                    CosmicGVariantView.objects.filter(g_variant_id=OuterRef('id'))
+                ))
+                # your existing annotations
+                .annotate(
+                    blocks=F('variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__block__name'),
+                    areas=F('variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__name'),
+                    genes=F('c_variants__gene__name'),
+                    patients=F(
+                        'variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__pat_id'),
+                )
+                # put COSMIC-backed variants first
+                .order_by('-has_cosmic', 'id')
+                # avoid duplicate rows from the joins
+                .distinct()
             )
 
             if not user.is_superuser:
-                return queryset.filter(
-                    variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__block__block_projects__in=get_user_projects(user)
+                qs = qs.filter(
+                    variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__block__block_projects__in=get_user_projects(
+                        user)
                 )
 
-            return queryset
+            return qs
 
         def _get_block_variants_queryset(block_id):
             """
