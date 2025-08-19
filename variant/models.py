@@ -1,10 +1,12 @@
 import json
 from django.db import models
-from django.db.models import Q, F, OuterRef, Value, CharField, When, Case, Exists, ExpressionWrapper, FloatField
+from django.db.models import (Q, F, OuterRef, Value, CharField, IntegerField, Count, Subquery,
+                              When, Case, Exists, ExpressionWrapper, FloatField)
 from django.contrib.postgres.aggregates import StringAgg
 from django.db.models.functions import Concat
 from datetime import datetime
 from projects.utils import get_user_projects
+from django.db.models.functions import Coalesce
 
 class GVariant(models.Model):
     hg = models.IntegerField(default=0)
@@ -33,11 +35,6 @@ class GVariant(models.Model):
             """
             qs = (
                 GVariant.objects
-                # mark whether this variant appears in the COSMIC view
-                .annotate(has_cosmic=Exists(
-                    CosmicGVariantView.objects.filter(g_variant_id=OuterRef('id'))
-                ))
-                # your existing annotations
                 .annotate(
                     blocks=F('variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__block__name'),
                     areas=F('variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__name'),
@@ -45,9 +42,7 @@ class GVariant(models.Model):
                     patients=F(
                         'variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__pat_id'),
                 )
-                # put COSMIC-backed variants first
-                .order_by('-has_cosmic', 'id')
-                # avoid duplicate rows from the joins
+                .order_by('id')  # highest COSMIC count first, then id
                 .distinct()
             )
 
@@ -404,6 +399,7 @@ class VariantsView(models.Model):
     reference_residues = models.CharField(max_length=100, null=True)
     inserted_residues = models.CharField(max_length=100, null=True)
     change_type = models.CharField(max_length=100, null=True)
+    primary_site_counts = models.JSONField()
 
     class Meta:
         managed = False
@@ -525,7 +521,7 @@ SELECT DISTINCT ON (vc.id)
     vc.caller,
     vc.ref_read,
     vc.alt_read,
-    CASE
+    CASE 
         WHEN vc.ref_read > 0 THEN (vc.alt_read * 100.0) / (vc.ref_read + vc.alt_read)
         ELSE 0.0
     END AS vaf,
@@ -548,32 +544,35 @@ SELECT DISTINCT ON (vc.id)
     pv.inserted_residues,
     pv.change_type,
     ar.id AS analysis_run_id,
-    ar.name AS analysis_run_name
-FROM
+    ar.name AS analysis_run_name,
+	cgv.primary_site_counts as primary_site_counts
+FROM 
     areas a
-JOIN
+JOIN 
     block b ON a.block = b.id
-JOIN
+JOIN 
     area_na_link anl ON anl.area_id = a.id
-JOIN
+JOIN 
     nuc_acids na ON anl.nucacid_id = na.id
-JOIN
+JOIN 
     na_sl_link nsl ON nsl.nucacid_id = na.id
-JOIN
+JOIN 
     sample_lib sl ON nsl.sample_lib_id = sl.id
-JOIN
+JOIN 
     variant_call vc ON vc.sample_lib_id = sl.id
-JOIN
-    g_variant gv ON vc.g_variant_id = gv.id
-JOIN
+JOIN 
+    g_variant gv ON gv.id = vc.g_variant_id
+JOIN 
     c_variant cv ON cv.g_variant_id = gv.id
-JOIN
+JOIN 
     gene g ON cv.gene_id = g.id
-JOIN
+JOIN 
     analysis_run ar ON vc.analysis_run_id = ar.id
-LEFT JOIN
+LEFT JOIN 
     p_variant pv ON pv.c_variant_id = cv.id
-WHERE
+JOIN 
+    cosmic_hg38.cosmic_g_variant_view_with_id cgv on cgv.g_variant_id=gv.id
+WHERE 
     a.area_type IS NOT NULL;
 """
 
@@ -601,6 +600,8 @@ class CosmicGVariantView(models.Model):
     gene_symbol = models.CharField(max_length=10)
     cosmic_aa = models.CharField(max_length=10)
     primary_site_counts = models.JSONField()
+    primary_site_counts_merged = models.JSONField()
+    primary_site_total = models.IntegerField()
 
     class Meta:
         managed = False
