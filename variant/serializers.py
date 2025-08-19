@@ -127,38 +127,19 @@ class GVariantSerializer(serializers.ModelSerializer):
             return None
 
     def get_primary_site_counts(self, obj):
-        print("*"*30)
         try:
-            qs = CosmicGVariantView.objects.filter(g_variant_id=obj.id).values_list("primary_site_counts", flat=True)
-            if not qs:
-                return None
-            merged = defaultdict(int)
-            for record in qs:
-                if not record:
-                    continue
-                for site, count in record.items():
-                    merged[site] += int(count) if count is not None else 0
-
-            total = sum(merged.values())
-            print(total)
-            return total
+            qs = CosmicGVariantView.objects.filter(g_variant_id=obj.id).first()
+            print(str(qs.primary_site_counts_merged))
+            return str(qs.primary_site_counts_merged)
         except Exception as e:
             print(e)
             return None
 
     def get_primary_site_count_detail(self, obj):
         try:
-            qs = CosmicGVariantView.objects.filter(g_variant_id=obj.id).values_list("primary_site_counts", flat=True)
-
-            merged = defaultdict(int)
-            for record in qs:
-                if not record:
-                    continue
-                for site, count in record.items():
-                    merged[site] += int(count) if count is not None else 0
-            print(merged)
-            print(type(merged))
-            return str(dict(merged))
+            qs = CosmicGVariantView.objects.filter(g_variant_id=obj.id).first()
+            print(qs.primary_site_total)
+            return qs.primary_site_total
         except Exception as e:
             print(e)
             return None
