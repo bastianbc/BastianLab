@@ -546,7 +546,9 @@ SELECT DISTINCT ON (vc.id)
     pv.change_type,
     ar.id AS analysis_run_id,
     ar.name AS analysis_run_name,
-	cgv.primary_site_counts as primary_site_counts
+	cgv.primary_site_counts_merged as primary_site_counts,
+	CAST(cgv.primary_site_total AS INTEGER) AS primary_site_total
+
 FROM 
     areas a
 JOIN 
@@ -571,8 +573,8 @@ JOIN
     analysis_run ar ON vc.analysis_run_id = ar.id
 LEFT JOIN 
     p_variant pv ON pv.c_variant_id = cv.id
-JOIN 
-    cosmic_hg38.cosmic_g_variant_view_with_id cgv on cgv.g_variant_id=gv.id
+LEFT JOIN 
+    cosmic_hg38.cosmic_g_variant_view_with_id_stats cgv on cgv.g_variant_id=gv.id
 WHERE 
     a.area_type IS NOT NULL;
 """
