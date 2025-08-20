@@ -137,17 +137,18 @@ def get_variants_by_area(request):
     order_direction = request.GET.get('order[0][dir]', 'asc')
 
     # colmun name mapping
-    columns = ["analysis_run_id", "analysis_run_name", "gene_name", "samplelib_name", "p_variant", "alias", "coverage", "vaf"]
+    columns = ["analysis_run_id", "analysis_run_name", "gene_name", "variant", "alias",
+               "coverage", "vaf", "primary_site_total"]
 
     # set to order column
     order_column = columns[int(order_column_index)]
-
+    print("*"*100, order_column, order_column_index)
     # set to order direction
     if order_direction == 'desc':
         order_column = f"-{order_column}"
 
     # main query
-    variants = VariantsView.objects.filter(area_id=area_id)
+    variants = VariantsView.objects.filter(area_id=area_id).order_by("-primary_site_total")
 
     total_records = variants.count()
 
@@ -167,7 +168,7 @@ def get_variants_by_area(request):
     total_filtered_records = variants.count()
 
     # apply pagination
-    variants = variants.order_by(order_column)[start:start + length]
+    variants = variants.order_by(order_column, "-primary_site_total")[start:start + length]
 
     # convert to data format of datatables
     data = []
@@ -181,17 +182,10 @@ def get_variants_by_area(request):
             'alias': variant.alias if variant.alias else '',
             'coverage': variant.coverage,
             'vaf': round(variant.vaf, 2) if variant.vaf else 0,
+            'primary_site_total': variant.primary_site_total if variant.primary_site_total else 0,
+            'primary_site_counts': variant.primary_site_counts if variant.primary_site_counts else ""
         })
-        print({
-            # 'DT_RowId': f"variant_{variant.variantcall_id}",
-            'variantcall_id': variant.variantcall_id,
-            'analysis_run_name': variant.analysis_run_name,
-            'gene_name': variant.gene_name,
-            'p_variant': variant.variant if variant.variant else '',
-            'alias': variant.alias if variant.alias else '',
-            'coverage': variant.coverage,
-            'vaf': round(variant.vaf, 2) if variant.vaf else 0,
-        })
+        print(variant.primary_site_counts)
     result = {
         'draw': draw,
         'recordsTotal': total_records,

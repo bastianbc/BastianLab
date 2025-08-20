@@ -129,7 +129,6 @@ class GVariantSerializer(serializers.ModelSerializer):
     def get_primary_site_counts(self, obj):
         try:
             qs = CosmicGVariantView.objects.filter(g_variant_id=obj.id).first()
-            print(str(qs.primary_site_counts_merged))
             return str(qs.primary_site_counts_merged)
         except Exception as e:
             print(e)
@@ -138,7 +137,6 @@ class GVariantSerializer(serializers.ModelSerializer):
     def get_primary_site_count_detail(self, obj):
         try:
             qs = CosmicGVariantView.objects.filter(g_variant_id=obj.id).first()
-            print(qs.primary_site_total)
             return qs.primary_site_total
         except Exception as e:
             print(e)
