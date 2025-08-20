@@ -113,7 +113,6 @@ AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazo
 DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 
 # Media files (served from bastian-lab bucket directly)
-MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -238,6 +237,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ]
 }
+MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media_files"
 
 # Authentication settings
 LOGIN_URL = '/auth/login'
