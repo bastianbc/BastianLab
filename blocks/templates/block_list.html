@@ -384,6 +384,19 @@
   </div>
 </div>
 <!--end::Modal -Block Detail Modal-->
+    <div class="modal fade" id="detailsModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-xl"> <!-- small popup -->
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Primary Site Counts</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <pre id="detailsContent" class="mb-0"></pre>
+          </div>
+        </div>
+      </div>
+    </div>
 {% endblock %}
 
 {% block scripts %}

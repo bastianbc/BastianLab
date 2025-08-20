@@ -18,7 +18,7 @@ var KTDatatablesServerSide = function () {
             // searchDelay: 500,
             processing: true,
             serverSide: true,
-            order: [[1, 'desc']],
+            order: [[9, 'desc']],
             stateSave: false,
             destroy: true,
             select: {
@@ -1115,6 +1115,7 @@ var KTDatatablesServerSide = function () {
                                   <th>Alias</th>
                                   <th>Coverage</th>
                                   <th>VAF</th>
+                                  <th>Cosmic</th>
                                   <th class="text-end min-w-100px">Actions</th>
                               </tr>
                           </thead>
@@ -1164,20 +1165,33 @@ var KTDatatablesServerSide = function () {
                             className: 'text-gray-800',
                         },
                         {
+                            data: 'primary_site_total',
+                            className: 'text-gray-800',
+                            render: function(data, type, row) {
+                                let id = row["primary_site_counts"];
+                                console.log(id, typeof(id));
+                                return `
+                                    <a href="#" 
+                                       class="show-popup" 
+                                       data-details='${JSON.stringify(row.primary_site_counts)}'>${data}
+                                    </a>
+                                `;
+                            }
+                        },
+                        {
                             data: null,
                             className: 'text-end',
                             render: function() {
+
                                 return `
-                                    <button type="button"
-                                            class="btn btn-icon btn-light-primary btn-sm"
-                                            data-bs-toggle="tooltip"
-                                            data-bs-placement="top"
-                                            title="View Details">
-                                        <i class="ki-duotone ki-eye fs-2">
-                                            <span class="path1"></span>
-                                            <span class="path2"></span>
-                                            <span class="path3"></span>
-                                        </i>
+                                    <button type="button" class="btn btn-icon btn-light-primary btn-sm" 
+                                        data-bs-toggle="tooltip" data-bs-placement="top" 
+                                        title="View Details"> 
+                                        <i class="ki-duotone ki-eye fs-2"> 
+                                            <span class="path1"></span> 
+                                            <span class="path2"></span> 
+                                            <span class="path3"></span> 
+                                        </i> 
                                     </button>
                                 `;
                             }
@@ -1201,7 +1215,7 @@ var KTDatatablesServerSide = function () {
                                 }
                         },
                     ],
-                    order: [[0, 'asc']],  // Sort by areas by default
+                    order: [[7, 'desc']],  // Sort by areas by default
                     pageLength: 10,
                     lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
                     responsive: true
@@ -1213,7 +1227,15 @@ var KTDatatablesServerSide = function () {
         // start the modals
         VariantModalByArea.init();
     }
+    $(document).on('click', '.show-popup', function (e) {
+        e.preventDefault();
+        let details = $(this).data('details');
+        console.log(details, typeof(details));
 
+        $('#detailsContent').text(details);
+        let modal = new bootstrap.Modal(document.getElementById('detailsModal'));
+        modal.show();
+    });
     // Public methods
     return {
         init: function () {

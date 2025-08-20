@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 @permission_required_for_async("blocks.view_block")
 def filter_blocks(request):
     blocks = Block.query_by_args(request.user,**request.GET)
+    print(blocks)
     serializer = BlocksSerializer(blocks['items'], many=True)
     result = dict()
     result['data'] = serializer.data
