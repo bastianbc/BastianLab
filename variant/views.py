@@ -149,7 +149,8 @@ def get_variants_by_area(request):
 
     # main query
     variants = VariantsView.objects.filter(area_id=area_id).order_by("-primary_site_total")
-
+    print(variants[0].primary_site_total)
+    print(type(variants[0].primary_site_total))
     total_records = variants.count()
 
     # search parameters
