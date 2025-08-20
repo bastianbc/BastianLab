@@ -95,7 +95,7 @@ INSTALLED_APPS = [
     'notification',
     'file_manager',
     'gpt',
-    'storages',
+    # 'storages',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -104,13 +104,13 @@ CRISPY_FAIL_SILENTLY = not DEBUG
 # ===============================
 # AWS S3 STORAGE CONFIGURATION
 # ===============================
-
-AWS_STORAGE_BUCKET_NAME = "bastian-lab-169-3-r-us-west-2.sec.ucsf.edu"
-AWS_S3_REGION_NAME = "us-west-2"
-AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com"
-
-# Default file storage (all uploads will go to S3)
-DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+#
+# AWS_STORAGE_BUCKET_NAME = "bastian-lab-169-3-r-us-west-2.sec.ucsf.edu"
+# AWS_S3_REGION_NAME = "us-west-2"
+# AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com"
+#
+# # Default file storage (all uploads will go to S3)
+# DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 
 # Media files (served from bastian-lab bucket directly)
 
@@ -237,7 +237,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ]
 }
-MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media_files"
+# MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/media_files"
 
 # Authentication settings
 LOGIN_URL = '/auth/login'
@@ -250,30 +250,30 @@ PI_GROUP_NAME = "Primary Investigators"
 
 
 # ========= S3 prefixes aligned to your bucket folders =========
-S3_BASE = f"s3://{AWS_STORAGE_BUCKET_NAME}"
+# S3_BASE = f"s3://{AWS_STORAGE_BUCKET_NAME}"
 
 # From the screenshot:
-S3_BASTIANRAID_PREFIX          = f"{S3_BASE}/BastianRaid-02"
-S3_TEMP_PREFIX                  = f"{S3_BASTIANRAID_PREFIX}/TEMP"
-S3_HISEQDATA_PREFIX             = f"{S3_BASTIANRAID_PREFIX}/HiSeqData"
-
-S3_SEQUENCINGDATA_PREFIX        = f"{S3_BASE}/sequencingdata"
-SEQUENCING_FILES_SOURCE_PREFIX  = f"{S3_SEQUENCINGDATA_PREFIX}/ProcessedData"
-SEQUENCING_FILES_DEST_PREFIX    = SEQUENCING_FILES_SOURCE_PREFIX
-
-VARIANT_FILES_SOURCE_PREFIX     = SEQUENCING_FILES_SOURCE_PREFIX
-
-S3_UPLOADS_PREFIX               = f"{S3_BASE}/uploads"
-
-# SMB_DIRECTORY_LABSHARE = "/mnt/labshare"
-# SMB_DIRECTORY_LABSHARE_LOCAL = "/Volumes/labshare"
-# BASTIANRAID_DIRECTORY = Path(Path(SMB_DIRECTORY_LABSHARE) / "BastianRaid-02")
-# TEMP_DIRECTORY = Path(Path(SMB_DIRECTORY_LABSHARE) / "BastianRaid-02" / "TEMP")
-# HISEQDATA_DIRECTORY = Path(Path(SMB_DIRECTORY_LABSHARE) / "BastianRaid-02" / "HiSeqData")
+# S3_BASTIANRAID_PREFIX          = f"{S3_BASE}/BastianRaid-02"
+# S3_TEMP_PREFIX                  = f"{S3_BASTIANRAID_PREFIX}/TEMP"
+# S3_HISEQDATA_PREFIX             = f"{S3_BASTIANRAID_PREFIX}/HiSeqData"
 #
-# SMB_DIRECTORY_SEQUENCINGDATA = "/mnt/sequencingdata"
-# SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
-# SEQUENCING_FILES_DESTINATION_DIRECTORY = SEQUENCING_FILES_SOURCE_DIRECTORY
+# S3_SEQUENCINGDATA_PREFIX        = f"{S3_BASE}/sequencingdata"
+# SEQUENCING_FILES_SOURCE_PREFIX  = f"{S3_SEQUENCINGDATA_PREFIX}/ProcessedData"
+# SEQUENCING_FILES_DEST_PREFIX    = SEQUENCING_FILES_SOURCE_PREFIX
 #
+# VARIANT_FILES_SOURCE_PREFIX     = SEQUENCING_FILES_SOURCE_PREFIX
 #
-# VARIANT_FILES_SOURCE_DIRECTORY = SEQUENCING_FILES_SOURCE_DIRECTORY
+# S3_UPLOADS_PREFIX               = f"{S3_BASE}/uploads"
+
+SMB_DIRECTORY_LABSHARE = "/mnt/labshare"
+SMB_DIRECTORY_LABSHARE_LOCAL = "/Volumes/labshare"
+BASTIANRAID_DIRECTORY = Path(Path(SMB_DIRECTORY_LABSHARE) / "BastianRaid-02")
+TEMP_DIRECTORY = Path(Path(SMB_DIRECTORY_LABSHARE) / "BastianRaid-02" / "TEMP")
+HISEQDATA_DIRECTORY = Path(Path(SMB_DIRECTORY_LABSHARE) / "BastianRaid-02" / "HiSeqData")
+
+SMB_DIRECTORY_SEQUENCINGDATA = "/mnt/sequencingdata"
+SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
+SEQUENCING_FILES_DESTINATION_DIRECTORY = SEQUENCING_FILES_SOURCE_DIRECTORY
+
+
+VARIANT_FILES_SOURCE_DIRECTORY = SEQUENCING_FILES_SOURCE_DIRECTORY
