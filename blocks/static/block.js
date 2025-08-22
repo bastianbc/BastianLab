@@ -210,40 +210,64 @@ var KTDatatablesServerSide = function () {
             handleResetForm();
             initShowScanImage();
             handleRowActions();
+            handleSelectedRows.init();
             KTMenu.createInstances();
         });
-
     }
 
+    // *************************************************************************************************************
+    // It was used this way to stay true to the theme structure.The theme selects/deselects the checkboxes itself.
+    // Then, we capture the checked boxes like this. We used the delay time.
+    // See: "Toggle Handler" in script.bundle.js
+    // *************************************************************************************************************
     var initRowSelection = function () {
-        // Select all checkboxes
-        const allCheckboxes = document.querySelectorAll('#block_datatable tbody [type="checkbox"]');
-        allCheckboxes.forEach(c => {
-            // Checkbox on Change event
-            c.addEventListener("change", function () {
-                toggleRowSelection(c.value);
-            });
+        const DELAY_MS = 50; // Delay to wait for KTUtil's operation
 
-            // Checkbox on click event
-            c.addEventListener('click', function () {
-                setTimeout(function () {
-                    toggleToolbars();
-                }, 50);
-            });
-        });
+        // Initialize all components
+        initSingleCheckboxes();
+        initSelectAllCheckbox();
 
-        function toggleRowSelection(id) {
-            var index = selectedRows.indexOf(id);
-            if (index === -1) {
-                // If the row is not selected, add it to selected rows
-                selectedRows.push(id);
-            } else {
-                // If the row is already selected, remove it in selected rows
-                selectedRows.splice(index, 1);
-            }
+        function initSingleCheckboxes() {
+            const allCheckboxes = document.querySelectorAll('.table tbody [type="checkbox"]');
+
+            allCheckboxes.forEach(checkbox => {
+                // Handle row selection change
+                checkbox.addEventListener("change", function () {
+                  // toggle row selection
+                  const index = selectedRows.indexOf(this.value);
+
+                  if (index === -1) {
+                      // Add row to selection
+                      selectedRows.push(this.value);
+                  } else {
+                      // Remove row from selection
+                      selectedRows.splice(index, 1);
+                  }
+                });
+
+                // Handle UI updates with slight delay
+                checkbox.addEventListener('click', function () {
+                    setTimeout(toggleToolbars, DELAY_MS);
+                });
+            });
         }
 
-    }
+        function initSelectAllCheckbox() {
+            const selectAllCheckbox = document.querySelector('[data-kt-check="true"]');
+
+            if (selectAllCheckbox) {
+                selectAllCheckbox.addEventListener("change", function () {
+                    setTimeout(() => {
+                        const checkedBoxes = document.querySelectorAll('.table tbody .form-check-input:checked');
+                        selectedRows = Array.from(checkedBoxes).map(checkbox => checkbox.value);
+
+                        toggleToolbars();
+
+                    }, DELAY_MS);
+                });
+            }
+        }
+    };
 
     var handleRestoreRowSelection = function () {
         const allCheckboxes = document.querySelectorAll('#block_datatable tbody [type="checkbox"]');
@@ -464,16 +488,6 @@ var KTDatatablesServerSide = function () {
         // Select elements
         const deleteSelected = document.querySelector('[data-kt-docs-table-select="delete_selected"]');
 
-        // Toggle delete selected toolbar
-        checkboxes.forEach(c => {
-            // Checkbox on click event
-            c.addEventListener('click', function () {
-                setTimeout(function () {
-                    toggleToolbars();
-                }, 50);
-            });
-        });
-
         // Deleted selected rows
         deleteSelected.addEventListener('click', function () {
             // SweetAlert2 pop up --- official docs reference: https://sweetalert2.github.io/
@@ -505,7 +519,7 @@ var KTDatatablesServerSide = function () {
                             type: "GET",
                             url: "/blocks/batch_delete",
                             data: {
-                              "selected_ids": getSelectedRows(),
+                              "selected_ids": JSON.stringify(selectedRows),
                             },
                             error: function (xhr, ajaxOptions, thrownError) {
                                 swal("Error deleting!", "Please try again", "error");
@@ -576,7 +590,7 @@ var KTDatatablesServerSide = function () {
 
             isInit = true;
 
-            initEvents();
+            initModalEvents();
           }
 
         });
@@ -589,16 +603,19 @@ var KTDatatablesServerSide = function () {
 
       }
 
-      function initEvents() {
+      function initModalEvents() {
 
         document.getElementById('btn_continue').addEventListener('click', function () {
+
+          var data = new FormData(document.getElementById('frm_creation_options'));
+          var options = Object.fromEntries(data.entries());
 
           $.ajax({
             type: "GET",
             url: "/areas/add_area_to_block_async",
             data: {
               "block_id": selectedItem["id"],
-              "options": getCreationOptions()
+              "options": JSON.stringify(options)
             },
           }).done(function(result) {
             if (result.success) {
@@ -634,192 +651,168 @@ var KTDatatablesServerSide = function () {
 
       }
 
-      const btnAddBlockToProject = document.querySelector('[data-kt-docs-table-select="event_add_block_to_project"]');
+      function initButtonEvents() {
+        const btnAddBlockToProject = document.querySelector('[data-kt-docs-table-select="event_add_block_to_project"]');
+        const btnAddBlockToPatient = document.querySelector('[data-kt-docs-table-select="event_add_block_to_patient"]');
+        const btnRemoveBlockFromProject = document.querySelector('[data-kt-docs-table-select="event_remove_block_from_project"]');
+        const btnRemoveBlockFromPatient = document.querySelector('[data-kt-docs-table-select="event_remove_block_from_patient"]');
 
-      const btnAddBlockToPatient = document.querySelector('[data-kt-docs-table-select="event_add_block_to_patient"]');
-
-
-      const btnRemoveBlockFromProject = document.querySelector('[data-kt-docs-table-select="event_remove_block_from_project"]');
-      const btnRemoveBlockFromPatient = document.querySelector('[data-kt-docs-table-select="event_remove_block_from_patient"]');
-
-      function getCreationOptions() {
-
-        var data = new FormData(document.getElementById('frm_creation_options'));
-        var options = Object.fromEntries(data.entries());
-
-        return JSON.stringify(options);
+        if (btnAddBlockToProject) btnAddBlockToProject.addEventListener('click', addBlockToProject);
+        if (btnAddBlockToPatient) btnAddBlockToPatient.addEventListener('click', addBlockToPatient);
+        if (btnRemoveBlockFromProject) btnRemoveBlockFromProject.addEventListener('click', removeBlockFromProject);
+        if (btnRemoveBlockFromPatient) btnRemoveBlockFromPatient.addEventListener('click', removeBlockFromPatient);
       }
 
-      if (btnAddBlockToProject) {
-
-        btnAddBlockToProject.addEventListener('click', function () {
-
-          $.ajax({
-            type: "GET",
-            url: "/blocks/add_block_to_project_async",
-            data: {
-              "selected_ids": JSON.stringify(selectedRows),
-              "project_id": this.getAttribute('data-project_id')
-            },
-          }).done(function(result) {
-            if (result.success) {
-              Swal.fire({
-                  text: "Block(s) added succesfully.",
-                  icon: "info",
-                  buttonsStyling: false,
-                  confirmButtonText: "Ok, got it!",
-                  customClass: {
-                      confirmButton: "btn fw-bold btn-success",
-                  }
-              }).then(function(){
-                window.location.href = "/projects";
-              });
-            }
-            else {
-              Swal.fire({
-                  text: "Block(s) could not be added.",
-                  icon: "error",
-                  buttonsStyling: false,
-                  confirmButtonText: "Ok, got it!",
-                  customClass: {
-                      confirmButton: "btn fw-bold btn-danger",
-                  }
-              });
-            }
-          });
-
-        });
-
-      }
-      if (btnAddBlockToPatient) {
-
-        btnAddBlockToPatient.addEventListener('click', function () {
-
-            $.ajax({
-                type: "GET",
-                url: "/blocks/add_block_to_patient_async",
-                data: {
-                    "selected_ids": JSON.stringify(selectedRows),
-                    "patient_id": this.getAttribute('data-patient_id')
-                },
-            }).done(function(result) {
-                if (result.success) {
-                    Swal.fire({
-                        text: "Block(s) added to the patient successfully.",
-                        icon: "info",
-                        buttonsStyling: false,
-                        confirmButtonText: "Ok, got it!",
-                        customClass: {
-                            confirmButton: "btn fw-bold btn-success",
-                        }
-                    }).then(function(){
-                        window.location.href = "/lab";
-                    });
+      function addBlockToProject() {
+        $.ajax({
+          type: "GET",
+          url: "/blocks/add_block_to_project_async",
+          data: {
+            "selected_ids": JSON.stringify(selectedRows),
+            "project_id": this.getAttribute('data-project_id')
+          },
+        }).done(function(result) {
+          if (result.success) {
+            Swal.fire({
+                text: "Block(s) added succesfully.",
+                icon: "info",
+                buttonsStyling: false,
+                confirmButtonText: "Ok, got it!",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-success",
                 }
-                else {
-                    Swal.fire({
-                        text: "Block(s) could not be added to the patient.",
-                        icon: "error",
-                        buttonsStyling: false,
-                        confirmButtonText: "Ok, got it!",
-                        customClass: {
-                            confirmButton: "btn fw-bold btn-danger",
-                        }
-                    });
+            }).then(function(){
+              window.location.href = "/projects";
+            });
+          }
+          else {
+            Swal.fire({
+                text: "Block(s) could not be added.",
+                icon: "error",
+                buttonsStyling: false,
+                confirmButtonText: "Ok, got it!",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-danger",
                 }
             });
-
+          }
         });
-
-    }
-
-      if (btnRemoveBlockFromProject) {
-
-        btnRemoveBlockFromProject.addEventListener('click', function () {
-
-          $.ajax({
-            type: "GET",
-            url: "/blocks/remove_block_from_project_async",
-            data: {
-              "selected_ids": JSON.stringify(selectedRows),
-              "project_id": this.getAttribute('data-project_id')
-            },
-          }).done(function(result) {
-            if (result.success) {
-              Swal.fire({
-                  text: "Block(s) removed succesfully.",
-                  icon: "info",
-                  buttonsStyling: false,
-                  confirmButtonText: "Ok, got it!",
-                  customClass: {
-                      confirmButton: "btn fw-bold btn-success",
-                  }
-              }).then(function(){
-                window.location.href = "/projects";
-              });
-            }
-            else {
-              Swal.fire({
-                  text: "Block(s) could not be removed.",
-                  icon: "error",
-                  buttonsStyling: false,
-                  confirmButtonText: "Ok, got it!",
-                  customClass: {
-                      confirmButton: "btn fw-bold btn-danger",
-                  }
-              });
-            }
-          });
-
-        });
-
       }
 
-      if (btnRemoveBlockFromPatient) {
-
-        btnRemoveBlockFromPatient.addEventListener('click', function () {
-
-          $.ajax({
+      function addBlockToPatient() {
+        $.ajax({
             type: "GET",
-            url: "/blocks/remove_block_from_patient_async",
+            url: "/blocks/add_block_to_patient_async",
             data: {
-              "selected_ids": JSON.stringify(selectedRows),
-              "project_id": this.getAttribute('data-patient_id')
+                "selected_ids": JSON.stringify(selectedRows),
+                "patient_id": this.getAttribute('data-patient_id')
             },
-          }).done(function(result) {
+        }).done(function(result) {
             if (result.success) {
-              Swal.fire({
-                  text: "Block(s) removed succesfully.",
-                  icon: "info",
-                  buttonsStyling: false,
-                  confirmButtonText: "Ok, got it!",
-                  customClass: {
-                      confirmButton: "btn fw-bold btn-success",
-                  }
-              }).then(function(){
-                window.location.href = "/lab";
-              });
+                Swal.fire({
+                    text: "Block(s) added to the patient successfully.",
+                    icon: "info",
+                    buttonsStyling: false,
+                    confirmButtonText: "Ok, got it!",
+                    customClass: {
+                        confirmButton: "btn fw-bold btn-success",
+                    }
+                }).then(function(){
+                    window.location.href = "/lab";
+                });
             }
             else {
-              Swal.fire({
-                  text: "Block(s) could not be removed.",
-                  icon: "error",
-                  buttonsStyling: false,
-                  confirmButtonText: "Ok, got it!",
-                  customClass: {
-                      confirmButton: "btn fw-bold btn-danger",
-                  }
-              });
+                Swal.fire({
+                    text: "Block(s) could not be added to the patient.",
+                    icon: "error",
+                    buttonsStyling: false,
+                    confirmButtonText: "Ok, got it!",
+                    customClass: {
+                        confirmButton: "btn fw-bold btn-danger",
+                    }
+                });
             }
-          });
+        });
+      };
 
+      function removeBlockFromProject() {
+
+        $.ajax({
+          type: "GET",
+          url: "/blocks/remove_block_from_project_async",
+          data: {
+            "selected_ids": JSON.stringify(selectedRows),
+            "project_id": this.getAttribute('data-project_id')
+          },
+        }).done(function(result) {
+          if (result.success) {
+            Swal.fire({
+                text: "Block(s) removed succesfully.",
+                icon: "info",
+                buttonsStyling: false,
+                confirmButtonText: "Ok, got it!",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-success",
+                }
+            }).then(function(){
+              window.location.href = "/projects";
+            });
+          }
+          else {
+            Swal.fire({
+                text: "Block(s) could not be removed.",
+                icon: "error",
+                buttonsStyling: false,
+                confirmButtonText: "Ok, got it!",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-danger",
+                }
+            });
+          }
         });
 
+      };
+
+      function removeBlockFromPatient() {
+        $.ajax({
+          type: "GET",
+          url: "/blocks/remove_block_from_patient_async",
+          data: {
+            "selected_ids": JSON.stringify(selectedRows),
+            "project_id": this.getAttribute('data-patient_id')
+          },
+        }).done(function(result) {
+          if (result.success) {
+            Swal.fire({
+                text: "Block(s) removed succesfully.",
+                icon: "info",
+                buttonsStyling: false,
+                confirmButtonText: "Ok, got it!",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-success",
+                }
+            }).then(function(){
+              window.location.href = "/lab";
+            });
+          }
+          else {
+            Swal.fire({
+                text: "Block(s) could not be removed.",
+                icon: "error",
+                buttonsStyling: false,
+                confirmButtonText: "Ok, got it!",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-danger",
+                }
+            });
+          }
+        });
       }
 
       return {
         init: function () {
           initModal();
+          initButtonEvents();
         }
       }
 
@@ -828,36 +821,22 @@ var KTDatatablesServerSide = function () {
     // Toggle toolbars
     var toggleToolbars = function () {
         // Define variables
-        const container = document.querySelector('#block_datatable');
+        const container = document.querySelector('.table');
         const toolbarBase = document.querySelector('[data-kt-docs-table-toolbar="base"]');
         const toolbarSelected = document.querySelector('[data-kt-docs-table-toolbar="selected"]');
         const selectedCount = document.querySelector('[data-kt-docs-table-select="selected_count"]');
 
-        // Select refreshed checkbox DOM elements
-        const allCheckboxes = container.querySelectorAll('tbody [type="checkbox"]');
-
-        // Detect checkboxes state & count
-        let checkedState = false;
-        let count = 0;
-
-        // Count checked boxes
-        allCheckboxes.forEach(c => {
-            if (c.checked) {
-                checkedState = true;
-                count++;
-            }
-        });
-
         // Toggle toolbars
-        if (checkedState) {
-            selectedCount.innerHTML = count;
+        if (selectedRows.length > 0) {
+            selectedCount.innerHTML = selectedRows.length;
             toolbarBase.classList.add('d-none');
             toolbarSelected.classList.remove('d-none');
         } else {
             toolbarBase.classList.remove('d-none');
             toolbarSelected.classList.add('d-none');
         }
-    }
+    };
+
 
     var initEditor = function () {
 
@@ -1011,10 +990,7 @@ var KTDatatablesServerSide = function () {
             tabContent: null,
 
             init: function() {
-                console.log("this:",this);
-                console.log("this:",document.getElementById("variant_layout_by_area"));
                 this.instance = new bootstrap.Modal(this.modal);
-                console.log("this.instance:",this.instance);
                 this.tabContainer = this.modal.querySelector('.variant-tab-container');
                 this.tabContent = this.modal.querySelector('.tab-content');
                 this.setupEventListeners();
@@ -1043,7 +1019,6 @@ var KTDatatablesServerSide = function () {
                 fetch(`/blocks/get_block_areas/${blockId}/`)
                     .then(response => response.json())
                     .then(data => {
-                        console.log(data);
                         // fill the details
                         this.populateBlockDetails(data);
 
@@ -1169,10 +1144,10 @@ var KTDatatablesServerSide = function () {
                             className: 'text-gray-800',
                             render: function(data, type, row) {
                                 let id = row["primary_site_counts"];
-                                console.log(id, typeof(id));
+
                                 return `
-                                    <a href="#" 
-                                       class="show-popup" 
+                                    <a href="#"
+                                       class="show-popup"
                                        data-details='${JSON.stringify(row.primary_site_counts)}'>${data}
                                     </a>
                                 `;
@@ -1184,14 +1159,14 @@ var KTDatatablesServerSide = function () {
                             render: function() {
 
                                 return `
-                                    <button type="button" class="btn btn-icon btn-light-primary btn-sm" 
-                                        data-bs-toggle="tooltip" data-bs-placement="top" 
-                                        title="View Details"> 
-                                        <i class="ki-duotone ki-eye fs-2"> 
-                                            <span class="path1"></span> 
-                                            <span class="path2"></span> 
-                                            <span class="path3"></span> 
-                                        </i> 
+                                    <button type="button" class="btn btn-icon btn-light-primary btn-sm"
+                                        data-bs-toggle="tooltip" data-bs-placement="top"
+                                        title="View Details">
+                                        <i class="ki-duotone ki-eye fs-2">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                            <span class="path3"></span>
+                                        </i>
                                     </button>
                                 `;
                             }
@@ -1230,7 +1205,6 @@ var KTDatatablesServerSide = function () {
     $(document).on('click', '.show-popup', function (e) {
         e.preventDefault();
         let details = $(this).data('details');
-        console.log(details, typeof(details));
 
         $('#detailsContent').text(details);
         let modal = new bootstrap.Modal(document.getElementById('detailsModal'));
