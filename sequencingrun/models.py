@@ -23,6 +23,7 @@ class SequencingRun(models.Model):
         ("hiseq-2500","HiSeq 2500"),
         ("hiseq-4000","HiSeq 4000"),
         ("iseq100","iSeq 100"),
+        ("revio","Revio"),
     )
 
     PE_TYPES = (

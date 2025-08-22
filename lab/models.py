@@ -22,6 +22,7 @@ class Patient(models.Model):
     CONSENT_TYPES = (
         ("HTAN patient","HTAN patient"),
         ("HTAN next-of-kin","HTAN next-of-kin"),
+        ("Melanoma Tissue Banking","Melanoma Tissue Banking"),
     )
 
     pat_id = models.CharField(max_length=12, blank=False, null=False, unique=True, validators=[validate_name_contains_space], verbose_name="Patient ID", help_text="Requires a unique identifier for each patient.")
