@@ -24,6 +24,7 @@ class SequencingRun(models.Model):
         ("hiseq-4000","HiSeq 4000"),
         ("iseq100","iSeq 100"),
         ("revio","Revio"),
+        ("miseqi100","MiSeq i100"),
     )
 
     PE_TYPES = (
@@ -31,6 +32,9 @@ class SequencingRun(models.Model):
         ("PE 100", "PE 100"),
         ("PE 150", "PE 150"),
         ("SE 150", "SE 150"),
+        ("SE100", "SE100"),
+        ("Long Reads", "Long Reads"),
+        ("Kinnex", "Kinnex"),
     )
 
     name = models.CharField(max_length=50, unique=True, validators=[validate_name_contains_space], verbose_name="Name")
