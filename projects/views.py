@@ -24,6 +24,11 @@ def filter_projects(request):
 
 @permission_required("projects.view_project",raise_exception=True)
 def projects(request):
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+
+    u = User.objects.get(username="cbagci")
+    print(u.get_all_permissions())
     filter = FilterForm()
     return render(request,"project_list.html", locals())
 
