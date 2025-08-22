@@ -27,7 +27,7 @@ class Patient(models.Model):
 
     pat_id = models.CharField(max_length=12, blank=False, null=False, unique=True, validators=[validate_name_contains_space], verbose_name="Patient ID", help_text="Requires a unique identifier for each patient.")
     sex = models.CharField(max_length=1, choices=SEX_TYPES, blank=True, null=True, verbose_name="Sex")
-    consent = models.CharField(max_length=25, choices=CONSENT_TYPES, blank=True, null=True, verbose_name="Consent")
+    consent = models.CharField(max_length=20, choices=CONSENT_TYPES, blank=True, null=True, verbose_name="Consent")
     dob = models.PositiveSmallIntegerField(blank=True, null=True, validators=[validate_birthyear_range], verbose_name="Birthyear")
     race = models.SmallIntegerField(choices=RACE_TYPES, default=7, blank=True, null=True)
     source = models.CharField(max_length=20, blank=True, null=True, verbose_name="Source")
