@@ -29,7 +29,7 @@ def patients(request):
     filter = FilterForm()
     return render(request,"patient_list.html", locals())
 
-@permission_required("lab.add_patients",raise_exception=True)
+@permission_required("lab.add_patient",raise_exception=True)
 def new_patient(request):
     if request.method=="POST":
         form = PatientForm(request.POST)
@@ -44,7 +44,7 @@ def new_patient(request):
 
     return render(request,"patient.html",locals())
 
-@permission_required("lab.change_patients",raise_exception=True)
+@permission_required("lab.change_patient",raise_exception=True)
 def edit_patient(request,id):
     patient = Patient.objects.get(id=id)
 
@@ -61,7 +61,7 @@ def edit_patient(request,id):
 
     return render(request,"patient.html",locals())
 
-@permission_required_for_async("lab.change_patients")
+@permission_required_for_async("lab.change_patient")
 def edit_patient_async(request):
     import re
     from core.utils import custom_update
@@ -84,7 +84,7 @@ def edit_patient_async(request):
 
     return JsonResponse({"success":True})
 
-@permission_required("lab.delete_patients",raise_exception=True)
+@permission_required("lab.delete_patient",raise_exception=True)
 def delete_patient(request,id):
     try:
         patient = Patient.objects.get(pat_id=id)
@@ -97,7 +97,7 @@ def delete_patient(request,id):
 
     return JsonResponse({ "deleted":True })
 
-@permission_required("lab.delete_patients",raise_exception=True)
+@permission_required("lab.delete_patient",raise_exception=True)
 def delete_batch_patients(request):
     try:
         selected_ids = json.loads(request.GET.get("selected_ids"))
@@ -139,67 +139,3 @@ def get_race(value):
             return x[0]
     return 7
 
-def _pat_get_or_create(fields:dict):
-    try:
-        pat = Patient.objects.get(pat_id=fields.get("Pat_ID"))
-        pat.sex = fields.get("Gender","")
-        pat.race = get_race(fields.get("Race",""))
-        pat.source = fields.get("Source","")
-        pat.notes = fields.get("Notes","")
-        pat.save()
-    except Exception as e:
-        print(e)
-
-def _patient_get_or_create(value):
-    if value:
-        obj, created = Patient.objects.get_or_create(
-            pat_id=value
-        )
-        return obj
-    return None
-
-def _block_get_or_create(value):
-    if value:
-        obj, created = Block.objects.get_or_create(
-            name=value
-        )
-        return obj
-    return None
-
-def _pat_get_or_create_consolidated(row):
-    try:
-        b = Block.objects.get(name=row["Block"])
-        b.patient = Patient.objects.get(pat_id=str(row["pat_id"]).replace(".0",""))
-        b.save()
-        print("saved")
-    except Exception as e:
-        print(e)
-
-def _pat_done_import(row):
-    try:
-        if not pd.isnull(row["Block"]):
-            try:
-                Block.objects.get(name=row["Block"])
-            except:
-                b = Block.objects.create(name=row["Block"])
-                patient = _patient_get_or_create(row["pat_id"])
-                b.patient = patient
-                b.save()
-    except Exception as e:
-        print(e)
-
-def _cerate_patients_from_consolidated_data():
-    import pandas as pd
-    from pathlib import Path
-
-    file = Path(Path(__file__).parent.parent / "uploads" / "Consolidated_data_final.csv")
-    df = pd.read_csv(file)
-    df[~df["pat_id"].isnull()].apply(lambda row: _pat_get_or_create_consolidated(row), axis=1)
-
-def _cerate_patients_from_patients_done():
-    import pandas as pd
-    from pathlib import Path
-
-    file = Path(Path(__file__).parent.parent / "uploads" / "patients_done.csv")
-    df = pd.read_csv(file)
-    df.apply(lambda row: _pat_done_import(row), axis=1)
