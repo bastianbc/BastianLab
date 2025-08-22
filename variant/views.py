@@ -186,7 +186,7 @@ def get_variants_by_area(request):
             'primary_site_total': variant.primary_site_total if variant.primary_site_total else 0,
             'primary_site_counts': variant.primary_site_counts if variant.primary_site_counts else ""
         })
-        print(variant.primary_site_counts)
+        print("variant.gvariant_id ",variant.gvariant_id,"variant.id", variant.id)
     result = {
         'draw': draw,
         'recordsTotal': total_records,
