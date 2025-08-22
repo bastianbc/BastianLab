@@ -4,9 +4,20 @@ from body.models import Body
 from django.core.exceptions import ValidationError
 from core.forms import BaseForm
 from lab.models import Patient
+from projects.models import Project
 
 class BlockForm(BaseForm, forms.ModelForm):
     # mock_body_site = forms.ModelChoiceField(queryset = Body.objects.filter(parent=None), label="Body Site", required=False)
+    projects = forms.ModelMultipleChoiceField(
+        queryset=Project.objects.all().order_by('name'),
+        required=False,
+        label="Projects",
+        widget=forms.SelectMultiple(attrs={
+            'class': 'form-control-sm',
+            'data-control': 'select2',  # keep consistency with your select2 usage
+        }),
+        help_text="Assign this block to one or more projects."
+    )
 
     class Meta:
         model = Block
@@ -28,7 +39,9 @@ class BlockForm(BaseForm, forms.ModelForm):
         self.fields["patient"].widget.attrs.update({'class': 'form-control-sm'})
         self.fields["patient"].widget.attrs["data-control"] = "select2"
 
-
+        # Initialize 'projects' with current relations when editing an existing Block
+        if self.instance and self.instance.pk:
+            self.fields['projects'].initial = self.instance.block_projects.all()
 
     def clean_body_site(self):
         """ Remove body_site if user selects '--Select--' """
@@ -46,6 +59,13 @@ class BlockForm(BaseForm, forms.ModelForm):
 
         if commit:
             instance.save()
+
+        if 'projects' in self.cleaned_data:
+            # Ensure instance is saved before setting M2M
+            if not instance.pk:
+                instance.save()
+            instance.block_projects.set(self.cleaned_data['projects'])
+
         return instance
 
 class AreaCreationForm(forms.Form):
