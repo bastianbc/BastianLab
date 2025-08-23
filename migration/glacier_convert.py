@@ -100,8 +100,12 @@ def strip_volumes_prefix(path: str) -> str:
     Turn '/Volumes/sequencingdata/.../file.ext' into 'sequencingdata/.../file.ext'
     Leaves other paths unchanged.
     """
-    prefix = "/Volumes/"
-    return path[len(prefix):] if path.startswith(prefix) else path.lstrip("/")
+    prefixes = ["/Volumes/", "mnt/"]
+
+    for p in prefixes:
+        if path.startswith(p):
+            return path[len(p):]
+    return path.lstrip("/")
 
 def register_missing_from_db():
     s3 = boto3.client("s3", region_name=AWS_REGION)
