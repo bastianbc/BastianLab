@@ -100,8 +100,7 @@ def strip_volumes_prefix(path: str) -> str:
     Turn '/Volumes/sequencingdata/.../file.ext' into 'sequencingdata/.../file.ext'
     Leaves other paths unchanged.
     """
-    prefixes = ["/Volumes/", "mnt/"]
-
+    prefixes = ["/Volumes/", "/mnt/labshare/"]
     for p in prefixes:
         if path.startswith(p):
             return path[len(p):]
@@ -111,13 +110,13 @@ def register_missing_from_db():
     s3 = boto3.client("s3", region_name=AWS_REGION)
 
     # Only rows not registered yet (per your screenshot)
-    rows = SMBDirectory.objects.filter(is_registered=False)
+    rows = SMBDirectory.objects.filter(is_registered=False)[:100]
 
     total = found = updated = missing = errors = 0
     for row in rows:
         total += 1
         local_path = row.directory or ""
-        key = strip_volumes_prefix(local_path)
+        key = local_path
 
         # Skip empty or folder markers
         if not key or key.endswith("/"):
@@ -126,7 +125,9 @@ def register_missing_from_db():
             continue
 
         try:
+            print(BUCKET_NAME, key)
             head = s3.head_object(Bucket=BUCKET_NAME, Key=key)
+            print(head)
             storage_class = head.get("StorageClass", "STANDARD")
             level = classify(storage_class)
             found += 1
