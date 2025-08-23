@@ -110,7 +110,7 @@ def register_missing_from_db():
     s3 = boto3.client("s3", region_name=AWS_REGION)
 
     # Only rows not registered yet (per your screenshot)
-    rows = SMBDirectory.objects.filter(is_registered=False)
+    rows = SMBDirectory.objects.filter(is_registered=False, storage_level__isnull=True)
 
     total = found = updated = missing = errors = 0
     for row in rows:
