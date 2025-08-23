@@ -125,14 +125,11 @@ def register_missing_from_db():
             continue
 
         try:
-            print(BUCKET_NAME, key)
             head = s3.head_object(Bucket=BUCKET_NAME, Key=key)
-            print(head)
             storage_class = head.get("StorageClass", "STANDARD")
             level = classify(storage_class)
             found += 1
 
-            print(f"🔎 {local_path} → key='{key}' → {storage_class} → level={level} ({'glacier' if level==1 else 'standard'})")
 
             if DRY_RUN:
                 continue
@@ -143,7 +140,7 @@ def register_missing_from_db():
                 # date_registered is set in model.save() when is_registered becomes True
                 row.save()
                 updated += 1
-
+            print(found)
         except ClientError as e:
             code = e.response.get("Error", {}).get("Code")
             if code in ("404", "NoSuchKey", "NotFound"):
