@@ -73,3 +73,80 @@ def convert_glacier():
 
     print(f"\nDone. Scanned {total} | Changed {changed} | Skipped {skipped} | Errors {errors}")
 
+
+
+
+from django.db import transaction
+
+from sequencingfile.models import SMBDirectory  # <-- adjust to your app
+
+AWS_REGION  = "us-west-2"
+BUCKET_NAME = "bastian-lab-169-3-r-us-west-2.sec.ucsf.edu"
+DRY_RUN     = False
+
+# Map S3 classes to your two levels
+STANDARD_CLASSES = {"STANDARD", "STANDARD_IA", "ONEZONE_IA", "INTELLIGENT_TIERING"}
+GLACIER_CLASSES  = {"GLACIER", "GLACIER_IR", "DEEP_ARCHIVE"}
+
+def classify(storage_class: str) -> int:
+    if not storage_class or storage_class in STANDARD_CLASSES:
+        return 0
+    if storage_class in GLACIER_CLASSES:
+        return 1
+    return 0
+
+def strip_volumes_prefix(path: str) -> str:
+    """
+    Turn '/Volumes/sequencingdata/.../file.ext' into 'sequencingdata/.../file.ext'
+    Leaves other paths unchanged.
+    """
+    prefix = "/Volumes/"
+    return path[len(prefix):] if path.startswith(prefix) else path.lstrip("/")
+
+def register_missing_from_db():
+    s3 = boto3.client("s3", region_name=AWS_REGION)
+
+    # Only rows not registered yet (per your screenshot)
+    rows = SMBDirectory.objects.filter(is_registered=False)
+
+    total = found = updated = missing = errors = 0
+    for row in rows:
+        total += 1
+        local_path = row.directory or ""
+        key = strip_volumes_prefix(local_path)
+
+        # Skip empty or folder markers
+        if not key or key.endswith("/"):
+            missing += 1
+            print(f"⏭️  Skip invalid/dir entry: {local_path}")
+            continue
+
+        try:
+            head = s3.head_object(Bucket=BUCKET_NAME, Key=key)
+            storage_class = head.get("StorageClass", "STANDARD")
+            level = classify(storage_class)
+            found += 1
+
+            print(f"🔎 {local_path} → key='{key}' → {storage_class} → level={level} ({'glacier' if level==1 else 'standard'})")
+
+            if DRY_RUN:
+                continue
+
+            with transaction.atomic():
+                row.storage_level = level
+                row.is_registered = True
+                # date_registered is set in model.save() when is_registered becomes True
+                row.save()
+                updated += 1
+
+        except ClientError as e:
+            code = e.response.get("Error", {}).get("Code")
+            if code in ("404", "NoSuchKey", "NotFound"):
+                missing += 1
+                print(f"❓ Not found in S3: key='{key}' (from '{local_path}')")
+            else:
+                errors += 1
+                print(f"❌ head_object error for key='{key}': {e}")
+
+    print(f"\nDone. Total {total} | Found {found} | Updated {updated} | Missing {missing} | Errors {errors}")
+
