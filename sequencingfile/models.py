@@ -353,9 +353,14 @@ class SequencingFile(models.Model):
 
 
 class SMBDirectory(models.Model):
+    LEVELS = (
+        (0, "standard"),
+        (1, "glacier"),
+    )
     directory = models.CharField(max_length=1000, unique=True, verbose_name="File Name")
     is_registered = models.BooleanField(default=False)
     date_registered = models.DateTimeField(blank=True, null=True)
+    storage_level = models.IntegerField(choices=LEVELS, blank=True, null=True)
 
     class Meta:
         db_table = "smb_directory"
