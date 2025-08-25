@@ -800,8 +800,8 @@ def generate_file_set(file, seq_run, sample_lib):
     return file_set
 
 def import_genes(request):
-    from .glacier_convert import convert_glacier, register_missing_from_db
-    register_missing_from_db()
+    from .glacier_convert import convert_glacier_and_mark_level, register_missing_from_db
+    convert_glacier_and_mark_level()
 
 
 def import_file_tree(request):
