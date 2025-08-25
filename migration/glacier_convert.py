@@ -1,41 +1,39 @@
+from myapp.models import SMBDirectory   # adjust import
 import boto3
 from botocore.exceptions import ClientError
 from boto3.s3.transfer import TransferConfig
 
 AWS_REGION = "us-west-2"
-BUCKET_NAME = "bastian-lab-169-3-r-us-west-2.sec.ucsf.edu"  # your bucket
-PREFIX = ""          # e.g., "BastianRaid-02/HiSeqData/" or "" for the whole bucket
-DRY_RUN = False      # set True first to preview changes
+BUCKET_NAME = "bastian-lab-169-3-r-us-west-2.sec.ucsf.edu"
+DRY_RUN = False   # set True first to preview changes
 
-# Multipart copy config (adjust part size / concurrency as needed)
 CONFIG = TransferConfig(
-    multipart_threshold=8 * 1024 * 1024,    # >8MB uses multipart
-    multipart_chunksize=64 * 1024 * 1024,   # 64MB parts
+    multipart_threshold=8 * 1024 * 1024,
+    multipart_chunksize=64 * 1024 * 1024,
     max_concurrency=10,
     use_threads=True
 )
 
-def convert_glacier():
-    # If you use a custom endpoint, uncomment endpoint_url:
-    # s3 = boto3.resource("s3", region_name=AWS_REGION,
-    #                     endpoint_url="https://s3.us-west-2.amazonaws.com")
+def convert_glacier_and_mark_level():
     s3 = boto3.resource("s3", region_name=AWS_REGION)
     client = s3.meta.client
-    bucket = s3.Bucket(BUCKET_NAME)
+
+    # your filter stays the same
+    rows = SMBDirectory.objects.filter(is_registered=True, storage_level=0)
 
     total = changed = skipped = errors = 0
 
-    for obj in bucket.objects.filter(Prefix=PREFIX):
-        key = obj.key
+    for row in rows:
+        key = row.directory
         total += 1
 
-        # Skip "folder markers"
-        if key.endswith("/") and obj.size == 0:
+        # If you have a size field and want to skip folder markers
+        if key.endswith("/") and getattr(row, "size", 0) == 0:
             skipped += 1
             print(f"⏭️  Skip folder marker: {key}")
             continue
 
-        # Check current storage class
+        # Read current storage class
         try:
             head = client.head_object(Bucket=BUCKET_NAME, Key=key)
         except ClientError as e:
@@ -44,22 +42,29 @@ def convert_glacier():
             continue
 
         storage_class = head.get("StorageClass", "STANDARD")
+
+        # If already DEEP_ARCHIVE, just sync the DB to level=1 (if desired)
         if storage_class == "DEEP_ARCHIVE":
+            if row.storage_level != 1 and not DRY_RUN:
+                row.storage_level = 1
+                row.save(update_fields=["storage_level"])
+                print(f"✅ Already DEEP_ARCHIVE, marked storage_level=1: {key}")
+            else:
+                print(f"✅ Already DEEP_ARCHIVE: {key}")
             skipped += 1
-            print(f"✅ Already DEEP_ARCHIVE: {key}")
             continue
 
+        # Prepare in-place copy to change storage class
         copy_source = {"Bucket": BUCKET_NAME, "Key": key}
         extra_args = {
             "StorageClass": "DEEP_ARCHIVE",
-            "MetadataDirective": "COPY",   # keep existing metadata
+            "MetadataDirective": "COPY",
         }
 
         try:
             if DRY_RUN:
                 print(f"🔎 DRY-RUN would change to DEEP_ARCHIVE: {key}")
             else:
-                # Multipart-capable self-copy to change storage class
                 s3.Object(BUCKET_NAME, key).copy(
                     copy_source,
                     ExtraArgs=extra_args,
@@ -67,11 +72,18 @@ def convert_glacier():
                 )
                 changed += 1
                 print(f"🔄 Changed to DEEP_ARCHIVE: {key}")
+
+                # ✅ persist the new level in DB
+                row.storage_level = 1
+                row.save(update_fields=["storage_level"])
+                print(f"💾 Updated DB storage_level=1 for: {key}")
+
         except ClientError as e:
             errors += 1
             print(f"❌ Error updating {key}: {e}")
 
     print(f"\nDone. Scanned {total} | Changed {changed} | Skipped {skipped} | Errors {errors}")
+
 
 
 
