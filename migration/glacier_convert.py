@@ -1,4 +1,4 @@
-from myapp.models import SMBDirectory   # adjust import
+from sequencingfile.models import SMBDirectory   # adjust import
 import boto3
 from botocore.exceptions import ClientError
 from boto3.s3.transfer import TransferConfig
