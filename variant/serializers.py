@@ -13,134 +13,75 @@ class GVariantSerializer(serializers.ModelSerializer):
     """
     DT_RowId = serializers.SerializerMethodField()
     patients = serializers.SerializerMethodField()
-    blocks = serializers.SerializerMethodField()
     areas = serializers.SerializerMethodField()
+    blocks = serializers.SerializerMethodField()
     genes = serializers.SerializerMethodField()
-    sample_lib = serializers.SerializerMethodField()
-    sequencing_run = serializers.SerializerMethodField()
-    gene_symbol = serializers.SerializerMethodField()
+    sample_libs = serializers.SerializerMethodField()
+    sequencing_runs = serializers.SerializerMethodField()
+    cosmic_gene_symbol = serializers.SerializerMethodField()
     cosmic_aa = serializers.SerializerMethodField()
-    primary_site_counts = serializers.SerializerMethodField()
-    primary_site_count_detail = serializers.SerializerMethodField()
+    cosmic_primary_site_counts = serializers.SerializerMethodField()
     total_calls = serializers.SerializerMethodField()
 
     class Meta:
         model = GVariant
         fields = ("id", "chrom", "start", "ref", "alt", "patients", "areas",
-                  "blocks", "sample_lib", "sequencing_run", "genes", "gene_symbol",
-                  "cosmic_aa", "primary_site_counts", "total_calls", "DT_RowId", "primary_site_count_detail", )
+                  "blocks", "sample_libs", "sequencing_runs", "genes", "cosmic_gene_symbol",
+                  "cosmic_aa", "cosmic_primary_site_counts", "total_calls", "DT_RowId", )
 
     def get_DT_RowId(self, obj):
         """DataTables row ID for frontend identification."""
         return getattr(obj, 'id')
 
+    def _get_unique_objects(self, objects):
+        """Helper method to get unique objects by id"""
+        if not objects:
+            return []
+
+        unique_dict = {}
+        for obj in objects:
+            if obj and 'id' in obj:
+                unique_dict[obj['id']] = obj
+
+        return list(unique_dict.values())
+
     def get_patients(self, obj):
-        """Get list of unique patient (id, name) tuples."""
-        patients = obj.variant_calls.filter(
-            sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__isnull=False
-        ).values_list(
-            'sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__id',
-            'sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__pat_id',
-        ).distinct()
-
-        # Convert to list of tuples (id, name)
-        return list(patients) if patients else []
-
-    def get_blocks(self, obj):
-        """Get list of unique block (id, name) tuples."""
-        blocks = obj.variant_calls.filter(
-            sample_lib__na_sl_links__nucacid__area_na_links__area__block__isnull=False
-        ).values_list(
-            'sample_lib__na_sl_links__nucacid__area_na_links__area__block__id',
-            'sample_lib__na_sl_links__nucacid__area_na_links__area__block__name',
-        ).distinct()
-
-        # Convert to list of tuples (id, name)
-        return list(blocks) if blocks else []
+        patients = getattr(obj, 'patients', [])
+        return self._get_unique_objects(patients)
 
     def get_areas(self, obj):
-        """Get list of unique area (id, name) tuples."""
-        areas = obj.variant_calls.filter(
-            sample_lib__na_sl_links__nucacid__area_na_links__area__isnull=False
-        ).values_list(
-            'sample_lib__na_sl_links__nucacid__area_na_links__area__id',
-            'sample_lib__na_sl_links__nucacid__area_na_links__area__name',
-        ).distinct()
+        areas = getattr(obj, 'areas', [])
+        return self._get_unique_objects(areas)
 
-        # Convert to list of tuples (id, name)
-        return list(areas) if areas else []
+    def get_blocks(self, obj):
+        blocks = getattr(obj, 'blocks', [])
+        return self._get_unique_objects(blocks)
 
     def get_genes(self, obj):
-        """Get list of unique gene (id, name) tuples."""
-        # Get unique genes from c variants with both id and name
-        genes_data = []
-        seen_ids = set()
+        genes = getattr(obj, 'genes', [])
+        return self._get_unique_objects(genes)
 
-        for cv in obj.c_variants.all():
-            if cv.gene and cv.gene.id not in seen_ids:
-                genes_data.append((cv.gene.id, cv.gene.name))
-                seen_ids.add(cv.gene.id)
+    def get_sample_libs(self, obj):
+        sample_libs = getattr(obj, 'sample_libs', [])
+        return self._get_unique_objects(sample_libs)
 
-        return genes_data if genes_data else []
+    def get_sequencing_runs(self, obj):
+        sequencing_runs = getattr(obj, 'sequencing_runs', [])
+        return self._get_unique_objects(sequencing_runs)
 
-    def get_sample_lib(self, obj):
-        """Get list of unique sample library (id, name) tuples."""
-        # Get unique sample libraries with both id and name
-        sample_libs_data = []
-        seen_ids = set()
+    def get_cosmic_gene_symbol(self, obj):
+        return getattr(obj, 'gene_symbol', None)
 
-        for vc in obj.variant_calls.all():
-            if vc.sample_lib and vc.sample_lib.id not in seen_ids:
-                sample_libs_data.append((vc.sample_lib.id, vc.sample_lib.name))
-                seen_ids.add(vc.sample_lib.id)
+    def get_cosmic_aa(self, obj):
+        return getattr(obj, 'cosmic_aa', None)
 
-        return sample_libs_data if sample_libs_data else []
-
-    def get_sequencing_run(self, obj):
-        """Get list of unique sequencing run (id, name) tuples."""
-        # Get unique sequencing runs with both id and name
-        seq_runs_data = []
-        seen_ids = set()
-
-        for vc in obj.variant_calls.all():
-            if vc.sequencing_run and vc.sequencing_run.id not in seen_ids:
-                seq_runs_data.append((vc.sequencing_run.id, vc.sequencing_run.name))
-                seen_ids.add(vc.sequencing_run.id)
-
-        return seq_runs_data if seq_runs_data else []
+    def get_cosmic_primary_site_counts(self, obj):
+        data = getattr(obj, 'primary_site_counts', None)
+        total = sum(data.values()) if data else 0
+        return total
 
     def get_total_calls(self, obj):
         return obj.variant_calls.count()
-
-    def get_gene_symbol(self, obj):
-        try:
-            cgv = CosmicGVariantView.objects.get(g_variant_id=obj.id)
-            return cgv.gene_symbol
-        except Exception as e:
-            return None
-
-    def get_cosmic_aa(self, obj):
-        try:
-            cgv = CosmicGVariantView.objects.get(g_variant_id=obj.id)
-            return cgv.cosmic_aa
-        except Exception as e:
-            return None
-
-    def get_primary_site_counts(self, obj):
-        try:
-            qs = CosmicGVariantView.objects.filter(g_variant_id=obj.id).first()
-            return str(qs.primary_site_counts_merged)
-        except Exception as e:
-            print(e)
-            return None
-
-    def get_primary_site_count_detail(self, obj):
-        try:
-            qs = CosmicGVariantView.objects.filter(g_variant_id=obj.id).first()
-            return qs.primary_site_total
-        except Exception as e:
-            print(e)
-            return None
 
 class VariantsViewSerializer(serializers.ModelSerializer):
     DT_RowId = serializers.SerializerMethodField()
