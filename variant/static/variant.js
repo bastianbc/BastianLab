@@ -87,12 +87,12 @@ var KTDatatablesServerSide = function () {
                 { data: 'patients' },
                 { data: 'areas' },
                 { data: 'blocks' },
-                { data: 'sample_lib' },
-                { data: 'sequencing_run' },
+                { data: 'sample_libs' },
+                { data: 'sequencing_runs' },
                 { data: 'genes' },
-                { data: 'gene_symbol' },
+                { data: 'cosmic_gene_symbol' },
                 { data: 'cosmic_aa' },
-                { data: 'primary_site_counts' },
+                { data: 'cosmic_primary_site_counts' },
                 { data: 'total_calls' },
                 { data: null },
             ],
@@ -113,9 +113,11 @@ var KTDatatablesServerSide = function () {
                     render: function (data, type, row) {
                         if (!data || !Array.isArray(data)) return '';
                         return data.map(function(patient) {
-                            var patientId = patient[0]; // id
-                            var patientName = patient[1]; // name
-                            return `<a href="/patients/edit/${patientId}" class="text-primary">${patientName}</a>`;
+                            if (patient) {
+                              var patientId = patient["id"]; // id
+                              var patientName = patient["name"]; // name
+                              return `<a href="/patients/edit/${patientId}" class="text-primary">${patientName}</a>`;
+                            }
                         }).join(', ');
                     }
                 },
@@ -125,8 +127,8 @@ var KTDatatablesServerSide = function () {
                     render: function (data, type, row) {
                         if (!data || !Array.isArray(data)) return '';
                         return data.map(function(area) {
-                            var areaId = area[0]; // id
-                            var areaName = area[1]; // name
+                            var areaId = area["id"]; // id
+                            var areaName = area["name"]; // name
                             return `<a href="/areas/edit/${areaId}" class="text-primary">${areaName}</a>`;
                         }).join(', ');
                     }
@@ -137,8 +139,8 @@ var KTDatatablesServerSide = function () {
                     render: function (data, type, row) {
                         if (!data || !Array.isArray(data)) return '';
                         return data.map(function(block) {
-                            var blockId = block[0]; // id
-                            var blockName = block[1]; // name
+                            var blockId = block["id"]; // id
+                            var blockName = block["name"]; // name
                             return `<a href="/blocks/edit/${blockId}" class="text-primary">${blockName}</a>`;
                         }).join(', ');
                     }
@@ -149,9 +151,9 @@ var KTDatatablesServerSide = function () {
                     render: function (data, type, row) {
                         if (!data || !Array.isArray(data)) return '';
                         return data.map(function(sampleLib) {
-                            var sampleLibId = sampleLib[0]; // id
-                            var sampleLibName = sampleLib[1]; // name
-                            return `<a href="/sample_libraries/edit/${sampleLibId}" class="text-primary">${sampleLibName}</a>`;
+                            var sampleLibId = sampleLib["id"]; // id
+                            var sampleLibName = sampleLib["name"]; // name
+                            return `<a href="/samplelib/edit/${sampleLibId}" class="text-primary">${sampleLibName}</a>`;
                         }).join(', ');
                     }
                 },
@@ -161,9 +163,11 @@ var KTDatatablesServerSide = function () {
                     render: function (data, type, row) {
                         if (!data || !Array.isArray(data)) return '';
                         return data.map(function(seqRun) {
-                            var seqRunId = seqRun[0]; // id
-                            var seqRunName = seqRun[1]; // name
-                            return `<a href="/sequencing_runs/edit/${seqRunId}" class="text-primary">${seqRunName}</a>`;
+                            if (seqRun) {
+                              var seqRunId = seqRun["id"]; // id
+                              var seqRunName = seqRun["name"]; // name
+                              return `<a href="/sequencingrun/edit/${seqRunId}" class="text-primary">${seqRunName}</a>`;
+                            }
                         }).join(', ');
                     }
                 },
@@ -173,11 +177,23 @@ var KTDatatablesServerSide = function () {
                     render: function (data, type, row) {
                         if (!data || !Array.isArray(data)) return '';
                         return data.map(function(gene) {
-                            var geneId = gene[0]; // id
-                            var geneName = gene[1]; // name
-                            return `<a href="/genes/edit/${geneId}" class="text-primary">${geneName}</a>`;
+                            if (gene) {
+                              var geneId = gene["id"]; // id
+                              var geneName = gene["name"]; // name
+                              return `<a href="/gene/edit/${geneId}" class="text-primary">${geneName}</a>`;
+                            }
                         }).join(', ');
                     }
+                },
+                {
+                  // gene symbol columns
+                  targets: 11,
+                  className: 'text-center'
+                },
+                {
+                  // cosmic aa columns
+                  targets: 12,
+                  className: 'text-center'
                 },
                 {
                     // Primary sites columns

@@ -1,8 +1,8 @@
 import json
 from django.db import models
 from django.db.models import (Q, F, OuterRef, Value, CharField, IntegerField, Count, Subquery,
-                              When, Case, Exists, ExpressionWrapper, FloatField)
-from django.contrib.postgres.aggregates import StringAgg
+                              When, Case, Exists, ExpressionWrapper, FloatField, Func)
+from django.contrib.postgres.aggregates import StringAgg, JSONBAgg
 from django.db.models.functions import Concat
 from datetime import datetime
 from projects.utils import get_user_projects
@@ -33,16 +33,66 @@ class GVariant(models.Model):
             Users can access entities based on their authorization. Admin users can access everything,
             while technicians or researchers can only access their own projects and related entities.
             """
+            cosmic_qs = CosmicGVariantView.objects.filter(
+                g_variant_id=OuterRef('pk')
+            ).values('gene_symbol', 'cosmic_aa', 'primary_site_counts')[:1]
+
             qs = (
                 GVariant.objects
                 .annotate(
-                    blocks=F('variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__block__name'),
-                    areas=F('variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__name'),
-                    genes=F('c_variants__gene__name'),
-                    patients=F(
-                        'variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__pat_id'),
+                    patients=JSONBAgg(
+                        Func(
+                            Value('id'), 'variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__id',
+                            Value('name'), 'variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__pat_id',
+                            function='jsonb_build_object'
+                        ),
+                        filter=Q(variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__id__isnull=False)
+                    ),
+                    blocks=JSONBAgg(
+                        Func(
+                            Value('id'), 'variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__block__id',
+                            Value('name'), 'variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__block__name',
+                            function='jsonb_build_object'
+                        ),
+                        filter=Q(variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__block__id__isnull=False)
+                    ),
+                    areas=JSONBAgg(
+                        Func(
+                            Value('id'), 'variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__id',
+                            Value('name'), 'variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__name',
+                            function='jsonb_build_object'
+                        ),
+                        filter=Q(variant_calls__sample_lib__na_sl_links__nucacid__area_na_links__area__id__isnull=False)
+                    ),
+                    genes=JSONBAgg(
+                        Func(
+                            Value('id'), 'c_variants__gene__id',
+                            Value('name'), 'c_variants__gene__name',
+                            function='jsonb_build_object'
+                        ),
+                        filter=Q(c_variants__gene__id__isnull=False)
+                    ),
+                    sample_libs=JSONBAgg(
+                        Func(
+                            Value('id'), 'variant_calls__sample_lib__id',
+                            Value('name'), 'variant_calls__sample_lib__name',
+                            function='jsonb_build_object'
+                        ),
+                        filter=Q(variant_calls__sample_lib__id__isnull=False)
+                    ),
+                    sequencing_runs=JSONBAgg(
+                        Func(
+                            Value('id'), 'variant_calls__sequencing_run__id',
+                            Value('name'), 'variant_calls__sequencing_run__name',
+                            function='jsonb_build_object'
+                        ),
+                        filter=Q(variant_calls__sequencing_run__id__isnull=False)
+                    ),
+                    gene_symbol=Subquery(cosmic_qs.values('gene_symbol')[:1]),
+                    cosmic_aa=Subquery(cosmic_qs.values('cosmic_aa')[:1]),
+                    primary_site_counts=Subquery(cosmic_qs.values('primary_site_counts')[:1]),
                 )
-                .order_by('id')  # highest COSMIC count first, then id
+                .order_by('id')
                 .distinct()
             )
 
@@ -400,7 +450,6 @@ class VariantsView(models.Model):
     inserted_residues = models.CharField(max_length=100, null=True)
     change_type = models.CharField(max_length=100, null=True)
     primary_site_counts = models.CharField(max_length=1000, null=True)
-    primary_site_total = models.IntegerField()
 
     class Meta:
         managed = False
@@ -522,7 +571,7 @@ SELECT DISTINCT ON (vc.id)
     vc.caller,
     vc.ref_read,
     vc.alt_read,
-    CASE 
+    CASE
         WHEN vc.ref_read > 0 THEN (vc.alt_read * 100.0) / (vc.ref_read + vc.alt_read)
         ELSE 0.0
     END AS vaf,
@@ -549,33 +598,33 @@ SELECT DISTINCT ON (vc.id)
 	cgv.primary_site_counts_merged as primary_site_counts,
 	CAST(cgv.primary_site_total AS INTEGER) AS primary_site_total
 
-FROM 
+FROM
     areas a
-JOIN 
+JOIN
     block b ON a.block = b.id
-JOIN 
+JOIN
     area_na_link anl ON anl.area_id = a.id
-JOIN 
+JOIN
     nuc_acids na ON anl.nucacid_id = na.id
-JOIN 
+JOIN
     na_sl_link nsl ON nsl.nucacid_id = na.id
-JOIN 
+JOIN
     sample_lib sl ON nsl.sample_lib_id = sl.id
-JOIN 
+JOIN
     variant_call vc ON vc.sample_lib_id = sl.id
-JOIN 
+JOIN
     g_variant gv ON gv.id = vc.g_variant_id
-JOIN 
+JOIN
     c_variant cv ON cv.g_variant_id = gv.id
-JOIN 
+JOIN
     gene g ON cv.gene_id = g.id
-JOIN 
+JOIN
     analysis_run ar ON vc.analysis_run_id = ar.id
-LEFT JOIN 
+LEFT JOIN
     p_variant pv ON pv.c_variant_id = cv.id
-LEFT JOIN 
+LEFT JOIN
     cosmic_hg38.cosmic_g_variant_view_with_id_stats cgv on cgv.g_variant_id=gv.id
-WHERE 
+WHERE
     a.area_type IS NOT NULL;
 """
 
@@ -596,17 +645,14 @@ select * from pg_catalog.pg_matviews;
 
 class CosmicGVariantView(models.Model):
     g_variant_id = models.IntegerField()
-    chr = models.CharField(max_length=2)
+    chr = models.CharField(max_length=10)
     pos = models.IntegerField()
     ref = models.CharField(max_length=1)
     alt = models.CharField(max_length=1)
     gene_symbol = models.CharField(max_length=10)
     cosmic_aa = models.CharField(max_length=10)
     primary_site_counts = models.JSONField()
-    primary_site_counts_merged = models.JSONField()
-    primary_site_total = models.IntegerField()
 
     class Meta:
         managed = False
-        db_table = 'cosmic_g_variant_view_with_id_stats'
-
+        db_table = 'cosmic_g_variant_view'
