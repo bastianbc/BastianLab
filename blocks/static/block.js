@@ -567,88 +567,93 @@ var KTDatatablesServerSide = function () {
     var handleSelectedRows = (function (e) {
 
       var modal = new bootstrap.Modal(document.getElementById("modal_area_options"));
-
       var selectedItem = {};
 
+      function resetForm() {
+        document.getElementById("frm_creation_options").reset();
+      }
+
       function initModal() {
-        var isInit = false;
+        var modalEl = document.getElementById("modal_area_options");
 
-        function resetForm() {
-
-          document.getElementById("frm_creation_options").reset();
-
-        }
-
-        document.getElementById("modal_area_options").addEventListener('show.bs.modal', function(e){
-
+        // When modal is about to open
+        modalEl.addEventListener("show.bs.modal", function (e) {
           selectedItem = {
-              "id": e.relatedTarget.getAttribute("data-block_id"),
-              "name": e.relatedTarget.getAttribute("data-block_name")
+            id: e.relatedTarget.getAttribute("data-block_id"),
+            name: e.relatedTarget.getAttribute("data-block_name"),
           };
-
-          if (!isInit) {
-
-            isInit = true;
-
-            initModalEvents();
-          }
-
-        });
-
-        document.getElementById("modal_area_options").addEventListener('hide.bs.modal', function(e){
 
           resetForm();
 
+          initModalEvents();
         });
 
+        // Optional: reset when modal closes
+        modalEl.addEventListener("hide.bs.modal", function () {
+          resetForm();
+        });
       }
 
       function initModalEvents() {
+        var btn = document.getElementById("btn_continue");
 
-        document.getElementById('btn_continue').addEventListener('click', function () {
+        // First remove any existing listener
+        btn.replaceWith(btn.cloneNode(true));
+        btn = document.getElementById("btn_continue"); // reselect cloned button
 
-          var data = new FormData(document.getElementById('frm_creation_options'));
+        btn.addEventListener("click", function () {
+          var form = document.getElementById("frm_creation_options");
+          var data = new FormData(form);
           var options = Object.fromEntries(data.entries());
 
           $.ajax({
             type: "GET",
             url: "/areas/add_area_to_block_async",
             data: {
-              "block_id": selectedItem["id"],
-              "options": JSON.stringify(options)
+              block_id: selectedItem.id,
+              options: JSON.stringify(options),
             },
-          }).done(function(result) {
-            if (result.success) {
-              Swal.fire({
-                  text: "The areas for "+ selectedItem["name"] +" were created",
+          })
+            .done(function (result) {
+              if (result.success) {
+                Swal.fire({
+                  text: "The areas for " + selectedItem.name + " were created",
                   icon: "info",
                   buttonsStyling: false,
                   confirmButtonText: "Ok, got it!",
                   customClass: {
-                      confirmButton: "btn fw-bold btn-success",
-                  }
-              });
-            }
-            else {
-              Swal.fire({
-                  text: "Areas(s) could not be created.",
+                    confirmButton: "btn fw-bold btn-success",
+                  },
+                });
+              } else {
+                Swal.fire({
+                  text: "Area(s) could not be created.",
                   icon: "error",
                   buttonsStyling: false,
                   confirmButtonText: "Ok, got it!",
                   customClass: {
-                      confirmButton: "btn fw-bold btn-danger",
-                  }
+                    confirmButton: "btn fw-bold btn-danger",
+                  },
+                });
+              }
+
+              modal.hide();
+              if (typeof dt !== "undefined" && dt.draw) {
+                dt.draw();
+              }
+            })
+            .fail(function (xhr, status, error) {
+              Swal.fire({
+                text: "An error occurred: " + error,
+                icon: "error",
+                buttonsStyling: false,
+                confirmButtonText: "Ok, got it!",
+                customClass: {
+                  confirmButton: "btn fw-bold btn-danger",
+                },
               });
-            }
-
-            modal.hide();
-
-            dt.draw();
-
-          });
-
+            });
         });
-
       }
 
       function initButtonEvents() {

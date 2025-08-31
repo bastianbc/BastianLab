@@ -12,7 +12,7 @@ from variant.models import VariantCall
 
 @permission_required_for_async("areas.view_area")
 def filter_areas(request):
-    
+
     areas = Area.query_by_args(request.user, **request.GET)
     serializer = AreasSerializer(areas['items'], many=True)
     result = dict()
@@ -48,15 +48,23 @@ def new_area(request):
 
 @permission_required("areas.add_area",raise_exception=True)
 def add_area_to_block_async(request):
-    block_id = json.loads(request.GET.get("block_id"))
-    options = json.loads(request.GET.get("options"))
-
     try:
-        for _ in range(int(options["number"])):
+        block_id = request.GET.get("block_id")
+        options = request.GET.get("options")
+
+        if not block_id or not options:
+            return JsonResponse({"success": False, "error": "Missing parameters"}, status=400)
+
+        block_id = int(block_id)
+        options = json.loads(options)
+        number_of_areas = int(options.get("number", 0))
+        print("number_of_areas:",number_of_areas)
+        for _ in range(number_of_areas):
             block = Block.objects.get(id=block_id)
             Area.objects.create(
                 block=block,
             )
+            print("xxxxxxx")
 
     except Exception as e:
         print(str(e))
