@@ -72,6 +72,7 @@ var KTDatatablesServerSide = function () {
               { data: 'scan_number'},
               { data: 'num_areas' },
               { data: 'num_variants' },
+              { data: null },
             ],
             columnDefs: [
                 {
@@ -136,13 +137,13 @@ var KTDatatablesServerSide = function () {
                         if (data > 0) {
                           let id = row["id"];
                           return `
-                              <a href="#" class="variant-link-by-area">${data}</a>`;
+                              <a href="#" class="variant-link">${data}</a>`;
                         }
                         return data;
                     }
                 },
                 {
-                    targets: 10,
+                    targets: -1,
                     data: null,
                     orderable: false,
                     className: 'text-end',
@@ -177,6 +178,12 @@ var KTDatatablesServerSide = function () {
                                 </div>
                                 <!--end::Menu item-->
 
+                                <!--begin::Menu item-->
+                                <div class="menu-item px-3">
+                                    <a href="#" class="menu-link px-3 variant-link">View Variants</a>
+                                </div>
+                                <!--end::Menu item-->
+                                
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
                                     <a href="/blocks/delete/` + row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
@@ -1002,7 +1009,7 @@ var KTDatatablesServerSide = function () {
             },
 
             setupEventListeners: function() {
-                document.querySelectorAll('.variant-link-by-area').forEach((item, i) => {
+                document.querySelectorAll('.variant-link').forEach((item, i) => {
                     item.addEventListener('click', (e) => {
                         // Select parent row
                         const parent = e.target.closest('tr');
@@ -1095,8 +1102,9 @@ var KTDatatablesServerSide = function () {
                                   <th>Alias</th>
                                   <th>Coverage</th>
                                   <th>VAF</th>
-                                  <th>Cosmic</th>
-                                  <th class="text-end min-w-100px">Actions</th>
+                                  <th>Cosmic Gene Symbol</th>
+                                  <th>Cosmic AA</th>
+                                  <th>Primary Site Counts</th>
                               </tr>
                           </thead>
                           <tbody class="text-gray-600 fw-semibold"></tbody>
@@ -1118,7 +1126,7 @@ var KTDatatablesServerSide = function () {
                     },
                     columns: [
                         {
-                            data: 'variantcall_id',
+                            data: 'gvariant_id',
                         },
                         {
                             data: 'analysis_run_name',
@@ -1145,36 +1153,16 @@ var KTDatatablesServerSide = function () {
                             className: 'text-gray-800',
                         },
                         {
-                            data: 'primary_site_total',
+                            data: 'cosmic_gene_symbol',
                             className: 'text-gray-800',
-                            render: function(data, type, row) {
-                                let id = row["primary_site_counts"];
-
-                                return `
-                                    <a href="#"
-                                       class="show-popup"
-                                       data-details='${JSON.stringify(row.primary_site_counts)}'>${data}
-                                    </a>
-                                `;
-                            }
                         },
                         {
-                            data: null,
-                            className: 'text-end',
-                            render: function() {
-
-                                return `
-                                    <button type="button" class="btn btn-icon btn-light-primary btn-sm"
-                                        data-bs-toggle="tooltip" data-bs-placement="top"
-                                        title="View Details">
-                                        <i class="ki-duotone ki-eye fs-2">
-                                            <span class="path1"></span>
-                                            <span class="path2"></span>
-                                            <span class="path3"></span>
-                                        </i>
-                                    </button>
-                                `;
-                            }
+                            data: 'cosmic_aa',
+                            className: 'text-gray-800',
+                        },
+                        {
+                            data: 'total_site_counts',
+                            className: 'text-gray-800 text-center',
                         }
                     ],
                     columnDefs: [
@@ -1194,11 +1182,28 @@ var KTDatatablesServerSide = function () {
                                     return data;
                                 }
                         },
+                        {
+                          targets: -1,
+                          render: function (data, type, row) {
+                              let tooltip = row.cosmic_primary_site_counts
+                                  ? Object.entries(row.cosmic_primary_site_counts)
+                                        .map(([k, v]) => `${k}: ${v}`)
+                                        .join('<br>')
+                                  : '';
+                              return `<span data-toggle="tooltip" data-html="true" title="${tooltip}">${data}</span>`;
+                          }
+                        }
                     ],
-                    order: [[7, 'desc']],  // Sort by areas by default
+                    order: [[9, 'desc']],  // Sort by areas by default
                     pageLength: 10,
                     lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
                     responsive: true
+                });
+
+                $(`#variant_datatable_${areaId}`).on('draw.dt', function () {
+                    $('[data-toggle="tooltip"]').tooltip({
+                        html: true   // allow HTML so <br> works
+                    });
                 });
             },
 
