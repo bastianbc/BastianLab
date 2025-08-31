@@ -134,20 +134,18 @@ def get_variants_by_area(request):
     order_direction = request.GET.get('order[0][dir]', 'asc')
 
     # colmun name mapping
-    columns = ["analysis_run_id", "analysis_run_name", "gene_name", "variant", "alias",
-               "coverage", "vaf", "primary_site_total"]
+    columns = ["analysis_run_id", "analysis_run_name", "gene_name", "variant", "alias", "coverage", "vaf", "cosmic_gene_symbol", "cosmic_aa", "total_site_counts"]
 
     # set to order column
     order_column = columns[int(order_column_index)]
-    print("*"*100, order_column, order_column_index)
+
     # set to order direction
     if order_direction == 'desc':
         order_column = f"-{order_column}"
 
     # main query
-    variants = VariantsView.objects.filter(area_id=area_id).order_by("-primary_site_total")
-    print(variants[0].primary_site_total)
-    print(type(variants[0].primary_site_total))
+    variants = VariantsView.objects.filter(area_id=area_id)
+
     total_records = variants.count()
 
     # search parameters
@@ -166,24 +164,26 @@ def get_variants_by_area(request):
     total_filtered_records = variants.count()
 
     # apply pagination
-    variants = variants.order_by(order_column, "-primary_site_total")[start:start + length]
+    variants = variants.order_by(order_column)[start:start + length]
 
     # convert to data format of datatables
     data = []
     for variant in variants:
         data.append({
             # 'DT_RowId': f"variant_{variant.variantcall_id}",
-            'variantcall_id': variant.variantcall_id,
+            'gvariant_id': variant.gvariant_id,
             'analysis_run_name': variant.analysis_run_name,
             'gene_name': variant.gene_name,
             'p_variant': variant.variant if variant.variant else '',
             'alias': variant.alias if variant.alias else '',
             'coverage': variant.coverage,
             'vaf': round(variant.vaf, 2) if variant.vaf else 0,
-            'primary_site_total': variant.primary_site_total if variant.primary_site_total else 0,
-            'primary_site_counts': variant.primary_site_counts if variant.primary_site_counts else ""
+            'cosmic_gene_symbol': variant.cosmic_gene_symbol,
+            'cosmic_aa': variant.cosmic_aa,
+            'total_site_counts': variant.total_site_counts,
+            'cosmic_primary_site_counts': variant.cosmic_primary_site_counts,
         })
-        print("variant.gvariant_id ",variant.gvariant_id,"variant.id", variant.id)
+
     result = {
         'draw': draw,
         'recordsTotal': total_records,

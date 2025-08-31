@@ -449,7 +449,10 @@ class VariantsView(models.Model):
     reference_residues = models.CharField(max_length=100, null=True)
     inserted_residues = models.CharField(max_length=100, null=True)
     change_type = models.CharField(max_length=100, null=True)
-    primary_site_counts = models.CharField(max_length=1000, null=True)
+    cosmic_gene_symbol = models.CharField(max_length=30, null=True)
+    cosmic_aa = models.CharField(max_length=30, null=True)
+    cosmic_primary_site_counts = models.JSONField(max_length=200, null=True)
+    total_site_counts = models.IntegerField()
 
     class Meta:
         managed = False
@@ -595,9 +598,13 @@ SELECT DISTINCT ON (vc.id)
     pv.change_type,
     ar.id AS analysis_run_id,
     ar.name AS analysis_run_name,
-	cgv.primary_site_counts_merged as primary_site_counts,
-	CAST(cgv.primary_site_total AS INTEGER) AS primary_site_total
-
+    cgv.gene_symbol AS cosmic_gene_symbol,
+    cgv.cosmic_aa,
+    cgv.primary_site_counts AS cosmic_primary_site_counts,
+    (
+        SELECT COALESCE(SUM((value)::int), 0)
+        FROM jsonb_each_text(cgv.primary_site_counts)
+    ) AS total_site_counts
 FROM
     areas a
 JOIN
@@ -623,7 +630,7 @@ JOIN
 LEFT JOIN
     p_variant pv ON pv.c_variant_id = cv.id
 LEFT JOIN
-    cosmic_hg38.cosmic_g_variant_view_with_id_stats cgv on cgv.g_variant_id=gv.id
+    cosmic_g_variant_view cgv on cgv.g_variant_id=gv.id
 WHERE
     a.area_type IS NOT NULL;
 """

@@ -596,6 +596,7 @@ var KTDatatablesServerSide = function () {
                         // Open modal
                         this.instance.show();
                         this.initializeModal(id);
+                        this.initializeDataTable(id);
                     });
                 });
 
@@ -618,7 +619,9 @@ var KTDatatablesServerSide = function () {
                                   <th>Alias</th>
                                   <th>Coverage</th>
                                   <th>VAF</th>
-                                  <th class="text-end min-w-100px">Actions</th>
+                                  <th>Cosmic Gene Symbol</th>
+                                  <th>Cosmic AA</th>
+                                  <th class="text-center">Primary Site Counts</th>
                               </tr>
                           </thead>
                           <tbody class="text-gray-600 fw-semibold"></tbody>
@@ -657,7 +660,7 @@ var KTDatatablesServerSide = function () {
                     },
                     columns: [
                         {
-                            data: 'variantcall_id',
+                            data: 'gvariant_id',
                         },
                         {
                             data: 'analysis_run_name',
@@ -684,23 +687,16 @@ var KTDatatablesServerSide = function () {
                             className: 'text-gray-800',
                         },
                         {
-                            data: null,
-                            className: 'text-end',
-                            render: function() {
-                                return `
-                                    <button type="button"
-                                            class="btn btn-icon btn-light-primary btn-sm"
-                                            data-bs-toggle="tooltip"
-                                            data-bs-placement="top"
-                                            title="View Details">
-                                        <i class="ki-duotone ki-eye fs-2">
-                                            <span class="path1"></span>
-                                            <span class="path2"></span>
-                                            <span class="path3"></span>
-                                        </i>
-                                    </button>
-                                `;
-                            }
+                            data: 'cosmic_gene_symbol',
+                            className: 'text-gray-800',
+                        },
+                        {
+                            data: 'cosmic_aa',
+                            className: 'text-gray-800',
+                        },
+                        {
+                            data: 'total_site_counts',
+                            className: 'text-gray-800 text-center',
                         }
                     ],
                     columnDefs: [
@@ -720,12 +716,30 @@ var KTDatatablesServerSide = function () {
                                     return data;
                                 }
                         },
+                        {
+                          targets: -1,
+                          render: function (data, type, row) {
+                              let tooltip = row.cosmic_primary_site_counts
+                                  ? Object.entries(row.cosmic_primary_site_counts)
+                                        .map(([k, v]) => `${k}: ${v}`)
+                                        .join('<br>')
+                                  : '';
+                              return `<span data-toggle="tooltip" data-html="true" title="${tooltip}">${data}</span>`;
+                          }
+                        }
                     ],
-                    order: [[0, 'asc']],  // Sort by areas by default
+                    order: [[9, 'desc']],  // Sort by areas by default
                     pageLength: 10,
                     lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
                     responsive: true
                 });
+
+                $('#variant_datatable').on('draw.dt', function () {
+                    $('[data-toggle="tooltip"]').tooltip({
+                        html: true   // allow HTML so <br> works
+                    });
+                });
+
             },
 
         };
