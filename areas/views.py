@@ -58,13 +58,12 @@ def add_area_to_block_async(request):
         block_id = int(block_id)
         options = json.loads(options)
         number_of_areas = int(options.get("number", 0))
-        print("number_of_areas:",number_of_areas)
+        
         for _ in range(number_of_areas):
             block = Block.objects.get(id=block_id)
             Area.objects.create(
                 block=block,
             )
-            print("xxxxxxx")
 
     except Exception as e:
         print(str(e))
