@@ -20,7 +20,7 @@ var KTDatatablesServerSide = function () {
             // searchDelay: 500,
             processing: true,
             serverSide: true,
-            order: [[0, 'desc']],
+            order: [[9, 'desc']],
             stateSave: false,
             destroy: true,
             select: {
@@ -135,7 +135,7 @@ var KTDatatablesServerSide = function () {
                         let id = row["id"];
                         if (data > 0) {
                             return `
-                              <a href="/variant?model=area&id=${id}&initial=true">${data}</a>`;
+                              <a href="#" class="variant-link">${data}</a>`;
                         }
                         return data;
                     }
@@ -177,9 +177,9 @@ var KTDatatablesServerSide = function () {
                                 <!--end::Menu item-->
 
                                 <!--begin::Menu item-->
-                                <div class="menu-item px-3">
-                                    <a href="#" class="menu-link px-3 variant-link">View Variants</a>
-                                </div>
+<!--                                <div class="menu-item px-3">-->
+<!--                                    <a href="#" class="menu-link px-3 variant-link">View Variants</a>-->
+<!--                                </div>-->
                                 <!--end::Menu item-->
                             </div>
                             <!--end::Menu-->

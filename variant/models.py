@@ -36,7 +36,6 @@ class GVariant(models.Model):
             cosmic_qs = CosmicGVariantView.objects.filter(
                 g_variant_id=OuterRef('pk')
             ).values('gene_symbol', 'cosmic_aa', 'primary_site_counts')[:1]
-
             qs = (
                 GVariant.objects
                 .annotate(
@@ -251,10 +250,13 @@ class GVariant(models.Model):
 
             # Get appropriate queryset based on context
             if model_block:
+                print("1"*100)
                 queryset = _get_block_variants_queryset(block_id)
             elif model_area:
+                print("2"*100)
                 queryset = _get_area_variants_queryset(area_id)
             else:
+                print("3"*100)
                 queryset = _get_authorizated_queryset()
 
             total = queryset.count()
@@ -659,7 +661,9 @@ class CosmicGVariantView(models.Model):
     gene_symbol = models.CharField(max_length=10)
     cosmic_aa = models.CharField(max_length=10)
     primary_site_counts = models.JSONField()
+    primary_site_counts_merged = models.JSONField()
+    primary_site_total = models.IntegerField()
 
     class Meta:
         managed = False
-        db_table = 'cosmic_g_variant_view'
+        db_table = 'cosmic_g_variant_view_with_id_stats'
