@@ -632,7 +632,7 @@ JOIN
 LEFT JOIN
     p_variant pv ON pv.c_variant_id = cv.id
 LEFT JOIN
-    cosmic_g_variant_view cgv on cgv.g_variant_id=gv.id
+    cosmic_hg38.cosmic_g_variant_view_with_id_stats cgv on cgv.g_variant_id=gv.id
 WHERE
     a.area_type IS NOT NULL;
 """
