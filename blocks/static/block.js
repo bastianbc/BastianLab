@@ -137,7 +137,7 @@ var KTDatatablesServerSide = function () {
                         if (data > 0) {
                           let id = row["id"];
                           return `
-                              <a href="#" class="variant-link">${data}</a>`;
+                              <a href="#" class="variant-link">${data}</a>`; 
                         }
                         return data;
                     }
@@ -183,7 +183,7 @@ var KTDatatablesServerSide = function () {
                                     <a href="#" class="menu-link px-3 variant-link">View Variants</a>
                                 </div>
                                 <!--end::Menu item-->
-                                
+
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
                                     <a href="/blocks/delete/` + row["id"] +`" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
