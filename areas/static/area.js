@@ -619,6 +619,7 @@ var KTDatatablesServerSide = function () {
                                   <th>Alias</th>
                                   <th>Coverage</th>
                                   <th>VAF</th>
+                                  <th>Caller</th>
                                   <th>Cosmic Gene Symbol</th>
                                   <th>Cosmic AA</th>
                                   <th class="text-center">Primary Site Counts</th>
@@ -687,6 +688,10 @@ var KTDatatablesServerSide = function () {
                             className: 'text-gray-800',
                         },
                         {
+                            data: 'caller',
+                            className: 'text-gray-800',
+                        },
+                        {
                             data: 'cosmic_gene_symbol',
                             className: 'text-gray-800',
                         },
@@ -728,7 +733,7 @@ var KTDatatablesServerSide = function () {
                           }
                         }
                     ],
-                    order: [[9, 'desc']],  // Sort by areas by default
+                    order: [[10, 'desc']],  // Sort by areas by default
                     pageLength: 10,
                     lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
                     responsive: true
