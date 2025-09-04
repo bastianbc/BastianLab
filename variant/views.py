@@ -134,7 +134,8 @@ def get_variants_by_area(request):
     order_direction = request.GET.get('order[0][dir]', 'asc')
 
     # colmun name mapping
-    columns = ["analysis_run_id", "analysis_run_name", "gene_name", "variant", "alias", "coverage", "vaf", "cosmic_gene_symbol", "cosmic_aa", "total_site_counts"]
+    columns = ["analysis_run_id", "analysis_run_name", "gene_name", "variant",
+               "alias", "coverage", "vaf", "caller", "cosmic_gene_symbol", "cosmic_aa", "total_site_counts"]
 
     # set to order column
     order_column = columns[int(order_column_index)]
@@ -178,6 +179,7 @@ def get_variants_by_area(request):
             'alias': variant.alias if variant.alias else '',
             'coverage': variant.coverage,
             'vaf': round(variant.vaf, 2) if variant.vaf else 0,
+            'caller': variant.caller,
             'cosmic_gene_symbol': variant.cosmic_gene_symbol,
             'cosmic_aa': variant.cosmic_aa,
             'total_site_counts': variant.total_site_counts,
