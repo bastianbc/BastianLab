@@ -36,7 +36,6 @@ class GVariant(models.Model):
             cosmic_qs = CosmicGVariantView.objects.filter(
                 g_variant_id=OuterRef('pk')
             ).values('gene_symbol', 'cosmic_aa', 'primary_site_counts')[:1]
-
             qs = (
                 GVariant.objects
                 .annotate(
@@ -251,10 +250,13 @@ class GVariant(models.Model):
 
             # Get appropriate queryset based on context
             if model_block:
+                print("1"*100)
                 queryset = _get_block_variants_queryset(block_id)
             elif model_area:
+                print("2"*100)
                 queryset = _get_area_variants_queryset(area_id)
             else:
+                print("3"*100)
                 queryset = _get_authorizated_queryset()
 
             total = queryset.count()
@@ -456,7 +458,7 @@ class VariantsView(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'variants_view'
+        db_table = 'variants_view_consolidated'
 
     def query_by_args(self, **kwargs):
         try:
@@ -630,11 +632,150 @@ JOIN
 LEFT JOIN
     p_variant pv ON pv.c_variant_id = cv.id
 LEFT JOIN
-    cosmic_g_variant_view cgv on cgv.g_variant_id=gv.id
+    cosmic_hg38.cosmic_g_variant_view_with_id_stats cgv on cgv.g_variant_id=gv.id
 WHERE
     a.area_type IS NOT NULL;
 """
 
+
+'''
+CREATE MATERIALIZED VIEW variants_view_consolidated AS
+WITH vc_norm AS (
+  SELECT
+    vc.*,
+    CASE
+      WHEN vc.caller IN ('FB')  THEN 'F'
+      WHEN vc.caller IN ('MT2') THEN 'M'
+      WHEN vc.caller IN ('HS')  THEN 'H'
+      ELSE NULL
+    END AS caller_norm,
+    CASE
+      WHEN vc.caller IN ('FB')  THEN 1
+      WHEN vc.caller IN ('MT2') THEN 2
+      WHEN vc.caller IN ('HS')  THEN 3
+      ELSE 99
+    END AS prio
+  FROM variant_call vc
+),
+-- Group per (variant, sample, analysis), compute FMH flags and ids per priority
+grp AS (
+  SELECT
+    g_variant_id,
+    sample_lib_id,
+    analysis_run_id,
+
+    -- FMH presence flags
+    BOOL_OR(caller_norm = 'F') AS has_f,
+    BOOL_OR(caller_norm = 'M') AS has_m,
+    BOOL_OR(caller_norm = 'H') AS has_h,
+
+    -- ids for preferred row choice
+    MIN(id) FILTER (WHERE prio = 1) AS fb_id,
+    MIN(id) FILTER (WHERE prio = 2) AS mt2_id,
+    MIN(id) FILTER (WHERE prio = 3) AS hs_id
+  FROM vc_norm
+  WHERE caller_norm IS NOT NULL
+  GROUP BY g_variant_id, sample_lib_id, analysis_run_id
+),
+best AS (
+  SELECT
+    COALESCE(fb_id, mt2_id, hs_id) AS picked_id,
+    g_variant_id,
+    sample_lib_id,
+    analysis_run_id,
+    -- Build FMH string in order without STRING_AGG DISTINCT
+    (CASE WHEN has_f THEN 'F' ELSE '' END) ||
+    (CASE WHEN has_m THEN 'M' ELSE '' END) ||
+    (CASE WHEN has_h THEN 'H' ELSE '' END) AS callers_fmh
+  FROM grp
+  WHERE COALESCE(fb_id, mt2_id, hs_id) IS NOT NULL
+),
+v AS (
+  -- Attach the chosen raw row (FB > MT2 > HS)
+  SELECT
+    b.g_variant_id,
+    b.sample_lib_id,
+    b.analysis_run_id,
+    b.callers_fmh,
+    n.id,
+    n.ref_read,
+    n.alt_read,
+    (n.ref_read + n.alt_read) AS coverage,
+    n.log2r,
+    n.variant_meta,
+    n.alias_meta
+  FROM best b
+  JOIN vc_norm n ON n.id = b.picked_id
+)
+SELECT DISTINCT ON (v.id)
+    ROW_NUMBER() OVER () AS id,                -- unstable view row id
+    v.id                AS variantcall_id,     -- chosen raw vc.id (stable reference)
+    a.id                AS area_id,
+    a.name              AS area_name,
+    a.area_type,
+    a.collection,
+    b.id                AS block_id,
+    b.name              AS block_name,
+    sl.id               AS samplelib_id,
+    sl.name             AS samplelib_name,
+    g.id                AS gene_id,
+    g.name              AS gene_name,
+    g.chr               AS chromosome,
+
+    -- Consolidated fields (from preferred caller)
+    v.coverage,
+    v.log2r,
+    v.callers_fmh       AS caller,
+    v.ref_read,
+    v.alt_read,
+    CASE WHEN v.ref_read > 0
+         THEN (v.alt_read * 100.0) / (v.ref_read + v.alt_read)
+         ELSE 0.0 END    AS vaf,
+
+    v.alias_meta        AS "alias",
+    v.variant_meta      AS "variant",
+
+    gv.id               AS gvariant_id,
+    gv.chrom            AS g_chromosome,
+    gv.start            AS g_start,
+    gv."end"            AS g_end,
+    gv.ref              AS g_ref,
+    gv.alt              AS g_alt,
+    gv.avsnp150,
+    cv.id               AS cvariant_id,
+    cv.nm_id,
+    cv.c_var,
+    cv.exon,
+    cv.func,
+    pv.id               AS pvariant_id,
+    pv.reference_residues,
+    pv.inserted_residues,
+    pv.change_type,
+    ar.id               AS analysis_run_id,
+    ar.name             AS analysis_run_name,
+    cgv.gene_symbol     AS cosmic_gene_symbol,
+    cgv.cosmic_aa,
+    cgv.primary_site_counts AS cosmic_primary_site_counts,
+    (
+      SELECT COALESCE(SUM((value)::int), 0)
+      FROM jsonb_each_text(cgv.primary_site_counts)
+    ) AS total_site_counts
+FROM areas a
+JOIN block b            ON a.block = b.id
+JOIN area_na_link anl   ON anl.area_id = a.id
+JOIN nuc_acids na       ON anl.nucacid_id = na.id
+JOIN na_sl_link nsl     ON nsl.nucacid_id = na.id
+JOIN sample_lib sl      ON nsl.sample_lib_id = sl.id
+JOIN v                  ON v.sample_lib_id = sl.id
+JOIN g_variant gv       ON gv.id = v.g_variant_id
+JOIN c_variant cv       ON cv.g_variant_id = gv.id
+JOIN gene g             ON cv.gene_id = g.id
+JOIN analysis_run ar    ON v.analysis_run_id = ar.id
+LEFT JOIN p_variant pv  ON pv.c_variant_id = cv.id
+LEFT JOIN cosmic_hg38.cosmic_g_variant_view_with_id_stats cgv
+                        ON cgv.g_variant_id = gv.id
+WHERE a.area_type IS NOT NULL;
+'''
 
 # Here are some database indexes after need to create after to created the materialized view above
 """
@@ -659,7 +800,9 @@ class CosmicGVariantView(models.Model):
     gene_symbol = models.CharField(max_length=10)
     cosmic_aa = models.CharField(max_length=10)
     primary_site_counts = models.JSONField()
+    primary_site_counts_merged = models.JSONField()
+    primary_site_total = models.IntegerField()
 
     class Meta:
         managed = False
-        db_table = 'cosmic_g_variant_view'
+        db_table = 'cosmic_g_variant_view_with_id_stats'
