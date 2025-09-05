@@ -1,7 +1,8 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from core.validators import validate_name_contains_space
-from django.db.models import Q, Count, Case, When, Value, CharField
+from django.db.models import Q, Count, Case, When, Value, CharField, Subquery
+from django.db.models.functions import Coalesce
 from django.utils.crypto import get_random_string
 import json
 from projects.utils import get_user_projects
@@ -119,11 +120,25 @@ class Block(models.Model):
             Users can access to some entities depend on their authorize. While the user having admin role can access to all things,
             technicians or researchers can access own projects and other entities related to it.
             '''
-            queryset = Block.objects.all().annotate(
-                num_areas=Count('block_areas', distinct=True),
-                project_num=Count("block_projects", distinct=True),
-                patient_num=Count('patient', distinct=True),
-                num_variants=Count("block_areas__area_na_links__nucacid__na_sl_links__sample_lib__variant_calls", distinct=True)
+            block_url_sq = BlockUrl.objects.order_by('id').values('url')[:1]
+
+            queryset = (
+                Block.objects
+                .annotate(
+                    num_areas=Count('block_areas', distinct=True),
+                    project_num=Count('block_projects', distinct=True),
+                    patient_num=Count('patient', distinct=True),
+                    num_variants=Count(
+                        'block_areas__area_na_links__nucacid__na_sl_links__sample_lib__variant_calls',
+                        distinct=True
+                    ),
+                    # <- add the global block url (first record)
+                    block_url=Coalesce(
+                        Subquery(block_url_sq),  # scalar subquery
+                        Value(None),  # fallback if table is empty
+                        output_field=CharField()
+                    ),
+                )
             )
 
             if not user.is_superuser:

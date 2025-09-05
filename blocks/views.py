@@ -17,46 +17,21 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from time import perf_counter
-from django.http import JsonResponse
+
 
 @permission_required_for_async("blocks.view_block")
 def filter_blocks(request):
-    start_time = perf_counter()
-    prev_time = start_time
-    prev_label = "start"
-
-    def log(step_label: str):
-        nonlocal prev_time, prev_label
-        now = perf_counter()
-        delta = now - prev_time
-        print(f"[filter_blocks] {prev_label} -> {step_label}: +{delta:.3f}s")
-        prev_time = now
-        prev_label = step_label
-
-    # 1) Query (will be optimized below)
     blocks = Block.query_by_args(request.user, **request.GET)
-    log("Block.query_by_args")
-
-    # 2) Fetch block_url ONCE; pass via context to avoid per-row DB hits
-    block_url_row = Block.get_block_url()  # e.g. {'url': '...'} or None
+    block_url_row = Block.get_block_url()
     block_url = block_url_row["url"] if block_url_row else None
-
     serializer = BlocksSerializer(blocks['items'], many=True, context={"block_url": block_url})
-    log("serialize Blocks")
-
     result = {}
-    log("create result dict")
-
-    result['data'] = serializer.data
-    log("set result.data")
-
-    result['draw'] = blocks['draw'];                 log("set result.draw")
-    result['recordsTotal'] = blocks['total'];        log("set result.recordsTotal")
-    result['recordsFiltered'] = blocks['count'];     log("set result.recordsFiltered")
-
+    data = serializer.data  # <-- evaluation happens here
+    result['data'] = data
+    result['draw'] = blocks['draw']
+    result['recordsTotal'] = blocks['total']
+    result['recordsFiltered'] = blocks['count']
     response = JsonResponse(result)
-    log("build JsonResponse")
     return response
 
 
