@@ -21,12 +21,10 @@ logger = logging.getLogger(__name__)
 
 @permission_required_for_async("blocks.view_block")
 def filter_blocks(request):
-    blocks = Block.query_by_args(request.user, **request.GET)
-    block_url_row = Block.get_block_url()
-    block_url = block_url_row["url"] if block_url_row else None
-    serializer = BlocksSerializer(blocks['items'], many=True, context={"block_url": block_url})
+    blocks = Block.query_by_args(request.user, **request.GET) # <-- burasi 10 sn tutuyor
+    serializer = BlocksSerializer(blocks['items'], many=True)
     result = {}
-    data = serializer.data  # <-- evaluation happens here
+    data = serializer.data  # <-- burasi 10 sn tutuyor
     result['data'] = data
     result['draw'] = blocks['draw']
     result['recordsTotal'] = blocks['total']
