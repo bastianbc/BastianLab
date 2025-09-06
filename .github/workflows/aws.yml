@@ -1,0 +1,68 @@
+name: EC2 Pull & Restart (Django)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  TARGET_DIR: /home/ssm-user/project/BastianLab
+  GUNICORN_SERVICE: gunicorn        # change if your unit name differs
+  NGINX_SERVICE: nginx
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Connectivity check
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}        # ssm-user
+          key: ${{ secrets.SSH_KEY }}              # private key
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script_stop: true
+          script: |
+            whoami
+            hostname
+            ls -ld ${{ env.TARGET_DIR }}
+
+      - name: Deploy (git pull + restart services)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script_stop: true
+          script: |
+            set -Eeuo pipefail
+            cd ${{ env.TARGET_DIR }}
+            git fetch --prune origin
+            git checkout main
+            git pull --ff-only origin main
+
+            # OPTIONAL Django ops (uncomment if/when you need them)
+            # source venv/bin/activate || true
+            # pip install -r requirements.txt
+            # python manage.py migrate --noinput
+            # python manage.py collectstatic --noinput
+
+            # Restart services (non-interactive sudo)
+            sudo -n systemctl daemon-reload
+            sudo -n systemctl restart ${{ env.GUNICORN_SERVICE }}
+            sudo -n nginx -t
+            sudo -n systemctl restart ${{ env.NGINX_SERVICE }}
+
+            # Quick verification
+            sudo -n systemctl is-active ${{ env.GUNICORN_SERVICE }}
+            sudo -n systemctl is-active ${{ env.NGINX_SERVICE }}
+            git rev-parse --short HEAD
