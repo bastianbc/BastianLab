@@ -137,7 +137,7 @@ var KTDatatablesServerSide = function () {
                         if (data > 0) {
                           let id = row["id"];
                           return `
-                              <a href="#" class="variant-link">${data}</a>`; 
+                              <a href="#" class="variant-link text-primary text-decoration-none cursor-pointer">${data}</a>`;
                         }
                         return data;
                     }
