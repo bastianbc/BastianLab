@@ -128,17 +128,16 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 9,
-                    orderable: true,
-                    className: "text-center",
-                    render: function (data, type, row) {
-                        let id = row["id"];
-                        if (data > 0) {
-                            return `
-                              <span class="variant-link text-primary text-decoration-none cursor-pointer">${data}</span>`;
-                        }
-                        return data;
+                  targets: 9,
+                  orderable: true,
+                  className: "text-center",
+                  render: function (data, type, row) {
+                    if (data > 0) {
+                      // note href="#" + data-area-id; no actual navigation target
+                      return `<a href="#" class="variant-link" data-area-id="${row.id}" role="button">${data}</a>`;
                     }
+                    return data;
+                  }
                 },
                 {
                     targets: 10,
@@ -204,8 +203,8 @@ var KTDatatablesServerSide = function () {
             toggleToolbars();
             handleDeleteRows();
             handleResetForm();
-            handleRowActions();
             KTMenu.createInstances();
+            handleVariantModal();
         });
     }
 
@@ -418,6 +417,28 @@ var KTDatatablesServerSide = function () {
             dt.search('').draw();
         });
     }
+    // Reset Filter
+    var handleVariantModal = () => {
+        // Select reset button
+        $.fn.dataTable.moment('MM/DD/YYYY');
+
+
+          // 2) ADD THIS DELEGATED CLICK HANDLER RIGHT HERE
+          //    (works across redraws and prevents page navigation)
+          const $table = $('#area_datatable');
+          $table
+            .off('click.variant')                            // avoid duplicate bindings
+            .on('click.variant', '.variant-link', function (e) {
+              e.preventDefault();
+              e.stopPropagation();
+
+              const areaId = this.dataset.areaId
+                || $(this).closest('tr').find('input[type="checkbox"]').val();
+
+              VariantModal.open(areaId);
+            });
+
+    }
 
     // Init toggle toolbar
     var handleBatchDeleteRows = function () {
@@ -574,184 +595,94 @@ var KTDatatablesServerSide = function () {
         });
     }
 
-    var handleRowActions = function () {
-        const VariantModal = {
-            modal: document.getElementById("variant_layout"),
-            instance: null,
-            modalContent: null,
+    // ---- Variant modal module (define once) ----
+    const VariantModal = (function () {
+          const modalEl = document.getElementById("variant_layout");
+          let instance = null;
 
-            init: function() {
-                this.instance = new bootstrap.Modal(this.modal);
-                this.modalContent = this.modal.querySelector('.modal-body');
-                this.setupEventListeners();
-            },
+          function ensure() {
+            if (!instance) instance = new bootstrap.Modal(modalEl);
+          }
 
-            setupEventListeners: function() {
-                document.querySelectorAll('.variant-link').forEach((item, i) => {
-                    item.addEventListener('click', (e) => {
-                        // Select parent row
-                        const parent = e.target.closest('tr');
-                        // Get customer name
-                        const id = parent.querySelector('input[type=checkbox]').value;
-                        // Open modal
-                        this.instance.show();
-                        this.initializeModal(id);
-                        this.initializeDataTable(id);
-                    });
-                });
+          function initializeModal() {
+            const body = modalEl.querySelector('.modal-body');
+            body.innerHTML = `
+              <div class="table-responsive">
+                <table id="variant_datatable" class="table align-middle table-row-dashed fs-6 gy-5">
+                  <thead>
+                    <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
+                      <th>VC</th>
+                      <th>Analysis Run</th>
+                      <th>Gene</th>
+                      <th>P Variant</th>
+                      <th>Alias</th>
+                      <th>Coverage</th>
+                      <th>VAF</th>
+                      <th>Caller</th>
+                      <th>Cosmic Gene Symbol</th>
+                      <th>Cosmic AA</th>
+                      <th class="text-center">Primary Site Counts</th>
+                    </tr>
+                  </thead>
+                  <tbody class="text-gray-600 fw-semibold"></tbody>
+                </table>
+              </div>`;
+          }
 
-            },
+          function initializeDataTable(areaId) {
+            // tear down any previous instance to avoid duplicates
+            if ($.fn.DataTable.isDataTable('#variant_datatable')) {
+              $('#variant_datatable').DataTable().clear().destroy();
+              $('#variant_datatable').off();
+            }
 
-            initializeModal: function(areaId) {
-                // Clear modal first
-                this.modal.querySelector('.modal-body').innerHTML = "";
+            $('#variant_datatable').DataTable({
+              processing: true,
+              serverSide: true,
+              ajax: { url: `/variant/get_variants_by_area`, type: 'GET', data: { area_id: areaId } },
+              columns: [
+                { data: 'gvariant_id', visible: false },
+                { data: 'analysis_run_name', className: 'text-gray-800' },
+                { data: 'gene_name',         className: 'text-gray-800' },
+                { data: 'p_variant',         className: 'text-gray-800' },
+                { data: 'alias',             className: 'text-gray-800' },
+                { data: 'coverage',          className: 'text-gray-800' },
+                { data: 'vaf',               className: 'text-gray-800' },
+                { data: 'caller',            className: 'text-gray-800' },
+                { data: 'cosmic_gene_symbol',className: 'text-gray-800' },
+                { data: 'cosmic_aa',         className: 'text-gray-800' },
+                {
+                  data: 'total_site_counts',
+                  className: 'text-gray-800 text-center',
+                  render: function (data, type, row) {
+                    const tip = row.cosmic_primary_site_counts
+                      ? Object.entries(row.cosmic_primary_site_counts).map(([k, v]) => `${k}: ${v}`).join('<br>')
+                      : '';
+                    return `<span data-toggle="tooltip" data-html="true" title="${tip}">${data}</span>`;
+                  }
+                }
+              ],
+              order: [[10, 'desc']],
+              pageLength: 10,
+              lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+              responsive: true
+            });
 
-                const div = document.createElement('div');
-                div.innerHTML = `
-                  <div class="table-responsive">
-                      <table id="variant_datatable" class="table align-middle table-row-dashed fs-6 gy-5">
-                          <thead>
-                              <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
-                                  <th>VC</th>
-                                  <th>Analysis Run</th>
-                                  <th>Gene</th>
-                                  <th>P Variant</th>
-                                  <th>Alias</th>
-                                  <th>Coverage</th>
-                                  <th>VAF</th>
-                                  <th>Caller</th>
-                                  <th>Cosmic Gene Symbol</th>
-                                  <th>Cosmic AA</th>
-                                  <th class="text-center">Primary Site Counts</th>
-                              </tr>
-                          </thead>
-                          <tbody class="text-gray-600 fw-semibold"></tbody>
-                      </table>
-                  </div>`;
+            $('#variant_datatable').on('draw.dt', function () {
+              $('[data-toggle="tooltip"]').tooltip({ html: true });
+            });
+          }
 
-                  this.modalContent.appendChild(div);
-            },
+          return {
+            open(areaId) {
+              ensure();
+              initializeModal();
+              instance.show();
+              initializeDataTable(areaId);
+            }
+          };
+        })();
 
-            showNoDataMessage: function(message) {
-                tabContainer.innerHTML = `
-                    <div class="card">
-                        <div class="card-body p-10 text-center">
-                            <i class="ki-duotone ki-information-5 fs-5x text-primary mb-5">
-                                <span class="path1"></span>
-                                <span class="path2"></span>
-                                <span class="path3"></span>
-                            </i>
-                            <p class="fs-3 fw-semibold text-gray-800 mb-2">${message}</p>
-                            <p class="fs-6 text-gray-600">Please select a different area or check if analysis has been completed.</p>
-                        </div>
-                    </div>
-                `;
-            },
-
-            initializeDataTable: function(areaId) {
-                $(`#variant_datatable`).DataTable({
-                    processing: true,
-                    serverSide: true,
-                    ajax: {
-                        url: `/variant/get_variants_by_area`,
-                        type: 'GET',
-                        data: {
-                            area_id: areaId,
-                        }
-                    },
-                    columns: [
-                        {
-                            data: 'gvariant_id',
-                        },
-                        {
-                            data: 'analysis_run_name',
-                            className: 'text-gray-800'
-                        },
-                        {
-                            data: 'gene_name',
-                            className: 'text-gray-800'
-                        },
-                        {
-                            data: 'p_variant',
-                            className: 'text-gray-800'
-                        },
-                        {
-                            data: 'alias',
-                            className: 'text-gray-800'
-                        },
-                        {
-                            data: 'coverage',
-                            className: 'text-gray-800'
-                        },
-                        {
-                            data: 'vaf',
-                            className: 'text-gray-800',
-                        },
-                        {
-                            data: 'caller',
-                            className: 'text-gray-800',
-                        },
-                        {
-                            data: 'cosmic_gene_symbol',
-                            className: 'text-gray-800',
-                        },
-                        {
-                            data: 'cosmic_aa',
-                            className: 'text-gray-800',
-                        },
-                        {
-                            data: 'total_site_counts',
-                            className: 'text-gray-800 text-center',
-                        }
-                    ],
-                    columnDefs: [
-                        {
-                            targets: 0,
-                            visible: false,
-                        },
-                        {
-                            targets: 1,
-                                orderable: true,
-                                render: function (data, type, row) {
-                                    if (data > 0) {
-                                      let id = row["id"];
-                                      return `
-                                          <a href="/areas?model=block&id=${id}&initial=true">${data}</a>`;
-                                    }
-                                    return data;
-                                }
-                        },
-                        {
-                          targets: -1,
-                          render: function (data, type, row) {
-                              let tooltip = row.cosmic_primary_site_counts
-                                  ? Object.entries(row.cosmic_primary_site_counts)
-                                        .map(([k, v]) => `${k}: ${v}`)
-                                        .join('<br>')
-                                  : '';
-                              return `<span data-toggle="tooltip" data-html="true" title="${tooltip}">${data}</span>`;
-                          }
-                        }
-                    ],
-                    order: [[10, 'desc']],  // Sort by areas by default
-                    pageLength: 10,
-                    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-                    responsive: true
-                });
-
-                $('#variant_datatable').on('draw.dt', function () {
-                    $('[data-toggle="tooltip"]').tooltip({
-                        html: true   // allow HTML so <br> works
-                    });
-                });
-
-            },
-
-        };
-
-        // start the modals
-        VariantModal.init();
-    }
 
     // Toggle toolbars
     var toggleToolbars = function () {

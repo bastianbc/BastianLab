@@ -131,16 +131,15 @@ var KTDatatablesServerSide = function () {
                     }
                 },
                 {
-                    targets: 9,
-                    orderable: true,
-                    render: function (data, type, row) {
-                        if (data > 0) {
-                          let id = row["id"];
-                          return `
-                              <a href="#" class="variant-link text-primary text-decoration-none cursor-pointer">${data}</a>`;
-                        }
-                        return data;
+                  targets: 9,
+                  orderable: true,
+                  render: function (data, type, row) {
+                    if (data > 0) {
+                      // no navigation; carry the block id for the delegated click handler
+                      return `<a href="#" class="variant-link text-primary text-decoration-none cursor-pointer" data-block-id="${row.id}" role="button">${data}</a>`;
                     }
+                    return data;
+                  }
                 },
                 {
                     targets: -1,
@@ -216,7 +215,7 @@ var KTDatatablesServerSide = function () {
             handleDeleteRows();
             handleResetForm();
             initShowScanImage();
-            handleRowActions();
+            handleVariantModal();
             handleSelectedRows.init();
             KTMenu.createInstances();
         });
@@ -284,6 +283,22 @@ var KTDatatablesServerSide = function () {
             }
         });
 
+    }
+
+    var handleVariantModal = function () {
+       // Delegate click so it survives redraws; prevent page navigation
+        const $table = $('#block_datatable');
+        $table
+          .off('click.variant') // avoid duplicate bindings if initDatatable re-runs
+          .on('click.variant', '.variant-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const blockId = this.dataset.blockId
+              || $(this).closest('tr').find('input[type="checkbox"]').val();
+
+            VariantModalByArea.open(blockId);
+          });
     }
 
     var initShowScanImage = function () {
@@ -993,230 +1008,155 @@ var KTDatatablesServerSide = function () {
 
     }
 
-    var handleRowActions = function () {
-        // Area Base Variant Modal
-        const VariantModalByArea = {
-            modal: document.getElementById("variant_layout_by_area"),
-            instance: null,
-            tabContainer: null,
-            tabContent: null,
 
-            init: function() {
-                this.instance = new bootstrap.Modal(this.modal);
-                this.tabContainer = this.modal.querySelector('.variant-tab-container');
-                this.tabContent = this.modal.querySelector('.tab-content');
-                this.setupEventListeners();
-            },
+    // Redirects from other pages
+    var handleInitialValue = () => {
 
-            setupEventListeners: function() {
-                document.querySelectorAll('.variant-link').forEach((item, i) => {
-                    item.addEventListener('click', (e) => {
-                        // Select parent row
-                        const parent = e.target.closest('tr');
-                        // Get customer name
-                        const id = parent.querySelector('input[type=checkbox]').value;
-                        // Open modal
-                        this.instance.show();
-                        this.initializeModal(id);
-                    });
-                });
+      // Remove parameters in URL
+      function cleanUrl() {
+        window.history.replaceState(null, null, window.location.pathname);
+      }
 
-            },
+      const params = new URLSearchParams(window.location.search);
+      const model = params.get('model');
+      const id = params.get('id');
+      const initial = params.get('initial');
 
-            initializeModal: function(blockId) {
-                // Clear modal first
-                this.tabContainer.innerHTML = "";
-                this.tabContent.innerHTML = "";
+      cleanUrl();
 
-                fetch(`/blocks/get_block_areas/${blockId}/`)
-                    .then(response => response.json())
-                    .then(data => {
-                        // fill the details
-                        this.populateBlockDetails(data);
+      if (initial =="true" && model != null && id !=null) {
 
-                        // create areas
-                        data.areas.forEach((area, index) => {
-                            // Create tab
-                            const isActive = index === 0;
-                            const tabId = `area_${index}`;
+        return JSON.stringify({
+          "model": model,
+          "id": id
+        });
 
-                            this.createTab(tabId, area.name, isActive);
-                            this.createTabPane(tabId, area.id, isActive, data.block.id);
-                            this.initializeDataTable(area.id);
-                        });
-                    })
-                    .catch(error => {
-                        console.error('Could not get block data:', error);
-                    });
+      }
 
-            },
+      return null;
 
-            populateBlockDetails: function(data) {
-                this.modal.querySelector('a[name="patient_id"]').textContent = data.patient_id;
-                this.modal.querySelector('a[name="block_name"]').textContent = data.block.name;
-                this.modal.querySelector('a[name="diagnosis"]').textContent = data.block.diagnosis;
-                this.modal.querySelector('a[name="body_site"]').textContent = data.block.body_site;
-            },
-
-            showNoDataMessage: function(message) {
-                tabContainer.innerHTML = `
-                    <div class="card">
-                        <div class="card-body p-10 text-center">
-                            <i class="ki-duotone ki-information-5 fs-5x text-primary mb-5">
-                                <span class="path1"></span>
-                                <span class="path2"></span>
-                                <span class="path3"></span>
-                            </i>
-                            <p class="fs-3 fw-semibold text-gray-800 mb-2">${message}</p>
-                            <p class="fs-6 text-gray-600">Please select a different area or check if analysis has been completed.</p>
-                        </div>
-                    </div>
-                `;
-            },
-
-            createTab: function(id, text, isActive) {
-                const li = document.createElement('li');
-                li.className = 'nav-item';
-                li.innerHTML = `
-                    <a class="nav-link text-active-primary pb-4 ${isActive ? 'active' : ''}"
-                       data-bs-toggle="tab"
-                       href="#${id}">
-                       ${text}
-                    </a>`;
-                this.tabContainer.appendChild(li);
-            },
-
-            createTabPane: function(id, areaId, isActive, blockId) {
-                const div = document.createElement('div');
-                div.className = `tab-pane fade ${isActive ? 'show active' : ''}`;
-                div.id = id;
-                div.innerHTML = `
-                  <div class="table-responsive">
-                      <table id="variant_datatable_${areaId}" class="table align-middle table-row-dashed fs-6 gy-5">
-                          <thead>
-                              <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
-                                  <th>VC</th>
-                                  <th>Analysis Run</th>
-                                  <th>Gene</th>
-                                  <th>P Variant</th>
-                                  <th>Alias</th>
-                                  <th>Coverage</th>
-                                  <th>VAF</th>
-                                  <th>Caller</th>
-                                  <th>Cosmic Gene Symbol</th>
-                                  <th>Cosmic AA</th>
-                                  <th>Primary Site Counts</th>
-                              </tr>
-                          </thead>
-                          <tbody class="text-gray-600 fw-semibold"></tbody>
-                      </table>
-                  </div>`;
-                this.tabContent.appendChild(div);
-            },
-
-            initializeDataTable: function(areaId) {
-                $(`#variant_datatable_${areaId}`).DataTable({
-                    processing: true,
-                    serverSide: true,
-                    ajax: {
-                        url: `/variant/get_variants_by_area`,
-                        type: 'GET',
-                        data: {
-                            area_id: areaId,
-                        }
-                    },
-                    columns: [
-                        {
-                            data: 'gvariant_id',
-                        },
-                        {
-                            data: 'analysis_run_name',
-                            className: 'text-gray-800'
-                        },
-                        {
-                            data: 'gene_name',
-                            className: 'text-gray-800'
-                        },
-                        {
-                            data: 'p_variant',
-                            className: 'text-gray-800'
-                        },
-                        {
-                            data: 'alias',
-                            className: 'text-gray-800'
-                        },
-                        {
-                            data: 'coverage',
-                            className: 'text-gray-800'
-                        },
-                        {
-                            data: 'vaf',
-                            className: 'text-gray-800',
-                        },
-                        {
-                            data: 'caller',
-                            className: 'text-gray-800',
-                        },
-                        {
-                            data: 'cosmic_gene_symbol',
-                            className: 'text-gray-800',
-                        },
-                        {
-                            data: 'cosmic_aa',
-                            className: 'text-gray-800',
-                        },
-                        {
-                            data: 'total_site_counts',
-                            className: 'text-gray-800 text-center',
-                        }
-                    ],
-                    columnDefs: [
-                        {
-                            targets: 0,
-                            visible: false,
-                        },
-                        {
-                            targets: 1,
-                                orderable: true,
-                                render: function (data, type, row) {
-                                    if (data > 0) {
-                                      let id = row["id"];
-                                      return `
-                                          <a href="/areas?model=block&id=${id}&initial=true">${data}</a>`;
-                                    }
-                                    return data;
-                                }
-                        },
-                        {
-                          targets: -1,
-                          render: function (data, type, row) {
-                              let tooltip = row.cosmic_primary_site_counts
-                                  ? Object.entries(row.cosmic_primary_site_counts)
-                                        .map(([k, v]) => `${k}: ${v}`)
-                                        .join('<br>')
-                                  : '';
-                              return `<span data-toggle="tooltip" data-html="true" title="${tooltip}">${data}</span>`;
-                          }
-                        }
-                    ],
-                    order: [[10, 'desc']],  // Sort by areas by default
-                    pageLength: 10,
-                    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-                    responsive: true
-                });
-
-                $(`#variant_datatable_${areaId}`).on('draw.dt', function () {
-                    $('[data-toggle="tooltip"]').tooltip({
-                        html: true   // allow HTML so <br> works
-                    });
-                });
-            },
-
-        };
-
-        // start the modals
-        VariantModalByArea.init();
     }
+
+    // Area-based Variant Modal (define once; callable via VariantModalByArea.open)
+    const VariantModalByArea = (function () {
+          const modal = document.getElementById("variant_layout_by_area");
+          let instance = null;
+          let tabContainer = null;
+          let tabContent = null;
+
+          function ensure() {
+            if (!instance) instance = new bootstrap.Modal(modal);
+            if (!tabContainer) tabContainer = modal.querySelector('.variant-tab-container');
+            if (!tabContent)   tabContent   = modal.querySelector('.tab-content');
+          }
+
+          function clearModal() {
+            tabContainer.innerHTML = "";
+            tabContent.innerHTML = "";
+          }
+
+          function populateBlockDetails(data) {
+            modal.querySelector('a[name="patient_id"]').textContent = data.patient_id;
+            modal.querySelector('a[name="block_name"]').textContent  = data.block.name;
+            modal.querySelector('a[name="diagnosis"]').textContent   = data.block.diagnosis;
+            modal.querySelector('a[name="body_site"]').textContent   = data.block.body_site;
+          }
+
+          function createTab(id, text, isActive) {
+            const li = document.createElement('li');
+            li.className = 'nav-item';
+            li.innerHTML = `
+              <a class="nav-link text-active-primary pb-4 ${isActive ? 'active' : ''}"
+                 data-bs-toggle="tab" href="#${id}">${text}</a>`;
+            tabContainer.appendChild(li);
+          }
+
+          function createTabPane(id, areaId, isActive) {
+            const div = document.createElement('div');
+            div.className = `tab-pane fade ${isActive ? 'show active' : ''}`;
+            div.id = id;
+            div.innerHTML = `
+              <div class="table-responsive">
+                <table id="variant_datatable_${areaId}" class="table align-middle table-row-dashed fs-6 gy-5">
+                  <thead>
+                    <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
+                      <th>VC</th><th>Analysis Run</th><th>Gene</th><th>P Variant</th>
+                      <th>Alias</th><th>Coverage</th><th>VAF</th><th>Caller</th>
+                      <th>Cosmic Gene Symbol</th><th>Cosmic AA</th><th>Primary Site Counts</th>
+                    </tr>
+                  </thead>
+                  <tbody class="text-gray-600 fw-semibold"></tbody>
+                </table>
+              </div>`;
+            tabContent.appendChild(div);
+          }
+
+          function initAreaVariantsTable(areaId) {
+            const sel = `#variant_datatable_${areaId}`;
+            if ($.fn.DataTable.isDataTable(sel)) {
+              $(sel).DataTable().clear().destroy();
+              $(sel).off();
+            }
+            $(sel).DataTable({
+              processing: true,
+              serverSide: true,
+              ajax: { url: `/variant/get_variants_by_area`, type: 'GET', data: { area_id: areaId } },
+              columns: [
+                { data: 'gvariant_id', visible: false },
+                { data: 'analysis_run_name', className: 'text-gray-800' },
+                { data: 'gene_name',         className: 'text-gray-800' },
+                { data: 'p_variant',         className: 'text-gray-800' },
+                { data: 'alias',             className: 'text-gray-800' },
+                { data: 'coverage',          className: 'text-gray-800' },
+                { data: 'vaf',               className: 'text-gray-800' },
+                { data: 'caller',            className: 'text-gray-800' },
+                { data: 'cosmic_gene_symbol',className: 'text-gray-800' },
+                { data: 'cosmic_aa',         className: 'text-gray-800' },
+                {
+                  data: 'total_site_counts',
+                  className: 'text-gray-800 text-center',
+                  render: function (data, type, row) {
+                    const tip = row.cosmic_primary_site_counts
+                      ? Object.entries(row.cosmic_primary_site_counts).map(([k, v]) => `${k}: ${v}`).join('<br>')
+                      : '';
+                    return `<span data-toggle="tooltip" data-html="true" title="${tip}">${data}</span>`;
+                  }
+                }
+              ],
+              order: [[10, 'desc']],
+              pageLength: 10,
+              lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+              responsive: true
+            });
+
+            $(sel).on('draw.dt', function () {
+              $('[data-toggle="tooltip"]').tooltip({ html: true });
+            });
+          }
+
+          async function build(blockId) {
+            clearModal();
+            const resp = await fetch(`/blocks/get_block_areas/${blockId}/`);
+            const data = await resp.json();
+
+            populateBlockDetails(data);
+
+            data.areas.forEach((area, index) => {
+              const isActive = index === 0;
+              const tabId = `area_${index}`;
+              createTab(tabId, area.name, isActive);
+              createTabPane(tabId, area.id, isActive);
+              initAreaVariantsTable(area.id);
+            });
+          }
+
+          return {
+            init() { ensure(); },                     // call once on page init
+            async open(blockId) { ensure(); instance.show(); await build(blockId); }
+          };
+        })();
+
+
     $(document).on('click', '.show-popup', function (e) {
         e.preventDefault();
         let details = $(this).data('details');
