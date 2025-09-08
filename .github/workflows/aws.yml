@@ -1,68 +1,46 @@
-name: EC2 Pull & Restart (Django)
+name: Deploy to EC2 (Django)
 
 on:
   push:
-    branches: [ main ]
-  workflow_dispatch:
+    branches:
+      - master
 
 concurrency:
-  group: deploy-${{ github.ref }}
-  cancel-in-progress: true
-
-env:
-  TARGET_DIR: /home/ssm-user/project/BastianLab
-  GUNICORN_SERVICE: gunicorn        # change if your unit name differs
-  NGINX_SERVICE: nginx
-
-permissions:
-  contents: read
+  group: ec2-deploy-bastianlab
+  cancel-in-progress: false
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: production
     steps:
-      - name: Connectivity check
+      - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}        # ssm-user
-          key: ${{ secrets.SSH_KEY }}              # private key
-          port: ${{ secrets.SSH_PORT || 22 }}
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}   # set to "ssm-user"
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          port: ${{ secrets.EC2_SSH_PORT }}       # optional, default 22
           script_stop: true
           script: |
-            whoami
-            hostname
-            ls -ld ${{ env.TARGET_DIR }}
+            set -euo pipefail
 
-      - name: Deploy (git pull + restart services)
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.SSH_PORT || 22 }}
-          script_stop: true
-          script: |
-            set -Eeuo pipefail
-            cd ${{ env.TARGET_DIR }}
+            cd /home/ssm-user/project/BastianLab
+
+            # Pull exactly what's on master to avoid drift
             git fetch --prune origin
-            git checkout main
-            git pull --ff-only origin main
+            git reset --hard origin/master
 
-            # OPTIONAL Django ops (uncomment if/when you need them)
-            # source venv/bin/activate || true
-            # pip install -r requirements.txt
-            # python manage.py migrate --noinput
-            # python manage.py collectstatic --noinput
+            # Your requested sequence
+            sudo systemctl daemon-reload
 
-            # Restart services (non-interactive sudo)
-            sudo -n systemctl daemon-reload
-            sudo -n systemctl restart ${{ env.GUNICORN_SERVICE }}
-            sudo -n nginx -t
-            sudo -n systemctl restart ${{ env.NGINX_SERVICE }}
+            # If your service file is named gunicorn.service, this is correct:
+            sudo systemctl restart gunicorn
 
-            # Quick verification
-            sudo -n systemctl is-active ${{ env.GUNICORN_SERVICE }}
-            sudo -n systemctl is-active ${{ env.NGINX_SERVICE }}
-            git rev-parse --short HEAD
+            # Validate Nginx config before bouncing it
+            sudo nginx -t
+            sudo systemctl restart nginx
+
+            # Postgres reload (ignore if service name differs)
+            sudo systemctl reload postgresql || true
+
+            echo "✅ Deploy finished on $(hostname) at $(date)"
