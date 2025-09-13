@@ -50,7 +50,7 @@ def get_file_sets(sequencing_run, sample_libs):
 
     paginator = s3.get_paginator("list_objects_v2")
     file_list = []
-    for page in paginator.paginate(Bucket=bucket, Path=path):
+    for page in paginator.paginate(Bucket=bucket, Prefix=path):
         for obj in page.get("Contents", []):
             key = obj["Key"]
             if key.endswith((".fastq.gz", ".bam", ".bai")):
