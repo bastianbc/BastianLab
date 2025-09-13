@@ -17,7 +17,6 @@ from django.core.files.base import ContentFile
 from capturedlib.models import SL_CL_LINK
 import json
 from analysisrun.forms import AnalysisRunForm
-from sequencingfile.views import execute_mount_script
 from sheet.api import _get_authorizated_queryset
 from sheet.service import CustomSampleLibSerializer
 
