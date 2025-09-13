@@ -115,6 +115,7 @@ def get_type(file):
 
 
 def get_or_create_file(file, fs):
+    print(file, fs)
     try:
         _file = SequencingFile.objects.get(name=file)
         _file.sequencing_file_set = fs
