@@ -117,7 +117,7 @@ def get_type(file):
 def get_or_create_file(file, fs):
     print(file, fs)
     try:
-        _file = SequencingFile.objects.get(name=file)
+        _file = SequencingFile.objects.get(name=file.split("/")[-1])
         _file.sequencing_file_set = fs
         _file.type = get_type(file)
         _file.save()
