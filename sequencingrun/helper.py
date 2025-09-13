@@ -46,22 +46,43 @@ def get_file_tree(file_list, path, sequencing_run, sample_libs):
     except ObjectDoesNotExist as e:
         print(e)
         return
+#
+#
+# def get_file_sets(sequencing_run, sample_libs):
+#     files = os.path.join(settings.HISEQDATA_DIRECTORY, sequencing_run.name)
+#     if not os.path.exists(files):
+#         raise FileNotFoundError(f"Directory not found {os.path.join(settings.HISEQDATA_DIRECTORY, sequencing_run.name)}")
+#     file_list = []
+#     file_sets = defaultdict(list)
+#     for root, dirs, files in os.walk(files):
+#         # print(root,dirs,files)
+#         for file in files:
+#             # print(file)
+#             if file.strip().endswith(".fastq.gz") | file.strip().endswith(".bam") | file.strip().endswith(".bai"):
+#                 file_list.append(file)
+#     print(get_file_tree(file_list, root, sequencing_run, sample_libs))
+#     return [{'file_set': key, 'files': value} for key, value in get_file_tree(file_list, root, sequencing_run, sample_libs).items()]
+import boto3
+from collections import defaultdict
+
+s3 = boto3.client("s3")
 
 
 def get_file_sets(sequencing_run, sample_libs):
-    files = os.path.join(settings.HISEQDATA_DIRECTORY, sequencing_run.name)
-    if not os.path.exists(files):
-        raise FileNotFoundError(f"Directory not found {os.path.join(settings.HISEQDATA_DIRECTORY, sequencing_run.name)}")
+    bucket = settings.AWS_STORAGE_BUCKET_NAME
+    prefix = f"BastianRaid-02/HiSeqData/{sequencing_run.name}/"
+
+    paginator = s3.get_paginator("list_objects_v2")
     file_list = []
-    file_sets = defaultdict(list)
-    for root, dirs, files in os.walk(files):
-        # print(root,dirs,files)
-        for file in files:
-            # print(file)
-            if file.strip().endswith(".fastq.gz") | file.strip().endswith(".bam") | file.strip().endswith(".bai"):
-                file_list.append(file)
-    print(get_file_tree(file_list, root, sequencing_run, sample_libs))
-    return [{'file_set': key, 'files': value} for key, value in get_file_tree(file_list, root, sequencing_run, sample_libs).items()]
+    for page in paginator.paginate(Bucket=bucket, Prefix=prefix):
+        for obj in page.get("Contents", []):
+            key = obj["Key"]
+            if key.endswith((".fastq.gz", ".bam", ".bai")):
+                file_list.append(key)
+
+    # Adapt get_file_tree to handle S3 keys
+    file_sets = get_file_tree(file_list, prefix, sequencing_run, sample_libs)
+    return [{"file_set": k, "files": v} for k, v in file_sets.items()]
 
 
 def get_or_create_file_set(sample, sequencing_run, file):
