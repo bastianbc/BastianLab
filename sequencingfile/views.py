@@ -516,23 +516,6 @@ def filter_temp_directory(request):
 
     return JsonResponse(result)
 
-def execute_mount_script():
-    try:
-        # Define your bash commands
-        commands = [
-            "sudo ufw disable",
-            "sudo mount -v -t cifs //bastianlab.ucsf.edu/labshare /mnt/labshare -o credentials=/etc/smbcredentials,file_mode=0777,dir_mode=0777"
-        ]
-
-        # Execute the commands using subprocess
-        for cmd in commands:
-            process = subprocess.run(cmd, shell=True, check=True, text=True, capture_output=True)
-        return True
-    except subprocess.CalledProcessError as e:
-        return False
-
-
-
 from pathlib import Path
 
 from django.conf import settings

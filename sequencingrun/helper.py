@@ -139,9 +139,11 @@ def create_files_and_sets(file_sets, sequencing_run):
         sample_lib = SampleLib.objects.get(name=item['file_set'])
         print(sample_lib)
         if item['files']:
-            print("1"*100)
+            print("2"*10)
             for file in item['files']:
+                print("3" * 10)
                 fs = get_or_create_file_set(sample_lib, sequencing_run, file)
+                print("4" * 10)
                 _file = get_or_create_file(file,fs)
                 files.append(_file.name)
     return files

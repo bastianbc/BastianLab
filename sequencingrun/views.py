@@ -194,8 +194,7 @@ def add_async(request):
         return JsonResponse({"success":False, "message": str(e)})
 
 def get_sequencing_files(request, id):
-    # execute_mount_script()
-    # try:
+    try:
         sequencing_run = SequencingRun.objects.get(id=id)
         sample_libs = SampleLib.objects.filter(sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct().order_by('name')
         file_sets = helper.get_file_sets(sequencing_run, sample_libs)
@@ -205,9 +204,9 @@ def get_sequencing_files(request, id):
             "sample_libs": SingleSampleLibSerializer(sample_libs, many=True).data,
             "sequencing_run": SingleSequencingRunSerializer(sequencing_run).data
         })
-    # except Exception as e:
-    #     print("$"*100)
-    #     return JsonResponse({"success": False, "message": str(e)})
+    except Exception as e:
+        print("$"*100)
+        return JsonResponse({"success": False, "message": str(e)})
 
 def save_sequencing_files(request, id):
     try:
@@ -220,6 +219,8 @@ def save_sequencing_files(request, id):
         # get posted data
         # files from source directory
         file_sets = helper.get_file_sets(sequencing_run, sample_libs)
+        print("1"*10)
+
         print(file_sets)
         files_created = helper.create_files_and_sets(file_sets, sequencing_run)
         print(files_created)
