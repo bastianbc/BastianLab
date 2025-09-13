@@ -86,6 +86,7 @@ def get_file_sets(sequencing_run, sample_libs):
 
 
 def get_or_create_file_set(sample, sequencing_run, file):
+    print(file,)
     try:
         fs = SequencingFileSet.objects.filter(
             sequencing_run=sequencing_run,
@@ -96,7 +97,8 @@ def get_or_create_file_set(sample, sequencing_run, file):
             fs = SequencingFileSet.objects.create(
                 prefix=generate_prefix(file),
                 sequencing_run=sequencing_run,
-                sample_lib=sample
+                sample_lib=sample,
+
             )
             print("set created")
         return fs
@@ -138,13 +140,10 @@ def create_files_and_sets(file_sets, sequencing_run):
     files = []
     for item in file_sets:
         sample_lib = SampleLib.objects.get(name=item['file_set'])
-        print(sample_lib)
         if item['files']:
-            print("2"*10)
             for file in item['files']:
-                print("3" * 10)
+                print("file_sets:", item)
                 fs = get_or_create_file_set(sample_lib, sequencing_run, file)
-                print("4" * 10)
                 _file = get_or_create_file(file,fs)
                 files.append(_file.name)
     return files
