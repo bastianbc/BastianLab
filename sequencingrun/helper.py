@@ -8,31 +8,6 @@ from collections import defaultdict
 from collections import defaultdict
 from samplelib.models import SampleLib
 
-def generate_prefix(x):
-    prefix = "*"*30
-    match = re.match(r'(\w+)[-_]([ACTG]{6,8}(?:-[ACTG]{6,8})?)', x)
-    if match:
-        dna = match.group(2)
-        prefix = x.split(dna)[0] + dna
-    elif ".fastq" in x:
-        prefix = x.split("_L0")[0]
-        if "." in prefix:
-            prefix = x.split("_R")[0]
-    elif ".sorted" in x:
-        prefix = x.split(".sorted")[0]
-    elif "deduplicated.realign.bam" in x:
-        prefix = x.split(".deduplicated.realign.bam")[0]
-    elif ".bam" in x and "deduplicated" not in x:
-        prefix = x.split(".bam")[0]
-        if "." in prefix:
-            prefix = x.split(".sortq")[0]
-    elif ".bai" in x and not ".bam" in x:
-        prefix = x.split(".bai")[0]
-
-    if "." not in prefix:
-        return prefix
-    return
-
 
 
 def get_file_tree(file_list, path, sequencing_run, sample_libs):
@@ -62,6 +37,7 @@ def get_file_tree(file_list, path, sequencing_run, sample_libs):
 #                 file_list.append(file)
 #     print(get_file_tree(file_list, root, sequencing_run, sample_libs))
 #     return [{'file_set': key, 'files': value} for key, value in get_file_tree(file_list, root, sequencing_run, sample_libs).items()]
+
 import boto3
 from collections import defaultdict
 
@@ -70,32 +46,31 @@ s3 = boto3.client("s3")
 
 def get_file_sets(sequencing_run, sample_libs):
     bucket = settings.AWS_STORAGE_BUCKET_NAME
-    prefix = f"BastianRaid-02/HiSeqData/{sequencing_run.name}/"
+    path = f"BastianRaid-02/HiSeqData/{sequencing_run.name}/"
 
     paginator = s3.get_paginator("list_objects_v2")
     file_list = []
-    for page in paginator.paginate(Bucket=bucket, Prefix=prefix):
+    for page in paginator.paginate(Bucket=bucket, Path=path):
         for obj in page.get("Contents", []):
             key = obj["Key"]
             if key.endswith((".fastq.gz", ".bam", ".bai")):
                 file_list.append(key)
 
     # Adapt get_file_tree to handle S3 keys
-    file_sets = get_file_tree(file_list, prefix, sequencing_run, sample_libs)
+    file_sets = get_file_tree(file_list, path, sequencing_run, sample_libs)
     return [{"file_set": k, "files": v} for k, v in file_sets.items()]
 
 
 def get_or_create_file_set(sample, sequencing_run, file):
-    print(file,)
     try:
         fs = SequencingFileSet.objects.filter(
             sequencing_run=sequencing_run,
             sample_lib=sample
         ).first()
         if not fs:
-            generate_prefix(file)
+            prefix = SequencingFile.generate_prefix(file)
             fs = SequencingFileSet.objects.create(
-                prefix=generate_prefix(file),
+                prefix=prefix,
                 sequencing_run=sequencing_run,
                 sample_lib=sample,
 
@@ -142,7 +117,6 @@ def create_files_and_sets(file_sets, sequencing_run):
         sample_lib = SampleLib.objects.get(name=item['file_set'])
         if item['files']:
             for file in item['files']:
-                print("file_sets:", item)
                 fs = get_or_create_file_set(sample_lib, sequencing_run, file)
                 _file = get_or_create_file(file,fs)
                 files.append(_file.name)
