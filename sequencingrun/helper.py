@@ -62,7 +62,7 @@ def get_file_sets(sequencing_run, sample_libs):
 
 
 def get_or_create_file_set(sample, sequencing_run, file):
-    try:
+    # try:
         fs = SequencingFileSet.objects.filter(
             sequencing_run=sequencing_run,
             sample_lib=sample
@@ -78,8 +78,8 @@ def get_or_create_file_set(sample, sequencing_run, file):
             )
             print("set created")
         return fs
-    except Exception as e:
-        print(e)
+    # except Exception as e:
+    #     print(e)
 
 
 def get_type(file):
