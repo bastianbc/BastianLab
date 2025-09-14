@@ -73,7 +73,7 @@ def get_or_create_file_set(sample, sequencing_run, file):
                 prefix=prefix,
                 sequencing_run=sequencing_run,
                 sample_lib=sample,
-
+                path=file.rsplit("/", 1)[0]
             )
             print("set created")
         return fs

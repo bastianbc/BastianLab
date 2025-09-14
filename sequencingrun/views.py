@@ -211,8 +211,8 @@ def save_sequencing_files(request, id):
     # try:
         sequencing_run = SequencingRun.objects.get(id=id)
         sample_libs = SampleLib.objects.filter(
-            sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run).distinct().order_by(
-            'name')
+            sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run
+        ).distinct().order_by('name')
         data = json.loads(request.POST.get('data'))
         print("*"*100, data)
         # files from source directory
