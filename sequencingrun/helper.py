@@ -66,10 +66,12 @@ def get_or_create_file_set(sample, sequencing_run, file):
         print(sample,sequencing_run)
         prefix, file_type = SequencingFileSet.generate_prefix(file.split("/")[-1])
         fs = SequencingFileSet.objects.filter(
-            sequencing_run=sequencing_run,
-            sample_lib=sample,
             prefix=prefix
         ).first()
+        fs.sequencing_run = sequencing_run
+        fs.sample_lib = sample
+        fs.path = file.rsplit("/", 1)[0]
+        fs.save()
         if not fs:
             print("^^^^",file.split("/")[-1])
 
