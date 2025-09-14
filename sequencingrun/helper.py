@@ -70,7 +70,7 @@ def get_or_create_file_set(sample, sequencing_run, file):
         if not fs:
             print(file.split("/")[-1])
             prefix = SequencingFileSet.generate_prefix(file.split("/")[-1])
-            fs = SequencingFileSet.objects.create(
+            fs, _ = SequencingFileSet.objects.create(
                 prefix=prefix,
                 sequencing_run=sequencing_run,
                 sample_lib=sample,
