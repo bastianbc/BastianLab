@@ -303,11 +303,27 @@ def import_csv_qpcr_analysis(request):
         graphic = qpcr.create_normalization_curve()
         results = qpcr.calculate_concentration()
 
-        for result in results:
-            sample_lib = SampleLib.objects.get(name=result[0])
-            sample_lib.update_qpcr(result[1])
+        missing_samples = set()
 
-        return JsonResponse({"success": True, "graphic":graphic, "sample_libs":[result[0] for result in results if result[0] != ""]})  # Return a JSON response indicating success
+        for name, value in results:
+            try:
+                sample_lib = SampleLib.objects.get(name=name)
+                sample_lib.update_qpcr(value)
+            except SampleLib.DoesNotExist:
+                missing_samples.add(name)
+
+        if missing_samples:
+            return JsonResponse({
+                "success": False,
+                "message": f"Some sample library records could not be found\n: {','.join(sorted(missing_samples))}",
+            })
+
+        return JsonResponse({
+            "success": True,
+            "graphic": graphic,
+            "sample_libs": [name for name, _ in results if name]
+        })
+
     except Exception as e:
         print(e)
-        return JsonResponse({"success": False, "message":str(e)})  # Return a JSON response indicating success
+        return JsonResponse({"success": False, "message": str(e)})
