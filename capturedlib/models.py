@@ -17,7 +17,7 @@ class CapturedLib(models.Model):
     nm = models.FloatField(default=0, verbose_name="nM")
     vol_init = models.FloatField(default=0, verbose_name="Volume Initialize")
     vol_remain = models.FloatField(default=0, verbose_name="Volume Remain")
-    pdf = models.FileField(upload_to="uploads/", null=True, blank=True)
+    pdf = models.FileField(upload_to="uploads/captured_lib_pdf_attachments", null=True, blank=True)
     notes = models.TextField(blank=True, null=True, verbose_name="Notes")
 
     class Meta:
