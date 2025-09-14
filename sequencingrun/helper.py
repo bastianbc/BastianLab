@@ -69,7 +69,7 @@ def get_or_create_file_set(sample, sequencing_run, file):
         ).first()
         if not fs:
             print("^^^^",file.split("/")[-1])
-            prefix = SequencingFileSet.generate_prefix(file.split("/")[-1])
+            prefix, file_type = SequencingFileSet.generate_prefix(file.split("/")[-1])
             fs = SequencingFileSet.objects.create(
                 prefix=prefix,
                 sequencing_run=sequencing_run,
