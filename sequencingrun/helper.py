@@ -63,13 +63,16 @@ def get_file_sets(sequencing_run, sample_libs):
 
 def get_or_create_file_set(sample, sequencing_run, file):
     # try:
+        print(sample,sequencing_run)
+        prefix, file_type = SequencingFileSet.generate_prefix(file.split("/")[-1])
         fs = SequencingFileSet.objects.filter(
             sequencing_run=sequencing_run,
-            sample_lib=sample
+            sample_lib=sample,
+            prefix=prefix
         ).first()
         if not fs:
             print("^^^^",file.split("/")[-1])
-            prefix, file_type = SequencingFileSet.generate_prefix(file.split("/")[-1])
+
             fs = SequencingFileSet.objects.create(
                 prefix=prefix,
                 sequencing_run=sequencing_run,
