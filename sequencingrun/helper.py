@@ -41,6 +41,7 @@ def get_file_sets(sequencing_run, sample_libs):
     print(file_list)
     # Adapt get_file_tree to handle S3 keys
     file_sets = get_file_tree(file_list, path, sequencing_run, sample_libs)
+    print(file_sets)
     return [{"file_set": k, "files": v} for k, v in file_sets.items()]
 
 
