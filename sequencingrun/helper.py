@@ -68,12 +68,13 @@ def get_or_create_file_set(sample, sequencing_run, file):
             sample_lib=sample
         ).first()
         if not fs:
-            prefix = SequencingFileSet.generate_prefix(file.rsplit("/", 1)[0])
+            print(file.split("/")[-1])
+            prefix = SequencingFileSet.generate_prefix(file.split("/")[-1])
             fs = SequencingFileSet.objects.create(
                 prefix=prefix,
                 sequencing_run=sequencing_run,
                 sample_lib=sample,
-                path=file.rsplit("/", 1)[0]
+                path=file.split("/")[-1]
             )
             print("set created")
         return fs
