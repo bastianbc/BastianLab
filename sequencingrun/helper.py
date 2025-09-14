@@ -52,10 +52,6 @@ def get_or_create_file_set(sample, sequencing_run, file):
         fs = SequencingFileSet.objects.filter(
             prefix=prefix
         ).first()
-        fs.sequencing_run = sequencing_run
-        fs.sample_lib = sample
-        fs.path = file.rsplit("/", 1)[0]
-        fs.save()
         if not fs:
             fs = SequencingFileSet.objects.create(
                 prefix=prefix,
@@ -63,6 +59,11 @@ def get_or_create_file_set(sample, sequencing_run, file):
                 sample_lib=sample,
                 path=file.split("/")[-1]
             )
+        else:
+            fs.sequencing_run = sequencing_run
+            fs.sample_lib = sample
+            fs.path = file.rsplit("/", 1)[0]
+            fs.save()
         return fs
     except Exception as e:
         print(e)
