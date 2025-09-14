@@ -122,7 +122,8 @@ class QPCRAnalysis():
                 self.standart_data.append([std_number, concentration_pm, ct_value])
             elif index >= 3 and  not row[3] == "": # real sample library data
                 ct_value = 0 if row[4] == "" else float(row[4])
-                sample_lib = row[3]
+                if not row[3] in ["EMPTY",]:
+                    sample_lib = row[3]
                 values.append((sample_lib, ct_value))
 
         # Sample data: # Sample data of three SLs with their duplicates in positions 1 and 2 of the tuple and a constant Average fragment length (bp) of 999 to be added for all in position 3 of the tuple]
