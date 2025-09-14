@@ -118,6 +118,7 @@ def create_files_and_sets(file_sets, sequencing_run):
         if item['files']:
             for file in item['files']:
                 fs = get_or_create_file_set(sample_lib, sequencing_run, file)
+                print("%%%",fs)
                 _file = get_or_create_file(file,fs)
                 files.append(_file.name)
     return files
