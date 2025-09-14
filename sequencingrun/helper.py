@@ -34,12 +34,11 @@ def get_file_sets(sequencing_run, sample_libs):
     paginator = s3.get_paginator("list_objects_v2")
     file_list = []
     for page in paginator.paginate(Bucket=bucket, Prefix=path):
-        print(page)
         for obj in page.get("Contents", []):
             key = obj["Key"]
             if key.endswith((".fastq.gz", ".bam", ".bai")):
                 file_list.append(key)
-
+    print(file_list)
     # Adapt get_file_tree to handle S3 keys
     file_sets = get_file_tree(file_list, path, sequencing_run, sample_libs)
     return [{"file_set": k, "files": v} for k, v in file_sets.items()]
