@@ -208,13 +208,12 @@ def get_sequencing_files(request, id):
         return JsonResponse({"success": False, "message": str(e)})
 
 def save_sequencing_files(request, id):
-    # try:
+    try:
         sequencing_run = SequencingRun.objects.get(id=id)
         sample_libs = SampleLib.objects.filter(
             sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs=sequencing_run
         ).distinct().order_by('name')
         data = json.loads(request.POST.get('data'))
-        print("*"*100, data)
         # files from source directory
         file_sets = helper.get_file_sets(sequencing_run, sample_libs)
         print("1"*10)
@@ -226,9 +225,9 @@ def save_sequencing_files(request, id):
             return JsonResponse({"success": True, "data": files_created})
         else:
             return JsonResponse({"success": False})
-    # except Exception as e:
-    #     return JsonResponse({"success": False, "message": str(e)})
-    # return JsonResponse({"success": success})
+    except Exception as e:
+        return JsonResponse({"success": False, "message": str(e)})
+    return JsonResponse({"success": success})
 
 def get_sample_libs_async(request):
     """

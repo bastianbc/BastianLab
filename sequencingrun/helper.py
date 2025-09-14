@@ -7,6 +7,9 @@ from django.core.exceptions import ObjectDoesNotExist
 from collections import defaultdict
 from collections import defaultdict
 from samplelib.models import SampleLib
+import boto3
+from collections import defaultdict
+
 
 
 
@@ -21,36 +24,17 @@ def get_file_tree(file_list, path, sequencing_run, sample_libs):
     except ObjectDoesNotExist as e:
         print(e)
         return
-#
-#
-# def get_file_sets(sequencing_run, sample_libs):
-#     files = os.path.join(settings.HISEQDATA_DIRECTORY, sequencing_run.name)
-#     if not os.path.exists(files):
-#         raise FileNotFoundError(f"Directory not found {os.path.join(settings.HISEQDATA_DIRECTORY, sequencing_run.name)}")
-#     file_list = []
-#     file_sets = defaultdict(list)
-#     for root, dirs, files in os.walk(files):
-#         # print(root,dirs,files)
-#         for file in files:
-#             # print(file)
-#             if file.strip().endswith(".fastq.gz") | file.strip().endswith(".bam") | file.strip().endswith(".bai"):
-#                 file_list.append(file)
-#     print(get_file_tree(file_list, root, sequencing_run, sample_libs))
-#     return [{'file_set': key, 'files': value} for key, value in get_file_tree(file_list, root, sequencing_run, sample_libs).items()]
-
-import boto3
-from collections import defaultdict
-
-s3 = boto3.client("s3")
 
 
 def get_file_sets(sequencing_run, sample_libs):
+    s3 = boto3.client("s3")
     bucket = settings.AWS_STORAGE_BUCKET_NAME
     path = f"BastianRaid-02/HiSeqData/{sequencing_run.name}/"
 
     paginator = s3.get_paginator("list_objects_v2")
     file_list = []
     for page in paginator.paginate(Bucket=bucket, Prefix=path):
+        print(page)
         for obj in page.get("Contents", []):
             key = obj["Key"]
             if key.endswith((".fastq.gz", ".bam", ".bai")):
@@ -62,8 +46,7 @@ def get_file_sets(sequencing_run, sample_libs):
 
 
 def get_or_create_file_set(sample, sequencing_run, file):
-    # try:
-        print(sample,sequencing_run)
+    try:
         prefix, file_type = SequencingFileSet.generate_prefix(file.split("/")[-1])
         fs = SequencingFileSet.objects.filter(
             prefix=prefix
@@ -73,18 +56,15 @@ def get_or_create_file_set(sample, sequencing_run, file):
         fs.path = file.rsplit("/", 1)[0]
         fs.save()
         if not fs:
-            print("^^^^",file.split("/")[-1])
-
             fs = SequencingFileSet.objects.create(
                 prefix=prefix,
                 sequencing_run=sequencing_run,
                 sample_lib=sample,
                 path=file.split("/")[-1]
             )
-            print("set created")
         return fs
-    # except Exception as e:
-    #     print(e)
+    except Exception as e:
+        print(e)
 
 
 def get_type(file):
@@ -98,7 +78,7 @@ def get_type(file):
 
 
 def get_or_create_file(file, fs):
-    # try:
+    try:
         _file = SequencingFile.objects.get(name=file.split("/")[-1])
         _file.sequencing_file_set = fs
         _file.type = get_type(file)
@@ -109,10 +89,9 @@ def get_or_create_file(file, fs):
                 name=file,
                 type=get_type(file)
             )
-            print("file created")
         return _file
-    # except Exception as e:
-    #     print(e)
+    except Exception as e:
+        print(e)
 
 
 

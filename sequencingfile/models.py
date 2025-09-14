@@ -32,7 +32,7 @@ class SequencingFileSet(models.Model):
 
     @classmethod
     def generate_prefix(cls, file_name):
-        # try:
+        try:
             match = re.match(r'.*[-_]([ACTG]{6,8})[-_]', file_name)
             prefix = None
             file_type = None
@@ -87,9 +87,9 @@ class SequencingFileSet(models.Model):
             # file_set.save()
 
             return prefix, file_type
-        # except Exception as e:
-        #     print(f"Error generating file set for {file_name}: {e}")
-        #     return None, None
+        except Exception as e:
+            print(f"Error generating file set for {file_name}: {e}")
+            return None, None
 
     @staticmethod
     def find_sample(file_name):
