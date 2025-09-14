@@ -94,7 +94,6 @@ def get_type(file):
 
 def get_or_create_file(file, fs):
     # try:
-        print("@@@",file, fs)
         _file = SequencingFile.objects.get(name=file.split("/")[-1])
         _file.sequencing_file_set = fs
         _file.type = get_type(file)
