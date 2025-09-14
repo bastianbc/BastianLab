@@ -39,6 +39,7 @@ def get_file_sets(sequencing_run, sample_libs):
             if key.endswith((".fastq.gz", ".bam", ".bai")):
                 file_list.append(key)
     print(file_list)
+    print(sample_libs)
     # Adapt get_file_tree to handle S3 keys
     file_sets = get_file_tree(file_list, path, sequencing_run, sample_libs)
     print(file_sets)
