@@ -130,11 +130,17 @@ class Block(models.Model):
                     num_areas=Count('block_areas', distinct=True),
                     project_num=Count('block_projects', distinct=True),
                     patient_num=Count('patient', distinct=True),
-                    num_variants=Subquery(
-                        VariantCounts.objects.filter(block_id=OuterRef('pk'))
-                        .values('block_variant_count')[:1],
-                        output_field=IntegerField()
+                    num_variants=Coalesce(
+                        Subquery(
+                            VariantCounts.objects
+                            .filter(block_id=OuterRef('pk'))
+                            .values('block_variant_count')[:1],
+                            output_field=IntegerField(),
+                        ),
+                        Value(0),
+                        output_field=IntegerField(),
                     ),
+
                     # <- add the global block url (first record)
                     block_url=Coalesce(
                         Subquery(block_url_sq),  # scalar subquery
