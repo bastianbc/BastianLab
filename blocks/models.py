@@ -129,7 +129,7 @@ class Block(models.Model):
                     project_num=Count('block_projects', distinct=True),
                     patient_num=Count('patient', distinct=True),
                     num_variants=Count(
-                        'block_areas__area_na_links__nucacid__na_sl_links__sample_lib__variant_calls',
+                        'block_areas__area_na_links__nucacid__na_sl_links__sample_lib__variant_calls__g_variant',
                         distinct=True
                     ),
                     # <- add the global block url (first record)
