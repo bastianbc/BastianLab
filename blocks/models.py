@@ -132,9 +132,7 @@ class Block(models.Model):
                     patient_num=Count('patient', distinct=True),
                     num_variants=Subquery(
                         VariantCounts.objects.filter(block_id=OuterRef('pk'))
-                        .values('block_id')
-                        .annotate(c=Count('block_id'))
-                        .values('c')[:1],
+                        .values('block_variant_count')[:1],
                         output_field=IntegerField()
                     ),
                     # <- add the global block url (first record)
