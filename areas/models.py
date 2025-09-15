@@ -80,7 +80,7 @@ class Area(models.Model):
                     distinct=True
                 ),
                 num_variants=Count(
-                    'area_na_links__nucacid__na_sl_links__sample_lib__variant_calls',
+                    'area_na_links__nucacid__na_sl_links__sample_lib__variant_calls__g_variant',
                     distinct=True
                 )
             )
