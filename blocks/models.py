@@ -1,11 +1,13 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from core.validators import validate_name_contains_space
-from django.db.models import Q, Count, Case, When, Value, CharField, Subquery
+from django.db.models import Q, Count, Value, CharField, Subquery, OuterRef, IntegerField
 from django.db.models.functions import Coalesce
 from django.utils.crypto import get_random_string
 import json
 from projects.utils import get_user_projects
+from variant.models import VariantCounts
+
 
 class Block(models.Model):
     P_STAGE_TYPES = (
@@ -128,9 +130,12 @@ class Block(models.Model):
                     num_areas=Count('block_areas', distinct=True),
                     project_num=Count('block_projects', distinct=True),
                     patient_num=Count('patient', distinct=True),
-                    num_variants=Count(
-                        'block_areas__area_na_links__nucacid__na_sl_links__sample_lib__variant_calls__g_variant',
-                        distinct=True
+                    num_variants=Subquery(
+                        VariantCounts.objects.filter(block_id=OuterRef('pk'))
+                        .values('block_id')
+                        .annotate(c=Count('block_id'))
+                        .values('c')[:1],
+                        output_field=IntegerField()
                     ),
                     # <- add the global block url (first record)
                     block_url=Coalesce(
