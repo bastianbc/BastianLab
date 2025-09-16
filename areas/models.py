@@ -1,9 +1,10 @@
 from django.db import models
-from django.db.models import Q, Count, Case, When, IntegerField, Value
-from datetime import datetime
+from django.db.models import Q, Count, Value, CharField, Subquery, OuterRef, IntegerField, When, Case
+from django.db.models.functions import Coalesce
 import json
 from core.validators import validate_name_contains_space
 from projects.utils import get_user_projects
+from variant.models import VariantCounts
 
 class Area(models.Model):
     AREA_TYPE_TYPES = [
@@ -79,10 +80,16 @@ class Area(models.Model):
                     'block__block_projects',
                     distinct=True
                 ),
-                num_variants=Count(
-                    'area_na_links__nucacid__na_sl_links__sample_lib__variant_calls__g_variant',
-                    distinct=True
-                )
+                num_variants=Coalesce(
+                    Subquery(
+                        VariantCounts.objects
+                        .filter(block_id=OuterRef('pk'))
+                        .values('block_variant_count')[:1],
+                        output_field=IntegerField(),
+                    ),
+                    Value(0),
+                    output_field=IntegerField(),
+                ),
             )
            
             if not user.is_superuser:
