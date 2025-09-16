@@ -83,8 +83,8 @@ class Area(models.Model):
                 num_variants=Coalesce(
                     Subquery(
                         VariantCounts.objects
-                        .filter(block_id=OuterRef('pk'))
-                        .values('block_variant_count')[:1],
+                        .filter(area_id=OuterRef('pk'))
+                        .values('areas_variant_count')[:1],
                         output_field=IntegerField(),
                     ),
                     Value(0),
