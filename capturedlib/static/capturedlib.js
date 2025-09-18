@@ -260,12 +260,10 @@ var KTDatatablesServerSide = function () {
 
     // Filter Datatable
     var handleFilterDatatable = () => {
-        console.log("handleFilterDatatable init");
       const filterButton = document.querySelector('[data-kt-docs-table-filter="filter"]');
 
       filterButton.addEventListener('click', function () {
         // Get filter values
-          console.log("handleFilterDatatable click");
         const normalArea = document.getElementById("normal_area_checkbox").checked? true : null;
         var bait = document.getElementById("id_bait").value;
 
