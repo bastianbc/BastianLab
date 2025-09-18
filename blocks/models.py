@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from core.validators import validate_name_contains_space
-from django.db.models import Q, Count, Value, CharField, Subquery, OuterRef, IntegerField
+from django.db.models import Q, Count, Value, CharField, Subquery, OuterRef, IntegerField, Case, When
 from django.db.models.functions import Coalesce
 from django.utils.crypto import get_random_string
 import json
@@ -142,10 +142,13 @@ class Block(models.Model):
                     ),
 
                     # <- add the global block url (first record)
-                    block_url=Coalesce(
-                        Subquery(block_url_sq),  # scalar subquery
-                        Value(None),  # fallback if table is empty
-                        output_field=CharField()
+                    block_url=Case(
+                        When(
+                            Q(scan_number__isnull=False) & ~Q(scan_number=""),
+                            then=Subquery(block_url_sq),
+                        ),
+                        default=Value(None),
+                        output_field=CharField(),
                     ),
                 )
             )
