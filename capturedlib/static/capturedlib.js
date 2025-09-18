@@ -10,7 +10,7 @@ var KTDatatablesServerSide = function () {
     var selectedRows = [];
 
     // Private functions
-    var initDatatable = function ( initialValue ,normalArea = null) {
+    var initDatatable = function ( initialValue ,normalArea = null, bait = null) {
 
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
 
@@ -37,6 +37,7 @@ var KTDatatablesServerSide = function () {
               type: 'GET',
               data: function (d) {
                 d.normal_area = normalArea;  // Filtre parametresini backend'e gönder
+                d.bait = bait;  // Filtre parametresini backend'e gönder
             },
               error: function (xhr, ajaxOptions, thrownError) {
                   if (xhr.status == 403) {
@@ -259,14 +260,17 @@ var KTDatatablesServerSide = function () {
 
     // Filter Datatable
     var handleFilterDatatable = () => {
+        console.log("handleFilterDatatable init");
       const filterButton = document.querySelector('[data-kt-docs-table-filter="filter"]');
 
       filterButton.addEventListener('click', function () {
         // Get filter values
-        const normalArea = document.getElementById("normal_area_checkbox").checked? true : null
-    
+          console.log("handleFilterDatatable click");
+        const normalArea = document.getElementById("normal_area_checkbox").checked? true : null;
+        var bait = document.getElementById("id_bait").value;
+
         // DataTable'ı başlat
-        initDatatable(null, normalArea);
+        initDatatable(null, normalArea, bait);
         });
     }
 
@@ -397,9 +401,9 @@ var KTDatatablesServerSide = function () {
         resetButton.addEventListener('click', function () {
          
           document.getElementById("normal_area_checkbox").checked = false;
-  
+            document.getElementById("id_bait").value = "";
           
-          initDatatable(null, null);
+          initDatatable(null, null, null);
       });
     }
 

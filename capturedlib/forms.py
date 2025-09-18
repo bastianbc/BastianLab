@@ -4,6 +4,7 @@ from core.forms import BaseForm
 from .models import CapturedLib, SL_CL_LINK
 from sequencinglib.models import SequencingLib
 from samplelib.models import SampleLib
+from bait.models import Bait
 
 class CapturedLibForm(BaseForm, forms.ModelForm):
     class Meta:
@@ -42,3 +43,13 @@ class SequencingLibCreationForm(forms.Form):
     buffer = forms.ChoiceField(choices=SequencingLib.BUFFER_TYPES)
     nm = forms.FloatField(initial=0, label="nM")
     vol_init = forms.FloatField(initial=0, label="Initialize Volume")
+
+
+
+class FilterForm(forms.Form):
+    area_type = forms.ChoiceField(choices=[('','---------' ),("normal","Normal"),("tumor","Tumor")], label="Area Type", required=False)
+    bait = forms.ModelChoiceField(queryset=Bait.objects.all().order_by('name'))
+
+    def __init__(self, *args, **kwargs):
+        super(FilterForm, self).__init__(*args, **kwargs)
+        self.fields["bait"].widget.attrs.update({'class':'form-control-sm'})

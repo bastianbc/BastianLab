@@ -94,6 +94,7 @@ class CapturedLib(models.Model):
             order_column = kwargs.get('order[0][column]', None)[0]
             order = kwargs.get('order[0][dir]', None)[0]
             normal_area = kwargs.get('normal_area', None)[0]
+            bait_filter = kwargs.get('bait', None)[0]
 
             order_column = ORDER_COLUMN_CHOICES[order_column]
             # django orm '-' -> desc
@@ -126,6 +127,10 @@ class CapturedLib(models.Model):
                     Q(sl_cl_links__sample_lib__na_sl_links__nucacid__na_type='dna') &
                     Q(sl_cl_links__sample_lib__na_sl_links__nucacid__area_na_links__area__area_type__value='normal')
             )
+            if bait_filter:
+                queryset = queryset.filter(
+                    Q(bait=bait_filter)
+                )
 
             count = queryset.count()
             queryset = queryset.order_by(order_column)[start:start + length]

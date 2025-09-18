@@ -14,6 +14,7 @@ from core.decorators import permission_required_for_async
 @permission_required("capturedlib.view_capturedlib",raise_exception=True)
 def capturedlibs(request):
     form = SequencingLibCreationForm()
+    filter = FilterForm()
     return render(request, "capturedlib_list.html", locals())
 
 @permission_required_for_async("capturedlib.view_capturedlib")
