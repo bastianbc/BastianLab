@@ -167,9 +167,8 @@ def register_missing_from_db():
 def sync_smbdirs_to_s3():
     s3 = boto3.client("s3", region_name=AWS_REGION)
 
-    # iterate only unregistered dirs
     for smbdir in SMBDirectory.objects.filter(is_registered=False):
-        prefix = smbdir.directory.strip("/")  # assuming `path` holds smb dir name
+        prefix = smbdir.directory.strip("/")
         prefix = prefix.replace("Volumes/","")
         resp = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix=prefix, MaxKeys=1)
 
