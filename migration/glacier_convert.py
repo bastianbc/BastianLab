@@ -179,4 +179,4 @@ def sync_smbdirs_to_s3():
                 smbdir.is_registered = True
                 smbdir.save(update_fields=["is_registered"])
         else:
-            print(f"[MISSING] {smbdir.path} not in S3")
+            print(f"[MISSING] {smbdir.directory} not in S3 - prefix: {prefix}")
