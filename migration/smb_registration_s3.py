@@ -75,7 +75,7 @@ def register_smb_from_s3():
                 created_count += 1
             else:
                 skipped += 1
-            print(skipped, created_count)
+            print(skipped, created_count, total)
     print(
         f"Done. total={total}, unique_considered={len(seen)}, "
         f"created={created_count}, skipped={skipped}, dry_run={DRY_RUN}"
