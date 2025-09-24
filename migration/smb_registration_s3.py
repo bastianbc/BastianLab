@@ -25,6 +25,7 @@ def register_smb():
         obj, created = SMBDirectory.objects.get_or_create(directory=path.strip())
 
 
+
 if __name__ == "__main__":
     print("start")
     register_smb()

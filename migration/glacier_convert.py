@@ -164,3 +164,19 @@ def register_missing_from_db():
 
     print(f"\nDone. Total {total} | Found {found} | Updated {updated} | Missing {missing} | Errors {errors}")
 
+def sync_smbdirs_to_s3():
+    s3 = boto3.client("s3", region_name=AWS_REGION)
+
+    # iterate only unregistered dirs
+    for smbdir in SMBDirectory.objects.filter(is_registered=False):
+        prefix = smbdir.directory.strip("/") + "/"  # assuming `path` holds smb dir name
+        prefix = prefix.replace("/Volumes/")
+        resp = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix=prefix, MaxKeys=1)
+
+        if "Contents" in resp:  # found at least one object
+            print(f"[FOUND] {smbdir.path} exists in S3")
+            if not DRY_RUN:
+                smbdir.is_registered = True
+                smbdir.save(update_fields=["is_registered"])
+        else:
+            print(f"[MISSING] {smbdir.path} not in S3")
