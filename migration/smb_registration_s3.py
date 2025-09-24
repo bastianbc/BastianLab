@@ -82,10 +82,7 @@ def register_smb_from_s3():
     )
 
 
-if __name__ == "__main__":
-    print("start")
-    register_smb_from_s3()
-    print("end")
+
 
 
 # import os

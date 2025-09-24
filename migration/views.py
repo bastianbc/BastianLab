@@ -801,7 +801,7 @@ def generate_file_set(file, seq_run, sample_lib):
 
 def import_genes(request):
     from .glacier_convert import convert_glacier_and_mark_level, register_missing_from_db, sync_smbdirs_to_s3
-    from smb_registration_s3 import register_smb_from_s3
+    from .smb_registration_s3 import register_smb_from_s3
     register_smb_from_s3()
 
 
