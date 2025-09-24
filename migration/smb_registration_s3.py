@@ -15,8 +15,8 @@ from sequencingfile.models import SMBDirectory
 AWS_REGION   = "us-west-2"
 BUCKET_NAME  = "bastian-lab-169-3-r-us-west-2.sec.ucsf.edu"
 S3_TEXT_KEYS = [
-    # "media_files/uploads/captured_lib_pdf_attachments/file_tree_06_21_BastianRaid-02.txt",
-    "uploads/captured_lib_pdf_attachments/file_tree_06_17_sequencingdata.txt",
+    "uploads/captured_lib_pdf_attachments/file_tree_06_21_BastianRaid-02.txt",
+    # "uploads/captured_lib_pdf_attachments/file_tree_06_17_sequencingdata.txt",
 ]
 DRY_RUN = False
 
@@ -94,7 +94,7 @@ def register_smb_from_s3():
 # from django.conf import settings
 # from sequencingfile.models import SMBDirectory
 # from pathlib import Path
-# import pandas as pd
+import pandas as pd
 #
 #
 # bastian-lab-169-3-r-us-west-2.sec.ucsf.edu
@@ -102,22 +102,22 @@ def register_smb_from_s3():
 # Upload
 # file_tree_06_21_BastianRaid-02.txt
 # file_tree_06_17_sequencingdata.txt
-# def register_smb():
-#     output_file = Path("/Users/cbagci/Documents/test/venv/file_tree_06_17_labshare.txt")
-#     output_file = Path("/Users/cbagci/Documents/test/venv/file_tree_06_17_sequencingdata.txt")
-#
-#     with open(output_file, "r") as f:
-#         lines = [line.strip() for line in f if line.strip()]  # remove empty lines
-#
-#     df = pd.DataFrame(lines, columns=["path"])
-#     df = df[~df["path"].str.endswith(("/"))]
-#     df = df[~df["path"].str.endswith(("/.DS_Store"))]
-#     for path in df["path"]:
-#         obj, created = SMBDirectory.objects.get_or_create(directory=path.strip())
-#
-#
-#
-# if __name__ == "__main__":
-#     print("start")
-#     register_smb()
-#     print("end")
+def register_smb():
+    output_file = Path("/Users/cbagci/Documents/test/venv/file_tree_06_21_BastianRaid-02.txt")
+    output_file = Path("/Users/cbagci/Documents/test/venv/file_tree_06_17_sequencingdata.txt")
+
+    with open(output_file, "r") as f:
+        lines = [line.strip() for line in f if line.strip()]  # remove empty lines
+
+    df = pd.DataFrame(lines, columns=["path"])
+    df = df[~df["path"].str.endswith(("/"))]
+    df = df[~df["path"].str.endswith(("/.DS_Store"))]
+    for path in df["path"]:
+        obj, created = SMBDirectory.objects.get_or_create(directory=path.strip())
+
+
+
+if __name__ == "__main__":
+    print("start")
+    register_smb()
+    print("end")
