@@ -16,7 +16,7 @@ AWS_REGION   = "us-west-2"
 BUCKET_NAME  = "bastian-lab-169-3-r-us-west-2.sec.ucsf.edu"
 S3_TEXT_KEYS = [
     # "media_files/uploads/captured_lib_pdf_attachments/file_tree_06_21_BastianRaid-02.txt",
-    "media_files/uploads/captured_lib_pdf_attachmentsfile_tree_06_17_sequencingdata.txt",
+    "media_files/uploads/captured_lib_pdf_attachments/file_tree_06_17_sequencingdata.txt",
 ]
 DRY_RUN = False
 
