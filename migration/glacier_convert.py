@@ -169,7 +169,6 @@ def sync_smbdirs_to_s3():
 
     for smbdir in SMBDirectory.objects.filter():
         prefix = smbdir.directory.strip("/")
-        prefix = prefix.replace("Volumes/","")
         resp = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix=prefix, MaxKeys=1)
 
         if "Contents" in resp:  # found at least one object
