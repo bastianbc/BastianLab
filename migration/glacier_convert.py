@@ -170,7 +170,7 @@ def sync_smbdirs_to_s3():
     # iterate only unregistered dirs
     for smbdir in SMBDirectory.objects.filter(is_registered=False):
         prefix = smbdir.directory.strip("/") + "/"  # assuming `path` holds smb dir name
-        prefix = prefix.replace("/Volumes/","")
+        prefix = prefix.replace("Volumes/","")
         resp = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix=prefix, MaxKeys=1)
 
         if "Contents" in resp:  # found at least one object
