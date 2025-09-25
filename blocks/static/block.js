@@ -27,7 +27,7 @@ var KTDatatablesServerSide = function () {
                 className: 'row-selected'
             },
             keys: {
-              columns: ':not(:first-child)',
+              columns: '.editable',
               keys: [ 9 ],
               editor: editor,
               editOnFocus: true
@@ -57,22 +57,17 @@ var KTDatatablesServerSide = function () {
               }
             },
             columns: [
-              {
-                class: 'dt-control',
-                orderable: false,
-                data: null,
-                defaultContent: ''
-              },
-              { data: 'id' },
-              { data: 'name'},
-              { data: 'project'},
-              { data: 'patient' },
-              { data: 'diagnosis' },
-              { data: 'body_site' },
-              { data: 'scan_number'},
-              { data: 'num_areas' },
-              { data: 'num_variants' },
-              { data: null },
+              { class: 'dt-control', orderable:false, data:null, defaultContent:'' }, // 0
+              { data: 'id' },                                                         // 1 (checkbox render below)
+              { data: 'name',        className: 'editable' },                         // 2
+              { data: 'project' },                                                    // 3
+              { data: 'patient' },                                                    // 4
+              { data: 'diagnosis',   className: 'editable' },                         // 5
+              { data: 'body_site',   className: 'editable' },                         // 6
+              { data: 'scan_number' },                                                // 7
+              { data: 'num_areas' },                                                  // 8
+              { data: 'num_variants' },                                               // 9
+              { data: null }                                                          // 10 actions
             ],
             columnDefs: [
                 {
@@ -968,11 +963,10 @@ var KTDatatablesServerSide = function () {
 
       }
 
-      $('#block_datatable').on( 'click', 'tbody td:not(:first-child)', function (e) {
-        editor.inline( dt.cell( this ).index(), {
-            onBlur: 'submit'
+      $('#block_datatable').on('click', 'tbody td.editable', function () {
+          editor.inline(dt.cell(this).index(), { onBlur: 'submit' });
         });
-      });
+
 
       $('#block_datatable').on( 'key-focus', function ( e, datatable, cell ) {
            editor.inline( cell.index() );
