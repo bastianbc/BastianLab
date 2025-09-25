@@ -168,12 +168,15 @@ def sync_smbdirs_to_s3():
     s3 = boto3.client("s3", region_name=AWS_REGION)
 
     for smbdir in SMBDirectory.objects.filter():
-        prefix = smbdir.directory.strip("/")
-        resp = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix=prefix, MaxKeys=1)
+        try:
+            prefix = smbdir.directory.strip("/")
+            resp = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix=prefix, MaxKeys=1)
 
-        if "Contents" in resp:  # found at least one object
-            print(f"{smbdir.directory[-3:]}")
-        else:
-            smbdir.is_registered = False
-            smbdir.save(update_fields=["is_registered"])
-            print(f"[MISSING] {smbdir.directory[-3:]} not in S3 - prefix: {prefix[-3:]}")
+            if "Contents" in resp:  # found at least one object
+                print(f"{smbdir.directory[-3:]}")
+            else:
+                smbdir.is_registered = False
+                smbdir.save(update_fields=["is_registered"])
+                print(f"[MISSING] {smbdir.directory[-3:]} not in S3 - prefix: {prefix[-3:]}")
+        except Exception as e:
+            print(e)
