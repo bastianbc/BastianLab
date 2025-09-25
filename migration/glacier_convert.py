@@ -172,10 +172,7 @@ def sync_smbdirs_to_s3():
         resp = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix=prefix, MaxKeys=1)
 
         if "Contents" in resp:  # found at least one object
-            print(f"[FOUND] {smbdir.directory[-3:]} exists in S3")
-            if not DRY_RUN:
-                smbdir.is_registered = True
-                smbdir.save(update_fields=["is_registered"])
+            print(f"{smbdir.directory[-3:]}")
         else:
             smbdir.is_registered = False
             smbdir.save(update_fields=["is_registered"])
