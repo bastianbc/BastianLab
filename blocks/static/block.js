@@ -57,17 +57,17 @@ var KTDatatablesServerSide = function () {
               }
             },
             columns: [
-              { class: 'dt-control', orderable:false, data:null, defaultContent:'' }, // 0
-              { data: 'id' },                                                         // 1 (checkbox render below)
-              { data: 'name',        className: 'editable' },                         // 2
-              { data: 'project' },                                                    // 3
-              { data: 'patient' },                                                    // 4
-              { data: 'diagnosis',   className: 'editable' },                         // 5
-              { data: 'body_site',   className: 'editable' },                         // 6
-              { data: 'scan_number' },                                                // 7
-              { data: 'num_areas' },                                                  // 8
-              { data: 'num_variants' },                                               // 9
-              { data: null }                                                          // 10 actions
+              { class: 'dt-control', orderable:false, data:null, defaultContent:'' },
+              { data: 'id' },
+              { data: 'name',className: 'editable' },
+              { data: 'project' },
+              { data: 'patient' },
+              { data: 'diagnosis',   className: 'editable' },
+              { data: 'body_site',   className: 'editable' },
+              { data: 'scan_number' },
+              { data: 'num_areas' },
+              { data: 'num_variants' },
+              { data: null }
             ],
             columnDefs: [
                 {
