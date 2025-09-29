@@ -14,5 +14,5 @@ urlpatterns = [
     path('check_can_deleted_async', views.check_can_deleted_async, name='check-can-deleted-async'),
     path("get_collections", views.get_collections, name='get-collections'),
     path("get_area_types", views.get_area_types, name='get-area-types'),
-    path("get_area_vaiants", views.get_area_vaiants, name='get_area_vaiants'),
+    path("get_block_async_by_area/<int:id>/", views.get_block_async_by_area, name='get-block-async-by-area'),
 ] + staticfiles_urlpatterns()

@@ -6,8 +6,6 @@ from django.db.models.functions import Coalesce
 from django.utils.crypto import get_random_string
 import json
 from projects.utils import get_user_projects
-from variant.models import VariantCounts
-
 
 class Block(models.Model):
     P_STAGE_TYPES = (
@@ -123,25 +121,15 @@ class Block(models.Model):
             technicians or researchers can access own projects and other entities related to it.
             '''
             block_url_sq = BlockUrl.objects.order_by('id').values('url')[:1]
-
+            block_summary_sq = BlockSummary.objects.filter(block=OuterRef('pk')).values('variant_count')[:1]
+            
             queryset = (
                 Block.objects
                 .annotate(
                     num_areas=Count('block_areas', distinct=True),
                     project_num=Count('block_projects', distinct=True),
                     patient_num=Count('patient', distinct=True),
-                    num_variants=Coalesce(
-                        Subquery(
-                            VariantCounts.objects
-                            .filter(block_id=OuterRef('pk'))
-                            .values('block_variant_count')[:1],
-                            output_field=IntegerField(),
-                        ),
-                        Value(0),
-                        output_field=IntegerField(),
-                    ),
-
-                    # <- add the global block url (first record)
+                    num_variants=Subquery(block_summary_sq),
                     block_url=Case(
                         When(
                             Q(scan_number__isnull=False) & ~Q(scan_number=""),
@@ -270,7 +258,10 @@ class Block(models.Model):
 
     @staticmethod
     def get_block_url():
-        return BlockUrl.objects.values("url").first()
+        try:
+            return BlockUrl.objects.first().url
+        except:
+            return None
 
 class BlockUrl(models.Model):
     url = models.CharField(max_length=1000, blank=True, null=True, verbose_name="")
@@ -278,3 +269,20 @@ class BlockUrl(models.Model):
     class Meta:
         db_table = 'blockurl'
         managed = True
+
+
+# TODO: When a new variant is added to the system, refresh the VariantsView materialized view.
+# This must be done manually after insert/update operations that affect the underlying data.
+class BlockSummary(models.Model):
+    block = models.OneToOneField(Block, primary_key=True, on_delete=models.CASCADE, related_name='block_summary')
+    variant_count = models.IntegerField(default=0, help_text="Number of variants associated with this block")
+    # area_count = models.IntegerField(default=0, help_text="Number of areas associated with this block")
+    # project_count = models.IntegerField(default=0, help_text="Number of projects associated with this block")
+    # patient_count = models.IntegerField(default=0, help_text="Number of patients associated with this block")
+
+    class Meta:
+        db_table = 'block_summary'
+        managed = True
+
+    def __str__(self):
+        return f"{self.block.name} - {self.variant_count} variants"
