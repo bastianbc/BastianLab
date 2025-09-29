@@ -52,7 +52,6 @@ var KTDatatablesServerSide = function () {
                             confirmButton: "btn fw-bold btn-primary",
                         }
                     });
-
                   }
               }
             },
