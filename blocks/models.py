@@ -281,7 +281,7 @@ class BlockSummary(models.Model):
     # patient_count = models.IntegerField(default=0, help_text="Number of patients associated with this block")
 
     class Meta:
-        db_table = 'public.block_summary'
+        db_table = 'block_summary'
         managed = True
 
     def __str__(self):
