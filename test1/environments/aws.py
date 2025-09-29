@@ -201,7 +201,7 @@ DATABASES = {
         "PORT":     RDS_SECRET["port"],
         "OPTIONS": {
             "sslmode": "require",
-            # "options": "-c search_path=cosmic_hg38,public"
+            "options": "-c search_path=cosmic_hg38,public"
         },
     }
 }
