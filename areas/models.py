@@ -193,7 +193,7 @@ class AreaSummary(models.Model):
     # patient_count = models.IntegerField(default=0, help_text="Number of patients associated with this area")
 
     class Meta:
-        db_table = 'area_summary'
+        db_table = 'public.area_summary'
         managed = True
 
     def __str__(self):
