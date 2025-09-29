@@ -422,12 +422,9 @@ var KTDatatablesServerSide = function () {
         // Select reset button
         $.fn.dataTable.moment('MM/DD/YYYY');
 
-
-          // 2) ADD THIS DELEGATED CLICK HANDLER RIGHT HERE
-          //    (works across redraws and prevents page navigation)
           const $table = $('#area_datatable');
           $table
-            .off('click.variant')                            // avoid duplicate bindings
+            .off('click.variant')
             .on('click.variant', '.variant-link', function (e) {
               e.preventDefault();
               e.stopPropagation();
@@ -605,7 +602,8 @@ var KTDatatablesServerSide = function () {
           }
 
           function initializeModal() {
-            const body = modalEl.querySelector('.modal-body');
+            console.log("initializeModal");
+            const body = modalEl.querySelector('.modal-body .content-container');
             body.innerHTML = `
               <div class="table-responsive">
                 <table id="variant_datatable" class="table align-middle table-row-dashed fs-6 gy-5">
@@ -673,13 +671,25 @@ var KTDatatablesServerSide = function () {
             });
           }
 
+          async function build(areaId) {
+            initializeModal();
+            const resp = await fetch(`/areas/get_block_async_by_area/${areaId}/`);
+            const data = await resp.json();
+
+            populateBlockDetails(data);
+            initializeDataTable(areaId);
+          }
+
+          function populateBlockDetails(data) {
+            modalEl.querySelector('a[name="patient_id"]').textContent = data.patient_id;
+            modalEl.querySelector('a[name="block_name"]').textContent  = data.block.name;
+            modalEl.querySelector('a[name="diagnosis"]').textContent   = data.block.diagnosis;
+            modalEl.querySelector('a[name="aperio_link"]').textContent   = data.block.aperio_link;
+          }
+
           return {
-            open(areaId) {
-              ensure();
-              initializeModal();
-              instance.show();
-              initializeDataTable(areaId);
-            }
+            init() { ensure(); },                     // call once on page init
+            async open(areaId) { ensure(); instance.show(); await build(areaId); }
           };
         })();
 

@@ -188,3 +188,17 @@ def get_area_vaiants(request):
         ]
     }
     return JsonResponse(response_data)
+
+def get_block_async_by_area(request, id):
+    area = Area.objects.get(id=id)
+    block = area.block
+    block_url = block.get_block_url()
+    return JsonResponse({
+        'block': {
+            'id': block.id,
+            'name': block.name,
+            'diagnosis': block.diagnosis,
+            'aperio_link': f"{block_url}{block.scan_number}",
+        },
+        'patient_id': block.patient.pat_id,
+    })

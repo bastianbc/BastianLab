@@ -4,7 +4,6 @@ from django.db.models.functions import Coalesce
 import json
 from core.validators import validate_name_contains_space
 from projects.utils import get_user_projects
-from variant.models import VariantCounts
 
 class Area(models.Model):
     AREA_TYPE_TYPES = [
@@ -67,6 +66,7 @@ class Area(models.Model):
             Users can access to some entities depend on their authorize. While the user having admin role can access to all things,
             technicians or researchers can access own projects and other entities related to it.
             '''
+            area_summary_sq = AreaSummary.objects.filter(area=OuterRef('pk')).values('variant_count')[:1]
 
             queryset = Area.objects.all().annotate(
                 num_nucacids=Count('area_na_links', distinct=True),
@@ -80,16 +80,7 @@ class Area(models.Model):
                     'block__block_projects',
                     distinct=True
                 ),
-                num_variants=Coalesce(
-                    Subquery(
-                        VariantCounts.objects
-                        .filter(area_id=OuterRef('pk'))
-                        .values('areas_variant_count')[:1],
-                        output_field=IntegerField(),
-                    ),
-                    Value(0),
-                    output_field=IntegerField(),
-                ),
+                num_variants=Subquery(area_summary_sq),
             )
            
             if not user.is_superuser:
@@ -192,4 +183,19 @@ class Area(models.Model):
         '''
         return [{"label":"---------","value":""}] + [{ "label":c[1], "value":c[0] } for c in Area.COLLECTION_CHOICES]
 
+# TODO: When a new variant is added to the system, refresh the VariantsView materialized view.
+# This must be done manually after insert/update operations that affect the underlying data.
+class AreaSummary(models.Model):
+    area = models.OneToOneField(Area, primary_key=True, on_delete=models.CASCADE, related_name='area_summary')
+    variant_count = models.IntegerField(default=0, help_text="Number of variants associated with this area")
+    # block_count = models.IntegerField(default=0, help_text="Number of blocks associated with this area")
+    # project_count = models.IntegerField(default=0, help_text="Number of projects associated with this area")
+    # patient_count = models.IntegerField(default=0, help_text="Number of patients associated with this area")
+
+    class Meta:
+        db_table = 'area_summary'
+        managed = True
+
+    def __str__(self):
+        return f"{self.area.name} - {self.variant_count} variants"
 

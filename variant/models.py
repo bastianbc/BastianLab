@@ -458,7 +458,7 @@ class VariantsView(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'variants_view_consolidated'
+        db_table = 'variants_view'
 
     def query_by_args(self, **kwargs):
         try:
@@ -570,17 +570,3 @@ class CosmicGVariantView(models.Model):
     class Meta:
         managed = False
         db_table = 'cosmic_g_variant_view_with_id_stats'
-
-
-
-class VariantCounts(models.Model):
-    area_id = models.IntegerField(primary_key=True)
-    area_name = models.CharField(max_length=50)
-    block_id = models.IntegerField()
-    block_name = models.CharField(max_length=50)
-    block_variant_count = models.IntegerField()
-    areas_variant_count = models.IntegerField()
-
-    class Meta:
-        managed = False
-        db_table = 'variant_counts'
