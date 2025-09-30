@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from core.validators import validate_name_contains_space
-from django.db.models import Q, Count, Value, CharField, Subquery, OuterRef, IntegerField, Case, When
+from django.db.models import Q, Count, Value, CharField, Subquery, OuterRef, IntegerField, Case, When, F
 from django.db.models.functions import Coalesce
 from django.utils.crypto import get_random_string
 import json
@@ -205,10 +205,7 @@ class Block(models.Model):
             order = kwargs.get('order[0][dir]', None)[0]
 
             order_column = ORDER_COLUMN_CHOICES[order_column]
-            # django orm '-' -> desc
-            if order == 'desc':
-                order_column = '-' + order_column
-
+            
             queryset = _get_authorizated_queryset()
 
             total = queryset.count()
@@ -245,7 +242,19 @@ class Block(models.Model):
                     )
 
             count = queryset.count()
-            queryset = queryset.order_by(order_column)[start:start + length]
+            
+            # Apply sorting with nulls_last for numeric columns
+            if order == 'desc':
+                if order_column in ['num_areas', 'num_variants']:
+                    queryset = queryset.order_by(F(order_column).desc(nulls_last=True))[start:start + length]
+                else:
+                    queryset = queryset.order_by('-' + order_column)[start:start + length]
+            else:
+                if order_column in ['num_areas', 'num_variants']:
+                    queryset = queryset.order_by(F(order_column).asc(nulls_last=True))[start:start + length]
+                else:
+                    queryset = queryset.order_by(order_column)[start:start + length]
+                    
             return {
                 'items': queryset,
                 'count': count,

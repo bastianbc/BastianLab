@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Q, Count, Value, CharField, Subquery, OuterRef, IntegerField, When, Case
+from django.db.models import Q, Count, Value, CharField, Subquery, OuterRef, IntegerField, When, Case, F
 from django.db.models.functions import Coalesce
 import json
 from core.validators import validate_name_contains_space
@@ -133,9 +133,6 @@ class Area(models.Model):
             order = kwargs.get('order[0][dir]', None)[0]
 
             order_column = ORDER_COLUMN_CHOICES[order_column]
-            # django orm '-' -> desc
-            if order == 'desc':
-                order_column = '-' + order_column
 
             queryset = _get_authorizated_queryset()
 
@@ -164,7 +161,17 @@ class Area(models.Model):
                     )
 
             count = queryset.count()
-            queryset = queryset.order_by(order_column)[start:start + length]
+            if order == 'desc':
+                if order_column in ['num_variants']:
+                    queryset = queryset.order_by(F(order_column).desc(nulls_last=True))[start:start + length]
+                else:
+                    queryset = queryset.order_by('-' + order_column)[start:start + length]
+            else:
+                if order_column in ['num_variants']:
+                    queryset = queryset.order_by(F(order_column).asc(nulls_last=True))[start:start + length]
+                else:
+                    queryset = queryset.order_by(order_column)[start:start + length]                                
+
             # queryset = queryset[start:start + length]
             return {
                 'items': queryset,
