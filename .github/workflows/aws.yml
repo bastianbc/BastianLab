@@ -27,8 +27,7 @@ jobs:
             cd /home/ssm-user/project/BastianLab
 
             # Pull exactly what's on master to avoid drift
-            git fetch --prune origin
-            git reset --hard origin/master
+            git pull origin main
 
             # Your requested sequence
             sudo systemctl daemon-reload

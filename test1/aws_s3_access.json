@@ -1,0 +1,7 @@
+]{
+  "username": "db_user",
+  "password": "1235",
+  "host":     "127.0.0.1",
+  "port":     56789,
+  "dbname":   "labdbproduction"
+}
