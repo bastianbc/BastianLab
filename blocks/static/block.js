@@ -1049,10 +1049,12 @@ var KTDatatablesServerSide = function () {
           }
 
           function populateBlockDetails(data) {
-            modal.querySelector('a[name="patient_id"]').textContent = data.patient_id;
-            modal.querySelector('a[name="block_name"]').textContent  = data.block.name;
-            modal.querySelector('a[name="diagnosis"]').textContent   = data.block.diagnosis;
-            modal.querySelector('a[name="aperio_link"]').textContent   = data.block.aperio_link;
+              modal.querySelector('a[name="patient_id"]').textContent = data.patient_id;
+              modal.querySelector('a[name="block_name"]').textContent = data.block.name;
+              modal.querySelector('a[name="diagnosis"]').textContent = data.block.diagnosis;
+              modal.querySelector('a[name="aperio_link"]').textContent = data.block.aperio_link;
+              modal.querySelector('a[name="aperio_link"]').href = data.block.aperio_link;
+
           }
 
           function createTab(id, text, isActive) {
