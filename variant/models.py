@@ -458,7 +458,7 @@ class VariantsView(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'variants_view_consolidated'
+        db_table = 'variants_view'
 
     def query_by_args(self, **kwargs):
         try:
