@@ -83,7 +83,7 @@ WHERE
 
 
 '''
-CREATE MATERIALIZED VIEW variants_view_consolidated AS
+CREATE MATERIALIZED VIEW variants_view AS
 SELECT DISTINCT ON (vc.variantcall_id)
     ROW_NUMBER() OVER() AS id,
     vc.variantcall_id AS variantcall_id,
@@ -159,7 +159,7 @@ JOIN
 LEFT JOIN
     p_variant pv ON pv.c_variant_id = cv.id
 LEFT JOIN
-    cosmic_hg38.cosmic_g_variant_view_with_id_stats cgv on cgv.g_variant_id=gv.id
+    cosmic_hg38.cosmic_g_variant_view cgv on cgv.g_variant_id=gv.id
 WHERE
     a.area_type IS NOT NULL;
 '''
@@ -229,3 +229,59 @@ LEFT JOIN g_variant gv
 GROUP BY a.id, a.name, b.id, b.name
 ORDER BY block_variant_count DESC, areas_variant_count DESC;
 """
+
+
+
+'''
+
+CREATE OR REPLACE VIEW cosmic_hg38.cosmic_g_variant_view AS
+WITH j AS (
+  SELECT
+    gv.id    AS g_variant_id,
+    gv.chrom AS chr,
+    gv.start AS pos,
+    gv.ref,
+    gv.alt,
+    cga.gene_symbol,
+    cga.mutation_aa,
+    cga.primary_site_counts
+  FROM g_variant gv
+  JOIN cosmic_hg38.cosmic_g_variant_annotation cga
+    ON gv.chrom::text = cga.chromosome
+   AND gv.start       = cga.genome_start::integer
+   AND gv.ref::text   = cga.genomic_wt_allele
+   AND gv.alt::text   = cga.genomic_mut_allele
+),
+merged AS (
+  -- explode JSON per row and sum counts per key across all matching rows
+  SELECT
+    g_variant_id, chr, pos, ref, alt,
+    e.key AS site,
+    SUM((e.value)::int) AS total
+  FROM j
+  CROSS JOIN LATERAL jsonb_each_text(j.primary_site_counts) AS e(key, value)
+  GROUP BY g_variant_id, chr, pos, ref, alt, e.key
+),
+merged_json AS (
+  SELECT
+    g_variant_id, chr, pos, ref, alt,
+    jsonb_object_agg(site, to_jsonb(total) ORDER BY site) AS primary_site_counts
+  FROM merged
+  GROUP BY g_variant_id, chr, pos, ref, alt
+)
+SELECT
+  j.g_variant_id,
+  j.chr,
+  j.pos,
+  j.ref,
+  j.alt,
+  string_agg(DISTINCT j.gene_symbol, ', ' ORDER BY j.gene_symbol) AS gene_symbol,
+  string_agg(DISTINCT j.mutation_aa, ', ' ORDER BY j.mutation_aa)   AS cosmic_aa,
+  COALESCE(mj.primary_site_counts, '{}'::jsonb)                      AS primary_site_counts
+FROM j
+LEFT JOIN merged_json mj
+  USING (g_variant_id, chr, pos, ref, alt)
+GROUP BY j.g_variant_id, j.chr, j.pos, j.ref, j.alt, mj.primary_site_counts
+ORDER BY j.g_variant_id;
+
+'''
