@@ -5,58 +5,6 @@
 {% endblock %}
 
 {% block content %}
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Polled JSON Log Stream</title>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <style>
-    #logs {
-      border:1px solid #ccc; padding:1rem;
-      height:300px; overflow-y:auto;
-      font-family:monospace;
-    }
-    .log-entry { margin:0.25rem 0; }
-  </style>
-</head>
-<body>
-  <h1>Live Logs (polled JSON)</h1>
-  <div id="logs"><em>Starting…</em></div>
-
-  <script>
-    $(function(){
-      let lastIdx = 0;
-
-      function poll() {
-        $.ajax({
-          url: '/sequencingfile/sequencingfileset/get_new_logs',
-          data: { since_idx: lastIdx },
-          dataType: 'json',
-          success(data) {
-            $('#logs em').remove();  // clear “Starting…”
-            data.logs.forEach(entry => {
-              const $line = $('<div class="log-entry">')
-                .text(`[${entry.idx}] ${entry.msg}`);
-              $('#logs').append($line);
-            });
-            if (data.last_idx > lastIdx) {
-              lastIdx = data.last_idx;
-              $('#logs').scrollTop($('#logs')[0].scrollHeight);
-            }
-          },
-          complete() {
-            // Schedule next poll in 1s
-            setTimeout(poll, 1000);
-          }
-        });
-      }
-
-      poll();
-    });
-  </script>
-</body>
-</html>
 
 <!--begin::Wrapper-->
 <div class="d-flex flex-stack flex-wrap mb-5">
@@ -235,24 +183,6 @@
 </table>
 <!--end::Datatable-->
 
-<h1>Live Logs</h1>
-  <pre id="log-container"></pre>
-
-  <script>
-    const logContainer = document.getElementById('log-container');
-    const es = new EventSource('/sequencingfile/sequencingfileset/stream_logs');
-
-    es.onmessage = e => {
-      logContainer.textContent += e.data + "\n";
-      // auto‐scroll
-      logContainer.scrollTop = logContainer.scrollHeight;
-    };
-
-    es.onerror = err => {
-      console.error("EventSource failed:", err);
-      es.close();
-    };
-  </script>
 
 {% endblock %}
 
