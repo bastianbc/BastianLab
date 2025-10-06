@@ -93,3 +93,48 @@ def save_analysis_run(request):
         analysis_run.sheet.save(csv_filename, content_file, save=True)
 
         return response
+
+
+
+@permission_required_for_async("analysis_run.delete_analysisrun")
+def delete_analysis_run(request,id):
+    try:
+        ar = AnalysisRun.objects.get(id=id)
+        ar.delete()
+        messages.success(request,"Analysis Run %s deleted successfully." % ar.name)
+        deleted = True
+    except Exception as e:
+        messages.error(request, "Analysis Run %s not deleted!" % ar.id)
+        deleted = False
+
+    return JsonResponse({ "deleted":deleted })
+
+
+@permission_required("analysis_run.delete_analysisrun",raise_exception=True)
+def delete_batch_analysis_run(request):
+    try:
+        selected_ids = json.loads(request.GET.get("selected_ids"))
+        AnalysisRun.objects.filter(id__in=selected_ids).delete()
+    except Exception as e:
+        print(str(e))
+        return JsonResponse({ "deleted":False })
+
+    return JsonResponse({ "deleted":True })
+
+
+
+@permission_required_for_async("blocks.delete_blocks")
+def check_can_deleted_async(request):
+    id = request.GET.get("id")
+    instance = AnalysisRun.objects.get(id=id)
+    related_objects = []
+    for field in instance._meta.related_objects:
+        relations = getattr(instance,field.related_name)
+        if relations.count() > 0:
+            related_objects.append({
+                "model": field.related_model.__name__,
+                "count": relations.count()
+            })
+    print("related_objects: ", related_objects)
+
+    return JsonResponse({"related_objects":related_objects})
