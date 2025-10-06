@@ -104,7 +104,9 @@ class SequencingRun(models.Model):
                 "4": "sequencer",
                 "5": "pe",
                 "6": "amp_cycles",
-                "7": "date_run"
+                "7": "date_run",
+                "8": "num_sequencinglibs",
+                "9": "num_file_sets",
             }
             draw = int(kwargs.get('draw', None)[0])
             length = int(kwargs.get('length', None)[0])

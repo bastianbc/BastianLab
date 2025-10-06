@@ -98,7 +98,7 @@ var KTDatatablesServerSide = function () {
                 {
                     targets: 8,
                     className: 'text-center',
-                    orderable: false,
+                    orderable: true,
                     render: function (data, type, row) {
                         if (data > 0) {
                           let id = row["id"];

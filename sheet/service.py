@@ -144,7 +144,6 @@ def generate_file(data, file_name):
     res = []
     seen = []
     for index, row in enumerate(data):
-        print(index)
         sl = SampleLib.objects.get(name=row.name)
         sl_seq_run = f"{sl.name}-{row.seq_run}"
         if sl_seq_run not in seen:
