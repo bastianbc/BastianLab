@@ -264,8 +264,6 @@ TECHNICIAN_GROUP_NAME = "Technicians"
 RESEARCHER_GROUP_NAME = "Researchers"
 PI_GROUP_NAME = "Primary Investigators"
 
-
-
 # Base S3 bucket prefix (per SEC config)
 S3_BASE = f"s3://{AWS_STORAGE_BUCKET_NAME}"
 
