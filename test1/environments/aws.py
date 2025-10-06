@@ -123,7 +123,7 @@ STORAGES = {
             "default_acl": "private",
             "file_overwrite": False,
             # optional key prefix inside the bucket:
-            # "location": "sequencingdata/ProcessedData",
+            "location": "sequencingdata/ProcessedData",
             "object_parameters": AWS_S3_OBJECT_PARAMETERS,
             "addressing_style": AWS_S3_ADDRESSING_STYLE,
             "signature_version": AWS_S3_SIGNATURE_VERSION,
