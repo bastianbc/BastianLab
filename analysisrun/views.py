@@ -59,13 +59,13 @@ def save_analysis_run(request):
         pipeline = request.POST.get('pipeline')
         genome = request.POST.get('genome')
         selected_ids = request.POST.getlist('selected_ids[]')
+        ar = AnalysisRun()
 
-        run_name = f"AR_{request.user}_{date.today():%m_%d_%Y}_{genome}_{(int(AnalysisRun.objects.last().id)+1)}"
+        run_name = f"{ar.generate_name()}_{pipeline}_{genome}"
         csv_filename = f"{run_name}.csv"
 
         # 1) get or create
         analysis_run, created = AnalysisRun.objects.get_or_create(
-            name=run_name,
             defaults={
                 'user':       request.user,
                 'pipeline':   pipeline,
