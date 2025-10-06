@@ -250,13 +250,10 @@ class GVariant(models.Model):
 
             # Get appropriate queryset based on context
             if model_block:
-                print("1"*100)
                 queryset = _get_block_variants_queryset(block_id)
             elif model_area:
-                print("2"*100)
                 queryset = _get_area_variants_queryset(area_id)
             else:
-                print("3"*100)
                 queryset = _get_authorizated_queryset()
 
             total = queryset.count()
@@ -460,6 +457,8 @@ class VariantsView(models.Model):
         managed = False
         db_table = 'variants_view'
 
+
+
     def query_by_args(self, **kwargs):
         try:
             ORDER_COLUMN_CHOICES = {
@@ -473,6 +472,18 @@ class VariantsView(models.Model):
                 "7": "variant",
             }
 
+            def get_kwarg_value(kwargs, key, default=None):
+                """
+                Extract value from kwargs, handling both single values and lists.
+                """
+                value = kwargs.get(key, default)
+                if isinstance(value, (list, tuple)):
+                    try:
+                        return value[0]
+                    except IndexError:
+                        return default
+                return value
+
             draw = int(kwargs.get('draw', None)[0])
             length = int(kwargs.get('length', None)[0])
             start = int(kwargs.get('start', None)[0])
@@ -480,44 +491,40 @@ class VariantsView(models.Model):
             order_column = kwargs.get('order[0][column]', None)[0]
             order = kwargs.get('order[0][dir]', None)[0]
 
+            sample_lib = get_kwarg_value(kwargs, 'sample_lib')
+            block = get_kwarg_value(kwargs, 'block')
+            area = get_kwarg_value(kwargs, 'area')
+            coverage_value = get_kwarg_value(kwargs, 'coverage')
+            log2r_value = get_kwarg_value(kwargs, 'log2r')
+            ref_read_value = get_kwarg_value(kwargs, 'ref_read')
+            alt_read_value = get_kwarg_value(kwargs, 'alt_read')
+
             order_column = ORDER_COLUMN_CHOICES[order_column]
             # django orm '-' -> desc
             if order == 'desc':
                 order_column = '-' + order_column
 
-            queryset = VariantsView.objects.filter(is_superuser=False)
+            queryset = VariantsView.objects.filter()
 
             total = queryset.count()
+            print("sample_lib: ", sample_lib)
+            print("block: ", block)
+            print("area: ", area)
+            print("coverage_value: ", coverage_value)
+            print("log2r_value: ", log2r_value)
+            print("ref_read_value: ", ref_read_value)
+            print("alt_read_value: ", alt_read_value)
 
-            total = queryset.count()
             if sample_lib:
-                queryset = queryset.filter(Q(sample_lib__id=sample_lib))
-
-            if sequencing_run:
-                queryset = queryset.filter(Q(sequencing_run__id=sequencing_run))
+                queryset = queryset.filter(Q(samplelib_id=sample_lib))
 
             if area:
                 queryset = queryset.filter(
-                    Q(sample_lib__na_sl_links__nucacid__area_na_links__area__id=block))
+                    Q(area_id=area))
 
             if block:
                 queryset = queryset.filter(
-                    Q(sample_lib__na_sl_links__nucacid__area_na_links__area__block__id=block))
-
-            if patient:
-                queryset = queryset.filter(
-                    Q(sample_lib__na_sl_links__nucacid__area_na_links__area__block__patient__id=patient))
-            if coverage_value:
-                queryset = queryset.filter(coverage=coverage_value)
-
-            if log2r_value:
-                queryset = queryset.filter(log2r=log2r_value)
-
-            if ref_read_value:
-                queryset = queryset.filter(ref_read=ref_read_value)
-
-            if alt_read_value:
-                queryset = queryset.filter(alt_read=alt_read_value)
+                    Q(block_id=block))
 
             if coverage_value:
                 queryset = queryset.filter(coverage=coverage_value)
@@ -530,17 +537,10 @@ class VariantsView(models.Model):
 
             if alt_read_value:
                 queryset = queryset.filter(alt_read=alt_read_value)
-
-            if search_value:
-                queryset = queryset.filter(
-                    Q(patient__icontains=search_value) |
-                    Q(area__icontains=search_value) |
-                    Q(last_name__icontains=search_value)
-                )
 
             count = queryset.count()
             queryset = queryset.order_by(order_column)[start:start + length]
-            # queryset = queryset[start:start + length]
+
             return {
                 'items': queryset,
                 'count': count,
@@ -551,9 +551,6 @@ class VariantsView(models.Model):
             print(str(e))
             raise
 
-# MATERIALIZED VIEW: variants_view
-#
-# Description: It was created to access all variants more effectively according to the assets it is associated with.
 
 class CosmicGVariantView(models.Model):
     g_variant_id = models.IntegerField()

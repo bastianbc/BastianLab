@@ -14,13 +14,31 @@ from .walk_sequencing_data import create_file_tree
 
 @permission_required_for_async("variant.view_variant")
 def filter_variants(request):
-    variants = GVariant.query_by_args(request.user,**request.GET)
-    serializer = GVariantSerializer(variants['items'], many=True)
-    result = dict()
-    result['data'] = serializer.data
-    result['draw'] = variants['draw']
-    result['recordsTotal'] = variants['total']
-    result['recordsFiltered'] = variants['count']
+    variants = VariantsView.query_by_args(request.user,**request.GET)
+    data = []
+    for variant in variants['items']:
+        data.append({
+            'id': variant.gvariant_id,
+            'chrom': variant.chromosome,
+            'start': variant.g_start,
+            'ref': variant.ref_read,
+            'alt': variant.alt_read,
+            'areas': variant.area_name,
+            'blocks': variant.block_name,
+            'sample_libs': variant.samplelib_name,
+            'genes': variant.gene_name,
+            'cosmic_gene_symbol': variant.cosmic_gene_symbol,
+            'cosmic_aa': variant.cosmic_aa,
+            'cosmic_primary_site_counts': variant.cosmic_primary_site_counts,
+            'total_calls': variant.total_site_counts,
+        })
+
+    result = {
+        'draw': int(request.GET.get('draw', 1)),
+        'recordsTotal': variants['total'],
+        'recordsFiltered': variants['count'],
+        'data': data
+    }
     return JsonResponse(result)
 
 def variants(request):

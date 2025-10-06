@@ -7,10 +7,6 @@ from sequencingrun.models import SequencingRun
 from lab.models import Patient
 
 class FilterForm(forms.Form):
-    sequencing_run=forms.ModelChoiceField(
-        queryset=SequencingRun.objects.filter(variant_calls__isnull=False).distinct(),
-        label="Sequencing Run"
-    )
     sample_lib=forms.ModelChoiceField(
         queryset=SampleLib.objects.filter(variant_calls__isnull=False).distinct(),
         label="Sample Library"
@@ -23,27 +19,15 @@ class FilterForm(forms.Form):
         queryset=Block.objects.filter(block_areas__area_na_links__nucacid__na_sl_links__sample_lib__variant_calls__isnull=False).distinct(),
         label="Blocks"
     )
-    patient=forms.ModelChoiceField(
-        queryset=Patient.objects.filter(
-            patient_blocks__block_areas__area_na_links__nucacid__na_sl_links__sample_lib__variant_calls__isnull=False
-        ).distinct(),
-        label="Patients"
-    )
     coverage = forms.IntegerField(label="Coverage")
     log2r = forms.FloatField(label="Log2r")
     ref_read = forms.IntegerField(label="Ref Read")
     alt_read = forms.IntegerField(label="Alt Read")
-    variant = forms.CharField(label="Variant")
-    variant_file = forms.CharField(label="Variant file")
 
     def __init__(self, *args, **kwargs):
         super(FilterForm, self).__init__(*args, **kwargs)
-        self.fields["patient"].widget.attrs.update({'class': 'form-control-sm'})
-        self.fields["patient"].widget.attrs["data-control"] = "select2"
         self.fields["block"].widget.attrs.update({'class': 'form-control-sm'})
         self.fields["block"].widget.attrs["data-control"] = "select2"
-        self.fields["sequencing_run"].widget.attrs.update({'class': 'form-control-sm'})
-        self.fields["sequencing_run"].widget.attrs["data-control"] = "select2"
         self.fields["sample_lib"].widget.attrs.update({'class': 'form-control-sm'})
         self.fields["sample_lib"].widget.attrs["data-control"] = "select2"
         self.fields["area"].widget.attrs.update({'class': 'form-control-sm'})
@@ -52,5 +36,3 @@ class FilterForm(forms.Form):
         self.fields["log2r"].widget.attrs.update({'class':'form-control-sm'})
         self.fields["ref_read"].widget.attrs.update({'class':'form-control-sm'})
         self.fields["alt_read"].widget.attrs.update({'class':'form-control-sm'})
-        self.fields["variant"].widget.attrs.update({'class':'form-control-sm'})
-        self.fields["variant_file"].widget.attrs.update({'class':'form-control-sm'})
