@@ -66,6 +66,7 @@ def save_analysis_run(request):
         print(csv_filename," ###333")
         # 1) get or create
         analysis_run, created = AnalysisRun.objects.get_or_create(
+            name=ar.generate_name(),
             defaults={
                 'user':       request.user,
                 'pipeline':   pipeline,
