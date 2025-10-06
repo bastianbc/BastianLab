@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 import json
-
+from .storage import CustomFileSystemStorage, analysis_run_upload_to
 
 class AnalysisRun(models.Model):
     PIPELINE_CHOICES = (
@@ -22,7 +22,7 @@ class AnalysisRun(models.Model):
     pipeline = models.CharField(max_length=10, choices=PIPELINE_CHOICES, verbose_name = "Pipeline Version")
     genome = models.CharField(max_length=10, choices=GENOME_CHOICES, verbose_name = "Reference Genome")
     date = models.DateTimeField(auto_now_add=True)
-    sheet = models.FileField(upload_to='sequencingdata/ProcessedData', verbose_name="Sheet File")
+    sheet = models.FileField(upload_to=analysis_run_upload_to, verbose_name="Sheet File")
     sheet_name = models.CharField(max_length=200, blank=True, null=True, verbose_name="Sheet Name")
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=STATUS_CHOICES[0][0], verbose_name = "Status")
     # used_seq_runs = models.FileField(storage=CustomFileSystemStorage(), upload_to=analysis_run_upload_to, verbose_name="SeqRun txt")
