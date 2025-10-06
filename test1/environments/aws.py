@@ -92,7 +92,6 @@ INSTALLED_APPS = [
     'notification',
     'file_manager',
     'gpt',
-    # 'storages',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -130,6 +129,21 @@ AWS_S3_ADDRESSING_STYLE = "path"
 DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 MEDIA_URL = f"https://s3.{AWS_S3_REGION_NAME}.amazonaws.com/{AWS_STORAGE_BUCKET_NAME}/"
 
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+        "OPTIONS": {
+            "bucket_name": AWS_STORAGE_BUCKET_NAME,
+            "region_name": AWS_S3_REGION_NAME,
+            "default_acl": "private",
+            "file_overwrite": False,
+            # All uploads go under this prefix in the bucket:
+            "location": "sequencingdata/ProcessedData",
+        },
+    },
+    # (optional) serve staticfiles from S3 too:
+    # "staticfiles": { "BACKEND": "storages.backends.s3boto3.S3ManifestStaticStorage" },
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
