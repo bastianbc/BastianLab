@@ -1,14 +1,7 @@
-import os
-import django
 from django.db import models
 from django.contrib.auth.models import User
 import json
-from django.conf import settings
-from .storage import CustomFileSystemStorage, analysis_run_upload_to
-# --- Django boot ---
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "test1.settings")
-os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
-django.setup()
+
 
 class AnalysisRun(models.Model):
     PIPELINE_CHOICES = (
