@@ -82,7 +82,7 @@ def serve_pdf(request, pk):
     # Convert the relative path to an absolute path in your filesystem
     qc = SampleQC.objects.get(pk=pk)
     file_path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, qc.variant_file.directory, qc.insert_size_histogram)
-
+    print("### file path: ", file_path)
     try:
         # Serve the file
         return FileResponse(open(file_path, 'rb'), content_type='application/pdf')
