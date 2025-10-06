@@ -102,32 +102,17 @@ CRISPY_FAIL_SILENTLY = not DEBUG
 # ===============================
 INSTALLED_APPS += ["storages"]
 
-# Region/bucket per SEC
 AWS_S3_REGION_NAME = "us-west-2"
 AWS_STORAGE_BUCKET_NAME = "bastian-lab-169-3-r-us-west-2.sec.ucsf.edu"
+AWS_S3_SIGNATURE_VERSION = "s3v4"
+AWS_S3_ADDRESSING_STYLE = "path"  # required for dotted bucket names
 
-# Use instance role credentials (SEC standard) — do NOT set access keys here.
-
-# Force KMS on every object, with UCSF-managed CMK
+# Optional: object parameters (ensure the KMS alias exists & IAM allows kms:Encrypt)
 AWS_S3_OBJECT_PARAMETERS = {
     "ServerSideEncryption": "aws:kms",
     "SSEKMSKeyId": "alias/managed-s3-key",
-    # (Optional but recommended) cache headers for static-like media
     "CacheControl": "max-age=86400",
 }
-
-# Private bucket with signed URLs
-AWS_QUERYSTRING_AUTH = True
-AWS_DEFAULT_ACL = None
-AWS_S3_FILE_OVERWRITE = False
-AWS_S3_SIGNATURE_VERSION = "s3v4"
-
-# Buckets with dots over TLS => path-style avoids cert mismatch
-AWS_S3_ADDRESSING_STYLE = "path"
-
-# Store MEDIA on S3; keep STATIC local unless you intentionally move it
-DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-MEDIA_URL = f"https://s3.{AWS_S3_REGION_NAME}.amazonaws.com/{AWS_STORAGE_BUCKET_NAME}/"
 
 STORAGES = {
     "default": {
@@ -137,10 +122,14 @@ STORAGES = {
             "region_name": AWS_S3_REGION_NAME,
             "default_acl": "private",
             "file_overwrite": False,
+            # optional key prefix inside the bucket:
+            # "location": "sequencingdata/ProcessedData",
+            "object_parameters": AWS_S3_OBJECT_PARAMETERS,
+            "addressing_style": AWS_S3_ADDRESSING_STYLE,
+            "signature_version": AWS_S3_SIGNATURE_VERSION,
         },
     },
-    # (optional) serve staticfiles from S3 too:
-    # "staticfiles": { "BACKEND": "storages.backends.s3boto3.S3ManifestStaticStorage" },
+    # "staticfiles": {"BACKEND": "storages.backends.s3boto3.S3ManifestStaticStorage"},
 }
 
 MIDDLEWARE = [
