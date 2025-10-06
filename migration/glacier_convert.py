@@ -230,12 +230,15 @@ def _copy_to_standard(s3_res, bucket, key):
     print(f"✅ STANDARD: {bucket}/{key}")
 
 def _request_restore(s3_cli, bucket, key, tier="Standard", days=7):
-    if DRY_RUN:
-        print(f"DRY: restore {bucket}/{key} (tier={tier})")
-        return
-    s3_cli.restore_object(Bucket=bucket, Key=key,
-                          RestoreRequest={"Days": days, "GlacierJobParameters": {"Tier": tier}})
-    print(f"🕒 restore requested: {bucket}/{key}")
+    try:
+        if DRY_RUN:
+            print(f"DRY: restore {bucket}/{key} (tier={tier})")
+            return
+        s3_cli.restore_object(Bucket=bucket, Key=key,
+                              RestoreRequest={"Days": days, "GlacierJobParameters": {"Tier": tier}})
+        print(f"🕒 restore requested: {bucket}/{key}")
+    except ClientError as e:
+        print(e)
 
 def make_qc_standard():
     s3_res = boto3.resource("s3", region_name=AWS_REGION)
