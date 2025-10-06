@@ -45,6 +45,7 @@ class AnalysisRun(models.Model):
             return "AR1"
 
     def save(self, *args, **kwargs):
+        print("save"*30)
         if not self.name:
             self.name = self.generate_name()
         super(AnalysisRun, self).save(*args, **kwargs)
