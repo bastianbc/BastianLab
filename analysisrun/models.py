@@ -39,6 +39,7 @@ class AnalysisRun(models.Model):
         last_run = AnalysisRun.objects.all().order_by('id').last()
         if last_run:
             last_id = int(last_run.name.replace('AR', ''))
+            print("### :", f"AR{last_id + 1}")
             return f"AR{last_id + 1}"
         else:
             return "AR1"
@@ -51,6 +52,7 @@ class AnalysisRun(models.Model):
     def analysis_run_upload_to(self, instance, filename):
         # instance.name is your unique run name (e.g. "AR_2025_05_05_hg38")
         # this will save into: <SEQUENCING_FILES_SOURCE_DIRECTORY>/AR_2025_05_05_hg38/filename
+        print("$$$ :", f"{instance.name}/{filename}")
         return f"{instance.name}/{filename}"
 
     def query_by_args(self, user, **kwargs):
