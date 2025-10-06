@@ -10,6 +10,11 @@ import logging
 import os
 from django.http import FileResponse, HttpResponse
 from django.conf import settings
+from urllib.parse import urlparse
+from django.http import FileResponse, Http404, HttpResponseRedirect
+from django.core.files.storage import default_storage
+from django.shortcuts import get_object_or_404
+import posixpath
 
 logger = logging.getLogger("file")
 
@@ -77,15 +82,57 @@ def get_sampleqc_detail(request, pk):
         'form': form,
     })
 
+#
+# def serve_pdf(request, pk):
+#     # Convert the relative path to an absolute path in your filesystem
+#     qc = SampleQC.objects.get(pk=pk)
+#     file_path = os.path.join(qc.variant_file.directory, qc.insert_size_histogram)
+#     print("### file path: ", file_path)
+#     print(os.path.exists(file_path))
+#     try:
+#         # Serve the file
+#         return FileResponse(open(file_path, 'rb'), content_type='application/pdf')
+#     except FileNotFoundError:
+#         return HttpResponse("PDF not found", status=404)
+
+
+def _to_key(prefix: str, filename: str) -> str:
+    """Return an S3 key from a prefix that may be a key, s3:// URL, or https URL."""
+    prefix = (prefix or "").strip()
+    filename = (filename or "").lstrip("/")
+
+    if prefix.startswith(("http://", "https://")):
+        p = urlparse(prefix)
+        # e.g. https://s3.us-west-2.amazonaws.com/<bucket>/<key...>
+        path = p.path.lstrip("/")
+        parts = path.split("/", 1)
+        key_prefix = parts[1] if len(parts) == 2 else ""
+    elif prefix.startswith("s3://"):
+        # s3://bucket/key...
+        path = prefix[5:]
+        parts = path.split("/", 1)
+        key_prefix = parts[1] if len(parts) == 2 else ""
+    else:
+        # already a key prefix
+        key_prefix = prefix.lstrip("/")
+
+    return filename if not key_prefix else posixpath.join(key_prefix, filename)
 
 def serve_pdf(request, pk):
-    # Convert the relative path to an absolute path in your filesystem
-    qc = SampleQC.objects.get(pk=pk)
-    file_path = os.path.join(qc.variant_file.directory, qc.insert_size_histogram)
-    print("### file path: ", file_path)
-    print(os.path.exists(file_path))
+    qc = get_object_or_404(SampleQC, pk=pk)
+
+    # Build the S3 key for the file
+    key = _to_key(qc.variant_file.directory, qc.insert_size_histogram)
+
+    # (A) Fast path: redirect to signed S3 URL (recommended for large PDFs)
     try:
-        # Serve the file
-        return FileResponse(open(file_path, 'rb'), content_type='application/pdf')
-    except FileNotFoundError:
-        return HttpResponse("PDF not found", status=404)
+        url = default_storage.url(key)  # generates signed URL if configured
+        return HttpResponseRedirect(url)
+    except Exception:
+        # (B) Fallback: stream from storage
+        if not default_storage.exists(key):
+            raise Http404("PDF not found")
+        f = default_storage.open(key, "rb")
+        resp = FileResponse(f, content_type="application/pdf")
+        resp["Content-Disposition"] = f'inline; filename="{qc.insert_size_histogram}"'
+        return resp
