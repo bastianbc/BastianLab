@@ -83,6 +83,7 @@ def serve_pdf(request, pk):
     qc = SampleQC.objects.get(pk=pk)
     file_path = os.path.join(qc.variant_file.directory, qc.insert_size_histogram)
     print("### file path: ", file_path)
+    print(os.path.exists(file_path))
     try:
         # Serve the file
         return FileResponse(open(file_path, 'rb'), content_type='application/pdf')
