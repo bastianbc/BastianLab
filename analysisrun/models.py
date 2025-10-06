@@ -5,7 +5,7 @@ from .storage import CustomFileSystemStorage, analysis_run_upload_to
 
 class AnalysisRun(models.Model):
     PIPELINE_CHOICES = (
-        ("v1", "V1"),
+        ("dna-v1", "DNA-V1"),
     )
 
     GENOME_CHOICES = (
@@ -50,11 +50,6 @@ class AnalysisRun(models.Model):
             self.name = self.generate_name()
         super(AnalysisRun, self).save(*args, **kwargs)
 
-    def analysis_run_upload_to(self, instance, filename):
-        # instance.name is your unique run name (e.g. "AR_2025_05_05_hg38")
-        # this will save into: <SEQUENCING_FILES_SOURCE_DIRECTORY>/AR_2025_05_05_hg38/filename
-        print("$$$ :", f"{instance.name}/{filename}")
-        return f"{instance.name}/{filename}"
 
     def query_by_args(self, user, **kwargs):
         def _get_authorizated_queryset():
