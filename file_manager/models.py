@@ -26,7 +26,7 @@ class FileProxyManager(models.Manager):
     """Custom manager for handling SMB files."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)  # Ensure proper manager initialization
-        self.smb_directory_labshare = settings.SMB_DIRECTORY_LABSHARE# Corrected attribute name
+        self.smb_directory_labshare = settings.BASTIANRAID_DIRECTORY# Corrected attribute name
         self.smb_directory_sequencingdata = settings.SMB_DIRECTORY_SEQUENCINGDATA  # Corrected capitalization
         self.variant_file_locations = ['alignment', 'snv', 'cnv']
         self.VALID_FILENAME_REGEX = re.compile(
