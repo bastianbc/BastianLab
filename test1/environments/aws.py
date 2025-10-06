@@ -137,8 +137,6 @@ STORAGES = {
             "region_name": AWS_S3_REGION_NAME,
             "default_acl": "private",
             "file_overwrite": False,
-            # All uploads go under this prefix in the bucket:
-            "location": "sequencingdata/ProcessedData",
         },
     },
     # (optional) serve staticfiles from S3 too:
