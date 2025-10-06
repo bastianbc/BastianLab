@@ -63,7 +63,7 @@ def save_analysis_run(request):
 
         run_name = f"{ar.generate_name()}_{pipeline}_{genome}"
         csv_filename = f"{run_name}.csv"
-
+        print(csv_filename," ###333")
         # 1) get or create
         analysis_run, created = AnalysisRun.objects.get_or_create(
             defaults={
