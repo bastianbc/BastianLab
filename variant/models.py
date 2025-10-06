@@ -507,13 +507,6 @@ class VariantsView(models.Model):
             queryset = VariantsView.objects.filter()
 
             total = queryset.count()
-            print("sample_lib: ", sample_lib)
-            print("block: ", block)
-            print("area: ", area)
-            print("coverage_value: ", coverage_value)
-            print("log2r_value: ", log2r_value)
-            print("ref_read_value: ", ref_read_value)
-            print("alt_read_value: ", alt_read_value)
 
             if sample_lib:
                 queryset = queryset.filter(Q(samplelib_id=sample_lib))

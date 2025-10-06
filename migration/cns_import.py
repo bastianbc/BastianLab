@@ -92,7 +92,6 @@ def create_csn(row, file):
             probes=row['probes'],
             weight=row['weight']
         )
-        print("csn created")
     except Exception as e:
         print(e)
 

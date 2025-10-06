@@ -63,7 +63,6 @@ def save_analysis_run(request):
 
         run_name = f"{ar.generate_name()}_{pipeline}_{genome}"
         csv_filename = f"{run_name}.csv"
-        print(csv_filename," ###333")
         # 1) get or create
         analysis_run, created = AnalysisRun.objects.get_or_create(
             name=ar.generate_name(),
@@ -90,7 +89,6 @@ def save_analysis_run(request):
             else response.content
         )
         content_file = ContentFile(raw_bytes)
-        print("@@@ ", csv_filename)
         analysis_run.sheet.save(csv_filename, content_file, save=True)
 
         return response
@@ -136,6 +134,5 @@ def check_can_deleted_async(request):
                 "model": field.related_model.__name__,
                 "count": relations.count()
             })
-    print("related_objects: ", related_objects)
 
     return JsonResponse({"related_objects":related_objects})
