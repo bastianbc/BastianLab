@@ -24,6 +24,8 @@ def filter_analysisruns(request):
     analysisruns = AnalysisRun().query_by_args(request.user, **request.GET)
     serializer = AnalysisRunSerializer(analysisruns["items"], many=True)
     result = dict()
+    for i in serializer.data:
+        print(i)
     result["data"] = serializer.data
     result["draw"] = analysisruns["draw"]
     result["recordsTotal"] = analysisruns["total"]
