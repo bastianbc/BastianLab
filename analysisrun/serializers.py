@@ -55,3 +55,10 @@ class AnalysisRunSerializer(serializers.ModelSerializer):
         else:
             raw = str(f or "")
         return _short_s3_or_local(raw)
+
+
+    def get_DT_RowId(self, obj):
+       return getattr(obj, 'id')
+
+    def get_status(self, obj):
+        return obj.get_status_display()
