@@ -685,6 +685,8 @@ var KTDatatablesServerSide = function () {
             modalEl.querySelector('a[name="block_name"]').textContent  = data.block.name;
             modalEl.querySelector('a[name="diagnosis"]').textContent   = data.block.diagnosis;
             modalEl.querySelector('a[name="aperio_link"]').textContent   = data.block.aperio_link;
+            modalEl.querySelector('a[name="aperio_link"]').href = data.block.aperio_link;
+
           }
 
           return {

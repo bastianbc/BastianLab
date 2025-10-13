@@ -198,7 +198,7 @@ def get_block_async_by_area(request, id):
             'id': block.id,
             'name': block.name,
             'diagnosis': block.diagnosis,
-            'aperio_link': f"{block_url}{block.scan_number}",
+            "aperio_link": f"{block_url}{block.scan_number}" if block.scan_number else "",
         },
         'patient_id': block.patient.pat_id,
     })

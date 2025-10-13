@@ -1,11 +1,23 @@
-from sequencingfile.models import SMBDirectory   # adjust import
+
+from boto3.s3.transfer import TransferConfig
+import os
+import argparse, time
 import boto3
 from botocore.exceptions import ClientError
-from boto3.s3.transfer import TransferConfig
+from django.db import transaction
+
+from sequencingfile.models import SMBDirectory  # <-- adjust to your app
+from qc.models import SampleQC
 
 AWS_REGION = "us-west-2"
 BUCKET_NAME = "bastian-lab-169-3-r-us-west-2.sec.ucsf.edu"
 DRY_RUN = False   # set True first to preview changes
+
+
+# Map S3 classes to your two levels
+STANDARD_CLASSES = {"STANDARD", "STANDARD_IA", "ONEZONE_IA", "INTELLIGENT_TIERING"}
+GLACIER_CLASSES  = {"GLACIER", "GLACIER_IR", "DEEP_ARCHIVE"}
+
 
 CONFIG = TransferConfig(
     multipart_threshold=8 * 1024 * 1024,
@@ -88,17 +100,7 @@ def convert_glacier_and_mark_level():
 
 
 
-from django.db import transaction
 
-from sequencingfile.models import SMBDirectory  # <-- adjust to your app
-
-AWS_REGION  = "us-west-2"
-BUCKET_NAME = "bastian-lab-169-3-r-us-west-2.sec.ucsf.edu"
-DRY_RUN     = False
-
-# Map S3 classes to your two levels
-STANDARD_CLASSES = {"STANDARD", "STANDARD_IA", "ONEZONE_IA", "INTELLIGENT_TIERING"}
-GLACIER_CLASSES  = {"GLACIER", "GLACIER_IR", "DEEP_ARCHIVE"}
 
 def classify(storage_class: str) -> int:
     if not storage_class or storage_class in STANDARD_CLASSES:
@@ -106,6 +108,7 @@ def classify(storage_class: str) -> int:
     if storage_class in GLACIER_CLASSES:
         return 1
     return 0
+
 
 def strip_volumes_prefix(path: str) -> str:
     """
@@ -180,3 +183,101 @@ def sync_smbdirs_to_s3():
                 print(f"[MISSING] {smbdir.directory[-3:]} not in S3 - prefix: {prefix[-3:]}")
         except Exception as e:
             print(e)
+
+import posixpath
+from urllib.parse import urlparse
+import boto3
+from botocore.exceptions import ClientError
+
+KMS_ALIAS   = "alias/managed-s3-key"  # set "" if not using SSE-KMS
+
+ARCHIVE = {"GLACIER", "DEEP_ARCHIVE"}
+STANDARDISH = {"STANDARD", "STANDARD_IA", "ONEZONE_IA", "INTELLIGENT_TIERING", "GLACIER_IR"}
+
+def _bucket_key_from_path(path: str):
+    """Accepts key prefix, s3:// URL, or https S3 URL; returns (bucket, key)."""
+    p = (path or "").strip()
+    if not p:
+        return (BUCKET_NAME, "")
+    if p.startswith("s3://"):
+        u = urlparse(p)
+        return (u.netloc or BUCKET_NAME, u.path.lstrip("/"))
+    if p.startswith(("http://", "https://")):
+        u = urlparse(p)
+        host, keypath = u.netloc, u.path.lstrip("/")
+        if ".s3." in host:                      # virtual-hosted
+            bucket = host.split(".s3.")[0]
+            return (bucket, keypath)
+        parts = keypath.split("/", 1)           # path-style
+        return (parts[0], parts[1] if len(parts) == 2 else "")
+    # treat as plain key
+    return (BUCKET_NAME, p.lstrip("/"))
+
+def _to_key(directory: str, filename: str) -> (str, str):
+    bucket, prefix = _bucket_key_from_path(directory)
+    key = posixpath.join(prefix.strip("/"), (filename or "").lstrip("/")) if filename else prefix
+    return bucket, key
+
+def _copy_to_standard(s3_res, bucket, key):
+    src = {"Bucket": bucket, "Key": key}
+    extra = {"StorageClass": "STANDARD", "MetadataDirective": "COPY"}
+    if KMS_ALIAS:
+        extra.update({"ServerSideEncryption": "aws:kms", "SSEKMSKeyId": KMS_ALIAS})
+    if DRY_RUN:
+        print(f"DRY: copy STANDARD {bucket}/{key}")
+        return
+    s3_res.Object(bucket, key).copy(src, ExtraArgs=extra)
+    print(f"✅ STANDARD: {bucket}/{key}")
+
+def _request_restore(s3_cli, bucket, key, tier="Standard", days=7):
+    try:
+        if DRY_RUN:
+            print(f"DRY: restore {bucket}/{key} (tier={tier})")
+            return
+        s3_cli.restore_object(Bucket=bucket, Key=key,
+                              RestoreRequest={"Days": days, "GlacierJobParameters": {"Tier": tier}})
+        print(f"🕒 restore requested: {bucket}/{key}")
+    except ClientError as e:
+        print(e)
+
+def make_qc_standard():
+    s3_res = boto3.resource("s3", region_name=AWS_REGION)
+    s3_cli = s3_res.meta.client
+
+    rows = SampleQC.objects.all().select_related("variant_file")  # filter as you wish
+
+    for row in rows:
+        # Build the “local” path you were using, then translate to (bucket,key)
+        local_path = posixpath.join(row.variant_file.directory or "", row.insert_size_histogram or "")
+        bucket, key = _bucket_key_from_path(local_path)
+
+        if not key or key.endswith("/"):
+            print(f"⏭️  skip invalid: {local_path}")
+            continue
+
+        try:
+            h = s3_cli.head_object(Bucket=bucket, Key=key)
+        except ClientError as e:
+            code = e.response.get("Error", {}).get("Code")
+            print(f"❌ head_object {bucket}/{key}: {code}")
+            continue
+
+        sc = h.get("StorageClass", "STANDARD")
+        restore = h.get("Restore", "")
+
+        if sc == "STANDARD":
+            print(f"✅ already STANDARD: {bucket}/{key}")
+            continue
+
+        if sc in STANDARDISH:
+            _copy_to_standard(s3_res, bucket, key)
+            continue
+
+        if sc in ARCHIVE:
+            if 'ongoing-request="false"' in str(restore):
+                _copy_to_standard(s3_res, bucket, key)
+            else:
+                _request_restore(s3_cli, bucket, key, tier="Standard", days=7)
+            continue
+
+        print(f"ℹ️ unknown class {sc}: {bucket}/{key}")

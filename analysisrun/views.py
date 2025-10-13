@@ -26,6 +26,8 @@ def filter_analysisruns(request):
     analysisruns = AnalysisRun().query_by_args(request.user, **request.GET)
     serializer = AnalysisRunSerializer(analysisruns["items"], many=True)
     result = dict()
+    for i in serializer.data:
+        print(i)
     result["data"] = serializer.data
     result["draw"] = analysisruns["draw"]
     result["recordsTotal"] = analysisruns["total"]
@@ -58,13 +60,13 @@ def save_analysis_run(request):
         pipeline = request.POST.get('pipeline')
         genome = request.POST.get('genome')
         selected_ids = request.POST.getlist('selected_ids[]')
+        ar = AnalysisRun()
 
-        run_name = f"AR_{request.user}_{date.today():%m_%d_%Y}_{genome}_{(int(AnalysisRun.objects.last().id)+1)}"
+        run_name = f"{ar.generate_name()}_{pipeline}_{genome}"
         csv_filename = f"{run_name}.csv"
-
         # 1) get or create
         analysis_run, created = AnalysisRun.objects.get_or_create(
-            name=run_name,
+            name=ar.generate_name(),
             defaults={
                 'user':       request.user,
                 'pipeline':   pipeline,
@@ -88,7 +90,6 @@ def save_analysis_run(request):
             else response.content
         )
         content_file = ContentFile(raw_bytes)
-
         analysis_run.sheet.save(csv_filename, content_file, save=True)
 
         return response
@@ -140,3 +141,46 @@ def get_import_status(request, ar_name):
     }
 
     return JsonResponse(response)
+
+
+@permission_required_for_async("analysis_run.delete_analysisrun")
+def delete_analysis_run(request,id):
+    try:
+        ar = AnalysisRun.objects.get(id=id)
+        ar.delete()
+        messages.success(request,"Analysis Run %s deleted successfully." % ar.name)
+        deleted = True
+    except Exception as e:
+        messages.error(request, "Analysis Run %s not deleted!" % ar.id)
+        deleted = False
+
+    return JsonResponse({ "deleted":deleted })
+
+
+@permission_required("analysis_run.delete_analysisrun",raise_exception=True)
+def delete_batch_analysis_run(request):
+    try:
+        selected_ids = json.loads(request.GET.get("selected_ids"))
+        AnalysisRun.objects.filter(id__in=selected_ids).delete()
+    except Exception as e:
+        print(str(e))
+        return JsonResponse({ "deleted":False })
+
+    return JsonResponse({ "deleted":True })
+
+
+
+@permission_required_for_async("blocks.delete_blocks")
+def check_can_deleted_async(request):
+    id = request.GET.get("id")
+    instance = AnalysisRun.objects.get(id=id)
+    related_objects = []
+    for field in instance._meta.related_objects:
+        relations = getattr(instance,field.related_name)
+        if relations.count() > 0:
+            related_objects.append({
+                "model": field.related_model.__name__,
+                "count": relations.count()
+            })
+
+    return JsonResponse({"related_objects":related_objects})

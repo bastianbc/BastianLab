@@ -107,7 +107,7 @@ var KTDatatablesServerSide = function () {
                     orderable: true,
                     render: function (data, type, row) {
                       if (data) {
-                        return `<a href="javascript:;" class="scan-image" data-url="`+ row["block_url"] + row["scan_number"] +`"><i class="fa-solid fa-image fa-xl" style="color: #40f900;"></i></a>`;
+                        return `<a href="javascript:;" class="scan-image" data-url="`+ row["block_url"] + row["scan_number"] +`"><i class="fa-solid fa-image fa-xl" style="color: #0047f9;"></i></a>`;
                       }
                       return "";
                     }
@@ -1049,10 +1049,12 @@ var KTDatatablesServerSide = function () {
           }
 
           function populateBlockDetails(data) {
-            modal.querySelector('a[name="patient_id"]').textContent = data.patient_id;
-            modal.querySelector('a[name="block_name"]').textContent  = data.block.name;
-            modal.querySelector('a[name="diagnosis"]').textContent   = data.block.diagnosis;
-            modal.querySelector('a[name="aperio_link"]').textContent   = data.block.aperio_link;
+              modal.querySelector('a[name="patient_id"]').textContent = data.patient_id;
+              modal.querySelector('a[name="block_name"]').textContent = data.block.name;
+              modal.querySelector('a[name="diagnosis"]').textContent = data.block.diagnosis;
+              modal.querySelector('a[name="aperio_link"]').textContent = data.block.aperio_link;
+              modal.querySelector('a[name="aperio_link"]').href = data.block.aperio_link;
+
           }
 
           function createTab(id, text, isActive) {

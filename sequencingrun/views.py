@@ -204,7 +204,6 @@ def get_sequencing_files(request, id):
             "sequencing_run": SingleSequencingRunSerializer(sequencing_run).data
         })
     except Exception as e:
-        print("$"*100)
         return JsonResponse({"success": False, "message": str(e)})
 
 def save_sequencing_files(request, id):
@@ -216,11 +215,8 @@ def save_sequencing_files(request, id):
         data = json.loads(request.POST.get('data'))
         # files from source directory
         file_sets = helper.get_file_sets(sequencing_run, sample_libs)
-        print("1"*10)
 
-        print(file_sets)
         files_created = helper.create_files_and_sets(file_sets, sequencing_run)
-        print(files_created)
         if files_created:
             return JsonResponse({"success": True, "data": files_created})
         else:

@@ -29,11 +29,9 @@ def get_sheet(request):
 
 
 def create_csv_sheet(request):
-    print(request)
     try:
         seq_runs = SequencingRun.objects.filter()
         query_set = query_by_args(request.user, seq_runs, **request.GET)
-        print(query_set)
         return generate_file(data=query_set, file_name="Analysis Report")
     except Exception as e:
         print(e)
@@ -72,5 +70,4 @@ def sheet_multiple(request):
     selected_ids = json.loads(request.POST.get("selected_ids"))
     seq_runs = SequencingRun.objects.filter(id__in=selected_ids)
     query_set = query_by_args(request.user, seq_runs, **request.GET)
-    serializer = CustomSampleLibSerializer(query_set, many=True)
-    return generate_file(data=serializer.data, file_name=("_".join([s.name for s in seq_runs]))[:50])
+    return generate_file(data=query_set, file_name=("_".join([s.name for s in seq_runs]))[:50])

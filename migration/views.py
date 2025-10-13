@@ -800,9 +800,9 @@ def generate_file_set(file, seq_run, sample_lib):
     return file_set
 
 def import_genes(request):
-    from .glacier_convert import convert_glacier_and_mark_level, register_missing_from_db, sync_smbdirs_to_s3
+    from .glacier_convert import make_qc_standard
     from .smb_registration_s3 import register_smb_from_s3
-    sync_smbdirs_to_s3()
+    make_qc_standard()
 
 
 def import_file_tree(request):

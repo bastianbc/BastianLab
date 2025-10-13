@@ -288,7 +288,7 @@ def get_block_areas(request, id):
                 'id': block.id,
                 'name': block.name,
                 'diagnosis': block.diagnosis,
-                'aperio_link': f"{block_url}{block.scan_number}",
+                "aperio_link": f"{block_url}{block.scan_number}" if block.scan_number else "",
             },
             'areas': list(areas.values('id', 'name', 'area_type'))
         }

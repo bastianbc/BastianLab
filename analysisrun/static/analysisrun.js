@@ -105,23 +105,7 @@ var KTDatatablesServerSide = function () {
 
                                 <!--begin::Menu item-->
                                 <div class="menu-item">
-                                    <a href="javascript:;" class="menu-link cns-link text-start"  data-ar-name="${row.name}">
-                                        Import CNS
-                                    </a>
-                                </div>
-                                <!--end::Menu item-->
-
-                                <!--begin::Menu item-->
-                                <div class="menu-item">
-                                    <a href="javascript:;" class="menu-link qc-link text-start"  data-ar-name="${row.name}">
-                                        Import QC
-                                    </a>
-                                </div>
-                                <!--end::Menu item-->
-
-                                <!--begin::Menu item-->
-                                <div class="menu-item">
-                                    <a href="#` + row["id"] + `" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
+                                    <a href="/analysisrun/delete/` + row["id"] + `" class="menu-link px-3" data-kt-docs-table-filter="delete_row">
                                         Delete
                                     </a>
                                 </div>

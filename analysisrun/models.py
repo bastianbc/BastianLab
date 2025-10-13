@@ -5,7 +5,7 @@ from .storage import CustomFileSystemStorage, analysis_run_upload_to
 
 class AnalysisRun(models.Model):
     PIPELINE_CHOICES = (
-        ("v1", "V1"),
+        ("dna-v1", "DNA-V1"),
     )
 
     GENOME_CHOICES = (
@@ -23,7 +23,7 @@ class AnalysisRun(models.Model):
     pipeline = models.CharField(max_length=10, choices=PIPELINE_CHOICES, verbose_name = "Pipeline Version")
     genome = models.CharField(max_length=10, choices=GENOME_CHOICES, verbose_name = "Reference Genome")
     date = models.DateTimeField(auto_now_add=True)
-    sheet = models.FileField(storage=CustomFileSystemStorage(), upload_to=analysis_run_upload_to, verbose_name="Sheet File")
+    sheet = models.FileField(upload_to=analysis_run_upload_to, verbose_name="Sheet File")
     sheet_name = models.CharField(max_length=200, blank=True, null=True, verbose_name="Sheet Name")
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=STATUS_CHOICES[1][0], verbose_name = "Status")
     # used_seq_runs = models.FileField(storage=CustomFileSystemStorage(), upload_to=analysis_run_upload_to, verbose_name="SeqRun txt")
@@ -40,19 +40,17 @@ class AnalysisRun(models.Model):
         last_run = AnalysisRun.objects.all().order_by('id').last()
         if last_run:
             last_id = int(last_run.name.replace('AR', ''))
+            print("### :", f"AR{last_id + 1}")
             return f"AR{last_id + 1}"
         else:
             return "AR1"
 
     def save(self, *args, **kwargs):
+        print("save"*30)
         if not self.name:
             self.name = self.generate_name()
         super(AnalysisRun, self).save(*args, **kwargs)
 
-    def analysis_run_upload_to(self, instance, filename):
-        # instance.name is your unique run name (e.g. "AR_2025_05_05_hg38")
-        # this will save into: <SEQUENCING_FILES_SOURCE_DIRECTORY>/AR_2025_05_05_hg38/filename
-        return f"{instance.name}/{filename}"
 
     def query_by_args(self, user, **kwargs):
         def _get_authorizated_queryset():

@@ -259,3 +259,5 @@ TEMP_DIRECTORY = Path(Path(SMB_DIRECTORY_LABSHARE) / "BastianRaid-02" / "TEMP")
 HISEQDATA_DIRECTORY = Path(Path(SMB_DIRECTORY_LABSHARE) / "BastianRaid-02" / "HiSeqData")
 
 VARIANT_FILES_SOURCE_DIRECTORY = os.path.join(BASE_DIR,"uploads", "Small_Gene_Panel")
+
+BASTIANRAID_DIRECTORY = "BastianRaid-02"

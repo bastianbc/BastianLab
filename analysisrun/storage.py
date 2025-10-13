@@ -7,6 +7,7 @@ class CustomFileSystemStorage(FileSystemStorage):
         # Default directory to store files
         kwargs['location'] = settings.SEQUENCING_FILES_SOURCE_DIRECTORY
         # prevent any chmod() calls
+        print("CustomFileSystemStorage", kwargs['location'])
         kwargs['file_permissions_mode'] = None
         kwargs['directory_permissions_mode'] = None
         super(CustomFileSystemStorage, self).__init__(*args, **kwargs)
@@ -31,4 +32,4 @@ class CustomFileSystemStorage(FileSystemStorage):
 # Custom storage to write files under SEQUENCING_FILES_SOURCE_DIRECTORY
 def analysis_run_upload_to(instance, filename):
     # Saves to: <SEQUENCING_FILES_SOURCE_DIRECTORY>/<run_name>/<filename>
-    return f"{instance.name}/{filename}"
+    return f"sequencingdata/ProcessedData/{instance.name}_{instance.pipeline}_{instance.genome}/{filename}"

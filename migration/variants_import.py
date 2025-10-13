@@ -405,7 +405,6 @@ def variant_file_parser(file_path, analysis_run_name):
     try:
         # Read file
         logger.debug("Reading file with pandas")
-        print(f"{file_path}")
         df = read_csv_file_custom(file_path)
         df = df.reset_index(drop=True)
 

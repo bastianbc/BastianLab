@@ -13,17 +13,13 @@ var KTDatatablesServerSide = function () {
     // Private functions
     var initDatatable = function (
         initialValue,
-        filterPatient,
         filterArea,
         filterBlock,
         filterSampleLib,
-        filterSequencingRun,
         filterCoverage,
         filterLog2r,
         filterRefRead,
-        filterAltRead,
-        filterVariant,
-        filterVariantFile
+        filterAltRead
         ) {
 
         $.fn.dataTable.moment( 'MM/DD/YYYY' );
@@ -50,17 +46,13 @@ var KTDatatablesServerSide = function () {
               url: '/variant/filter_variants',
               type: 'GET',
               data:{
-                "patient": filterPatient,
                 "area": filterArea,
                 "block": filterBlock,
                 "sample_lib": filterSampleLib,
-                "sequencing_run":filterSequencingRun,
                 "coverage": filterCoverage,
                 "log2r": filterLog2r,
                 "ref_read": filterRefRead,
                 "alt_read": filterAltRead,
-                "variant": filterVariant,
-                "variant_file": filterVariantFile
               },
               error: function (xhr, ajaxOptions, thrownError) {
                   if (xhr.status == 403) {
@@ -84,11 +76,9 @@ var KTDatatablesServerSide = function () {
                 { data: 'start' },
                 { data: 'ref' },
                 { data: 'alt' },
-                { data: 'patients' },
                 { data: 'areas' },
                 { data: 'blocks' },
                 { data: 'sample_libs' },
-                { data: 'sequencing_runs' },
                 { data: 'genes' },
                 { data: 'cosmic_gene_symbol' },
                 { data: 'cosmic_aa' },
@@ -106,104 +96,6 @@ var KTDatatablesServerSide = function () {
                                 <input class="form-check-input" type="checkbox" value="${data}" />
                             </div>`;
                     }
-                },
-                {
-                    // Patients column (index 5) - expects array of [id, name] tuples
-                    targets: 5,
-                    render: function (data, type, row) {
-                        if (!data || !Array.isArray(data)) return '';
-                        return data.map(function(patient) {
-                            if (patient) {
-                              var patientId = patient["id"]; // id
-                              var patientName = patient["name"]; // name
-                              return `<a href="/patients/edit/${patientId}" class="text-primary">${patientName}</a>`;
-                            }
-                        }).join(', ');
-                    }
-                },
-                {
-                    // Areas column (index 6) - expects array of [id, name] tuples
-                    targets: 6,
-                    render: function (data, type, row) {
-                        if (!data || !Array.isArray(data)) return '';
-                        return data.map(function(area) {
-                            var areaId = area["id"]; // id
-                            var areaName = area["name"]; // name
-                            return `<a href="/areas/edit/${areaId}" class="text-primary">${areaName}</a>`;
-                        }).join(', ');
-                    }
-                },
-                {
-                    // Blocks column (index 7) - expects array of [id, name] tuples
-                    targets: 7,
-                    render: function (data, type, row) {
-                        if (!data || !Array.isArray(data)) return '';
-                        return data.map(function(block) {
-                            var blockId = block["id"]; // id
-                            var blockName = block["name"]; // name
-                            return `<a href="/blocks/edit/${blockId}" class="text-primary">${blockName}</a>`;
-                        }).join(', ');
-                    }
-                },
-                {
-                    // Sample libraries column (index 8) - expects array of [id, name] tuples
-                    targets: 8,
-                    render: function (data, type, row) {
-                        if (!data || !Array.isArray(data)) return '';
-                        return data.map(function(sampleLib) {
-                            var sampleLibId = sampleLib["id"]; // id
-                            var sampleLibName = sampleLib["name"]; // name
-                            return `<a href="/samplelib/edit/${sampleLibId}" class="text-primary">${sampleLibName}</a>`;
-                        }).join(', ');
-                    }
-                },
-                {
-                    // Sequencing runs column (index 9) - expects array of [id, name] tuples
-                    targets: 9,
-                    render: function (data, type, row) {
-                        if (!data || !Array.isArray(data)) return '';
-                        return data.map(function(seqRun) {
-                            if (seqRun) {
-                              var seqRunId = seqRun["id"]; // id
-                              var seqRunName = seqRun["name"]; // name
-                              return `<a href="/sequencingrun/edit/${seqRunId}" class="text-primary">${seqRunName}</a>`;
-                            }
-                        }).join(', ');
-                    }
-                },
-                {
-                    // Genes column (index 10) - expects array of [id, name] tuples
-                    targets: 10,
-                    render: function (data, type, row) {
-                        if (!data || !Array.isArray(data)) return '';
-                        return data.map(function(gene) {
-                            if (gene) {
-                              var geneId = gene["id"]; // id
-                              var geneName = gene["name"]; // name
-                              return `<a href="/gene/edit/${geneId}" class="text-primary">${geneName}</a>`;
-                            }
-                        }).join(', ');
-                    }
-                },
-                {
-                  // gene symbol columns
-                  targets: 11,
-                  className: 'text-center'
-                },
-                {
-                  // cosmic aa columns
-                  targets: 12,
-                  className: 'text-center'
-                },
-                {
-                    // Primary sites columns
-                    targets: 13,
-                    className: 'text-center'
-                },
-                {
-                    // Total calls columns
-                    targets: 14,
-                    className: 'text-center'
                 },
                {
                     targets: -1,
@@ -310,8 +202,6 @@ var KTDatatablesServerSide = function () {
         // Filter datatable on submit
         filterButton.addEventListener('click', function () {
 
-          var patient = document.getElementById("id_patient").value;
-          var sequencingRun = document.getElementById("id_sequencing_run").value
           var sampleLib = document.getElementById("id_sample_lib").value;
           var area = document.getElementById("id_area").value;
           var block = document.getElementById("id_block").value;
@@ -319,13 +209,11 @@ var KTDatatablesServerSide = function () {
           var log2r = document.getElementById("id_log2r").value;
           var refRead = document.getElementById("id_ref_read").value;
           var altRead = document.getElementById("id_alt_read").value;
-          var variant = document.getElementById("id_variant").value;
-          var variant_file = document.getElementById("id_variant_file").value;
 
           console.log(sampleLib);
 
           // DataTable'ı başlat
-          initDatatable(null, patient, area, block, sampleLib, sequencingRun ,coverage, log2r, refRead, altRead, variant, variant_file);
+          initDatatable(null, area, block, sampleLib ,coverage, log2r, refRead, altRead);
 
         });
 
@@ -469,7 +357,7 @@ var KTDatatablesServerSide = function () {
             document.getElementById("id_alt_read").value = "";
             document.getElementById("id_variant_file").value = "";
 
-            initDatatable(null ,null ,null ,null,null,null,null,null,null,null,null,null);
+            initDatatable(null ,null,null,null,null,null,null,null);
         });
     }
 
@@ -904,7 +792,7 @@ var KTDatatablesServerSide = function () {
     // Public methods
     return {
         init: function () {
-            initDatatable( handleInitialValue() ,null,null,null,null,null,null,null,null,null,null,null);
+            initDatatable( handleInitialValue() ,null,null,null,null,null,null,null);
             handleSearchDatatable();
             initToggleToolbar();
             handleFilterDatatable();
