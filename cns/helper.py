@@ -136,3 +136,57 @@ def generate_graph(ar_name,file_path):
     pilImage.save(buffer, "PNG")
 
     return base64.b64encode(buffer.getvalue()).decode("utf-8")
+
+def parse_cns_file_with_handler(analysis_run, file_path):
+    try:
+        file_name = file_path.split('/')[-1]
+        # example file name: BCB006.SGLP-0458.Tumor_dedup_BSQR.cns
+        sequencing_run = file_name.split(".")[0]
+        sample_lib = file_name.split(".")[1]
+
+        df = pd.read_csv(file_path, index_col=False, sep='\t')
+        for _, row in df.iterrows():
+            # Check if the Cns object already exists
+            if not Cns.objects.filter(
+                sample_lib=sample_lib,
+                sequencing_run=sequencing_run,
+                variant_file=file_path,
+                analysis_run=analysis_run,
+                chromosome=row["chromosome"],
+                start=int(row["start"]),
+                end=int(row["end"]),
+            ).exists():
+
+                depth = float(row["depth"])
+                ci_hi = float(row["ci_hi"])
+                ci_lo = float(row["ci_lo"])
+                cn = float(row.get("cn", 0.0))
+                log2 = float(row["log2"])
+                p_bintest = float(row.get("p_bintest", 0.0))
+                p_ttest = float(row.get("p_ttest", 0.0))
+                probes = float(row["probes"])
+                weight = float(row["weight"])
+
+                Cns.objects.create(
+                    sample_lib=sample_lib,
+                    sequencing_run=sequencing_run,
+                    variant_file=file_path,
+                    analysis_run=analysis_run,
+                    chromosome=row["chromosome"],
+                    start=int(row["start"]),
+                    end=int(row["end"]),
+                    gene=row["gene"],
+                    depth=depth,
+                    ci_hi=ci_hi,
+                    ci_lo=ci_lo,
+                    cn=cn,
+                    log2=log2,
+                    p_bintest=p_bintest,
+                    p_ttest=p_ttest,
+                    probes=probes,
+                    weight=weight,
+                )
+        print(f"Cns file parsed: {file_name}")
+        return True
+    except Exception as e:
+        print(f"Error parsing file: {e}")

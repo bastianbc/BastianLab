@@ -97,8 +97,8 @@ var KTDatatablesServerSide = function () {
                             <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-200px py-4" data-kt-menu="true">
                                 <!--begin::Menu item-->
                                 <div class="menu-item">
-                                    <a href="javascript:;" class="menu-link variants-link text-start" data-kt-docs-table-filter="detail_row">
-                                        Get Variants
+                                    <a href="/analysisrun/initialize_import_variants/${row.name}" class="menu-link variants11-link text-start" data-kt-docs-table-filter="detail_row">
+                                        Import Variants
                                     </a>
                                 </div>
                                 <!--end::Menu item-->

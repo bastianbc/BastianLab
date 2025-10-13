@@ -1,0 +1,77 @@
+{% extends "master.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="card shadow">
+  <div class="card-header">
+    <h3 class="card-title mb-0">Import Variants</h3>
+  </div>
+
+  <div class="card-body">
+    <p><strong>Analysis Run:</strong> {{ analysis_run }}</p>
+    <p><strong>Total Files:</strong> {{ total_files }}</p>
+
+    <div class="mb-3">
+      <div class="progress" style="height: 25px;">
+        <div id="progress-bar" class="progress-bar progress-bar-striped bg-success"
+             style="width: {{progress|default:0}}%">
+          {{progress|default:0}}%
+        </div>
+      </div>
+    </div>
+
+    <p>Status: <span id="status">{{status}}</span></p>
+    <p id="error" class="text-danger small">{{error|default:""}}</p>
+
+    <button id="import-btn" class="btn btn-primary" onclick="startImport()">Import Variants</button>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const arName = "{{ analysis_run }}";
+
+  function updateUI(data) {
+    const bar = document.getElementById("progress-bar");
+    const status = document.getElementById("status");
+    const error = document.getElementById("error");
+
+    bar.style.width = `${data.progress}%`;
+    bar.textContent = `${data.progress}%`;
+    status.textContent = data.status;
+    error.textContent = data.error || "";
+
+    if (data.status === "processing") {
+      setTimeout(checkStatus, 5000);
+    }
+  }
+
+  function checkStatus() {
+    fetch(`/analysisrun/get_import_status/${arName}/`)
+      .then(res => res.json())
+      .then(data => updateUI(data))
+      .catch(err => console.error("Error checking status:", err));
+  }
+
+  function startImport() {
+    const btn = document.getElementById("import-btn");
+    btn.disabled = true;
+    btn.textContent = "Importing...";
+
+    fetch(`/analysisrun/initialize_import_variants/${arName}/?restart=1`)
+      .then(res => {
+        if (!res.ok) throw new Error("Failed to start import");
+        return res.text();
+      })
+      .then(() => {
+        checkStatus();
+      })
+      .catch(err => {
+        document.getElementById("error").textContent = err.message;
+        btn.disabled = false;
+        btn.textContent = "Import Variants";
+      });
+  }
+</script>
+{% endblock %}

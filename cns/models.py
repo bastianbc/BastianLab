@@ -22,6 +22,8 @@ class Cns(models.Model):
     p_ttest = models.FloatField(default=0.0)
     probes = models.FloatField(default=0.0)
     weight = models.CharField(max_length=500, blank=True, null=True)
+    diagram= models.FileField(upload_to="uploads/cns_diagram_pdf_attachments", null=True, blank=True)
+    scatter = models.FileField(upload_to="uploads/cns_scatter_png_attachments", null=True, blank=True)
 
     class Meta:
         db_table = "cns"

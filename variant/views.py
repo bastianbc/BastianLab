@@ -4,7 +4,6 @@ from core.decorators import permission_required_for_async
 from .models import *
 from .serializers import *
 from django.http import JsonResponse
-from .helper import variant_file_parser
 from django.db import transaction
 from django.conf import settings
 import os
@@ -194,3 +193,4 @@ def get_variants_by_area(request):
     }
 
     return JsonResponse(result)
+

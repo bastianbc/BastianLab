@@ -13,6 +13,8 @@ from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from cns.helper import generate_graph
 from sheet.views import get_sheet_by_id
+from .handlers import *
+from .helper import VariantImporter
 
 
 @permission_required("sequencingrun.view_sequencingrun", raise_exception=True)
@@ -50,9 +52,6 @@ def save_csv_response_to_disk(response, save_path):
     # 3) Write to disk in binary mode
     with open(save_path, "wb") as f:
         f.write(raw)
-
-from datetime import date
-from django.core.files.base import ContentFile
 
 def save_analysis_run(request):
     if request.method == "POST":
@@ -93,3 +92,51 @@ def save_analysis_run(request):
         analysis_run.sheet.save(csv_filename, content_file, save=True)
 
         return response
+
+def initialize_import_variants(request, ar_name):
+    """
+    Renders the import page.
+    Does NOT start background import automatically.
+    User must click 'Start Import' to begin.
+    """
+    importer = VariantImporter(ar_name)
+    importer.discover_files()
+    cache_data = importer.get_progress()
+
+    return render(request, "import_variants.html", {
+        "analysis_run": ar_name,
+        "total_files": importer.total_files,
+        "progress": cache_data.get("progress", 0),
+        "status": cache_data.get("status", "not_started"),
+        "error": cache_data.get("error"),
+    })
+
+
+def get_import_status(request, ar_name):
+    """
+    Poll the current import progress and status.
+    If never started or in error state, attempt auto-restart.
+    """
+    importer = VariantImporter(ar_name)
+    importer.discover_files()
+    cache_data = importer.get_progress()
+
+    status = cache_data.get("status", "not_started")
+    progress = cache_data.get("progress", 0)
+
+    # Auto-start if import never started or previously failed
+    if status in ["not_started", "error"]:
+        result = importer.start_import(force_restart=True)
+        status = result["status"]
+        progress = result.get("progress", 0)
+        cache_data = importer.get_progress()
+
+    response = {
+        "analysis_run": ar_name,
+        "total_files": importer.total_files,
+        "progress": cache_data.get("progress", progress),
+        "status": cache_data.get("status", status),
+        "error": cache_data.get("error"),
+    }
+
+    return JsonResponse(response)
