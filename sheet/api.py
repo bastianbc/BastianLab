@@ -91,6 +91,50 @@ def _get_authorizated_queryset(seq_runs):
         .order_by('name')
     )
 
+def query_by_args_broad_institute(seq_runs):
+    return (
+        SampleLib.objects.filter(
+            sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=seq_runs
+        ).annotate(
+            area=F('na_sl_links__nucacid__area_na_links__area'),
+            block=F('na_sl_links__nucacid__area_na_links__area__block__name'),
+            sex=Subquery(
+                Patient.objects.filter(
+                    patient_blocks__block_areas__area_na_links__nucacid__na_sl_links__sample_lib=OuterRef('pk')
+                ).values('sex')[:1]
+            ),
+            area_type=Subquery(
+                Area.objects.filter(
+                    area_na_links__nucacid__na_sl_links__sample_lib=OuterRef('pk')
+                )
+                .annotate(
+                    simplified_area_type=Case(
+                        When(area_type__value='normal', then=Value('normal')),
+                        When(area_type__isnull=True, then=Value(None)),
+                        default=Value('tumor'),
+                        output_field=CharField(),
+                    )
+                )
+                .values('simplified_area_type')[:1]
+            ),
+        )
+        .distinct()
+        .order_by('name')
+    )
+
+
+
+def query_by_args_ucsf_cat(seq_runs):
+    return (
+        SampleLib.objects.filter(
+            sl_cl_links__captured_lib__cl_seql_links__sequencing_lib__sequencing_runs__id__in=seq_runs
+        ).annotate(i7=F('barcode__i7'), i5=F('barcode__i5'))
+        .distinct()
+        .order_by('name')
+    )
+
+
+
 
 def _parse_value(search_value):
     if "_initial:" in search_value:

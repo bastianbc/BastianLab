@@ -657,7 +657,7 @@ var KTDatatablesServerSide = function () {
       }
 
        function handleGenerateSheet() {
-          const generateSelected = document.querySelector('[data-kt-docs-table-select="generate_sample_sheet"]');
+          const generateSelected = document.querySelector('[data-kt-docs-table-select="generate_broad_institute"]');
             generateSelected.addEventListener('click', function () {
                 const loadingEl = document.createElement("div");
                 document.body.prepend(loadingEl);
@@ -672,7 +672,81 @@ var KTDatatablesServerSide = function () {
                 KTApp.showPageLoading();
 
                 $.ajax({
-                url: '/sheet/sheet_multiple',
+                url: '/sheet/generate_broad_institute',
+                type: 'POST',
+                headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
+                data: {
+                    "selected_ids": JSON.stringify(selectedRows)
+                },
+                xhrFields: {
+                    responseType: 'blob'
+                },
+                success: function(data, status, xhr) {
+                    var filename = "";
+                    var disposition = xhr.getResponseHeader('Content-Disposition');
+                    if (disposition && disposition.indexOf('attachment') !== -1) {
+                        var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+                        var matches = filenameRegex.exec(disposition);
+                        if (matches != null && matches[1]) filename = matches[1].replace(/['"]/g, '');
+                    }
+
+                    var blob = new Blob([data], { type: 'text/csv' });
+
+                    var link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = filename || "seq_run_sheet.csv"; // Provide a default filename if none is found
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    loadingEl.remove();
+                    Swal.fire({
+                        text: "Your file is downloaded!.",
+                        icon: "success",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn fw-bold btn-primary",
+                        }
+                    }).then(function(){
+                  wait(1500);
+                  location.reload();
+              });
+                },
+                error: function(response) {
+                    loadingEl.remove();
+                     Swal.fire({
+                        text: "Your file can not created",
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn fw-bold btn-primary",
+                        }
+                    });
+
+                  }
+                });
+            });
+       }
+
+
+       function handleUCSFcat() {
+          const generateSelected = document.querySelector('[data-kt-docs-table-select="generate_ucsf_cat"]');
+            generateSelected.addEventListener('click', function () {
+                const loadingEl = document.createElement("div");
+                document.body.prepend(loadingEl);
+                loadingEl.classList.add("page-loader");
+                loadingEl.classList.add("flex-column");
+                loadingEl.classList.add("bg-dark");
+                loadingEl.classList.add("bg-opacity-25");
+                loadingEl.innerHTML = `
+                    <span class="spinner-border text-primary" role="status"></span>
+                    <span class="text-gray-800 fs-6 fw-semibold mt-5">"CSV File is Generating..."</span>
+                `;
+                KTApp.showPageLoading();
+
+                $.ajax({
+                url: '/sheet/generate_ucsf_cat',
                 type: 'POST',
                 headers: {'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value },
                 data: {
@@ -1102,7 +1176,7 @@ var KTDatatablesServerSide = function () {
 
       return {
         init: function () {
-          handleBatchDelete(), handleGenerateSheet(), uncheckedFirstCheckBox(), handleGenerateAnalysisSheet();
+          handleBatchDelete(), handleGenerateSheet(),  handleUCSFcat(), uncheckedFirstCheckBox(), handleGenerateAnalysisSheet();
         }
       }
 

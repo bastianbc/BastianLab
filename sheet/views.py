@@ -1,12 +1,12 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from .service import get_sample_lib_list, generate_file
+from .service import generate_file, generate_file_broad_institute, generate_file_ucsf_cat
 from sequencingrun.models import SequencingRun
 import json
 from .forms import FilterForm, ReportForm
-from .api import query_by_args, _get_authorizated_queryset
+from .api import query_by_args, _get_authorizated_queryset, query_by_args_broad_institute, query_by_args_ucsf_cat
 from .service import CustomSampleLibSerializer
-from datetime import date
+
 
 def filter_sheet(request):
     seq_runs = SequencingRun.objects.filter()
@@ -15,8 +15,6 @@ def filter_sheet(request):
     result = dict()
     result['data'] = serializer.data
     result['draw'] = samplelibs['draw']
-    # result['recordsTotal'] = samplelibs['total']
-    # result['recordsFiltered'] = samplelibs['count']
     result['recordsTotal'] = 4000
     result['recordsFiltered'] = 10
     return JsonResponse(result)
@@ -66,8 +64,14 @@ def sheet_seq_run(request):
         return JsonResponse({'error': str(e)}, status=500)
 
 
-def sheet_multiple(request):
+def generate_broad_institute(request):
     selected_ids = json.loads(request.POST.get("selected_ids"))
     seq_runs = SequencingRun.objects.filter(id__in=selected_ids)
-    query_set = query_by_args(request.user, seq_runs, **request.GET)
-    return generate_file(data=query_set, file_name=("_".join([s.name for s in seq_runs]))[:50])
+    query_set = query_by_args_broad_institute(seq_runs)
+    return generate_file_broad_institute(data=query_set)
+
+def generate_ucsf_cat(request):
+    selected_ids = json.loads(request.POST.get("selected_ids"))
+    seq_runs = SequencingRun.objects.filter(id__in=selected_ids)
+    query_set = query_by_args_ucsf_cat(seq_runs)
+    return generate_file_ucsf_cat(data=query_set)
