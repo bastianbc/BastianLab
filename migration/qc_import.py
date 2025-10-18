@@ -7,7 +7,7 @@ from django.conf import settings
 import pandas as pd
 from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist
-from variant.models import VariantCall, GVariant, CVariant, PVariant, VariantFile
+from variant.models import VariantCall, GVariant, CVariant, PVariant
 from analysisrun.models import AnalysisRun
 from samplelib.models import SampleLib
 import re
@@ -16,7 +16,7 @@ from pathlib import Path
 from gene.models import Gene
 from qc.helper import parse_dup_metrics, parse_hs_metrics, parse_insert_size_metrics
 from qc.models import SampleQC
-from analysisrun.models import AnalysisRun
+from analysisrun.models import AnalysisRun, VariantFile
 
 logger = logging.getLogger("file")
 
@@ -240,7 +240,7 @@ def import_qc():
 
 
 from qc.models import SampleQC
-from variant.models import  VariantFile
+from analysisrun.models import VariantFile
 
 
 def merge_sample_qc_metrics():

@@ -4,7 +4,7 @@ from pathlib import Path
 from django.conf import settings
 from django.db import models
 from concurrent.futures import ThreadPoolExecutor
-from variant.models import VariantFile
+from analysisrun.models import VariantFile
 from qc.models import SampleQC
 from variant.models import VariantCall
 from cns.models import Cns

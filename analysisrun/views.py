@@ -101,6 +101,7 @@ def initialize_import_variants(request, ar_name):
     User must click 'Start Import' to begin.
     """
     importer = VariantImporter(ar_name)
+    importer.reset_status()
     importer.discover_files()
     cache_data = importer.get_progress()
 
@@ -113,34 +114,42 @@ def initialize_import_variants(request, ar_name):
     })
 
 
-def get_import_status(request, ar_name):
+def start_import_variants(request, ar_name):
     """
     Poll the current import progress and status.
     If never started or in error state, attempt auto-restart.
     """
-    importer = VariantImporter(ar_name)
-    importer.discover_files()
-    cache_data = importer.get_progress()
-
-    status = cache_data.get("status", "not_started")
-    progress = cache_data.get("progress", 0)
-
-    # Auto-start if import never started or previously failed
-    if status in ["not_started", "error"]:
-        result = importer.start_import(force_restart=True)
-        status = result["status"]
-        progress = result.get("progress", 0)
+    try:
+        importer = VariantImporter(ar_name)
+        importer.discover_files()
         cache_data = importer.get_progress()
 
-    response = {
-        "analysis_run": ar_name,
-        "total_files": importer.total_files,
-        "progress": cache_data.get("progress", progress),
-        "status": cache_data.get("status", status),
-        "error": cache_data.get("error"),
-    }
+        status = cache_data.get("status", "not_started")
+        progress = cache_data.get("progress", 0)
+        processed_files = cache_data.get("processed_files", 0)
+        # Auto-start if import never started or previously failed
+        if status in ["not_started", "error"]:
+            result = importer.start_import(force_restart=True)
+            status = result["status"]
+            progress = result.get("progress", 0)
+            cache_data = importer.get_progress()
 
-    return JsonResponse(response)
+        return JsonResponse({
+            "analysis_run": ar_name,
+            "total_files": importer.total_files,
+            "processed_files": processed_files,
+            "progress": progress,
+            "status": status,
+            "error": cache_data.get("error", None),
+        })
+    except Exception as e:
+        return JsonResponse({
+            "error": str(e),
+            "status": "error",
+            "processed_files": 0,
+            "progress": 0,
+            "total_files": 0,
+        })
 
 
 @permission_required_for_async("analysis_run.delete_analysisrun")

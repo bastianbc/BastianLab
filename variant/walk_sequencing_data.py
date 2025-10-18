@@ -3,7 +3,7 @@ import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "test1.settings")
 django.setup()
 from django.conf import settings
-from variant.models import VariantFile
+from analysisrun.models import VariantFile
 
 logger = logging.getLogger("file-tree")
 

@@ -1,10 +1,8 @@
 import os
-from analysisrun.models import AnalysisRun
+from analysisrun.models import AnalysisRun, VariantFile
 from cns.models import Cns
 from cns.helper import parse_cns_file_with_handler
-from variant.models import VariantFile
 import pandas as pd
-from variant.helper import variant_file_parser
 from qc.helper import find_sample_libraries_for_analysis_run, parse_dup_metrics
 
 class AlignmentsFolderHandler:
@@ -25,19 +23,19 @@ class AlignmentsFolderHandler:
         return True, "Processed alignments file", {}
 
 class CnvFolderHandler:
-    def __init__(self, analysis_run):
-        self.analysis_run = analysis_run
+    def __init__(self):
+        pass
 
-    def process(self, file_path):
-        print(f"Processing cnv file: {self.analysis_run}")
-        parse_cns_file_with_handler(self.analysis_run, file_path)                
+    def process(self, analysis_run, file_path):
+        print(f"Processing cnv file: {file_path}")
+        parse_cns_file_with_handler(analysis_run, file_path)                
         return True, "Processed cnv file", {}
 
 class SnvFolderHandler:
-    def __init__(self, analysis_run):
-        self.analysis_run = analysis_run
+    def __init__(self):
+        pass
 
-    def process(self, file_path):
+    def process(self, analysis_run, file_path):
         print(f"Processing snv file: {file_path}")
-        variant_file_parser(file_path, self.analysis_run)
+        variant_file_parser(file_path, analysis_run)
         return True, "Processed snv file", {}

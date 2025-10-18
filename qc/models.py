@@ -13,7 +13,7 @@ class SampleQC(models.Model):
     sample_lib = models.ForeignKey("samplelib.SampleLib", on_delete=models.CASCADE, related_name='qc_metrics', blank=True, null=True)
     analysis_run = models.ForeignKey("analysisrun.AnalysisRun", on_delete=models.CASCADE, related_name='qc_metrics')
     sequencing_run = models.ForeignKey("sequencingrun.SequencingRun", on_delete=models.CASCADE, related_name="qc_metrics", blank=True, null=True)
-    variant_file = models.ForeignKey("variant.VariantFile", on_delete=models.CASCADE, related_name="qc_metrics", blank=True, null=True)
+    variant_file = models.ForeignKey("analysisrun.VariantFile", on_delete=models.CASCADE, related_name="qc_metrics", blank=True, null=True)
     type = models.CharField(max_length=20, choices=FILE_TYPES, blank=True, null=True)
     date = models.DateTimeField(default=datetime.now, verbose_name="Date")
     # Duplicate metrics

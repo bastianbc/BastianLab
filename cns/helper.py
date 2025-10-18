@@ -3,8 +3,9 @@ import csv
 from django.conf import settings
 from analysisrun.models import AnalysisRun
 from cns.models import Cns
-from variant.models import VariantCall
-from variant.models import VariantFile
+from samplelib.models import SampleLib
+from sequencingrun.models import SequencingRun
+from analysisrun.models import VariantFile
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib import pylab
@@ -33,7 +34,7 @@ def find_cns_files(folder):
     cns_files = []
     for root, _, files in os.walk(folder):
         for file in files:
-            if file.endswith(".cns") and ".bintest" not in file and ".call" not in file:
+            if file.endswith(".cns"):
                 cns_files.append(os.path.join(root, file))
     return cns_files
 
@@ -138,44 +139,85 @@ def generate_graph(ar_name,file_path):
     return base64.b64encode(buffer.getvalue()).decode("utf-8")
 
 def parse_cns_file_with_handler(analysis_run, file_path):
+    print("--------------------------------")
+    print("Parsing cns file with handler")
+    print("--------------------------------")
     try:
         file_name = file_path.split('/')[-1]
         # example file name: BCB006.SGLP-0458.Tumor_dedup_BSQR.cns
-        sequencing_run = file_name.split(".")[0]
-        sample_lib = file_name.split(".")[1]
-
+        sequencing_run_name = file_name.split(".")[0]
+        sequencing_run = SequencingRun.objects.get(name=sequencing_run_name)
+        
+        sample_lib_name = file_name.split(".")[1]
+        sample_lib = SampleLib.objects.get(name=sample_lib_name)
+        
+        variant_file = VariantFile.objects.create(name=file_name, directory=file_path, analysis_run=analysis_run, type="cns")
+        
         df = pd.read_csv(file_path, index_col=False, sep='\t')
+
+        def get_float_value(value, default=0.0):
+            """Safely convert value to float with default fallback"""
+            try:
+                return float(value)
+            except (ValueError, TypeError):
+                return default
+
+        def get_string_value(value, default=""):
+            """Safely convert value to string with default fallback"""
+            try:
+                return str(value) if value is not None else default
+            except:
+                return default
+
+        created_objects_count = 0
+
         for _, row in df.iterrows():
             # Check if the Cns object already exists
             if not Cns.objects.filter(
                 sample_lib=sample_lib,
                 sequencing_run=sequencing_run,
-                variant_file=file_path,
+                variant_file=variant_file,
                 analysis_run=analysis_run,
                 chromosome=row["chromosome"],
                 start=int(row["start"]),
                 end=int(row["end"]),
             ).exists():
 
-                depth = float(row["depth"])
-                ci_hi = float(row["ci_hi"])
-                ci_lo = float(row["ci_lo"])
-                cn = float(row.get("cn", 0.0))
-                log2 = float(row["log2"])
-                p_bintest = float(row.get("p_bintest", 0.0))
-                p_ttest = float(row.get("p_ttest", 0.0))
-                probes = float(row["probes"])
-                weight = float(row["weight"])
+                # Handle different column structures based on file type
+                depth = get_float_value(row.get("depth", 0.0))
+                log2 = get_float_value(row.get("log2", 0.0))
+                probes = get_float_value(row.get("probes", 0.0))
+                weight = get_string_value(row.get("weight", ""))
+                gene = get_string_value(row.get("gene", ""))
+                
+                # Initialize optional fields with defaults
+                ci_hi = 0.0
+                ci_lo = 0.0
+                cn = 0.0
+                p_bintest = 0.0
+                p_ttest = 0.0
+
+                # Set values based on available columns
+                if "ci_hi" in row:
+                    ci_hi = get_float_value(row["ci_hi"])
+                if "ci_lo" in row:
+                    ci_lo = get_float_value(row["ci_lo"])
+                if "cn" in row:
+                    cn = get_float_value(row["cn"])
+                if "p_bintest" in row:
+                    p_bintest = get_float_value(row["p_bintest"])
+                if "p_ttest" in row:
+                    p_ttest = get_float_value(row["p_ttest"])
 
                 Cns.objects.create(
                     sample_lib=sample_lib,
                     sequencing_run=sequencing_run,
-                    variant_file=file_path,
+                    variant_file=variant_file,
                     analysis_run=analysis_run,
                     chromosome=row["chromosome"],
                     start=int(row["start"]),
                     end=int(row["end"]),
-                    gene=row["gene"],
+                    gene=gene,
                     depth=depth,
                     ci_hi=ci_hi,
                     ci_lo=ci_lo,
@@ -186,7 +228,11 @@ def parse_cns_file_with_handler(analysis_run, file_path):
                     probes=probes,
                     weight=weight,
                 )
-        print(f"Cns file parsed: {file_name}")
+
+                created_objects_count += 1
+
+        print(f"Cns file parsed: {file_name} - {created_objects_count} records created")
         return True
     except Exception as e:
-        print(f"Error parsing file: {e}")
+        print(f"Error parsing file {file_path}: {e}")
+        return False

@@ -338,7 +338,7 @@ class VariantCall(models.Model):
     g_variant = models.ForeignKey(GVariant, on_delete=models.CASCADE, related_name="variant_calls")
     sample_lib = models.ForeignKey("samplelib.SampleLib", on_delete=models.CASCADE, related_name="variant_calls", blank=True, null=True)
     sequencing_run = models.ForeignKey("sequencingrun.SequencingRun", on_delete=models.CASCADE, related_name="variant_calls", blank=True, null=True)
-    variant_file = models.ForeignKey("variant.VariantFile", on_delete=models.CASCADE, related_name="variant_calls", blank=True, null=True)
+    variant_file = models.ForeignKey("analysisrun.VariantFile", on_delete=models.CASCADE, related_name="variant_calls", blank=True, null=True)
     coverage = models.IntegerField(default=0)
     analysis_run = models.ForeignKey("analysisrun.AnalysisRun", on_delete=models.CASCADE, related_name="variant_calls")
     log2r = models.FloatField(default=0.0)
@@ -390,24 +390,6 @@ class PVariant(models.Model):
         """Ensure is_alias is updated before saving."""
         self.update_is_alias()
         super().save(*args, **kwargs)
-
-class VariantFile(models.Model):
-    FILE_TYPES = [
-        ('cns', 'cns'),
-        ('variant', "variant"),
-        ('qc', "qc")
-    ]
-    name = models.CharField(max_length=150, blank=True, null=True)
-    directory = models.CharField(max_length=500, blank=True, null=True)
-    date = models.DateTimeField(default=datetime.now, verbose_name="Date")
-    call = models.BooleanField(default=False)
-    type = models.CharField(max_length=10, choices=FILE_TYPES, blank=True, null=True)
-
-    class Meta:
-        db_table = "variant_file"
-
-    def __str__(self):
-        return self.name
 
 class VariantsView(models.Model):
     area_id = models.IntegerField()

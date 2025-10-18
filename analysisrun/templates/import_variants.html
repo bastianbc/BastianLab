@@ -31,47 +31,52 @@
 {% block scripts %}
 <script>
   const arName = "{{ analysis_run }}";
+  const btnImport = document.getElementById("import-btn");
+  const error = document.getElementById("error");
+  const progress = document.getElementById("progress-bar");
+  const status = document.getElementById("status");
 
-  function updateUI(data) {
-    const bar = document.getElementById("progress-bar");
-    const status = document.getElementById("status");
-    const error = document.getElementById("error");
+  btnImport.addEventListener("click", startImport); 
 
-    bar.style.width = `${data.progress}%`;
-    bar.textContent = `${data.progress}%`;
-    status.textContent = data.status;
-    error.textContent = data.error || "";
+  function updateProgress(data) {
+    progress.style.width = `${data.progress}%`;
+    progress.innerText = `${data.progress}%`;
+    status.innerText = data.status;
+    error.innerText = data.error || "";
 
     if (data.status === "processing") {
-      setTimeout(checkStatus, 5000);
+      // Check status every 5 seconds
+      setTimeout(startImport, 5000);
+    } else if (data.status === "done") {
+      // Import completed successfully
+      btnImport.disabled = false;
+      btnImport.innerText = "Import Variants";
+      status.innerText = `Import completed successfully with ${data.processed_files} of ${data.total_files} files processed!`;
     }
   }
 
-  function checkStatus() {
-    fetch(`/analysisrun/get_import_status/${arName}/`)
-      .then(res => res.json())
-      .then(data => updateUI(data))
-      .catch(err => console.error("Error checking status:", err));
-  }
-
   function startImport() {
-    const btn = document.getElementById("import-btn");
-    btn.disabled = true;
-    btn.textContent = "Importing...";
+    btnImport.disabled = true;
+    error.innerText = "";
+    progress.style.width = "0%";
+    progress.innerText = "0%";
+    status.innerText = "Importing...";
+    btnImport.innerText = "Importing...";
 
-    fetch(`/analysisrun/initialize_import_variants/${arName}/?restart=1`)
-      .then(res => {
-        if (!res.ok) throw new Error("Failed to start import");
-        return res.text();
-      })
-      .then(() => {
-        checkStatus();
+    fetch(`/analysisrun/start_import_variants/${arName}/`)
+      .then(res => res.json())
+      .then(data => {
+        console.log(data);  
+        status.innerText = data.status;
+        error.innerText = data.error || "";      
+        updateProgress(data);
       })
       .catch(err => {
-        document.getElementById("error").textContent = err.message;
-        btn.disabled = false;
-        btn.textContent = "Import Variants";
+        error.innerText = err.message;
+        btnImport.disabled = false;
+        btnImport.innerText = "Import Variants";
       });
   }
+
 </script>
 {% endblock %}
