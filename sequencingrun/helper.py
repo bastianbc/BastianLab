@@ -11,8 +11,6 @@ import boto3
 from collections import defaultdict
 
 
-
-
 def get_file_tree(file_list, path, sequencing_run, sample_libs):
     try:
         sample_dict = defaultdict(list)
@@ -26,24 +24,53 @@ def get_file_tree(file_list, path, sequencing_run, sample_libs):
         return
 
 
+
 def get_file_sets(sequencing_run, sample_libs):
+    """
+    Fetch file sets for a given sequencing run and its associated sample libraries.
+    Checks if the S3 folder for the sequencing run exists before proceeding.
+    """
+
     s3 = boto3.client("s3")
     bucket = settings.AWS_STORAGE_BUCKET_NAME
+    base_url = "https://s3.us-west-2.amazonaws.com/bastian-lab-169-3-r-us-west-2.sec.ucsf.edu"
     path = f"BastianRaid-02/HiSeqData/{sequencing_run.name}/"
+    full_s3_path = f"{base_url}/{path}"
 
+    # Check if the sequencing run folder exists in S3
+    try:
+        response = s3.list_objects_v2(Bucket=bucket, Prefix=path, MaxKeys=1)
+        if "Contents" not in response:
+            raise FileNotFoundError(
+                f"No folder found in S3 for sequencing run '{sequencing_run.name}'.\n"
+                f"Expected location: {full_s3_path}"
+            )
+    except Exception as e:
+        raise FileNotFoundError(
+            f"Error accessing S3 for sequencing run '{sequencing_run.name}': {str(e)}\n"
+        )
+
+    # Folder exists, list files
     paginator = s3.get_paginator("list_objects_v2")
     file_list = []
+
     for page in paginator.paginate(Bucket=bucket, Prefix=path):
         for obj in page.get("Contents", []):
             key = obj["Key"]
             if key.endswith((".fastq.gz", ".bam", ".bai")):
                 file_list.append(key)
-    print(file_list)
-    print(sample_libs)
-    # Adapt get_file_tree to handle S3 keys
+
+    # If folder exists but has no relevant files
+    if not file_list:
+        raise FileNotFoundError(
+            f"S3 folder '{path}' exists but contains no .fastq.gz, .bam, or .bai files.\n"
+            f"Checked location: {full_s3_path}"
+        )
+
+    # ✅ Process file sets
     file_sets = get_file_tree(file_list, path, sequencing_run, sample_libs)
-    print(file_sets)
     return [{"file_set": k, "files": v} for k, v in file_sets.items()]
+
 
 
 def get_or_create_file_set(sample, sequencing_run, file):

@@ -1231,14 +1231,20 @@ var KTDatatablesServerSide = function () {
                   }
                   else {
                       Swal.fire({
-                          text: `${data.message} please check your folder name`,
-                          icon: "error",
-                          buttonsStyling: false,
-                          confirmButtonText: "Ok, got it!",
-                          customClass: {
-                              confirmButton: "btn fw-bold btn-primary",
-                          }
-                      });
+                        title: "Error",
+                        text: `${data.message}`,
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok, got it!",
+                        width: "700px", // 📏 Increase popup width
+                        padding: "2em", // 🧱 Add padding around content
+                        customClass: {
+                            popup: "swal2-large-popup",
+                            title: "swal2-large-title",
+                            htmlContainer: "swal2-large-text",
+                            confirmButton: "btn fw-bold btn-primary btn-lg", // 💡 Larger button
+                        }
+                    });
                   }
               },
               error: function (data) {}
