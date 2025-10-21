@@ -101,6 +101,7 @@ CRISPY_FAIL_SILENTLY = not DEBUG
 # AWS S3 STORAGE CONFIGURATION
 # ===============================
 INSTALLED_APPS += ["storages"]
+INSTALLED_APPS += ["django.contrib.staticfiles"]
 
 AWS_S3_REGION_NAME = "us-west-2"
 AWS_STORAGE_BUCKET_NAME = "bastian-lab-169-3-r-us-west-2.sec.ucsf.edu"
@@ -127,7 +128,11 @@ STORAGES = {
             "signature_version": AWS_S3_SIGNATURE_VERSION,
         },
     },
-    # "staticfiles": {"BACKEND": "storages.backends.s3boto3.S3ManifestStaticStorage"},
+    "staticfiles": {  # STATIC files collected to STATIC_ROOT
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        # or for cache-busting:
+        # "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
+    },
 }
 
 MIDDLEWARE = [
@@ -239,10 +244,10 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/dev/howto/static-files/
 
-STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'test1/static'),
 ]
+STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 APPEND_SLASH = True
 
