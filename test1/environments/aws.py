@@ -101,7 +101,6 @@ CRISPY_FAIL_SILENTLY = not DEBUG
 # AWS S3 STORAGE CONFIGURATION
 # ===============================
 INSTALLED_APPS += ["storages"]
-INSTALLED_APPS += ["django.contrib.staticfiles"]
 
 AWS_S3_REGION_NAME = "us-west-2"
 AWS_STORAGE_BUCKET_NAME = "bastian-lab-169-3-r-us-west-2.sec.ucsf.edu"
