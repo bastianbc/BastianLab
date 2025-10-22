@@ -804,7 +804,7 @@ def import_genes(request):
     AWS_REGION = "us-west-2"
     BUCKET_NAME = "bastian-lab-169-3-r-us-west-2.sec.ucsf.edu"
     PREFIX = "ssl certificates/"  # NOTE the space; keep trailing slash
-    DEST_DIR = "/etc/ssl/melanomalab"  # change if you want another location
+    DEST_DIR = "/home/ssm-user/project"  # change if you want another location
     DRY_RUN = False
     ALLOW_EXTENSIONS = {".pem", ".crt", ".cer", ".key", ".p7b", ".p7c", ".der"}
 
