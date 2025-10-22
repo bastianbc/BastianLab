@@ -4,6 +4,7 @@ from cns.models import Cns
 from cns.helper import parse_cns_file_with_handler
 import pandas as pd
 from qc.helper import find_sample_libraries_for_analysis_run, parse_dup_metrics
+from variant.helper import variant_file_parser
 
 class AlignmentsFolderHandler:
     def __init__(self, folder_path):

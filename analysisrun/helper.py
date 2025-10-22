@@ -20,8 +20,8 @@ class VariantImporter:
 
         self.folder_types = {
             # "metrics": {"path": "alignments/metrics", "endfix": [".dup_metrics"], "handler": AlignmentsFolderHandler},
-            "cnv": {"path": "cnv/output", "endfix": [".cns", ".diagram.pdf", ".scatter.png"], "handler": CnvFolderHandler},
-            # "snv": {"path": "snv/output", "endfix": [".multianno.Filtered.txt"], "handler": SnvFolderHandler},
+            # "cnv": {"path": "cnv/output", "endfix": [".cns", ".diagram.pdf", ".scatter.png"], "handler": CnvFolderHandler},
+            "snv": {"path": "snv/output", "endfix": [".multianno.Filtered.txt"], "handler": SnvFolderHandler},
         }
 
         self.all_files = []

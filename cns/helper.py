@@ -139,9 +139,6 @@ def generate_graph(ar_name,file_path):
     return base64.b64encode(buffer.getvalue()).decode("utf-8")
 
 def parse_cns_file_with_handler(analysis_run, file_path):
-    print("--------------------------------")
-    print("Parsing cns file with handler")
-    print("--------------------------------")
     try:
         file_name = file_path.split('/')[-1]
         # example file name: BCB006.SGLP-0458.Tumor_dedup_BSQR.cns
@@ -168,6 +165,20 @@ def parse_cns_file_with_handler(analysis_run, file_path):
                 return str(value) if value is not None else default
             except:
                 return default
+        
+        def get_diagram_file(file_path):
+            folder = os.path.dirname(file_path)
+            for f in os.listdir(folder):
+                if f.endswith('.diagram.pdf'):
+                    return os.path.join(folder, f)
+            return ""
+        
+        def get_scatter_file(file_path):
+            folder = os.path.dirname(file_path)
+            for f in os.listdir(folder):
+                if f.endswith('.scatter.png'):
+                    return os.path.join(folder, f)
+            return ""
 
         created_objects_count = 0
 
@@ -189,7 +200,8 @@ def parse_cns_file_with_handler(analysis_run, file_path):
                 probes = get_float_value(row.get("probes", 0.0))
                 weight = get_string_value(row.get("weight", ""))
                 gene = get_string_value(row.get("gene", ""))
-                
+                diagram = get_diagram_file(file_path)
+                scatter = get_scatter_file(file_path)
                 # Initialize optional fields with defaults
                 ci_hi = 0.0
                 ci_lo = 0.0
@@ -227,6 +239,8 @@ def parse_cns_file_with_handler(analysis_run, file_path):
                     p_ttest=p_ttest,
                     probes=probes,
                     weight=weight,
+                    diagram=diagram,
+                    scatter=scatter,
                 )
 
                 created_objects_count += 1
