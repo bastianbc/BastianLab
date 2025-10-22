@@ -204,3 +204,99 @@ def generate_file(data, file_name):
     for item in res:
         writer.writerow([getattr(item, field) for field in field_names])
     return response
+
+
+def generate_file_broad_institute(data):
+    class Report(object):
+        def __init__(self):
+            self.no = 0
+            self.sample = ""
+            self.area = ""
+            self.sex = ""
+            self.vol_remain = ""
+            self.qpcr_conc = ""
+            self.block = ""
+            self.area_type = ""
+            self.blank = ""
+            self.block_start = ""
+
+    res = []
+    for index, row in enumerate(data):
+        report = Report()
+        report.no = index + 1
+        report.area = getattr(row, "area", "")
+        report.sample = getattr(row, "name", "")
+        report.block = getattr(row, "block", "")
+        report.sex = getattr(row, "sex", "")
+        report.area_type = getattr(row, "area_type", "")
+        report.qpcr_conc = getattr(row, "qpcr_conc", "")
+        report.vol_remain = getattr(row, "vol_remain", "")
+        report.blank = ""
+        report.block_start = "yes"
+        res.append(report)
+
+    # Create HTTP Response
+    response = HttpResponse(
+        content_type='text/csv',
+        headers={'Content-Disposition': f'attachment; filename="Sequencing_sheet_for_Broad_Institute.csv"'},
+    )
+
+    # Aligned headers with your data model
+    field_names = [
+        "no", "sample", "area", "sex", "vol_remain",
+        "qpcr_conc", "block", "area_type", "blank", "block_start"
+    ]
+
+    # Friendly column names for CSV (optional)
+    display_headers = [
+        "No", "Collaborator Participant ID", "Collaborator Sample ID", "Gender", "Volume", "Concentration",
+        "Collaborator Sample ID_2", "Sample Type", "RIN Number", "Collected After 01/25/2015"
+    ]
+
+    writer = csv.writer(response)
+    writer.writerow(display_headers)
+    for item in res:
+        writer.writerow([getattr(item, field) for field in field_names])
+
+    return response
+
+
+def generate_file_ucsf_cat(data):
+    class Report(object):
+        def __init__(self):
+            self.no = 0
+            self.sample = ""
+            self.i7 = ""
+            self.i5 = ""
+
+    res = []
+    for index, row in enumerate(data):
+        report = Report()
+        report.no = index + 1
+        report.sample = getattr(row, "name", "")
+        report.i7 = getattr(row, "i7", "")
+        report.i5 = getattr(row, "i5", "")
+        res.append(report)
+
+    # Create HTTP Response
+    response = HttpResponse(
+        content_type='text/csv',
+        headers={'Content-Disposition': f'attachment; filename="Sequencing_sheet_for_UCSF_CAT.csv"'},
+    )
+
+    # Aligned headers with your data model
+    field_names = [
+        "no", "sample", "i7", "i5"
+    ]
+
+    # Friendly column names for CSV (optional)
+    display_headers = [
+        "No", "Sample Name", "Index1 (i7)", "Index2 (i5)",
+    ]
+
+    writer = csv.writer(response)
+    writer.writerow(display_headers)
+    for item in res:
+        writer.writerow([getattr(item, field) for field in field_names])
+
+    return response

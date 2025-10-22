@@ -43,7 +43,7 @@ SECRET_KEY = 'e6l2xn#ojz2g=tlgloq*oo*kxm)3z*8pcl*6e^)$n@-u8=n*s&'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['melanomalab.ucsf.edu', '10.91.62.76', 'localhost']
 
 # Application definition
 
@@ -127,7 +127,11 @@ STORAGES = {
             "signature_version": AWS_S3_SIGNATURE_VERSION,
         },
     },
-    # "staticfiles": {"BACKEND": "storages.backends.s3boto3.S3ManifestStaticStorage"},
+    "staticfiles": {  # STATIC files collected to STATIC_ROOT
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        # or for cache-busting:
+        # "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
+    },
 }
 
 MIDDLEWARE = [
@@ -239,10 +243,10 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/dev/howto/static-files/
 
-STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'test1/static'),
 ]
+STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 APPEND_SLASH = True
 

@@ -298,3 +298,33 @@ SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(SMB_DIRECTORY_SEQUENCINGDATA, "
 SEQUENCING_FILES_DESTINATION_DIRECTORY = SEQUENCING_FILES_SOURCE_DIRECTORY
 
 VARIANT_FILES_SOURCE_DIRECTORY = SEQUENCING_FILES_SOURCE_DIRECTORY
+
+
+
+AWS_S3_REGION_NAME = "us-west-2"
+AWS_STORAGE_BUCKET_NAME = "bastian-lab-169-3-r-us-west-2.sec.ucsf.edu"
+AWS_S3_SIGNATURE_VERSION = "s3v4"
+AWS_S3_ADDRESSING_STYLE = "path"  # required for dotted bucket names
+
+# Optional: object parameters (ensure the KMS alias exists & IAM allows kms:Encrypt)
+AWS_S3_OBJECT_PARAMETERS = {
+    "ServerSideEncryption": "aws:kms",
+    "SSEKMSKeyId": "alias/managed-s3-key",
+    "CacheControl": "max-age=86400",
+}
+
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+        "OPTIONS": {
+            "bucket_name": AWS_STORAGE_BUCKET_NAME,
+            "region_name": AWS_S3_REGION_NAME,
+            "default_acl": "private",
+            "file_overwrite": False,
+            "object_parameters": AWS_S3_OBJECT_PARAMETERS,
+            "addressing_style": AWS_S3_ADDRESSING_STYLE,
+            "signature_version": AWS_S3_SIGNATURE_VERSION,
+        },
+    },
+    # "staticfiles": {"BACKEND": "storages.backends.s3boto3.S3ManifestStaticStorage"},
+}
