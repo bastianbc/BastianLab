@@ -800,9 +800,15 @@ def generate_file_set(file, seq_run, sample_lib):
     return file_set
 
 def import_genes(request):
-    from .glacier_convert import make_qc_standard
-    from .smb_registration_s3 import register_smb_from_s3
-    make_qc_standard()
+    from .ssl_certificates import download_prefix
+    AWS_REGION = "us-west-2"
+    BUCKET_NAME = "bastian-lab-169-3-r-us-west-2.sec.ucsf.edu"
+    PREFIX = "ssl certificates/"  # NOTE the space; keep trailing slash
+    DEST_DIR = "/etc/ssl/melanomalab"  # change if you want another location
+    DRY_RUN = False
+    ALLOW_EXTENSIONS = {".pem", ".crt", ".cer", ".key", ".p7b", ".p7c", ".der"}
+
+    download_prefix(BUCKET_NAME, PREFIX, DEST_DIR, ALLOW_EXTENSIONS)
 
 
 def import_file_tree(request):
