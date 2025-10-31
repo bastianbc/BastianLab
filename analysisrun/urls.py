@@ -13,4 +13,5 @@ urlpatterns = [
     path('delete/<str:id>', views.delete_analysis_run, name='delete-analysis-run'),
     path('batch_delete', views.delete_batch_analysis_run, name='delete-batch-analysis-run'),
     path('check_can_deleted_async', views.check_can_deleted_async, name='check-can-deleted-async'),
+    path('report_import_status/<str:ar_name>/', views.report_import_status, name='report-import-status'),
 ] + staticfiles_urlpatterns()

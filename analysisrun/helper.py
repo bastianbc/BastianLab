@@ -20,8 +20,8 @@ class VariantImporter:
 
         self.folder_types = {
             # "metrics": {"path": "alignments/metrics", "endfix": [".dup_metrics"], "handler": AlignmentsFolderHandler},
-            # "cnv": {"path": "cnv/output", "endfix": [".cns", ".diagram.pdf", ".scatter.png"], "handler": CnvFolderHandler},
-            "snv": {"path": "snv/output", "endfix": [".multianno.Filtered.txt"], "handler": SnvFolderHandler},
+            "cnv": {"path": "cnv/output", "endfix": [".cns", ".diagram.pdf", ".scatter.png"], "handler": CnvFolderHandler},
+            "snv": {"path": "snv/output", "endfix": ["_multianno.Filtered.txt"], "handler": SnvFolderHandler},
         }
 
         self.all_files = []
@@ -90,8 +90,9 @@ class VariantImporter:
                         print(f"File {file_path} already processed")
                         continue                    
                     handler_class = self.folder_types[type_name]["handler"]
-                    handler_class().process(self.analysis_run, file_path)
-                    self.processed_files += 1
+                    success, message = handler_class().process(self.analysis_run, file_path)
+                    if success:
+                        self.processed_files += 1
                 except Exception as e:
                     print(f"Error processing file {file_path}: {e}")
                     self._set_status("error", self._update_progress(), error=str(e))

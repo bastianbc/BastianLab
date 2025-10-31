@@ -1,9 +1,10 @@
 import pandas as pd
 from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist
+from sequencingrun.models import SequencingRun
 from .models import VariantCall, GVariant, CVariant, PVariant
 from gene.models import Gene
-from analysisrun.models import AnalysisRun
+from analysisrun.models import AnalysisRun, VariantFile
 from samplelib.models import SampleLib
 import re
 import os
@@ -83,23 +84,23 @@ def get_hg(filename):
 
 def get_sample_lib(filename):
     logger.debug(f"Getting sample lib from filename: {filename}")
-    match = re.match(r'^[^.]+', filename)
-    if match:
-        name = match.group(0)
-        logger.debug(f"Extracted sample lib name: {name}")
-        try:
-            sample_lib = SampleLib.objects.get(name=name)
-            logger.info(f"Found sample lib: {sample_lib}")
-            return sample_lib
-        except Exception as e:
-            logger.error(f"Error finding sample lib with name {name}: {str(e)}")
-            return None
-    logger.warning(f"Could not extract sample lib name from filename: {filename}")
-    return None
+    sample_lib_name = filename.split('.')[1]
+    try:
+        sample_lib = SampleLib.objects.get(name=sample_lib_name)
+        return sample_lib
+    except SampleLib.DoesNotExist:
+        logger.error(f"Sample library not found: {sample_lib_name}")
+        return None
 
 def get_sequencing_run(filename):
     logger.debug(f"Getting sequencing run for filename: {filename}")
-    return None
+    sequencing_run_name = filename.split('.')[0]
+    try:
+        sequencing_run = SequencingRun.objects.get(name=sequencing_run_name)
+        return sequencing_run
+    except SequencingRun.DoesNotExist:
+        logger.error(f"Sequencing run not found: {sequencing_run_name}")
+        return None
 
 def get_analysis_run(name):
     logger.debug(f"Getting analysis run: {name}")
@@ -109,6 +110,15 @@ def get_analysis_run(name):
         return analysis_run
     except ObjectDoesNotExist:
         logger.error(f"Analysis run not found: {name}")
+        return None
+
+def get_gene(gene_name, hg):
+    logger.debug(f"Getting gene: {gene_name} for hg: {hg}")
+    try:
+        gene = Gene.objects.get(name=gene_name, hg=hg)
+        return gene
+    except Gene.DoesNotExist:
+        logger.error(f"Gene not found: {gene_name}")
         return None
 
 def check_required_fields(row):
@@ -349,3 +359,41 @@ def variant_file_parser(file_path, analysis_run_name):
     except Exception as e:
         logger.critical(f"Critical error in variant file parser: {str(e)}", exc_info=True)
         return False, f"Critical error: {str(e)}", {}
+
+def variant_file_parser_with_handler(analysis_run, variant_file):
+    logger.info(f"Starting variant file parser for {variant_file.name}")
+    file_path = os.path.join(variant_file.directory, variant_file.name)
+    df = pd.read_csv(file_path, sep='\t')
+    # Process each row
+    for index, row in df.iterrows():
+        try:
+            g_variant = get_or_create_g_variant(
+                hg=get_hg(file_path),
+                chrom=row['Chr'],
+                start=row['Start'],
+                end=row['End'],
+                ref=row['Ref'],
+                alt=row['Alt'],
+                avsnp150=row.get('avsnp150', '')
+            )
+            c_variant = CVariant.objects.create(
+                    g_variant=g_variant,
+                    gene=get_gene(row['Gene.refGene'], f"hg{get_hg(variant_file.name)}"),
+                    nm_id=row['dbNSFP_gene'],
+                    exon=row['ExonicFunc.refGene'],
+                    c_var=row['AAChange.refGene'],
+                    func=row['Func.refGene'],
+                    gene_detail=row.get('GeneDetail.refGene', '')
+                )
+
+            p_variant = PVariant.objects.create(
+                c_variant=c_variant,
+                start=row['Start'],
+                end=row['End'],
+                reference_residues=row['Ref'],
+                inserted_residues=row['Alt']
+            )
+        except Exception as e:
+            logger.error(f"Error processing row {index + 1}: {str(e)}", exc_info=True)
+            return False, f"Error processing row {index + 1}: {str(e)}"
+    return True, "All variants processed successfully"

@@ -151,6 +151,18 @@ def start_import_variants(request, ar_name):
             "total_files": 0,
         })
 
+@permission_required_for_async("analysis_run.view_analysisrun")
+def report_import_status(request, ar_name):
+    variant_files = VariantFile.objects.filter(analysis_run__name=ar_name)
+    files_info = [
+        {
+            "file_name": file.name,
+            "status": file.get_status_display()
+        }
+        for file in variant_files
+    ]
+    return JsonResponse(files_info, safe=False)
+
 
 @permission_required_for_async("analysis_run.delete_analysisrun")
 def delete_analysis_run(request,id):

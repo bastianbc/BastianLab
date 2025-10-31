@@ -132,6 +132,12 @@ class AnalysisRun(models.Model):
             raise
 
 class VariantFile(models.Model):
+    STATUS_CHOICES = (
+        ("pending", "Pending"),
+        ("processing", "Processing"),
+        ("completed", "Completed"),
+        ("failed", "Failed"),
+    )
     FILE_TYPES = [
         ('cns', 'cns'),
         ('variant', "variant"),
@@ -139,10 +145,11 @@ class VariantFile(models.Model):
     ]
     analysis_run = models.ForeignKey("analysisrun.AnalysisRun", on_delete=models.CASCADE, related_name="variant_files")
     type = models.CharField(max_length=10, choices=FILE_TYPES, blank=True, null=True)
-    name = models.CharField(max_length=150, blank=True, null=True)
-    directory = models.CharField(max_length=500, blank=True, null=True)
+    name = models.CharField(max_length=150)
+    directory = models.CharField(max_length=500)
     date = models.DateTimeField(auto_now_add=True, verbose_name="Date")
     call = models.BooleanField(default=False)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="pending", verbose_name = "Status")
     
     class Meta:
         db_table = "variant_file"

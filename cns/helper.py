@@ -245,8 +245,6 @@ def parse_cns_file_with_handler(analysis_run, file_path):
 
                 created_objects_count += 1
 
-        print(f"Cns file parsed: {file_name} - {created_objects_count} records created")
-        return True
+        return True, "Cns file parsed successfully"
     except Exception as e:
-        print(f"Error parsing file {file_path}: {e}")
-        return False
+        return False, f"Error parsing file {file_path}: {e}"
