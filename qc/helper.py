@@ -4,6 +4,8 @@ import logging
 from datetime import datetime
 from collections import defaultdict
 from qc.models import SampleQC
+from samplelib.models import SampleLib
+from sequencingrun.models import SequencingRun
 
 logger = logging.getLogger(__name__)
 
@@ -459,3 +461,69 @@ def save_qc_metrics(ar_name):
 #         'data': results,
 #         'summary_report': {}
 #     }
+
+def get_sample_lib(file_path):
+    """
+    Get the sample library from the file path.
+    """
+    sample_lib_name = file_path.split('.')[1]
+    try:
+        sample_lib = SampleLib.objects.get(name=sample_lib_name)
+        return sample_lib
+    except SampleLib.DoesNotExist:
+        logger.error(f"SampleLib {sample_lib_name} not found")
+        return None
+
+def get_sequencing_run(file_path):
+    """
+    Get the sequencing run from the file path.
+    """
+    sequencing_run_name = file_path.split('.')[0]
+    try:
+        sequencing_run = SequencingRun.objects.get(name=sequencing_run_name)
+        return sequencing_run
+    except SequencingRun.DoesNotExist:
+        logger.error(f"SequencingRun {sequencing_run_name} not found")
+        return None
+
+def parse_dup_metrics_with_handler(analysis_run, file_path):
+    """
+    Parse duplicate metrics file and extract required values and save to the database.
+    """
+    try:
+        df = pd.read_csv(file_path, sep='\t', skiprows=6, encoding='utf-8', engine='python')
+        row = df.iloc[0]
+        # Extract metrics
+        metrics = {
+            'unpaired_reads_examined': row.get('UNPAIRED_READS_EXAMINED'),
+            'read_pairs_examined': row.get('READ_PAIRS_EXAMINED'),
+            'secondary_or_supplementary_rds': row.get('SECONDARY_OR_SUPPLEMENTARY_RDS'),
+            'unmapped_reads': row.get('UNMAPPED_READS'),
+            'unpaired_read_duplicates': row.get('UNPAIRED_READ_DUPLICATES'),
+            'read_pair_duplicates': row.get('READ_PAIR_DUPLICATES'),
+            'read_pair_optical_duplicates': row.get('READ_PAIR_OPTICAL_DUPLICATES'),
+            'percent_duplication': row.get('PERCENT_DUPLICATION'),
+            'estimated_library_size': row.get('ESTIMATED_LIBRARY_SIZE')
+        }
+
+        # Log any missing metrics
+        missing_metrics = [k for k, v in metrics.items() if v is None]
+        if missing_metrics:
+            logger.warning(f"Missing metrics in {file_path}: {', '.join(missing_metrics)}")
+        
+        sample_qc, created = SampleQC.objects.get_or_create(
+            sample_lib=get_sample_lib(file_path), 
+            analysis_run=analysis_run,
+            sequencing_run=get_sequencing_run(file_path),
+            type='dup_metrics'
+        )
+        
+        for field, value in metrics.items():
+            setattr(sample_qc, field, value)
+        
+        sample_qc.save()
+        
+        return True, f"Processed duplicate metrics file {file_path}"
+    except Exception as e:
+        logger.error(f"Error parsing duplicate metrics file {file_path}: {str(e)}")
+        return False, f"Error parsing duplicate metrics file {file_path}: {str(e)}"

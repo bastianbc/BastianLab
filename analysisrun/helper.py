@@ -19,9 +19,9 @@ class VariantImporter:
         self.folder_path = os.path.join(settings.VARIANT_FILES_SOURCE_DIRECTORY, ar_name)
 
         self.folder_types = {
-            # "metrics": {"path": "alignments/metrics", "endfix": [".dup_metrics"], "handler": AlignmentsFolderHandler},
-            "cnv": {"path": "cnv/output", "endfix": [".cns", ".diagram.pdf", ".scatter.png"], "handler": CnvFolderHandler},
-            "snv": {"path": "snv/output", "endfix": ["_multianno.Filtered.txt"], "handler": SnvFolderHandler},
+            "metrics": {"path": "alignments/metrics", "endfix": [".dup_metrics"], "handler": AlignmentsFolderHandler},
+            # "cnv": {"path": "cnv/output", "endfix": [".cns", ".diagram.pdf", ".scatter.png"], "handler": CnvFolderHandler},
+            # "snv": {"path": "snv/output", "endfix": ["_multianno.Filtered.txt"], "handler": SnvFolderHandler},
         }
 
         self.all_files = []
