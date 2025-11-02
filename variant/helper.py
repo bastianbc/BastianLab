@@ -301,7 +301,6 @@ def variant_file_parser(file_path, analysis_run_name):
                             logger.debug(f"Processing entry: {entry}")
                             gene_name, nm_id, exon, c_var, p_var = entry.split(':')
                             hg_value = f"hg{get_hg(filename)}"
-                            print(hg_value)
                             gene = Gene.objects.get(name=gene_name,hg=hg_value)
                             # Create CVariant instance
                             c_variant = CVariant.objects.create(

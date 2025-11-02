@@ -12,8 +12,11 @@ from matplotlib import pylab
 import base64
 from PIL import Image
 from io import BytesIO
+import logging
 
 BASE_PATH = settings.VARIANT_FILES_SOURCE_DIRECTORY
+
+logger = logging.getLogger(__name__)
 
 def handle_variant_file(ar_name, folder):
     folder_path = find_folders(ar_name, folder)
@@ -43,7 +46,6 @@ def parse_cns_file(file_path, ar_name):
         analysis_run = AnalysisRun.objects.get(name=ar_name)
         file_name = file_path.split['/'][-1]
 
-        variant_file = VariantFile.objects.get_or_create(name=file_name, directory=file_path)
         created_objects_count = 0
 
         sample_lib = file_name.split(".")[1]
@@ -138,17 +140,29 @@ def generate_graph(ar_name,file_path):
 
     return base64.b64encode(buffer.getvalue()).decode("utf-8")
 
-def parse_cns_file_with_handler(analysis_run, file_path):
+def get_sequencing_run(file_path):
+    sequencing_run_name = file_path.split(".")[0]
     try:
-        file_name = file_path.split('/')[-1]
+        return SequencingRun.objects.get(name=sequencing_run_name)
+    except SequencingRun.DoesNotExist:
+        logger.error(f"Sequencing run not found: {sequencing_run_name}")
+        return None
+
+def get_sample_lib(file_path):
+    sample_lib_name = file_path.split(".")[1]
+    try:
+        return SampleLib.objects.get(name=sample_lib_name)
+    except SampleLib.DoesNotExist:
+        logger.error(f"Sample library not found: {sample_lib_name}")
+        return None
+
+def parse_cns_file_with_handler(analysis_run, variant_file):
+    try:
+        file_path = os.path.join(variant_file.directory, variant_file.name)
         # example file name: BCB006.SGLP-0458.Tumor_dedup_BSQR.cns
-        sequencing_run_name = file_name.split(".")[0]
-        sequencing_run = SequencingRun.objects.get(name=sequencing_run_name)
+        sequencing_run = get_sequencing_run(file_path)
         
-        sample_lib_name = file_name.split(".")[1]
-        sample_lib = SampleLib.objects.get(name=sample_lib_name)
-        
-        variant_file = VariantFile.objects.create(name=file_name, directory=file_path, analysis_run=analysis_run, type="cns")
+        sample_lib = get_sample_lib(file_path)
         
         df = pd.read_csv(file_path, index_col=False, sep='\t')
 
@@ -247,4 +261,4 @@ def parse_cns_file_with_handler(analysis_run, file_path):
 
         return True, "Cns file parsed successfully"
     except Exception as e:
-        return False, f"Error parsing file {file_path}: {e}"
+        return False, f"Error parsing file {variant_file.name}: {e}"

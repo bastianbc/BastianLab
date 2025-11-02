@@ -1,16 +1,13 @@
-document.addEventListener("DOMContentLoaded", function() {  
-    const arName = window.location.pathname.split('/').filter(Boolean).pop();
-    const btnImport = document.getElementById("import-btn");
-    const error = document.getElementById("error");
-    const progress = document.getElementById("progress-bar");
-    const status = document.getElementById("status");
+const arName = window.location.pathname.split('/').filter(Boolean).pop();
+const btnImport = document.getElementById("import-btn");
+const error = document.getElementById("error");
+const progress = document.getElementById("progress-bar");
+const status = document.getElementById("status");
 
+// Initialize event listeners
+document.addEventListener("DOMContentLoaded", function() {  
     btnImport.addEventListener("click", startImport); 
 });
-
-function init() {
-    const arName = window.location.pathname.split('/').filter(Boolean).pop();
-}
 
 function updateProgress(data) {
     progress.style.width = `${data.progress}%`;

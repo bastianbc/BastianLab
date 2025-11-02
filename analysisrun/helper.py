@@ -19,8 +19,8 @@ class VariantImporter:
         self.folder_path = os.path.join(settings.VARIANT_FILES_SOURCE_DIRECTORY, ar_name)
 
         self.folder_types = {
-            "metrics": {"path": "alignments/metrics", "endfix": [".dup_metrics"], "handler": AlignmentsFolderHandler},
-            # "cnv": {"path": "cnv/output", "endfix": [".cns", ".diagram.pdf", ".scatter.png"], "handler": CnvFolderHandler},
+            # "metrics": {"path": "alignments/metrics", "endfix": [".dup_metrics"], "handler": AlignmentsFolderHandler},
+            "cnv": {"path": "cnv/output", "endfix": [".cns", ".diagram.pdf", ".scatter.png"], "handler": CnvFolderHandler},
             # "snv": {"path": "snv/output", "endfix": ["_multianno.Filtered.txt"], "handler": SnvFolderHandler},
         }
 
@@ -101,10 +101,15 @@ class VariantImporter:
             # Set status to done when all files are processed successfully
             print(f"Variant import completed successfully for {self.ar_name}")
             self._set_status("done", 100)
+            
+            self.analysis_run.status = "completed"
+            self.analysis_run.save()
 
         except Exception as e:
             print(f"Fatal error in import for {self.ar_name}: {e}")
             self._set_status("error", self._update_progress(), error=str(e))
+            self.analysis_run.status = "failed"
+            self.analysis_run.save()
             return
             
     def get_progress(self):        

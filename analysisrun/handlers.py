@@ -47,7 +47,10 @@ class CnvFolderHandler:
             }
         )
         
-        success, message = parse_cns_file_with_handler(analysis_run, file_path)                
+        success, message = parse_cns_file_with_handler(analysis_run, variant_file)     
+
+        print("success: {0}, message: {1}".format(success, message))
+
         status = "completed" if success else "failed"
         variant_file.status = status
         variant_file.save()
