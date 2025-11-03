@@ -2,20 +2,8 @@ import os
 import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "test1.settings")
 django.setup()
-
-
-from django.db import transaction
 from variant.models import VariantCall, CVariant, PVariant
-
 import logging
-
-from django.db.models import Q, F, OuterRef, Value, CharField, When, \
-    Case, Exists
-from django.contrib.postgres.aggregates import StringAgg
-from django.db.models.functions import Concat
-from variant.serializers import VariantSerializer
-
-
 logger = logging.getLogger("file")
 
 
@@ -89,12 +77,32 @@ def generate_variant_2():
     pass
 
 
+import csv
+from analysisrun.models import VariantFile
+from analysisrun.models import AnalysisRun
+from pathlib import Path
+
+
+def restore_variant_files():
+    with open(Path(__file__).parent / "variant_file_dump.csv", newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            VariantFile.objects.update_or_create(
+                analysis_run=AnalysisRun.objects.get(id=2),
+                name=row['name'],
+                directory=row['directory'],
+                defaults={
+                    'type': row['type'],
+                    'call': row.get('call', False),
+                    'status': row.get('status', 'pending'),
+                }
+            )
 
 
 
 
 
-if __name__ == "__main__":
-    print("start")
-    generate_variant_2()
-    print("end")
+# if __name__ == "__main__":
+#     print("start")
+#     generate_variant_2()
+#     print("end")
