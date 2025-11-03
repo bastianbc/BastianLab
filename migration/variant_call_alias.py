@@ -78,25 +78,41 @@ def generate_variant_2():
 
 
 import csv
-from analysisrun.models import VariantFile
-from analysisrun.models import AnalysisRun
-from pathlib import Path
+import boto3
+from io import StringIO
+from analysisrun.models import VariantFile, AnalysisRun
 
 
 def restore_variant_files():
-    with open(Path(__file__).parent / "variant_file_dump.csv", newline='') as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            VariantFile.objects.update_or_create(
-                analysis_run=AnalysisRun.objects.get(id=2),
-                name=row['name'],
-                directory=row['directory'],
-                defaults={
-                    'type': row['type'],
-                    'call': row.get('call', False),
-                    'status': row.get('status', 'pending'),
-                }
-            )
+    # --- AWS S3 Configuration ---
+    bucket_name = "bastian-lab-169-3-r-us-west-2.sec.ucsf.edu"
+    object_key = "TEST/variant_file_dump.csv"
+
+    s3 = boto3.client("s3", region_name="us-west-2")
+
+    # --- Download the CSV file into memory ---
+    response = s3.get_object(Bucket=bucket_name, Key=object_key)
+    csv_content = response["Body"].read().decode("utf-8")
+
+    reader = csv.DictReader(StringIO(csv_content))
+
+    # --- Restore VariantFile entries ---
+    count = 0
+    for row in reader:
+        VariantFile.objects.update_or_create(
+            analysis_run=AnalysisRun.objects.get(id=2),  # Adjust the analysis_run id as needed
+            name=row["name"],
+            directory=row["directory"],
+            defaults={
+                "type": row.get("type"),
+                "call": row.get("call", False),
+                "status": row.get("status", "pending"),
+            },
+        )
+        count += 1
+
+    print(f"✅ Restored {count} VariantFile records from s3://{bucket_name}/{object_key}")
+
 
 
 
