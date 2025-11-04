@@ -1,7 +1,17 @@
 {% extends "master.html" %}
+
 {% load crispy_forms_tags %}
 
+{% block head %}
+<style>
+    .swal2-popup {
+        width: 600px !important;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
+
 <div class="card shadow">
   <div class="card-header">
     <h3 class="card-title mb-0">Import Variants</h3>
@@ -54,9 +64,10 @@
     </div>
   </div>
 </div>
-<!--end::Modal-->
+
 {% endblock %}
 
 {% block scripts %}
-<script src="static/import-variant.js" charset="utf-8"></script>
+<script src="static/import-variant.js"></script>
 {% endblock %}
+
