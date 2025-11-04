@@ -1,5 +1,7 @@
 import os
 import csv
+import sys
+
 from django.conf import settings
 from analysisrun.models import AnalysisRun
 from cns.models import Cns
@@ -149,7 +151,9 @@ def get_sequencing_run(file_path):
         return None
 
 def get_sample_lib(file_path):
+    print("*"*80,file_path)
     sample_lib_name = file_path.split(".")[1]
+    print("*"*80,sample_lib_name)
     try:
         return SampleLib.objects.get(name=sample_lib_name)
     except SampleLib.DoesNotExist:
@@ -163,7 +167,7 @@ def parse_cns_file_with_handler(analysis_run, variant_file):
         file_path = os.path.join(variant_file.directory, variant_file.name)
         # example file name: BCB006.SGLP-0458.Tumor_dedup_BSQR.cns
         sequencing_run = get_sequencing_run(file_path)
-        
+        print("&"*80)
         sample_lib = get_sample_lib(file_path)
         
         df = pd.read_csv(file_path, index_col=False, sep='\t')
