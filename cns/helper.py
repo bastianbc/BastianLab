@@ -152,7 +152,8 @@ def get_sequencing_run(file_path):
 
 def get_sample_lib(file_path):
     print("*"*80,file_path)
-    sample_lib_name = file_path.split(".")[1]
+    file_name = file_path.split("/")[-1]
+    sample_lib_name = file_name.split(".")[1]
     print("*"*80,sample_lib_name)
     try:
         return SampleLib.objects.get(name=sample_lib_name)
