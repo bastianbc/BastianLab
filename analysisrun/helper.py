@@ -33,21 +33,6 @@ class VariantImporter:
         self.s3 = boto3.client("s3", region_name=settings.AWS_S3_REGION_NAME)
 
 
-    def discover_files(self):
-        """Scan the folder and find variant files to process."""
-        self.all_files.clear()
-        for root, _, files in os.walk(self.folder_path):
-            for f in files:
-                for type_name, ft in self.folder_types.items():
-                    if any(f.endswith(e) for e in ft["endfix"]):
-                        full_path = os.path.join(root, f)
-                        self.all_files.append((type_name, full_path))
-        self.total_files = len(self.all_files)
-        self.processed_files = 0
-        print("all files: ", self.all_files)
-        print("all self.folder_path: ", self.folder_path)
-        return self.all_files
-
     def discover_files_s3(self):
         """Scan S3 bucket and find variant files to process."""
         self.all_files.clear()
@@ -67,8 +52,6 @@ class VariantImporter:
 
         self.total_files = len(self.all_files)
         self.processed_files = 0
-        print("all files:", self.all_files)
-        print("S3 prefix:", self.folder_path)
         return self.all_files
 
     def _cache_key(self):
@@ -116,6 +99,7 @@ class VariantImporter:
             print(f"Starting variant import for {self.ar_name} ({self.total_files} files)")
             for idx, (type_name, file_path) in enumerate(self.all_files, start=1):
                 try:
+                    print("&&&& file: ",type_name, file_path)
                     if VariantFile.objects.filter(analysis_run=self.analysis_run, name=file_path.split('/')[-1], directory=file_path).exists():
                         print(f"File {file_path} already processed")
                         continue                    
