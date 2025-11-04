@@ -16,7 +16,7 @@ class VariantImporter:
     def __init__(self, ar_name: str):
         self.ar_name = ar_name
         self.analysis_run = AnalysisRun.objects.get(name=ar_name)
-        self.folder_path = os.path.join(settings.VARIANT_FILES_SOURCE_DIRECTORY, ar_name)
+        self.folder_path = os.path.join(settings.VARIANT_FILES_SOURCE_DIRECTORY, self.analysis_run.sheet_name)
 
         self.folder_types = {
             "metrics": {"path": "alignments/metrics", "endfix": [".dup_metrics"], "handler": AlignmentsFolderHandler},

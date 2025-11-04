@@ -98,9 +98,7 @@ def initialize_import_variants(request, ar_name):
     Does NOT start background import automatically.
     User must click 'Start Import' to begin.
     """
-    print(f"Initializing {ar_name}")
-    analysis_run = AnalysisRun.objects.get(name=ar_name)
-    importer = VariantImporter(analysis_run.sheet_name)
+    importer = VariantImporter(ar_name)
     importer.reset_status()
     importer.discover_files()
     cache_data = importer.get_progress()
