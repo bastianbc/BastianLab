@@ -1,4 +1,4 @@
-// import-variant.js
+// import_variant.js
 
 // Extract the Analysis Run name from the URL
 const arName = window.location.pathname.split('/').filter(Boolean).pop();
