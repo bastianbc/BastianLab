@@ -84,6 +84,7 @@ def get_hg(filename):
 
 def get_sample_lib(filename):
     logger.debug(f"Getting sample lib from filename: {filename}")
+    print("$$$$$ get_sample_lib_ variant helper ", filename)
     sample_lib_name = filename.split('.')[1]
     try:
         sample_lib = SampleLib.objects.get(name=sample_lib_name)
@@ -94,6 +95,7 @@ def get_sample_lib(filename):
 
 def get_sequencing_run(filename):
     logger.debug(f"Getting sequencing run for filename: {filename}")
+    print("$$$$$ get_sequencing_run variant helper ", filename)
     sequencing_run_name = filename.split('.')[0]
     try:
         sequencing_run = SequencingRun.objects.get(name=sequencing_run_name)

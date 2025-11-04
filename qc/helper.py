@@ -466,7 +466,8 @@ def get_sample_lib(file_path):
     """
     Get the sample library from the file path.
     """
-    sample_lib_name = file_path.split('.')[1]
+    file_name = file_path.split("/")[-1]
+    sample_lib_name = file_name.split('.')[1]
     print("@@@@@@@",file_path, sample_lib_name)
     try:
         sample_lib = SampleLib.objects.get(name=sample_lib_name)
@@ -479,7 +480,8 @@ def get_sequencing_run(file_path):
     """
     Get the sequencing run from the file path.
     """
-    sequencing_run_name = file_path.split('.')[0]
+    file_name = file_path.split("/")[-1]
+    sequencing_run_name = file_name.split('.')[0]
     try:
         sequencing_run = SequencingRun.objects.get(name=sequencing_run_name)
         return sequencing_run
