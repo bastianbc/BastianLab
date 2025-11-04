@@ -7,7 +7,6 @@ class CustomFileSystemStorage(FileSystemStorage):
         # Default directory to store files
         kwargs['location'] = settings.SEQUENCING_FILES_SOURCE_DIRECTORY
         # prevent any chmod() calls
-        print("CustomFileSystemStorage", kwargs['location'])
         kwargs['file_permissions_mode'] = None
         kwargs['directory_permissions_mode'] = None
         super(CustomFileSystemStorage, self).__init__(*args, **kwargs)
