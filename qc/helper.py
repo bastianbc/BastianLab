@@ -467,6 +467,7 @@ def get_sample_lib(file_path):
     Get the sample library from the file path.
     """
     sample_lib_name = file_path.split('.')[1]
+    print("@@@@@@@",file_path, sample_lib_name)
     try:
         sample_lib = SampleLib.objects.get(name=sample_lib_name)
         return sample_lib
