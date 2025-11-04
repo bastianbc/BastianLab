@@ -143,7 +143,9 @@ def generate_graph(ar_name,file_path):
     return base64.b64encode(buffer.getvalue()).decode("utf-8")
 
 def get_sequencing_run(file_path):
-    sequencing_run_name = file_path.split(".")[0]
+    print("get_sequencing_run"*80,file_path)
+    file_name = file_path.split("/")[-1]
+    sequencing_run_name = file_name.split(".")[0]
     try:
         return SequencingRun.objects.get(name=sequencing_run_name)
     except SequencingRun.DoesNotExist:
@@ -151,7 +153,7 @@ def get_sequencing_run(file_path):
         return None
 
 def get_sample_lib(file_path):
-    print("*"*80,file_path)
+    print("get_sample_lib"*80,file_path)
     file_name = file_path.split("/")[-1]
     sample_lib_name = file_name.split(".")[1]
     print("*"*80,sample_lib_name)
