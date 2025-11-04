@@ -100,7 +100,7 @@ def initialize_import_variants(request, ar_name):
     """
     importer = VariantImporter(ar_name)
     importer.reset_status()
-    importer.discover_files()
+    importer.discover_files_s3()
     cache_data = importer.get_progress()
 
     return render(request, "import_variants.html", {
@@ -119,7 +119,7 @@ def start_import_variants(request, ar_name):
     """
     try:
         importer = VariantImporter(ar_name)
-        importer.discover_files()
+        importer.discover_files_s3()
         cache_data = importer.get_progress()
 
         status = cache_data.get("status", "not_started")

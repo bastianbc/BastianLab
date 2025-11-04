@@ -1,10 +1,12 @@
 import os
+import boto3
 import traceback
 from concurrent.futures import ThreadPoolExecutor
 from django.conf import settings
 from django.core.cache import cache
 from analysisrun.models import AnalysisRun, VariantFile
 from analysisrun.handlers import AlignmentsFolderHandler, CnvFolderHandler, SnvFolderHandler
+
 
 class VariantImporter:
     """
@@ -16,7 +18,7 @@ class VariantImporter:
     def __init__(self, ar_name: str):
         self.ar_name = ar_name
         self.analysis_run = AnalysisRun.objects.get(name=ar_name)
-        self.folder_path = os.path.join(settings.VARIANT_FILES_SOURCE_DIRECTORY, self.analysis_run.sheet_name)
+        self.folder_path = f"sequencingdata/ProcessedData/{self.analysis_run.sheet_name}"  # S3 prefix (no bucket name)
 
         self.folder_types = {
             "metrics": {"path": "alignments/metrics", "endfix": [".dup_metrics"], "handler": AlignmentsFolderHandler},
@@ -27,6 +29,9 @@ class VariantImporter:
         self.all_files = []
         self.processed_files = 0
         self.total_files = 0
+
+        self.s3 = boto3.client("s3", region_name=settings.AWS_S3_REGION_NAME)
+
 
     def discover_files(self):
         """Scan the folder and find variant files to process."""
@@ -41,6 +46,29 @@ class VariantImporter:
         self.processed_files = 0
         print("all files: ", self.all_files)
         print("all self.folder_path: ", self.folder_path)
+        return self.all_files
+
+    def discover_files_s3(self):
+        """Scan S3 bucket and find variant files to process."""
+        self.all_files.clear()
+        paginator = self.s3.get_paginator("list_objects_v2")
+
+        for page in paginator.paginate(
+            Bucket=settings.AWS_STORAGE_BUCKET_NAME,
+            Prefix=self.folder_path,
+        ):
+            for obj in page.get("Contents", []):
+                key = obj["Key"]
+                file_name = key.split("/")[-1]
+                for type_name, ft in self.folder_types.items():
+                    if any(file_name.endswith(e) for e in ft["endfix"]):
+                        full_s3_path = f"s3://{settings.AWS_STORAGE_BUCKET_NAME}/{key}"
+                        self.all_files.append((type_name, full_s3_path))
+
+        self.total_files = len(self.all_files)
+        self.processed_files = 0
+        print("all files:", self.all_files)
+        print("S3 prefix:", self.folder_path)
         return self.all_files
 
     def _cache_key(self):
@@ -76,7 +104,7 @@ class VariantImporter:
         self._set_status("processing", 0)
 
         # Discover files before starting
-        self.discover_files()
+        self.discover_files_s3()
 
         # Submit background job
         self.executor.submit(self._background_job)
