@@ -361,7 +361,6 @@ def variant_file_parser(file_path, analysis_run_name):
 
 def variant_file_parser_with_handler(analysis_run, variant_file):
     logger.info(f"Starting variant file parser for {variant_file.name}")
-    print(f"Starting variant file parser for {variant_file.name}")
     file_path = os.path.join(variant_file.directory, variant_file.name)
     df = pd.read_csv(file_path, sep='\t')
     # Process each row

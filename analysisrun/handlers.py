@@ -25,6 +25,7 @@ class AlignmentsFolderHandler:
 
         success, message = parse_dup_metrics_with_handler(analysis_run, file_path)
         status = "completed" if success else "failed"
+        print(f"@@@@@@@@@@@AlignmentsFolderHandler: {status}: {message}")
         variant_file.status = status
         variant_file.save()
         
@@ -52,6 +53,7 @@ class CnvFolderHandler:
         print("success: {0}, message: {1}".format(success, message))
 
         status = "completed" if success else "failed"
+        print(f"@@@@@@@@@@@CnvFolderHandler: {status}: {message}")
         variant_file.status = status
         variant_file.save()
 
@@ -77,6 +79,8 @@ class SnvFolderHandler:
         success, message = variant_file_parser_with_handler(analysis_run=analysis_run, variant_file=variant_file)
         print("success: {0}, message: {1}".format(success, message))
         status = "completed" if success else "failed"
+
+        print(f"@@@@@@@@@@@SnvFolderHandler: {status}: {message}")
         variant_file.status = status
         variant_file.save()
         

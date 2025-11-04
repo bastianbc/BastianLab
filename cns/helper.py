@@ -143,7 +143,6 @@ def generate_graph(ar_name,file_path):
     return base64.b64encode(buffer.getvalue()).decode("utf-8")
 
 def get_sequencing_run(file_path):
-    print("get_sequencing_run"*80,file_path)
     file_name = file_path.split("/")[-1]
     sequencing_run_name = file_name.split(".")[0]
     try:
@@ -153,10 +152,8 @@ def get_sequencing_run(file_path):
         return None
 
 def get_sample_lib(file_path):
-    print("get_sample_lib"*80,file_path)
     file_name = file_path.split("/")[-1]
     sample_lib_name = file_name.split(".")[1]
-    print("*"*80,sample_lib_name)
     try:
         return SampleLib.objects.get(name=sample_lib_name)
     except SampleLib.DoesNotExist:
@@ -166,11 +163,9 @@ def get_sample_lib(file_path):
 def parse_cns_file_with_handler(analysis_run, variant_file):
     try:
         logger.info(f"Starting variant file parser for {variant_file.name}")
-        print(f"Starting variant file parser for {variant_file.name}")
         file_path = os.path.join(variant_file.directory, variant_file.name)
         # example file name: BCB006.SGLP-0458.Tumor_dedup_BSQR.cns
         sequencing_run = get_sequencing_run(file_path)
-        print("&"*80)
         sample_lib = get_sample_lib(file_path)
         
         df = pd.read_csv(file_path, index_col=False, sep='\t')
