@@ -23,7 +23,7 @@
     <p>Status: <span id="status">{{status}}</span></p>
     <p id="error" class="text-danger small">{{error|default:""}}</p>
 
-      <button id="import-btn" class="btn btn-primary">Import Variants</button>
+    <button id="import-btn" class="btn btn-primary" onclick="startImport()">Import Variants</button>
   </div>
 </div>
 <!--begin::Modal-->
@@ -58,5 +58,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="/static/import_variant.js" charset="utf-8"></script>
+<script src="/static/import-variant.js" charset="utf-8"></script>
 {% endblock %}
