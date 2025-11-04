@@ -158,6 +158,8 @@ def get_sample_lib(file_path):
 
 def parse_cns_file_with_handler(analysis_run, variant_file):
     try:
+        logger.info(f"Starting variant file parser for {variant_file.name}")
+        print(f"Starting variant file parser for {variant_file.name}")
         file_path = os.path.join(variant_file.directory, variant_file.name)
         # example file name: BCB006.SGLP-0458.Tumor_dedup_BSQR.cns
         sequencing_run = get_sequencing_run(file_path)
