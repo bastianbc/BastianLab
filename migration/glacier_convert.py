@@ -1,11 +1,7 @@
 
 from boto3.s3.transfer import TransferConfig
-import os
-import argparse, time
-import boto3
-from botocore.exceptions import ClientError
 from django.db import transaction
-
+from collections import defaultdict
 from sequencingfile.models import SMBDirectory  # <-- adjust to your app
 from qc.models import SampleQC
 
@@ -281,3 +277,66 @@ def make_qc_standard():
             continue
 
         print(f"ℹ️ unknown class {sc}: {bucket}/{key}")
+
+
+
+
+
+
+def calculate_size():
+    BUCKET_NAME = "bastian-lab-169-3-r-us-west-2.sec.ucsf.edu"
+    REGION = "us-west-2"
+
+    s3 = boto3.client("s3", region_name=REGION)
+    storage_stats = defaultdict(int)
+    standard_folders = defaultdict(int)
+    continuation_token = None
+
+    print(f"Scanning bucket: {BUCKET_NAME} in region {REGION} ...")
+
+    while True:
+        list_kwargs = {"Bucket": BUCKET_NAME, "MaxKeys": 1000}
+        if continuation_token:
+            list_kwargs["ContinuationToken"] = continuation_token
+
+        response = s3.list_objects_v2(**list_kwargs)
+
+        if "Contents" not in response:
+            break
+
+        for obj in response["Contents"]:
+            size = obj["Size"]
+            storage_class = obj.get("StorageClass", "STANDARD")
+
+            storage_stats[storage_class] += size
+
+            # If file is STANDARD, track its parent folder
+            if storage_class == "STANDARD":
+                key = obj["Key"]
+                parent = key.split("/")[0] if "/" in key else "(root)"
+                standard_folders[parent] += size
+
+        if response.get("IsTruncated"):
+            continuation_token = response["NextContinuationToken"]
+        else:
+            break
+
+    # --- PRINT STORAGE CLASS SUMMARY ---
+    print("\n📊 Storage Breakdown by Class:")
+    total_bytes = sum(storage_stats.values())
+    for storage_class, bytes_used in storage_stats.items():
+        gb_used = bytes_used / (1024 ** 3)
+        tb_used = bytes_used / (1024 ** 4)
+        print(f"  • {storage_class:<15} {gb_used:,.2f} GB  ({tb_used:,.2f} TB)")
+
+    print(f"\nTotal Size: {total_bytes / (1024 ** 4):,.2f} TB ({total_bytes / (1024 ** 3):,.2f} GB)")
+
+    # --- PRINT PARENT FOLDER SIZES (STANDARD ONLY) ---
+    print("\n📁 Top-level folders for STANDARD class:")
+    sorted_folders = sorted(standard_folders.items(), key=lambda x: x[1], reverse=True)
+    for folder, bytes_used in sorted_folders[:15]:  # top 15 folders
+        gb_used = bytes_used / (1024 ** 3)
+        print(f"  • {folder:<40} {gb_used:,.2f} GB")
+
+
+
