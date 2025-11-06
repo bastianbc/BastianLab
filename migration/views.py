@@ -800,8 +800,10 @@ def generate_file_set(file, seq_run, sample_lib):
     return file_set
 
 def import_genes(request):
-    from .variant_call_alias import restore_variant_files
-    restore_variant_files()
+    from .glacier_convert import calculate_size
+    calculate_size()
+    # from .variant_call_alias import restore_variant_files
+    # restore_variant_files()
 
 
 def import_file_tree(request):
