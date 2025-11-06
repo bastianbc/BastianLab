@@ -1,19 +1,12 @@
-
+import boto3
+from botocore.exceptions import ClientError
 from boto3.s3.transfer import TransferConfig
-from django.db import transaction
-from collections import defaultdict
-from sequencingfile.models import SMBDirectory  # <-- adjust to your app
-from qc.models import SampleQC
 
+# --- CONFIGURATION ---
 AWS_REGION = "us-west-2"
 BUCKET_NAME = "bastian-lab-169-3-r-us-west-2.sec.ucsf.edu"
-DRY_RUN = False   # set True first to preview changes
-
-
-# Map S3 classes to your two levels
-STANDARD_CLASSES = {"STANDARD", "STANDARD_IA", "ONEZONE_IA", "INTELLIGENT_TIERING"}
-GLACIER_CLASSES  = {"GLACIER", "GLACIER_IR", "DEEP_ARCHIVE"}
-
+DRY_RUN = True  # ✅ Set to False after confirming output
+PREFIX = ""     # e.g., "HiSeqData/" if you want to limit scope
 
 CONFIG = TransferConfig(
     multipart_threshold=8 * 1024 * 1024,
@@ -26,71 +19,75 @@ def convert_glacier_and_mark_level():
     s3 = boto3.resource("s3", region_name=AWS_REGION)
     client = s3.meta.client
 
-    # your filter stays the same
-    rows = SMBDirectory.objects.filter(is_registered=True, storage_level=0)
-
+    continuation_token = None
     total = changed = skipped = errors = 0
 
-    for row in rows:
-        key = row.directory
-        total += 1
+    print(f"🔍 Scanning bucket {BUCKET_NAME} in region {AWS_REGION}...")
 
-        # If you have a size field and want to skip folder markers
-        if key.endswith("/") and getattr(row, "size", 0) == 0:
-            skipped += 1
-            print(f"⏭️  Skip folder marker: {key}")
-            continue
+    while True:
+        list_kwargs = {"Bucket": BUCKET_NAME, "MaxKeys": 1000}
+        if PREFIX:
+            list_kwargs["Prefix"] = PREFIX
+        if continuation_token:
+            list_kwargs["ContinuationToken"] = continuation_token
 
-        # Read current storage class
-        try:
-            head = client.head_object(Bucket=BUCKET_NAME, Key=key)
-        except ClientError as e:
-            errors += 1
-            print(f"❌ head_object failed for {key}: {e}")
-            continue
+        response = client.list_objects_v2(**list_kwargs)
 
-        storage_class = head.get("StorageClass", "STANDARD")
+        if "Contents" not in response:
+            break
 
-        # If already DEEP_ARCHIVE, just sync the DB to level=1 (if desired)
-        if storage_class == "DEEP_ARCHIVE":
-            if row.storage_level != 1 and not DRY_RUN:
-                row.storage_level = 1
-                row.save(update_fields=["storage_level"])
-                print(f"✅ Already DEEP_ARCHIVE, marked storage_level=1: {key}")
-            else:
-                print(f"✅ Already DEEP_ARCHIVE: {key}")
-            skipped += 1
-            continue
+        for obj in response["Contents"]:
+            key = obj["Key"]
+            size = obj["Size"]
+            total += 1
 
-        # Prepare in-place copy to change storage class
-        copy_source = {"Bucket": BUCKET_NAME, "Key": key}
-        extra_args = {
-            "StorageClass": "DEEP_ARCHIVE",
-            "MetadataDirective": "COPY",
-        }
+            # Skip folder markers
+            if key.endswith("/") or size == 0:
+                skipped += 1
+                continue
 
-        try:
-            if DRY_RUN:
-                print(f"🔎 DRY-RUN would change to DEEP_ARCHIVE: {key}")
-            else:
-                s3.Object(BUCKET_NAME, key).copy(
-                    copy_source,
-                    ExtraArgs=extra_args,
-                    Config=CONFIG
-                )
-                changed += 1
-                print(f"🔄 Changed to DEEP_ARCHIVE: {key}")
+            try:
+                head = client.head_object(Bucket=BUCKET_NAME, Key=key)
+                storage_class = head.get("StorageClass", "STANDARD")
+            except ClientError as e:
+                errors += 1
+                print(f"❌ Failed to read metadata for {key}: {e}")
+                continue
 
-                # ✅ persist the new level in DB
-                row.storage_level = 1
-                row.save(update_fields=["storage_level"])
-                print(f"💾 Updated DB storage_level=1 for: {key}")
+            # Skip if already Glacier or Deep Archive
+            if storage_class in ("GLACIER", "GLACIER_IR", "DEEP_ARCHIVE"):
+                skipped += 1
+                continue
 
-        except ClientError as e:
-            errors += 1
-            print(f"❌ Error updating {key}: {e}")
+            copy_source = {"Bucket": BUCKET_NAME, "Key": key}
+            extra_args = {"StorageClass": "DEEP_ARCHIVE", "MetadataDirective": "COPY"}
 
-    print(f"\nDone. Scanned {total} | Changed {changed} | Skipped {skipped} | Errors {errors}")
+            try:
+                if DRY_RUN:
+                    print(f"🔎 DRY-RUN → would convert {key} ({storage_class}) → DEEP_ARCHIVE")
+                else:
+                    s3.Object(BUCKET_NAME, key).copy(copy_source, ExtraArgs=extra_args, Config=CONFIG)
+                    changed += 1
+                    print(f"✅ Converted {key} → DEEP_ARCHIVE")
+
+            except ClientError as e:
+                errors += 1
+                print(f"❌ Copy failed for {key}: {e}")
+
+        # Handle pagination
+        if response.get("IsTruncated"):
+            continuation_token = response["NextContinuationToken"]
+        else:
+            break
+
+    print(f"\n📊 Summary for {BUCKET_NAME}")
+    print(f"  Total scanned : {total}")
+    print(f"  Converted     : {changed}")
+    print(f"  Skipped       : {skipped}")
+    print(f"  Errors        : {errors}")
+
+
+
 
 
 
