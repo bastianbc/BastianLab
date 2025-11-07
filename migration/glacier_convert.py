@@ -27,7 +27,6 @@ def safe_head_object(client, bucket, key):
             return None
         else:
             raise
-
 def convert_glacier_and_mark_level():
     s3 = boto3.resource("s3", region_name=AWS_REGION)
     client = s3.meta.client
@@ -51,11 +50,14 @@ def convert_glacier_and_mark_level():
             size = obj["Size"]
             total += 1
             print(total)
-            # --- 🧩 Detect AWS-managed access log files ---
-            if key.startswith("managed-"):
+
+            # --- 🧩 Skip AWS-managed and mirror delivery log files ---
+            if key.startswith(("managed-", "mmdl-")):
                 skipped += 1
+                print(f"⏭️ Skipped AWS-managed or mirror log file: {key}")
                 continue
 
+            # --- Skip folder markers and zero-byte objects ---
             if key.endswith("/") or size == 0:
                 skipped += 1
                 continue
@@ -93,6 +95,7 @@ def convert_glacier_and_mark_level():
     print(f"  Converted     : {changed}")
     print(f"  Skipped       : {skipped}")
     print(f"  Errors        : {errors}")
+
 
 
 BUCKET_NAME = "managed-039612868981-server-access-logs"
