@@ -54,7 +54,6 @@ def convert_glacier_and_mark_level():
             # --- 🧩 Skip AWS-managed and mirror delivery log files ---
             if key.startswith(("managed-", "mmdl-")):
                 skipped += 1
-                print(f"⏭️ Skipped AWS-managed or mirror log file: {key}")
                 continue
 
             # --- Skip folder markers and zero-byte objects ---
