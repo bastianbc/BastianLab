@@ -5,7 +5,7 @@ from boto3.s3.transfer import TransferConfig
 # --- CONFIGURATION ---
 AWS_REGION = "us-west-2"
 BUCKET_NAME = "bastian-lab-169-3-r-us-west-2.sec.ucsf.edu"
-DRY_RUN = True  # ✅ Set to False after confirming output
+DRY_RUN = False  # ✅ Set to False after confirming output
 PREFIX = ""     # e.g., "HiSeqData/" if you want to limit scope
 
 CONFIG = TransferConfig(
