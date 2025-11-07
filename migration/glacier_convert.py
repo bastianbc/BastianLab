@@ -27,7 +27,6 @@ def safe_head_object(client, bucket, key):
             return None
         else:
             raise
-
 def convert_glacier_and_mark_level():
     s3 = boto3.resource("s3", region_name=AWS_REGION)
     client = s3.meta.client
@@ -50,6 +49,14 @@ def convert_glacier_and_mark_level():
             key = obj["Key"]
             size = obj["Size"]
             total += 1
+
+            # --- 🧩 Detect AWS-managed access log files ---
+            if key.startswith("managed-"):
+                skipped += 1
+                log_path = f"s3://{BUCKET_NAME}/{key}"
+                print(f"📂 Managed access log file located: {log_path}")
+                continue
+
             if key.endswith("/") or size == 0:
                 skipped += 1
                 continue
@@ -71,7 +78,9 @@ def convert_glacier_and_mark_level():
                 if DRY_RUN:
                     print(f"🔎 Would convert {key} ({storage_class}) → DEEP_ARCHIVE")
                 else:
-                    s3.Object(BUCKET_NAME, key).copy(copy_source, ExtraArgs=extra_args, Config=CONFIG)
+                    s3.Object(BUCKET_NAME, key).copy(
+                        copy_source, ExtraArgs=extra_args, Config=CONFIG
+                    )
                     changed += 1
                     print(f"✅ Converted {key} → DEEP_ARCHIVE")
             except ClientError as e:
@@ -83,7 +92,11 @@ def convert_glacier_and_mark_level():
         else:
             break
 
-    print(f"\n📊 Summary: total={total}, converted={changed}, skipped={skipped}, errors={errors}")
+    print(f"\n📊 Summary for {BUCKET_NAME}")
+    print(f"  Total scanned : {total}")
+    print(f"  Converted     : {changed}")
+    print(f"  Skipped       : {skipped}")
+    print(f"  Errors        : {errors}")
 
 
 BUCKET_NAME = "managed-039612868981-server-access-logs"
