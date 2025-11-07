@@ -27,6 +27,7 @@ def safe_head_object(client, bucket, key):
             return None
         else:
             raise
+
 def convert_glacier_and_mark_level():
     s3 = boto3.resource("s3", region_name=AWS_REGION)
     client = s3.meta.client
@@ -53,8 +54,6 @@ def convert_glacier_and_mark_level():
             # --- 🧩 Detect AWS-managed access log files ---
             if key.startswith("managed-"):
                 skipped += 1
-                log_path = f"s3://{BUCKET_NAME}/{key}"
-                print(f"📂 Managed access log file located: {log_path}")
                 continue
 
             if key.endswith("/") or size == 0:
