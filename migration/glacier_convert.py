@@ -74,14 +74,11 @@ def convert_glacier_and_mark_level():
             extra_args = {"StorageClass": "DEEP_ARCHIVE", "MetadataDirective": "COPY"}
 
             try:
-                if DRY_RUN:
-                    print(f"🔎 Would convert {key} ({storage_class}) → DEEP_ARCHIVE")
-                else:
-                    s3.Object(BUCKET_NAME, key).copy(
-                        copy_source, ExtraArgs=extra_args, Config=CONFIG
-                    )
-                    changed += 1
-                    print(f"✅ Converted {key} → DEEP_ARCHIVE")
+                s3.Object(BUCKET_NAME, key).copy(
+                    copy_source, ExtraArgs=extra_args, Config=CONFIG
+                )
+                changed += 1
+                print(f"✅ Converted {key} → DEEP_ARCHIVE")
             except ClientError as e:
                 errors += 1
                 print(f"❌ Copy failed for {key}: {e}")
