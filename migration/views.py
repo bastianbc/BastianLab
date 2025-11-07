@@ -800,9 +800,9 @@ def generate_file_set(file, seq_run, sample_lib):
     return file_set
 
 def import_genes(request):
-    from .glacier_convert import calculate_size, convert_glacier_and_mark_level
+    from .glacier_convert import calculate_size, convert_glacier_and_mark_level, delete_all_objects
     print("importing genes...")
-    convert_glacier_and_mark_level()
+    convert_glacier_and_mark_level("managed-039612868981-server-access-logs")
     # from .variant_call_alias import restore_variant_files
     # restore_variant_files()
 

@@ -40,7 +40,7 @@ def convert_glacier_and_mark_level():
             key = obj["Key"]
             size = obj["Size"]
             total += 1
-
+            print(total)
             # Skip folder markers
             if key.endswith("/") or size == 0:
                 skipped += 1
@@ -86,6 +86,32 @@ def convert_glacier_and_mark_level():
     print(f"  Skipped       : {skipped}")
     print(f"  Errors        : {errors}")
 
+import boto3
+
+BUCKET_NAME = "managed-039612868981-server-access-logs"
+
+s3 = boto3.client("s3")
+
+def delete_all_objects(bucket):
+    paginator = s3.get_paginator("list_objects_v2")
+    pages = paginator.paginate(Bucket=bucket)
+
+    deleted = 0
+    for page in pages:
+        if "Contents" in page:
+            # Prepare a batch of up to 1000 keys (S3 limit per delete request)
+            objects_to_delete = [{"Key": obj["Key"]} for obj in page["Contents"]]
+            response = s3.delete_objects(
+                Bucket=bucket,
+                Delete={"Objects": objects_to_delete, "Quiet": True}
+            )
+            deleted += len(objects_to_delete)
+            print(f"Deleted {deleted} objects so far...")
+
+    print(f"\n✅ Completed — all objects deleted from {bucket}")
+
+if __name__ == "__main__":
+    delete_all_objects(BUCKET_NAME)
 
 
 
