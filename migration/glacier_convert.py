@@ -15,14 +15,25 @@ CONFIG = TransferConfig(
     use_threads=True
 )
 
+from botocore.exceptions import ClientError
+
+def safe_head_object(client, bucket, key):
+    try:
+        return client.head_object(Bucket=bucket, Key=key)
+    except ClientError as e:
+        code = e.response["Error"]["Code"]
+        if code in ("404", "NoSuchKey", "NotFound"):
+            print(f"⚠️ Object not found or already archived: {key}")
+            return None
+        else:
+            raise
+
 def convert_glacier_and_mark_level():
     s3 = boto3.resource("s3", region_name=AWS_REGION)
     client = s3.meta.client
 
     continuation_token = None
     total = changed = skipped = errors = 0
-
-    print(f"🔍 Scanning bucket {BUCKET_NAME} in region {AWS_REGION}...")
 
     while True:
         list_kwargs = {"Bucket": BUCKET_NAME, "MaxKeys": 1000}
@@ -32,7 +43,6 @@ def convert_glacier_and_mark_level():
             list_kwargs["ContinuationToken"] = continuation_token
 
         response = client.list_objects_v2(**list_kwargs)
-
         if "Contents" not in response:
             break
 
@@ -40,21 +50,16 @@ def convert_glacier_and_mark_level():
             key = obj["Key"]
             size = obj["Size"]
             total += 1
-            print(total)
-            # Skip folder markers
             if key.endswith("/") or size == 0:
                 skipped += 1
                 continue
 
-            try:
-                head = client.head_object(Bucket=BUCKET_NAME, Key=key)
-                storage_class = head.get("StorageClass", "STANDARD")
-            except ClientError as e:
+            head = safe_head_object(client, BUCKET_NAME, key)
+            if not head:
                 errors += 1
-                print(f"❌ Failed to read metadata for {key}: {e}")
                 continue
 
-            # Skip if already Glacier or Deep Archive
+            storage_class = head.get("StorageClass", "STANDARD")
             if storage_class in ("GLACIER", "GLACIER_IR", "DEEP_ARCHIVE"):
                 skipped += 1
                 continue
@@ -64,29 +69,22 @@ def convert_glacier_and_mark_level():
 
             try:
                 if DRY_RUN:
-                    print(f"🔎 DRY-RUN → would convert {key} ({storage_class}) → DEEP_ARCHIVE")
+                    print(f"🔎 Would convert {key} ({storage_class}) → DEEP_ARCHIVE")
                 else:
                     s3.Object(BUCKET_NAME, key).copy(copy_source, ExtraArgs=extra_args, Config=CONFIG)
                     changed += 1
                     print(f"✅ Converted {key} → DEEP_ARCHIVE")
-
             except ClientError as e:
                 errors += 1
                 print(f"❌ Copy failed for {key}: {e}")
 
-        # Handle pagination
         if response.get("IsTruncated"):
             continuation_token = response["NextContinuationToken"]
         else:
             break
 
-    print(f"\n📊 Summary for {BUCKET_NAME}")
-    print(f"  Total scanned : {total}")
-    print(f"  Converted     : {changed}")
-    print(f"  Skipped       : {skipped}")
-    print(f"  Errors        : {errors}")
+    print(f"\n📊 Summary: total={total}, converted={changed}, skipped={skipped}, errors={errors}")
 
-import boto3
 
 BUCKET_NAME = "managed-039612868981-server-access-logs"
 
