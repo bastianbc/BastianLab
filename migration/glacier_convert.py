@@ -50,7 +50,7 @@ def convert_glacier_and_mark_level():
             key = obj["Key"]
             size = obj["Size"]
             total += 1
-
+            print(total)
             # --- 🧩 Detect AWS-managed access log files ---
             if key.startswith("managed-"):
                 skipped += 1
