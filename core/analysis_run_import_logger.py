@@ -19,12 +19,20 @@ class S3StorageLogHandler(logging.Handler):
         self.buffer = io.StringIO()
         self.timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         self.log_filename = f"{self.ar_name}_import_{self.timestamp.replace(':', '').replace(' ', '_')}.log"
-        self.seq_files = getattr(settings, "SEQUENCING_FILES_SOURCE_DIRECTORY")
-        self.log_key = f"{self.seq_files}/{self.sheet_name}/parse_logs/{self.log_filename}"
 
-        # S3 config (from Django settings or defaults)
-        self.region = getattr(settings, "AWS_S3_REGION_NAME", "us-west-2")
+        # Get sequencing directory path from settings and clean any s3:// prefix
+        self.seq_files = getattr(settings, "SEQUENCING_FILES_SOURCE_DIRECTORY", "")
         self.bucket = getattr(settings, "AWS_STORAGE_BUCKET_NAME", "bastian-lab-169-3-r-us-west-2.sec.ucsf.edu")
+        self.region = getattr(settings, "AWS_S3_REGION_NAME", "us-west-2")
+
+        # 🔧 Clean s3://bucket_name/ prefix if present
+        if self.seq_files.startswith("s3://"):
+            prefix = f"s3://{self.bucket}/"
+            if self.seq_files.startswith(prefix):
+                self.seq_files = self.seq_files[len(prefix):]  # remove the full s3://bucket_name/ part
+
+        # ✅ Build proper S3 key (no double s3:// prefix)
+        self.log_key = f"{self.seq_files}/{self.sheet_name}/parse_logs/{self.log_filename}".lstrip("/")
 
         # ✨ Add header immediately
         header = self._build_header()
@@ -40,12 +48,11 @@ class S3StorageLogHandler(logging.Handler):
             f"📄 Sheet Name: {self.sheet_name}\n"
             f"📦 Total Files: {self.total_files}\n"
             f"⏰ Start Time: {self.timestamp}\n"
-            f"🌐 Destination: {self.bucket}\n"
+            f"🌐 Destination: {self.bucket}/{self.log_key}\n"
             f"{line}\n"
         )
 
     def emit(self, record):
-        """Write log record to memory buffer."""
         msg = self.format(record)
         self.buffer.write(msg + "\n")
 
@@ -65,20 +72,17 @@ class S3StorageLogHandler(logging.Handler):
                 config=boto3.session.Config(signature_version="s3v4"),
             )
 
-            # ✅ Upload the log file content
+            # ✅ Upload the log file
             s3_client.put_object(
                 Bucket=self.bucket,
                 Key=self.log_key,
                 Body=content.encode("utf-8"),
                 ContentType="text/plain",
-                ServerSideEncryption="aws:kms",
-                SSEKMSKeyId="alias/managed-s3-key",
             )
 
             print(f"✅ Log uploaded successfully to s3://{self.bucket}/{self.log_key}")
 
         except (NoCredentialsError, ClientError, EndpointConnectionError, Exception) as e:
-            # ⚠️ Local fallback
             downloads_dir = os.path.join(os.path.expanduser("~"), "Downloads")
             os.makedirs(downloads_dir, exist_ok=True)
             local_path = os.path.join(downloads_dir, self.log_filename)
@@ -91,14 +95,13 @@ class S3StorageLogHandler(logging.Handler):
                 print(f"❌ Critical error saving log locally: {inner_e}")
 
     def write_test_log(self):
-        """Direct S3 test method to verify boto3 access works."""
+        """Direct S3 test to verify boto3 access works."""
         try:
             s3_client = boto3.client(
                 "s3",
                 region_name=self.region,
                 config=boto3.session.Config(signature_version="s3v4"),
             )
-
             test_key = "logs/test_connection.log"
             s3_client.put_object(
                 Bucket=self.bucket,
