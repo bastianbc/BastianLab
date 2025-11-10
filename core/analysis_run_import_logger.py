@@ -1,17 +1,15 @@
 import logging
 import io
 import os
+import boto3
 from datetime import datetime
 from django.conf import settings
-from django.core.files.storage import default_storage
-from django.core.files.base import ContentFile
-from botocore.exceptions import NoCredentialsError, ClientError
-import s3fs
+from botocore.exceptions import NoCredentialsError, ClientError, EndpointConnectionError
 
 
 class S3StorageLogHandler(logging.Handler):
-    """Writes import logs to S3 (production) or local Downloads folder (development),
-    with a formatted banner header for clarity."""
+    """Writes import logs to S3 (via boto3) or local Downloads folder as fallback.
+    Adds a formatted header for clarity and context."""
 
     def __init__(self, ar_name, sheet_name, total_files=None):
         super().__init__()
@@ -23,7 +21,11 @@ class S3StorageLogHandler(logging.Handler):
         self.log_filename = f"{self.ar_name}_import_{self.timestamp.replace(':', '').replace(' ', '_')}.log"
         self.log_key = f"{self.sheet_name}/parse_logs/{self.log_filename}"
 
-        # ✨ Add beautiful header at the top
+        # S3 config (from Django settings or defaults)
+        self.region = getattr(settings, "AWS_S3_REGION_NAME", "us-west-2")
+        self.bucket = getattr(settings, "AWS_STORAGE_BUCKET_NAME", "bastian-lab-169-3-r-us-west-2.sec.ucsf.edu")
+
+        # ✨ Add header immediately
         header = self._build_header()
         self.buffer.write(header + "\n\n")
 
@@ -34,41 +36,52 @@ class S3StorageLogHandler(logging.Handler):
             f"🧬 VARIANT IMPORT LOG\n"
             f"{line}\n"
             f"📁 Analysis Run Name: {self.ar_name}\n"
-            f"📄 Sheet: {self.sheet_name}\n"
+            f"📄 Sheet Name: {self.sheet_name}\n"
             f"📦 Total Files: {self.total_files}\n"
             f"⏰ Start Time: {self.timestamp}\n"
-            f"🌐 Destination: {getattr(settings, 'AWS_STORAGE_BUCKET_NAME', 'Local/Downloads')}\n"
+            f"🌐 Destination: {self.bucket}\n"
             f"{line}\n"
         )
 
     def emit(self, record):
-        """Write log record into in-memory buffer."""
+        """Write log record to memory buffer."""
         msg = self.format(record)
         self.buffer.write(msg + "\n")
 
     def close(self):
-        """Flush buffer and upload the log to S3, or fallback to Downloads folder."""
+        """Flush buffer to S3 or fallback to Downloads."""
         try:
-            content = self.buffer.getvalue()  # ✅ read first
+            content = self.buffer.getvalue()
         finally:
-            # Close buffer after reading
             self.buffer.close()
             super().close()
 
         try:
-            # ✅ Try to upload to S3 via django-storages
-            bucket_name = getattr(settings, "AWS_STORAGE_BUCKET_NAME", None)
-            if not bucket_name:
-                raise RuntimeError("AWS S3 storage bucket not configured")
+            # ✅ Create S3 client
+            s3_client = boto3.client(
+                "s3",
+                region_name=self.region,
+                config=boto3.session.Config(signature_version="s3v4"),
+            )
 
-            default_storage.save(self.log_key, ContentFile(content))
-            print(f"✅ Log successfully saved to s3://{bucket_name}/{self.log_key}")
+            # ✅ Upload the log file content
+            s3_client.put_object(
+                Bucket=self.bucket,
+                Key=self.log_key,
+                Body=content.encode("utf-8"),
+                ContentType="text/plain",
+                ServerSideEncryption="aws:kms",
+                SSEKMSKeyId="alias/managed-s3-key",
+            )
 
-        except (NoCredentialsError, ClientError, RuntimeError, Exception) as e:
-            # ⚠️ fallback — local Downloads folder
+            print(f"✅ Log uploaded successfully to s3://{self.bucket}/{self.log_key}")
+
+        except (NoCredentialsError, ClientError, EndpointConnectionError, Exception) as e:
+            # ⚠️ Local fallback
             downloads_dir = os.path.join(os.path.expanduser("~"), "Downloads")
             os.makedirs(downloads_dir, exist_ok=True)
             local_path = os.path.join(downloads_dir, self.log_filename)
+
             try:
                 with open(local_path, "w", encoding="utf-8") as f:
                     f.write(content)
@@ -77,24 +90,26 @@ class S3StorageLogHandler(logging.Handler):
                 print(f"❌ Critical error saving log locally: {inner_e}")
 
     def write_test_log(self):
-        """Test direct S3 write via s3fs (useful for validating ADFS sessions)."""
+        """Direct S3 test method to verify boto3 access works."""
         try:
-            fs = s3fs.S3FileSystem(
-                anon=False,
-                client_kwargs={
-                    "region_name": "us-west-2",
-                    "endpoint_url": "https://s3.us-west-2.amazonaws.com",
-                },
-                config_kwargs={"signature_version": "s3v4"},
+            s3_client = boto3.client(
+                "s3",
+                region_name=self.region,
+                config=boto3.session.Config(signature_version="s3v4"),
             )
-            bucket_path = f"bastian-lab-169-3-r-us-west-2.sec.ucsf.edu/{self.sheet_name}/parse_logs/test_connection.log"
-            with fs.open(bucket_path, "w") as f:
-                f.write("✅ Connected to S3 successfully via ADFS & s3fs!\n")
-            print(f"✅ Test log written to s3://{bucket_path}")
+
+            test_key = "logs/test_connection.log"
+            s3_client.put_object(
+                Bucket=self.bucket,
+                Key=test_key,
+                Body="✅ Connected to S3 successfully via boto3!\n",
+                ContentType="text/plain",
+            )
+            print(f"✅ Test log written to s3://{self.bucket}/{test_key}")
         except Exception as e:
-            downloads_dir = os.path.join(os.path.expanduser('~'), 'Downloads')
+            downloads_dir = os.path.join(os.path.expanduser("~"), "Downloads")
             os.makedirs(downloads_dir, exist_ok=True)
-            test_path = os.path.join(downloads_dir, 'test_connection.log')
-            with open(test_path, 'w') as f:
-                f.write(f"⚠️ S3 test failed: {e}\nSaved locally instead.")
-            print(f"⚠️ S3 connection test failed, log saved to: {test_path}")
+            test_path = os.path.join(downloads_dir, "test_connection.log")
+            with open(test_path, "w") as f:
+                f.write(f"⚠️ S3 connection test failed: {e}\nSaved locally instead.")
+            print(f"⚠️ S3 connection test failed, saved locally to: {test_path}")
