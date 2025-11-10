@@ -19,7 +19,8 @@ class S3StorageLogHandler(logging.Handler):
         self.buffer = io.StringIO()
         self.timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         self.log_filename = f"{self.ar_name}_import_{self.timestamp.replace(':', '').replace(' ', '_')}.log"
-        self.log_key = f"{self.sheet_name}/parse_logs/{self.log_filename}"
+        self.seq_files = getattr(settings, "SEQUENCING_FILES_SOURCE_DIRECTORY")
+        self.log_key = f"{self.seq_files}/{self.sheet_name}/parse_logs/{self.log_filename}"
 
         # S3 config (from Django settings or defaults)
         self.region = getattr(settings, "AWS_S3_REGION_NAME", "us-west-2")
