@@ -7,6 +7,7 @@ from cns.helper import parse_cns_file_with_handler
 from qc.helper import parse_dup_metrics_with_handler
 from variant.helper import variant_file_parser
 from core.analysis_run_import_logger import S3StorageLogHandler  # 👈 your S3/local hybrid handler
+from django.db import connection
 
 
 def build_file_header(file_path, handler_type):
@@ -23,6 +24,47 @@ def build_file_header(file_path, handler_type):
         f"⏰ Start Time: {timestamp}\n"
         f"{line}\n"
     )
+
+
+def build_file_footer(analysis_run_name, file_name=None):
+    """
+    Automatically builds a prettified footer with DB object counts
+    for the given analysis run.
+    """
+    from variant.models import GVariant, CVariant, PVariant, VariantCall  # lazy import to avoid circulars
+
+    line = "═" * 100
+    sub_line = "─" * 100
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    try:
+        # Scoped counts per AnalysisRun (safe fallback to total if filter fails)
+        variant_calls = VariantCall.objects.filter(analysis_run__name=analysis_run_name)
+        g_variants = GVariant.objects.filter(variant_calls__analysis_run__name=analysis_run_name).distinct()
+        c_variants = CVariant.objects.filter(g_variant__variant_calls__analysis_run__name=analysis_run_name).distinct()
+        p_variants = PVariant.objects.filter(
+            c_variant__g_variant__variant_calls__analysis_run__name=analysis_run_name).distinct()
+
+        footer = (
+            f"\n{line}\n"
+            f"🏁 FILE PARSING SUMMARY — {file_name or 'N/A'}\n"
+            f"{sub_line}\n"
+            f"📦 Variant Calls:       {variant_calls.count():>8}\n"
+            f"🧬 GVariants:           {g_variants.count():>8}\n"
+            f"🔗 CVariants:           {c_variants.count():>8}\n"
+            f"🧫 PVariants:           {p_variants.count():>8}\n"
+            f"{sub_line}\n"
+            f"✅ Completed at: {timestamp}\n"
+            f"{line}\n"
+        )
+    except Exception as e:
+        footer = (
+            f"\n{line}\n"
+            f"⚠️ Error building footer: {e}\n"
+            f"{line}\n"
+        )
+
+    return footer
 
 
 class AlignmentsFolderHandler:
@@ -107,6 +149,7 @@ class SnvFolderHandler:
         if success:
             self.logger.info(f"✅ SNV File processed successfully: {name}")
             self.logger.info(f"📊 Rows: {stats.get('total_rows', 'N/A')} | Success: {stats.get('successful', 'N/A')} | Failures: {stats.get('failed', 'N/A')}")
+            self.logger.info(build_file_footer(analysis_run.name, file_name=os.path.basename(file_path)))
         else:
             self.logger.error(f"❌ SNV File failed: {name} | Reason: {message}")
 
