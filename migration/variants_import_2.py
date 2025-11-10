@@ -7,8 +7,8 @@ from django.conf import settings
 import pandas as pd
 from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist
-from variant.models import VariantCall, GVariant, CVariant, PVariant, VariantFile
-from analysisrun.models import AnalysisRun
+from variant.models import VariantCall, GVariant, CVariant, PVariant
+from analysisrun.models import AnalysisRun, VariantFile
 from samplelib.models import SampleLib
 import re
 import logging
@@ -298,65 +298,66 @@ def create_gene_detail(gene_detail, row_gene, g_variant, func):
 def create_c_and_p_variants(g_variant, aachange, func, gene_detail, filename, row_gene):
     logger.debug(f"Creating C and P variants for aachange: {aachange}")
     entries = aachange.split(',')
-    if any(aachange.strip() in invalid for invalid in ["UNKNOWN", "."]):
+
+    # Handle "UNKNOWN" or "." cases first
+    if any(aachange.strip() == invalid for invalid in ["UNKNOWN", "."]):
         if gene_detail.strip() == "." or "dist=" in gene_detail:
             return
         create_gene_detail(gene_detail, row_gene, g_variant, func)
-    else:
-        for entry in entries:
-            try:
-                logger.debug(f"Processing entry: {entry}")
-                if len(entry.split(':'))==4:
-                    gene, nm_id, exon, c_var = entry.split(':') # NTRK1:NM_001012331:exon16:c.C2253A:p.Y751X,NTRK1
-                    gene = get_gene(gene, "hg38", nm_id) # TODO look at it
-                    # Create CVariant instance
-                    is_alias = True if nm_id.lower() == gene.nm_canonical.lower() else False
-                    if gene:
-                        c_variant = CVariant.objects.create(
-                            g_variant=g_variant,
-                            gene=gene,
-                            nm_id=nm_id,
-                            exon=exon,
-                            c_var=c_var[:99],
-                            func=func,
-                            gene_detail=entry[:99]
-                        )
-                        logger.info(f"Created CVariant: {c_variant}")
+        return
 
-                if len(entry.split(':'))==5:
-                    gene, nm_id, exon, c_var, p_var = entry.split(':') # NTRK1:NM_001012331:exon16:c.C2253A:p.Y751X,NTRK1
-                    gene = get_gene(gene, "hg38", nm_id) # TODO look at it
-                    # Create CVariant instance
-                    is_alias = True if nm_id.lower() == gene.nm_canonical.lower() else False
-                    if gene:
-                        c_variant = CVariant.objects.create(
-                            g_variant=g_variant,
-                            gene=gene,
-                            nm_id=nm_id,
-                            exon=exon,
-                            c_var=c_var[:99],
-                            func=func,
-                            gene_detail=entry[:99]
-                        )
-                        logger.info(f"Created CVariant: {c_variant}")
+    # Process valid entries
+    for entry in entries:
+        try:
+            parts = entry.split(':')
+            if len(parts) not in [4, 5]:
+                logger.warning(f"Skipping malformed entry: {entry}")
+                continue
 
-                        # Create PVariant instance if p_var is present
-                        if p_var:
-                            start, end, reference_residues, inserted_residues, change_type = parse_p_var(p_var)
-                            inserted_residues = f"{inserted_residues[:98]}*" if p_var.endswith("*") else inserted_residues[:99]
-                            p_variant = PVariant.objects.create(
-                                c_variant=c_variant,
-                                start=start,
-                                end=end,
-                                reference_residues=reference_residues,
-                                inserted_residues=inserted_residues,
-                                change_type=change_type,
-                                name_meta=p_var[:99],
-                                is_alias=is_alias
-                            )
+            gene, nm_id, exon, c_var = parts[:4]
+            p_var = parts[-1] if len(parts) == 5 else None
 
-            except Exception as e:
-                logger.error(f"Error processing AAChange entry '{entry}': {str(e)}")
+            # Fetch gene safely
+            gene_obj = get_gene(gene, "hg38", nm_id)
+            if not gene_obj:
+                logger.warning(f"Gene not found for entry: {entry}")
+                continue
+
+            # Determine alias relationship
+            is_alias = nm_id.lower() == gene_obj.nm_canonical.lower()
+
+            # Create CVariant
+            c_variant = CVariant.objects.create(
+                g_variant=g_variant,
+                gene=gene_obj,
+                nm_id=nm_id,
+                exon=exon,
+                c_var=c_var[:99],
+                func=func,
+                gene_detail=entry[:99],
+            )
+            logger.info(f"Created CVariant: {c_variant}")
+
+            # Create PVariant if present
+            if p_var:
+                start, end, ref_res, ins_res, change_type = parse_p_var(p_var)
+                ins_res = f"{ins_res[:98]}*" if p_var.endswith("*") else ins_res[:99]
+
+                p_variant = PVariant.objects.create(
+                    c_variant=c_variant,
+                    start=start,
+                    end=end,
+                    reference_residues=ref_res,
+                    inserted_residues=ins_res,
+                    change_type=change_type,
+                    name_meta=p_var[:99],
+                    is_alias=is_alias,
+                )
+                logger.info(f"Created PVariant: {p_variant}")
+
+        except Exception as e:
+            logger.error(f"Error processing AAChange entry '{entry}': {str(e)}", exc_info=True)
+
 
 def read_csv_file_custom(file_path):
     with open(file_path, 'r') as f:
@@ -532,48 +533,47 @@ def variant_file_parser(file_path, analysis_run_name):
 def create_variant_file(row):
     VariantFile.objects.get_or_create(name=row['File'], directory=row['Dir'])
 
-# Parse and save data into the database
-def import_variants():
-    print("1"*30)
-    VariantFile.objects.filter(name='BCB002.NMLP-001.FB_Final.annovar.hg38_multianno_Filtered.txt').update(call=False)
-    print("2"*30)
-    files = VariantFile.objects.filter(name__icontains="hg38", type="variant", variant_calls__isnull=True)
-    print("3"*30)
-    # VariantCall.objects.filter().delete()
-    print("4"*30)
-    for file in files:
-        file_path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA,file.directory)
-        if "_Filtered" in os.path.join(file_path, file.name):
-            variant_file_parser(os.path.join(file_path,file.name), "AR_ALL")
 
-
-def create_genes(row):
-    gene = Gene.objects.create(
-        gene_id = row['gene_id'],
-        name = row['name'],
-        full_name = row['full_name'],
-        chr = str(row['chr']),
-        start = int(row['start']) if not pd.isnull(row['start']) else 0,
-        end = int(row['end']) if not pd.isnull(row['end']) else 0,
-        hg = row['Hg'],
-        nm_canonical = row['NM_canonical']
-    )
-
-def import_genes():
-    # gene_instance = Gene.objects.get(id=1)  # Get the Gene instance
-    # CVariant.objects.filter().update(gene=gene_instance)
-    # Gene.objects.filter(id__gt=1).delete()
-    SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
-    p = Path("/Users/cbagci/Downloads/MANE.GRCh38.csv")
-    # file = os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "cns_files.csv")
-    file = Path(Path(__file__).parent.parent / "uploads" / "MANE_hg19_final_filtered.csv")
-    df = pd.read_csv(p, index_col=False)
-    df = df.reset_index()
-    df.apply(create_genes, axis=1)
-    pass
-
-
-if __name__ == "__main__":
-    print("start")
-    import_genes()
-    print("end")
+# # Parse and save data into the database
+# def import_variants():
+#     print("1"*30)
+#     VariantFile.objects.filter(name='BCB002.NMLP-001.FB_Final.annovar.hg38_multianno_Filtered.txt').update(call=False)
+#     print("2"*30)
+#     files = VariantFile.objects.filter(name__icontains="hg38", type="variant", variant_calls__isnull=True)
+#     print("3"*30)
+#     # VariantCall.objects.filter().delete()
+#     print("4"*30)
+#     for file in files:
+#         file_path = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA,file.directory)
+#         if "_Filtered" in os.path.join(file_path, file.name):
+#             variant_file_parser(os.path.join(file_path,file.name), "AR_ALL")
+#
+# def create_genes(row):
+#     gene = Gene.objects.create(
+#         gene_id = row['gene_id'],
+#         name = row['name'],
+#         full_name = row['full_name'],
+#         chr = str(row['chr']),
+#         start = int(row['start']) if not pd.isnull(row['start']) else 0,
+#         end = int(row['end']) if not pd.isnull(row['end']) else 0,
+#         hg = row['Hg'],
+#         nm_canonical = row['NM_canonical']
+#     )
+#
+# def import_genes():
+#     # gene_instance = Gene.objects.get(id=1)  # Get the Gene instance
+#     # CVariant.objects.filter().update(gene=gene_instance)
+#     # Gene.objects.filter(id__gt=1).delete()
+#     SEQUENCING_FILES_SOURCE_DIRECTORY = os.path.join(settings.SMB_DIRECTORY_SEQUENCINGDATA, "ProcessedData")
+#     p = Path("/Users/cbagci/Downloads/MANE.GRCh38.csv")
+#     # file = os.path.join(SEQUENCING_FILES_SOURCE_DIRECTORY, "cns_files.csv")
+#     file = Path(Path(__file__).parent.parent / "uploads" / "MANE_hg19_final_filtered.csv")
+#     df = pd.read_csv(p, index_col=False)
+#     df = df.reset_index()
+#     df.apply(create_genes, axis=1)
+#     pass
+#
+# if __name__ == "__main__":
+#     print("start")
+#     import_genes()
+#     print("end")

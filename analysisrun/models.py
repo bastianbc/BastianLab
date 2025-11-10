@@ -157,3 +157,22 @@ class VariantFile(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def caller(self):
+        """
+        Infers the mutation caller from the file name.
+        FB → Freebayes | HS → Hotspot | MT2 → Mutect2
+        Returns the caller code (e.g., 'FB') or None if not identifiable.
+        """
+        callers = {
+            "FB": "Freebayes",
+            "HS": "Hotspot",
+            "MT2": "Mutect2",
+        }
+
+        filename = self.name.upper()
+        for code in callers:
+            if code in filename:
+                return code
+        return None

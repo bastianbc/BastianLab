@@ -353,6 +353,8 @@ class VariantCall(models.Model):
     class Meta:
         db_table = "variant_call"
 
+
+
 class CVariant(models.Model):
     g_variant = models.ForeignKey(GVariant, on_delete=models.CASCADE, related_name="c_variants", blank=True, null=True)
     gene = models.ForeignKey("gene.Gene", on_delete=models.CASCADE, related_name="c_variants", blank=True, null=True)

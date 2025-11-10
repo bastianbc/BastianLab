@@ -9,9 +9,16 @@ urlpatterns = [
     path("filter_analysisruns", views.filter_analysisruns, name="filter-analysisruns"),
     path('save_analysis_run', views.save_analysis_run, name='save-analysis-run'),
     path('initialize_import_variants/<str:ar_name>/', views.initialize_import_variants, name='initialize-import-variants'),
-    path('start_import_variants/<str:ar_name>/', views.start_import_variants, name='start-import-variants'),
+    # path('start_import_variants/<str:ar_name>/', views.start_import_variants, name='start_import_variants'),
+    # path('check_import_progress/<str:ar_name>/', views.check_import_progress, name='check_import_progress'),
+
+    path('start_import_variants/<str:ar_name>/', views.start_import_variants, name='start_import_variants'),
+    path('check_import_progress/<str:ar_name>/', views.check_import_progress, name='check_import_progress'),
+    path('report_import_status/<str:ar_name>/', views.report_import_status, name='report_import_status'),
+
+
     path('delete/<str:id>', views.delete_analysis_run, name='delete-analysis-run'),
     path('batch_delete', views.delete_batch_analysis_run, name='delete-batch-analysis-run'),
     path('check_can_deleted_async', views.check_can_deleted_async, name='check-can-deleted-async'),
-    path('report_import_status/<str:ar_name>/', views.report_import_status, name='report-import-status'),
+    # path('report_import_status/<str:ar_name>/', views.report_import_status, name='report-import-status'),
 ] + staticfiles_urlpatterns()

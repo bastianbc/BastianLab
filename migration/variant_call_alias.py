@@ -100,6 +100,7 @@ def restore_variant_files():
     count = 0
     for row in reader:
         VariantFile.objects.update_or_create(
+            id=row.get("id"),
             analysis_run=AnalysisRun.objects.get(id=2),  # Adjust the analysis_run id as needed
             name=row["name"],
             directory=row["directory"],
