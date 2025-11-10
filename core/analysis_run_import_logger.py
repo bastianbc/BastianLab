@@ -13,14 +13,15 @@ class S3StorageLogHandler(logging.Handler):
     """Writes import logs to S3 (production) or local Downloads folder (development),
     with a formatted banner header for clarity."""
 
-    def __init__(self, ar_name, total_files=None):
+    def __init__(self, ar_name, sheet_name, total_files=None):
         super().__init__()
         self.ar_name = ar_name
+        self.sheet_name = sheet_name
         self.total_files = total_files or "Unknown"
         self.buffer = io.StringIO()
         self.timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         self.log_filename = f"{self.ar_name}_import_{self.timestamp.replace(':', '').replace(' ', '_')}.log"
-        self.log_key = f"logs/{self.log_filename}"
+        self.log_key = f"{self.sheet_name}/parse_logs/{self.log_filename}"
 
         # ✨ Add beautiful header at the top
         header = self._build_header()
