@@ -221,7 +221,8 @@ def report_import_status(request, ar_name):
     analysis_run = AnalysisRun.objects.get(name=ar_name)
     variant_files = VariantFile.objects.filter(analysis_run=analysis_run)
 
-    log_url = S3StorageLogHandler.get_log_path(ar_name)
+    log_url = S3StorageLogHandler.get_log_path(analysis_run.name)
+    print("log_url", log_url)
 
     files_info = [
         {

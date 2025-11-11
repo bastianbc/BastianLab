@@ -42,6 +42,7 @@ class S3StorageLogHandler(logging.Handler):
     @staticmethod
     def get_log_path(ar_name):
         """Return the most recent log path for a given AnalysisRun name."""
+        print("%"*50, _last_log_paths)
         return _last_log_paths.get(ar_name)
 
     def _build_header(self):
