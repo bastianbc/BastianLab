@@ -147,7 +147,7 @@ def start_import_variants(request, ar_name):
         AnalysisRun.objects.filter(name=ar_name).update(status="pending")
         importer = VariantImporter(ar_name)
         importer.discover_files_s3()
-        # change 📦 Total Files: Unknown line after this line from handler
+
         handler.update_total_files(importer.total_files)
         logging.info(f"=== start_import_variants called for {ar_name} ===")
 
