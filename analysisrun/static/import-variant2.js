@@ -101,19 +101,33 @@ function startImport() {
 }
 
 function viewReport() {
-    const modal = new bootstrap.Modal(document.getElementById('report-modal'));
-    modal.show();
-    fetch(`/analysisrun/report_import_status/${arName}/`)
-      .then(res => res.json())
-      .then(data => {
-        console.log(data);
-        const reportTable = document.querySelector('#report-modal .modal-body table tbody');
-        reportTable.innerHTML = data.map(file => `<tr><td>${file.file_name}</td><td>${file.status}</td></tr>`).join('');
-      })
-      .catch(err => {
-        console.error("Error loading report:", err);
-      });
+  const modal = new bootstrap.Modal(document.getElementById('report-modal'));
+  modal.show();
+
+  fetch(`/analysisrun/report_import_status/${arName}/`)
+    .then(res => res.json())
+    .then(data => {
+      console.log(data);
+      const reportTable = document.querySelector('#report-modal .modal-body table tbody');
+      reportTable.innerHTML = data.map(file => `
+        <tr>
+          <td>${file.file_name}</td>
+          <td>${file.status}</td>
+          <td>
+            ${file.log_url 
+              ? `<a href="${file.log_url.replace('s3://', 'https://s3.console.aws.amazon.com/s3/object/')}" 
+                   target="_blank" 
+                   rel="noopener noreferrer">View Log</a>` 
+              : '<span class="text-muted">N/A</span>'}
+          </td>
+        </tr>
+      `).join('');
+    })
+    .catch(err => {
+      console.error("Error loading report:", err);
+    });
 }
+
 
 
 // const arName = window.location.pathname.split('/').filter(Boolean).pop();

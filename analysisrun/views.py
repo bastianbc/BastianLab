@@ -288,15 +288,26 @@ def check_import_progress(request, ar_name):
 
 @permission_required_for_async("analysis_run.view_analysisrun")
 def report_import_status(request, ar_name):
+    bucket = getattr(settings, "AWS_STORAGE_BUCKET_NAME", "")
+    base_prefix = getattr(settings, "SEQUENCING_FILES_SOURCE_DIRECTORY", "").replace(f"s3://{bucket}/", "")
+    log_base_path = f"s3://{bucket}/{base_prefix}/{ar_name}/parse_logs"
+
     variant_files = VariantFile.objects.filter(analysis_run__name=ar_name)
-    files_info = [
-        {
+
+    files_info = []
+    for file in variant_files:
+        # Try to locate log file pattern: <AR>_import_<timestamp>.log
+        log_name_prefix = f"{ar_name}_import_"
+        file_log_url = f"{log_base_path}/{log_name_prefix}{file.name}.log"  # optional: use your actual naming scheme
+
+        files_info.append({
             "file_name": file.name,
-            "status": file.get_status_display()
-        }
-        for file in variant_files
-    ]
+            "status": file.get_status_display(),
+            "log_url": file_log_url,
+        })
+
     return JsonResponse(files_info, safe=False)
+
 
 
 @permission_required_for_async("analysis_run.delete_analysisrun")
