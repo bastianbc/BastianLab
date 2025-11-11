@@ -138,23 +138,18 @@ def start_import_variants(request, ar_name):
     root_logger = logging.getLogger()
     analysis_run = AnalysisRun.objects.get(name=ar_name)
     handler = S3StorageLogHandler(analysis_run.name, analysis_run.sheet_name)
-    handler.write_test_log()
     handler.setFormatter(logging.Formatter("[%(asctime)s] %(name)s %(levelname)s: %(message)s"))
     root_logger.addHandler(handler)
     root_logger.setLevel(logging.INFO)
 
     try:
-        logging.info(f"=== start_import_variants called for {ar_name} ===")
-
         GVariant.objects.filter(variant_calls__analysis_run__name=ar_name).delete()
-        logging.info(f"Deleted GVariant records for {ar_name}")
-
         AnalysisRun.objects.filter(name=ar_name).update(status="pending")
-        logging.info(f"AnalysisRun {ar_name} set to pending")
-
         importer = VariantImporter(ar_name)
         importer.discover_files_s3()
-        logging.info(f"Discovered {importer.total_files} files")
+        # change 📦 Total Files: Unknown line after this line from handler
+        handler.update_total_files(importer.total_files)
+        logging.info(f"=== start_import_variants called for {ar_name} ===")
 
         result = importer.start_import(force_restart=True)
         logging.info(f"Import started — status={result.get('status')} progress={result.get('progress', 0)}")

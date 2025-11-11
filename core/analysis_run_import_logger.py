@@ -35,9 +35,20 @@ class S3StorageLogHandler(logging.Handler):
         # ✅ Build proper S3 key (no double s3:// prefix)
         self.log_key = f"{self.seq_files}/{self.sheet_name}/parse_logs/{self.log_filename}".lstrip("/")
 
-        # ✨ Add header immediately
+
+
+    def update_total_files(self, total_files):
+        """
+        Updates the '📦 Total Files' line in the in-memory header buffer.
+        Keeps existing logs intact.
+        """
+        self.total_files = total_files
+
+        # ✨ Add header immediately after get total files
         header = self._build_header()
         self.buffer.write(header + "\n\n")
+
+
 
     @staticmethod
     def get_log_path(ar_name):
@@ -102,26 +113,3 @@ class S3StorageLogHandler(logging.Handler):
             except Exception as inner_e:
                 print(f"❌ Critical error saving log locally: {inner_e}")
 
-    def write_test_log(self):
-        """Direct S3 test to verify boto3 access works."""
-        try:
-            s3_client = boto3.client(
-                "s3",
-                region_name=self.region,
-                config=boto3.session.Config(signature_version="s3v4"),
-            )
-            test_key = "logs/test_connection.log"
-            s3_client.put_object(
-                Bucket=self.bucket,
-                Key=test_key,
-                Body="✅ Connected to S3 successfully via boto3!\n",
-                ContentType="text/plain",
-            )
-            print(f"✅ Test log written to s3://{self.bucket}/{test_key}")
-        except Exception as e:
-            downloads_dir = os.path.join(os.path.expanduser("~"), "Downloads")
-            os.makedirs(downloads_dir, exist_ok=True)
-            test_path = os.path.join(downloads_dir, "test_connection.log")
-            with open(test_path, "w") as f:
-                f.write(f"⚠️ S3 connection test failed: {e}\nSaved locally instead.")
-            print(f"⚠️ S3 connection test failed, saved locally to: {test_path}")

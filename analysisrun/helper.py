@@ -21,11 +21,9 @@ class VariantImporter:
         self.folder_path = f"sequencingdata/ProcessedData/{self.analysis_run.sheet_name}"
 
         self.folder_types = {
-            "snv": {
-                "path": "snv/output",
-                "endfix": ["_multianno_Filtered.txt"],
-                "handler": SnvFolderHandler,
-            },
+            # "metrics": {"path": "alignments/metrics", "endfix": [".dup_metrics"], "handler": AlignmentsFolderHandler},
+            # "cnv": {"path": "cnv/output", "endfix": [".cns", ".diagram.pdf", ".scatter.png"],"handler": CnvFolderHandler},
+            "snv": {"path": "snv/output", "endfix": ["_multianno_Filtered.txt"], "handler": SnvFolderHandler},
         }
 
         self.all_files = []

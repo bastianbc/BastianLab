@@ -25,11 +25,9 @@ def build_file_header(file_path, handler_type):
         f"{line}\n"
     )
 
-
-def build_file_footer(analysis_run_name, file_name=None):
+def build_file_footer(analysis_run_name, file_name=None, stats=None):
     """
-    Automatically builds a prettified footer with DB object counts
-    for the given analysis run.
+    Builds a prettified footer with DB object counts and optional file-level stats.
     """
     from variant.models import GVariant, CVariant, PVariant, VariantCall  # lazy import to avoid circulars
 
@@ -38,7 +36,7 @@ def build_file_footer(analysis_run_name, file_name=None):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     try:
-        # Scoped counts per AnalysisRun (safe fallback to total if filter fails)
+        # Scoped counts per AnalysisRun
         variant_calls = VariantCall.objects.filter(analysis_run__name=analysis_run_name)
         g_variants = GVariant.objects.filter(variant_calls__analysis_run__name=analysis_run_name).distinct()
         c_variants = CVariant.objects.filter(g_variant__variant_calls__analysis_run__name=analysis_run_name).distinct()
@@ -49,14 +47,29 @@ def build_file_footer(analysis_run_name, file_name=None):
             f"\n{line}\n"
             f"🏁 FILE PARSING SUMMARY — {file_name or 'N/A'}\n"
             f"{sub_line}\n"
-            f"📦 Variant Calls:       {variant_calls.count():>8}\n"
-            f"🧬 GVariants:           {g_variants.count():>8}\n"
-            f"🔗 CVariants:           {c_variants.count():>8}\n"
-            f"🧫 PVariants:           {p_variants.count():>8}\n"
+            f"📦 Variant Calls: {variant_calls.count():>10}\n"
+            f"🧬 GVariants:     {g_variants.count():>10}\n"
+            f"🔗 CVariants:     {c_variants.count():>10}\n"
+            f"🧫 PVariants:     {p_variants.count():>10}\n"
+        )
+
+        # Optional stats from parser
+        if stats:
+            footer += (
+                f"{sub_line}\n"
+                f"📊 FILE STATS\n"
+                f"{sub_line}\n"
+                f"   • Total Rows : {stats.get('total_rows', 'N/A')}\n"
+                f"   • Successful : {stats.get('successful', 'N/A')}\n"
+                f"   • Failed     : {stats.get('failed', 'N/A')}\n"
+            )
+
+        footer += (
             f"{sub_line}\n"
             f"✅ Completed at: {timestamp}\n"
             f"{line}\n"
         )
+
     except Exception as e:
         footer = (
             f"\n{line}\n"
@@ -142,15 +155,18 @@ class SnvFolderHandler:
             file_path=file_path,
             variant_file=variant_file,
         )
-
+        print("%%%%%%%%%%% stats ", stats)
         variant_file.status = "completed" if success else "failed"
         variant_file.save()
 
         if success:
             self.logger.info(f"✅ SNV File processed successfully: {name}")
             self.logger.info(f"📊 Rows: {stats.get('total_rows', 'N/A')} | Success: {stats.get('successful', 'N/A')} | Failures: {stats.get('failed', 'N/A')}")
-            self.logger.info(build_file_footer(analysis_run.name, file_name=os.path.basename(file_path)))
         else:
             self.logger.error(f"❌ SNV File failed: {name} | Reason: {message}")
-
+        self.logger.info(build_file_footer(
+            analysis_run.name,
+            file_name=os.path.basename(file_path),
+            stats=stats
+        ))
         return success, message
