@@ -4,17 +4,17 @@ const error = document.getElementById("error");
 const progress = document.getElementById("progress-bar");
 const status = document.getElementById("status");
 
-let pollingInterval = null;
-let importStarted = false;  // ✅ ADD THIS FLAG
+let importStarted = false;
 
 // Initialize event listeners
 document.addEventListener("DOMContentLoaded", function() {
     btnImport.addEventListener("click", startImport);
 });
 
-
 function startProgressPolling() {
     console.log("⏳ Starting 2-second polling to /check_import_progress/");
+
+    let currentProgress = 0; // Track current displayed progress
 
     const interval = setInterval(() => {
         fetch(`/analysisrun/check_import_progress/${arName}/`)
@@ -22,31 +22,50 @@ function startProgressPolling() {
             .then(data => {
                 console.log("📊 Progress check:", data);
 
-                const progressPercent = data.progress || 0;
+                const targetProgress = data.progress || 0;
                 const processed = data.processed_files || 0;
                 const total = data.total_files || 0;
                 const currentStatus = data.status || "processing";
+                const logUrl = data.log_url || null;
 
-                // ✅ Update progress bar width and label
-                progress.style.width = `${progressPercent}%`;
-                progress.innerText = `${progressPercent}%`;
-
-                // ✅ Color transitions by state
-                progress.classList.remove("bg-success", "bg-danger", "bg-primary");
-                if (currentStatus === "done") {
-                    progress.classList.add("bg-success");
-                } else if (currentStatus === "error") {
-                    progress.classList.add("bg-danger");
-                } else {
-                    progress.classList.add("bg-primary");
+                // ✅ Update Log File button (if exists)
+                const logBtn = document.querySelector('#report-modal .card-toolbar a');
+                if (logBtn && logUrl) {
+                    const awsUrl = logUrl.replace('s3://', 'https://s3.console.aws.amazon.com/s3/object/');
+                    logBtn.href = awsUrl;
+                    logBtn.target = "_blank";
+                    logBtn.textContent = "Open Log File";
+                    logBtn.classList.remove("btn-light");
+                    logBtn.classList.add("btn-primary");
                 }
 
-                // ✅ Update status text during processing
+                // ✅ Smooth progress bar animation
+                const smoothProgress = () => {
+                    if (currentProgress < targetProgress) {
+                        currentProgress += Math.min(1, targetProgress - currentProgress);
+                        progress.style.width = `${currentProgress}%`;
+                        progress.innerText = `${Math.round(currentProgress)}%`;
+                        requestAnimationFrame(smoothProgress);
+                    } else {
+                        currentProgress = targetProgress;
+                        progress.style.width = `${currentProgress}%`;
+                        progress.innerText = `${Math.round(currentProgress)}%`;
+                    }
+                };
+                smoothProgress();
+
+                // ✅ Color transitions
+                progress.classList.remove("bg-success", "bg-danger", "bg-primary");
+                if (currentStatus === "done") progress.classList.add("bg-success");
+                else if (currentStatus === "error") progress.classList.add("bg-danger");
+                else progress.classList.add("bg-primary");
+
+                // ✅ Update status while processing
                 if (currentStatus === "processing") {
                     status.innerText = `${currentStatus} (${processed}/${total} files)`;
                 }
 
-                // ✅ Handle successful completion
+                // ✅ Completion
                 if (currentStatus === "done") {
                     clearInterval(interval);
                     btnImport.disabled = false;
@@ -54,13 +73,11 @@ function startProgressPolling() {
                     progress.classList.remove("progress-bar-striped", "progress-bar-animated");
                     importStarted = false;
 
-                    // ✅ Direct inline report link
                     status.innerHTML = `
                         ✅ Import completed successfully with ${processed} of ${total} files processed!
                         <a href="#" onclick="viewReport()" class="fw-bold text-primary ms-2">View Report</a>
                     `;
 
-                    // Optional: Success popup
                     Swal.fire({
                         icon: 'success',
                         title: 'Import Complete!',
@@ -69,7 +86,7 @@ function startProgressPolling() {
                     });
                 }
 
-                // ✅ Handle error
+                // ✅ Error state
                 if (currentStatus === "error") {
                     clearInterval(interval);
                     btnImport.disabled = false;
@@ -104,7 +121,6 @@ function startProgressPolling() {
     }, 10000);
 }
 
-
 function startImport() {
     if (importStarted) {
         console.log("⚠️ Import already started — ignoring duplicate click");
@@ -120,15 +136,15 @@ function startImport() {
     status.innerText = "Starting import...";
     btnImport.innerText = "Importing...";
 
-    // ✅ Start polling immediately, before fetch completes
+    // Start polling immediately (before backend finishes)
     console.log("⏱ Launching progress polling before fetch finishes...");
     startProgressPolling();
 
-    // Fire off the long-running backend call
+    // Fire backend import
     fetch(`/analysisrun/start_import_variants/${arName}/`)
         .then(res => res.json())
         .then(data => {
-            console.log("✅ Import request acknowledged by backend:", data);
+            console.log("✅ Import request acknowledged:", data);
             status.innerText = "Import in progress...";
         })
         .catch(err => {
@@ -140,50 +156,30 @@ function startImport() {
         });
 }
 
-
-
-
 function viewReport() {
-  const modal = new bootstrap.Modal(document.getElementById('report-modal'));
-  modal.show();
+    const modal = new bootstrap.Modal(document.getElementById('report-modal'));
+    modal.show();
 
-  fetch(`/analysisrun/report_import_status/${arName}/`)
-    .then(res => res.json())
-    .then(data => {
-      const reportTable = document.querySelector('#report-modal .modal-body table tbody');
-
-      // ✅ Generate rows aligned with header (6 columns total)
-      reportTable.innerHTML = data.map((file, index) => `
-        <tr>
-          <!-- NO -->
-          <td class="text-gray-800 fw-bold fs-6">${index + 1}</td>
-
-          <!-- FILE NAME -->
-          <td colspan="2">
-            <span class="text-gray-800 fw-bold text-hover-primary mb-1 fs-6">
-              ${file.file_name}
-            </span>
-          </td>
-
-          <!-- STATUS -->
-          <td colspan="2" class="text-end pe-0">
-            <span class="text-gray-800 fw-bold fs-6">${file.status}</span>
-          </td>
-
-          <!-- LOG FILE -->
-          <td colspan="2" class="text-end">
-            ${file.log_url 
-              ? `<a href="${file.log_url.replace('s3://', 'https://s3.console.aws.amazon.com/s3/object/')}" 
-                   target="_blank" 
-                   rel="noopener noreferrer"
-                   class="text-primary fw-bold fs-6">View Log</a>` 
-              : '<span class="text-muted fw-bold fs-6">N/A</span>'}
-          </td>
-        </tr>
-      `).join('');
-    })
-    .catch(err => {
-      console.error("Error loading report:", err);
-    });
+    fetch(`/analysisrun/report_import_status/${arName}/`)
+        .then(res => res.json())
+        .then(data => {
+            const reportTable = document.querySelector('#report-modal .modal-body table tbody');
+            reportTable.innerHTML = data.map((file, index) => `
+                <tr>
+                  <td class="text-gray-800 fw-bold fs-6">${index + 1}</td>
+                  <td colspan="2"><span class="text-gray-800 fw-bold text-hover-primary mb-1 fs-6">${file.file_name}</span></td>
+                  <td colspan="2" class="text-end pe-0"><span class="text-gray-800 fw-bold fs-6">${file.status}</span></td>
+                  <td colspan="2" class="text-end">
+                    ${file.log_url 
+                        ? `<a href="${file.log_url.replace('s3://', 'https://s3.console.aws.amazon.com/s3/object/')}" 
+                               target="_blank" rel="noopener noreferrer"
+                               class="text-primary fw-bold fs-6">View Log</a>`
+                        : '<span class="text-muted fw-bold fs-6">N/A</span>'}
+                  </td>
+                </tr>
+            `).join('');
+        })
+        .catch(err => {
+            console.error("Error loading report:", err);
+        });
 }
-
