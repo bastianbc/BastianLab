@@ -12,72 +12,107 @@ document.addEventListener("DOMContentLoaded", function() {
     btnImport.addEventListener("click", startImport);
 });
 
-function updateProgress(data) {
-    progress.style.width = `${data.progress}%`;
-    progress.innerText = `${data.progress}%`;
-    status.innerText = data.status;
-    error.innerText = data.error || "";
 
-    if (data.status === "processing") {
-        // Start polling if not already polling
-        if (!pollingInterval) {
-            console.log("Starting polling...");
-            pollingInterval = setInterval(checkProgress, 3000); // Poll every 3 seconds
-        }
-    } else if (data.status === "done") {
-        // Stop polling
-        console.log("Import completed, stopping polling");
-        stopPolling();
-        btnImport.disabled = false;
-        btnImport.innerText = "Import Variants";
-        importStarted = false;  // ✅ RESET FLAG
-        status.innerHTML = `Import completed successfully with ${data.processed_files} of ${data.total_files} files processed! <a href="#" onclick="viewReport()">View Report</a>`;
-    } else if (data.status === "error") {
-        // Stop polling on error
-        console.log("Import error, stopping polling");
-        stopPolling();
-        btnImport.disabled = false;
-        btnImport.innerText = "Import Variants";
-        importStarted = false;  // ✅ RESET FLAG
-    }
+function startProgressPolling() {
+    console.log("⏳ Starting 2-second polling to /check_import_progress/");
+
+    const interval = setInterval(() => {
+        fetch(`/analysisrun/check_import_progress/${arName}/`)
+            .then(res => res.json())
+            .then(data => {
+                console.log("📊 Progress check:", data);
+
+                const progressPercent = data.progress || 0;
+                const processed = data.processed_files || 0;
+                const total = data.total_files || 0;
+                const currentStatus = data.status || "processing";
+
+                // ✅ Update progress bar width and label
+                progress.style.width = `${progressPercent}%`;
+                progress.innerText = `${progressPercent}%`;
+
+                // ✅ Color transitions by state
+                progress.classList.remove("bg-success", "bg-danger", "bg-primary");
+                if (currentStatus === "done") {
+                    progress.classList.add("bg-success");
+                } else if (currentStatus === "error") {
+                    progress.classList.add("bg-danger");
+                } else {
+                    progress.classList.add("bg-primary");
+                }
+
+                // ✅ Update status text during processing
+                if (currentStatus === "processing") {
+                    status.innerText = `${currentStatus} (${processed}/${total} files)`;
+                }
+
+                // ✅ Handle successful completion
+                if (currentStatus === "done") {
+                    clearInterval(interval);
+                    btnImport.disabled = false;
+                    btnImport.innerText = "Import Complete";
+                    progress.classList.remove("progress-bar-striped", "progress-bar-animated");
+                    importStarted = false;
+
+                    // ✅ Direct inline report link
+                    status.innerHTML = `
+                        ✅ Import completed successfully with ${processed} of ${total} files processed!
+                        <a href="#" onclick="viewReport()" class="fw-bold text-primary ms-2">View Report</a>
+                    `;
+
+                    // Optional: Success popup
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Import Complete!',
+                        text: `Successfully processed ${processed} of ${total} files.`,
+                        confirmButtonText: 'OK'
+                    });
+                }
+
+                // ✅ Handle error
+                if (currentStatus === "error") {
+                    clearInterval(interval);
+                    btnImport.disabled = false;
+                    btnImport.innerText = "Retry Import";
+                    progress.classList.remove("progress-bar-striped", "progress-bar-animated");
+                    progress.classList.add("bg-danger");
+                    error.innerText = data.error || "Unknown error occurred";
+                    importStarted = false;
+
+                    status.innerHTML = `
+                        ❌ Import failed after ${processed} of ${total} files.
+                        <span class="text-danger fw-bold">Check logs or retry.</span>
+                    `;
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Import Failed',
+                        text: data.error || 'An error occurred during import'
+                    });
+                }
+            })
+            .catch(err => {
+                console.error("❌ Polling error:", err);
+                clearInterval(interval);
+                btnImport.disabled = false;
+                btnImport.innerText = "Import Variants";
+                progress.classList.add("bg-danger");
+                status.innerText = "❌ Connection lost while polling progress.";
+                error.innerText = err.message;
+                importStarted = false;
+            });
+    }, 10000);
 }
 
-function checkProgress() {
-    // Just check progress, don't start new import
-    console.log("Checking progress...");
-    fetch(`/analysisrun/check_import_progress/${arName}/`)
-      .then(res => res.json())
-      .then(data => {
-        console.log("Progress check:", data);
-        updateProgress(data);
-      })
-      .catch(err => {
-        console.error("Error checking progress:", err);
-        error.innerText = err.message;
-        stopPolling();
-        btnImport.disabled = false;
-        btnImport.innerText = "Import Variants";
-        importStarted = false;  // ✅ RESET FLAG
-      });
-}
-
-function stopPolling() {
-    if (pollingInterval) {
-        clearInterval(pollingInterval);
-        pollingInterval = null;
-        console.log("Polling stopped");
-    }
-}
 
 function startImport() {
-    // ✅ PREVENT DOUBLE CLICKS
     if (importStarted) {
-        console.log("Import already started, ignoring duplicate click");
+        console.log("⚠️ Import already started — ignoring duplicate click");
         return;
     }
 
-    console.log("Starting import...");
-    importStarted = true;  // ✅ SET FLAG
+    console.log("🚀 Starting import...");
+    importStarted = true;
     btnImport.disabled = true;
     error.innerText = "";
     progress.style.width = "0%";
@@ -85,20 +120,28 @@ function startImport() {
     status.innerText = "Starting import...";
     btnImport.innerText = "Importing...";
 
+    // ✅ Start polling immediately, before fetch completes
+    console.log("⏱ Launching progress polling before fetch finishes...");
+    startProgressPolling();
+
+    // Fire off the long-running backend call
     fetch(`/analysisrun/start_import_variants/${arName}/`)
-      .then(res => res.json())
-      .then(data => {
-        console.log("Import started:", data);
-        updateProgress(data);
-      })
-      .catch(err => {
-        console.error("Error starting import:", err);
-        error.innerText = err.message;
-        btnImport.disabled = false;
-        btnImport.innerText = "Import Variants";
-        importStarted = false;  // ✅ RESET FLAG ON ERROR
-      });
+        .then(res => res.json())
+        .then(data => {
+            console.log("✅ Import request acknowledged by backend:", data);
+            status.innerText = "Import in progress...";
+        })
+        .catch(err => {
+            console.error("❌ Error starting import:", err);
+            error.innerText = err.message;
+            btnImport.disabled = false;
+            btnImport.innerText = "Import Variants";
+            importStarted = false;
+        });
 }
+
+
+
 
 function viewReport() {
   const modal = new bootstrap.Modal(document.getElementById('report-modal'));
@@ -107,18 +150,34 @@ function viewReport() {
   fetch(`/analysisrun/report_import_status/${arName}/`)
     .then(res => res.json())
     .then(data => {
-      console.log(data);
       const reportTable = document.querySelector('#report-modal .modal-body table tbody');
-      reportTable.innerHTML = data.map(file => `
+
+      // ✅ Generate rows aligned with header (6 columns total)
+      reportTable.innerHTML = data.map((file, index) => `
         <tr>
-          <td>${file.file_name}</td>
-          <td>${file.status}</td>
-          <td>
+          <!-- NO -->
+          <td class="text-gray-800 fw-bold fs-6">${index + 1}</td>
+
+          <!-- FILE NAME -->
+          <td colspan="2">
+            <span class="text-gray-800 fw-bold text-hover-primary mb-1 fs-6">
+              ${file.file_name}
+            </span>
+          </td>
+
+          <!-- STATUS -->
+          <td colspan="2" class="text-end pe-0">
+            <span class="text-gray-800 fw-bold fs-6">${file.status}</span>
+          </td>
+
+          <!-- LOG FILE -->
+          <td colspan="2" class="text-end">
             ${file.log_url 
               ? `<a href="${file.log_url.replace('s3://', 'https://s3.console.aws.amazon.com/s3/object/')}" 
                    target="_blank" 
-                   rel="noopener noreferrer">View Log</a>` 
-              : '<span class="text-muted">N/A</span>'}
+                   rel="noopener noreferrer"
+                   class="text-primary fw-bold fs-6">View Log</a>` 
+              : '<span class="text-muted fw-bold fs-6">N/A</span>'}
           </td>
         </tr>
       `).join('');
@@ -128,67 +187,3 @@ function viewReport() {
     });
 }
 
-
-
-// const arName = window.location.pathname.split('/').filter(Boolean).pop();
-// const btnImport = document.getElementById("import-btn");
-// const error = document.getElementById("error");
-// const progress = document.getElementById("progress-bar");
-// const status = document.getElementById("status");
-//
-// // Initialize event listeners
-// document.addEventListener("DOMContentLoaded", function() {
-//     btnImport.addEventListener("click", startImport);
-// });
-//
-// function updateProgress(data) {
-//     progress.style.width = `${data.progress}%`;
-//     progress.innerText = `${data.progress}%`;
-//     status.innerText = data.status;
-//     error.innerText = data.error || "";
-//
-//     if (data.status === "processing") {
-//       // Check status every 5 seconds
-//       setTimeout(startImport, 1000);
-//     } else if (data.status === "done") {
-//       // Import completed successfully
-//       btnImport.disabled = false;
-//       btnImport.innerText = "Import Variants";
-//       status.innerHTML = `Import completed successfully with ${data.processed_files} of ${data.total_files} files processed! <a href="#" onclick="viewReport()">View Report</a>`;
-//     }
-// }
-//
-// function startImport() {
-//     btnImport.disabled = true;
-//     error.innerText = "";
-//     progress.style.width = "0%";
-//     progress.innerText = "0%";
-//     status.innerText = "Importing...";
-//     btnImport.innerText = "Importing...";
-//
-//     fetch(`/analysisrun/start_import_variants/${arName}/`)
-//       .then(res => res.json())
-//       .then(data => {
-//         console.log(data);
-//         status.innerText = data.status;
-//         error.innerText = data.error || "";
-//         updateProgress(data);
-//       })
-//       .catch(err => {
-//         error.innerText = err.message;
-//         btnImport.disabled = false;
-//         btnImport.innerText = "Import Variants";
-//       });
-// }
-//
-// function viewReport() {
-//     const modal = new bootstrap.Modal(document.getElementById('report-modal'));
-//     modal.show();
-//     fetch(`/analysisrun/report_import_status/${arName}/`)
-//       .then(res => res.json())
-//       .then(data => {
-//         console.log(data);
-//         const reportTable = document.querySelector('#report-modal .modal-body table tbody');
-//         reportTable.innerHTML = data.map(file => `<tr><td>${file.file_name}</td><td>${file.status}</td></tr>`).join('');
-//       });
-// }

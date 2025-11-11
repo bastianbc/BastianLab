@@ -23,7 +23,7 @@
 
     <div class="mb-3">
       <div class="progress" style="height: 25px;">
-        <div id="progress-bar" class="progress-bar progress-bar-striped bg-success"
+        <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
              style="width: {{progress|default:0}}%">
           {{progress|default:0}}%
         </div>
@@ -34,29 +34,60 @@
     <p id="error" class="text-danger small">{{error|default:""}}</p>
 
     <button id="import-btn" class="btn btn-primary" onclick="startImport()">Import Variants</button>
+
   </div>
 </div>
 <!--begin::Modal-->
 <div class="modal fade" id="report-modal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered mw-800px">
+  <div class="modal-dialog modal-dialog-centered mw-1000px">
     <div class="modal-content">
-      <div class="modal-header">
-        <h2>Import Variants Report</h2>
-      </div>
       <div class="modal-body">
-        <div class="card card-flush">
-          <div class="card-body">
-            <table class="table table-bordered">
-              <thead>
-                <tr>
-                  <th>File Name</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
+        <!--begin::Table widget 9-->
+        <div class="card card-flush h-xl-100">
+            <!--begin::Header-->
+            <div class="card-header pt-5">
+                <!--begin::Title-->
+                <h3 class="card-title align-items-start flex-column">
+                    <span class="card-label fw-bold text-gray-800">Import Variants Report</span>
+                </h3>
+                <!--end::Title-->
+
+                <!--begin::Toolbar-->
+                <div class="card-toolbar">
+                    <a href="#" class="btn btn-sm btn-light">Log File</a>
+                </div>
+                <!--end::Toolbar-->
+            </div>
+            <!--end::Header-->
+
+            <!--begin::Body-->
+            <div class="card-body py-3">
+                <!--begin::Table container-->
+                <div class="table-responsive">
+                    <!--begin::Table-->
+                    <table class="table table-row-dashed align-middle gs-0 gy-4">
+                        <!--begin::Table head-->
+                        <thead>
+                            <tr class="fs-7 fw-bold border-0 text-gray-500">
+                                <th class="min-w-50px">NO</th>
+                                <th class="min-w-300px" colspan="2">FILE NAME</th>
+                                <th class="min-w-150px text-end pe-0" colspan="2">STATUS</th>
+                                <th class="text-end min-w-150px" colspan="2">LOG FILE</th>
+                            </tr>
+                        </thead>
+                        <!--end::Table head-->
+
+                        <!--begin::Table body-->
+                        <tbody></tbody>
+                        <!--end::Table body-->
+                    </table>
+                    <!--end::Table-->
+                </div>
+                <!--end::Table container-->
+            </div>
+            <!--end::Body-->
         </div>
+        <!--end::Table Widget 9-->
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

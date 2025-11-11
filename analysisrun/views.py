@@ -177,31 +177,50 @@ def start_import_variants(request, ar_name):
         root_logger.removeHandler(handler)
 
 
-
-
 def check_import_progress(request, ar_name):
     """
     Poll the current import progress and status.
-    This is called repeatedly by the frontend to check progress.
+    Called repeatedly by the frontend every few seconds to check progress.
     """
-    print("=" * 200,"check_import_progress")
+    print("*" * 10, "check_import_progress")
+
     try:
         importer = VariantImporter(ar_name)
         cache_data = importer.get_progress()
+        print("cache_data", cache_data)
 
         status = cache_data.get("status", "not_started")
-        progress = cache_data.get("progress", 0)
+        total_files = cache_data.get("total_files", 0)
         processed_files = cache_data.get("processed_files", 0)
+        error = cache_data.get("error", None)
 
+        # ✅ Calculate dynamic progress as percentage
+        if total_files > 0:
+            progress = int((processed_files / total_files) * 100)
+        else:
+            progress = 0
+
+        # ✅ Save computed progress back for smoother frontend sync
+        cache_data["progress"] = progress
+
+        # ✅ Retrieve log URL (if available)
+        log_url = S3StorageLogHandler.get_log_path(ar_name)
+
+        print(f"Progress check → {processed_files}/{total_files} files ({progress}%)")
+
+        # ✅ Return full JSON snapshot for frontend
         return JsonResponse({
             "analysis_run": ar_name,
-            "total_files": importer.total_files,
-            "processed_files": processed_files,
-            "progress": progress,
             "status": status,
-            "error": cache_data.get("error", None),
+            "progress": progress,
+            "processed_files": processed_files,
+            "total_files": total_files,
+            "error": error,
+            "log_url": log_url,
         })
+
     except Exception as e:
+        logger.exception(f"Error during progress check for {ar_name}: {e}")
         return JsonResponse({
             "error": str(e),
             "status": "error",

@@ -53,6 +53,10 @@ class VariantImporter:
 
         self.total_files = len(self.all_files)
         self.processed_files = 0
+        # ✅ Immediately write discovered total to cache
+        self._set_status("processing", 0)
+        logger.info(f"📦 Discovered {self.total_files} total files for {self.ar_name}")
+
         return self.all_files
 
     # ----------------------------------------------------------------------
@@ -68,6 +72,7 @@ class VariantImporter:
                 "status": status,
                 "processed_files": self.processed_files,
                 "progress": progress,
+                "total_files": self.total_files,  # ✅ Always save total_files
                 "error": error,
             },
             timeout=60 * 60,  # 1 hour
@@ -157,14 +162,29 @@ class VariantImporter:
     # Utilities
     # ----------------------------------------------------------------------
     def get_progress(self):
-        """Return current progress, status, and error (if any)."""
+        """Return current progress, total files, processed count, status, and error (if any)."""
         cache_data = cache.get(self._cache_key())
         if not cache_data:
-            return {"status": "not_started", "progress": 0, "error": None}
+            return {
+                "status": "not_started",
+                "progress": 0,
+                "processed_files": 0,
+                "total_files": getattr(self, "total_files", 0),
+                "error": None,
+            }
 
-        if cache_data["status"] == "processing":
+        # Ensure total_files is preserved in cache or fallback to self.total_files
+        total_files = cache_data.get("total_files") or getattr(self, "total_files", 0)
+        processed_files = cache_data.get("processed_files", 0)
+
+        # If still processing, update progress dynamically
+        if cache_data.get("status") == "processing":
             cache_data["progress"] = self._update_progress()
             cache.set(self._cache_key(), cache_data, timeout=60 * 60)
+
+        # Safely include totals
+        cache_data.setdefault("total_files", total_files)
+        cache_data.setdefault("processed_files", processed_files)
 
         return cache_data
 
