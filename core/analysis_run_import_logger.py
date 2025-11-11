@@ -5,6 +5,7 @@ import boto3
 from datetime import datetime
 from django.conf import settings
 from botocore.exceptions import NoCredentialsError, ClientError, EndpointConnectionError
+from django.core.cache import cache
 
 _last_log_paths = {}
 
@@ -38,6 +39,7 @@ class S3StorageLogHandler(logging.Handler):
         # Store the S3 URL for this analysis run
         self.log_url = f"s3://{self.bucket}/{self.log_key}"
         _last_log_paths[self.ar_name] = self.log_url
+        cache.set(f"log_url:{self.ar_name}", self.log_url, timeout=60 * 60 * 24 * 7)
 
     def _build_header(self):
         """Build formatted header for log file."""
@@ -92,6 +94,8 @@ class S3StorageLogHandler(logging.Handler):
 
     @staticmethod
     def get_log_path(ar_name):
-        """Return the most recent log path for a given AnalysisRun name."""
-        return _last_log_paths.get(ar_name)
+        """Retrieve from memory or cache."""
+        if ar_name in _last_log_paths:
+            return _last_log_paths[ar_name]
+        return cache.get(f"log_url:{ar_name}")
 

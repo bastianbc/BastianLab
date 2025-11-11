@@ -9,7 +9,7 @@ from analysisrun.models import AnalysisRun, VariantFile
 from analysisrun.handlers import AlignmentsFolderHandler, CnvFolderHandler, SnvFolderHandler
 
 logger = logging.getLogger("file")
-
+print("!!!!!!!!!!!!!! os.cpu_count()", os.cpu_count())
 class VariantImporter:
     """
     Variant file importer with progress and error tracking (synchronous version).
