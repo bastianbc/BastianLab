@@ -8,6 +8,7 @@ from botocore.exceptions import NoCredentialsError, ClientError, EndpointConnect
 
 _last_log_paths = {}
 
+
 class S3StorageLogHandler(logging.Handler):
     """Writes import logs to S3 (via boto3) or local Downloads folder as fallback.
     Adds a formatted header for clarity and context."""
@@ -21,95 +22,76 @@ class S3StorageLogHandler(logging.Handler):
         self.timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         self.log_filename = f"{self.ar_name}_import_{self.timestamp.replace(':', '').replace(' ', '_')}.log"
 
-        # Get sequencing directory path from settings and clean any s3:// prefix
         self.seq_files = getattr(settings, "SEQUENCING_FILES_SOURCE_DIRECTORY", "")
         self.bucket = getattr(settings, "AWS_STORAGE_BUCKET_NAME", "bastian-lab-169-3-r-us-west-2.sec.ucsf.edu")
         self.region = getattr(settings, "AWS_S3_REGION_NAME", "us-west-2")
 
-        # 🔧 Clean s3://bucket_name/ prefix if present
+        # Clean s3:// prefix if present
         if self.seq_files.startswith("s3://"):
             prefix = f"s3://{self.bucket}/"
             if self.seq_files.startswith(prefix):
-                self.seq_files = self.seq_files[len(prefix):]  # remove the full s3://bucket_name/ part
+                self.seq_files = self.seq_files[len(prefix):]
 
-        # ✅ Build proper S3 key (no double s3:// prefix)
+        # Build proper S3 key
         self.log_key = f"{self.seq_files}/{self.sheet_name}/parse_logs/{self.log_filename}".lstrip("/")
 
+        # Store the S3 URL for this analysis run
+        self.log_url = f"s3://{self.bucket}/{self.log_key}"
+        _last_log_paths[self.ar_name] = self.log_url
 
+    def _build_header(self):
+        """Build formatted header for log file."""
+        return f"""
+            {'=' * 80}
+            Analysis Run Import Log
+            {'=' * 80}
+            Analysis Run: {self.ar_name}
+            Sheet Name: {self.sheet_name}
+            Timestamp: {self.timestamp}
+            Total Files: {self.total_files}
+            Log File: {self.log_filename}
+            {'=' * 80}
+        """
 
     def update_total_files(self, total_files):
-        """
-        Updates the '📦 Total Files' line in the in-memory header buffer.
-        Keeps existing logs intact.
-        """
+        """Updates the total files count."""
         self.total_files = total_files
-
-        # ✨ Add header immediately after get total files
         header = self._build_header()
         self.buffer.write(header + "\n\n")
 
-
-
-    @staticmethod
-    def get_log_path(ar_name):
-        """Return the most recent log path for a given AnalysisRun name."""
-        print("%"*50, _last_log_paths)
-        return _last_log_paths.get(ar_name)
-
-    def _build_header(self):
-        line = "=" * 100
-        return (
-            f"\n{line}\n"
-            f"🧬 VARIANT IMPORT LOG\n"
-            f"{line}\n"
-            f"📁 Analysis Run Name: {self.ar_name}\n"
-            f"📄 Sheet Name: {self.sheet_name}\n"
-            f"📦 Total Files: {self.total_files}\n"
-            f"⏰ Start Time: {self.timestamp}\n"
-            f"🌐 Destination: {self.bucket}/{self.log_key}\n"
-            f"{line}\n"
-        )
-
     def emit(self, record):
-        msg = self.format(record)
-        self.buffer.write(msg + "\n")
+        """Write log record to buffer."""
+        try:
+            msg = self.format(record)
+            self.buffer.write(msg + "\n")
+        except Exception:
+            self.handleError(record)
 
     def close(self):
-        """Flush buffer to S3 or fallback to Downloads."""
+        """Upload buffered logs to S3."""
         try:
-            content = self.buffer.getvalue()
+            s3_client = boto3.client('s3', region_name=self.region)
+            log_content = self.buffer.getvalue()
+
+            s3_client.put_object(
+                Bucket=self.bucket,
+                Key=self.log_key,
+                Body=log_content.encode('utf-8'),
+                ContentType='text/plain'
+            )
+
+        except (NoCredentialsError, ClientError, EndpointConnectionError) as e:
+            # Fallback to local file if S3 fails
+            downloads_path = os.path.expanduser("~/Downloads")
+            local_path = os.path.join(downloads_path, self.log_filename)
+            with open(local_path, 'w') as f:
+                f.write(self.buffer.getvalue())
         finally:
             self.buffer.close()
             super().close()
 
-        try:
-            # ✅ Create S3 client
-            s3_client = boto3.client(
-                "s3",
-                region_name=self.region,
-                config=boto3.session.Config(signature_version="s3v4"),
-            )
-
-            # ✅ Upload the log file
-            s3_client.put_object(
-                Bucket=self.bucket,
-                Key=self.log_key,
-                Body=content.encode("utf-8"),
-                ContentType="text/plain",
-            )
-            _last_log_paths[self.ar_name] = f"s3://{self.bucket}/{self.log_key}"
-
-            print(f"✅ Log uploaded successfully to s3://{self.bucket}/{self.log_key}")
-
-        except (NoCredentialsError, ClientError, EndpointConnectionError, Exception) as e:
-            downloads_dir = os.path.join(os.path.expanduser("~"), "Downloads")
-            os.makedirs(downloads_dir, exist_ok=True)
-            local_path = os.path.join(downloads_dir, self.log_filename)
-
-            try:
-                with open(local_path, "w", encoding="utf-8") as f:
-                    f.write(content)
-                print(f"⚠️ Failed to upload log to S3 ({e}); saved locally to: {local_path}")
-            except Exception as inner_e:
-                print(f"❌ Critical error saving log locally: {inner_e}")
+    @staticmethod
+    def get_log_path(ar_name):
+        """Return the most recent log path for a given AnalysisRun name."""
+        return _last_log_paths.get(ar_name)
 
