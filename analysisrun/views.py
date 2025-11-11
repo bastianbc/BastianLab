@@ -215,96 +215,22 @@ def check_import_progress(request, ar_name):
             "total_files": 0,
         })
 
-#
-# def initialize_import_variants(request, ar_name):
-#     """
-#     Renders the import page.
-#     Does NOT start background import automatically.
-#     User must click 'Start Import' to begin.
-#     """
-#     GVariant.objects.filter(
-#         variant_calls__analysis_run__name="AR5"
-#     ).delete()
-#     print(GVariant.objects.filter(
-#         variant_calls__analysis_run__name="AR5"
-#     ))
-#     AnalysisRun.objects.filter(name="AR5").update(status="pending")
-#
-#     importer = VariantImporter(ar_name)
-#     importer.reset_status()
-#     importer.discover_files_s3()
-#     cache_data = importer.get_progress()
-#
-#     return render(request, "import_variants.html", {
-#         "analysis_run": ar_name,
-#         "total_files": importer.total_files,
-#         "progress": cache_data.get("progress", 0),
-#         "status": cache_data.get("status", "not_started"),
-#         "error": cache_data.get("error"),
-#     })
-#
-#
-# def start_import_variants(request, ar_name):
-#         """
-#         Poll the current import progress and status.
-#         If never started or in error state, attempt auto-restart.
-#         """
-#     # try:
-#         GVariant.objects.filter(
-#             variant_calls__analysis_run__name="AR5"
-#         ).delete()
-#         AnalysisRun.objects.filter(name="AR5").update(status="pending")
-#
-#         importer = VariantImporter(ar_name)
-#         importer.discover_files_s3()
-#         cache_data = importer.get_progress()
-#
-#         status = cache_data.get("status", "not_started")
-#         progress = cache_data.get("progress", 0)
-#         processed_files = cache_data.get("processed_files", 0)
-#         # Auto-start if import never started or previously failed
-#         if status in ["not_started", "error"]:
-#             result = importer.start_import(force_restart=True)
-#             status = result["status"]
-#             progress = result.get("progress", 0)
-#             cache_data = importer.get_progress()
-#
-#         return JsonResponse({
-#             "analysis_run": ar_name,
-#             "total_files": importer.total_files,
-#             "processed_files": processed_files,
-#             "progress": progress,
-#             "status": status,
-#             "error": cache_data.get("error", None),
-#         })
-    # except Exception as e:
-    #     return JsonResponse({
-    #         "error": str(e),
-    #         "status": "error",
-    #         "processed_files": 0,
-    #         "progress": 0,
-    #         "total_files": 0,
-    #     })
 
 @permission_required_for_async("analysis_run.view_analysisrun")
 def report_import_status(request, ar_name):
-    bucket = getattr(settings, "AWS_STORAGE_BUCKET_NAME", "")
-    base_prefix = getattr(settings, "SEQUENCING_FILES_SOURCE_DIRECTORY", "").replace(f"s3://{bucket}/", "")
-    log_base_path = f"s3://{bucket}/{base_prefix}/{ar_name}/parse_logs"
+    analysis_run = AnalysisRun.objects.get(name=ar_name)
+    variant_files = VariantFile.objects.filter(analysis_run=analysis_run)
 
-    variant_files = VariantFile.objects.filter(analysis_run__name=ar_name)
+    log_url = S3StorageLogHandler.get_log_path(ar_name)
 
-    files_info = []
-    for file in variant_files:
-        # Try to locate log file pattern: <AR>_import_<timestamp>.log
-        log_name_prefix = f"{ar_name}_import_"
-        file_log_url = f"{log_base_path}/{log_name_prefix}{file.name}.log"  # optional: use your actual naming scheme
-
-        files_info.append({
+    files_info = [
+        {
             "file_name": file.name,
             "status": file.get_status_display(),
-            "log_url": file_log_url,
-        })
+            "log_url": log_url,
+        }
+        for file in variant_files
+    ]
 
     return JsonResponse(files_info, safe=False)
 

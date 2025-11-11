@@ -6,6 +6,7 @@ from datetime import datetime
 from django.conf import settings
 from botocore.exceptions import NoCredentialsError, ClientError, EndpointConnectionError
 
+_last_log_paths = {}
 
 class S3StorageLogHandler(logging.Handler):
     """Writes import logs to S3 (via boto3) or local Downloads folder as fallback.
@@ -37,6 +38,11 @@ class S3StorageLogHandler(logging.Handler):
         # ✨ Add header immediately
         header = self._build_header()
         self.buffer.write(header + "\n\n")
+
+    @staticmethod
+    def get_log_path(ar_name):
+        """Return the most recent log path for a given AnalysisRun name."""
+        return _last_log_paths.get(ar_name)
 
     def _build_header(self):
         line = "=" * 100
@@ -79,6 +85,7 @@ class S3StorageLogHandler(logging.Handler):
                 Body=content.encode("utf-8"),
                 ContentType="text/plain",
             )
+            _last_log_paths[self.ar_name] = f"s3://{self.bucket}/{self.log_key}"
 
             print(f"✅ Log uploaded successfully to s3://{self.bucket}/{self.log_key}")
 
