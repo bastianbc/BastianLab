@@ -32,3 +32,8 @@ class CustomFileSystemStorage(FileSystemStorage):
 def analysis_run_upload_to(instance, filename):
     # Saves to: <SEQUENCING_FILES_SOURCE_DIRECTORY>/<run_name>/<filename>
     return f"sequencingdata/ProcessedData/{instance.name}_{instance.pipeline}_{instance.genome}/{filename}"
+
+
+def cns_upload_to(instance, filename):
+    # Organize attachments under a consistent structure
+    return f"uploads/cns_attachments/{instance.sample_lib_id or 'unknown'}/{filename}"
