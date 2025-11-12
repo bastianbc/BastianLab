@@ -2,6 +2,7 @@ from django.db import models
 from projects.utils import get_user_projects
 from django.db.models import Q
 import json
+from analysisrun.storage import CustomFileSystemStorage, cns_upload_to
 
 
 class Cns(models.Model):
@@ -22,8 +23,8 @@ class Cns(models.Model):
     p_ttest = models.FloatField(default=0.0)
     probes = models.FloatField(default=0.0)
     weight = models.TextField(blank=True, null=True)
-    diagram= models.FileField(upload_to="uploads/cns_diagram_attachments", null=True, blank=True)
-    scatter = models.FileField(upload_to="uploads/cns_scatter_attachments", null=True, blank=True)
+    diagram = models.FileField(upload_to=cns_upload_to, max_length=500, blank=True, null=True)
+    scatter = models.FileField(upload_to=cns_upload_to, max_length=500, blank=True, null=True)
 
     class Meta:
         db_table = "cns"
