@@ -36,4 +36,12 @@ def analysis_run_upload_to(instance, filename):
 
 def cns_upload_to(instance, filename):
     # Organize attachments under a consistent structure
-    return f"uploads/cns_attachments/{instance.sample_lib_id or 'unknown'}/{filename}"
+    return f"uploads/cns_attachments/{instance.sample_lib_id}/{filename}"
+
+
+def qc_upload_to(instance, filename):
+    """
+    Stores insert size histograms under a structured path:
+    sequencingdata/ProcessedData/<analysis_run>/<sample_lib>/qc/
+    """
+    return f"uploads/insert_size_histogram/{instance.sample_lib_id}/{filename}"

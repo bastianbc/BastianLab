@@ -2,6 +2,12 @@ import os
 import pandas as pd
 import logging
 from datetime import datetime
+import s3fs
+import io
+import csv
+import sys
+from urllib.parse import urlparse
+import boto3
 from collections import defaultdict
 from qc.models import SampleQC
 from samplelib.models import SampleLib
@@ -17,6 +23,124 @@ QC_FILE_EXTENSIONS = {
     "insert_metrics": ".insert_size_metrics.txt",
     "histogram_pdf": ".Tumor_insert_size_histogram.pdf"
 }
+EXCEPTION_STATS = defaultdict(int)
+
+EXCEPTION_CODES = {
+    # --- Metrics (QC) parsing ---
+    "MET000": "SampleLib / SequencingRun not detected",
+    "MET001": "Error processing metrics for sample",
+    "MET002": "Unrecognized metrics file type",
+    "MET003": "Metrics file parsing exception",
+    "MET004": "Missing or unreadable metrics file",
+    "MET005": "Error saving SampleQC record",
+    "MET999": "Unhandled metrics parsing error",
+}
+def log_and_track_exception(code, message, exception_obj=None, **kwargs):
+    """Helper to log error with code and update stats."""
+    code_msg = EXCEPTION_CODES.get(code, "UNKNOWN ERROR")
+    log_msg = f"[{code}: {code_msg}] {message}"
+    # Track stats by function code
+    EXCEPTION_STATS[code] += 1
+    if exception_obj:
+        logger.error(log_msg, exc_info=True, extra=kwargs)
+    else:
+        logger.error(log_msg, extra=kwargs)
+
+
+
+
+def read_s3_metrics_file(file_path, sep='\t', skiprows=6):
+    """
+    Reads a metrics file (dup, hs, insert, etc.) from S3 or local disk into a pandas DataFrame.
+    Automatically converts HTTPS S3 URLs to s3:// format and handles AWS SSO sessions.
+    Skips non-text attachments (PDF/PNG).
+    """
+    logger.info(f"Reading metrics file: {file_path}")
+
+    # --- Step 0: Early skip for attachments ---
+    if file_path.endswith((".pdf", ".png")):
+        msg = f"Skipping non-text metrics file: {file_path}"
+        log_and_track_exception("MET004", msg)
+        return None
+
+    s3_client = boto3.client("s3")
+    fs = s3fs.S3FileSystem(anon=False)
+
+    # --- Step 1: Normalize URL to s3:// form ---
+    s3_path = file_path
+    try:
+        if file_path.startswith("https://s3."):
+            parsed = urlparse(file_path)
+            if parsed.netloc.endswith("amazonaws.com"):
+                bucket_and_key = parsed.path.lstrip("/").split("/", 1)
+                if len(bucket_and_key) == 2:
+                    bucket, key = bucket_and_key
+                    s3_path = f"s3://{bucket}/{key}"
+            logger.debug(f"Converted HTTPS URL to S3 path: {s3_path}")
+        elif file_path.startswith(("http://", "https://")):
+            parsed = urlparse(file_path)
+            bucket_and_key = parsed.path.lstrip("/").split("/", 1)
+            if len(bucket_and_key) == 2:
+                bucket, key = bucket_and_key
+                s3_path = f"s3://{bucket}/{key}"
+            logger.debug(f"Converted generic HTTP URL to S3 path: {s3_path}")
+    except Exception as e:
+        log_and_track_exception("MET004", f"URL normalization failed for '{file_path}'", e)
+
+    # --- Step 2: Read file content ---
+    content = None
+    try:
+        if s3_path.startswith("s3://"):
+            parsed = urlparse(s3_path)
+            bucket = parsed.netloc
+            key = parsed.path.lstrip("/")
+            logger.debug(f"Opening file from S3: bucket={bucket}, key={key}")
+
+            try:
+                obj = s3_client.get_object(Bucket=bucket, Key=key)
+                content = obj["Body"].read().decode("utf-8", errors="ignore")
+            except s3_client.exceptions.NoSuchKey:
+                msg = f"Metrics file not found in S3: {s3_path}"
+                log_and_track_exception("MET004", msg)
+                logger.error(msg)
+                return None
+        else:
+            logger.debug(f"Opening local metrics file: {file_path}")
+            with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+                content = f.read()
+    except Exception as e:
+        log_and_track_exception("MET004", f"Failed to read file '{file_path or s3_path}'", e)
+        raise
+
+    # --- Step 3: Parse TSV content into DataFrame ---
+    try:
+        lines = [ln for ln in content.strip().split("\n") if ln.strip()]
+        if not lines:
+            raise ValueError(f"Empty metrics file: {file_path}")
+
+        # Skip Picard headers (if any)
+        csv.field_size_limit(min(sys.maxsize, 2147483647))
+        reader = csv.reader(io.StringIO(content), delimiter=sep)
+
+        # If skiprows specified (Picard has ~6 metadata lines)
+        for _ in range(skiprows):
+            next(reader, None)
+
+        rows = list(reader)
+        if not rows or len(rows) < 2:
+            raise ValueError(f"No valid data rows found in metrics file: {file_path}")
+
+        df = pd.DataFrame(rows[1:], columns=rows[0])
+        logger.info(f"✅ Parsed metrics file successfully — {len(df)} rows, {len(df.columns)} columns.")
+        return df
+
+    except Exception as e:
+        log_and_track_exception("MET004", f"Failed to parse metrics file '{file_path}'", e)
+        raise
+
+
+
+
 
 def find_sample_libraries_for_analysis_run(ar_name):
     """
@@ -71,13 +195,8 @@ def parse_dup_metrics(file_path):
     The table starts at row 7.
     """
     try:
-        # Check if file exists
-        if not file_path or not os.path.exists(file_path):
-            logger.error(f"Duplicate metrics file not found: {file_path}")
-            return {}
-
         # Read the file with pandas
-        df = pd.read_csv(file_path, sep='\t', skiprows=6, encoding='utf-8', engine='python')
+        df = read_s3_metrics_file(file_path)
 
         # Check if data is present
         if df.empty or len(df) < 2:
@@ -117,13 +236,8 @@ def parse_hs_metrics(file_path):
     The table starts at row 7.
     """
     try:
-        # Check if file exists
-        if not file_path or not os.path.exists(file_path):
-            logger.error(f"Hs metrics file not found: {file_path}")
-            return {}
-
         # Read the file with pandas
-        df = pd.read_csv(file_path, sep='\t', skiprows=6, encoding='utf-8', engine='python')
+        df = read_s3_metrics_file(file_path)
 
         # Check if data is present
         if df.empty or len(df) < 2:
@@ -168,14 +282,8 @@ def parse_insert_size_metrics(file_path):
     The table starts at row 7.
     """
     try:
-        # Check if file exists
-        if not file_path or not os.path.exists(file_path):
-            logger.error(f"Insert size metrics file not found: {file_path}")
-            return {}
-
         # Read the file with pandas
-        df = pd.read_csv(file_path, sep='\t', skiprows=6, encoding='utf-8', engine='python')
-
+        df = read_s3_metrics_file(file_path)
         # Check if data is present
         if df.empty or len(df) < 2:
             logger.warning(f"Empty or incomplete data in {file_path}")
@@ -221,254 +329,12 @@ def group_qc_files_by_sample(qc_files):
 
     return sample_libraries
 
-def save_qc_metrics(ar_name):
-    """
-    Process all samples associated with an analysis run and save the data to the database.
-    Creates and returns a summary report of the processing.
-    """
-    logger.info(f"Starting to process and save QC metrics for analysis run name: {ar_name}")
-
-    # Get the AnalysisRun object
-    try:
-        from analysisrun.models import AnalysisRun
-        analysis_run = AnalysisRun.objects.get(name=ar_name)
-        logger.info(f"Found analysis run: {ar_name}")
-    except AnalysisRun.DoesNotExist:
-        logger.error(f"Analysis run with name {ar_name} not found")
-        return {
-            'analysis_run_name': ar_name,
-            'status': 'error',
-            'message': f"Analysis run with name {ar_name} not found",
-            'summary_report': {}
-        }
-
-    # Find all sample libraries and their QC files
-    qc_files = find_sample_libraries_for_analysis_run(ar_name)
-
-    if not qc_files:
-        logger.warning(f"No QC files found for analysis run {ar_name}")
-        return {
-            'analysis_run': ar_name,
-            'status': 'warning',
-            'message': f"No QC files found for analysis run {ar_name}",
-            'summary_report': {}
-        }
-
-    # Group QC files by sample library
-    sample_libraries = group_qc_files_by_sample(qc_files)
-
-    # Process each sample library
-    logger.info(f"Processing {len(sample_libraries)} sample libraries for analysis run {ar_name}")
-
-    # Dictionary to store processing status for each sample
-    summary_report = {}
-
-    for sample_lib_name, details in sample_libraries.items():
-        try:
-            # Get QC files for this sample
-            sample_files = details['files']
-            sequencing_run_name = details['sequencing_run_name']
-
-            # Default status is False for all metrics
-            processing_status = {
-                'dup_metrics_processed': False,
-                'hs_metrics_processed': False,
-                'insert_metrics_processed': False,
-                'histogram_pdf_processed': False
-            }
-
-            # Get the SampleLib object
-            try:
-                from samplelib.models import SampleLib
-                sample_lib = SampleLib.objects.get(name=sample_lib_name)
-            except SampleLib.DoesNotExist:
-                logger.error(f"SampleLib {sample_lib_name} not found")
-                summary_report[sample_lib_name] = {
-                    'dup_metrics_processed': False,
-                    'hs_metrics_processed': False,
-                    'insert_metrics_processed': False,
-                    'histogram_pdf_processed': False,
-                    'error': f"SampleLib {sample_lib_name} not found"
-                }
-                continue
-            except Exception as e:
-                logger.error(f"Error retrieving SampleLib {sample_lib_name}: {str(e)}")
-                summary_report[sample_lib_name] = {
-                    'dup_metrics_processed': False,
-                    'hs_metrics_processed': False,
-                    'insert_metrics_processed': False,
-                    'histogram_pdf_processed': False,
-                    'error': str(e)
-                }
-                continue
-
-            # Get the SequencingRun object
-            try:
-                from sequencingrun.models import SequencingRun
-                sequencing_run = SequencingRun.objects.get(name=sequencing_run_name)
-            except SequencingRun.DoesNotExist:
-                logger.error(f"SequencingRun {sequencing_run_name} not found")
-                summary_report[sample_lib_name] = {
-                    'dup_metrics_processed': False,
-                    'hs_metrics_processed': False,
-                    'insert_metrics_processed': False,
-                    'histogram_pdf_processed': False,
-                    'error': f"SequencingRun {sequencing_run_name} not found"
-                }
-                continue
-            except Exception as e:
-                logger.error(f"Error retrieving SequencingRun {sequencing_run_name}: {str(e)}")
-                summary_report[sample_lib_name] = {
-                    'dup_metrics_processed': False,
-                    'hs_metrics_processed': False,
-                    'insert_metrics_processed': False,
-                    'histogram_pdf_processed': False,
-                    'error': str(e)
-                }
-                continue
-
-            # Get or create SampleQC object
-            try:
-                sample_qc = SampleQC.objects.get(sample_lib=sample_lib,analysis_run=analysis_run)
-                # Update the sequencing run if it was previously null
-                if sample_qc.sequencing_run is None and sequencing_run is not None:
-                    sample_qc.sequencing_run = sequencing_run
-            except SampleQC.DoesNotExist:
-                # Create a new SampleQC object
-                sample_qc = SampleQC(
-                    sample_lib=sample_lib,
-                    analysis_run=analysis_run,
-                    sequencing_run=sequencing_run
-                )
-
-            # Parse duplicate metrics if available
-            dup_metrics_path = sample_files.get('dup_metrics')
-            if dup_metrics_path and os.path.exists(dup_metrics_path):
-                dup_metrics = parse_dup_metrics(dup_metrics_path)
-                if dup_metrics:
-                    for field, value in dup_metrics.items():
-                        setattr(sample_qc, field, value)
-                    processing_status['dup_metrics_processed'] = True
-
-            # Parse Hs metrics if available
-            hs_metrics_path = sample_files.get('hs_metrics')
-            if hs_metrics_path and os.path.exists(hs_metrics_path):
-                hs_metrics = parse_hs_metrics(hs_metrics_path)
-                if hs_metrics:
-                    for field, value in hs_metrics.items():
-                        setattr(sample_qc, field, value)
-                    processing_status['hs_metrics_processed'] = True
-
-            # Parse insert size metrics if available
-            insert_metrics_path = sample_files.get('insert_metrics')
-            if insert_metrics_path and os.path.exists(insert_metrics_path):
-                insert_metrics = parse_insert_size_metrics(insert_metrics_path)
-                if insert_metrics:
-                    for field, value in insert_metrics.items():
-                        setattr(sample_qc, field, value)
-                    processing_status['insert_metrics_processed'] = True
-
-            # Save histogram PDF path if available
-            histogram_pdf_path = sample_files.get('histogram_pdf')
-            if histogram_pdf_path and os.path.exists(histogram_pdf_path):
-                sample_qc.insert_size_histogram = histogram_pdf_path
-                processing_status['histogram_pdf_processed'] = True
-
-            # Save the sample QC data
-            sample_qc.save()
-            logger.info(f"Successfully saved QC metrics for {sample_lib_name} in analysis run {ar_name}")
-
-            # Add processing status to summary report
-            summary_report[sample_lib_name] = processing_status
-
-        except Exception as e:
-            logger.error(f"Error processing {sample_lib_name} for analysis run {ar_name}: {str(e)}")
-            # Add failed processing status to summary report
-            summary_report[sample_lib_name] = {
-                'dup_metrics_processed': False,
-                'hs_metrics_processed': False,
-                'insert_metrics_processed': False,
-                'histogram_pdf_processed': False,
-                'error': str(e)
-            }
-
-    if not summary_report:
-        summary_status = 'error'
-        message = 'No sample libraries were processed'
-    else:
-        all_failed = all(not any(status.values()) for lib, status in summary_report.items() if isinstance(status, dict) and 'error' not in status)
-        if all_failed:
-            summary_status = 'error'
-            message = 'Failed to process any QC metrics'
-        else:
-            summary_status = 'success'
-            message = f'Processed QC metrics for {len(summary_report)} sample libraries'
-
-    return {
-        'analysis_run': ar_name,
-        'status': summary_status,
-        'message': message,
-        'summary_report': summary_report
-    }
-
-# def process_analysis_run(ar_name):
-#     """
-#     Process all samples associated with an analysis run.
-#     This is the main business flow that starts with an analysis run ID.
-#     """
-#     logger.info(f"Starting to process analysis run: {ar_name}")
-#
-#     # Find all sample libraries and their QC files in a single pass
-#     qc_files = find_sample_libraries_for_analysis_run(ar_name)
-#
-#     sample_libraries = group_qc_files_by_sample(qc_files)
-#
-#     # Process each sample library
-#     logger.info(f"Processing {len(sample_libraries)} sample libraries for analysis run {ar_name}")
-#     results = []
-#
-#     for sample_lib_name, details in sample_libraries.items():
-#         try:
-#             # Get QC files for this sample
-#             sample_files = details['files']
-#             sequencing_run_name = details['files']
-#
-#             # Parse each metrics file
-#             dup_metrics = parse_dup_metrics(sample_files['dup_metrics'])
-#             hs_metrics = parse_hs_metrics(sample_files['hs_metrics'])
-#             insert_metrics = parse_insert_size_metrics(sample_files['insert_metrics'])
-#
-#             # Combine all metrics into a tabular row
-#             combined_metrics = {
-#                 'sequencing_run_name': sequencing_run_name,
-#                 'sample_lib_name': sample_lib_name,
-#                 'histogram_pdf_path': sample_files.get('histogram_pdf'),
-#                 **dup_metrics,
-#                 **hs_metrics,
-#                 **insert_metrics
-#             }
-#
-#             # Add to results
-#             results.append(combined_metrics)
-#             logger.info(f"Successfully processed {sample_lib_name} for analysis run {ar_name}")
-#
-#         except Exception as e:
-#             logger.error(f"Error processing {sample_lib_name} for analysis run {ar_name}: {str(e)}")
-#
-#     return {
-#         'analysis_run': ar_name,
-#         'status': summary_status,
-#         'data': results,
-#         'summary_report': {}
-#     }
-
 def get_sample_lib(file_path):
     """
     Get the sample library from the file path.
     """
     file_name = file_path.split("/")[-1]
     sample_lib_name = file_name.split('.')[1]
-    print("@@@@@@@",file_path, sample_lib_name)
     try:
         sample_lib = SampleLib.objects.get(name=sample_lib_name)
         return sample_lib
@@ -489,44 +355,89 @@ def get_sequencing_run(file_path):
         logger.error(f"SequencingRun {sequencing_run_name} not found")
         return None
 
-def parse_dup_metrics_with_handler(analysis_run, file_path):
-    """
-    Parse duplicate metrics file and extract required values and save to the database.
-    """
-    try:
-        df = pd.read_csv(file_path, sep='\t', skiprows=6, encoding='utf-8', engine='python')
-        row = df.iloc[0]
-        # Extract metrics
-        metrics = {
-            'unpaired_reads_examined': row.get('UNPAIRED_READS_EXAMINED'),
-            'read_pairs_examined': row.get('READ_PAIRS_EXAMINED'),
-            'secondary_or_supplementary_rds': row.get('SECONDARY_OR_SUPPLEMENTARY_RDS'),
-            'unmapped_reads': row.get('UNMAPPED_READS'),
-            'unpaired_read_duplicates': row.get('UNPAIRED_READ_DUPLICATES'),
-            'read_pair_duplicates': row.get('READ_PAIR_DUPLICATES'),
-            'read_pair_optical_duplicates': row.get('READ_PAIR_OPTICAL_DUPLICATES'),
-            'percent_duplication': row.get('PERCENT_DUPLICATION'),
-            'estimated_library_size': row.get('ESTIMATED_LIBRARY_SIZE')
-        }
 
-        # Log any missing metrics
-        missing_metrics = [k for k, v in metrics.items() if v is None]
-        if missing_metrics:
-            logger.warning(f"Missing metrics in {file_path}: {', '.join(missing_metrics)}")
-        
-        sample_qc, created = SampleQC.objects.get_or_create(
-            sample_lib=get_sample_lib(file_path), 
-            analysis_run=analysis_run,
-            sequencing_run=get_sequencing_run(file_path),
-            type='dup_metrics'
-        )
-        
-        for field, value in metrics.items():
-            setattr(sample_qc, field, value)
-        
+def parse_metrics_files(analysis_run, file_path):
+    """
+    Incrementally process a single metrics file related to an AnalysisRun.
+    Detects the file type from its name and calls the corresponding parser.
+    Updates SampleQC record without overwriting existing metrics.
+    """
+
+    logger.info(f"📊 Processing single metric file for: {analysis_run.name}")
+    file_name = os.path.basename(file_path)
+    logger.debug(f"Detected metrics file: {file_name}")
+
+    # --- Identify sample and sequencing context ---
+    sample_lib = get_sample_lib(file_path)
+    sequencing_run = get_sequencing_run(file_path)
+    if not (sample_lib and sequencing_run):
+        msg = f"⚠️ Could not determine sample_lib or sequencing_run from {file_name}"
+        log_and_track_exception("MET000", msg)
+        logger.warning(msg)
+        return False, msg, {}
+
+    sample_qc, _ = SampleQC.objects.get_or_create(
+        sample_lib=sample_lib,
+        sequencing_run=sequencing_run,
+        analysis_run=analysis_run,
+    )
+
+    stats = {
+        "file_name": file_name,
+        "parsed": False,
+        "errors": [],
+    }
+
+    # try:
+        # --- Decide which parser to run ---
+    lower_name = file_name.lower()
+
+    if lower_name.endswith(".dup_metrics"):
+        metrics = parse_dup_metrics(file_path)
+        sample_qc.dup_metrics_path = file_path
+        stats["parsed"] = True
+        logger.info(f"🧩 Parsed duplication metrics for {sample_lib.name}")
+
+    elif "hs_metrics" in lower_name or lower_name.endswith("_hs_metrics.txt"):
+        metrics = parse_hs_metrics(file_path)
+        sample_qc.hs_metrics_path = file_path
+        stats["parsed"] = True
+        logger.info(f"🧬 Parsed hybrid-selection metrics for {sample_lib.name}")
+
+    elif lower_name.endswith(".insert_size_metrics.txt"):
+        metrics = parse_insert_size_metrics(file_path)
+        sample_qc.insert_metrics_path = file_path
+        stats["parsed"] = True
+        logger.info(f"📏 Parsed insert-size metrics for {sample_lib.name}")
+
+    elif lower_name.endswith("_insert_size_histogram.pdf"):
+        metrics = None
+        sample_qc.histogram_pdf_path = file_path
         sample_qc.save()
-        
-        return True, f"Processed duplicate metrics file {file_path}"
-    except Exception as e:
-        logger.error(f"Error parsing duplicate metrics file {file_path}: {str(e)}")
-        return False, f"Error parsing duplicate metrics file {file_path}: {str(e)}"
+        stats["parsed"] = True
+        logger.info(f"🖼️ Attached insert-size histogram PDF for {sample_lib.name}")
+
+    else:
+        msg = f"Unrecognized metrics file type: {file_name}"
+        logger.warning(msg)
+        log_and_track_exception("MET002", msg)
+        return False, msg, stats
+
+    # --- Save metrics incrementally without overwriting previous fields ---
+    if metrics:
+        print("$$$$$$$ metrics: ", metrics)
+        for key, val in metrics.items():
+            if hasattr(sample_qc, key):
+                setattr(sample_qc, key, val)
+        sample_qc.save()
+
+    msg = f"✅ Successfully processed metrics file: {file_name}"
+    logger.info(msg)
+    return True, msg, stats
+
+    # except Exception as e:
+    #     error_msg = f"❌ Error processing metrics file {file_name}: {e}"
+    #     log_and_track_exception("MET003", error_msg, e)
+    #     stats["errors"].append(str(e))
+    #     logger.error(error_msg)
+    #     return False, error_msg, stats

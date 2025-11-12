@@ -3,6 +3,7 @@ from projects.utils import get_user_projects
 from django.db.models import Q
 import json
 from datetime import datetime
+from analysisrun.storage import qc_upload_to
 
 class SampleQC(models.Model):
     FILE_TYPES = [
@@ -46,7 +47,7 @@ class SampleQC(models.Model):
     mode_insert_size = models.IntegerField(null=True, blank=True)
     mean_insert_size = models.FloatField(null=True, blank=True)
     # Path to histogram PDF
-    insert_size_histogram = models.CharField(max_length=200, null=True, blank=True)
+    insert_size_histogram = models.FileField(upload_to=qc_upload_to, max_length=500, blank=True, null=True, verbose_name="Insert Size Histogram")
 
     class Meta:
         # unique_together = ('sample_lib', 'analysis_run')

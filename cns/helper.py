@@ -8,7 +8,6 @@ import s3fs
 import logging
 from collections import defaultdict
 from django.conf import settings
-from analysisrun.models import AnalysisRun
 from cns.models import Cns
 from samplelib.models import SampleLib
 from sequencingrun.models import SequencingRun

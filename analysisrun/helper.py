@@ -21,10 +21,10 @@ class VariantImporter:
         self.folder_path = f"sequencingdata/ProcessedData/{self.analysis_run.sheet_name}"
 
         self.folder_types = {
-            # "metrics": {"path": "alignments/metrics", "endfix": [".dup_metrics"], "handler": AlignmentsFolderHandler},
-            "cnv": {"path": "cnv/output", "endfix": [".cns"],"handler": CnvFolderHandler},
-            "cnv_attachments": {"path": "cnv/output", "endfix": ["diagram.pdf", "scatter.png"], "handler": CnvAttachmentHandler},
-            "snv": {"path": "snv/output", "endfix": ["_multianno_Filtered.txt"], "handler": SnvFolderHandler},
+            "metrics": {"path": "alignments/metrics", "endfix": [".dup_metrics","_Hs_Metrics.txt",".insert_size_metrics.txt","insert_size_histogram.pdf",], "handler": AlignmentsFolderHandler},
+            # "cnv": {"path": "cnv/output", "endfix": [".cns"],"handler": CnvFolderHandler},
+            # "cnv_attachments": {"path": "cnv/output", "endfix": ["diagram.pdf", "scatter.png"], "handler": CnvAttachmentHandler},
+            # "snv": {"path": "snv/output", "endfix": ["_multianno_Filtered.txt"], "handler": SnvFolderHandler},
         }
 
         self.all_files = []
@@ -81,7 +81,6 @@ class VariantImporter:
 
         # --- Sort discovered files deterministically ---
         self.all_files = sorted(discovered_files, key=sort_key)
-
         # --- Cache and log ---
         self.total_files = len(self.all_files)
         self.processed_files = 0

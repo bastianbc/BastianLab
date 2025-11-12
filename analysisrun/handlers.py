@@ -4,7 +4,7 @@ from datetime import datetime
 from analysisrun.models import AnalysisRun, VariantFile
 from cns.models import Cns
 from cns.helper import parse_cns_file_with_handler, assign_cnv_attachments
-from qc.helper import parse_dup_metrics_with_handler
+from qc.helper import parse_metrics_files
 from variant.helper import variant_file_parser
 from core.analysis_run_import_logger import S3StorageLogHandler  # 👈 your S3/local hybrid handler
 from django.db import connection
@@ -99,7 +99,7 @@ class AlignmentsFolderHandler:
             defaults={"status": "processing"},
         )
 
-        success, message = parse_dup_metrics_with_handler(analysis_run, file_path)
+        success, message, stats = parse_metrics_files(analysis_run, file_path)
         variant_file.status = "completed" if success else "failed"
         variant_file.save()
 
