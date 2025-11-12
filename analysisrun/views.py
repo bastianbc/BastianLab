@@ -101,24 +101,24 @@ def initialize_import_variants(request, ar_name):
     """
     print("*"*50,"initialize_import_variants")
     # Use ar_name parameter, not hard-coded "AR5"
-    # GVariant.objects.filter(
-    #     variant_calls__analysis_run__name=ar_name
-    # ).delete()
-    # print(f"Deleted variants for {ar_name}")
-    # print(GVariant.objects.filter(
-    #     variant_calls__analysis_run__name=ar_name
-    # ))
-    #
+    GVariant.objects.filter(
+        variant_calls__analysis_run__name=ar_name
+    ).delete()
+    print(f"Deleted variants for {ar_name}")
+    print(GVariant.objects.filter(
+        variant_calls__analysis_run__name=ar_name
+    ))
+
     SampleQC.objects.filter(analysis_run__name=ar_name).delete()
     print(f"Deleted qc samples {ar_name}")
     print(SampleQC.objects.filter(
         analysis_run__name=ar_name
     ))
-    # Cns.objects.filter(analysis_run__name=ar_name).delete()
-    # print(f"Deleted cns samples {ar_name}")
-    # print(Cns.objects.filter(
-    #     analysis_run__name=ar_name
-    # ))
+    Cns.objects.filter(analysis_run__name=ar_name).delete()
+    print(f"Deleted cns samples {ar_name}")
+    print(Cns.objects.filter(
+        analysis_run__name=ar_name
+    ))
 
     AnalysisRun.objects.filter(name=ar_name).update(status="pending")
     VariantFile.objects.filter(analysis_run__name=ar_name).delete()

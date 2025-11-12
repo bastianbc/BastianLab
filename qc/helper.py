@@ -1,7 +1,6 @@
 import os
 import pandas as pd
 import logging
-from datetime import datetime
 import s3fs
 import io
 import csv
@@ -45,8 +44,6 @@ def log_and_track_exception(code, message, exception_obj=None, **kwargs):
         logger.error(log_msg, exc_info=True, extra=kwargs)
     else:
         logger.error(log_msg, extra=kwargs)
-
-
 
 
 def read_s3_metrics_file(file_path, sep='\t', skiprows=6):
@@ -138,56 +135,6 @@ def read_s3_metrics_file(file_path, sep='\t', skiprows=6):
         log_and_track_exception("MET004", f"Failed to parse metrics file '{file_path}'", e)
         raise
 
-
-
-
-
-def find_sample_libraries_for_analysis_run(ar_name):
-    """
-    Find all sample libraries associated with a specific analysis run
-    by traversing through the directory structure.
-    """
-    logger.info(f"Searching for sample libraries and QC files for sequencing run: {ar_name}")
-
-    # List to store sample QC file information
-    sample_qc_files = []
-
-    # Walk through all directories starting from the base directory
-    for root, _, files in os.walk(BASE_DIR):
-        # Filter QC files by extensions
-        qc_files_in_dir = [f for f in files if any(f.endswith(ext) for ext in QC_FILE_EXTENSIONS.values())]
-
-        # If we found QC files, process them
-        for filename in qc_files_in_dir:
-            parts = filename.split('.')
-            # Check if filename has enough parts and matches the pattern
-            if len(parts) >= 3:
-                # In format "BCB002.NMLP-001.Tumor.dup_metrics":
-                # parts[0] is sequencing run (BCB002)
-                # parts[1] is sample library (NMLP-001)
-                sequencing_run_name = parts[0]
-                sample_lib_name = parts[1]
-
-                # Determine file type
-                file_path = os.path.join(root, filename)
-                file_type = None
-
-                for qc_type, extension in QC_FILE_EXTENSIONS.items():
-                    if filename.endswith(extension):
-                        file_type = qc_type
-                        break
-
-                if file_type:
-                    sample_qc_files.append({
-                        'sequencing_run_name': sequencing_run_name,
-                        'sample_lib_name': sample_lib_name,
-                        'file_type': file_type,
-                        'file_path': file_path,
-                    })
-
-                    logger.info(f"Found {file_type} file for sequencing run {sequencing_run_name}, sample {sample_lib_name}: {filename}")
-
-    return sample_qc_files
 
 def parse_dup_metrics(file_path):
     """
@@ -388,56 +335,56 @@ def parse_metrics_files(analysis_run, file_path):
         "errors": [],
     }
 
-    # try:
+    try:
         # --- Decide which parser to run ---
-    lower_name = file_name.lower()
+        lower_name = file_name.lower()
 
-    if lower_name.endswith(".dup_metrics"):
-        metrics = parse_dup_metrics(file_path)
-        sample_qc.dup_metrics_path = file_path
-        stats["parsed"] = True
-        logger.info(f"🧩 Parsed duplication metrics for {sample_lib.name}")
+        if lower_name.endswith(".dup_metrics"):
+            metrics = parse_dup_metrics(file_path)
+            sample_qc.dup_metrics_path = file_path
+            stats["parsed"] = True
+            logger.info(f"🧩 Parsed duplication metrics for {sample_lib.name}")
 
-    elif "hs_metrics" in lower_name or lower_name.endswith("_hs_metrics.txt"):
-        metrics = parse_hs_metrics(file_path)
-        sample_qc.hs_metrics_path = file_path
-        stats["parsed"] = True
-        logger.info(f"🧬 Parsed hybrid-selection metrics for {sample_lib.name}")
+        elif "hs_metrics" in lower_name or lower_name.endswith("_hs_metrics.txt"):
+            metrics = parse_hs_metrics(file_path)
+            sample_qc.hs_metrics_path = file_path
+            stats["parsed"] = True
+            logger.info(f"🧬 Parsed hybrid-selection metrics for {sample_lib.name}")
 
-    elif lower_name.endswith(".insert_size_metrics.txt"):
-        metrics = parse_insert_size_metrics(file_path)
-        sample_qc.insert_metrics_path = file_path
-        stats["parsed"] = True
-        logger.info(f"📏 Parsed insert-size metrics for {sample_lib.name}")
+        elif lower_name.endswith(".insert_size_metrics.txt"):
+            metrics = parse_insert_size_metrics(file_path)
+            sample_qc.insert_metrics_path = file_path
+            stats["parsed"] = True
+            logger.info(f"📏 Parsed insert-size metrics for {sample_lib.name}")
 
-    elif lower_name.endswith("_insert_size_histogram.pdf"):
-        metrics = None
-        sample_qc.histogram_pdf_path = file_path
-        sample_qc.save()
-        stats["parsed"] = True
-        logger.info(f"🖼️ Attached insert-size histogram PDF for {sample_lib.name}")
+        elif lower_name.endswith("_insert_size_histogram.pdf"):
+            metrics = None
+            sample_qc.insert_size_histogram = file_path
+            sample_qc.save()
+            stats["parsed"] = True
+            logger.info(f"🖼️ Attached insert-size histogram PDF for {sample_lib.name}")
 
-    else:
-        msg = f"Unrecognized metrics file type: {file_name}"
-        logger.warning(msg)
-        log_and_track_exception("MET002", msg)
-        return False, msg, stats
+        else:
+            msg = f"Unrecognized metrics file type: {file_name}"
+            logger.warning(msg)
+            log_and_track_exception("MET002", msg)
+            return False, msg, stats
 
-    # --- Save metrics incrementally without overwriting previous fields ---
-    if metrics:
-        print("$$$$$$$ metrics: ", metrics)
-        for key, val in metrics.items():
-            if hasattr(sample_qc, key):
-                setattr(sample_qc, key, val)
-        sample_qc.save()
+        # --- Save metrics incrementally without overwriting previous fields ---
+        if metrics:
+            print("$$$$$$$ metrics: ", metrics)
+            for key, val in metrics.items():
+                if hasattr(sample_qc, key):
+                    setattr(sample_qc, key, val)
+            sample_qc.save()
 
-    msg = f"✅ Successfully processed metrics file: {file_name}"
-    logger.info(msg)
-    return True, msg, stats
+        msg = f"✅ Successfully processed metrics file: {file_name}"
+        logger.info(msg)
+        return True, msg, stats
 
-    # except Exception as e:
-    #     error_msg = f"❌ Error processing metrics file {file_name}: {e}"
-    #     log_and_track_exception("MET003", error_msg, e)
-    #     stats["errors"].append(str(e))
-    #     logger.error(error_msg)
-    #     return False, error_msg, stats
+    except Exception as e:
+        error_msg = f"❌ Error processing metrics file {file_name}: {e}"
+        log_and_track_exception("MET003", error_msg, e)
+        stats["errors"].append(str(e))
+        logger.error(error_msg)
+        return False, error_msg, stats

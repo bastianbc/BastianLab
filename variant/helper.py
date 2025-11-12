@@ -12,7 +12,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from sequencingrun.models import SequencingRun
 from .models import VariantCall, GVariant, CVariant, PVariant
 from gene.models import Gene
-from analysisrun.models import AnalysisRun, VariantFile
+from analysisrun.models import AnalysisRun
 from samplelib.models import SampleLib
 from urllib.parse import urlparse
 from collections import defaultdict
