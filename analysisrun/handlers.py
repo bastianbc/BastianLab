@@ -3,7 +3,7 @@ import logging
 from datetime import datetime
 from analysisrun.models import AnalysisRun, VariantFile
 from cns.models import Cns
-from cns.helper import parse_cns_file_with_handler
+from cns.helper import parse_cns_file_with_handler, assign_cnv_attachments
 from qc.helper import parse_dup_metrics_with_handler
 from variant.helper import variant_file_parser
 from core.analysis_run_import_logger import S3StorageLogHandler  # 👈 your S3/local hybrid handler
@@ -91,7 +91,7 @@ class AlignmentsFolderHandler:
             name=os.path.basename(file_path),
             directory=os.path.dirname(file_path),
             analysis_run=analysis_run,
-            type="variant",
+            type="qc",
             defaults={"status": "processing"},
         )
 
@@ -109,22 +109,50 @@ class CnvFolderHandler:
         self.logger = logging.getLogger("cnv_parser")
 
     def process(self, analysis_run, file_path):
+        print("^"*50, "process")
         self.logger.info(build_file_header(file_path, "cnv"))
 
         variant_file, _ = VariantFile.objects.get_or_create(
             name=os.path.basename(file_path),
             directory=os.path.dirname(file_path),
             analysis_run=analysis_run,
-            type="variant",
+            type="cns",
             defaults={"status": "processing"},
         )
+        print("1"*50, "variant file")
 
-        success, message = parse_cns_file_with_handler(analysis_run, variant_file)
+        success, message = parse_cns_file_with_handler(
+            analysis_run=analysis_run,
+            file_path=file_path,
+            variant_file=variant_file,)
         variant_file.status = "completed" if success else "failed"
         variant_file.save()
 
         status_emoji = "✅" if success else "❌"
         self.logger.info(f"{status_emoji} CNV file parsed: {variant_file.name} → {variant_file.status}")
+        return success, message
+
+
+class CnvAttachmentHandler:
+    def __init__(self):
+        self.logger = logging.getLogger("cnv_parser")
+
+    def process(self, analysis_run, file_path):
+        print("^"*50, "CnvAttachmentHandler")
+        self.logger.info(build_file_header(file_path, "cnv-attachments"))
+
+
+        print("2"*50, "CnvAttachmentHandler")
+
+        success, message, stats = assign_cnv_attachments(
+            analysis_run=analysis_run,
+            file_path=file_path
+        )
+        print("3"*50, "CnvAttachmentHandler")
+
+
+
+
         return success, message
 
 

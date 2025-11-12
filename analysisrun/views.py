@@ -18,8 +18,9 @@ from .handlers import *
 from .helper import VariantImporter
 from variant.models import GVariant
 from core.analysis_run_import_logger import S3StorageLogHandler
+from qc.models import SampleQC
 
-# logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 @permission_required("sequencingrun.view_sequencingrun", raise_exception=True)
@@ -104,15 +105,25 @@ def initialize_import_variants(request, ar_name):
     Does NOT start background import automatically.
     User must click 'Start Import' to begin.
     """
-    print("*"*200,"initialize_import_variants")
+    print("*"*50,"initialize_import_variants")
     # Use ar_name parameter, not hard-coded "AR5"
-    GVariant.objects.filter(
-        variant_calls__analysis_run__name=ar_name
-    ).delete()
-
-    print(f"Deleted variants for {ar_name}")
-    print(GVariant.objects.filter(
-        variant_calls__analysis_run__name=ar_name
+    # GVariant.objects.filter(
+    #     variant_calls__analysis_run__name=ar_name
+    # ).delete()
+    # print(f"Deleted variants for {ar_name}")
+    # print(GVariant.objects.filter(
+    #     variant_calls__analysis_run__name=ar_name
+    # ))
+    #
+    # SampleQC.objects.filter(analysis_run__name=ar_name).delete()
+    # print(f"Deleted qc samples {ar_name}")
+    # print(SampleQC.objects.filter(
+    #     analysis_run__name=ar_name
+    # ))
+    Cns.objects.filter(analysis_run__name=ar_name).delete()
+    print(f"Deleted cns samples {ar_name}")
+    print(Cns.objects.filter(
+        analysis_run__name=ar_name
     ))
 
     AnalysisRun.objects.filter(name=ar_name).update(status="pending")
@@ -133,7 +144,7 @@ def initialize_import_variants(request, ar_name):
 
 
 def start_import_variants(request, ar_name):
-    print("-" * 200, "start_import_variants")
+    print("-" * 50, "start_import_variants")
     # Attach handler to root logger to capture all logs in this request
     root_logger = logging.getLogger()
     analysis_run = AnalysisRun.objects.get(name=ar_name)

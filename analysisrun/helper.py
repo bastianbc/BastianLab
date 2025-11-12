@@ -6,7 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 from django.conf import settings
 from django.core.cache import cache
 from analysisrun.models import AnalysisRun, VariantFile
-from analysisrun.handlers import AlignmentsFolderHandler, CnvFolderHandler, SnvFolderHandler
+from analysisrun.handlers import AlignmentsFolderHandler, CnvFolderHandler, SnvFolderHandler, CnvAttachmentHandler
 
 logger = logging.getLogger("file")
 print("!!!!!!!!!!!!!! os.cpu_count()", os.cpu_count())
@@ -22,8 +22,9 @@ class VariantImporter:
 
         self.folder_types = {
             # "metrics": {"path": "alignments/metrics", "endfix": [".dup_metrics"], "handler": AlignmentsFolderHandler},
-            # "cnv": {"path": "cnv/output", "endfix": [".cns", ".diagram.pdf", ".scatter.png"],"handler": CnvFolderHandler},
-            "snv": {"path": "snv/output", "endfix": ["_multianno_Filtered.txt"], "handler": SnvFolderHandler},
+            "cnv": {"path": "cnv/output", "endfix": [".cns"],"handler": CnvFolderHandler},
+            "cnv_attachments": {"path": "cnv/output", "endfix": ["diagram.pdf", "scatter.png"], "handler": CnvAttachmentHandler},
+            # "snv": {"path": "snv/output", "endfix": ["_multianno_Filtered.txt"], "handler": SnvFolderHandler},
         }
 
         self.all_files = []
@@ -35,10 +36,20 @@ class VariantImporter:
     # File Discovery
     # ----------------------------------------------------------------------
     def discover_files_s3(self):
-        """Scan S3 bucket and find variant files to process."""
+        """
+        Scan S3 bucket and find variant files to process.
+        Ensures files are always ordered:
+        1) _multianno_Filtered.txt
+        2) .dup_metrics
+        3) .cns
+        4) .diagram.pdf
+        5) .scatter.png
+        """
         self.all_files.clear()
         paginator = self.s3.get_paginator("list_objects_v2")
+        discovered_files = []
 
+        # --- Discover all matching files from S3 ---
         for page in paginator.paginate(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Prefix=self.folder_path):
             for obj in page.get("Contents", []):
                 key = obj["Key"]
@@ -49,13 +60,36 @@ class VariantImporter:
                             f"https://s3.{settings.AWS_S3_REGION_NAME}.amazonaws.com/"
                             f"{settings.AWS_STORAGE_BUCKET_NAME}/{key}"
                         )
-                        self.all_files.append((type_name, full_s3_path))
+                        discovered_files.append((type_name, full_s3_path))
 
+        # --- Define strict priority by suffix ---
+        priority_order = [
+            "_multianno_Filtered.txt",  # SNV
+            ".dup_metrics",  # Metrics
+            ".cns",  # CNV core file
+            ".diagram.pdf",  # CNV diagram
+            ".scatter.png",  # CNV scatter
+        ]
+
+        def sort_key(item):
+            _, file_path = item
+            file_name = file_path.lower()
+            for idx, suffix in enumerate(priority_order):
+                if file_name.endswith(suffix.lower()):
+                    return (idx, file_name)
+            return (len(priority_order), file_name)  # fallback to last
+
+        # --- Sort discovered files deterministically ---
+        self.all_files = sorted(discovered_files, key=sort_key)
+
+        # --- Cache and log ---
         self.total_files = len(self.all_files)
         self.processed_files = 0
-        # ✅ Immediately write discovered total to cache
         self._set_status("processing", 0)
-        logger.info(f"📦 Discovered {self.total_files} total files for {self.ar_name}")
+        logger.info(f"📦 Discovered {self.total_files} total files for {self.ar_name} in strict order")
+
+        for i, (_, path) in enumerate(self.all_files, start=1):
+            logger.info(f"   {i:02d}. {os.path.basename(path)}")
 
         return self.all_files
 
@@ -115,26 +149,28 @@ class VariantImporter:
     # Internal import runner
     # ----------------------------------------------------------------------
     def _run_import_job(self):
-        """Sequentially process discovered files."""
-        try:
+            """Sequentially process discovered files."""
+        # try:
             print(f"Starting variant import for {self.ar_name} ({self.total_files} files)")
             for idx, (type_name, file_path) in enumerate(self.all_files, start=1):
-                try:
-                    print(f"Processing file {idx}/{self.total_files}: {file_path}")
-                    handler_class = self.folder_types[type_name]["handler"]
-                    success, message = handler_class().process(self.analysis_run, file_path)
-                    if success:
-                        self.processed_files += 1
-                    else:
-                        self._set_status("error", self._update_progress(), error=message)
-                        logger.error(f"Handler failed for {file_path}: {message}")
-                        break
-                except Exception as e:
-                    logger.error(f"Error processing {file_path}: {e}", exc_info=True)
-                    self._set_status("error", self._update_progress(), error=str(e))
-                    self.analysis_run.status = "failed"
-                    self.analysis_run.save()
-                    return {"status": "error", "error": str(e)}
+
+                # try:
+                print(f"Processing file {idx}/{self.total_files}: {file_path}, type: {type_name}")
+                handler_class = self.folder_types[type_name]["handler"]
+                print(handler_class)
+                success, message = handler_class().process(self.analysis_run, file_path)
+                if success:
+                    self.processed_files += 1
+                else:
+                    self._set_status("error", self._update_progress(), error=message)
+                    logger.error(f"Handler failed for {file_path}: {message}")
+                    break
+                # except Exception as e:
+                #     logger.error(f"Error processing {file_path}: {e}", exc_info=True)
+                #     self._set_status("error", self._update_progress(), error=str(e))
+                #     self.analysis_run.status = "failed"
+                #     self.analysis_run.save()
+                #     return {"status": "error", "error": str(e)}
 
                 # Update progress every iteration
                 self._update_progress()
@@ -151,12 +187,12 @@ class VariantImporter:
                 "progress": 100,
             }
 
-        except Exception as e:
-            logger.critical(f"Fatal error in variant import for {self.ar_name}: {e}", exc_info=True)
-            self._set_status("error", self._update_progress(), error=str(e))
-            self.analysis_run.status = "failed"
-            self.analysis_run.save()
-            return {"status": "error", "error": str(e)}
+        # except Exception as e:
+        #     logger.critical(f"Fatal error in variant import for {self.ar_name}: {e}", exc_info=True)
+        #     self._set_status("error", self._update_progress(), error=str(e))
+        #     self.analysis_run.status = "failed"
+        #     self.analysis_run.save()
+        #     return {"status": "error", "error": str(e)}
 
     # ----------------------------------------------------------------------
     # Utilities
