@@ -2,7 +2,7 @@ from django.db import models
 from projects.utils import get_user_projects
 from django.db.models import Q
 import json
-from analysisrun.storage import CustomFileSystemStorage, cns_upload_to
+from analysisrun.storage import cns_upload_to
 
 
 class Cns(models.Model):

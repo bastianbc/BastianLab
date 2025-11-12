@@ -9,7 +9,7 @@ from analysisrun.models import AnalysisRun, VariantFile
 from analysisrun.handlers import AlignmentsFolderHandler, CnvFolderHandler, SnvFolderHandler, CnvAttachmentHandler
 
 logger = logging.getLogger("file")
-print("!!!!!!!!!!!!!! os.cpu_count()", os.cpu_count())
+
 class VariantImporter:
     """
     Variant file importer with progress and error tracking (synchronous version).
@@ -24,7 +24,7 @@ class VariantImporter:
             # "metrics": {"path": "alignments/metrics", "endfix": [".dup_metrics"], "handler": AlignmentsFolderHandler},
             "cnv": {"path": "cnv/output", "endfix": [".cns"],"handler": CnvFolderHandler},
             "cnv_attachments": {"path": "cnv/output", "endfix": ["diagram.pdf", "scatter.png"], "handler": CnvAttachmentHandler},
-            # "snv": {"path": "snv/output", "endfix": ["_multianno_Filtered.txt"], "handler": SnvFolderHandler},
+            "snv": {"path": "snv/output", "endfix": ["_multianno_Filtered.txt"], "handler": SnvFolderHandler},
         }
 
         self.all_files = []
@@ -86,10 +86,6 @@ class VariantImporter:
         self.total_files = len(self.all_files)
         self.processed_files = 0
         self._set_status("processing", 0)
-        logger.info(f"📦 Discovered {self.total_files} total files for {self.ar_name} in strict order")
-
-        for i, (_, path) in enumerate(self.all_files, start=1):
-            logger.info(f"   {i:02d}. {os.path.basename(path)}")
 
         return self.all_files
 

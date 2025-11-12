@@ -138,7 +138,7 @@ function startImport() {
 
     // Start polling immediately (before backend finishes)
     console.log("⏱ Launching progress polling before fetch finishes...");
-    // startProgressPolling();
+    startProgressPolling();
 
     // Fire backend import
     fetch(`/analysisrun/start_import_variants/${arName}/`)

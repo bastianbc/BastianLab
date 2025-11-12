@@ -79,6 +79,10 @@ def build_file_footer(analysis_run_name, file_name=None, stats=None):
 
     return footer
 
+from datetime import datetime
+
+
+
 
 class AlignmentsFolderHandler:
     def __init__(self):
@@ -109,28 +113,110 @@ class CnvFolderHandler:
         self.logger = logging.getLogger("cnv_parser")
 
     def process(self, analysis_run, file_path):
-        print("^"*50, "process")
+        """Processes and parses CNV (.cns) files and updates VariantFile status."""
         self.logger.info(build_file_header(file_path, "cnv"))
+        stats = {}
+        try:
+            file_name = os.path.basename(file_path)
+            directory = os.path.dirname(file_path)
 
-        variant_file, _ = VariantFile.objects.get_or_create(
-            name=os.path.basename(file_path),
-            directory=os.path.dirname(file_path),
-            analysis_run=analysis_run,
-            type="cns",
-            defaults={"status": "processing"},
+            # --- Create or get VariantFile record ---
+            try:
+                variant_file, _ = VariantFile.objects.get_or_create(
+                    name=file_name,
+                    directory=directory,
+                    analysis_run=analysis_run,
+                    type="cns",
+                    defaults={"status": "processing"},
+                )
+            except Exception as e:
+                return False, f"VariantFile creation failed for {file_name}"
+
+            # --- Parse the CNS file ---
+            try:
+                success, message, stats = parse_cns_file_with_handler(
+                    analysis_run=analysis_run,
+                    file_path=file_path,
+                    variant_file=variant_file,
+                )
+            except Exception as e:
+                variant_file.status = "failed"
+                variant_file.save()
+                return False, f"CNV parsing failed: {str(e)}"
+
+            # --- Update VariantFile status ---
+            variant_file.status = "completed" if success else "failed"
+            variant_file.save()
+
+
+            # --- Logging summary ---
+            status_emoji = "✅" if success else "❌"
+            summary_msg = f"{status_emoji} CNV file parsed: {variant_file.name} → {variant_file.status}"
+            self.logger.info(summary_msg)
+
+            # --- Custom footer for CNS ---
+            footer_msg = self.build_cns_footer(
+                analysis_run=analysis_run,
+                file_name=os.path.basename(file_path),
+                stats=stats,
+                success=success,
+                message=message
+            )
+            self.logger.info(footer_msg)
+
+            return success, message
+
+        except Exception as e:
+            error_msg = f"Critical error in CNV Folder Handler for file {file_path}: {str(e)}"
+            self.logger.error(error_msg)
+            return False, error_msg
+
+    @staticmethod
+    def build_cns_footer(analysis_run, file_name=None, stats=None, success=True, message=None):
+        """
+        Builds a formatted CNV (CNS) parsing summary footer for logs.
+        Counts Cns objects related to the given AnalysisRun and displays summary stats.
+        """
+        line = "=" * 70
+        sub_line = "-" * 70
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        # Count CNS objects linked to this AnalysisRun
+        total_cns = Cns.objects.filter(analysis_run=analysis_run).count()
+
+        footer = (
+            f"\n{line}\n"
+            f"🏁 CNS FILE PARSING SUMMARY — {file_name or 'N/A'}\n"
+            f"{sub_line}\n"
+            f"📊 CNS Records: {total_cns:>10}\n"
         )
-        print("1"*50, "variant file")
 
-        success, message = parse_cns_file_with_handler(
-            analysis_run=analysis_run,
-            file_path=file_path,
-            variant_file=variant_file,)
-        variant_file.status = "completed" if success else "failed"
-        variant_file.save()
+        # Optional parser stats (like total rows, success/fail)
+        if stats:
+            footer += (
+                f"{sub_line}\n"
+                f"📊 FILE STATS\n"
+                f"{sub_line}\n"
+                f"   • Total Rows : {stats.get('total_rows', 'N/A')}\n"
+                f"   • Successful : {stats.get('successful', 'N/A')}\n"
+                f"   • Failed     : {stats.get('failed', 'N/A')}\n"
+            )
+
+        # Optional message
+        if message:
+            footer += (
+                f"{sub_line}\n"
+                f"💬 Message: {message}\n"
+            )
 
         status_emoji = "✅" if success else "❌"
-        self.logger.info(f"{status_emoji} CNV file parsed: {variant_file.name} → {variant_file.status}")
-        return success, message
+        footer += (
+            f"{sub_line}\n"
+            f"{status_emoji} Completed at: {timestamp}\n"
+            f"{line}\n"
+        )
+
+        return footer
 
 
 class CnvAttachmentHandler:
@@ -138,22 +224,54 @@ class CnvAttachmentHandler:
         self.logger = logging.getLogger("cnv_parser")
 
     def process(self, analysis_run, file_path):
-        print("^"*50, "CnvAttachmentHandler")
+        """Assigns CNV attachment files (.diagram.pdf / .scatter.png) to CNS records."""
         self.logger.info(build_file_header(file_path, "cnv-attachments"))
+        stats = {}
 
+        try:
+            success, message, stats = assign_cnv_attachments(
+                analysis_run=analysis_run,
+                file_path=file_path
+            )
 
-        print("2"*50, "CnvAttachmentHandler")
+            status_emoji = "✅" if success else "❌"
+            summary_msg = (
+                f"{status_emoji} CNV attachment assignment completed: "
+                f"{os.path.basename(file_path)} | Updated={stats.get('updated_records', 0)}"
+            )
+            self.logger.info(summary_msg)
 
-        success, message, stats = assign_cnv_attachments(
-            analysis_run=analysis_run,
-            file_path=file_path
+            footer_msg = self.build_cns_attachment_footer(
+                analysis_run_name=analysis_run.name,
+                file_name=os.path.basename(file_path),
+                success=success,
+                message=message,
+                stats=stats,
+            )
+            self.logger.info(footer_msg)
+
+            return success, message
+
+        except Exception as e:
+            error_msg = f"Critical error in CNV Attachment Handler for file {file_path}: {str(e)}"
+            self.logger.error(error_msg)
+            return False, error_msg
+
+    @staticmethod
+    def build_cns_attachment_footer(analysis_run_name, file_name, success, message, stats):
+        """Custom footer for CNV attachment logs."""
+        status_emoji = "✅" if success else "❌"
+        divider = "-" * 70
+        return (
+            f"\n{divider}\n"
+            f"📎 CNS Attachment File: {file_name}\n"
+            f"🧩 Analysis Run: {analysis_run_name}\n"
+            f"{status_emoji} Status: {'Success' if success else 'Failed'}\n"
+            f"📊 Updated Records: {stats.get('updated_records', 'N/A')} / Total: {stats.get('total_records', 'N/A')}\n"
+            f"💬 Message: {message}\n"
+            f"{divider}\n"
         )
-        print("3"*50, "CnvAttachmentHandler")
 
-
-
-
-        return success, message
 
 
 class SnvFolderHandler:
