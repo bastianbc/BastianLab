@@ -203,7 +203,7 @@ def check_import_progress(request, ar_name):
         if total_files > 0:
             progress = int((processed_files / total_files) * 100)
         else:
-            progress = 0
+            progress = 5
 
         # ✅ Save computed progress back for smoother frontend sync
         cache_data["progress"] = progress
