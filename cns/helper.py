@@ -15,6 +15,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib import pylab
 from urllib.parse import urlparse
+from django.db import transaction
 
 logger = logging.getLogger("file")
 
@@ -220,11 +221,14 @@ def get_or_none(model_class, **kwargs):
         log_and_track_exception("CNS011", f"get_or_none failed for {model_class.__name__} with {kwargs}", e)
         return None
 
+
+@transaction.atomic
 def parse_cns_file_with_handler(file_path, analysis_run, variant_file):
     """
     Parse and register CNS files (.cns, .call.cns, .bintest.cns).
     Creates or updates Cns objects based on genomic coordinates.
-    Fills missing columns if records already exist.
+    Wrapped in a database transaction for atomic integrity.
+
     Returns:
         (success: bool, message: str, stats: dict)
     """
@@ -252,59 +256,63 @@ def parse_cns_file_with_handler(file_path, analysis_run, variant_file):
 
         df.columns = [c.strip().lower() for c in df.columns]
         stats["total_rows"] = len(df)
+        optional_fields = ["ci_hi", "ci_lo", "cn", "p_bintest", "p_ttest"]
 
         created_objects_count = 0
         updated_objects_count = 0
-        optional_fields = ["ci_hi", "ci_lo", "cn", "p_bintest", "p_ttest"]
 
-        for i, row in df.iterrows():
-            try:
-                chromosome = row.get("chromosome")
-                start = int(row.get("start", 0))
-                end = int(row.get("end", 0))
-                gene = get_string_value(row.get("gene", ""))
-                log2 = get_float_value(row.get("log2", 0.0))
-                depth = get_float_value(row.get("depth", 0.0))
-                weight = get_string_value(row.get("weight", ""))
-                probes = get_float_value(row.get("probes", 0.0))
+        # --- Begin atomic transaction ---
+        with transaction.atomic():
+            for i, row in df.iterrows():
+                try:
+                    chromosome = row.get("chromosome")
+                    start = int(row.get("start", 0))
+                    end = int(row.get("end", 0))
+                    gene = get_string_value(row.get("gene", ""))
+                    log2 = get_float_value(row.get("log2", 0.0))
+                    depth = get_float_value(row.get("depth", 0.0))
+                    weight = get_string_value(row.get("weight", ""))
+                    probes = get_float_value(row.get("probes", 0.0))
 
-                cns_obj, created = Cns.objects.get_or_create(
-                    sample_lib=sample_lib,
-                    sequencing_run=sequencing_run,
-                    variant_file=variant_file,
-                    analysis_run=analysis_run,
-                    chromosome=chromosome,
-                    start=start,
-                    end=end,
-                    gene=gene,
-                    defaults={
-                        "depth": depth,
-                        "log2": log2,
-                        "weight": weight,
-                        "probes": probes,
-                    },
-                )
+                    cns_obj, created = Cns.objects.get_or_create(
+                        sample_lib=sample_lib,
+                        sequencing_run=sequencing_run,
+                        variant_file=variant_file,
+                        analysis_run=analysis_run,
+                        chromosome=chromosome,
+                        start=start,
+                        end=end,
+                        gene=gene,
+                        defaults={
+                            "depth": depth,
+                            "log2": log2,
+                            "weight": weight,
+                            "probes": probes,
+                        },
+                    )
 
-                if created:
-                    created_objects_count += 1
-                    stats["successful"] += 1
-                else:
-                    updated = False
-                    update_fields = []
-                    for field in optional_fields:
-                        if field in row and getattr(cns_obj, field) in (None, 0.0, ""):
-                            setattr(cns_obj, field, get_float_value(row[field]))
-                            update_fields.append(field)
-                            updated = True
-                    if updated:
-                        cns_obj.save(update_fields=update_fields)
-                        updated_objects_count += 1
+                    if created:
+                        created_objects_count += 1
                         stats["successful"] += 1
+                    else:
+                        update_fields = []
+                        for field in optional_fields:
+                            if field in row and getattr(cns_obj, field) in (None, 0.0, ""):
+                                setattr(cns_obj, field, get_float_value(row[field]))
+                                update_fields.append(field)
+                        if update_fields:
+                            cns_obj.save(update_fields=update_fields)
+                            updated_objects_count += 1
+                            stats["successful"] += 1
 
-            except Exception as row_err:
-                log_and_track_exception("CNS007", f"Row processing failed at index={i}", row_err)
-                stats["failed"] += 1
-                stats["errors"].append(str(row_err))
+                except Exception as row_err:
+                    # Rollback only the failed row (continue processing next)
+                    log_and_track_exception("CNS007", f"Row processing failed at index={i}", row_err)
+                    stats["failed"] += 1
+                    stats["errors"].append(f"Row {i}: {row_err}")
+                    continue
+
+        # --- End transaction ---
 
         stats["created"] = created_objects_count
         stats["updated"] = updated_objects_count
@@ -318,6 +326,7 @@ def parse_cns_file_with_handler(file_path, analysis_run, variant_file):
         return True, msg, stats
 
     except Exception as e:
+        # If any top-level issue happens, rollback entire batch
         error_msg = f"Critical error in parse_cns_file_with_handler for '{file_path}': {str(e)}"
         log_and_track_exception("CNS012", error_msg, e)
         stats["failed"] = stats.get("total_rows", 0)

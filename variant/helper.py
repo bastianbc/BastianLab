@@ -115,7 +115,6 @@ def check_file(file_path):
         log_and_track_exception("CF004", f"Invalid file format for {file_path}. Expected .txt file")
         return False, "Invalid file format. Expected .txt file"
 
-    logger.info(f"Local file check passed for {file_path}")
     return True, ""
 
 def get_caller(filename):
@@ -305,7 +304,6 @@ def get_analysis_run(name):
     logger.debug(f"Getting analysis run: {name}")
     try:
         analysis_run = AnalysisRun.objects.get(name=name)
-        logger.info(f"Found analysis run: {analysis_run}")
         return analysis_run
     except ObjectDoesNotExist:
         log_and_track_exception("GAR001", f"Analysis run not found: {name}")
@@ -347,7 +345,6 @@ def get_or_create_g_variant(hg, chrom, start, end, ref, alt, avsnp150):
             ref=ref,
             alt=alt
         )
-        logger.info(f"Found existing GVariant: {g_variant.start}-{g_variant.end}-{g_variant.ref} {g_variant.alt}")
         return g_variant
     except GVariant.DoesNotExist:
         # Create new GVariant if none exists
@@ -360,7 +357,6 @@ def get_or_create_g_variant(hg, chrom, start, end, ref, alt, avsnp150):
             alt=alt,
             avsnp150=avsnp150
         )
-        logger.info(f"Created new GVariant:{g_variant.start}-{g_variant.end}-{g_variant.ref} {g_variant.alt}")
         return g_variant
     except Exception as e:
         # Log and track the general exception
@@ -394,7 +390,6 @@ def create_gene_detail(gene_detail, row_gene, g_variant, func, filename):
                     is_gene_detail=True
                 )
                 (variant_meta if is_alias else alias_meta).append(entry)
-                logger.info(f"Created CVariant: {c_variant}")
         except Exception as e:
             log_and_track_exception(
                 "CGD001", f"Error processing gene_detail entry '{entry}': {str(e)}", exception_obj=e
@@ -449,7 +444,6 @@ def create_c_and_p_variants(g_variant, variant_call, aachange, func, gene_detail
                 gene_detail=entry[:99],
                 is_alias=is_alias,
             )
-            logger.info(f"Created CVariant: {c_variant.gene_detail}")
 
             # Create PVariant if present
             if p_var:
@@ -467,7 +461,6 @@ def create_c_and_p_variants(g_variant, variant_call, aachange, func, gene_detail
                     is_alias=is_alias,
                 )
                 (variant_meta if is_alias else alias_meta).append(f'{p_variant.name_meta}({c_variant.nm_id})')
-                logger.info(f"Created PVariant: {p_variant.id}-{p_variant.start}-{p_variant.end}-{p_variant.name_meta}-")
 
         except Exception as e:
             log_and_track_exception("CCPV001", f"Error processing AAChange entry '{entry}': {str(e)}", exception_obj=e)
@@ -479,7 +472,6 @@ def create_c_and_p_variants(g_variant, variant_call, aachange, func, gene_detail
     variant_call.variant_meta = variant_meta
     variant_call.alias_meta = alias_meta
     variant_call.save()
-    logger.info(f"Varaint Call Alias : {variant_call.alias_meta} - Varaint Call Variant : {variant_call.variant_meta}")
 
 def read_csv_file_custom(file_path):
     """
@@ -618,7 +610,6 @@ def variant_file_parser(file_path, analysis_run, variant_file):
                         ref_read=row['Ref_reads'],
                         alt_read=row['Alt_reads'],
                     )
-                    logger.info(f"Created variant_call {variant_call.id}-{variant_call.caller}-{variant_call.ref_read}-{variant_call.alt_read}")
                     stats["successful"] += 1
 
                     create_c_and_p_variants(
