@@ -44,6 +44,7 @@ function startProgressPolling() {
         fetch(`/analysisrun/check_import_progress/${arName}/`)
             .then(res => res.json())
             .then(data => {
+                console.log("📊 Progress check:", data);
                 const progressElement = document.querySelector('#progress-bar');
                 if (!progressElement) return;
 
