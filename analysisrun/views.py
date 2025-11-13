@@ -139,11 +139,15 @@ def initialize_import_variants(request, ar_name):
 
 def start_import_variants(request, ar_name):
     print("-" * 50, "start_import_variants")
-    # Attach handler to root logger to capture all logs in this request
-    root_logger = logging.getLogger()
+
+    # Create handler first
     analysis_run = AnalysisRun.objects.get(name=ar_name)
     handler = S3StorageLogHandler(analysis_run.name, analysis_run.sheet_name)
-    handler.setFormatter(logging.Formatter("[%(asctime)s] %(name)s %(levelname)s: %(message)s"))
+    handler.setFormatter(logging.Formatter("[%(asctime)s] [%(threadName)s] %(name)s %(levelname)s: %(message)s"))
+
+    # Attach to root logger with proper level
+    root_logger = logging.getLogger()
+    original_level = root_logger.level
     root_logger.addHandler(handler)
     root_logger.setLevel(logging.INFO)
 
@@ -178,8 +182,58 @@ def start_import_variants(request, ar_name):
             "total_files": 0,
         })
     finally:
+        # Give threads time to finish logging
+        import time
+        time.sleep(0.5)
+
         handler.close()
         root_logger.removeHandler(handler)
+        root_logger.setLevel(original_level)
+
+
+# def start_import_variants(request, ar_name):
+#     print("-" * 50, "start_import_variants")
+#     # Attach handler to root logger to capture all logs in this request
+#     root_logger = logging.getLogger()
+#     analysis_run = AnalysisRun.objects.get(name=ar_name)
+#     handler = S3StorageLogHandler(analysis_run.name, analysis_run.sheet_name)
+#     handler.setFormatter(logging.Formatter("[%(asctime)s] %(name)s %(levelname)s: %(message)s"))
+#     root_logger.addHandler(handler)
+#     root_logger.setLevel(logging.INFO)
+#
+#     try:
+#         GVariant.objects.filter(variant_calls__analysis_run__name=ar_name).delete()
+#         AnalysisRun.objects.filter(name=ar_name).update(status="pending")
+#         importer = VariantImporter(ar_name)
+#         importer.discover_files_s3()
+#
+#         handler.update_total_files(importer.total_files)
+#         logging.info(f"=== start_import_variants called for {ar_name} ===")
+#
+#         result = importer.start_import(force_restart=True)
+#         logging.info(f"Import started — status={result.get('status')} progress={result.get('progress', 0)}")
+#
+#         return JsonResponse({
+#             "analysis_run": ar_name,
+#             "total_files": importer.total_files,
+#             "processed_files": result.get("processed_files", 0),
+#             "progress": result.get("progress", 0),
+#             "status": result.get("status", "processing"),
+#             "error": result.get("error", None),
+#         })
+#
+#     except Exception as e:
+#         logging.exception(f"Error in start_import_variants for {ar_name}: {e}")
+#         return JsonResponse({
+#             "error": str(e),
+#             "status": "error",
+#             "processed_files": 0,
+#             "progress": 0,
+#             "total_files": 0,
+#         })
+#     finally:
+#         handler.close()
+#         root_logger.removeHandler(handler)
 
 
 def check_import_progress(request, ar_name):
