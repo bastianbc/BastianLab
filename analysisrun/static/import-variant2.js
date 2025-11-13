@@ -12,97 +12,95 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function startProgressPolling() {
-    console.log("⏳ Starting progress polling...");
+    console.log("⏳ Starting 2-second polling to /check_import_progress/");
 
-    let currentProgress = 0;
-    let firstUpdateReceived = false; // Flag for first real progress update
-    let warmupActive = true;         // Whether the initial slow ramp-up is active
-    const warmupTarget = 5;          // Slowly move 0 → 5%
-    const warmupDuration = 3000;     // 3 seconds total warmup time
-
-    // --- Warm-up animation: reassuring initial movement ---
-    const warmupStart = performance.now();
-    function warmupStep(timestamp) {
-        const elapsed = timestamp - warmupStart;
-        const progressElement = document.querySelector('#progress-bar');
-        if (!progressElement) return;
-
-        if (elapsed < warmupDuration && !firstUpdateReceived) {
-            const progress = (elapsed / warmupDuration) * warmupTarget;
-            progressElement.style.width = `${progress}%`;
-            progressElement.innerText = `${Math.round(progress)}%`;
-            requestAnimationFrame(warmupStep);
-        } else if (!firstUpdateReceived) {
-            progressElement.style.width = `${warmupTarget}%`;
-            progressElement.innerText = `${warmupTarget}%`;
-        }
-    }
-    requestAnimationFrame(warmupStep);
-
-    // --- Regular polling ---
     const interval = setInterval(() => {
         fetch(`/analysisrun/check_import_progress/${arName}/`)
             .then(res => res.json())
             .then(data => {
                 console.log("📊 Progress check:", data);
-                const progressElement = document.querySelector('#progress-bar');
-                if (!progressElement) return;
 
-                const targetProgress = data.progress || 0;
+                const progressPercent = data.progress || 0;
                 const processed = data.processed_files || 0;
                 const total = data.total_files || 0;
                 const currentStatus = data.status || "processing";
-                const logUrl = data.log_url || null;
 
-                // --- Detect first real update ---
-                if (targetProgress > 0 && !firstUpdateReceived) {
-                    firstUpdateReceived = true;
-                    warmupActive = false;
-                    console.log("🎯 First progress update received — switching from warmup.");
+                // ✅ Update progress bar width and label
+                progress.style.width = `${progressPercent}%`;
+                progress.innerText = `${progressPercent}%`;
+
+                // ✅ Color transitions by state
+                progress.classList.remove("bg-success", "bg-danger", "bg-primary");
+                if (currentStatus === "done") {
+                    progress.classList.add("bg-success");
+                } else if (currentStatus === "error") {
+                    progress.classList.add("bg-danger");
+                } else {
+                    progress.classList.add("bg-primary");
                 }
 
-                // --- Smooth animation toward target ---
-                const smoothProgress = () => {
-                    if (currentProgress < targetProgress) {
-                        currentProgress += Math.min(1, targetProgress - currentProgress);
-                        progressElement.style.width = `${currentProgress}%`;
-                        progressElement.innerText = `${Math.round(currentProgress)}%`;
-                        requestAnimationFrame(smoothProgress);
-                    } else {
-                        currentProgress = targetProgress;
-                        progressElement.style.width = `${currentProgress}%`;
-                        progressElement.innerText = `${Math.round(currentProgress)}%`;
-                    }
-                };
-                smoothProgress();
+                // ✅ Update status text during processing
+                if (currentStatus === "processing") {
+                    status.innerText = `${currentStatus} (${processed}/${total} files)`;
+                }
 
-                // --- Color transitions ---
-                progressElement.classList.remove("bg-success", "bg-danger", "bg-primary");
-                if (currentStatus === "done") progressElement.classList.add("bg-success");
-                else if (currentStatus === "error") progressElement.classList.add("bg-danger");
-                else progressElement.classList.add("bg-primary");
+                // ✅ Handle successful completion
+                if (currentStatus === "done") {
+                    clearInterval(interval);
+                    btnImport.disabled = false;
+                    btnImport.innerText = "Import Complete";
+                    progress.classList.remove("progress-bar-striped", "progress-bar-animated");
+                    importStarted = false;
 
-                // --- Update status text ---
-                const status = document.querySelector('#status');
-                if (status) {
-                    if (currentStatus === "processing") {
-                        status.innerText = `${currentStatus} (${processed}/${total} files)`;
-                    } else if (currentStatus === "done") {
-                        status.innerHTML = `✅ Completed ${processed} of ${total} files`;
-                        clearInterval(interval);
-                    } else if (currentStatus === "error") {
-                        status.innerHTML = `❌ Error after ${processed} of ${total} files`;
-                        clearInterval(interval);
-                    }
+                    // ✅ Direct inline report link
+                    status.innerHTML = `
+                        ✅ Import completed successfully with ${processed} of ${total} files processed!
+                        <a href="#" onclick="viewReport()" class="fw-bold text-primary ms-2">View Report</a>
+                    `;
+
+                    // Optional: Success popup
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Import Complete!',
+                        text: `Successfully processed ${processed} of ${total} files.`,
+                        confirmButtonText: 'OK'
+                    });
+                }
+
+                // ✅ Handle error
+                if (currentStatus === "error") {
+                    clearInterval(interval);
+                    btnImport.disabled = false;
+                    btnImport.innerText = "Retry Import";
+                    progress.classList.remove("progress-bar-striped", "progress-bar-animated");
+                    progress.classList.add("bg-danger");
+                    error.innerText = data.error || "Unknown error occurred";
+                    importStarted = false;
+
+                    status.innerHTML = `
+                        ❌ Import failed after ${processed} of ${total} files.
+                        <span class="text-danger fw-bold">Check logs or retry.</span>
+                    `;
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Import Failed',
+                        text: data.error || 'An error occurred during import'
+                    });
                 }
             })
             .catch(err => {
                 console.error("❌ Polling error:", err);
                 clearInterval(interval);
+                btnImport.disabled = false;
+                btnImport.innerText = "Import Variants";
+                progress.classList.add("bg-danger");
+                status.innerText = "❌ Connection lost while polling progress.";
+                error.innerText = err.message;
+                importStarted = false;
             });
     }, 10000);
 }
-
 
 function startImport() {
     if (importStarted) {
