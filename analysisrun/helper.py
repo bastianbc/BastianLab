@@ -273,7 +273,7 @@ class VariantImporter:
             "cnv_attachments": {"path": "cnv/output", "endfix": ["diagram.pdf", "scatter.png"], "handler": CnvAttachmentHandler},
             "snv": {"path": "snv/output", "endfix": ["_multianno_Filtered.txt"], "handler": SnvFolderHandler},
         }
-
+        self.count_files = {}
         self.all_files = []
         self.processed_files = 0
         self.total_files = 0
@@ -284,56 +284,58 @@ class VariantImporter:
     # ----------------------------------------------------------------------
     def discover_files_s3(self):
         """
-        Scan S3 bucket and find variant files to process.
-        Ensures files are always ordered:
-        1) _multianno_Filtered.txt
-        2) .dup_metrics
-        3) .cns
-        4) .diagram.pdf
-        5) .scatter.png
+        Discover and order files by folder types, with counting.
+        Order:
+          1. metrics
+          2. cnv
+          3. cnv_attachments
+          4. snv
+        (Or whatever order folder_types is defined)
         """
         self.all_files.clear()
         paginator = self.s3.get_paginator("list_objects_v2")
-        discovered_files = []
 
-        # --- Discover all matching files from S3 ---
-        for page in paginator.paginate(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Prefix=self.folder_path):
+        # Temporary: group by folder type
+        grouped = {ftype: [] for ftype in self.folder_types.keys()}
+
+        # --- Scan S3 and classify files ---
+        for page in paginator.paginate(
+                Bucket=settings.AWS_STORAGE_BUCKET_NAME,
+                Prefix=self.folder_path
+        ):
             for obj in page.get("Contents", []):
                 key = obj["Key"]
                 file_name = key.split("/")[-1]
+
                 for type_name, ft in self.folder_types.items():
                     if any(file_name.endswith(e) for e in ft["endfix"]):
                         full_s3_path = (
                             f"https://s3.{settings.AWS_S3_REGION_NAME}.amazonaws.com/"
                             f"{settings.AWS_STORAGE_BUCKET_NAME}/{key}"
                         )
-                        discovered_files.append((type_name, full_s3_path))
+                        grouped[type_name].append(full_s3_path)
+                        break  # stop after first matching folder type
 
-        # --- Define strict priority by suffix ---
-        priority_order = [
-            "_multianno_Filtered.txt",  # SNV
-            ".dup_metrics",  # Metrics
-            ".cns",  # CNV core file
-            ".diagram.pdf",  # CNV diagram
-            ".scatter.png",  # CNV scatter
-        ]
+        # --- Sort inside each folder type group ---
+        for ftype in grouped:
+            grouped[ftype] = sorted(grouped[ftype])
 
-        def sort_key(item):
-            _, file_path = item
-            file_name = file_path.lower()
-            for idx, suffix in enumerate(priority_order):
-                if file_name.endswith(suffix.lower()):
-                    return (idx, file_name)
-            return (len(priority_order), file_name)  # fallback to last
+        # --- Flatten them in folder_types order ---
+        ordered_files = []
+        for ftype in self.folder_types.keys():
+            ordered_files.extend([(ftype, path) for path in grouped[ftype]])
 
-        # --- Sort discovered files deterministically ---
-        self.all_files = sorted(discovered_files, key=sort_key)
-        # --- Cache and log ---
-        self.total_files = len(self.all_files)
+        # --- Set importer state ---
+        self.all_files = ordered_files
+        self.total_files = len(ordered_files)
         self.processed_files = 0
-        self._set_status("processing", 0)
 
+        # Optionally set progress
+        self._set_status("processing", 0)
+        self.count_files = {ftype: len(grouped[ftype]) for ftype in grouped}
+        # --- Return grouped results if needed ---
         return self.all_files
+
 
     # ----------------------------------------------------------------------
     # Cache helpers

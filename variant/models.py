@@ -393,6 +393,7 @@ class PVariant(models.Model):
         self.update_is_alias()
         super().save(*args, **kwargs)
 
+
 class VariantsView(models.Model):
     area_id = models.IntegerField()
     area_name = models.CharField(max_length=50)

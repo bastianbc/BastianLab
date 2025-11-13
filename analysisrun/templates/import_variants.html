@@ -16,16 +16,120 @@
 {% block content %}
 
 <div class="card shadow">
-  <div class="card-header">
-    <h3 class="card-title mb-0">Import Variants</h3>
-  </div>
+
 
   <div class="card-body">
-    <p><strong>Analysis Run:</strong> {{ analysis_run }}</p>
-    <p><strong>Total Files:</strong> {{ total_files }}</p>
 
-    <div class="mb-3">
-      <div class="progress" style="height: 25px;">
+      <div class="d-flex flex-wrap flex-sm-nowrap">
+
+
+            <!--begin::Info-->
+            <div class="flex-grow-1">
+                <!--begin::Title-->
+                <div class="d-flex justify-content-between align-items-start flex-wrap mb-2">
+                    <!--begin::User-->
+                    <div class="d-flex flex-column">
+                        <!--begin::Name-->
+                        <div class="d-flex align-items-center mb-2">
+                            <a href="#" class="text-gray-900 text-hover-primary fs-2 fw-bold me-1">Import Variants</a>
+                            <a href="#"><i class="ki-duotone ki-verify fs-1 text-primary"><span class="path1"></span><span class="path2"></span></i></a>
+                        </div>
+                        <!--end::Name-->
+
+                        <!--begin::Info-->
+                        <div class="d-flex flex-wrap fw-semibold fs-6 mb-4 pe-2">
+                            <a href="#" class="d-flex align-items-center text-gray-500 text-hover-primary me-5 mb-2">
+                                <i class="ki-duotone ki-profile-circle fs-4 me-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
+                                {{ analysis_run }}
+                            </a>
+                            <a href="#" class="d-flex align-items-center text-gray-500 text-hover-primary me-5 mb-2">
+                                <i class="ki-duotone ki-geolocation fs-4 me-1"><span class="path1"></span><span class="path2"></span></i>
+                                {{ total_files }}
+                            </a>
+                            <a href="{{ ar_location }}" class="d-flex align-items-center text-gray-500 text-hover-primary mb-2">
+                                <i class="ki-duotone ki-sms fs-4 me-1"><span class="path1"></span><span class="path2"></span></i>
+                                {{ ar_location }}
+                            </a>
+                        </div>
+                        <!--end::Info-->
+                    </div>
+                    <!--end::User-->
+
+
+                </div>
+                <!--end::Title-->
+                <!--begin::Stats-->
+                <div class="d-flex flex-wrap flex-stack">
+                    <!--begin::Wrapper-->
+                    <div class="d-flex flex-column flex-grow-1 pe-8">
+                        <!--begin::Stats-->
+                        <div class="d-flex flex-wrap">
+                            <!--begin::Stat-->
+                            <div class="border border-gray-300 border-dashed rounded min-w-125px py-3 px-4 me-6 mb-3">
+                                <!--begin::Number-->
+                                <div class="d-flex align-items-center">
+                                    <i class="ki-duotone ki-arrow-up fs-3 text-success me-2"><span class="path1"></span><span class="path2"></span></i>
+                                    <div class="fs-2 fw-bold counted" data-kt-countup="true" data-kt-countup-value="{{ metrics_count }}" data-kt-countup-prefix="$" data-kt-initialized="1">{{ metrics_count }}</div>
+                                </div>
+                                <!--end::Number-->
+                                <!--begin::Label-->
+                                <div class="fw-semibold fs-6 text-gray-500">METRICS COUNT</div>
+                                <!--end::Label-->
+                            </div>
+                            <!--end::Stat-->
+                            <!--begin::Stat-->
+                            <div class="border border-gray-300 border-dashed rounded min-w-125px py-3 px-4 me-6 mb-3">
+                                <!--begin::Number-->
+                                <div class="d-flex align-items-center">
+                                    <i class="ki-duotone ki-arrow-up fs-3 text-success me-2"><span class="path1"></span><span class="path2"></span></i>
+                                    <div class="fs-2 fw-bold counted" data-kt-countup="true" data-kt-countup-value="{{ cnv_count }}" data-kt-initialized="1">{{ cnv_count }}</div>
+                                </div>
+                                <!--end::Number-->
+                                <!--begin::Label-->
+                                <div class="fw-semibold fs-6 text-gray-500">CNV COUNT</div>
+                                <!--end::Label-->
+                            </div>
+                            <!--end::Stat-->
+                            <!--begin::Stat-->
+                            <div class="border border-gray-300 border-dashed rounded min-w-125px py-3 px-4 me-6 mb-3">
+                                <!--begin::Number-->
+                                <div class="d-flex align-items-center">
+                                    <i class="ki-duotone ki-arrow-up fs-3 text-success me-2"><span class="path1"></span><span class="path2"></span></i>
+                                    <div class="fs-2 fw-bold counted" data-kt-countup="true" data-kt-countup-value="{{ snv_count }}" data-kt-countup-prefix="%" data-kt-initialized="1">{{ snv_count }}</div>
+                                </div>
+                                <!--end::Number-->
+                                <!--begin::Label-->
+                                <div class="fw-semibold fs-6 text-gray-500">SNV COUNT</div>
+                                <!--end::Label-->
+                            </div>
+                            <!--end::Stat-->
+                            <!--begin::Stat-->
+                            <div class="border border-gray-300 border-dashed rounded min-w-125px py-3 px-4 me-6 mb-3">
+                                <!--begin::Number-->
+                                <div class="d-flex align-items-center">
+                                    <i class="ki-duotone ki-arrow-up fs-3 text-success me-2"><span class="path1"></span><span class="path2"></span></i>
+                                    <div class="fs-2 fw-bold counted" data-kt-countup="true" data-kt-countup-value="{{ cnv_attachments_count }}" data-kt-countup-prefix="%" data-kt-initialized="1">{{ cnv_attachments_count }}</div>
+                                </div>
+                                <!--end::Number-->
+                                <!--begin::Label-->
+                                <div class="fw-semibold fs-6 text-gray-500">CNV_ATTACHMENTS COUNT</div>
+                                <!--end::Label-->
+                            </div>
+                            <!--end::Stat-->
+                        </div>
+                        <!--end::Stats-->
+                    </div>
+                    <!--end::Wrapper-->
+
+                </div>
+                <!--end::Stats-->
+            </div>
+            <!--end::Info-->
+        </div>
+
+
+    <div class="mb-7 mt-7">
+      <div class="progress" style="height: 50px;">
         <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
              style="width: {{progress|default:0}}%">
           {{progress|default:0}}%
@@ -35,8 +139,22 @@
 
     <p>Status: <span id="status">{{status}}</span></p>
     <p id="error" class="text-danger small">{{error|default:""}}</p>
+    <div class="border border-gray-300 border-dashed rounded p-4 d-flex align-items-center gap-4">
 
-    <button id="import-btn" class="btn btn-primary" onclick="startImport()">Import Variants</button>
+    <button id="import-btn"
+            class="btn btn-primary fw-bold px-6"
+            onclick="startImport()">
+        Import Variants
+    </button>
+
+    <button id="btnResetProcess"
+            class="btn btn-light-danger fw-bold px-6"
+            onclick="resetProcess()">
+        Reset All Process
+    </button>
+
+</div>
+
 
   </div>
 </div>

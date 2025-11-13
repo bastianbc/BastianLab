@@ -13,6 +13,7 @@ from .helper import VariantImporter
 from variant.models import GVariant
 from core.analysis_run_import_logger import S3StorageLogHandler
 from qc.models import SampleQC
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -100,43 +101,23 @@ def initialize_import_variants(request, ar_name):
     User must click 'Start Import' to begin.
     """
     print("*"*50,"initialize_import_variants")
-    # Use ar_name parameter, not hard-coded "AR5"
-    GVariant.objects.filter(
-        variant_calls__analysis_run__name=ar_name
-    ).delete()
-    print(f"Deleted variants for {ar_name}")
-    print(GVariant.objects.filter(
-        variant_calls__analysis_run__name=ar_name
-    ))
-
-    SampleQC.objects.filter(analysis_run__name=ar_name).delete()
-    print(f"Deleted qc samples {ar_name}")
-    print(SampleQC.objects.filter(
-        analysis_run__name=ar_name
-    ))
-    Cns.objects.filter(analysis_run__name=ar_name).delete()
-    print(f"Deleted cns samples {ar_name}")
-    print(Cns.objects.filter(
-        analysis_run__name=ar_name
-    ))
-
-    AnalysisRun.objects.filter(name=ar_name).update(status="pending")
-    VariantFile.objects.filter(analysis_run__name=ar_name).delete()
-
     importer = VariantImporter(ar_name)
+    ar_url = f's3://us-west-2.amazonaws.com/{getattr(settings, "AWS_STORAGE_BUCKET_NAME", "bastian-lab-169-3-r-us-west-2.sec.ucsf.edu")}/{importer.folder_path}'
     importer.reset_status()
     importer.discover_files_s3()
     cache_data = importer.get_progress()
-
     return render(request, "import_variants.html", {
         "analysis_run": ar_name,
         "total_files": importer.total_files,
+        "ar_location": ar_url,
+        "metrics_count": importer.count_files["metrics"],
+        "cnv_count": importer.count_files["cnv"],
+        "cnv_attachments_count": importer.count_files["cnv_attachments"],
+        "snv_count": importer.count_files["snv"],
         "progress": cache_data.get("progress", 0),
         "status": cache_data.get("status", "not_started"),
         "error": cache_data.get("error"),
     })
-
-
 
 
 def start_import_variants(request, ar_name):
@@ -150,8 +131,6 @@ def start_import_variants(request, ar_name):
     root_logger.setLevel(logging.INFO)
 
     try:
-        GVariant.objects.filter(variant_calls__analysis_run__name=ar_name).delete()
-        AnalysisRun.objects.filter(name=ar_name).update(status="pending")
         importer = VariantImporter(ar_name)
         importer.discover_files_s3()
 
@@ -184,6 +163,58 @@ def start_import_variants(request, ar_name):
         root_logger.removeHandler(handler)
 
 
+def reset_process(request, ar_name):
+    print("-" * 50, "reset_process")
+
+    try:
+        analysis_run = AnalysisRun.objects.get(name=ar_name)
+
+        # Track delete counts for frontend information
+        deleted_counts = {}
+
+        # Delete GVariants
+        deleted_counts["gvariants"] = GVariant.objects.filter(
+            variant_calls__analysis_run__name=ar_name
+        ).delete()[0]
+
+        # Delete SampleQC
+        deleted_counts["sample_qc"] = SampleQC.objects.filter(
+            analysis_run__name=ar_name
+        ).delete()[0]
+
+        # Delete CNS objects
+        deleted_counts["cns"] = Cns.objects.filter(
+            analysis_run__name=ar_name
+        ).delete()[0]
+
+        # Delete VariantFile records
+        deleted_counts["variant_files"] = VariantFile.objects.filter(
+            analysis_run__name=ar_name
+        ).delete()[0]
+
+        # Reset status
+        analysis_run.status = "pending"
+        analysis_run.save()
+
+        # FRONTEND-FRIENDLY RESPONSE
+        return JsonResponse({
+            "analysis_run": ar_name,
+            "deleted": deleted_counts,
+            "status": "success",
+            "message": "All related objects deleted."
+        })
+
+    except Exception as e:
+        logging.exception(f"Error in reset_process for {ar_name}: {e}")
+        return JsonResponse({
+            "analysis_run": ar_name,
+            "error": str(e),
+            "status": "error"
+        }, status=500)
+
+
+
+
 def check_import_progress(request, ar_name):
     """
     Poll the current import progress and status.
@@ -194,7 +225,6 @@ def check_import_progress(request, ar_name):
     try:
         importer = VariantImporter(ar_name)
         cache_data = importer.get_progress()
-        print("cache_data", cache_data)
 
         status = cache_data.get("status", "not_started")
         total_files = cache_data.get("total_files", 0)
@@ -247,7 +277,6 @@ def report_import_status(request, ar_name):
     variant_files = VariantFile.objects.filter(analysis_run=analysis_run)
 
     log_url = S3StorageLogHandler.get_log_path(analysis_run.name)
-    print("log_url", log_url)
 
     files_info = [
         {
@@ -282,7 +311,6 @@ def delete_batch_analysis_run(request):
         selected_ids = json.loads(request.GET.get("selected_ids"))
         AnalysisRun.objects.filter(id__in=selected_ids).delete()
     except Exception as e:
-        print(str(e))
         return JsonResponse({ "deleted":False })
 
     return JsonResponse({ "deleted":True })

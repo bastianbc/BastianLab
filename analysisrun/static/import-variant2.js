@@ -8,7 +8,9 @@ let importStarted = false;
 
 // Initialize event listeners
 document.addEventListener("DOMContentLoaded", function() {
-    btnImport.addEventListener("click", startImport);
+    if (btnImport) {
+        btnImport.addEventListener("click", startImport);
+    }
 });
 
 function startProgressPolling() {
@@ -160,7 +162,62 @@ function viewReport() {
                 </tr>
             `).join('');
         })
+
         .catch(err => {
             console.error("Error loading report:", err);
         });
 }
+
+function resetProcess() {
+
+    Swal.fire({
+        title: "Reset All Process?",
+        text: "This will delete all imported objects related to this analysis run.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        confirmButtonText: "Yes, Reset",
+        cancelButtonText: "Cancel",
+        reverseButtons: true
+    }).then((result) => {
+        if (!result.isConfirmed) {
+            return;
+        }
+
+        // Show loading
+        Swal.fire({
+            title: "Resetting...",
+            text: "Please wait while we delete all related objects.",
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            allowEnterKey: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        fetch(`/analysisrun/reset_process/${arName}/`)
+            .then(res => res.json())
+            .then(data => {
+                Swal.fire({
+                    icon: "success",
+                    title: "Process Reset",
+                    text: `Successfully deleted ${data.deleted_count || data.length} objects.`,
+                    confirmButtonText: "OK",
+                }).then(() => {
+                    // Refresh the page after success
+                    window.location.reload();
+                });
+            })
+            .catch(err => {
+                Swal.fire({
+                    icon: "error",
+                    title: "Reset Failed",
+                    text: err.message || "An unexpected error occurred.",
+                });
+            });
+    });
+}
+
+
+

@@ -372,7 +372,6 @@ def parse_metrics_files(analysis_run, file_path):
 
         # --- Save metrics incrementally without overwriting previous fields ---
         if metrics:
-            print("$$$$$$$ metrics: ", metrics)
             for key, val in metrics.items():
                 if hasattr(sample_qc, key):
                     setattr(sample_qc, key, val)
