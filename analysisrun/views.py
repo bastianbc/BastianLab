@@ -203,11 +203,11 @@ def check_import_progress(request, ar_name):
         if total_files > 0:
             progress = int((processed_files / total_files) * 100)
             # Prevent progress from staying below 5% once processing begins
-            if progress < 5 and status == "processing" and processed_files > 0:
+            if progress < 5:
                 progress = 5
         else:
             # When no files yet discovered but job started, show 5% baseline
-            progress = 5 if status == "processing" else 0
+            progress = 5
 
         # ✅ Save computed progress back for smoother frontend sync
         cache_data["progress"] = progress
