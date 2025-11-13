@@ -20,7 +20,7 @@ function startProgressPolling() {
             .then(data => {
                 console.log("📊 Progress check:", data);
 
-                const progressPercent = data.progress || 0;
+                const progressPercent = data.progress || 5;
                 const processed = data.processed_files || 0;
                 const total = data.total_files || 0;
                 const currentStatus = data.status || "processing";
