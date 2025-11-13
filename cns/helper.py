@@ -192,7 +192,7 @@ def read_cns_file(file_path):
 
         df = pd.DataFrame(data[1:], columns=data[0])
         logger.info(f"✅ Parsed CNS file successfully — {len(df)} rows, {len(df.columns)} columns.")
-        return df.head(1)
+        return df
     except Exception as e:
         log_and_track_exception("CNS009", f"Failed to parse CNS file '{file_path}'", e)
         raise
