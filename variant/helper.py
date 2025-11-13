@@ -518,7 +518,7 @@ def read_csv_file_custom(file_path):
                 data.append(row)
 
         df = pd.DataFrame(data[1:], columns=data[0])
-        return df
+        return df.head(1)
 
     except Exception as e:
         # Log and track general exception for reading/parsing failures
