@@ -66,6 +66,7 @@ def filter_accounts(request):
 
 @permission_required("account.change_user",raise_exception=True)
 def reset_password(request,id):
+    print("reset passss"*10)
     user = User.objects.get(id=id)
     user.reset_password()
     messages.success(request,"Account's Password reset. ")

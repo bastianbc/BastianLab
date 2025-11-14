@@ -207,3 +207,172 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(
             f"Done. Scanned {total} | Found {found_cnt} | Missing {missing_cnt} | Updated {updated}"
         ))
+
+
+# !/usr/bin/env python3
+"""
+S3 Upload Script with Skip-If-Exists Logic
+"""
+
+import os
+import boto3
+from pathlib import Path
+from boto3.s3.transfer import TransferConfig
+from botocore.exceptions import ClientError
+import logging
+from datetime import datetime
+
+# Configure multipart upload for large files
+MB = 1024 * 1024
+config = TransferConfig(
+    multipart_threshold=100 * MB,  # Use multipart for files > 100MB
+    max_concurrency=10,
+    multipart_chunksize=10 * MB,
+    use_threads=True
+)
+
+SOURCE_DIR = "/mnt/smb_volume/ProcessedData/hg38_ProcessedData/Analysis.tumor-normal/Broad/14-July-25/BroadWES1-3/"
+S3_BUCKET = "bastian-lab-169-3-r-us-west-2.sec.ucsf.edu"
+S3_PREFIX = "sequencingdata/ProcessedData/AR9_dna-v1_hg38/Analysis.tumor-normal/Broad/14-July-25/BroadWES1-3/"
+
+# Setup logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler(f's3_upload_{datetime.now().strftime("%Y%m%d_%H%M%S")}.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
+# Initialize S3 client once
+s3_client = boto3.client('s3', region_name='us-west-2')
+
+# Statistics
+stats = {
+    'total_files': 0,
+    'skipped': 0,
+    'uploaded': 0,
+    'failed': 0,
+    'skipped_bytes': 0,
+    'uploaded_bytes': 0
+}
+
+
+def file_exists_in_s3(s3_key, local_file_size):
+    """
+    Check if file exists in S3 with the same size
+    Returns True if file exists and has same size, False otherwise
+    """
+    try:
+        response = s3_client.head_object(Bucket=S3_BUCKET, Key=s3_key)
+        s3_size = response['ContentLength']
+
+        if s3_size == local_file_size:
+            logger.info(f"⊘ SKIP (exists): {s3_key} ({local_file_size:,} bytes)")
+            return True
+        else:
+            logger.info(f"⚠ Size mismatch (Local: {local_file_size:,}, S3: {s3_size:,}), re-uploading: {s3_key}")
+            return False
+
+    except ClientError as e:
+        if e.response['Error']['Code'] == '404':
+            # File doesn't exist in S3
+            return False
+        else:
+            logger.error(f"Error checking S3 for {s3_key}: {e}")
+            return False
+
+
+def upload_with_progress(local_file, s3_key):
+    """Upload file with progress callback, skip if already exists"""
+    file_size = os.path.getsize(local_file)
+
+    # Check if file already exists in S3
+    if file_exists_in_s3(s3_key, file_size):
+        stats['skipped'] += 1
+        stats['skipped_bytes'] += file_size
+        return True  # Skip upload
+
+    # File doesn't exist or size mismatch, upload it
+    def progress_callback(bytes_transferred):
+        percentage = (bytes_transferred / file_size) * 100
+        print(f"\rUploading {os.path.basename(local_file)}: {percentage:.1f}%", end='', flush=True)
+
+    try:
+        logger.info(f"↑ Uploading: {local_file} -> s3://{S3_BUCKET}/{s3_key} ({file_size:,} bytes)")
+
+        s3_client.upload_file(
+            local_file,
+            S3_BUCKET,
+            s3_key,
+            Config=config,
+            Callback=progress_callback
+        )
+
+        print()  # New line after progress
+        logger.info(f"✓ Completed: {s3_key}")
+        stats['uploaded'] += 1
+        stats['uploaded_bytes'] += file_size
+        return True
+
+    except Exception as e:
+        print()  # New line after progress
+        logger.error(f"✗ Failed: {local_file} - {e}")
+        stats['failed'] += 1
+        return False
+
+
+def print_summary():
+    """Print upload summary statistics"""
+    logger.info("\n" + "=" * 80)
+    logger.info("UPLOAD SUMMARY")
+    logger.info("=" * 80)
+    logger.info(f"Total files found:     {stats['total_files']:,}")
+    logger.info(f"Files uploaded:        {stats['uploaded']:,} ({stats['uploaded_bytes'] / (1024 ** 3):.2f} GB)")
+    logger.info(f"Files skipped:         {stats['skipped']:,} ({stats['skipped_bytes'] / (1024 ** 3):.2f} GB)")
+    logger.info(f"Files failed:          {stats['failed']:,}")
+    logger.info(f"Total transferred:     {stats['uploaded_bytes'] / (1024 ** 3):.2f} GB")
+    logger.info(f"Total skipped (saved): {stats['skipped_bytes'] / (1024 ** 3):.2f} GB")
+    logger.info("=" * 80)
+
+
+def run():
+    """Main execution function"""
+    source_path = Path(SOURCE_DIR)
+
+    if not source_path.exists():
+        logger.error(f"Source directory does not exist: {SOURCE_DIR}")
+        return
+
+    logger.info(f"Starting upload from: {SOURCE_DIR}")
+    logger.info(f"Destination: s3://{S3_BUCKET}/{S3_PREFIX}")
+    logger.info(f"Scanning files...")
+
+    # Collect all files first
+    files_to_process = []
+    for file_path in source_path.rglob('*'):
+        if file_path.is_file():
+            files_to_process.append(file_path)
+
+    stats['total_files'] = len(files_to_process)
+    logger.info(f"Found {stats['total_files']:,} files to process\n")
+
+    # Process each file
+    for idx, file_path in enumerate(files_to_process, 1):
+        relative_path = file_path.relative_to(source_path)
+        s3_key = S3_PREFIX + str(relative_path).replace('\\', '/')
+
+        logger.info(f"[{idx}/{stats['total_files']}] Processing: {relative_path}")
+        upload_with_progress(str(file_path), s3_key)
+
+        # Print progress summary every 10 files
+        if idx % 10 == 0:
+            logger.info(f"\nProgress: {idx}/{stats['total_files']} files processed")
+            logger.info(f"  Uploaded: {stats['uploaded']}, Skipped: {stats['skipped']}, Failed: {stats['failed']}\n")
+
+    # Print final summary
+    print_summary()
+
+

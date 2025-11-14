@@ -85,9 +85,10 @@ var KTDatatablesServerSide = function () {
                                 </div>
                                 <!--end::Menu item-->
 
+                                
                                 <!--begin::Menu item-->
                                 <div class="menu-item px-3">
-                                    <a href="/account/reset_password/` + row["id"] +`" class="menu-link px-3">
+                                    <a href="/auth/set_password/` + row["id"] +`" class="menu-link px-3">
                                         Reset Password
                                     </a>
                                 </div>

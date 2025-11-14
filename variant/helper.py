@@ -342,8 +342,8 @@ def get_or_create_g_variant(hg, chrom, start, end, ref, alt, avsnp150):
             chrom=chrom,
             start=start,
             end=end,
-            ref=ref,
-            alt=alt
+            ref=ref[:99],
+            alt=alt[:99]
         )
         return g_variant
     except GVariant.DoesNotExist:
@@ -353,8 +353,8 @@ def get_or_create_g_variant(hg, chrom, start, end, ref, alt, avsnp150):
             chrom=chrom,
             start=start,
             end=end,
-            ref=ref,
-            alt=alt,
+            ref=ref[:99],
+            alt=alt[:99],
             avsnp150=avsnp150
         )
         return g_variant
@@ -591,8 +591,8 @@ def variant_file_parser(file_path, analysis_run, variant_file):
                         chrom=row['Chr'],
                         start=row['Start'],
                         end=row['End'],
-                        ref=row['Ref'],
-                        alt=row['Alt'],
+                        ref=row['Ref'][:99],
+                        alt=row['Alt'][:99],
                         avsnp150=row.get('avsnp150', '')
                     )
 

@@ -62,7 +62,12 @@ def change_password(request):
     return render (request,"change-password.html",locals())
 
 def set_password(request):
-    user = User.objects.get(username=request.session["username"])
+    print(request.user)
+    print(request.session)
+    print(request.GET)
+    print(request.POST)
+    # user = User.objects.get(username=request.session["username"])
+    user = request.user
     if request.method == "POST":
         form = SetPasswordForm(user=user,data=request.POST)
         if form.is_valid():
