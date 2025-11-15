@@ -207,132 +207,43 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(
             f"Done. Scanned {total} | Found {found_cnt} | Missing {missing_cnt} | Updated {updated}"
         ))
-
 #!/usr/bin/env python3
-"""
-Simplified S3 Upload Script
-- Streams files (no pre-collection)
-- Skips files already existing in S3 with same size
-"""
-
-import os
-import boto3
+import subprocess
 import logging
-from pathlib import Path
 from datetime import datetime
-from boto3.s3.transfer import TransferConfig
-from botocore.exceptions import ClientError
 
-# ----------------------------------------------------
-# CONFIG
-# ----------------------------------------------------
 SOURCE = "/mnt/smb_volume/ProcessedData/hg38_ProcessedData/Analysis.tumor-normal/Broad/14-July-25/BroadWES1-3/"
 BUCKET = "bastian-lab-169-3-r-us-west-2.sec.ucsf.edu"
 PREFIX = "sequencingdata/ProcessedData/AR9_dna-v1_hg38/Analysis.tumor-normal/Broad/14-July-25/BroadWES1-3/"
-
-config = TransferConfig(
-    multipart_threshold=100 * 1024**2,      # 100 MB
-    multipart_chunksize=10 * 1024**2,       # 10 MB
-    max_concurrency=10,
-    use_threads=True
-)
-
-s3 = boto3.client("s3", region_name="us-west-2")
+DEST = f"s3://{BUCKET}/{PREFIX}"
 
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
     handlers=[
-        logging.FileHandler(f"s3_upload_{datetime.now():%Y%m%d_%H%M%S}.log"),
+        logging.FileHandler(f"s3_sync_{datetime.now():%Y%m%d_%H%M%S}.log"),
         logging.StreamHandler(),
     ],
 )
 log = logging.getLogger(__name__)
 
-stats = dict(total=0, uploaded=0, skipped=0, failed=0, uploaded_bytes=0, skipped_bytes=0)
 
+def run_sync():
+    log.info(f"Starting AWS sync")
+    log.info(f"Source: {SOURCE}")
+    log.info(f"Destination: {DEST}")
 
-# ----------------------------------------------------
-# HELPERS
-# ----------------------------------------------------
-def exists_in_s3(key, size):
-    """Return True if same-size file already exists in S3."""
-    try:
-        head = s3.head_object(Bucket=BUCKET, Key=key)
-        if head.get("ContentLength") == size:
-            # log.info(f"SKIP: {key} ({size:,} bytes)")
-            return True
-        log.info(f"Re-uploading (size changed): {key}")
-        return False
-    except ClientError as e:
-        if e.response["Error"]["Code"] == "404":
-            return False
-        log.error(f"Error checking S3 for {key}: {e}")
-        return False
-
-
-def upload_file(local, key):
-    """Upload file unless already exists in S3."""
-    size = os.path.getsize(local)
-
-    if exists_in_s3(key, size):
-        stats["skipped"] += 1
-        stats["skipped_bytes"] += size
-        return
-
-    def progress(bytes_done):
-        pct = bytes_done / size * 100
-        print(f"\rUploading {os.path.basename(local)}: {pct:5.1f}%", end="")
+    cmd = [
+        "aws", "s3", "sync",
+        SOURCE, DEST,
+        "--only-show-errors",
+        "--no-progress",
+        "--size-only",          # Skip files if size matches (fast)
+        "--exact-timestamps",   # Preserve mod-times
+    ]
 
     try:
-        log.info(f"UPLOAD: {local} → s3://{BUCKET}/{key}")
-        s3.upload_file(local, BUCKET, key, Config=config, Callback=progress)
-        stats["uploaded"] += 1
-        stats["uploaded_bytes"] += size
-    except Exception as ex:
-        print()
-        log.error(f"Failed upload: {local} - {ex}")
-        stats["failed"] += 1
-
-
-def summary():
-    log.info("\n" + "=" * 60)
-    log.info("UPLOAD SUMMARY")
-    log.info("=" * 60)
-    log.info(f"Total files:   {stats['total']}")
-    log.info(f"Uploaded:      {stats['uploaded']} ({stats['uploaded_bytes'] / 1024**3:.2f} GB)")
-    log.info(f"Skipped:       {stats['skipped']} ({stats['skipped_bytes'] / 1024**3:.2f} GB)")
-    log.info(f"Failed:        {stats['failed']}")
-    log.info("=" * 60)
-
-
-# ----------------------------------------------------
-# MAIN
-# ----------------------------------------------------
-def run():
-    root = Path(SOURCE)
-    if not root.exists():
-        log.error(f"Source path not found: {SOURCE}")
-        return
-
-    log.info(f"Uploading from {SOURCE}")
-    log.info(f"To: s3://{BUCKET}/{PREFIX}")
-
-    for path in root.rglob("*"):
-        if not path.is_file():
-            continue
-
-        stats["total"] += 1
-        rel = path.relative_to(root)
-        key = f"{PREFIX}{rel}".replace("\\", "/")
-
-        # log.info(f"[{stats['total']}] {rel}")
-        upload_file(str(path), key)
-
-        if stats["total"] % 10 == 0:
-            log.info(f"Progress → {stats['total']} processed")
-
-    summary()
-
-
-
+        subprocess.check_call(cmd)
+        log.info("✓ Sync completed successfully")
+    except subprocess.CalledProcessError as e:
+        log.error(f"✗ Sync failed: {e}")
