@@ -326,7 +326,7 @@ def run():
         rel = path.relative_to(root)
         key = f"{PREFIX}{rel}".replace("\\", "/")
 
-        log.info(f"[{stats['total']}] {rel}")
+        # log.info(f"[{stats['total']}] {rel}")
         upload_file(str(path), key)
 
         if stats["total"] % 10 == 0:
