@@ -260,7 +260,7 @@ def exists_in_s3(key, size):
     try:
         head = s3.head_object(Bucket=BUCKET, Key=key)
         if head.get("ContentLength") == size:
-            log.info(f"SKIP: {key} ({size:,} bytes)")
+            # log.info(f"SKIP: {key} ({size:,} bytes)")
             return True
         log.info(f"Re-uploading (size changed): {key}")
         return False
