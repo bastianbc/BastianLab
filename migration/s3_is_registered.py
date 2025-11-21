@@ -212,9 +212,9 @@ import subprocess
 import logging
 from datetime import datetime
 
-SOURCE = "/mnt/smb_volume/ProcessedData/hg38_ProcessedData/Analysis.tumor-normal/Broad/14-July-25/BroadWES1-3/snv/"
+SOURCE = "/mnt/smb_volume/ProcessedData/hg38_ProcessedData/Analysis.tumor-normal/Broad/14-July-25/BroadWES1-3/snv/scripts"
 BUCKET = "bastian-lab-169-3-r-us-west-2.sec.ucsf.edu"
-PREFIX = "sequencingdata/ProcessedData/AR9_dna-v1_hg38/Analysis.tumor-normal/Broad/14-July-25/BroadWES1-3/snv/"
+PREFIX = "sequencingdata/ProcessedData/AR9_dna-v1_hg38/Analysis.tumor-normal/Broad/14-July-25/BroadWES1-3/snv/scripts"
 DEST = f"s3://{BUCKET}/{PREFIX}"
 
 logging.basicConfig(
