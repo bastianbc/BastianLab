@@ -271,7 +271,7 @@ class VariantImporter:
             ], "handler": AlignmentsFolderHandler},
             "cnv": {"path": "cnv/output", "endfix": [".cns"],"handler": CnvFolderHandler},
             "cnv_attachments": {"path": "cnv/output", "endfix": ["diagram.pdf", "scatter.png"], "handler": CnvAttachmentHandler},
-            "snv": {"path": "snv/output", "endfix": ["_multianno_Filtered.txt"], "handler": SnvFolderHandler},
+            "snv": {"path": "snv/output", "endfix": ["_multianno_Filtered.txt", "_multianno.Filtered.txt"], "handler": SnvFolderHandler},
         }
         self.count_files = {}
         self.all_files = []
