@@ -800,9 +800,9 @@ def generate_file_set(file, seq_run, sample_lib):
     return file_set
 
 def import_genes(request):
-    from .s3_is_registered import run_sync
+    from .s3_is_registered import run_sync_2
     print("importing genes...")
-    run_sync()
+    run_sync_2()
     # from .variant_call_alias import restore_variant_files
     # restore_variant_files()
 

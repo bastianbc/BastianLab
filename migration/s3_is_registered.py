@@ -247,3 +247,107 @@ def run_sync():
         log.info("✓ Sync completed successfully")
     except subprocess.CalledProcessError as e:
         log.error(f"✗ Sync failed: {e}")
+
+
+
+
+#!/usr/bin/env python3
+import subprocess
+import logging
+from datetime import datetime
+import os
+
+# ---------------------------------------------------------
+# CONFIGURATION
+# ---------------------------------------------------------
+
+# LOCAL SMB PATH
+BASE_SOURCE = (
+    "/mnt/smb_volume/ProcessedData/hg38_ProcessedData/"
+    "Analysis.tumor-normal/Broad/14-July-25/BroadWES1-3/snv/output/"
+)
+
+# S3 BUCKET + PREFIX
+BUCKET = "bastian-lab-169-3-r-us-west-2.sec.ucsf.edu"
+BASE_PREFIX = (
+    "sequencingdata/ProcessedData/AR9_dna-v1_hg38/"
+    "Analysis.tumor-normal/Broad/14-July-25/BroadWES1-3/snv/output/"
+)
+
+# EXACT 13 FOLDERS TO SYNC
+FOLDERS = [
+    "BCB042_BroadInstitute_WES_2.2223_Mel1.Tumor",
+    "BCB042_BroadInstitute_WES_2.2224_Mel2.Tumor",
+    "BCB042_BroadInstitute_WES_2.2225_Nevus.Tumor",
+    "BCB042_BroadInstitute_WES_2.2227_Mel.Tumor",
+    "BCB042_BroadInstitute_WES_2.2228_Nevus.Tumor",
+    "BCB042_BroadInstitute_WES_2.2230_Mel.Tumor",
+    "BCB042_BroadInstitute_WES_2.2231_MIS.Tumor",
+    "BCB042_BroadInstitute_WES_2.2232_Nevus.Tumor",
+    "BCB042_BroadInstitute_WES_2.2234_Mel.Tumor",
+    "BCB042_BroadInstitute_WES_2.2235_Nevus.Tumor",
+    "BCB042_BroadInstitute_WES_2.2237_MIS.Tumor",
+    "BCB042_BroadInstitute_WES_2.2238_Mel.Tumor",
+    "BCB042_BroadInstitute_WES_2.2239_Nevus.Tumor",
+]
+
+# ---------------------------------------------------------
+# LOGGING SETUP
+# ---------------------------------------------------------
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    handlers=[
+        logging.FileHandler(f"s3_sync_selected_{datetime.now():%Y%m%d_%H%M%S}.log"),
+        logging.StreamHandler(),
+    ],
+)
+
+log = logging.getLogger(__name__)
+
+# ---------------------------------------------------------
+# SYNC FUNCTION
+# ---------------------------------------------------------
+
+def sync_folder(folder_name):
+    source = os.path.join(BASE_SOURCE, folder_name)
+    prefix = BASE_PREFIX + folder_name + "/"
+    dest = f"s3://{BUCKET}/{prefix}"
+
+    log.info(f"---------------------------------------------")
+    log.info(f"Syncing folder: {folder_name}")
+    log.info(f"Source:      {source}")
+    log.info(f"Destination: {dest}")
+    log.info(f"---------------------------------------------")
+
+    cmd = [
+        "aws", "s3", "sync",
+        source,
+        dest,
+        "--only-show-errors",
+        "--no-progress",
+        "--size-only",
+        "--exact-timestamps",
+    ]
+
+    try:
+        subprocess.check_call(cmd)
+        log.info(f"✓ Completed sync for: {folder_name}")
+    except subprocess.CalledProcessError as e:
+        log.error(f"✗ Sync FAILED for: {folder_name} — {e}")
+
+# ---------------------------------------------------------
+# MAIN EXECUTION
+# ---------------------------------------------------------
+
+def run_sync_2():
+    for folder in FOLDERS:
+        folder_path = os.path.join(BASE_SOURCE, folder)
+        if not os.path.isdir(folder_path):
+            log.warning(f"Skipping {folder}: Not found or not a directory")
+            continue
+        sync_folder(folder)
+
+
+

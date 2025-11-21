@@ -8,4 +8,6 @@ urlpatterns = [
     path("logout",views.log_out,name="logout"),
     path("set_password", views.set_password, name="set-password"),
     path("change_password", views.change_password, name="change-password"),
+    path("forgot_password", views.forgot_password, name="forgot-password"),
+    path("reset_password/<uidb64>/<token>/", views.reset_password, name="reset-password"),
 ] + staticfiles_urlpatterns()

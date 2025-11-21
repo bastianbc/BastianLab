@@ -282,3 +282,26 @@ SEQUENCING_FILES_DESTINATION_DIRECTORY = SEQUENCING_FILES_SOURCE_DIRECTORY
 VARIANT_FILES_SOURCE_DIRECTORY = SEQUENCING_FILES_SOURCE_DIRECTORY
 
 
+# ================================
+# EMAIL CONFIGURATION (POSTFIX)
+# ================================
+
+# Use local Postfix as the SMTP relay
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "localhost"
+EMAIL_PORT = 25
+
+# No TLS needed — connection is local only
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = False
+
+# No authentication needed — Postfix is local-only
+EMAIL_HOST_USER = ""
+EMAIL_HOST_PASSWORD = ""
+
+# Default sender for outgoing emails
+DEFAULT_FROM_EMAIL = "noreply@melanomalab.ucsf.edu"
+SERVER_EMAIL = "noreply@melanomalab.ucsf.edu"
+
+# Optional: for debugging, show detailed email errors in logs
+EMAIL_TIMEOUT = 10
