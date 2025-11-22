@@ -122,6 +122,16 @@ def initialize_import_variants(request, ar_name):
 
 def start_import_variants(request, ar_name):
     print("-" * 50, "start_import_variants")
+    # Delete GVariants
+    deleted_counts = {}
+    deleted_counts["gvariants"] = GVariant.objects.filter(
+        variant_calls__analysis_run__name=ar_name
+    ).delete()[0]
+
+
+    deleted_counts["variant_files"] = VariantFile.objects.filter(
+        analysis_run__name=ar_name, name__contains="Filtered"
+    ).delete()[0]
     # Attach handler to root logger to capture all logs in this request
     root_logger = logging.getLogger()
     analysis_run = AnalysisRun.objects.get(name=ar_name)

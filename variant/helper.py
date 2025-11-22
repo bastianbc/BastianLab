@@ -127,6 +127,16 @@ def get_caller(filename):
     logger.debug(f"Extracted caller: {caller}")
     return caller
 
+def get_depth(row):
+    if "Depth" in row:
+        coverage = row["Depth"]
+    elif "Normal_Depth" in row:
+        coverage = row["Normal_Depth"]
+    elif "Tumor_Depth" in row:
+        coverage = row["Tumor_Depth"]
+    else:
+        coverage = 0
+    return coverage
 
 def parse_p_var(p_var):
     logger.debug(f"Parsing p_var: {p_var}")
@@ -320,7 +330,7 @@ def get_gene(gene_name, hg):
 
 def check_required_fields(row):
     logger.debug("Checking required fields in row")
-    required_fields = ['Chr', 'Start', 'End', 'Ref', 'Alt', 'Depth',
+    required_fields = ['Chr', 'Start', 'End', 'Ref', 'Alt',
                       'Ref_reads', 'Alt_reads', 'AAChange.refGene']
 
     for field in required_fields:
@@ -527,6 +537,7 @@ def read_csv_file_custom(file_path):
                                 exception_obj=e,
                                 file_path=file_path)
 
+
 @transaction.atomic
 def variant_file_parser(file_path, analysis_run, variant_file):
     logger.info(f"Starting variant file parser for {file_path}")
@@ -602,7 +613,7 @@ def variant_file_parser(file_path, analysis_run, variant_file):
                         sequencing_run=get_sequencing_run(filename),
                         variant_file=variant_file,
                         g_variant=g_variant,
-                        coverage=row['Depth'],
+                        coverage=get_depth(row),
                         log2r=get_log2r(),
                         caller=caller,
                         normal_sl=normal_sample_lib,
