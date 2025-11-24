@@ -101,14 +101,6 @@ def initialize_import_variants(request, ar_name):
     User must click 'Start Import' to begin.
     """
     print("*"*50,"initialize_import_variants")
-    deleted_counts = {}
-    deleted_counts["gvariants"] = GVariant.objects.filter(
-        variant_calls__analysis_run__name=ar_name
-    ).delete()[0]
-
-    deleted_counts["variant_files"] = VariantFile.objects.filter(
-        analysis_run__name=ar_name, name__contains="Filtered"
-    ).delete()[0]
     importer = VariantImporter(ar_name)
     ar_url = f's3://us-west-2.amazonaws.com/{getattr(settings, "AWS_STORAGE_BUCKET_NAME", "bastian-lab-169-3-r-us-west-2.sec.ucsf.edu")}/{importer.folder_path}'
     importer.reset_status()
@@ -132,16 +124,6 @@ def initialize_import_variants(request, ar_name):
 
 def start_import_variants(request, ar_name):
     print("-" * 50, "start_import_variants")
-    # Delete GVariants
-    deleted_counts = {}
-    deleted_counts["gvariants"] = GVariant.objects.filter(
-        variant_calls__analysis_run__name=ar_name
-    ).delete()[0]
-
-
-    deleted_counts["variant_files"] = VariantFile.objects.filter(
-        analysis_run__name=ar_name, name__contains="Filtered"
-    ).delete()[0]
     # Attach handler to root logger to capture all logs in this request
     root_logger = logging.getLogger()
     analysis_run = AnalysisRun.objects.get(name=ar_name)
@@ -150,37 +132,37 @@ def start_import_variants(request, ar_name):
     root_logger.addHandler(handler)
     root_logger.setLevel(logging.INFO)
 
-    # try:
-    importer = VariantImporter(ar_name)
-    importer.discover_files_s3()
+    try:
+        importer = VariantImporter(ar_name)
+        importer.discover_files_s3()
 
-    handler.update_total_files(importer.total_files)
-    logging.info(f"=== start_import_variants called for {ar_name} ===")
+        handler.update_total_files(importer.total_files)
+        logging.info(f"=== start_import_variants called for {ar_name} ===")
 
-    result = importer.start_import(force_restart=True)
-    logging.info(f"Import started — status={result.get('status')} progress={result.get('progress', 0)}")
+        result = importer.start_import(force_restart=True)
+        logging.info(f"Import started — status={result.get('status')} progress={result.get('progress', 0)}")
 
-    return JsonResponse({
-        "analysis_run": ar_name,
-        "total_files": importer.total_files,
-        "processed_files": result.get("processed_files", 0),
-        "progress": result.get("progress", 0),
-        "status": result.get("status", "processing"),
-        "error": result.get("error", None),
-    })
+        return JsonResponse({
+            "analysis_run": ar_name,
+            "total_files": importer.total_files,
+            "processed_files": result.get("processed_files", 0),
+            "progress": result.get("progress", 0),
+            "status": result.get("status", "processing"),
+            "error": result.get("error", None),
+        })
 
-    # except Exception as e:
-    #     logging.exception(f"Error in start_import_variants for {ar_name}: {e}")
-    #     return JsonResponse({
-    #         "error": str(e),
-    #         "status": "error",
-    #         "processed_files": 0,
-    #         "progress": 0,
-    #         "total_files": 0,
-    #     })
-    # finally:
-    #     handler.close()
-    #     root_logger.removeHandler(handler)
+    except Exception as e:
+        logging.exception(f"Error in start_import_variants for {ar_name}: {e}")
+        return JsonResponse({
+            "error": str(e),
+            "status": "error",
+            "processed_files": 0,
+            "progress": 0,
+            "total_files": 0,
+        })
+    finally:
+        handler.close()
+        root_logger.removeHandler(handler)
 
 
 def reset_process(request, ar_name):

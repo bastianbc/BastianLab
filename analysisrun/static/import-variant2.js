@@ -101,7 +101,7 @@ function startProgressPolling() {
                 error.innerText = err.message;
                 importStarted = false;
             });
-    }, 1000000);
+    }, 1000);
 }
 
 function startImport() {

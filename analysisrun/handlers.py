@@ -267,7 +267,6 @@ class SnvFolderHandler:
         line = "═" * 100
         sub_line = "─" * 100
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        # try:
         # Scoped counts per AnalysisRun
         variant_calls = VariantCall.objects.filter(analysis_run__variant_files__name=file_name)
         g_variants = GVariant.objects.filter(variant_calls__analysis_run__variant_files__name=analysis_run_name).distinct()
@@ -275,7 +274,6 @@ class SnvFolderHandler:
             g_variant__variant_calls__analysis_run__variant_files__name=analysis_run_name).distinct()
         p_variants = PVariant.objects.filter(
             c_variant__g_variant__variant_calls__analysis_run__variant_files__name=analysis_run_name).distinct()
-        print("6" * 10)
         footer = (
             f"\n{line}\n"
             f"🏁 FILE PARSING SUMMARY — {file_name or 'N/A'}\n"
@@ -296,17 +294,9 @@ class SnvFolderHandler:
                 f"   • Successful : {stats.get('successful', 'N/A')}\n"
                 f"   • Failed     : {stats.get('failed', 'N/A')}\n"
             )
-        print("7" * 10)
         footer += (
             f"{sub_line}\n"
             f"✅ Completed at: {timestamp}\n"
             f"{line}\n"
         )
-        print("8" * 10)
-        # except Exception as e:
-        #     footer = (
-        #         f"\n{line}\n"
-        #         f"⚠️ Error building footer: {e}\n"
-        #         f"{line}\n"
-        #     )
         return footer
