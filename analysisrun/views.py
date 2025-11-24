@@ -104,7 +104,7 @@ def initialize_import_variants(request, ar_name):
     importer = VariantImporter(ar_name)
     ar_url = f's3://us-west-2.amazonaws.com/{getattr(settings, "AWS_STORAGE_BUCKET_NAME", "bastian-lab-169-3-r-us-west-2.sec.ucsf.edu")}/{importer.folder_path}'
     importer.reset_status()
-    # importer.clear_discovery_cache()
+    importer.clear_discovery_cache()
     importer.discover_files_s3()
 
     cache_data = importer.get_progress()
