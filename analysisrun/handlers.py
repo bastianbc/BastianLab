@@ -6,6 +6,7 @@ from cns.models import Cns
 from cns.helper import parse_cns_file_with_handler, assign_cnv_attachments
 from qc.helper import parse_metrics_files
 from variant.helper import variant_file_parser
+from variant.models import GVariant, CVariant, PVariant, VariantCall  # lazy import to avoid circulars
 
 
 def build_file_header(file_path, handler_type):
@@ -243,13 +244,18 @@ class SnvFolderHandler:
         )
         print(success, message, stats)
         variant_file.status = "completed" if success else "failed"
+        print("1"*10)
         variant_file.save()
+        print("2"*10)
 
         if success:
+            print("3" * 10)
             self.logger.info(f"✅ SNV File processed successfully: {name}")
             self.logger.info(f"📊 Rows: {stats.get('total_rows', 'N/A')} | Success: {stats.get('successful', 'N/A')} | Failures: {stats.get('failed', 'N/A')}")
         else:
+            print("4" * 10)
             self.logger.error(f"❌ SNV File failed: {name} | Reason: {message}")
+
         self.logger.info(self.build_file_footer(
             analysis_run.name,
             file_name=os.path.basename(file_path),
@@ -262,12 +268,11 @@ class SnvFolderHandler:
         """
         Builds a prettified footer with DB object counts and optional file-level stats.
         """
-        from variant.models import GVariant, CVariant, PVariant, VariantCall  # lazy import to avoid circulars
 
         line = "═" * 100
         sub_line = "─" * 100
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
+        print("5" * 10)
         # try:
         # Scoped counts per AnalysisRun
         variant_calls = VariantCall.objects.filter(analysis_run__name=analysis_run_name)
@@ -276,7 +281,7 @@ class SnvFolderHandler:
             g_variant__variant_calls__analysis_run__name=analysis_run_name).distinct()
         p_variants = PVariant.objects.filter(
             c_variant__g_variant__variant_calls__analysis_run__name=analysis_run_name).distinct()
-
+        print("6" * 10)
         footer = (
             f"\n{line}\n"
             f"🏁 FILE PARSING SUMMARY — {file_name or 'N/A'}\n"
@@ -297,13 +302,13 @@ class SnvFolderHandler:
                 f"   • Successful : {stats.get('successful', 'N/A')}\n"
                 f"   • Failed     : {stats.get('failed', 'N/A')}\n"
             )
-
+        print("7" * 10)
         footer += (
             f"{sub_line}\n"
             f"✅ Completed at: {timestamp}\n"
             f"{line}\n"
         )
-
+        print("8" * 10)
         # except Exception as e:
         #     footer = (
         #         f"\n{line}\n"

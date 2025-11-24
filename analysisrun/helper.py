@@ -366,6 +366,7 @@ class VariantImporter:
         return f"import_status_{self.ar_name}"
 
     def _set_status(self, status, progress=0, error=None):
+        print("9" * 10)
         cache.set(
             self._cache_key(),
             {
@@ -380,6 +381,7 @@ class VariantImporter:
 
     def _update_progress(self):
         """Recalculate and update progress in cache."""
+        print("10_" * 10)
         progress = int((self.processed_files / self.total_files) * 100) if self.total_files else 0
         self._set_status("processing", progress)
         return progress
