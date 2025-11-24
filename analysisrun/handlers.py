@@ -268,46 +268,46 @@ class SnvFolderHandler:
         sub_line = "─" * 100
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        try:
-            # Scoped counts per AnalysisRun
-            variant_calls = VariantCall.objects.filter(analysis_run__name=analysis_run_name)
-            g_variants = GVariant.objects.filter(variant_calls__analysis_run__name=analysis_run_name).distinct()
-            c_variants = CVariant.objects.filter(
-                g_variant__variant_calls__analysis_run__name=analysis_run_name).distinct()
-            p_variants = PVariant.objects.filter(
-                c_variant__g_variant__variant_calls__analysis_run__name=analysis_run_name).distinct()
+        # try:
+        # Scoped counts per AnalysisRun
+        variant_calls = VariantCall.objects.filter(analysis_run__name=analysis_run_name)
+        g_variants = GVariant.objects.filter(variant_calls__analysis_run__name=analysis_run_name).distinct()
+        c_variants = CVariant.objects.filter(
+            g_variant__variant_calls__analysis_run__name=analysis_run_name).distinct()
+        p_variants = PVariant.objects.filter(
+            c_variant__g_variant__variant_calls__analysis_run__name=analysis_run_name).distinct()
 
-            footer = (
-                f"\n{line}\n"
-                f"🏁 FILE PARSING SUMMARY — {file_name or 'N/A'}\n"
-                f"{sub_line}\n"
-                f"📦 Variant Calls: {variant_calls.count():>10}\n"
-                f"🧬 GVariants:     {g_variants.count():>10}\n"
-                f"🔗 CVariants:     {c_variants.count():>10}\n"
-                f"🧫 PVariants:     {p_variants.count():>10}\n"
-            )
+        footer = (
+            f"\n{line}\n"
+            f"🏁 FILE PARSING SUMMARY — {file_name or 'N/A'}\n"
+            f"{sub_line}\n"
+            f"📦 Variant Calls: {variant_calls.count():>10}\n"
+            f"🧬 GVariants:     {g_variants.count():>10}\n"
+            f"🔗 CVariants:     {c_variants.count():>10}\n"
+            f"🧫 PVariants:     {p_variants.count():>10}\n"
+        )
 
-            # Optional stats from parser
-            if stats:
-                footer += (
-                    f"{sub_line}\n"
-                    f"📊 FILE STATS\n"
-                    f"{sub_line}\n"
-                    f"   • Total Rows : {stats.get('total_rows', 'N/A')}\n"
-                    f"   • Successful : {stats.get('successful', 'N/A')}\n"
-                    f"   • Failed     : {stats.get('failed', 'N/A')}\n"
-                )
-
+        # Optional stats from parser
+        if stats:
             footer += (
                 f"{sub_line}\n"
-                f"✅ Completed at: {timestamp}\n"
-                f"{line}\n"
+                f"📊 FILE STATS\n"
+                f"{sub_line}\n"
+                f"   • Total Rows : {stats.get('total_rows', 'N/A')}\n"
+                f"   • Successful : {stats.get('successful', 'N/A')}\n"
+                f"   • Failed     : {stats.get('failed', 'N/A')}\n"
             )
 
-        except Exception as e:
-            footer = (
-                f"\n{line}\n"
-                f"⚠️ Error building footer: {e}\n"
-                f"{line}\n"
-            )
+        footer += (
+            f"{sub_line}\n"
+            f"✅ Completed at: {timestamp}\n"
+            f"{line}\n"
+        )
+
+        # except Exception as e:
+        #     footer = (
+        #         f"\n{line}\n"
+        #         f"⚠️ Error building footer: {e}\n"
+        #         f"{line}\n"
+        #     )
         return footer
