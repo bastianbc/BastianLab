@@ -104,7 +104,9 @@ def initialize_import_variants(request, ar_name):
     importer = VariantImporter(ar_name)
     ar_url = f's3://us-west-2.amazonaws.com/{getattr(settings, "AWS_STORAGE_BUCKET_NAME", "bastian-lab-169-3-r-us-west-2.sec.ucsf.edu")}/{importer.folder_path}'
     importer.reset_status()
+    # importer.clear_discovery_cache()
     importer.discover_files_s3()
+
     cache_data = importer.get_progress()
     return render(request, "import_variants.html", {
         "analysis_run": ar_name,
@@ -140,37 +142,37 @@ def start_import_variants(request, ar_name):
     root_logger.addHandler(handler)
     root_logger.setLevel(logging.INFO)
 
-    try:
-        importer = VariantImporter(ar_name)
-        importer.discover_files_s3()
+    # try:
+    importer = VariantImporter(ar_name)
+    importer.discover_files_s3()
 
-        handler.update_total_files(importer.total_files)
-        logging.info(f"=== start_import_variants called for {ar_name} ===")
+    handler.update_total_files(importer.total_files)
+    logging.info(f"=== start_import_variants called for {ar_name} ===")
 
-        result = importer.start_import(force_restart=True)
-        logging.info(f"Import started — status={result.get('status')} progress={result.get('progress', 0)}")
+    result = importer.start_import(force_restart=True)
+    logging.info(f"Import started — status={result.get('status')} progress={result.get('progress', 0)}")
 
-        return JsonResponse({
-            "analysis_run": ar_name,
-            "total_files": importer.total_files,
-            "processed_files": result.get("processed_files", 0),
-            "progress": result.get("progress", 0),
-            "status": result.get("status", "processing"),
-            "error": result.get("error", None),
-        })
+    return JsonResponse({
+        "analysis_run": ar_name,
+        "total_files": importer.total_files,
+        "processed_files": result.get("processed_files", 0),
+        "progress": result.get("progress", 0),
+        "status": result.get("status", "processing"),
+        "error": result.get("error", None),
+    })
 
-    except Exception as e:
-        logging.exception(f"Error in start_import_variants for {ar_name}: {e}")
-        return JsonResponse({
-            "error": str(e),
-            "status": "error",
-            "processed_files": 0,
-            "progress": 0,
-            "total_files": 0,
-        })
-    finally:
-        handler.close()
-        root_logger.removeHandler(handler)
+    # except Exception as e:
+    #     logging.exception(f"Error in start_import_variants for {ar_name}: {e}")
+    #     return JsonResponse({
+    #         "error": str(e),
+    #         "status": "error",
+    #         "processed_files": 0,
+    #         "progress": 0,
+    #         "total_files": 0,
+    #     })
+    # finally:
+    #     handler.close()
+    #     root_logger.removeHandler(handler)
 
 
 def reset_process(request, ar_name):
@@ -230,7 +232,7 @@ def check_import_progress(request, ar_name):
     Poll the current import progress and status.
     Called repeatedly by the frontend every few seconds to check progress.
     """
-    print("*" * 10, "check_import_progress")
+    # print("*" * 10, "check_import_progress")
 
     try:
         importer = VariantImporter(ar_name)
@@ -257,7 +259,7 @@ def check_import_progress(request, ar_name):
         # ✅ Retrieve log URL (if available)
         log_url = S3StorageLogHandler.get_log_path(ar_name)
 
-        print(f"Progress check → {processed_files}/{total_files} files ({progress}%)")
+        # print(f"Progress check → {processed_files}/{total_files} files ({progress}%)")
 
         # ✅ Return full JSON snapshot for frontend
         return JsonResponse({

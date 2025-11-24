@@ -19,6 +19,22 @@ from collections import defaultdict
 
 logger = logging.getLogger("file")
 
+stats = {
+    "total_rows": 0,
+    "successful": 0,
+    "failed": 0,
+    "errors": []
+}
+ROW_ERROR_OCCURRED = False
+
+def reset_global_stats():
+    stats["total_rows"] = 0
+    stats["successful"] = 0
+    stats["failed"] = 0
+    stats["errors"].clear()
+    EXCEPTION_STATS.clear()
+
+
 # Global dictionary to hold exception statistics
 EXCEPTION_STATS = defaultdict(int)
 
@@ -61,17 +77,40 @@ EXCEPTION_CODES = {
 
 }
 
-
 def log_and_track_exception(code, message, exception_obj=None, **kwargs):
-    """Helper to log error with code and update stats."""
+    """Log error, increment exception stats, and register failure globally."""
     code_msg = EXCEPTION_CODES.get(code, "UNKNOWN ERROR")
     log_msg = f"[{code}: {code_msg}] {message}"
-    # Track stats by function code
+
+    # Track exception counts
     EXCEPTION_STATS[code] += 1
+
+    # 🔥 Track row failure globally
+    stats["failed"] += 1
+    stats["errors"].append(log_msg)
+    global ROW_ERROR_OCCURRED
+    ROW_ERROR_OCCURRED = True
+    # Normal logging
+    print("stats in logger: ", stats)
     if exception_obj:
         logger.error(log_msg, exc_info=True, extra=kwargs)
+        print(log_msg)
     else:
         logger.error(log_msg, extra=kwargs)
+        print(log_msg)
+
+
+
+# def log_and_track_exception(code, message, exception_obj=None, **kwargs):
+#     """Helper to log error with code and update stats."""
+#     code_msg = EXCEPTION_CODES.get(code, "UNKNOWN ERROR")
+#     log_msg = f"[{code}: {code_msg}] {message}"
+#     # Track stats by function code
+#     EXCEPTION_STATS[code] += 1
+#     if exception_obj:
+#         logger.error(log_msg, exc_info=True, extra=kwargs)
+#     else:
+#         logger.error(log_msg, extra=kwargs)
 
 
 def check_file(file_path):
@@ -95,7 +134,7 @@ def check_file(file_path):
 
         try:
             s3.head_object(Bucket=bucket, Key=key)
-            logger.info(f"S3 file check passed for {file_path}")
+            print(f"S3 file check passed for {file_path}")
             return True, ""
         except s3.exceptions.S3ClientError as e:
             code = e.response["Error"]["Code"]
@@ -272,12 +311,12 @@ def get_normal_sample_lib(sample_lib):
         ).exclude(pk=sample_lib.pk).distinct().first()
 
         if normal_sl:
-            logger.info(f"Found normal sample lib: {normal_sl}")
+            print(f"Found normal sample lib: {normal_sl}")
         else:
-            logger.info("No normal sample lib found")
+            print("No normal sample lib found")
         return normal_sl
     except Exception as e:
-        log_and_track_exception("GSN001", f"Error getting normal sample lib: {str(e)}", exception_obj=e)
+        print("GSN001", f"Error getting normal sample lib: {str(e)}")
         return None
 
 def get_hg(filename):
@@ -330,8 +369,7 @@ def get_gene(gene_name, hg):
 
 def check_required_fields(row):
     logger.debug("Checking required fields in row")
-    required_fields = ['Chr', 'Start', 'End', 'Ref', 'Alt',
-                      'Ref_reads', 'Alt_reads', 'AAChange.refGene']
+    required_fields = ['Chr', 'Start', 'End', 'Ref', 'Alt', 'AAChange.refGene']
 
     for field in required_fields:
         if field not in row or pd.isna(row[field]):
@@ -528,7 +566,7 @@ def read_csv_file_custom(file_path):
                 data.append(row)
 
         df = pd.DataFrame(data[1:], columns=data[0])
-        return df
+        return df.head(5)
 
     except Exception as e:
         # Log and track general exception for reading/parsing failures
@@ -540,125 +578,123 @@ def read_csv_file_custom(file_path):
 
 @transaction.atomic
 def variant_file_parser(file_path, analysis_run, variant_file):
-    logger.info(f"Starting variant file parser for {file_path}")
-    logger.info(f"Analysis run name: {analysis_run}")
+    print(f"Starting variant file parser for {file_path}")
     # File check
     is_valid, error_msg = check_file(file_path)
     if not is_valid:
         log_and_track_exception("VFP002", f"File validation failed: {error_msg}")
         return False, error_msg, EXCEPTION_STATS
 
-    try:
-        # Read file
-        logger.debug("Reading file with pandas")
-        df = read_csv_file_custom(file_path)
-        df = df.reset_index(drop=True)
+    # try:
+    # Read file
+    logger.debug("Reading file with pandas")
+    df = read_csv_file_custom(file_path)
+    df = df.reset_index(drop=True)
 
-        if df.empty:
-            log_and_track_exception("VFP002", f"File is empty: {error_msg}")
-            return False, "File is empty", EXCEPTION_STATS
+    if df.empty:
+        log_and_track_exception("VFP002", f"File is empty: {error_msg}")
+        return False, "File is empty", EXCEPTION_STATS
 
-        filename = file_path.split("/")[-1]
-        logger.debug(f"Processing filename: {filename}")
-        # Sample library check
-        sample_lib = get_sample_lib(filename)
-        if not sample_lib:
-            logger.error(f"Sample library not found: {filename}")
-            return False, f"Sample library not found: {filename}", {}
+    filename = file_path.split("/")[-1]
+    logger.debug(f"Processing filename: {filename}")
+    # Sample library check
+    sample_lib = get_sample_lib(filename)
+    if not sample_lib:
+        logger.error(f"Sample library not found: {filename}")
+        return False, f"Sample library not found: {filename}", {}
+    reset_global_stats()
+    stats["total_rows"] = len(df)
 
-        stats = {
-            "total_rows": len(df),
-            "successful": 0,
-            "failed": 0,
-            "errors": []
-        }
-        logger.info(f"Starting to process {stats['total_rows']} rows")
 
-        normal_sample_lib = get_normal_sample_lib(sample_lib)
-        # Process each row
-        for index, row in df.iterrows():
-            try:
-                # Check required fields
-                fields_valid, field_error = check_required_fields(row)
-                if not fields_valid:
-                    logger.error(f"Row {index + 1}: {field_error}")
-                    stats["errors"].append(f"Row {index + 1}: {field_error}")
-                    stats["failed"] += 1
-                    continue
+    normal_sample_lib = get_normal_sample_lib(sample_lib)
+    # Process each row
+    for index, row in df.iterrows():
+        # try:
+        # Check required fields
+        global ROW_ERROR_OCCURRED
+        ROW_ERROR_OCCURRED = False
+        fields_valid, field_error = check_required_fields(row)
+        if not fields_valid:
+            logger.error(f"Row {index + 1}: {field_error}")
+            stats["errors"].append(f"Row {index + 1}: {field_error}")
+            stats["failed"] += 1
+            continue
 
-                # Caller check
-                caller = get_caller(filename)
-                if not caller:
-                    logger.error(f"Row {index + 1}: Could not determine caller")
-                    stats["errors"].append(f"Row {index + 1}: Could not determine caller")
-                    stats["failed"] += 1
-                    continue
+        # Caller check
+        caller = get_caller(filename)
+        if not caller:
+            logger.error(f"Row {index + 1}: Could not determine caller")
+            stats["errors"].append(f"Row {index + 1}: Could not determine caller")
+            stats["failed"] += 1
+            continue
 
-                with transaction.atomic():
-                    logger.debug(f"Getting or creating GVariant for row {index + 1}")
+        with transaction.atomic():
+            logger.debug(f"Getting or creating GVariant for row {index + 1}")
 
-                    g_variant = get_or_create_g_variant(
-                        hg=get_hg(filename),
-                        chrom=row['Chr'],
-                        start=row['Start'],
-                        end=row['End'],
-                        ref=row['Ref'][:99],
-                        alt=row['Alt'][:99],
-                        avsnp150=row.get('avsnp150', '')
-                    )
+            g_variant = get_or_create_g_variant(
+                hg=get_hg(filename),
+                chrom=row['Chr'],
+                start=row['Start'],
+                end=row['End'],
+                ref=row['Ref'][:99],
+                alt=row['Alt'][:99],
+                avsnp150=row.get('avsnp150', '')
+            )
 
-                    variant_call = VariantCall.objects.create(
-                        analysis_run=analysis_run,
-                        sample_lib=sample_lib,
-                        sequencing_run=get_sequencing_run(filename),
-                        variant_file=variant_file,
-                        g_variant=g_variant,
-                        coverage=get_depth(row),
-                        log2r=get_log2r(),
-                        caller=caller,
-                        normal_sl=normal_sample_lib,
-                        label="",
-                        ref_read=row['Ref_reads'],
-                        alt_read=row['Alt_reads'],
-                    )
-                    stats["successful"] += 1
+            variant_call = VariantCall.objects.create(
+                analysis_run=analysis_run,
+                sample_lib=sample_lib,
+                sequencing_run=get_sequencing_run(filename),
+                variant_file=variant_file,
+                g_variant=g_variant,
+                coverage=get_depth(row),
+                log2r=get_log2r(),
+                caller=caller,
+                normal_sl=normal_sample_lib,
+                label="",
+                ref_read=row.get('Ref_reads', 0),
+                alt_read=row.get('Alt_reads', 0),
+            )
+            if not ROW_ERROR_OCCURRED:
+                stats["successful"] += 1
 
-                    create_c_and_p_variants(
-                        g_variant=g_variant,
-                        variant_call=variant_call,
-                        aachange=row['AAChange.refGene'],
-                        func=row['ExonicFunc.refGene'],
-                        gene_detail=row.get('GeneDetail.refGene', ''),
-                        filename=filename,
-                        row_gene=row['Gene.refGene']
-                    )
+            create_c_and_p_variants(
+                g_variant=g_variant,
+                variant_call=variant_call,
+                aachange=row['AAChange.refGene'],
+                func=row['ExonicFunc.refGene'],
+                gene_detail=row.get('GeneDetail.refGene', ''),
+                filename=filename,
+                row_gene=row['Gene.refGene']
+            )
+            print("stats in loop: ", stats)
+        # except Exception as e:
+        #     log_and_track_exception("VFP001", f"Error processing row {index + 1}: {str(e)}", exception_obj=e)
+        #     stats["errors"].append(f"Row {index + 1}: {str(e)}")
+        #     stats["failed"] += 1
 
-            except Exception as e:
-                log_and_track_exception("VFP001", f"Error processing row {index + 1}: {str(e)}", exception_obj=e)
-                stats["errors"].append(f"Row {index + 1}: {str(e)}")
-                stats["failed"] += 1
+    # Create result message
+    if stats["failed"] == stats["total_rows"]:
+        log_and_track_exception("VFP001", "No variants could be processed - all rows failed", error_stats=stats["failed"])
+        return False, "No variants could be processed", stats
+    elif stats["failed"] > 0:
+        logger.warning(f"{stats['successful']} variants processed successfully, {stats['failed']} variants failed")
+        stats["exception_stats"] = dict(EXCEPTION_STATS)
+        return True, f"{stats['successful']} variants processed successfully, {stats['failed']} variants failed", stats
+    else:
+        print("All variants processed successfully")
+        stats["exception_stats"] = dict(EXCEPTION_STATS)
+        return True, "All variants processed successfully", stats
 
-        # Create result message
-        if stats["failed"] == stats["total_rows"]:
-            log_and_track_exception("VFP001", "No variants could be processed - all rows failed", error_stats=stats["failed"])
-            return False, "No variants could be processed", stats
-        elif stats["failed"] > 0:
-            logger.warning(f"{stats['successful']} variants processed successfully, {stats['failed']} variants failed")
-            stats["exception_stats"] = dict(EXCEPTION_STATS)
-            return True, f"{stats['successful']} variants processed successfully, {stats['failed']} variants failed", stats
-        else:
-            logger.info("All variants processed successfully")
-            stats["exception_stats"] = dict(EXCEPTION_STATS)
-            return True, "All variants processed successfully", stats
-
-    except Exception as e:
-        log_and_track_exception("VFP001", f"Critical error in variant file parser: {str(e)}", exception_obj=e)
-        stats = {
-            "total_rows": 0,
-            "successful": 0,
-            "failed": 0,
-            "errors": [f"Critical error: {str(e)}"],
-            "exception_stats": dict(EXCEPTION_STATS)
-        }
-        return False, f"Critical error: {str(e)}", stats
-
+    # except Exception as e:
+    #     log_and_track_exception("VFP001", f"Critical error in variant file parser: {str(e)}", exception_obj=e)
+    #     stats = {
+    #         "total_rows": 0,
+    #         "successful": 0,
+    #         "failed": 0,
+    #         "errors": [f"Critical error: {str(e)}"],
+    #         "exception_stats": dict(EXCEPTION_STATS)
+    #     }
+    #     return False, f"Critical error: {str(e)}", stats
+    # finally:
+    #     reset_global_stats()

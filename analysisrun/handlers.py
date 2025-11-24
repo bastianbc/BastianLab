@@ -241,6 +241,7 @@ class SnvFolderHandler:
             file_path=file_path,
             variant_file=variant_file,
         )
+        print(success, message, stats)
         variant_file.status = "completed" if success else "failed"
         variant_file.save()
 

@@ -282,23 +282,36 @@ class VariantImporter:
     # ----------------------------------------------------------------------
     # File Discovery
     # ----------------------------------------------------------------------
+    def clear_discovery_cache(self):
+        cache_key = f"variant_importer_discovery_{self.ar_name}"
+        cache.delete(cache_key)
+
     def discover_files_s3(self):
         """
-        Discover and order files by folder types, with counting.
-        Order:
-          1. metrics
-          2. cnv
-          3. cnv_attachments
-          4. snv
-        (Or whatever order folder_types is defined)
+        Discover and order files by folder types, WITH CACHING.
+        If cached results exist, return them directly without scanning S3.
         """
+        cache_key = f"variant_importer_discovery_{self.ar_name}"
+
+        # ---------- CHECK CACHE ----------
+        cached = cache.get(cache_key)
+        if cached:
+            self.all_files = cached["all_files"]
+            self.total_files = cached["total_files"]
+            self.count_files = cached["count_files"]
+            self.processed_files = 0
+            self._set_status("processing", 0)
+            print("[CACHE HIT] Loaded discovered files from cache.")
+            return self.all_files
+
+        print("[CACHE MISS] Scanning S3…")
+
+        # ---------- ORIGINAL LOGIC ----------
         self.all_files.clear()
         paginator = self.s3.get_paginator("list_objects_v2")
 
-        # Temporary: group by folder type
         grouped = {ftype: [] for ftype in self.folder_types.keys()}
 
-        # --- Scan S3 and classify files ---
         for page in paginator.paginate(
                 Bucket=settings.AWS_STORAGE_BUCKET_NAME,
                 Prefix=self.folder_path
@@ -314,28 +327,37 @@ class VariantImporter:
                             f"{settings.AWS_STORAGE_BUCKET_NAME}/{key}"
                         )
                         grouped[type_name].append(full_s3_path)
-                        break  # stop after first matching folder type
+                        break
 
-        # --- Sort inside each folder type group ---
+        # sort grouped lists
         for ftype in grouped:
             grouped[ftype] = sorted(grouped[ftype])
 
-        # --- Flatten them in folder_types order ---
+        # flatten in folder order
         ordered_files = []
         for ftype in self.folder_types.keys():
             ordered_files.extend([(ftype, path) for path in grouped[ftype]])
 
-        # --- Set importer state ---
+        # update internal state
         self.all_files = ordered_files
         self.total_files = len(ordered_files)
-        self.processed_files = 0
-
-        # Optionally set progress
-        self._set_status("processing", 0)
         self.count_files = {ftype: len(grouped[ftype]) for ftype in grouped}
-        # --- Return grouped results if needed ---
-        return self.all_files
+        self.processed_files = 0
+        self._set_status("processing", 0)
 
+        # ---------- WRITE TO CACHE ----------
+        cache.set(
+            cache_key,
+            {
+                "all_files": self.all_files,
+                "total_files": self.total_files,
+                "count_files": self.count_files,
+            },
+            timeout=6 * 3600  # 6 hours
+        )
+        print("[CACHE WRITE] Discovery cached.")
+
+        return self.all_files
 
     # ----------------------------------------------------------------------
     # Cache helpers
@@ -394,49 +416,49 @@ class VariantImporter:
     # ----------------------------------------------------------------------
     def _run_import_job(self):
         """Sequentially process discovered files."""
-        try:
-            print(f"Starting variant import for {self.ar_name} ({self.total_files} files)")
-            for idx, (type_name, file_path) in enumerate(self.all_files, start=1):
+        # try:
+        print(f"Starting variant import for {self.ar_name} ({self.total_files} files)")
+        for idx, (type_name, file_path) in enumerate(self.all_files, start=1):
 
-                try:
-                    print(f"Processing file {idx}/{self.total_files}: {file_path}, type: {type_name}")
-                    handler_class = self.folder_types[type_name]["handler"]
-                    print(handler_class)
-                    success, message = handler_class().process(self.analysis_run, file_path)
-                    if success:
-                        self.processed_files += 1
-                    else:
-                        self._set_status("error", self._update_progress(), error=message)
-                        logger.error(f"Handler failed for {file_path}: {message}")
-                        break
-                except Exception as e:
-                    logger.error(f"Error processing {file_path}: {e}", exc_info=True)
-                    self._set_status("error", self._update_progress(), error=str(e))
-                    self.analysis_run.status = "failed"
-                    self.analysis_run.save()
-                    return {"status": "error", "error": str(e)}
+            # try:
+            print(f"Processing file {idx}/{self.total_files}: {file_path}, type: {type_name}")
+            handler_class = self.folder_types[type_name]["handler"]
+            print(handler_class)
+            success, message = handler_class().process(self.analysis_run, file_path)
+            if success:
+                self.processed_files += 1
+            else:
+                self._set_status("error", self._update_progress(), error=message)
+                logger.error(f"Handler failed for {file_path}: {message}")
+                break
+            # except Exception as e:
+            #     logger.error(f"Error processing {file_path}: {e}", exc_info=True)
+            #     self._set_status("error", self._update_progress(), error=str(e))
+            #     self.analysis_run.status = "failed"
+            #     self.analysis_run.save()
+            #     return {"status": "error", "error": str(e)}
 
-                # Update progress every iteration
-                self._update_progress()
+            # Update progress every iteration
+            self._update_progress()
 
-            # Mark completion
-            self._set_status("done", 100)
-            self.analysis_run.status = "completed"
-            self.analysis_run.save()
-            logger.info(f"Variant import completed for {self.ar_name}")
+        # Mark completion
+        self._set_status("done", 100)
+        self.analysis_run.status = "completed"
+        self.analysis_run.save()
+        logger.info(f"Variant import completed for {self.ar_name}")
 
-            return {
-                "status": "done",
-                "processed_files": self.processed_files,
-                "progress": 100,
-            }
+        return {
+            "status": "done",
+            "processed_files": self.processed_files,
+            "progress": 100,
+        }
 
-        except Exception as e:
-            logger.critical(f"Fatal error in variant import for {self.ar_name}: {e}", exc_info=True)
-            self._set_status("error", self._update_progress(), error=str(e))
-            self.analysis_run.status = "failed"
-            self.analysis_run.save()
-            return {"status": "error", "error": str(e)}
+        # except Exception as e:
+        #     logger.critical(f"Fatal error in variant import for {self.ar_name}: {e}", exc_info=True)
+        #     self._set_status("error", self._update_progress(), error=str(e))
+        #     self.analysis_run.status = "failed"
+        #     self.analysis_run.save()
+        #     return {"status": "error", "error": str(e)}
 
     # ----------------------------------------------------------------------
     # Utilities
