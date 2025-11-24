@@ -6,12 +6,7 @@ const status = document.getElementById("status");
 
 let importStarted = false;
 
-// Initialize event listeners
-document.addEventListener("DOMContentLoaded", function() {
-    if (btnImport) {
-        btnImport.addEventListener("click", startImport);
-    }
-});
+
 
 function startProgressPolling() {
     console.log("⏳ Starting 2-second polling to /check_import_progress/");
