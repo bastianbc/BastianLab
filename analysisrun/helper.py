@@ -432,7 +432,6 @@ class VariantImporter:
             else:
                 self._set_status("error", self._update_progress(), error=message)
                 logger.error(f"Handler failed for {file_path}: {message}")
-                break
             # except Exception as e:
             #     logger.error(f"Error processing {file_path}: {e}", exc_info=True)
             #     self._set_status("error", self._update_progress(), error=str(e))
