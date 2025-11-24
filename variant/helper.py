@@ -91,13 +91,10 @@ def log_and_track_exception(code, message, exception_obj=None, **kwargs):
     global ROW_ERROR_OCCURRED
     ROW_ERROR_OCCURRED = True
     # Normal logging
-    print("stats in logger: ", stats)
     if exception_obj:
         logger.error(log_msg, exc_info=True, extra=kwargs)
-        print(log_msg)
     else:
         logger.error(log_msg, extra=kwargs)
-        print(log_msg)
 
 
 
@@ -134,7 +131,7 @@ def check_file(file_path):
 
         try:
             s3.head_object(Bucket=bucket, Key=key)
-            print(f"S3 file check passed for {file_path}")
+            logger.info(f"S3 file check passed for {file_path}")
             return True, ""
         except s3.exceptions.S3ClientError as e:
             code = e.response["Error"]["Code"]
@@ -311,12 +308,12 @@ def get_normal_sample_lib(sample_lib):
         ).exclude(pk=sample_lib.pk).distinct().first()
 
         if normal_sl:
-            print(f"Found normal sample lib: {normal_sl}")
+            logger.info(f"Found normal sample lib: {normal_sl}")
         else:
-            print("No normal sample lib found")
+            logger.info("No normal sample lib found")
         return normal_sl
     except Exception as e:
-        print("GSN001", f"Error getting normal sample lib: {str(e)}")
+        logger.info("GSN001", f"Error getting normal sample lib: {str(e)}")
         return None
 
 def get_hg(filename):
@@ -577,7 +574,7 @@ def read_csv_file_custom(file_path):
 
 
 def variant_file_parser(file_path, analysis_run, variant_file):
-    print(f"Starting variant file parser for {file_path}")
+    logger.info(f"Starting variant file parser for {file_path}")
     global stats
     # File check
     is_valid, error_msg = check_file(file_path)
@@ -667,7 +664,6 @@ def variant_file_parser(file_path, analysis_run, variant_file):
                     filename=filename,
                     row_gene=row['Gene.refGene']
                 )
-                print("stats in loop: ", stats)
             # except Exception as e:
             #     log_and_track_exception("VFP001", f"Error processing row {index + 1}: {str(e)}", exception_obj=e)
             #     stats["errors"].append(f"Row {index + 1}: {str(e)}")
@@ -682,7 +678,7 @@ def variant_file_parser(file_path, analysis_run, variant_file):
             stats["exception_stats"] = dict(EXCEPTION_STATS)
             return True, f"{stats['successful']} variants processed successfully, {stats['failed']} variants failed", stats
         else:
-            print("All variants processed successfully")
+            logger.info("All variants processed successfully")
             stats["exception_stats"] = dict(EXCEPTION_STATS)
             return True, "All variants processed successfully", stats
 

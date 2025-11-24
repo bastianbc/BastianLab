@@ -242,23 +242,18 @@ class SnvFolderHandler:
             file_path=file_path,
             variant_file=variant_file,
         )
-        print(success, message, stats)
         variant_file.status = "completed" if success else "failed"
-        print("1"*10)
         variant_file.save()
-        print("2"*10)
 
         if success:
-            print("3" * 10)
             self.logger.info(f"✅ SNV File processed successfully: {name}")
             self.logger.info(f"📊 Rows: {stats.get('total_rows', 'N/A')} | Success: {stats.get('successful', 'N/A')} | Failures: {stats.get('failed', 'N/A')}")
         else:
-            print("4" * 10)
             self.logger.error(f"❌ SNV File failed: {name} | Reason: {message}")
 
         self.logger.info(self.build_file_footer(
             analysis_run.name,
-            file_name=os.path.basename(file_path),
+            file_name=name,
             stats=stats
         ))
         return success, message
@@ -272,15 +267,14 @@ class SnvFolderHandler:
         line = "═" * 100
         sub_line = "─" * 100
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        print("5" * 10)
         # try:
         # Scoped counts per AnalysisRun
-        variant_calls = VariantCall.objects.filter(analysis_run__name=analysis_run_name)
-        g_variants = GVariant.objects.filter(variant_calls__analysis_run__name=analysis_run_name).distinct()
+        variant_calls = VariantCall.objects.filter(analysis_run__variant_files__name=file_name)
+        g_variants = GVariant.objects.filter(variant_calls__analysis_run__variant_files__name=analysis_run_name).distinct()
         c_variants = CVariant.objects.filter(
-            g_variant__variant_calls__analysis_run__name=analysis_run_name).distinct()
+            g_variant__variant_calls__analysis_run__variant_files__name=analysis_run_name).distinct()
         p_variants = PVariant.objects.filter(
-            c_variant__g_variant__variant_calls__analysis_run__name=analysis_run_name).distinct()
+            c_variant__g_variant__variant_calls__analysis_run__variant_files__name=analysis_run_name).distinct()
         print("6" * 10)
         footer = (
             f"\n{line}\n"
