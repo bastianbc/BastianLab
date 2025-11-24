@@ -167,37 +167,47 @@ class VariantImporter:
     # Internal import runner
     # ----------------------------------------------------------------------
     def _run_import_job(self):
-        """Sequentially process discovered files."""
+        """Sequentially process all discovered files synchronously."""
         try:
             print(f"Starting variant import for {self.ar_name} ({self.total_files} files)")
-            for idx, (type_name, file_path) in enumerate(self.all_files, start=1):
 
+            for idx, (type_name, file_path) in enumerate(self.all_files, start=1):
                 try:
                     handler_class = self.folder_types[type_name]["handler"]
                     success, message = handler_class().process(self.analysis_run, file_path)
+
                     if success:
                         self.processed_files += 1
-                        self._update_progress()
                     else:
+                        # Mark error but DO NOT STOP the loop
                         self._set_status("error", self._update_progress(), error=message)
                         logger.error(f"Handler failed for {file_path}: {message}")
+
                 except Exception as e:
                     logger.error(f"Error processing {file_path}: {e}", exc_info=True)
                     self._set_status("error", self._update_progress(), error=str(e))
                     self.analysis_run.status = "failed"
                     self.analysis_run.save()
                     return {"status": "error", "error": str(e)}
-                # Mark completion
-                self._set_status("done", 100)
-                self.analysis_run.status = "completed"
-                self.analysis_run.save()
-                logger.info(f"Variant import completed for {self.ar_name}")
 
-                return {
-                    "status": "done",
-                    "processed_files": self.processed_files,
-                    "progress": 100,
-                }
+                # Update progress AFTER each file
+                self._update_progress()
+
+            # ---------------------------------------------------------
+            # ✔ AFTER the loop — all files processed
+            # ---------------------------------------------------------
+            self._set_status("done", 100)
+            self.analysis_run.status = "completed"
+            self.analysis_run.save()
+
+            logger.info(f"Variant import fully completed for {self.ar_name}")
+
+            return {
+                "status": "done",
+                "processed_files": self.processed_files,
+                "total_files": self.total_files,
+                "progress": 100,
+            }
 
         except Exception as e:
             logger.critical(f"Fatal error in variant import for {self.ar_name}: {e}", exc_info=True)
