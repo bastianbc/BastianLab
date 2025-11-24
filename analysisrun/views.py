@@ -101,6 +101,14 @@ def initialize_import_variants(request, ar_name):
     User must click 'Start Import' to begin.
     """
     print("*"*50,"initialize_import_variants")
+    deleted_counts = {}
+    deleted_counts["gvariants"] = GVariant.objects.filter(
+        variant_calls__analysis_run__name=ar_name
+    ).delete()[0]
+
+    deleted_counts["variant_files"] = VariantFile.objects.filter(
+        analysis_run__name=ar_name, name__contains="Filtered"
+    ).delete()[0]
     importer = VariantImporter(ar_name)
     ar_url = f's3://us-west-2.amazonaws.com/{getattr(settings, "AWS_STORAGE_BUCKET_NAME", "bastian-lab-169-3-r-us-west-2.sec.ucsf.edu")}/{importer.folder_path}'
     importer.reset_status()
