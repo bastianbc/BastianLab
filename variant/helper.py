@@ -576,7 +576,6 @@ def read_csv_file_custom(file_path):
                                 file_path=file_path)
 
 
-@transaction.atomic
 def variant_file_parser(file_path, analysis_run, variant_file):
     print(f"Starting variant file parser for {file_path}")
     # File check
