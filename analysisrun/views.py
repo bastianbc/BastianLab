@@ -141,7 +141,7 @@ def start_import_variants(request, ar_name):
 
         result = importer.start_import(force_restart=True)
         logging.info(f"Import started — status={result.get('status')} progress={result.get('progress', 0)}")
-
+        print("1"*10)
         return JsonResponse({
             "analysis_run": ar_name,
             "total_files": importer.total_files,
@@ -153,6 +153,7 @@ def start_import_variants(request, ar_name):
 
     except Exception as e:
         logging.exception(f"Error in start_import_variants for {ar_name}: {e}")
+        print("2"*10)
         return JsonResponse({
             "error": str(e),
             "status": "error",
