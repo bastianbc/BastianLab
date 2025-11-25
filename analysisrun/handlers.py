@@ -269,11 +269,9 @@ class SnvFolderHandler:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         # Scoped counts per AnalysisRun
         variant_calls = VariantCall.objects.filter(analysis_run__variant_files__name=file_name)
-        g_variants = GVariant.objects.filter(variant_calls__analysis_run__variant_files__name=analysis_run_name).distinct()
-        c_variants = CVariant.objects.filter(
-            g_variant__variant_calls__analysis_run__variant_files__name=analysis_run_name).distinct()
-        p_variants = PVariant.objects.filter(
-            c_variant__g_variant__variant_calls__analysis_run__variant_files__name=analysis_run_name).distinct()
+        g_variants = GVariant.objects.filter(variant_calls__in=variant_calls).distinct()
+        c_variants = CVariant.objects.filter(g_variant__in=g_variants).distinct()
+        p_variants = PVariant.objects.filter(c_variant__in=c_variants).distinct()
         footer = (
             f"\n{line}\n"
             f"🏁 FILE PARSING SUMMARY — {file_name or 'N/A'}\n"
@@ -283,7 +281,6 @@ class SnvFolderHandler:
             f"🔗 CVariants:     {c_variants.count():>10}\n"
             f"🧫 PVariants:     {p_variants.count():>10}\n"
         )
-
         # Optional stats from parser
         if stats:
             footer += (

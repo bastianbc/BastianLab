@@ -18,11 +18,11 @@ class VariantImporter:
         self.folder_path = f"sequencingdata/ProcessedData/{self.analysis_run.sheet_name}"
 
         self.folder_types = {
-            "metrics": {"path": "alignments/metrics", "endfix": [
-                ".dup_metrics","_Hs_Metrics.txt",".insert_size_metrics.txt","insert_size_histogram.pdf"
-            ], "handler": AlignmentsFolderHandler},
-            "cnv": {"path": "cnv/output", "endfix": [".cns"],"handler": CnvFolderHandler},
-            "cnv_attachments": {"path": "cnv/output", "endfix": ["diagram.pdf", "scatter.png"], "handler": CnvAttachmentHandler},
+            # "metrics": {"path": "alignments/metrics", "endfix": [
+            #     ".dup_metrics","_Hs_Metrics.txt",".insert_size_metrics.txt","insert_size_histogram.pdf"
+            # ], "handler": AlignmentsFolderHandler},
+            # "cnv": {"path": "cnv/output", "endfix": [".cns"],"handler": CnvFolderHandler},
+            # "cnv_attachments": {"path": "cnv/output", "endfix": ["diagram.pdf", "scatter.png"], "handler": CnvAttachmentHandler},
             "snv": {"path": "snv/output", "endfix": ["_multianno_Filtered.txt", "_multianno.Filtered.txt"], "handler": SnvFolderHandler},
         }
         self.count_files = {}
@@ -79,7 +79,7 @@ class VariantImporter:
                             f"{settings.AWS_STORAGE_BUCKET_NAME}/{key}"
                         )
                         grouped[type_name].append(full_s3_path)
-                        break
+
 
         # sort grouped lists
         for ftype in grouped:

@@ -362,6 +362,7 @@ def get_gene(gene_name, hg):
         return gene
     except Gene.DoesNotExist:
         log_and_track_exception("GG001", f"Gene not found: {gene_name} (hg: {hg})")
+        print("GG001", f"Gene not found: {gene_name} (hg: {hg})")
         return None
 
 def check_required_fields(row):
@@ -420,6 +421,8 @@ def create_gene_detail(gene_detail, row_gene, g_variant, func, filename):
             nm_id, exon, c_var = entry.split(':')
             hg_value = f"hg{get_hg(filename)}"
             gene_obj = get_gene(row_gene, hg_value)
+            if not gene_obj:
+                return "", ""
             # Create CVariant instance
             is_alias = True if nm_id.lower() == gene_obj.nm_canonical.lower() else False
             if gene_obj:
@@ -668,7 +671,7 @@ def variant_file_parser(file_path, analysis_run, variant_file):
                 log_and_track_exception("VFP001", f"Error processing row {index + 1}: {str(e)}", exception_obj=e)
                 stats["errors"].append(f"Row {index + 1}: {str(e)}")
                 stats["failed"] += 1
-
+        print(stats)
         # Create result message
         if stats["failed"] == stats["total_rows"]:
             log_and_track_exception("VFP001", "No variants could be processed - all rows failed", error_stats=stats["failed"])

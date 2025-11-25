@@ -125,6 +125,13 @@ def initialize_import_variants(request, ar_name):
 def start_import_variants(request, ar_name):
     print("-" * 50, "start_import_variants")
     # Attach handler to root logger to capture all logs in this request
+    # Delete GVariants
+    GVariant.objects.filter(
+        variant_calls__analysis_run__name=ar_name
+    ).delete()[0]
+    VariantFile.objects.filter(
+        analysis_run__name=ar_name
+    ).delete()[0]
     root_logger = logging.getLogger()
     analysis_run = AnalysisRun.objects.get(name=ar_name)
     handler = S3StorageLogHandler(analysis_run.name, analysis_run.sheet_name)
@@ -141,7 +148,6 @@ def start_import_variants(request, ar_name):
 
         result = importer.start_import(force_restart=True)
         logging.info(f"Import started — status={result.get('status')} progress={result.get('progress', 0)}")
-        print("1"*10)
         return JsonResponse({
             "analysis_run": ar_name,
             "total_files": importer.total_files,
