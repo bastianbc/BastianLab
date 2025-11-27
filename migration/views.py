@@ -799,10 +799,22 @@ def generate_file_set(file, seq_run, sample_lib):
     print("file_set generated", prefix, "------", file)
     return file_set
 
+
+def read_genes():
+    file = Path(Path(__file__).parent.parent / "uploads" / "gene_past_version.csv")
+    df = pd.read_csv(file)
+    # df[~df["Input Conc."].isnull()].apply(lambda row: get_or_cons(row), axis=1)
+    print(df)
+    for i,row in df.iterrows():
+        gene = Gene.objects.get(id=row["id"])
+        gene.name = row["name"]
+        gene.save()
+        print(gene.name)
+
 def import_genes(request):
-    from .s3_is_registered import run_sync_2, run_sync
+    # from .s3_is_registered import run_sync_2, run_sync
     print("importing genes...")
-    run_sync()
+    read_genes()
     # from .variant_call_alias import restore_variant_files
     # restore_variant_files()
 
