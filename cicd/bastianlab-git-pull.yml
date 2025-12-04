@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: SEC-compliant CloudFormation wrapper for running git pull on Bastian Lab EC2 via SSM RunCommand
+
+Parameters:
+  InstanceId:
+    Type: String
+    Description: EC2 instance ID to run git pull on
+
+Resources:
+  PlaceholderLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/bastianlab/gitpull/${InstanceId}"
+      RetentionInDays: 30
+
+Outputs:
+
+  GitPullCommand:
+    Description: "Run this command to execute git pull via SSM RunCommand"
+    Value: !Sub |
+      aws ssm send-command \
+        --instance-ids ${InstanceId} \
+        --document-name "AWS-RunShellScript" \
+        --comment "Run git pull on BastianLab project" \
+        --parameters commands="echo 'Running git pull...'; su - ssm-user -c 'cd /home/ssm-user/project/BastianLab && git pull'" \
+        --output text
+
+  SimpleGitPullCommand:
+    Description: "Simplified version"
+    Value: !Sub |
+      aws ssm send-command \
+        --instance-ids ${InstanceId} \
+        --document-name AWS-RunShellScript \
+        --parameters commands="su - ssm-user -c 'cd /home/ssm-user/project/BastianLab && git pull'"
