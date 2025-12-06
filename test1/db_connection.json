@@ -1,7 +1,7 @@
 {
   "username": "db_user",
   "password": "1235",
-  "host":     "labdbproduction-restore.cf8eouyk40ff.us-west-2.rds.amazonaws.com",
+  "host":     "labdbproduction.cf8eouyk40ff.us-west-2.rds.amazonaws.com",
   "port":     5432,
   "dbname":   "labdbproduction"
 }
