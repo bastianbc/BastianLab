@@ -812,9 +812,9 @@ def read_genes():
         print(gene.name)
 
 def import_genes(request):
-    from .glacier_convert import convert_to_standard
+    from .glacier_convert import convert_prefix
     print("convert_to_standard...")
-    convert_to_standard()
+    convert_prefix()
     # from .variant_call_alias import restore_variant_files
     # restore_variant_files()
 

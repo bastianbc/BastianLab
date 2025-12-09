@@ -95,59 +95,98 @@ def convert_glacier_and_mark_level():
     print(f"  Skipped       : {skipped}")
     print(f"  Errors        : {errors}")
 
-
 import boto3
 from botocore.exceptions import ClientError
-from boto3.s3.transfer import TransferConfig
 
-# --- CONFIGURATION ---
-AWS_REGION = "us-west-2"
-BUCKET_NAME = "bastian-lab-169-3-r-us-west-2.sec.ucsf.edu"
-DRY_RUN = False  # Set to True to see actions without changing S3
+s3 = boto3.client("s3", region_name="us-west-2")
+
+BUCKET = "bastian-lab-169-3-r-us-west-2.sec.ucsf.edu"
 PREFIX = "BastianRaid-02/HiSeqData/BCB119_NC12685/NC12685/AM2-062/"
+PART_SIZE = 500 * 1024 * 1024  # 500 MB per part
 
-CONFIG = TransferConfig(
-    multipart_threshold=8 * 1024 * 1024,
-    multipart_chunksize=64 * 1024 * 1024,
-    max_concurrency=10,
-    use_threads=True
-)
 
-s3 = boto3.client("s3", region_name=AWS_REGION)
+def multipart_copy_large_object(key, size):
+    print(f"Starting multipart copy for large file: {key} ({size} bytes)")
 
-def convert_to_standard():
+    # 1. Start multipart upload
+    mpu = s3.create_multipart_upload(
+        Bucket=BUCKET,
+        Key=key,
+        StorageClass="STANDARD",
+        MetadataDirective="COPY"
+    )
+
+    upload_id = mpu["UploadId"]
+    parts = []
+    part_number = 1
+
     try:
-        paginator = s3.get_paginator("list_objects_v2")
-        pages = paginator.paginate(Bucket=BUCKET_NAME, Prefix=PREFIX)
+        # 2. Loop through parts
+        for start in range(0, size, PART_SIZE):
+            end = min(start + PART_SIZE - 1, size - 1)
 
-        for page in pages:
-            if "Contents" not in page:
+            print(f" Copying part {part_number}: bytes {start}-{end}")
+
+            part = s3.upload_part_copy(
+                Bucket=BUCKET,
+                Key=key,
+                CopySource={"Bucket": BUCKET, "Key": key},
+                UploadId=upload_id,
+                PartNumber=part_number,
+                CopySourceRange=f"bytes={start}-{end}"
+            )
+
+            parts.append({"ETag": part["CopyPartResult"]["ETag"], "PartNumber": part_number})
+            part_number += 1
+
+        # 3. Complete multipart upload
+        s3.complete_multipart_upload(
+            Bucket=BUCKET,
+            Key=key,
+            UploadId=upload_id,
+            MultipartUpload={"Parts": parts}
+        )
+
+        print(f"✓ Completed STANDARD conversion for large object: {key}")
+
+    except Exception as e:
+        print(f"❌ Failed during multipart upload: {e}")
+        s3.abort_multipart_upload(Bucket=BUCKET, Key=key, UploadId=upload_id)
+
+
+def convert_prefix():
+    paginator = s3.get_paginator("list_objects_v2")
+    for page in paginator.paginate(Bucket=BUCKET, Prefix=PREFIX):
+        if "Contents" not in page:
+            continue
+
+        for obj in page["Contents"]:
+            key = obj["Key"]
+            size = obj["Size"]
+
+            if key.endswith("/"):
                 continue
 
-            for obj in page["Contents"]:
-                key = obj["Key"]
+            print(f"Processing: {key}")
 
-                print(f"Processing: {key}")
+            # Large file → needs multipart
+            if size > 5 * 1024 * 1024 * 1024:
+                multipart_copy_large_object(key, size)
+                continue
 
-                if DRY_RUN:
-                    print(f"DRY RUN: Would copy {key} to STANDARD")
-                    continue
+            # Small file → use regular copy
+            try:
+                s3.copy_object(
+                    Bucket=BUCKET,
+                    CopySource={"Bucket": BUCKET, "Key": key},
+                    Key=key,
+                    StorageClass="STANDARD",
+                    MetadataDirective="COPY"
+                )
+                print(f"✓ Converted small file to STANDARD: {key}")
+            except ClientError as e:
+                print(f"❌ Failed for {key}: {e}")
 
-                # Copy object to itself with STANDARD storage class
-                try:
-                    s3.copy_object(
-                        Bucket=BUCKET_NAME,
-                        CopySource={"Bucket": BUCKET_NAME, "Key": key},
-                        Key=key,
-                        StorageClass="STANDARD",
-                        MetadataDirective="COPY"
-                    )
-                    print(f"✓ Converted to STANDARD: {key}")
 
-                except ClientError as e:
-                    print(f"❌ Failed for {key}: {e}")
-
-    except ClientError as e:
-        print(f"Error listing objects: {e}")
 
 
