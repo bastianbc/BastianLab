@@ -102,13 +102,13 @@ s3 = boto3.client("s3", region_name="us-west-2")
 
 BUCKET = "bastian-lab-169-3-r-us-west-2.sec.ucsf.edu"
 PREFIX = "BastianRaid-02/HiSeqData/BCB119_NC12685/NC12685/AM2-062/"
-PART_SIZE = 500 * 1024 * 1024  # 500 MB
+PART_SIZE = 500 * 1024 * 1024  # 500 MB per part
 
 
 def multipart_copy_large_object(key, size):
     print(f"Starting multipart copy for large file: {key} ({size} bytes)")
 
-    # 1. Start multipart upload (NO MetadataDirective here)
+    # 1. Start multipart upload
     mpu = s3.create_multipart_upload(
         Bucket=BUCKET,
         Key=key,
@@ -122,7 +122,6 @@ def multipart_copy_large_object(key, size):
     try:
         for start in range(0, size, PART_SIZE):
             end = min(start + PART_SIZE - 1, size - 1)
-
             print(f" Copying part {part_number}: bytes {start}-{end}")
 
             part = s3.upload_part_copy(
@@ -131,14 +130,17 @@ def multipart_copy_large_object(key, size):
                 UploadId=upload_id,
                 PartNumber=part_number,
                 CopySource={"Bucket": BUCKET, "Key": key},
-                CopySourceRange=f"bytes={start}-{end}",
-                MetadataDirective="COPY"  # ✔️ ALLOWED HERE
+                CopySourceRange=f"bytes={start}-{end}"
             )
 
-            parts.append({"ETag": part["CopyPartResult"]["ETag"], "PartNumber": part_number})
+            parts.append({
+                "ETag": part["CopyPartResult"]["ETag"],
+                "PartNumber": part_number
+            })
+
             part_number += 1
 
-        # 3. Complete multipart
+        # 3. Complete
         s3.complete_multipart_upload(
             Bucket=BUCKET,
             Key=key,
@@ -159,7 +161,6 @@ def multipart_copy_large_object(key, size):
 
 def convert_prefix():
     paginator = s3.get_paginator("list_objects_v2")
-
     for page in paginator.paginate(Bucket=BUCKET, Prefix=PREFIX):
         if "Contents" not in page:
             continue
@@ -173,21 +174,21 @@ def convert_prefix():
 
             print(f"Processing: {key}")
 
-            # large file
+            # Large --> multipart copy
             if size > 5 * 1024 * 1024 * 1024:
                 multipart_copy_large_object(key, size)
                 continue
 
-            # small file
+            # Small --> copy_object
             try:
                 s3.copy_object(
                     Bucket=BUCKET,
                     CopySource={"Bucket": BUCKET, "Key": key},
                     Key=key,
-                    StorageClass="STANDARD",
-                    MetadataDirective="COPY"
+                    StorageClass="STANDARD"
                 )
                 print(f"✓ Converted to STANDARD: {key}")
+
             except ClientError as e:
                 print(f"❌ Failed for {key}: {e}")
 
