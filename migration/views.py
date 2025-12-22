@@ -812,11 +812,10 @@ def read_genes():
         print(gene.name)
 
 def import_genes(request):
-    from .glacier_convert import convert_prefix
-    print("convert_to_standard...")
-    convert_prefix()
-    # from .variant_call_alias import restore_variant_files
-    # restore_variant_files()
+    from s3_is_registered import run_sync
+    print("run_sync...")
+    run_sync()
+    print("finised...")
 
 
 def import_file_tree(request):
