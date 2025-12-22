@@ -812,7 +812,7 @@ def read_genes():
         print(gene.name)
 
 def import_genes(request):
-    from s3_is_registered import run_sync
+    from .s3_is_registered import run_sync
     print("run_sync...")
     run_sync()
     print("finised...")
