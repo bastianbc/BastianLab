@@ -165,7 +165,7 @@ secret_path = Path(__file__).resolve().parent.parent / "db_connection_local.json
 RDS_SECRET = json.loads(secret_path.read_text())
 
 DATABASES = {
-    "default": {
+    "ucsf": {
         "ENGINE":   "django.db.backends.postgresql",
         "NAME":     RDS_SECRET["dbname"],
         "USER":     RDS_SECRET["username"],
@@ -177,7 +177,7 @@ DATABASES = {
             "options": "-c search_path=cosmic_hg38,public"
         },
     },
-    'ucsf': {
+    'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'USER': 'testuser',
         'PASSWORD': '1235',
