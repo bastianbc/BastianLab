@@ -285,23 +285,24 @@ VARIANT_FILES_SOURCE_DIRECTORY = SEQUENCING_FILES_SOURCE_DIRECTORY
 # ================================
 # EMAIL CONFIGURATION (POSTFIX)
 # ================================
+SMTP_CONFIG_PATH = BASE_DIR / "test1" / "smtp.json"
 
-# Use local Postfix as the SMTP relay
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "localhost"
-EMAIL_PORT = 25
+if SMTP_CONFIG_PATH.exists():
+    with open(SMTP_CONFIG_PATH) as f:
+        smtp_config = json.load(f)
 
-# No TLS needed — connection is local only
-EMAIL_USE_TLS = False
-EMAIL_USE_SSL = False
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+    EMAIL_HOST = smtp_config.get("EMAIL_HOST")
+    EMAIL_PORT = smtp_config.get("EMAIL_PORT", 587)
+    EMAIL_USE_TLS = smtp_config.get("EMAIL_USE_TLS", True)
+    EMAIL_USE_SSL = smtp_config.get("EMAIL_USE_SSL", False)
+    EMAIL_HOST_USER = smtp_config.get("EMAIL_HOST_USER")
+    EMAIL_HOST_PASSWORD = smtp_config.get("EMAIL_HOST_PASSWORD")
+    DEFAULT_FROM_EMAIL = smtp_config.get(
+        "DEFAULT_FROM_EMAIL",
+        EMAIL_HOST_USER
+    )
 
-# No authentication needed — Postfix is local-only
-EMAIL_HOST_USER = ""
-EMAIL_HOST_PASSWORD = ""
+else:
+    raise FileNotFoundError(f"SMTP config not found: {SMTP_CONFIG_PATH}")
 
-# Default sender for outgoing emails
-DEFAULT_FROM_EMAIL = "noreply@melanomalab.ucsf.edu"
-SERVER_EMAIL = "noreply@melanomalab.ucsf.edu"
-
-# Optional: for debugging, show detailed email errors in logs
-EMAIL_TIMEOUT = 10
