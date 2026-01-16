@@ -1,9 +1,8 @@
 {
-  "EMAIL_HOST": "smtp.ucsf.edu",
+  "EMAIL_HOST": "smtp-us.ser.proofpoint.com",
   "EMAIL_PORT": 587,
   "EMAIL_USE_TLS": true,
   "EMAIL_HOST_USER": "76371f97-82d2-4f84-bac7-b3784cd671a8",
   "EMAIL_HOST_PASSWORD": "Nysu6UYuhT0m",
   "DEFAULT_FROM_EMAIL": "melanomalab@ucsf.edu"
 }
-
