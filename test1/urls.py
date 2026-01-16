@@ -5,7 +5,6 @@ from django.contrib import admin
 from django.views.static import serve
 from django.views.generic.base import TemplateView
 from django.views.generic import RedirectView
-from core.utils import smtp_health
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -40,7 +39,6 @@ urlpatterns = [
     path('notification/', include('notification.urls')),
     path('file_manager/', include('file_manager.urls')),
     path('gpt/', include('gpt.urls')),
-    path("health/smtp/", smtp_health),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 handler404 = "core.views.error_404"
