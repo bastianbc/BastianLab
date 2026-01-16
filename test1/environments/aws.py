@@ -306,3 +306,5 @@ if SMTP_CONFIG_PATH.exists():
 else:
     raise FileNotFoundError(f"SMTP config not found: {SMTP_CONFIG_PATH}")
 
+
+
