@@ -19,8 +19,8 @@ def filter_areas(request):
     context = {
         'user': "user",
         'activation_url': "activation_url",
-        'logo_url': 'https://melanomalab.ucsf.edu/static/assets/media/logos/bastianlab.png',
-        'icon_url': 'https://melanomalab.ucsf.edu/static/media/email/icon-positive-vote-1.svg',
+        'logo_url': 'https://melanomalab.ucsf.edu/static/assets/images/bastianlablogo.png',
+        'icon_url': 'https://melanomalab.ucsf.edu/static/assets/images/icon-positive-vote-2.svg',
         'site_url': 'https://melanomalab.ucsf.edu',
         'welcome_message': 'Welcome to our platform!',
         'support_phone': '+31 6 3344 55 56',
