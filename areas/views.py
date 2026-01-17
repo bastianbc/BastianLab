@@ -10,28 +10,35 @@ from .serializers import AreasSerializer
 from areatype.models import AreaType
 from variant.models import VariantCall
 from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+
 
 @permission_required_for_async("areas.view_area")
 def filter_areas(request):
     from django.core.mail import send_mail
-    html_body = render_to_string(
-        "welcome.html",
-        {
-            "name":  "there",
-            "activation_url": "https://melanomalab.ucsf.edu/activate/token123",
-            "logo_url": "https://melanomalab.ucsf.edu/static/email/logo.png",
-            "hero_icon_url": "https://melanomalab.ucsf.edu/static/email/welcome.png",
-            "support_url": "https://melanomalab.ucsf.edu/support",
-            "year":"",
-        },
-    )
+    context = {
+        'user': "user",
+        'activation_url': "activation_url",
+        'logo_url': 'https://yourdomain.com/static/media/email/logo-1.svg',
+        'icon_url': 'https://yourdomain.com/static/media/email/icon-positive-vote-1.svg',
+        'site_url': 'https://yourdomain.com',
+        'welcome_message': 'Welcome to our platform!',
+        'support_phone': '+31 6 3344 55 56',
+        'support_email': 'support@yourdomain.com',
+        'support_url': 'https://yourdomain.com',
+    }
+
+    html_message = render_to_string('welcome.html', context)
+    plain_message = strip_tags(html_message)
+
     send_mail(
-        "SMTP Django Test",
-        html_body,
-        None,
-        ["ceylan.bagci@ucsf.edu"],
-        fail_silently=False,
+        subject='Welcome to Our Platform!',
+        message=plain_message,
+        from_email=None,
+        recipient_list=["ceylan.bagci@ucsf.edu"],
+        html_message=html_message,
     )
+
 
     areas = Area.query_by_args(request.user, **request.GET)
     serializer = AreasSerializer(areas['items'], many=True)
