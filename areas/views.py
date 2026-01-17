@@ -9,14 +9,25 @@ from core.decorators import permission_required_for_async
 from .serializers import AreasSerializer
 from areatype.models import AreaType
 from variant.models import VariantCall
+from django.template.loader import render_to_string
 
 @permission_required_for_async("areas.view_area")
 def filter_areas(request):
     from django.core.mail import send_mail
-
+    html_body = render_to_string(
+        "core/templates/welcome.html",
+        {
+            "name":  "there",
+            "activation_url": "https://melanomalab.ucsf.edu/activate/token123",
+            "logo_url": "https://melanomalab.ucsf.edu/static/email/logo.png",
+            "hero_icon_url": "https://melanomalab.ucsf.edu/static/email/welcome.png",
+            "support_url": "https://melanomalab.ucsf.edu/support",
+            "year":"",
+        },
+    )
     send_mail(
         "SMTP Django Test",
-        "This confirms Django SMTP is working.",
+        html_body,
         None,
         ["ceylan.bagci@ucsf.edu"],
         fail_silently=False,
