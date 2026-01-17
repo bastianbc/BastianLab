@@ -12,6 +12,15 @@ from variant.models import VariantCall
 
 @permission_required_for_async("areas.view_area")
 def filter_areas(request):
+    from django.core.mail import send_mail
+
+    send_mail(
+        "SMTP Django Test",
+        "This confirms Django SMTP is working.",
+        None,
+        ["ceylan.bagci@ucsf.edu"],
+        fail_silently=False,
+    )
 
     areas = Area.query_by_args(request.user, **request.GET)
     serializer = AreasSerializer(areas['items'], many=True)
