@@ -282,29 +282,29 @@ SEQUENCING_FILES_DESTINATION_DIRECTORY = SEQUENCING_FILES_SOURCE_DIRECTORY
 VARIANT_FILES_SOURCE_DIRECTORY = SEQUENCING_FILES_SOURCE_DIRECTORY
 
 
-# # ================================
-# # EMAIL CONFIGURATION (POSTFIX)
-# # ================================
-# SMTP_CONFIG_PATH = BASE_DIR / "test1" / "smtp.json"
-#
-# if SMTP_CONFIG_PATH.exists():
-#     with open(SMTP_CONFIG_PATH) as f:
-#         smtp_config = json.load(f)
-#
-#     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-#     EMAIL_HOST = smtp_config.get("EMAIL_HOST")
-#     EMAIL_PORT = smtp_config.get("EMAIL_PORT", 587)
-#     EMAIL_USE_TLS = smtp_config.get("EMAIL_USE_TLS", True)
-#     EMAIL_USE_SSL = smtp_config.get("EMAIL_USE_SSL", False)
-#     EMAIL_HOST_USER = smtp_config.get("EMAIL_HOST_USER")
-#     EMAIL_HOST_PASSWORD = smtp_config.get("EMAIL_HOST_PASSWORD")
-#     DEFAULT_FROM_EMAIL = smtp_config.get(
-#         "DEFAULT_FROM_EMAIL",
-#         EMAIL_HOST_USER
-#     )
-#
-# else:
-#     raise FileNotFoundError(f"SMTP config not found: {SMTP_CONFIG_PATH}")
+# ================================
+# EMAIL CONFIGURATION (POSTFIX)
+# ================================
+SMTP_CONFIG_PATH = BASE_DIR / "test1" / "smtp.json"
+
+if SMTP_CONFIG_PATH.exists():
+    with open(SMTP_CONFIG_PATH) as f:
+        smtp_config = json.load(f)
+
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+    EMAIL_HOST = smtp_config.get("EMAIL_HOST")
+    EMAIL_PORT = smtp_config.get("EMAIL_PORT", 587)
+    EMAIL_USE_TLS = smtp_config.get("EMAIL_USE_TLS", True)
+    EMAIL_USE_SSL = smtp_config.get("EMAIL_USE_SSL", False)
+    EMAIL_HOST_USER = smtp_config.get("EMAIL_HOST_USER")
+    EMAIL_HOST_PASSWORD = smtp_config.get("EMAIL_HOST_PASSWORD")
+    DEFAULT_FROM_EMAIL = smtp_config.get(
+        "DEFAULT_FROM_EMAIL",
+        EMAIL_HOST_USER
+    )
+
+else:
+    raise FileNotFoundError(f"SMTP config not found: {SMTP_CONFIG_PATH}")
 
 
 
