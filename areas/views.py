@@ -19,13 +19,13 @@ def filter_areas(request):
     context = {
         'user': "user",
         'activation_url': "activation_url",
-        'logo_url': 'https://yourdomain.com/static/media/email/logo-1.svg',
-        'icon_url': 'https://yourdomain.com/static/media/email/icon-positive-vote-1.svg',
-        'site_url': 'https://yourdomain.com',
+        'logo_url': 'https://melanomalab.ucsf.edu/static/assets/media/logos/bastianlab.png',
+        'icon_url': 'https://melanomalab.ucsf.edu/static/media/email/icon-positive-vote-1.svg',
+        'site_url': 'https://melanomalab.ucsf.edu',
         'welcome_message': 'Welcome to our platform!',
         'support_phone': '+31 6 3344 55 56',
-        'support_email': 'support@yourdomain.com',
-        'support_url': 'https://yourdomain.com',
+        'support_email': 'melanomalab@ucsf.edu',
+        'support_url': 'https://melanomalab.ucsf.edu',
     }
 
     html_message = render_to_string('welcome.html', context)
