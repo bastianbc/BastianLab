@@ -302,7 +302,7 @@ if SMTP_CONFIG_PATH.exists():
         "DEFAULT_FROM_EMAIL",
         EMAIL_HOST_USER
     )
-
+print(EMAIL_HOST_USER, EMAIL_HOST_PASSWORD, EMAIL_USE_TLS, EMAIL_USE_SSL, EMAIL_HOST)
 else:
     raise FileNotFoundError(f"SMTP config not found: {SMTP_CONFIG_PATH}")
 
