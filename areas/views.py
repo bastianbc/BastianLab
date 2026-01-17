@@ -15,7 +15,7 @@ from django.template.loader import render_to_string
 def filter_areas(request):
     from django.core.mail import send_mail
     html_body = render_to_string(
-        "core/templates/welcome.html",
+        "welcome.html",
         {
             "name":  "there",
             "activation_url": "https://melanomalab.ucsf.edu/activate/token123",
