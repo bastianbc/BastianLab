@@ -68,25 +68,29 @@ def log_in(request):
 
             username = request.POST.get("username")
             password = request.POST.get("password")
-            next = request.GET.get("next")
+            next_url = request.GET.get("next")
 
+            # ✅ Step 1: Find user first
+            user_obj = User.objects.filter(username=username).first()
+
+            if user_obj and not user_obj.is_active:
+                messages.error(
+                    request,
+                    "Your account is not activated yet. Please check your email for the activation link."
+                )
+                return redirect("/auth/login")
+
+            # ✅ Step 2: Authenticate only if active
             user = authenticate(username=username, password=password)
 
             if user:
-                if not user.is_active:
-                    messages.error(
-                        request,
-                        "Your account is not activated yet. Please check your email for the activation link."
-                    )
-                    return redirect("/auth/login")
-
                 login(request, user)
-                return redirect(next or settings.LOGIN_REDIRECT_URL)
+                return redirect(next_url or settings.LOGIN_REDIRECT_URL)
 
             else:
                 messages.error(request, "Invalid username or password.")
 
-        except Exception as e:
+        except Exception:
             logger.exception("Login error")
             messages.error(request, "Unexpected error occurred.")
 
