@@ -17,10 +17,13 @@ class User(User):
     def query_by_args(self, **kwargs):
         try:
             ORDER_COLUMN_CHOICES = {
-                '0': 'username',
-                '1': 'first_name',
-                '2': 'last_name',
-                '4': 'last_login',
+                "0": "id",
+                "1": "username",
+                "2": "email",
+                "3": "first_name",
+                "4": "last_name",
+                "5": "groups__name",
+                "6": "last_login",
             }
             draw = int(kwargs.get('draw', None)[0])
             length = int(kwargs.get('length', None)[0])

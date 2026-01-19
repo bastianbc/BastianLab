@@ -1,0 +1,41 @@
+{% extends "basic_email_template.html" %}
+
+{% block title %}
+<tr>
+<td align="center">
+    <h2>New User Registration</h2>
+</td>
+</tr>
+{% endblock title %}
+
+{% block content %}
+<tr>
+<td align="center" style="font-size:14px;">
+    <p>A new user has registered:</p>
+
+    <p>
+        <strong>Email:</strong> {{ new_user.email }}<br>
+        <strong>Username:</strong> {{ new_user.username }}
+    </p>
+
+    <p>Please complete the account setup.</p>
+</td>
+</tr>
+{% endblock content %}
+
+{% block cta %}
+<tr>
+<td align="center" style="padding-bottom:30px;">
+    <a href="{{ admin_edit_url }}"
+       style="background-color:#198754;
+              color:#ffffff;
+              text-decoration:none;
+              padding:12px 28px;
+              border-radius:6px;
+              font-size:14px;
+              display:inline-block;">
+        Review User Account
+    </a>
+</td>
+</tr>
+{% endblock cta %}

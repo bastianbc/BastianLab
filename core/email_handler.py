@@ -3,6 +3,9 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 import logging
+from django.contrib.auth import get_user_model
+
+UserModel = get_user_model()
 
 logger = logging.getLogger(__name__)
 
@@ -74,3 +77,12 @@ def send_email(
             raise
 
         return False
+
+
+
+def get_superuser_emails():
+    return list(
+        UserModel.objects
+        .filter(is_superuser=True, is_active=True)
+        .values_list("email", flat=True)
+    )

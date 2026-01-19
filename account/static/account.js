@@ -13,11 +13,12 @@ var KTDatatablesServerSide = function () {
             // searchDelay: 500,
             processing: true,
             serverSide: true,
-            order: [[1, 'desc']],
+            order: [[0, 'desc']],
             stateSave: false,
             destroy: true,
             ajax: '/account/filter_accounts',
             columns: [
+                { data: 'id' },
                 { data: 'username' },
                 { data: 'email' },
                 { data: 'first_name' },
@@ -34,24 +35,13 @@ var KTDatatablesServerSide = function () {
                 { data: null }
             ],
             columnDefs: [
-                // {
-                //     targets: 0,
-                //     orderable: false,
-                //     render: function (data) {
-                //         return `
-                //             <div class="form-check form-check-sm form-check-custom form-check-solid">
-                //                 <input class="form-check-input" type="checkbox" value="${data}" />
-                //             </div>`;
-                //     }
-                // },
-                // {
-                //     targets: 4,
-                //     render: function (data, type, row) {
-                //         return `<img src="${hostUrl}media/svg/card-logos/${row.CreditCardType}.svg" class="w-35px me-3" alt="${row.CreditCardType}">` + data;
-                //     }
-                // },
                 {
-                    targets: 6,
+                    targets: 0,              // hide ID column
+                    visible: false,
+                    searchable: false
+                },
+                {
+                    targets: 7,
                     data: null,
                     orderable: false,
                     className: 'text-end',

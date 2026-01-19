@@ -12,7 +12,7 @@ from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.urls import reverse
-from core.email_handler import send_email
+from core.email_handler import send_email, get_superuser_emails
 import logging
 
 logger = logging.getLogger(__name__)
@@ -42,7 +42,26 @@ def signup(request):
                     "activation_url": activation_url,
                 },
             )
+            # --------------------
+            # Admin notification
+            # --------------------
+            admin_emails = get_superuser_emails()
 
+            if admin_emails:
+                admin_edit_url = request.build_absolute_uri(
+                    reverse("edit-account", kwargs={"pk": user.pk})
+                )
+
+                send_email(
+                    subject="New User Registered - Action Required",
+                    template_name="new_user_registered.html",
+                    recipients=admin_emails,
+                    context={
+                        "new_user": user,
+                        "admin_edit_url": admin_edit_url,
+                    },
+                    fail_silently=True,  # don't block signup if admin email fails
+                )
             messages.success(
                 request,
                 "Account created successfully. Please check your email to activate your account."

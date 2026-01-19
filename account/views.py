@@ -55,13 +55,13 @@ def filter_accounts(request):
     from .serializers import AccountSerializer
     from django.http import JsonResponse
 
-    patients = User().query_by_args(**request.GET)
-    serializer = AccountSerializer(patients['items'], many=True)
+    accounts = User().query_by_args(**request.GET)
+    serializer = AccountSerializer(accounts['items'], many=True)
     result = dict()
     result['data'] = serializer.data
-    result['draw'] = patients['draw']
-    result['recordsTotal'] = patients['total']
-    result['recordsFiltered'] = patients['count']
+    result['draw'] = accounts['draw']
+    result['recordsTotal'] = accounts['total']
+    result['recordsFiltered'] = accounts['count']
 
     return JsonResponse(result)
 
