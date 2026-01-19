@@ -61,7 +61,6 @@ def signup(request):
 
 
 
-
 def log_in(request):
     if request.method == "POST":
         try:
@@ -69,30 +68,33 @@ def log_in(request):
 
             username = request.POST.get("username")
             password = request.POST.get("password")
-            next = request.GET.get('next')
+            next = request.GET.get("next")
+
             user = authenticate(username=username, password=password)
 
             if user:
+                if not user.is_active:
+                    messages.error(
+                        request,
+                        "Your account is not activated yet. Please check your email for the activation link."
+                    )
+                    return redirect("/auth/login")
+
                 login(request, user)
-                if next:
-                    return redirect(next)
-                else:
-                    return redirect(settings.LOGIN_REDIRECT_URL)
+                return redirect(next or settings.LOGIN_REDIRECT_URL)
+
             else:
-                user = User.objects.filter(username=username,last_login__isnull=True)
-                if user.exists():
-                    request.session["username"] = username
-                    return redirect("/auth/set_password")
-                else:
-                    messages.error(request, "Invalid username or password!")
-                messages.error(request, "Authentication Error!")
+                messages.error(request, "Invalid username or password.")
+
         except Exception as e:
-            messages.error(request, "Unexpected Error!")
-            print(e)
+            logger.exception("Login error")
+            messages.error(request, "Unexpected error occurred.")
+
     else:
         form = LoginForm()
 
     return render(request, "sign-in.html", locals())
+
 
 def log_out(request):
     logout(request)
