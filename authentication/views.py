@@ -14,6 +14,8 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 from core.email_handler import send_email, get_superuser_emails
 import logging
+from django.contrib.sites.shortcuts import get_current_site
+
 
 logger = logging.getLogger(__name__)
 
@@ -156,46 +158,33 @@ def set_password(request):
     return render(request,"new-password.html",locals())
 
 
+
 def forgot_password(request):
+    message = None
+
     if request.method == "POST":
-        form = PasswordResetRequestForm(request.POST)
+        email = request.POST.get("email", "").strip()
+        user = User.objects.filter(email=email).first()
 
-        if form.is_valid():
-            email = form.cleaned_data["email"]
+        if user:
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token = default_token_generator.make_token(user)
+            domain = get_current_site(request).domain
 
-            # 🔐 Do NOT leak whether user exists
-            user = User.objects.filter(email=email, is_active=True).first()
+            reset_link = f"https://{domain}/reset-password/{uid}/{token}/"
 
-            if user:
-                token = default_token_generator.make_token(user)
-                uid = urlsafe_base64_encode(force_bytes(user.pk))
-
-                reset_url = request.build_absolute_uri(
-                    reverse("reset-password", kwargs={"uidb64": uid, "token": token})
-                )
-
-                # ✅ Send branded reset email
-                send_email(
-                    subject="Reset Your Password - Bastian Lab",
-                    template_name="password_reset.html",
-                    recipients=[user.email],
-                    context={
-                        "user": user.email,
-                        "reset_url": reset_url,
-                    },
-                )
-
-            # Always show success message (even if user doesn't exist)
-            messages.success(
-                request,
-                "If an account exists with this email, a password reset link has been sent."
+            send_mail(
+                subject="Password Reset Request",
+                message=f"Click the link below to reset your password:\n\n{reset_link}",
+                from_email="no-reply@yourdomain.com",
+                recipient_list=[email],
+                fail_silently=True,
             )
-            return redirect("/auth/login")
 
-    else:
-        form = PasswordResetRequestForm()
+        # Always return same message for security
+        message = "If this email exists in our system, you will receive a password reset link shortly."
 
-    return render(request, "forgot-password.html", {"form": form})
+    return render(request, "forgot_password.html", {"message": message})
 
 
 def reset_password(request, uidb64, token):

@@ -102,3 +102,5 @@ class SetNewPasswordForm(forms.Form):
         if password1 and password2 and password1 != password2:
             raise forms.ValidationError("The two password fields didn't match.")
         return password2
+
+
