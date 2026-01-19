@@ -1,147 +1,54 @@
-{% load extra %}
-<!DOCTYPE html>
-<html lang="en">
-<head><base href="../../../"/>
-    <title>The Bastian Lab studies tumors that arise from melanocytes, the melanin-producing cells of the skin and other organs.</title>
-    <meta charset="utf-8" />
-    <meta name="description" content="The Bastian Lab studies tumors that arise from melanocytes, the melanin-producing cells of the skin and other organs." />
-    <meta name="keywords" content="metronic, bootstrap, bootstrap 5, Django" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+{% extends "auth/master_auth.html" %}
+{% block title %}Sign Up | Bastian Lab{% endblock %}
 
-    <link rel="shortcut icon" href="/static/assets/media/logos/bastianlab.png" />
+{% block content %}
 
-    <!-- Fonts -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700" />
+<form class="form w-100"
+      method="post"
+      action="/auth/signup/"
+      novalidate>
 
-    <!-- Global Styles -->
-    <link href="/static/assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
-    <link href="/static/assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
-    <link href="/static/assets/plugins/custom/passwordeye/password-eye.css" rel="stylesheet" type="text/css" />
-</head>
+    {% csrf_token %}
 
-<body id="kt_body" class="app-blank bgi-size-cover bgi-position-center bgi-no-repeat">
-
-<script>
-    var defaultThemeMode = "light";
-    var themeMode;
-    if (document.documentElement) {
-        if (document.documentElement.hasAttribute("data-theme-mode")) {
-            themeMode = document.documentElement.getAttribute("data-theme-mode");
-        } else {
-            if (localStorage.getItem("data-theme") !== null) {
-                themeMode = localStorage.getItem("data-theme");
-            } else {
-                themeMode = defaultThemeMode;
-            }
-        }
-        if (themeMode === "system") {
-            themeMode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-        }
-        document.documentElement.setAttribute("data-theme", themeMode);
-    }
-</script>
-
-<div class="d-flex flex-column flex-root">
-
-    <!-- Background -->
-    <style>
-        body {
-            background-image: url('/static/assets/images/backgroundimage.jpg');
-        }
-        [data-theme="dark"] body {
-            background-image: url('/static/assets/images/backgroundimage.jpg');
-        }
-    </style>
-
-    <!-- Authentication - Sign-up -->
-    <div class="d-flex flex-column flex-column-fluid flex-lg-row">
-
-        <!-- Aside -->
-        <div class="d-flex flex-center w-lg-50 pt-15 pt-lg-0 px-10">
-            <div class="d-flex flex-center flex-lg-start flex-column">
-                <a href="#" class="mb-7">
-                    <img alt="Logo" src="/static/assets/images/bastianlablogo.png" style="height:128px !important"/>
-                </a>
-                <h2 class="text-white fw-normal m-0">Welcome to the Bastian Lab</h2>
-            </div>
+    <div class="text-center mb-11">
+        <h1 class="text-dark fw-bolder mb-3">Sign Up</h1>
+        <div class="text-gray-500 fw-semibold fs-6">
+            Create your account to access the platform
         </div>
+    </div>
 
-        <!-- Body -->
-        <div class="d-flex flex-center w-lg-50 p-10">
-            <div class="card rounded-3 w-md-550px">
-                <div class="card-body p-10 p-lg-20">
+    <div class="fv-row mb-8">
+        <label class="form-label fw-semibold text-dark">Email</label>
+        {{ form.email }}
+    </div>
 
-                    <!-- Form -->
-                    <form class="form w-100"
-                          method="post"
-                          action="/auth/signup/"
-                          novalidate>
-
-                        {% csrf_token %}
-
-                        <!-- Heading -->
-                        <div class="text-center mb-11">
-                            <h1 class="text-dark fw-bolder mb-3">Sign Up</h1>
-                            <div class="text-gray-500 fw-semibold fs-6">
-                                Create your account to access the platform
-                            </div>
-                        </div>
-
-                       <!-- Email -->
-                        <div class="fv-row mb-8">
-                            <label class="form-label fw-semibold text-dark">Email</label>
-                            {{ form.email }}
-                        </div>
-
-                        <!-- Password -->
-                        <div class="fv-row mb-8">
-                            <label class="form-label fw-semibold text-dark">Password</label>
-                            <div class="password-input-container">
-                                {{ form.password }}
-                                <div class="toggle-password">
-                                    <i class="bi bi-eye d-none"></i>
-                                </div>
-                            </div>
-                        </div>
-
-
-                        <!-- Messages -->
-                        <div class="fv-row mb-3 text-center">
-                            {% for message in messages %}
-                                <span class="text-danger">{{ message }}</span>
-                            {% endfor %}
-                        </div>
-
-                        <!-- Submit -->
-                        <div class="d-grid mb-10">
-                            <button type="submit" class="btn btn-primary">
-                                <span class="indicator-label">Create Account</span>
-                                <span class="indicator-progress">
-                                    Please wait...
-                                    <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
-                                </span>
-                            </button>
-                        </div>
-
-                        <!-- Sign In Link -->
-                        <div class="text-gray-500 text-center fw-semibold fs-6">
-                            Already have an account?
-                            <a href="/auth/login" class="link-primary">Sign In</a>
-                        </div>
-
-                    </form>
-                    <!-- End Form -->
-
-                </div>
+    <div class="fv-row mb-8">
+        <label class="form-label fw-semibold text-dark">Password</label>
+        <div class="password-input-container">
+            {{ form.password }}
+            <div class="toggle-password">
+                <i class="bi bi-eye d-none"></i>
             </div>
         </div>
     </div>
-</div>
 
-<!-- JS -->
-<script src="/static/assets/plugins/global/plugins.bundle.js"></script>
-<script src="/static/assets/js/scripts.bundle.js"></script>
-<script src="/static/assets/plugins/custom/passwordeye/password-eye.js"></script>
+    <div class="fv-row mb-3 text-center">
+        {% for message in messages %}
+            <span class="text-danger">{{ message }}</span>
+        {% endfor %}
+    </div>
 
-</body>
-</html>
+    <div class="d-grid mb-10">
+        <button type="submit" class="btn btn-primary">
+            Create Account
+        </button>
+    </div>
+
+    <div class="text-gray-500 text-center fw-semibold fs-6">
+        Already have an account?
+        <a href="/auth/login" class="link-primary">Sign In</a>
+    </div>
+
+</form>
+
+{% endblock %}
