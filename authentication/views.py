@@ -157,46 +157,45 @@ def set_password(request):
 
 
 def forgot_password(request):
-    """Handle password reset request"""
     if request.method == "POST":
         form = PasswordResetRequestForm(request.POST)
+
         if form.is_valid():
-            email = form.cleaned_data['email']
-            user = User.objects.get(email=email)
+            email = form.cleaned_data["email"]
 
-            # Generate token
-            token = default_token_generator.make_token(user)
-            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            # 🔐 Do NOT leak whether user exists
+            user = User.objects.filter(email=email, is_active=True).first()
 
-            # Build reset URL
-            reset_url = request.build_absolute_uri(
-                reverse('reset-password', kwargs={'uidb64': uid, 'token': token})
-            )
+            if user:
+                token = default_token_generator.make_token(user)
+                uid = urlsafe_base64_encode(force_bytes(user.pk))
 
-            # Send email
-            subject = 'Password Reset Request - Bastian Lab'
-            message = render_to_string('password_reset_email.html', {
-                'user': user,
-                'reset_url': reset_url,
-            })
-
-            try:
-                send_mail(
-                    subject,
-                    message,
-                    settings.DEFAULT_FROM_EMAIL,
-                    [email],
-                    fail_silently=False,
+                reset_url = request.build_absolute_uri(
+                    reverse("reset-password", kwargs={"uidb64": uid, "token": token})
                 )
-                messages.success(request, "Password reset link has been sent to your email address.")
-                return redirect("/auth/login")
-            except Exception as e:
-                logger.error(f"Failed to send password reset email: {e}")
-                messages.error(request, "Failed to send email. Please try again later.")
+
+                # ✅ Send branded reset email
+                send_email(
+                    subject="Reset Your Password - Bastian Lab",
+                    template_name="password_reset.html",
+                    recipients=[user.email],
+                    context={
+                        "user": user.email,
+                        "reset_url": reset_url,
+                    },
+                )
+
+            # Always show success message (even if user doesn't exist)
+            messages.success(
+                request,
+                "If an account exists with this email, a password reset link has been sent."
+            )
+            return redirect("/auth/login")
+
     else:
         form = PasswordResetRequestForm()
 
-    return render(request, "forgot-password.html", locals())
+    return render(request, "forgot-password.html", {"form": form})
 
 
 def reset_password(request, uidb64, token):
