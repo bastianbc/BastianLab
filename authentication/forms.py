@@ -2,6 +2,45 @@ from django import forms
 from core.forms import BaseForm
 from account.models import User
 from django.contrib.auth.forms import PasswordResetForm as DjangoPasswordResetForm
+from django.contrib.auth.password_validation import validate_password
+
+
+from django import forms
+from account.models import User
+
+class SignUpForm(BaseForm):
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            "class": "form-control bg-transparent",
+            "placeholder": "Password"
+        })
+    )
+
+    class Meta:
+        model = User
+        fields = ("email",)
+
+    def clean_password(self):
+        password = self.cleaned_data.get("password")
+
+        # 🔐 Run Django's built-in validators
+        validate_password(password)
+
+        return password
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.username = self.cleaned_data["email"]
+        user.set_password(self.cleaned_data["password"])
+        user.is_active = False
+
+        if commit:
+            user.save()
+
+        return user
+
+
+
 
 class LoginForm(BaseForm):
     class Meta:

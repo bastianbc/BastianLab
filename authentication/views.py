@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required,permission_required
 from account.models import User
 from django.contrib.auth.forms import SetPasswordForm,PasswordChangeForm
-from .forms import LoginForm, PasswordResetRequestForm, SetNewPasswordForm
+from .forms import LoginForm, PasswordResetRequestForm, SetNewPasswordForm, SignUpForm
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
@@ -15,6 +15,54 @@ from django.urls import reverse
 import logging
 
 logger = logging.getLogger(__name__)
+
+
+def signup(request):
+    if request.method == "POST":
+        form = SignUpForm(request.POST)
+
+        if form.is_valid():
+            user = form.save()
+
+            token = default_token_generator.make_token(user)
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+            activation_url = request.build_absolute_uri(
+                reverse("activate-account", kwargs={"uidb64": uid, "token": token})
+            )
+
+            message = render_to_string("activation.html", {
+                "user": user,
+                "activation_url": activation_url,
+            })
+
+            send_mail(
+                "Activate Your Account - Bastian Lab",
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                [user.email],
+                fail_silently=False,
+            )
+
+            messages.success(
+                request,
+                "Account created successfully. Please check your email to activate your account."
+            )
+            return redirect("/auth/login")
+
+        else:
+            # ✅ Push form errors into messages
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, error)
+
+    else:
+        form = SignUpForm()
+
+    return render(request, "sign-up.html", {"form": form})
+
+
+
 
 def log_in(request):
     if request.method == "POST":
@@ -152,3 +200,20 @@ def reset_password(request, uidb64, token):
     else:
         messages.error(request, "The password reset link is invalid or has expired.")
         return render(request, "reset-password.html", {'validlink': False})
+
+
+def activate_account(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user and default_token_generator.check_token(user, token):
+        user.is_active = True
+        user.save()
+        messages.success(request, "Your account has been activated successfully. You can now log in.")
+        return redirect("/auth/login")
+    else:
+        messages.error(request, "Activation link is invalid or has expired.")
+        return redirect("/auth/login")

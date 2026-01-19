@@ -23,6 +23,7 @@ def new_account(request):
         form = CreateAccountForm()
     return render(request,"account.html",locals())
 
+
 @permission_required("account.change_user",raise_exception=True)
 def edit_account(request,id):
     instance = User.objects.get(id=id)
