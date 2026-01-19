@@ -5,6 +5,7 @@ from .models import *
 from .serializers import *
 from django.http import JsonResponse
 
+@permission_required_for_async("gene.view_gene")
 def genes(request):
     return render(request,"genes.html",locals())
 
