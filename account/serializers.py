@@ -6,7 +6,7 @@ class AccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ("id","username","first_name","last_name","group","last_login",)
+        fields = ("id","username","email","first_name","last_name","group","last_login",)
 
     def get_group(self,obj):
         if obj.groups.first():

@@ -19,6 +19,7 @@ var KTDatatablesServerSide = function () {
             ajax: '/account/filter_accounts',
             columns: [
                 { data: 'username' },
+                { data: 'email' },
                 { data: 'first_name' },
                 { data: 'last_name' },
                 { data: 'group' },
@@ -50,7 +51,7 @@ var KTDatatablesServerSide = function () {
                 //     }
                 // },
                 {
-                    targets: 5,
+                    targets: 6,
                     data: null,
                     orderable: false,
                     className: 'text-end',
