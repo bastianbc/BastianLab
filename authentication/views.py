@@ -208,10 +208,10 @@ def reset_password(request, uidb64, token):
         else:
             form = SetNewPasswordForm()
 
-        return render(request, "reset-password.html", {'form': form, 'validlink': True})
+        return render(request, "change-password.html", {'form': form, 'validlink': True})
     else:
         messages.error(request, "The password reset link is invalid or has expired.")
-        return render(request, "reset-password.html", {'validlink': False})
+        return render(request, "change-password.html", {'validlink': False})
 
 
 def activate_account(request, uidb64, token):
