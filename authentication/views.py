@@ -170,7 +170,7 @@ def forgot_password(request):
         if user:
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             token = default_token_generator.make_token(user)
-            activation_url = f"https://{request.get_host()}/auth/reset-password/{uid}/{token}/"
+            activation_url = f"https://{request.get_host()}/auth/reset_password/{uid}/{token}/"
 
             send_email(
                 subject="Reset Your Password - Bastian Lab",
