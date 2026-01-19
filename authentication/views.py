@@ -35,7 +35,7 @@ def signup(request):
             # ✅ Send activation email using centralized service
             send_email(
                 subject="Activate Your Account - Bastian Lab",
-                template_name="emails/account_activation.html",
+                template_name="activation.html",
                 recipients=[user.email],
                 context={
                     "user": user.email,
