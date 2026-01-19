@@ -46,7 +46,7 @@ def signup(request):
             # Admin notification
             # --------------------
             admin_emails = get_superuser_emails()
-
+            print("admin_emails", admin_emails)
             if admin_emails:
                 admin_edit_url = request.build_absolute_uri(
                     reverse("edit-account", kwargs={"id": user.id})
