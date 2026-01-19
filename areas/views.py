@@ -15,31 +15,6 @@ from django.utils.html import strip_tags
 
 @permission_required_for_async("areas.view_area")
 def filter_areas(request):
-    # from django.core.mail import send_mail
-    # context = {
-    #     'user': "user",
-    #     'activation_url': "activation_url",
-    #     'logo_url': 'https://melanomalab.ucsf.edu/static/assets/images/bastianlablogo.png',
-    #     'icon_url': 'https://melanomalab.ucsf.edu/static/assets/images/icon-positive-vote-2.svg',
-    #     'site_url': 'https://melanomalab.ucsf.edu',
-    #     'welcome_message': 'Welcome to our platform!',
-    #     'support_phone': '+31 6 3344 55 56',
-    #     'support_email': 'melanomalab@ucsf.edu',
-    #     'support_url': 'https://melanomalab.ucsf.edu',
-    # }
-    #
-    # html_message = render_to_string('welcome.html', context)
-    # plain_message = strip_tags(html_message)
-    #
-    # send_mail(
-    #     subject='Welcome to Our Platform!',
-    #     message=plain_message,
-    #     from_email=None,
-    #     recipient_list=["ceylan.bagci@ucsf.edu"],
-    #     html_message=html_message,
-    # )
-    #
-
     areas = Area.query_by_args(request.user, **request.GET)
     serializer = AreasSerializer(areas['items'], many=True)
     result = dict()

@@ -43,72 +43,72 @@ def custom_update(model, pk, parameters):
     return obj
 
 
-# # -------------------------------------------------------------------
-# # Email Service
-# # -------------------------------------------------------------------
-#
-# class MailService:
-#     """
-#     Central email service abstraction.
-#     """
-#
-#     @staticmethod
-#     def send(
-#         *,
-#         subject: str,
-#         body: str,
-#         to: list[str],
-#         html: str | None = None,
-#         cc: list[str] | None = None,
-#         bcc: list[str] | None = None,
-#     ) -> None:
-#         msg = EmailMessage(
-#             subject=subject,
-#             body=html or body,
-#             from_email=settings.DEFAULT_FROM_EMAIL,
-#             to=to,
-#             cc=cc or [],
-#             bcc=bcc or [],
-#         )
-#
-#         if html:
-#             msg.content_subtype = "html"
-#
-#         msg.send(fail_silently=False)
-#
-#
-# # -------------------------------------------------------------------
-# # SMTP Health Check
-# # -------------------------------------------------------------------
-#
-# def smtp_health(request):
-#     """
-#     Lightweight SMTP connectivity health check.
-#     """
-#
-#     try:
-#         conn = get_connection()
-#         conn.open()
-#         conn.close()
-#         MailService.send(
-#             subject="Pipeline Completed",
-#             body="Variant ingestion completed successfully.",
-#             to=["ceylan.bagci@ucsf.edu"],
-#         )
-#         return JsonResponse(
-#             {
-#                 "smtp": "ok",
-#                 "backend": settings.EMAIL_BACKEND,
-#                 "host": settings.EMAIL_HOST,
-#                 "port": settings.EMAIL_PORT,
-#             }
-#         )
-#
-#     except Exception as e:
-#         return JsonResponse(
-#             {
-#                 "smtp": "error",
-#                 "detail": str(e),
-#             },
-#             status=500,
-#         )
+# -------------------------------------------------------------------
+# Email Service
+# -------------------------------------------------------------------
+
+class MailService:
+    """
+    Central email service abstraction.
+    """
+
+    @staticmethod
+    def send(
+        *,
+        subject: str,
+        body: str,
+        to: list[str],
+        html: str | None = None,
+        cc: list[str] | None = None,
+        bcc: list[str] | None = None,
+    ) -> None:
+        msg = EmailMessage(
+            subject=subject,
+            body=html or body,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=to,
+            cc=cc or [],
+            bcc=bcc or [],
+        )
+
+        if html:
+            msg.content_subtype = "html"
+
+        msg.send(fail_silently=False)
+
+
+# -------------------------------------------------------------------
+# SMTP Health Check
+# -------------------------------------------------------------------
+
+def smtp_health(request):
+    """
+    Lightweight SMTP connectivity health check.
+    """
+
+    try:
+        conn = get_connection()
+        conn.open()
+        conn.close()
+        MailService.send(
+            subject="Pipeline Completed",
+            body="Variant ingestion completed successfully.",
+            to=["ceylan.bagci@ucsf.edu"],
+        )
+        return JsonResponse(
+            {
+                "smtp": "ok",
+                "backend": settings.EMAIL_BACKEND,
+                "host": settings.EMAIL_HOST,
+                "port": settings.EMAIL_PORT,
+            }
+        )
+
+    except Exception as e:
+        return JsonResponse(
+            {
+                "smtp": "error",
+                "detail": str(e),
+            },
+            status=500,
+        )

@@ -12,6 +12,7 @@ from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.urls import reverse
+from core.email_handler import send_email
 import logging
 
 logger = logging.getLogger(__name__)
@@ -31,17 +32,15 @@ def signup(request):
                 reverse("activate-account", kwargs={"uidb64": uid, "token": token})
             )
 
-            message = render_to_string("activation.html", {
-                "user": user,
-                "activation_url": activation_url,
-            })
-
-            send_mail(
-                "Activate Your Account - Bastian Lab",
-                message,
-                settings.DEFAULT_FROM_EMAIL,
-                [user.email],
-                fail_silently=False,
+            # ✅ Send activation email using centralized service
+            send_email(
+                subject="Activate Your Account - Bastian Lab",
+                template_name="emails/account_activation.html",
+                recipients=[user.email],
+                context={
+                    "user": user.email,
+                    "activation_url": activation_url,
+                },
             )
 
             messages.success(
@@ -51,7 +50,6 @@ def signup(request):
             return redirect("/auth/login")
 
         else:
-            # ✅ Push form errors into messages
             for field, errors in form.errors.items():
                 for error in errors:
                     messages.error(request, error)

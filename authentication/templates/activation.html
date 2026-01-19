@@ -1,42 +1,25 @@
-<!DOCTYPE html>
-<html>
-<body style="margin:0; padding:0; background-color:#D5D9E2; font-family:Arial, Helvetica, sans-serif;">
+{% extends "basic_email_template.html" %}
 
-<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#D5D9E2; padding:40px 0;">
-<tr>
-<td align="center">
-
-<!-- Container -->
-<table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:20px; padding:40px;">
-
-<!-- Logo -->
-<tr>
-<td align="center" style="padding-bottom:20px;">
-    <img src="https://your-domain.com/static/assets/images/bastianlablogo.png"
-         height="48"
-         alt="Bastian Lab">
-</td>
-</tr>
-
-<!-- Greeting -->
+{% block title %}
 <tr>
 <td align="center" style="padding-bottom:20px;">
     <h2 style="margin:0; font-size:22px; color:#181C32;">
-        Hi {{ user.username }}, welcome to Bastian Lab
+        Hi {{ user }}, activate your account
     </h2>
 </td>
 </tr>
+{% endblock title %}
 
-<!-- Message -->
+{% block content %}
 <tr>
 <td align="center" style="padding-bottom:25px; color:#7E8299; font-size:14px;">
-    <p style="margin:4px 0;">Your account has been created successfully.</p>
-    <p style="margin:4px 0;">Please activate your account to complete registration.</p>
-    <p style="margin:4px 0;">Click the button below to get started.</p>
+    <p>Your account has been created successfully.</p>
+    <p>Please activate your account to continue.</p>
 </td>
 </tr>
+{% endblock content %}
 
-<!-- Button -->
+{% block cta %}
 <tr>
 <td align="center" style="padding-bottom:30px;">
     <a href="{{ activation_url }}"
@@ -51,37 +34,4 @@
     </a>
 </td>
 </tr>
-
-<!-- Divider -->
-<tr>
-<td style="border-top:1px solid #eeeeee; padding:20px 0;"></td>
-</tr>
-
-<!-- Security Note -->
-<tr>
-<td align="center" style="color:#5E6278; font-size:13px;">
-    <p style="margin:4px 0;">
-        If you did not create this account, you can safely ignore this email.
-    </p>
-    <p style="margin:4px 0;">
-        This activation link will expire for security reasons.
-    </p>
-</td>
-</tr>
-
-<!-- Footer -->
-<tr>
-<td align="center" style="padding-top:30px; font-size:12px; color:#A1A5B7;">
-    <p style="margin:4px 0;">© {{ now|date:"Y" }} Bastian Lab</p>
-</td>
-</tr>
-
-</table>
-<!-- End Container -->
-
-</td>
-</tr>
-</table>
-
-</body>
-</html>
+{% endblock cta %}
