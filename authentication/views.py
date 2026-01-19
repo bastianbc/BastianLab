@@ -49,7 +49,7 @@ def signup(request):
 
             if admin_emails:
                 admin_edit_url = request.build_absolute_uri(
-                    reverse("edit-account", kwargs={"pk": user.pk})
+                    reverse("edit-account", kwargs={"id": user.id})
                 )
 
                 send_email(
@@ -60,7 +60,7 @@ def signup(request):
                         "new_user": user,
                         "admin_edit_url": admin_edit_url,
                     },
-                    fail_silently=True,  # don't block signup if admin email fails
+                    fail_silently=True,
                 )
             messages.success(
                 request,
