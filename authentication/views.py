@@ -159,6 +159,7 @@ def set_password(request):
 
 
 
+
 def forgot_password(request):
     message = None
 
@@ -169,16 +170,16 @@ def forgot_password(request):
         if user:
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             token = default_token_generator.make_token(user)
-            domain = get_current_site(request).domain
+            activation_url = f"https://{request.get_host()}/reset-password/{uid}/{token}/"
 
-            reset_link = f"https://{domain}/reset-password/{uid}/{token}/"
-
-            send_mail(
-                subject="Password Reset Request",
-                message=f"Click the link below to reset your password:\n\n{reset_link}",
-                from_email="no-reply@yourdomain.com",
-                recipient_list=[email],
-                fail_silently=True,
+            send_email(
+                subject="Reset Your Password - Bastian Lab",
+                template_name="password_reset.html",
+                recipients=[user.email],
+                context={
+                    "user": user.email,
+                    "reset_url": activation_url,
+                },
             )
 
         # Always return same message for security
