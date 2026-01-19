@@ -196,22 +196,39 @@ def reset_password(request, uidb64, token):
     except (TypeError, ValueError, OverflowError, User.DoesNotExist):
         user = None
 
+    context = {
+        "uidb64": uidb64,
+        "token": token,
+    }
+
     if user is not None and default_token_generator.check_token(user, token):
         if request.method == "POST":
             form = SetNewPasswordForm(request.POST)
             if form.is_valid():
-                new_password = form.cleaned_data['new_password2']
+                new_password = form.cleaned_data["new_password2"]
                 user.set_password(new_password)
                 user.save()
-                messages.success(request, "Your password has been reset successfully. You can now log in with your new password.")
+                messages.success(
+                    request,
+                    "Your password has been reset successfully. You can now log in with your new password."
+                )
                 return redirect("/auth/login")
         else:
             form = SetNewPasswordForm()
 
-        return render(request, "reset_password.html", {'form': form, 'validlink': True})
+        context.update({
+            "form": form,
+            "validlink": True,
+        })
+        return render(request, "reset_password.html", context)
+
     else:
         messages.error(request, "The password reset link is invalid or has expired.")
-        return render(request, "reset_password.html", {'validlink': False})
+        context.update({
+            "validlink": False,
+        })
+        return render(request, "reset_password.html", context)
+
 
 
 def activate_account(request, uidb64, token):
